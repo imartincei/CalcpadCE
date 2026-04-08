@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Installer output
 Calcpad.Wpf/Installer/Output/
+
+# Personal notes (not for upstream)
+TODO-*.md
