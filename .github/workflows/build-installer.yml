@@ -36,14 +36,14 @@ jobs:
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             VERSION="${GITHUB_REF#refs/tags/v}"
             INSTALLER_NAME="CalcpadCE-setup-${VERSION}"
-            PORTABLE_NAME="CalcpadCE-portable-${VERSION}"
+            PORTABLE_NAME="CalcpadCE-portable-en-${VERSION}"
             DEB_NAME="Calcpad.${VERSION}"
             RPM_NAME="CalcpadCE.${VERSION}"
             TARBALL_NAME="CalcpadCE-${VERSION}"
           else
             VERSION="${BASE_VERSION}-${SHORT_SHA}"
             INSTALLER_NAME="CalcpadCE-setup-${VERSION}"
-            PORTABLE_NAME="CalcpadCE-portable-${VERSION}"
+            PORTABLE_NAME="CalcpadCE-portable-en-${VERSION}"
             DEB_NAME="Calcpad.${VERSION}"
             RPM_NAME="CalcpadCE.${VERSION}"
             TARBALL_NAME="CalcpadCE-${VERSION}"
@@ -99,26 +99,22 @@ jobs:
           name: ${{ needs.determine-version.outputs.installer_name }}
           path: Calcpad.Wpf/Installer/Output/${{ needs.determine-version.outputs.installer_name }}.exe
 
-      - name: Publish portable single-file
+      - name: Publish portable (self-contained)
         run: >
           dotnet publish Calcpad.Wpf/Calcpad.wpf.csproj
-          -c Release -r win-x64 --self-contained false
-          -p:PublishSingleFile=true
-          -p:EnableCompressionInSingleFile=true
-          -p:IncludeNativeLibrariesForSelfExtract=true
-          -p:IncludeAllContentForSelfExtract=true
+          -c Release -r win-x64 --self-contained true
           -p:Version=${{ needs.determine-version.outputs.version }}
           -o portable-output
 
-      - name: Rename portable exe
+      - name: Create portable zip
         shell: pwsh
-        run: Copy-Item 'portable-output/Calcpad.exe' 'Calcpad.Wpf/Installer/Output/${{ needs.determine-version.outputs.portable_name }}.exe'
+        run: Compress-Archive -Path portable-output\* -DestinationPath "Calcpad.Wpf/Installer/Output/${{ needs.determine-version.outputs.portable_name }}.zip"
 
       - name: Upload portable artifact
         uses: actions/upload-artifact@v7
         with:
           name: ${{ needs.determine-version.outputs.portable_name }}
-          path: Calcpad.Wpf/Installer/Output/${{ needs.determine-version.outputs.portable_name }}.exe
+          path: Calcpad.Wpf/Installer/Output/${{ needs.determine-version.outputs.portable_name }}.zip
 
   build-deb:
     needs: determine-version
