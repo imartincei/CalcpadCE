@@ -108,7 +108,9 @@ jobs:
 
       - name: Create portable zip
         shell: pwsh
-        run: Compress-Archive -Path portable-output\* -DestinationPath "Calcpad.Wpf/Installer/Output/${{ needs.determine-version.outputs.portable_name }}.zip"
+        run: |
+          Rename-Item portable-output "${{ needs.determine-version.outputs.portable_name }}"
+          Compress-Archive -Path "${{ needs.determine-version.outputs.portable_name }}" -DestinationPath "Calcpad.Wpf/Installer/Output/${{ needs.determine-version.outputs.portable_name }}.zip"
 
       - name: Upload portable artifact
         uses: actions/upload-artifact@v7
