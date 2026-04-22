@@ -1,15 +1,17 @@
 # Use the official .NET runtime as base image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
 # Use the official .NET SDK for building
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Copy the entire CalcpadVM directory to access all dependencies
-COPY . .
+# Copy the full repo (build context must be repo root)
+COPY Calcpad.Core/ Calcpad.Core/
+COPY Calcpad.OpenXml/ Calcpad.OpenXml/
+COPY Calcpad.Server/ Calcpad.Server/
 
 # Build the Calcpad.Server Linux project
 WORKDIR /src/Calcpad.Server
@@ -30,7 +32,7 @@ RUN apt-get update && \
     apt-get install -y \
         chromium \
         fonts-liberation \
-        libasound2 \
+        libasound2t64 \
         libatk-bridge2.0-0 \
         libdrm2 \
         libgtk-3-0 \
@@ -46,9 +48,10 @@ RUN apt-get update && \
 # Copy the published application
 COPY --from=publish /app/publish .
 
-# Copy necessary files from Calcpad.Cli for templates and resources
-COPY --from=build /src/Calcpad.Cli/doc ./doc
-COPY --from=build /src/Calcpad.Cli/Fonts ./Fonts
+# Copy necessary files from Calcpad.Cli for templates and resources (if needed)
+# Note: Calcpad.Cli is not part of the build context; add it to the COPY stage if these are required
+# COPY --from=build /src/Calcpad.Cli/doc ./doc
+# COPY --from=build /src/Calcpad.Cli/Fonts ./Fonts
 
 # Set environment variables
 ENV ASPNETCORE_URLS=http://+:8080

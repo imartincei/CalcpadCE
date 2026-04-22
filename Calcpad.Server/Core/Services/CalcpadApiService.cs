@@ -1,5 +1,7 @@
 using Calcpad.Server.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading.RateLimiting;
 
 namespace Calcpad.Server.Services
 {
@@ -10,11 +12,26 @@ namespace Calcpad.Server.Services
     public static class CalcpadApiService
     {
         /// <summary>
+        /// When true, strict security restrictions are applied (public Docker server).
+        /// When false (default), the server runs in permissive local mode (Windows tray app).
+        /// Controlled by the CALCPAD_PUBLIC_MODE environment variable.
+        /// </summary>
+        public static bool IsPublicMode { get; } =
+            string.Equals(Environment.GetEnvironmentVariable("CALCPAD_PUBLIC_MODE"), "true", StringComparison.OrdinalIgnoreCase)
+            || Environment.GetEnvironmentVariable("CALCPAD_PUBLIC_MODE") == "1";
+
+        /// <summary>
         /// Configure the web application builder with all necessary services
         /// </summary>
         public static WebApplicationBuilder ConfigureBuilder(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Limit request body size: 512 KB in public mode, 50 MB locally
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.Limits.MaxRequestBodySize = IsPublicMode ? 512_000 : 50_000_000;
+            });
 
             // Add services to the container
             builder.Services.AddControllers()
@@ -24,14 +41,53 @@ namespace Calcpad.Server.Services
             builder.Services.AddScoped<CalcpadService>();
             builder.Services.AddScoped<PdfGeneratorService>();
 
-            // Add CORS policy
+            // Add CORS policy — restricted in public mode, open locally
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader();
+                    if (IsPublicMode)
+                    {
+                        var corsOrigins = Environment.GetEnvironmentVariable("CALCPAD_CORS_ORIGINS")
+                            ?? "https://calcpad-ce.org";
+                        policy.WithOrigins(corsOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                              .AllowAnyMethod()
+                              .AllowAnyHeader();
+                    }
+                    else
+                    {
+                        policy.AllowAnyOrigin()
+                              .AllowAnyMethod()
+                              .AllowAnyHeader();
+                    }
+                });
+            });
+
+            // Rate limiting — strict in public mode, effectively unlimited locally
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                var convertLimit = IsPublicMode ? 20 : int.MaxValue;
+                var pdfLimit = IsPublicMode ? 5 : int.MaxValue;
+                var generalLimit = IsPublicMode ? 100 : int.MaxValue;
+
+                options.AddFixedWindowLimiter("convert", opt =>
+                {
+                    opt.PermitLimit = convertLimit;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.QueueLimit = 0;
+                });
+                options.AddFixedWindowLimiter("pdf", opt =>
+                {
+                    opt.PermitLimit = pdfLimit;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.QueueLimit = 0;
+                });
+                options.AddFixedWindowLimiter("general", opt =>
+                {
+                    opt.PermitLimit = generalLimit;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.QueueLimit = 0;
                 });
             });
 
@@ -43,16 +99,31 @@ namespace Calcpad.Server.Services
         /// </summary>
         public static WebApplication ConfigureApp(WebApplication app)
         {
-            // Configure the HTTP request pipeline
-            if (app.Environment.IsDevelopment())
+            // Expose Swagger only in local mode (not on the public server)
+            if (!IsPublicMode)
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();
+
+            // Security headers
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+                context.Response.Headers["X-Frame-Options"] = "DENY";
+                context.Response.Headers["Cache-Control"] = "no-store";
+                context.Response.Headers["Referrer-Policy"] = "no-referrer";
+                await next();
+            });
+
             app.UseCors("AllowAll");
+            app.UseRateLimiter();
             app.MapControllers();
+
+            var mode = IsPublicMode ? "PUBLIC" : "LOCAL";
+            Console.WriteLine($"Calcpad server starting in {mode} mode");
 
             return app;
         }

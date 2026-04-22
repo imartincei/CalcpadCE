@@ -1,5 +1,6 @@
 using Calcpad.Core;
 using Calcpad.Server.Controllers;
+using System.Text.RegularExpressions;
 
 namespace Calcpad.Server.Services
 {
@@ -32,35 +33,33 @@ namespace Calcpad.Server.Services
                 // 2. Parse macros and includes (following WPF pattern)
                 var macroParser = new MacroParser();
                 
-                // Set up the Include function for #include directives
-                macroParser.Include = (fileName, fields) =>
+                if (CalcpadApiService.IsPublicMode)
                 {
-                    try
+                    // #include is disabled in public mode to prevent path traversal attacks.
+                    macroParser.Include = (fileName, fields) =>
                     {
-                        if (!File.Exists(fileName))
-                            return $"' File not found: {fileName}";
-                        
-                        // Simply read and return the file content
-                        // Note: fields parameter is required by Calcpad.Core but not used in Server
-                        return File.ReadAllText(fileName);
-                    }
-                    catch (Exception ex)
-                    {
-                        FileLogger.LogError($"Error reading include file: {fileName}", ex);
-                        return $"' Error reading file: {fileName} - {ex.Message}";
-                    }
-                };
-                
-                // Configure auth settings for #fetch if provided
-                if (settings?.Auth != null && !string.IsNullOrEmpty(settings.Auth.Url) && !string.IsNullOrEmpty(settings.Auth.JWT))
-                {
-                    macroParser.AuthSettings = new Calcpad.Core.AuthSettings
-                    {
-                        Url = settings.Auth.Url,
-                        JWT = settings.Auth.JWT
+                        FileLogger.LogWarning("Blocked #include directive in public mode", fileName);
+                        return "' #include is not supported in public mode";
                     };
                 }
-                
+                else
+                {
+                    // Local mode: allow #include with default file-reading behavior
+                    macroParser.Include = (fileName, fields) =>
+                    {
+                        try
+                        {
+                            if (!File.Exists(fileName))
+                                return $"' File not found: {fileName}";
+                            return File.ReadAllText(fileName);
+                        }
+                        catch (Exception ex)
+                        {
+                            FileLogger.LogError($"Error reading include file: {fileName}", ex);
+                            return $"' Error reading file: {fileName} - {ex.Message}";
+                        }
+                    };
+                }
                 string outputText;
                 var hasMacroErrors = macroParser.Parse(calcpadContent, out outputText, null, 0, true);
                 
@@ -75,10 +74,26 @@ namespace Calcpad.Server.Services
                 {
                     try
                     {
-                        // 3. Parse expressions and calculate (following WPF pattern)
+                        // 3. Parse expressions and calculate with a wall-clock timeout
+                        var timeoutSeconds = CalcpadApiService.IsPublicMode ? 15 : 300;
                         var parser = new ExpressionParser { Settings = coreSettings };
-                        parser.Parse(outputText, true, false); // calculate = true, getXml = false for HTML
+                        var parseTask = Task.Run(() =>
+                        {
+                            parser.Parse(outputText, true, false);
+                        });
+                        if (!parseTask.Wait(TimeSpan.FromSeconds(timeoutSeconds)))
+                        {
+                            parser.Cancel();
+                            FileLogger.LogWarning($"Computation timeout after {timeoutSeconds} seconds");
+                            throw new TimeoutException($"Computation exceeded the maximum allowed time of {timeoutSeconds} seconds.");
+                        }
+                        // Re-throw any exception from the parse task
+                        parseTask.GetAwaiter().GetResult();
                         htmlResult = parser.HtmlResult;
+                    }
+                    catch (TimeoutException)
+                    {
+                        throw;
                     }
                     catch (Exception parseEx)
                     {
@@ -474,12 +489,37 @@ tan_angle = tan(angle°)";
 </html>";
         }
 
+        private static readonly string CspMetaTag =
+            "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src data:;\">";
+
         private string WrapHtmlResult(string htmlContent, string theme = "light")
         {
+            // Sanitize dangerous HTML tags from Calcpad output before wrapping
+            htmlContent = SanitizeHtml(htmlContent);
+
             // Use the comprehensive HTML template with theme support
             var themeClass = theme.ToLower() == "dark" ? " class=\"dark-theme\"" : "";
             var templateWithTheme = _htmlTemplate.Replace("<body>", $"<body{themeClass}>");
+            // Inject Content-Security-Policy to block inline scripts and external resources
+            templateWithTheme = templateWithTheme.Replace("<head>", $"<head>\n    {CspMetaTag}");
             return templateWithTheme.Replace("{{CONTENT}}", htmlContent);
+        }
+
+        private static readonly Regex DangerousTagsRegex = new(
+            @"<\s*/?\s*(script|iframe|object|embed|form|base|link|meta|applet|svg\s+[^>]*on\w+)[^>]*>",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static readonly Regex EventHandlerRegex = new(
+            @"\s+on\w+\s*=\s*[""'][^""']*[""']",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static string SanitizeHtml(string html)
+        {
+            // Strip dangerous tags: script, iframe, object, embed, form, base, link, meta, applet
+            html = DangerousTagsRegex.Replace(html, string.Empty);
+            // Strip event handler attributes (onclick, onerror, etc.)
+            html = EventHandlerRegex.Replace(html, string.Empty);
+            return html;
         }
 
         private static void TryDeleteFile(string filePath)
