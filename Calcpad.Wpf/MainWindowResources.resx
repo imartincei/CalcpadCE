@@ -1146,6 +1146,39 @@ You can find your unsaved data in
   <data name="SaveDocumentFirstForRelativePaths" xml:space="preserve">
     <value>Save the document first to insert relative paths. An absolute path was used instead.</value>
   </data>
+  <data name="Library_Tooltip" xml:space="preserve">
+    <value>Show/hide library panel</value>
+  </data>
+  <data name="Library_Title" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="Library_AddFolder" xml:space="preserve">
+    <value>+ Folder</value>
+  </data>
+  <data name="Library_AddFolder_Tooltip" xml:space="preserve">
+    <value>Add a folder of .cpd files to the library</value>
+  </data>
+  <data name="Library_RemoveFolder" xml:space="preserve">
+    <value>Remove from library</value>
+  </data>
+  <data name="Library_Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Library_Refresh_Tooltip" xml:space="preserve">
+    <value>Rescan library folders</value>
+  </data>
+  <data name="Library_NoFunctionsFound" xml:space="preserve">
+    <value>(no functions)</value>
+  </data>
+  <data name="Library_FolderNotFound" xml:space="preserve">
+    <value>Folder not found: {0}</value>
+  </data>
+  <data name="Library_SelectFolderDialog_Title" xml:space="preserve">
+    <value>Select a library folder</value>
+  </data>
+  <data name="Library_Hide" xml:space="preserve">
+    <value>Hide library panel</value>
+  </data>
   <data name="MultilineExpressionBlock" xml:space="preserve">
     <value>Multiline expression block</value>
   </data>

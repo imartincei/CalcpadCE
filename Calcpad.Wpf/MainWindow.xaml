@@ -1812,6 +1812,14 @@
                 ToolTip="{x:Static wpf:MainWindowResources.ShowHelp}">
             <Image Source="Resources/help.png" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Button>
+        <Button Grid.Row="0" Click="LibraryButton_Click" x:Name="LibraryButton"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
+                Height="24" Width="24" Margin="325,24,0,0"
+                Focusable="false" IsTabStop="false"
+                Background="{x:Null}" BorderBrush="{x:Null}"
+                ToolTip="{x:Static wpf:MainWindowResources.Library_Tooltip}">
+            <Image Source="Resources/open.png" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        </Button>
         <TextBlock Grid.Row="0" TextWrapping="Wrap" FontSize="11.5" Margin="0,6,146,0" Height="16"
             VerticalAlignment="Top"  HorizontalAlignment="Right" Width="110" Foreground="#DA000000"
             Text="{x:Static wpf:MainWindowResources.MaxOutputCount}" />
@@ -2231,7 +2239,79 @@
                            MouseUp="Website_MouseUp"/>
             </StatusBarItem>
         </StatusBar>
-        <Grid x:Name="FramesGrid" Margin="0,1,0,35" Grid.Row="1">
+        <Grid x:Name="MainContentGrid" Grid.Row="1" Margin="0,1,0,35">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="LibraryColumn" Width="0"/>
+                <ColumnDefinition x:Name="LibrarySplitterColumn" Width="0"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" x:Name="LibraryPanel" Visibility="Collapsed"
+                    BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                    BorderThickness="0,1,1,1" Background="#FFFAFAFA">
+                <DockPanel LastChildFill="True" Margin="2">
+                    <Border DockPanel.Dock="Top" Padding="2" Background="#FFEFEFEF">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{x:Static wpf:MainWindowResources.Library_Title}"
+                                       FontWeight="Bold" VerticalAlignment="Center" Margin="4,0,8,0"/>
+                            <Button x:Name="LibraryAddFolderButton"
+                                    Content="{x:Static wpf:MainWindowResources.Library_AddFolder}"
+                                    ToolTip="{x:Static wpf:MainWindowResources.Library_AddFolder_Tooltip}"
+                                    Click="LibraryAddFolderButton_Click"
+                                    Padding="6,1" Margin="0,0,4,0" FontSize="11"/>
+                            <Button x:Name="LibraryRefreshButton"
+                                    Content="{x:Static wpf:MainWindowResources.Library_Refresh}"
+                                    ToolTip="{x:Static wpf:MainWindowResources.Library_Refresh_Tooltip}"
+                                    Click="LibraryRefreshButton_Click"
+                                    Padding="6,1" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+                    <TreeView x:Name="LibraryTree"
+                              BorderThickness="0" Background="Transparent"
+                              MouseDoubleClick="LibraryTree_MouseDoubleClick"
+                              FontSize="12">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="TreeViewItem">
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate DataType="{x:Type wpf:LibraryFolderNode}" ItemsSource="{Binding Children}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="📁 " FontFamily="Segoe UI Emoji"/>
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold">
+                                        <TextBlock.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="{x:Static wpf:MainWindowResources.Library_RemoveFolder}"
+                                                          Click="LibraryRemoveFolderMenuItem_Click"
+                                                          Tag="{Binding}"/>
+                                            </ContextMenu>
+                                        </TextBlock.ContextMenu>
+                                    </TextBlock>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                            <HierarchicalDataTemplate DataType="{x:Type wpf:LibraryFileNode}" ItemsSource="{Binding Children}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="📄 " FontFamily="Segoe UI Emoji"/>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                            <HierarchicalDataTemplate DataType="{x:Type wpf:LibraryFunctionNode}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="ƒ " Foreground="#FF1565C0" FontStyle="Italic"/>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                            <DataTemplate DataType="{x:Type wpf:LibraryPlaceholderNode}">
+                                <TextBlock Text="{Binding Name}" Foreground="Gray" FontStyle="Italic"/>
+                            </DataTemplate>
+                        </TreeView.Resources>
+                    </TreeView>
+                </DockPanel>
+            </Border>
+            <GridSplitter Grid.Column="1" x:Name="LibrarySplitter" Width="4"
+                          HorizontalAlignment="Stretch" Visibility="Collapsed"
+                          Background="#FFE3E3E3"/>
+        <Grid x:Name="FramesGrid" Grid.Column="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120*"/>
                 <ColumnDefinition />
@@ -2799,6 +2879,7 @@
                     TabIndex="22" Click="CodeCheckBox_Click" FontFamily="Segoe UI Semibold" >
                 </CheckBox>
             </Border>
+        </Grid>
         </Grid>
         <TextBlock Grid.Row="0" TextWrapping="Wrap" FontSize="12.5" Margin="0,28,155,0" Height="16"
             VerticalAlignment="Top"  HorizontalAlignment="Right" Width="50"

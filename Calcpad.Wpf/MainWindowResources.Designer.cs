@@ -1042,6 +1042,50 @@ namespace Calcpad.Wpf {
             }
         }
 
+        public static string Library_Tooltip {
+            get { return ResourceManager.GetString("Library_Tooltip", resourceCulture); }
+        }
+
+        public static string Library_Title {
+            get { return ResourceManager.GetString("Library_Title", resourceCulture); }
+        }
+
+        public static string Library_AddFolder {
+            get { return ResourceManager.GetString("Library_AddFolder", resourceCulture); }
+        }
+
+        public static string Library_AddFolder_Tooltip {
+            get { return ResourceManager.GetString("Library_AddFolder_Tooltip", resourceCulture); }
+        }
+
+        public static string Library_RemoveFolder {
+            get { return ResourceManager.GetString("Library_RemoveFolder", resourceCulture); }
+        }
+
+        public static string Library_Refresh {
+            get { return ResourceManager.GetString("Library_Refresh", resourceCulture); }
+        }
+
+        public static string Library_Refresh_Tooltip {
+            get { return ResourceManager.GetString("Library_Refresh_Tooltip", resourceCulture); }
+        }
+
+        public static string Library_NoFunctionsFound {
+            get { return ResourceManager.GetString("Library_NoFunctionsFound", resourceCulture); }
+        }
+
+        public static string Library_FolderNotFound {
+            get { return ResourceManager.GetString("Library_FolderNotFound", resourceCulture); }
+        }
+
+        public static string Library_SelectFolderDialog_Title {
+            get { return ResourceManager.GetString("Library_SelectFolderDialog_Title", resourceCulture); }
+        }
+
+        public static string Library_Hide {
+            get { return ResourceManager.GetString("Library_Hide", resourceCulture); }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Enables markdown in comments.
         /// </summary>

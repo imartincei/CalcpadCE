@@ -1145,6 +1145,39 @@
   <data name="SaveDocumentFirstForRelativePaths" xml:space="preserve">
     <value>请先保存文档以便插入相对路径。本次已改用绝对路径。</value>
   </data>
+  <data name="Library_Tooltip" xml:space="preserve">
+    <value>显示/隐藏库面板</value>
+  </data>
+  <data name="Library_Title" xml:space="preserve">
+    <value>库</value>
+  </data>
+  <data name="Library_AddFolder" xml:space="preserve">
+    <value>+ 文件夹</value>
+  </data>
+  <data name="Library_AddFolder_Tooltip" xml:space="preserve">
+    <value>将 .cpd 文件夹添加到库中</value>
+  </data>
+  <data name="Library_RemoveFolder" xml:space="preserve">
+    <value>从库中移除</value>
+  </data>
+  <data name="Library_Refresh" xml:space="preserve">
+    <value>刷新</value>
+  </data>
+  <data name="Library_Refresh_Tooltip" xml:space="preserve">
+    <value>重新扫描库文件夹</value>
+  </data>
+  <data name="Library_NoFunctionsFound" xml:space="preserve">
+    <value>(无函数)</value>
+  </data>
+  <data name="Library_FolderNotFound" xml:space="preserve">
+    <value>未找到文件夹: {0}</value>
+  </data>
+  <data name="Library_SelectFolderDialog_Title" xml:space="preserve">
+    <value>选择库文件夹</value>
+  </data>
+  <data name="Library_Hide" xml:space="preserve">
+    <value>隐藏库面板</value>
+  </data>
   <data name="MultilineExpressionBlock" xml:space="preserve">
     <value>多行表达式块</value>
   </data>

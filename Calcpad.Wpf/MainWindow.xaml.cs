@@ -91,6 +91,7 @@ namespace Calcpad.Wpf
         private readonly UndoManager _undoMan;
         private readonly WebView2Wrapper _wv2Warper;
         private readonly InsertManager _insertManager;
+        private readonly LibraryManager _libraryManager = new();
         private readonly AutoCompleteManager _autoCompleteManager;
 
         private readonly string _readmeFileName;
@@ -237,6 +238,8 @@ namespace Calcpad.Wpf
             };
             _insertManager = new(RichTextBox);
             _autoCompleteManager = new(RichTextBox, AutoCompleteListBox, Dispatcher, _insertManager);
+            LibraryTree.ItemsSource = _libraryManager.Folders;
+            _libraryManager.LoadFromSettings(Properties.Settings.Default.LibraryFolders);
             _cfn = string.Empty;
             Title = AppInfo.Title;
             _isTextChangedEnabled = false;
@@ -710,6 +713,7 @@ namespace Calcpad.Wpf
             MaxOutputCountTextBox.Text = settings.MaxOutputCount.ToString();
             EmbedCheckBox.IsChecked = settings.Embed;
             UseRelativePathsCheckBox.IsChecked = settings.UseRelativePaths;
+            SetLibraryPanelVisible(settings.ShowLibraryPanel);
             if (settings.WindowLeft > 0) Left = settings.WindowLeft;
             if (settings.WindowTop > 0) Top = settings.WindowTop;
             if (settings.WindowWidth > 0) Width = settings.WindowWidth;
@@ -795,6 +799,10 @@ namespace Calcpad.Wpf
             settings.MaxOutputCount = int.TryParse(MaxOutputCountTextBox.Text, out int i) ? i : (int)20;
             settings.Embed = EmbedCheckBox.IsChecked ?? false;
             settings.UseRelativePaths = UseRelativePathsCheckBox.IsChecked ?? false;
+            settings.ShowLibraryPanel = LibraryPanel.Visibility == Visibility.Visible;
+            if (LibraryColumn.Width.Value > 0)
+                settings.LibraryPanelWidth = LibraryColumn.Width.Value;
+            settings.LibraryFolders = _libraryManager.ToSettings();
             settings.WindowLeft = Left;
             settings.WindowTop = Top;
             settings.WindowWidth = Width;
@@ -2130,9 +2138,143 @@ namespace Calcpad.Wpf
                 InsertImage(dlg.FileName);
         }
 
+        private void LibraryButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetLibraryPanelVisible(LibraryPanel.Visibility != Visibility.Visible);
+        }
+
+        private void SetLibraryPanelVisible(bool visible)
+        {
+            if (visible)
+            {
+                var w = Properties.Settings.Default.LibraryPanelWidth;
+                if (w < 120) w = 250;
+                LibraryColumn.Width = new GridLength(w);
+                LibrarySplitterColumn.Width = new GridLength(4);
+                LibraryPanel.Visibility = Visibility.Visible;
+                LibrarySplitter.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                if (LibraryColumn.Width.Value > 0)
+                    Properties.Settings.Default.LibraryPanelWidth = LibraryColumn.Width.Value;
+                LibraryColumn.Width = new GridLength(0);
+                LibrarySplitterColumn.Width = new GridLength(0);
+                LibraryPanel.Visibility = Visibility.Collapsed;
+                LibrarySplitter.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void LibraryAddFolderButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new OpenFolderDialog
+            {
+                Title = MainWindowResources.Library_SelectFolderDialog_Title,
+                Multiselect = false
+            };
+            if (dlg.ShowDialog() == true)
+                _libraryManager.AddFolder(dlg.FolderName);
+        }
+
+        private void LibraryRefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            _libraryManager.Refresh();
+        }
+
+        private void LibraryRemoveFolderMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem mi && mi.Tag is LibraryFolderNode folder)
+                _libraryManager.RemoveFolder(folder);
+        }
+
+        private void LibraryTree_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            switch (LibraryTree.SelectedItem)
+            {
+                case LibraryFunctionNode fn:
+                    InsertFunctionReference(fn.FilePath, fn.Function);
+                    e.Handled = true;
+                    break;
+                case LibraryFileNode file:
+                    InsertFileInclude(file.FullPath);
+                    e.Handled = true;
+                    break;
+            }
+        }
+
+        private void InsertFileInclude(string filePath)
+        {
+            var path = BuildLinkedPath(filePath);
+            _insertManager.InsertText($"#include {path}\n");
+        }
+
+        private void InsertFunctionReference(string filePath, LibraryFunction fn)
+        {
+            EnsureIncludeAtTop(filePath);
+            // Wrap the args in `{…}` so InsertManager.SelectInsertedText highlights them for quick replacement.
+            var signature = string.IsNullOrEmpty(fn.Signature) ? fn.Name : $"{fn.Name}({{{fn.Signature}}})";
+            _insertManager.InsertText($"' {signature}\n");
+        }
+
+        /// Adds an #include directive for filePath at the top of the document if one isn't already
+        /// present (case-insensitive comparison on canonicalized full paths).
+        private void EnsureIncludeAtTop(string filePath)
+        {
+            var targetFull = Path.GetFullPath(filePath);
+            Paragraph lastIncludeParagraph = null;
+            foreach (var block in _document.Blocks)
+            {
+                if (block is not Paragraph p) continue;
+                var text = new TextRange(p.ContentStart, p.ContentEnd).Text.TrimStart();
+                if (!text.StartsWith("#include", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (lastIncludeParagraph is not null) break;
+                    continue;
+                }
+                lastIncludeParagraph = p;
+                var existing = ExtractIncludePath(text);
+                if (existing is null) continue;
+                try
+                {
+                    var existingFull = Path.IsPathRooted(existing)
+                        ? Path.GetFullPath(existing)
+                        : Path.GetFullPath(existing,
+                            string.IsNullOrEmpty(CurrentFileName) ? Environment.CurrentDirectory : Path.GetDirectoryName(CurrentFileName));
+                    if (string.Equals(existingFull, targetFull, StringComparison.OrdinalIgnoreCase))
+                        return;
+                }
+                catch { /* ignore malformed include paths */ }
+            }
+
+            var path = BuildLinkedPath(filePath);
+            var newPara = new Paragraph();
+            newPara.Inlines.Add(new Run($"#include {path}"));
+            _highlighter.Parse(newPara, IsComplex, GetLineNumber(newPara), true);
+            if (lastIncludeParagraph is not null)
+                _document.Blocks.InsertAfter(lastIncludeParagraph, newPara);
+            else if (_document.Blocks.FirstBlock is not null)
+                _document.Blocks.InsertBefore(_document.Blocks.FirstBlock, newPara);
+            else
+                _document.Blocks.Add(newPara);
+        }
+
+        private static string ExtractIncludePath(string trimmedLine)
+        {
+            // Mirror MacroParser.ParseInclude (Calcpad.Core/Parsers/MacroParser.cs): path runs from
+            // index 8 to the first '#{…}' field marker (if any) or end of line. No quotes supported.
+            var afterKeyword = trimmedLine.AsSpan(8);
+            var sharp = afterKeyword.IndexOf('#');
+            if (sharp >= 0)
+                afterKeyword = afterKeyword[..sharp];
+            return afterKeyword.Trim().ToString();
+        }
+
         private bool _relativePathWarningShown;
 
-        private string BuildImageSrc(string filePath)
+        /// Returns a path string suitable for embedding in the document (image src, #include path, etc.):
+        /// relative to the current document folder when "Use relative paths" is on and the doc is saved,
+        /// otherwise the original absolute path (with forward slashes).
+        private string BuildLinkedPath(string filePath)
         {
             var hasCurrentDoc = !string.IsNullOrEmpty(CurrentFileName);
             var useRelative = UseRelativePathsCheckBox.IsChecked ?? false;
@@ -2170,7 +2312,7 @@ namespace Calcpad.Wpf
         {
             var fileName = Path.GetFileName(filePath);
             var size = GetImageSize(filePath);
-            var src = BuildImageSrc(filePath);
+            var src = BuildLinkedPath(filePath);
             var p = new Paragraph();
             p.Inlines.Add(new Run($"'<img style=\"height:{size.Height}pt; width:{size.Width}pt;\" src=\"{src}\" alt=\"{fileName}\">"));
             _highlighter.Parse(p, IsComplex, GetLineNumber(p), true);

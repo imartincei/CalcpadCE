@@ -1145,6 +1145,39 @@
   <data name="SaveDocumentFirstForRelativePaths" xml:space="preserve">
     <value>Запазете документа, за да вмъквате относителни пътища. Вместо това беше използван абсолютен път.</value>
   </data>
+  <data name="Library_Tooltip" xml:space="preserve">
+    <value>Показване/скриване на панела с библиотеката</value>
+  </data>
+  <data name="Library_Title" xml:space="preserve">
+    <value>Библиотека</value>
+  </data>
+  <data name="Library_AddFolder" xml:space="preserve">
+    <value>+ Папка</value>
+  </data>
+  <data name="Library_AddFolder_Tooltip" xml:space="preserve">
+    <value>Добавяне на папка с .cpd файлове към библиотеката</value>
+  </data>
+  <data name="Library_RemoveFolder" xml:space="preserve">
+    <value>Премахни от библиотеката</value>
+  </data>
+  <data name="Library_Refresh" xml:space="preserve">
+    <value>Опресни</value>
+  </data>
+  <data name="Library_Refresh_Tooltip" xml:space="preserve">
+    <value>Повторно сканиране на папките от библиотеката</value>
+  </data>
+  <data name="Library_NoFunctionsFound" xml:space="preserve">
+    <value>(няма функции)</value>
+  </data>
+  <data name="Library_FolderNotFound" xml:space="preserve">
+    <value>Папката не е намерена: {0}</value>
+  </data>
+  <data name="Library_SelectFolderDialog_Title" xml:space="preserve">
+    <value>Изберете папка от библиотеката</value>
+  </data>
+  <data name="Library_Hide" xml:space="preserve">
+    <value>Скрий панела с библиотеката</value>
+  </data>
   <data name="MultilineExpressionBlock" xml:space="preserve">
     <value>Многоредов блок от изрази</value>
   </data>

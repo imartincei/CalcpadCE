@@ -321,5 +321,40 @@ namespace Calcpad.Wpf.Properties {
                 this["UseRelativePaths"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection LibraryFolders {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["LibraryFolders"]));
+            }
+            set {
+                this["LibraryFolders"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("250")]
+        public double LibraryPanelWidth {
+            get {
+                return ((double)(this["LibraryPanelWidth"]));
+            }
+            set {
+                this["LibraryPanelWidth"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowLibraryPanel {
+            get {
+                return ((bool)(this["ShowLibraryPanel"]));
+            }
+            set {
+                this["ShowLibraryPanel"] = value;
+            }
+        }
     }
 }
