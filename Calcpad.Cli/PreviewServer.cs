@@ -49,8 +49,16 @@ namespace Calcpad.Cli
                 {
                     var request = JsonSerializer.Deserialize<PreviewRequest>(line, JsonOptions);
                     id = request?.Id ?? 0;
-                    var html = Render(request, settings);
-                    response = new PreviewResponse { Id = id, Ok = true, Html = html };
+                    if (request?.Export is not null)
+                    {
+                        var outPath = Export(request, settings);
+                        response = new PreviewResponse { Id = id, Ok = true, OutPath = outPath };
+                    }
+                    else
+                    {
+                        var html = Render(request, settings);
+                        response = new PreviewResponse { Id = id, Ok = true, Html = html };
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -80,6 +88,55 @@ namespace Calcpad.Cli
             if (req is null)
                 return Body(string.Empty);
 
+            var unwrappedCode = Prepare(req, settings, out var macroErrorHtml);
+            if (macroErrorHtml is not null)
+                return Body(macroErrorHtml);
+
+            var parser = new ExpressionParser { Settings = settings };
+            parser.Parse(unwrappedCode, true, false);
+            return Body(parser.HtmlResult);
+        }
+
+        // Renders the worksheet (with the current input values) to a file via the same
+        // Converter the one-shot CLI uses, so the export matches the calculated output.
+        private static string Export(PreviewRequest req, Settings settings)
+        {
+            var format = (req.Export.Format ?? "html").Trim().ToLowerInvariant();
+            var outPath = req.Export.OutPath;
+            if (string.IsNullOrWhiteSpace(outPath))
+                throw new ArgumentException("Missing export output path.");
+
+            var unwrappedCode = Prepare(req, settings, out var macroErrorHtml);
+            if (macroErrorHtml is not null)
+                throw new InvalidOperationException("Cannot export: the worksheet has macro or #include errors.");
+
+            var getXml = format is "docx";
+            var parser = new ExpressionParser { Settings = settings };
+            parser.Parse(unwrappedCode, true, getXml);
+
+            var converter = new Converter(isSilent: true, isBodyOnly: false);
+            switch (format)
+            {
+                case "html":
+                case "htm":
+                    converter.ToHtml(parser.HtmlResult, outPath);
+                    break;
+                case "docx":
+                    converter.ToOpenXml(parser.HtmlResult, outPath, parser.OpenXmlExpressions);
+                    break;
+                default:
+                    throw new ArgumentException($"Unsupported export format: {format}");
+            }
+            return outPath;
+        }
+
+        // Shared preparation: resolve paths, set units, read & macro-expand the source,
+        // and inject interactive input values. Returns the unwrapped code, or null with
+        // macroErrorHtml set when macro/include expansion failed.
+        private static string Prepare(PreviewRequest req, Settings settings, out string macroErrorHtml)
+        {
+            macroErrorHtml = null;
+
             // Resolve relative #include / image paths against the document folder when known.
             // Resolve to an absolute path BEFORE changing the working directory, otherwise a
             // relative SourcePath would be resolved against the previous request's folder.
@@ -102,14 +159,15 @@ namespace Calcpad.Cli
             var macroParser = new MacroParser { Include = CalcpadReader.Include };
             var hasMacroErrors = macroParser.Parse(code, out var unwrappedCode, null, 0, true);
             if (hasMacroErrors)
-                return Body(CalcpadReader.CodeToHtml(unwrappedCode));
+            {
+                macroErrorHtml = CalcpadReader.CodeToHtml(unwrappedCode);
+                return null;
+            }
 
             if (req.InputValues is { Count: > 0 })
                 unwrappedCode = ApplyInputValues(unwrappedCode, req.InputValues);
 
-            var parser = new ExpressionParser { Settings = settings };
-            parser.Parse(unwrappedCode, true, false);
-            return Body(parser.HtmlResult);
+            return unwrappedCode;
         }
 
         // Injects the interactive input-field values back into the source as {value} tokens,
@@ -155,6 +213,7 @@ namespace Calcpad.Cli
             public string SourceText { get; set; }
             public string Units { get; set; }
             public List<InputValue> InputValues { get; set; }
+            public ExportRequest Export { get; set; }
         }
 
         private sealed class InputValue
@@ -163,11 +222,18 @@ namespace Calcpad.Cli
             public string Value { get; set; }
         }
 
+        private sealed class ExportRequest
+        {
+            public string Format { get; set; }
+            public string OutPath { get; set; }
+        }
+
         private sealed class PreviewResponse
         {
             public long Id { get; set; }
             public bool Ok { get; set; }
             public string Html { get; set; }
+            public string OutPath { get; set; }
             public string Error { get; set; }
         }
     }
