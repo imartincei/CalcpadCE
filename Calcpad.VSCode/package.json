@@ -5,6 +5,12 @@
   "version": "0.1.0",
   "publisher": "calcpad",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/imartincei/CalcpadCE.git",
+    "directory": "Calcpad.VSCode"
+  },
+  "homepage": "https://github.com/imartincei/CalcpadCE",
   "engines": {
     "vscode": "^1.84.0"
   },
@@ -27,6 +33,13 @@
           ".cpdz"
         ],
         "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "calcpad",
+        "scopeName": "source.calcpad",
+        "path": "./syntaxes/calcpad.tmLanguage.json"
       }
     ],
     "commands": [
@@ -138,6 +151,7 @@
     "build": "npm run copy-assets && npm run compile",
     "watch": "node esbuild.mjs --watch",
     "publish-cli": "node scripts/publish-cli.mjs",
+    "package": "vsce package",
     "vscode:prepublish": "npm run build"
   },
   "devDependencies": {
