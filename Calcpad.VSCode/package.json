@@ -41,6 +41,16 @@
         "title": "Calcpad: Open Preview to the Side",
         "category": "Calcpad",
         "icon": "$(open-preview)"
+      },
+      {
+        "command": "calcpad.exportHtml",
+        "title": "Calcpad: Export to HTML",
+        "category": "Calcpad"
+      },
+      {
+        "command": "calcpad.exportDocx",
+        "title": "Calcpad: Export to Word (DOCX)",
+        "category": "Calcpad"
       }
     ],
     "keybindings": [
@@ -73,6 +83,14 @@
         {
           "command": "calcpad.showPreviewToSide",
           "when": "editorLangId == calcpad"
+        },
+        {
+          "command": "calcpad.exportHtml",
+          "when": "editorLangId == calcpad"
+        },
+        {
+          "command": "calcpad.exportDocx",
+          "when": "editorLangId == calcpad"
         }
       ],
       "explorer/context": [
@@ -80,6 +98,16 @@
           "command": "calcpad.showPreview",
           "when": "resourceExtname == .cpd || resourceExtname == .cpdz",
           "group": "navigation"
+        },
+        {
+          "command": "calcpad.exportHtml",
+          "when": "resourceExtname == .cpd || resourceExtname == .cpdz",
+          "group": "calcpad@1"
+        },
+        {
+          "command": "calcpad.exportDocx",
+          "when": "resourceExtname == .cpd || resourceExtname == .cpdz",
+          "group": "calcpad@2"
         }
       ]
     },

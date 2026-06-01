@@ -26,6 +26,12 @@ export function activate(context: vscode.ExtensionContext): void {
         manager!.openPreview(uri, { side: true });
       }
     }),
+    vscode.commands.registerCommand('calcpad.exportHtml', (arg?: vscode.Uri) => {
+      void manager!.exportCommand(resolveUri(arg), 'html');
+    }),
+    vscode.commands.registerCommand('calcpad.exportDocx', (arg?: vscode.Uri) => {
+      void manager!.exportCommand(resolveUri(arg), 'docx');
+    }),
     vscode.workspace.onDidChangeTextDocument((e) => {
       if (e.document.languageId === 'calcpad' || e.document.uri.fsPath.endsWith('.cpd')) {
         manager!.onSourceChanged(e.document);

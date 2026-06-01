@@ -15,10 +15,17 @@ export interface RenderRequest {
   inputValues?: InputValue[];
 }
 
+export type ExportFormat = 'html' | 'docx';
+
+export interface ExportRequest extends RenderRequest {
+  export: { format: ExportFormat; outPath: string };
+}
+
 interface ServerResponse {
   id: number;
   ok: boolean;
   html?: string;
+  outPath?: string;
   error?: string;
 }
 
@@ -28,7 +35,7 @@ export class CalcpadRenderer implements vscode.Disposable {
   private proc: ChildProcessWithoutNullStreams | undefined;
   private rl: readline.Interface | undefined;
   private nextId = 1;
-  private readonly pending = new Map<number, { resolve: (html: string) => void; reject: (err: Error) => void }>();
+  private readonly pending = new Map<number, { resolve: (r: ServerResponse) => void; reject: (err: Error) => void }>();
   private readonly output: vscode.OutputChannel;
   private disposed = false;
 
@@ -37,10 +44,26 @@ export class CalcpadRenderer implements vscode.Disposable {
   }
 
   async render(request: RenderRequest): Promise<string> {
+    const response = await this.send(request);
+    if (!response.ok) {
+      throw new Error(response.error ?? 'Unknown render error.');
+    }
+    return response.html ?? '';
+  }
+
+  async export(request: ExportRequest): Promise<string> {
+    const response = await this.send(request);
+    if (!response.ok) {
+      throw new Error(response.error ?? 'Unknown export error.');
+    }
+    return response.outPath ?? request.export.outPath;
+  }
+
+  private send(request: RenderRequest | ExportRequest): Promise<ServerResponse> {
     const proc = this.ensureProcess();
     const id = this.nextId++;
     const payload = JSON.stringify({ id, ...request });
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<ServerResponse>((resolve, reject) => {
       this.pending.set(id, { resolve, reject });
       proc.stdin.write(payload + '\n', (err) => {
         if (err) {
@@ -99,11 +122,7 @@ export class CalcpadRenderer implements vscode.Disposable {
       return;
     }
     this.pending.delete(response.id);
-    if (response.ok && response.html !== undefined) {
-      entry.resolve(response.html);
-    } else {
-      entry.reject(new Error(response.error ?? 'Unknown render error.'));
-    }
+    entry.resolve(response);
   }
 
   private failAllPending(err: Error): void {

@@ -1,6 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CalcpadRenderer, InputValue } from './CalcpadRenderer';
+import { CalcpadRenderer, ExportFormat, InputValue } from './CalcpadRenderer';
+
+export interface ExportState {
+  inputValues: InputValue[];
+  units: string | undefined;
+}
 
 function getNonce(): string {
   let text = '';
@@ -47,7 +52,8 @@ export class CalcpadPreviewPanel {
     sourceUri: vscode.Uri,
     viewColumn: vscode.ViewColumn,
     private readonly onDispose: (panel: CalcpadPreviewPanel) => void,
-    private readonly onActivated: (panel: CalcpadPreviewPanel) => void
+    private readonly onActivated: (panel: CalcpadPreviewPanel) => void,
+    private readonly onExport: (uri: vscode.Uri, format: ExportFormat, state: ExportState) => void
   ) {
     this.sourceUri = sourceUri;
     const roots = computeRoots(context.extensionUri, sourceUri);
@@ -100,6 +106,11 @@ export class CalcpadPreviewPanel {
     this.panel.title = this.title();
   }
 
+  // Current interactive state, so a command-triggered export matches what's shown.
+  get exportState(): ExportState {
+    return { inputValues: this.inputValues, units: this.units };
+  }
+
   async update(sourceText: string): Promise<void> {
     const token = ++this.renderToken;
     try {
@@ -136,6 +147,10 @@ export class CalcpadPreviewPanel {
       this.units = typeof msg.units === 'string' && msg.units.length > 0 ? msg.units : this.units;
       const doc = await this.findOpenDocument();
       await this.update(doc?.getText() ?? '');
+    } else if (msg.type === 'export' && (msg.format === 'html' || msg.format === 'docx')) {
+      const inputValues = Array.isArray(msg.inputValues) ? msg.inputValues : this.inputValues;
+      const units = typeof msg.units === 'string' && msg.units.length > 0 ? msg.units : this.units;
+      this.onExport(this.sourceUri, msg.format, { inputValues, units });
     }
   }
 
@@ -194,6 +209,7 @@ export class CalcpadPreviewPanel {
       color: var(--vscode-button-foreground);
       background: var(--vscode-button-background);
     }
+    #cp-toolbar .cp-spacer { flex: 1; }
     .calcpad-status { color: var(--vscode-descriptionForeground); padding: 1em; font-style: italic; }
     .calcpad-error { color: var(--vscode-errorForeground); padding: 1em; white-space: pre-wrap; }
   </style>
@@ -202,6 +218,9 @@ export class CalcpadPreviewPanel {
   <div id="cp-toolbar">
     <button id="cp-mode-interactive" title="Editable input fields, live recalculation">Interactive</button>
     <button id="cp-mode-final" title="Read-only calculated output">Final</button>
+    <span class="cp-spacer"></span>
+    <button id="cp-export-html" title="Export the calculated worksheet to HTML">Export HTML</button>
+    <button id="cp-export-docx" title="Export the calculated worksheet to Word (DOCX)">Export DOCX</button>
   </div>
   <div id="calcpad-root"><div class="calcpad-status">Rendering…</div></div>
   <script nonce="${nonce}" src="${jqueryUri}"></script>

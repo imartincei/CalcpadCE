@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
-import { CalcpadRenderer } from './CalcpadRenderer';
-import { CalcpadPreviewPanel } from './CalcpadPreviewPanel';
+import * as path from 'path';
+import { CalcpadRenderer, ExportFormat } from './CalcpadRenderer';
+import { CalcpadPreviewPanel, ExportState } from './CalcpadPreviewPanel';
 
 function isCalcpad(doc: vscode.TextDocument): boolean {
   return doc.languageId === 'calcpad' || /\.cpdz?$/i.test(doc.uri.fsPath);
@@ -88,9 +89,64 @@ export class CalcpadPreviewManager implements vscode.Disposable {
       },
       () => {
         /* activated hook (unused) */
-      }
+      },
+      (exportUri, format, state) => void this.doExport(exportUri, format, state)
     );
     void this.renderNow();
+  }
+
+  // Export command entry point: uses the preview's current state when it targets
+  // the same document, so the exported file matches what is shown.
+  async exportCommand(uri: vscode.Uri | undefined, format: ExportFormat): Promise<void> {
+    const target = uri ?? vscode.window.activeTextEditor?.document.uri;
+    if (!target) {
+      void vscode.window.showWarningMessage('Open a .cpd file to export.');
+      return;
+    }
+    const state: ExportState =
+      this.preview && this.preview.sourceUri.toString() === target.toString()
+        ? this.preview.exportState
+        : { inputValues: [], units: undefined };
+    await this.doExport(target, format, state);
+  }
+
+  private async doExport(uri: vscode.Uri, format: ExportFormat, state: ExportState): Promise<void> {
+    const ext = format === 'docx' ? 'docx' : 'html';
+    const defaultUri = vscode.Uri.file(uri.fsPath.replace(/\.[^.\\/]+$/, '') + '.' + ext);
+    const filters: Record<string, string[]> =
+      format === 'docx' ? { 'Word document': ['docx'] } : { HTML: ['html', 'htm'] };
+    const target = await vscode.window.showSaveDialog({ defaultUri, filters });
+    if (!target) {
+      return;
+    }
+
+    const doc = vscode.workspace.textDocuments.find((d) => d.uri.toString() === uri.toString());
+    const sourceText = doc ? doc.getText() : (await vscode.workspace.openTextDocument(uri)).getText();
+
+    try {
+      await this.renderer.export({
+        sourcePath: uri.fsPath,
+        sourceText,
+        units: state.units,
+        inputValues: state.inputValues,
+        export: { format, outPath: target.fsPath }
+      });
+      const open = 'Open';
+      const reveal = 'Reveal in Explorer';
+      const choice = await vscode.window.showInformationMessage(
+        `Calcpad: exported to ${path.basename(target.fsPath)}`,
+        open,
+        reveal
+      );
+      if (choice === open) {
+        void vscode.env.openExternal(target);
+      } else if (choice === reveal) {
+        void vscode.commands.executeCommand('revealFileInOS', target);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      void vscode.window.showErrorMessage(`Calcpad export failed: ${message}`);
+    }
   }
 
   private async renderNow(): Promise<void> {

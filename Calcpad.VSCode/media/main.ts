@@ -213,9 +213,15 @@ window.addEventListener('message', (event) => {
   }
 });
 
-// Wire the mode toolbar (exists in the persistent shell, outside #calcpad-root).
+function sendExport(format: 'html' | 'docx'): void {
+  vscode.postMessage({ type: 'export', format, inputValues: collectInputs(), units: currentUnits() });
+}
+
+// Wire the toolbar (exists in the persistent shell, outside #calcpad-root).
 $(function () {
   $('#cp-mode-interactive').on('click', () => setMode('interactive'));
   $('#cp-mode-final').on('click', () => setMode('final'));
+  $('#cp-export-html').on('click', () => sendExport('html'));
+  $('#cp-export-docx').on('click', () => sendExport('docx'));
   setMode(mode);
 });
