@@ -12,9 +12,13 @@ namespace Calcpad.Cli
     internal static class CalcpadReader
     {
         private static readonly StringBuilder _stringBuilder = new();
-        internal static string Read(string fileName)
+        internal static string Read(string fileName) => ProcessLines(ReadLines(fileName));
+
+        //Same preprocessing as Read, but from an in-memory source string (used by the preview server).
+        internal static string ReadText(string text) => ProcessLines(text.EnumerateLines());
+
+        private static string ProcessLines(SpanLineEnumerator inputLines)
         {
-            var inputLines = ReadLines(fileName);
             var outputLines = new List<string>();
             var hasForm = false;
             foreach (var line in inputLines)

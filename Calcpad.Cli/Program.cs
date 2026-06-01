@@ -70,6 +70,12 @@ namespace Calcpad.Cli
 
         static void Main()
         {
+            var cliArgs = Environment.GetCommandLineArgs();
+            if (cliArgs.Length > 1 && cliArgs[1] == "--serve")
+            {
+                PreviewServer.Run();
+                return;
+            }
             Thread.CurrentThread.CurrentUICulture = new CultureInfo(_currentCultureName);
             try
             {
@@ -216,7 +222,7 @@ namespace Calcpad.Cli
                 $".{ext}" :
                 $".{_currentCultureName}.{ext}";
 
-        static Settings GetSettings()
+        internal static Settings GetSettings()
         {
             Settings settings = new();
             settings.Math.Decimals = 6;
