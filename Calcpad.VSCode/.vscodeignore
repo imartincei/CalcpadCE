@@ -1,0 +1,20 @@
+# Sources & build tooling — only ship the bundled output
+src/**
+media/main.ts
+scripts/**
+esbuild.mjs
+tsconfig.json
+.vscode/**
+**/*.map
+**/*.ts
+node_modules/**
+.gitignore
+
+# CLI extras we don't need in the preview bundle
+bin/**/doc/HELP*
+bin/**/doc/help*
+bin/**/doc/readme*
+bin/**/doc/LICENSE*
+bin/**/wkhtmltopdf*
+bin/**/Examples/**
+bin/**/*.pdb

@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "build",
+      "problemMatcher": ["$tsc", "$esbuild"],
+      "label": "npm: build",
+      "detail": "Copy assets and bundle the extension + webview."
+    }
+  ]
+}

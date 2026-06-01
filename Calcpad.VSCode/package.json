@@ -1,0 +1,122 @@
+{
+  "name": "calcpad-preview",
+  "displayName": "CalcpadCE Preview",
+  "description": "Live, interactive preview for CalcpadCE .cpd worksheets — like the built-in Markdown preview.",
+  "version": "0.1.0",
+  "publisher": "calcpad",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.84.0"
+  },
+  "categories": [
+    "Visualization",
+    "Programming Languages"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "languages": [
+      {
+        "id": "calcpad",
+        "aliases": [
+          "Calcpad",
+          "calcpad"
+        ],
+        "extensions": [
+          ".cpd",
+          ".cpdz"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "calcpad.showPreview",
+        "title": "Calcpad: Open Preview",
+        "category": "Calcpad",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "calcpad.showPreviewToSide",
+        "title": "Calcpad: Open Preview to the Side",
+        "category": "Calcpad",
+        "icon": "$(open-preview)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "calcpad.showPreview",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "editorLangId == calcpad"
+      },
+      {
+        "command": "calcpad.showPreviewToSide",
+        "key": "ctrl+k v",
+        "mac": "cmd+k v",
+        "when": "editorLangId == calcpad"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "calcpad.showPreviewToSide",
+          "when": "editorLangId == calcpad",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "calcpad.showPreview",
+          "when": "editorLangId == calcpad"
+        },
+        {
+          "command": "calcpad.showPreviewToSide",
+          "when": "editorLangId == calcpad"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "calcpad.showPreview",
+          "when": "resourceExtname == .cpd || resourceExtname == .cpdz",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "CalcpadCE Preview",
+      "properties": {
+        "calcpad.preview.debounceMs": {
+          "type": "number",
+          "default": 300,
+          "description": "Delay in milliseconds before re-rendering the preview after an edit."
+        },
+        "calcpad.preview.updateOnSaveOnly": {
+          "type": "boolean",
+          "default": false,
+          "description": "Only refresh the preview when the document is saved (not on every edit)."
+        },
+        "calcpad.cli.path": {
+          "type": "string",
+          "default": "",
+          "description": "Override path to the Calcpad CLI used for rendering. May point to the native executable or to Cli.dll (run via dotnet). Leave empty to use the bundled binary."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "copy-assets": "node scripts/copy-assets.mjs",
+    "compile": "node esbuild.mjs",
+    "build": "npm run copy-assets && npm run compile",
+    "watch": "node esbuild.mjs --watch",
+    "publish-cli": "node scripts/publish-cli.mjs",
+    "vscode:prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.84.0",
+    "@vscode/vsce": "^2.24.0",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.4.0"
+  }
+}

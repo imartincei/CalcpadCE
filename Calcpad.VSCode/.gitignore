@@ -1,0 +1,13 @@
+node_modules/
+dist/
+bin/
+*.vsix
+
+# The repo-root .gitignore ignores these globally; they are required for the extension.
+!package.json
+!package-lock.json
+# Generated webview assets
+media/main.js
+media/main.js.map
+media/calcpad.css
+media/jquery-3.6.3.min.js
