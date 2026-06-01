@@ -2293,18 +2293,13 @@ namespace Calcpad.Wpf
                     return relative;
                 }
             }
-            else if (useRelative && !_relativePathWarningShown)
+            else if (useRelative && !hasCurrentDoc && !_relativePathWarningShown)
             {
                 _relativePathWarningShown = true;
                 MessageBox.Show(MainWindowResources.SaveDocumentFirstForRelativePaths,
                     "CalcpadCE", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            else if (hasCurrentDoc)
-            {
-                var fileDir = Path.GetDirectoryName(filePath);
-                if (string.Equals(Path.GetDirectoryName(CurrentFileName), fileDir, StringComparison.OrdinalIgnoreCase))
-                    return "./" + Path.GetFileName(filePath);
-            }
+            // Relative paths off (or no saved document): always emit the absolute path.
             return filePath.Replace('\\', '/');
         }
 
