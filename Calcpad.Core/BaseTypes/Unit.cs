@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -340,6 +340,7 @@ namespace Calcpad.Core
             var h = s.Scale("h", 3600d);
             var deg = new Unit("°C", 0f, 0f, 0f, 0f, 1f);
             var A = new Unit("A", 0f, 0f, 0f, 1f);
+            var Ah = new Unit(A * h, "Ah");
             var N = new Unit("N", 1f, 1f, -2f);
             var kN = N.Shift(3);
             var Nm = new Unit("Nm", 1f, 2f, -2f);
@@ -351,6 +352,7 @@ namespace Calcpad.Core
             var W = new Unit("W", 1f, 2f, -3f);
             var C = new Unit("C", 0f, 0f, 1f, 1f);
             var V = new Unit("V", 1f, 2f, -3f, -1f);
+            var kV = V.Shift(3);
             var F = new Unit("F", -1f, -2f, 4f, 2f);
             var Ohm = new Unit("Ω", 1f, 2f, -3f, -2f);
             var S = new Unit("S", -1f, -2f, 3f, 2f);
@@ -398,13 +400,15 @@ namespace Calcpad.Core
             {
                 S,    // -1, -2,  3,  2
                 F,    // -1, -2,  4,  2
-                C,    // 0,  0,  1,  1
-                T,    // 1,  0, -2, -1
-                Ohm,  // 1,  2, -3, -2
-                V,    // 1,  2, -3, -1
-                W,    // 1,  2, -3
-                H,    // 1,  2, -2, -2
-                Wb    // 1,  2, -2, -1
+                C,    //  0,  0,  1,  1
+                T,    //  1,  0, -2, -1
+                Ohm,  //  1,  2, -3, -2
+                V,    //  1,  2, -3, -1
+                kV,   //  1,  2, -3, -1
+                W,    //  1,  2, -3
+                H,    //  1,  2, -2, -2
+                Ah,   //  0,  0,  1,  1
+                Wb    //  1,  2, -2, -1
             }.ToFrozenSet();
 
             Dictionary<string, Unit> units = new(StringComparer.Ordinal)
@@ -557,7 +561,7 @@ namespace Calcpad.Core
                 {"μA",  A.Shift(-6)},
                 {"nA",  A.Shift(-9)},
                 {"pA",  A.Shift(-12)},
-                {"Ah",  new(A * h, "Ah")},
+                {"Ah",  Ah},
                 {"mAh", new(A.Shift(-3) * h, "mAh")},
 
                 {"°C",  deg.Scale("°C", 1d)},
@@ -652,16 +656,6 @@ namespace Calcpad.Core
                 {"nWh", J.Scale("nWh", 3.6e-6)},
                 {"pWh", J.Scale("pWh", 3.6e-9)},
 
-                {"VAh",  J.Scale("VAh",  3.6e+3)},
-                {"kVAh", J.Scale("kVAh", 3.6e+6)},
-                {"MVAh", J.Scale("MVAh", 3.6e+9)},
-                {"GVAh", J.Scale("GVAh", 3.6e+12)},
-
-                {"VARh",  J.Scale("VARh",  3.6e+3)},
-                {"kVARh", J.Scale("kVARh", 3.6e+6)},
-                {"MVARh", J.Scale("MVARh", 3.6e+9)},
-                {"GVARh", J.Scale("GVARh", 3.6e+12)},
-
                 {"erg", J.Scale("erg", 1e-7)},
                 {"eV",  J.Scale("eV",  1.6021773300241367e-19)},
                 {"keV", J.Scale("keV", 1.6021773300241367e-16)},
@@ -724,7 +718,7 @@ namespace Calcpad.Core
                 {"pC", C.Shift(-12)},
 
                 {"V",  V},
-                {"kV", V.Shift(3)},
+                {"kV", kV},
                 {"MV", V.Shift(6)},
                 {"GV", V.Shift(9)},
                 {"TV", V.Shift(12)},
@@ -1156,8 +1150,12 @@ namespace Calcpad.Core
         {
             if ((!u._text?.StartsWith("VA") ?? true) &&
                 ElectricalUnits.TryGetValue(u, out var eu))
-                return eu;
+            {
+                if (eu._text == "kV")
+                    return Units["V"];
 
+                return eu;
+            }
             return u;
         }
 
@@ -1773,7 +1771,7 @@ namespace Calcpad.Core
                 if (!s.Contains('^'))
                 {
                     var writer = new TextWriter(null, false);
-                    var ps = GetFraction(f) ??
+                    var ps = GetFraction(f) ?? 
                         (d < 0 ?
                             $"({writer.FormatNumberHelper(d, null)})" :
                             writer.FormatNumberHelper(d, null));
@@ -1790,7 +1788,7 @@ namespace Calcpad.Core
         private static string GetFraction(float f)
         {
             var uf = Math.Abs(f);
-            if (uf >= 1f)
+            if (uf >= 1f) 
                 return null;
 
             var s = f < 0 ? "-" : string.Empty;
