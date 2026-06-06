@@ -709,7 +709,6 @@ namespace Calcpad.Wpf
             ZeroSmallMatrixElementsCheckBox.IsChecked = settings.ZeroSmallMatrixElements;
             MaxOutputCountTextBox.Text = settings.MaxOutputCount.ToString();
             EmbedCheckBox.IsChecked = settings.Embed;
-            UseRelativePathsCheckBox.IsChecked = settings.UseRelativePaths;
             if (settings.WindowLeft > 0) Left = settings.WindowLeft;
             if (settings.WindowTop > 0) Top = settings.WindowTop;
             if (settings.WindowWidth > 0) Width = settings.WindowWidth;
@@ -794,7 +793,6 @@ namespace Calcpad.Wpf
             settings.ZeroSmallMatrixElements = ZeroSmallMatrixElementsCheckBox.IsChecked ?? false;
             settings.MaxOutputCount = int.TryParse(MaxOutputCountTextBox.Text, out int i) ? i : (int)20;
             settings.Embed = EmbedCheckBox.IsChecked ?? false;
-            settings.UseRelativePaths = UseRelativePathsCheckBox.IsChecked ?? false;
             settings.WindowLeft = Left;
             settings.WindowTop = Top;
             settings.WindowWidth = Width;
@@ -2130,47 +2128,17 @@ namespace Calcpad.Wpf
                 InsertImage(dlg.FileName);
         }
 
-        private bool _relativePathWarningShown;
-
-        private string BuildImageSrc(string filePath)
-        {
-            var hasCurrentDoc = !string.IsNullOrEmpty(CurrentFileName);
-            var useRelative = UseRelativePathsCheckBox.IsChecked ?? false;
-
-            if (useRelative && hasCurrentDoc)
-            {
-                var docDir = Path.GetDirectoryName(CurrentFileName);
-                var relative = Path.GetRelativePath(docDir, filePath).Replace('\\', '/');
-                // Path.GetRelativePath returns the original absolute path when the file is on
-                // a different volume — in that case fall through to the absolute branch below.
-                if (!Path.IsPathRooted(relative))
-                {
-                    if (!relative.StartsWith("./", StringComparison.Ordinal) &&
-                        !relative.StartsWith("../", StringComparison.Ordinal))
-                        relative = "./" + relative;
-                    return relative;
-                }
-            }
-            else if (useRelative && !_relativePathWarningShown)
-            {
-                _relativePathWarningShown = true;
-                MessageBox.Show(MainWindowResources.SaveDocumentFirstForRelativePaths,
-                    "CalcpadCE", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else if (hasCurrentDoc)
-            {
-                var fileDir = Path.GetDirectoryName(filePath);
-                if (string.Equals(Path.GetDirectoryName(CurrentFileName), fileDir, StringComparison.OrdinalIgnoreCase))
-                    return "./" + Path.GetFileName(filePath);
-            }
-            return filePath.Replace('\\', '/');
-        }
-
         private void InsertImage(string filePath)
         {
             var fileName = Path.GetFileName(filePath);
             var size = GetImageSize(filePath);
-            var src = BuildImageSrc(filePath);
+            var fileDir = Path.GetDirectoryName(filePath);
+            string src;
+            if (!string.IsNullOrEmpty(CurrentFileName) &&
+                string.Equals(Path.GetDirectoryName(CurrentFileName), fileDir, StringComparison.OrdinalIgnoreCase))
+                src = "./" + fileName;
+            else
+                src = filePath.Replace('\\', '/');
             var p = new Paragraph();
             p.Inlines.Add(new Run($"'<img style=\"height:{size.Height}pt; width:{size.Width}pt;\" src=\"{src}\" alt=\"{fileName}\">"));
             _highlighter.Parse(p, IsComplex, GetLineNumber(p), true);

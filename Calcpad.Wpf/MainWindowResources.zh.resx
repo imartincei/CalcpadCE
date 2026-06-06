@@ -1136,15 +1136,6 @@
   <data name="EmbedPlotsInsideTheHtmlAsBase64EncodedImagesSaveToFilesIfUnchecked" xml:space="preserve">
     <value>将图片作为base64编码图像嵌入Html,若未检查即保存为文件.</value>
   </data>
-  <data name="Relative" xml:space="preserve">
-    <value>相对路径</value>
-  </data>
-  <data name="UseRelativePathsForInsertedImages" xml:space="preserve">
-    <value>插入图像时使用相对路径(相对于当前文档所在文件夹解析)。</value>
-  </data>
-  <data name="SaveDocumentFirstForRelativePaths" xml:space="preserve">
-    <value>请先保存文档以便插入相对路径。本次已改用绝对路径。</value>
-  </data>
   <data name="MultilineExpressionBlock" xml:space="preserve">
     <value>多行表达式块</value>
   </data>

@@ -1016,33 +1016,6 @@ namespace Calcpad.Wpf {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Relative.
-        /// </summary>
-        public static string Relative {
-            get {
-                return ResourceManager.GetString("Relative", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Use relative paths for inserted images (resolved against the current document folder)..
-        /// </summary>
-        public static string UseRelativePathsForInsertedImages {
-            get {
-                return ResourceManager.GetString("UseRelativePathsForInsertedImages", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Save the document first to insert relative paths. An absolute path was used instead..
-        /// </summary>
-        public static string SaveDocumentFirstForRelativePaths {
-            get {
-                return ResourceManager.GetString("SaveDocumentFirstForRelativePaths", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to Enables markdown in comments.
         /// </summary>
         public static string EnablesMarkdownInComments {

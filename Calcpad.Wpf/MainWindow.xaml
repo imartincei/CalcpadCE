@@ -2193,14 +2193,6 @@
                     Margin="4,0,0,0"
                     TabIndex="20"  IsChecked="True"
                     Click="EmbedCheckBox_Click" FontSize="11"/>
-            <CheckBox x:Name="UseRelativePathsCheckBox"
-                    Content="{x:Static wpf:MainWindowResources.Relative}"
-                    ToolTip="{x:Static wpf:MainWindowResources.UseRelativePathsForInsertedImages}"
-                    Height="16"
-                    VerticalAlignment="Top" HorizontalAlignment="Right"
-                    Margin="4,0,0,0"
-                    TabIndex="23" IsChecked="True"
-                    FontSize="11"/>
             <TextBlock Height="18"
                        TextWrapping="Wrap"
                        VerticalAlignment="Top"

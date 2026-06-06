@@ -1136,15 +1136,6 @@
   <data name="EmbedPlotsInsideTheHtmlAsBase64EncodedImagesSaveToFilesIfUnchecked" xml:space="preserve">
     <value>Вграждане на графики в HTML като base64 кодирани изображения. Запазване във файлове, ако не е отметнато.</value>
   </data>
-  <data name="Relative" xml:space="preserve">
-    <value>Относителни</value>
-  </data>
-  <data name="UseRelativePathsForInsertedImages" xml:space="preserve">
-    <value>Използвай относителни пътища за вмъкнатите изображения (спрямо папката на текущия документ).</value>
-  </data>
-  <data name="SaveDocumentFirstForRelativePaths" xml:space="preserve">
-    <value>Запазете документа, за да вмъквате относителни пътища. Вместо това беше използван абсолютен път.</value>
-  </data>
   <data name="MultilineExpressionBlock" xml:space="preserve">
     <value>Многоредов блок от изрази</value>
   </data>

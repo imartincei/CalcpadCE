@@ -309,17 +309,5 @@ namespace Calcpad.Wpf.Properties {
                 this["Embed"] = value;
             }
         }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool UseRelativePaths {
-            get {
-                return ((bool)(this["UseRelativePaths"]));
-            }
-            set {
-                this["UseRelativePaths"] = value;
-            }
-        }
     }
 }

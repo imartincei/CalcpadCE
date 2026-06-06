@@ -1137,15 +1137,6 @@ You can find your unsaved data in
   <data name="EmbedPlotsInsideTheHtmlAsBase64EncodedImagesSaveToFilesIfUnchecked" xml:space="preserve">
     <value>Embed plots inside the Html as base64 encoded images, Save to files if unchecked.</value>
   </data>
-  <data name="Relative" xml:space="preserve">
-    <value>Relative</value>
-  </data>
-  <data name="UseRelativePathsForInsertedImages" xml:space="preserve">
-    <value>Use relative paths for inserted images (resolved against the current document folder).</value>
-  </data>
-  <data name="SaveDocumentFirstForRelativePaths" xml:space="preserve">
-    <value>Save the document first to insert relative paths. An absolute path was used instead.</value>
-  </data>
   <data name="MultilineExpressionBlock" xml:space="preserve">
     <value>Multiline expression block</value>
   </data>
