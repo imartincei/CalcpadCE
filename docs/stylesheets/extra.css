@@ -31,6 +31,7 @@ img[height="20"] {
 /* Use system fonts instead of loading Roboto from Google Fonts. */
 body {
     --md-text-font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --md-code-font: 'Cascadia Code';
 }
 
 /* CalcpadCE internal sylesheets */
