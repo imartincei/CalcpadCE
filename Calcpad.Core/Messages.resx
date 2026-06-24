@@ -250,6 +250,12 @@
   <data name="Circular_reference_detected_for_function_0" xml:space="preserve">
         <value>Circular reference detected for function "{0}".</value>
     </data>
+  <data name="Circular_reference_detected_for_macro_0" xml:space="preserve">
+        <value>Circular reference detected for macro "{0}".</value>
+    </data>
+  <data name="Circular_include_detected_0" xml:space="preserve">
+        <value>Circular #include detected: "{0}".</value>
+    </data>
   <data name="Invalid_function_definition_exception" xml:space="preserve">
         <value>Invalid function definition. It has to match the pattern: "f(x; y; z...) = expression".</value>
     </data>

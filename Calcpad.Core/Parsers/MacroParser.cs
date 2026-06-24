@@ -82,8 +82,15 @@ namespace Calcpad.Core
             Include,
         }
         private readonly List<int> _lineNumbers = [];
+        // Filesystem path comparison must match the host OS to avoid false-positive circular
+        // detection on case-sensitive filesystems (Linux) or missed detection on Windows.
+        private static readonly StringComparer PathComparer =
+            OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        private readonly HashSet<string> _includeStack = new(PathComparer);
         private static readonly Dictionary<string, Macro> Macros = new(StringComparer.Ordinal);
         public Func<string, Queue<string>, string> Include;
+        public ClientFileCache ClientFileCache { get; set; }
+        public string SourceFilePath { get; set; }
 
         private static Keywords GetKeyword(ReadOnlySpan<char> s)
         {
@@ -108,6 +115,7 @@ namespace Calcpad.Core
                 sb = new StringBuilder(sourceCode.Length);
                 Macros.Clear();
                 _lineNumbers.Clear();
+                _includeStack.Clear();
                 _parsedLineNumber = 0;
             }
             var macroBuilder = new StringBuilder(1000);
@@ -210,11 +218,7 @@ namespace Calcpad.Core
                 if (n < 9)
                     n = lineContent.Length;
 
-                var includeFileName = lineContent[8..n].Trim().ToString();
-                includeFileName = Path.GetFullPath(Environment.ExpandEnvironmentVariables(includeFileName));
-                var fileExists = File.Exists(includeFileName);
-                if (!fileExists)
-                    AppendError(lineContent, Messages.File_not_found);
+                var rawFileName = lineContent[8..n].Trim().ToString();
 
                 Queue<string> fields = new();
                 if (nf1 > 0)
@@ -229,8 +233,68 @@ namespace Calcpad.Core
                             fields.Enqueue(item.Trim().ToString());
                     }
                 }
-                if (fileExists)
-                    Parse(Include(includeFileName, fields), out _, sb, lineNumber, addLineNumbers);
+
+                // Resolve relative to source file directory when available
+                var sourceDir = !string.IsNullOrEmpty(SourceFilePath)
+                    ? Path.GetDirectoryName(SourceFilePath) : null;
+
+                // Try filesystem first
+                bool fileExists = false;
+                string resolvedPath = null;
+                try
+                {
+                    var expanded = Environment.ExpandEnvironmentVariables(rawFileName);
+                    resolvedPath = sourceDir != null
+                        ? Path.GetFullPath(expanded, sourceDir)
+                        : Path.GetFullPath(expanded);
+                    fileExists = File.Exists(resolvedPath);
+                }
+                catch { /* Not a valid filesystem path (e.g., URLs, API syntax) */ }
+
+                // Detect circular includes
+                var includeKey = resolvedPath ?? rawFileName;
+                if (!_includeStack.Add(includeKey))
+                {
+                    AppendError(lineContent, string.Format(Messages.Circular_include_detected_0, rawFileName));
+                    return;
+                }
+
+                try
+                {
+                    if (fileExists)
+                    {
+                        ParseWithSourcePath(Include(resolvedPath, fields), resolvedPath);
+                        return;
+                    }
+
+                    var cacheKey = resolvedPath ?? rawFileName;
+                    var fallbackKey = resolvedPath != null ? rawFileName : null;
+                    if (ClientFileCache != null && ClientFileCache.TryGetContentMultiKey(cacheKey, fallbackKey, out var cachedContent))
+                    {
+                        ParseWithSourcePath(cachedContent, resolvedPath);
+                        return;
+                    }
+
+                    if (ClientFileCache != null && ClientFileCache.TryGetErrorMultiKey(cacheKey, fallbackKey, out var cachedError))
+                    {
+                        AppendError(lineContent, cachedError);
+                        return;
+                    }
+
+                    AppendError(lineContent, Messages.File_not_found);
+                }
+                finally
+                {
+                    _includeStack.Remove(includeKey);
+                }
+            }
+
+            void ParseWithSourcePath(string content, string newSourcePath)
+            {
+                var savedSourcePath = SourceFilePath;
+                SourceFilePath = newSourcePath;
+                try { Parse(content, out _, sb, lineNumber, addLineNumbers); }
+                finally { SourceFilePath = savedSourcePath; }
             }
 
             void ParseDef(ReadOnlySpan<char> lineContent)
@@ -375,7 +439,7 @@ namespace Calcpad.Core
             return fields;
         }
 
-        private static string ApplyMacros(ReadOnlySpan<char> lineContent)
+        private static string ApplyMacros(ReadOnlySpan<char> lineContent, HashSet<string> currentlyExpanding = null)
         {
             var index = lineContent.IndexOf("$");
             if (index < 0)
@@ -387,6 +451,7 @@ namespace Calcpad.Core
             var bracketCount = 0;
             var emptyMacro = new Macro(null, null);
             var macro = emptyMacro;
+            string macroKey = null;
             Queue<string> fields = null;
             if (index >= 0)
             {
@@ -414,7 +479,7 @@ namespace Calcpad.Core
 
                     if (c == ';' && bracketCount == 1 || c == ')' && bracketCount == 0)
                     {
-                        var s = ApplyMacros(textSpan.Cut());
+                        var s = ApplyMacros(textSpan.Cut(), currentlyExpanding);
                         macroArguments.Add(s);
                         textSpan.Reset(i + 1);
                         if ((macroArguments.Count == macro.ParameterCount) != (c == ')'))
@@ -428,9 +493,16 @@ namespace Calcpad.Core
                     textSpan.Expand();
                     var macroName = textSpan.ToString();
                     int j, mlen = macroName.Length - 1;
+                    macroKey = null;
                     for (j = 0; j < mlen; ++j)
-                        if (Macros.TryGetValue(macroName[j..], out macro))
+                    {
+                        var candidate = macroName[j..];
+                        if (Macros.TryGetValue(candidate, out macro))
+                        {
+                            macroKey = candidate;
                             break;
+                        }
+                    }
 
                     if (macro.IsEmpty)
                         throw Exceptions.UndefinedMacro(macroName);
@@ -445,7 +517,7 @@ namespace Calcpad.Core
                 {
                     if (!macro.IsEmpty)
                     {
-                        var s = ApplyMacros(macro.Run(macroArguments));
+                        var s = ExpandMacro(macro, macroArguments, macroKey, ref currentlyExpanding);
                         var sbLength = stringBuilder.Length;
                         SetLineInputFields(s, stringBuilder, fields, false);
                         if (stringBuilder.Length == sbLength)
@@ -479,10 +551,20 @@ namespace Calcpad.Core
             }
             else if (macroArguments.Count == macro.ParameterCount)
             {
-                var s = ApplyMacros(macro.Run(macroArguments));
+                var s = ExpandMacro(macro, macroArguments, macroKey, ref currentlyExpanding);
                 stringBuilder.Append(s);
             }
             return stringBuilder.ToString();
+        }
+
+        private static string ExpandMacro(Macro macro, List<string> macroArguments, string macroKey, ref HashSet<string> currentlyExpanding)
+        {
+            if (currentlyExpanding != null && currentlyExpanding.Contains(macroKey))
+                throw Exceptions.CircularMacroReference(macroKey);
+            currentlyExpanding ??= new HashSet<string>(StringComparer.Ordinal);
+            currentlyExpanding.Add(macroKey);
+            try { return ApplyMacros(macro.Run(macroArguments), currentlyExpanding); }
+            finally { currentlyExpanding.Remove(macroKey); }
         }
 
 

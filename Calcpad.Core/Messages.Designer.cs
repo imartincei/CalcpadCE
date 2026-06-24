@@ -259,6 +259,24 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
+        // /   Looks up a localized string similar to Circular reference detected for macro &quot;{0}&quot;..
+        // / </summary>
+        public static string Circular_reference_detected_for_macro_0 {
+            get {
+                return ResourceManager.GetString("Circular_reference_detected_for_macro_0", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to Circular #include detected: &quot;{0}&quot;..
+        // / </summary>
+        public static string Circular_include_detected_0 {
+            get {
+                return ResourceManager.GetString("Circular_include_detected_0", resourceCulture);
+            }
+        }
+
+        // / <summary>
         // /   Looks up a localized string similar to Condition block not initialized with &quot;#if&quot;..
         // / </summary>
         public static string Condition_block_not_initialized_with_if {

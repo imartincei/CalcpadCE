@@ -232,6 +232,9 @@ namespace Calcpad.Core
         internal static MathParserException CircularReference(string name) =>
             new(string.Format(Messages.Circular_reference_detected_for_function_0, name));
 
+        internal static MathParserException CircularMacroReference(string name) =>
+            new(string.Format(Messages.Circular_reference_detected_for_macro_0, name));
+
         internal static MathParserException InvalidFunctionDefinition() =>
             new(Messages.Invalid_function_definition_exception);
 

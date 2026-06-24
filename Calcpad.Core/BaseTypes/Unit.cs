@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -26,7 +26,7 @@ namespace Calcpad.Core
         private static readonly string CompositeUnitChars = Calculator.NegChar + "∕^";
         private static readonly string[] Names = ["g", "m", "s", "A", "°C", "mol", "cd", "rad", ""];
         private static readonly Unit[] ForceUnits = new Unit[9], ForceUnits_US = new Unit[9];
-        private static readonly FrozenSet<Unit> ElectricalUnits;
+        private static readonly FrozenDictionary<Unit, Unit> ElectricalUnits;
         private static FrozenDictionary<string, Unit> Units;
         private static readonly string[] UnitNames =
         [
@@ -396,20 +396,22 @@ namespace Calcpad.Core
             ForceUnits_US[7] = (kipf * m.Pow(3f)).Scale("kip·ft^3", 0.028316846592);
             ForceUnits_US[8] = (kipf * m.Pow(4f)).Scale("kip·ft^4", 0.0086309748412416);
 
-            ElectricalUnits = new HashSet<Unit>()
+            // Each electrical unit maps to its canonical output. kV maps to V so
+            // kV-scaled inputs collapse to V without a post-lookup fix-up.
+            ElectricalUnits = new Dictionary<Unit, Unit>()
             {
-                S,    // -1, -2,  3,  2
-                F,    // -1, -2,  4,  2
-                C,    //  0,  0,  1,  1
-                T,    //  1,  0, -2, -1
-                Ohm,  //  1,  2, -3, -2
-                V,    //  1,  2, -3, -1
-                kV,   //  1,  2, -3, -1
-                W,    //  1,  2, -3
-                H,    //  1,  2, -2, -2
-                Ah,   //  0,  0,  1,  1
-                Wb    //  1,  2, -2, -1
-            }.ToFrozenSet();
+                { S,   S   }, // -1, -2,  3,  2
+                { F,   F   }, // -1, -2,  4,  2
+                { C,   C   }, //  0,  0,  1,  1
+                { T,   T   }, //  1,  0, -2, -1
+                { Ohm, Ohm }, //  1,  2, -3, -2
+                { V,   V   }, //  1,  2, -3, -1
+                { kV,  V   }, //  1,  2, -3, -1
+                { W,   W   }, //  1,  2, -3
+                { H,   H   }, //  1,  2, -2, -2
+                { Ah,  Ah  }, //  0,  0,  1,  1
+                { Wb,  Wb  }, //  1,  2, -2, -1
+            }.ToFrozenDictionary();
 
             Dictionary<string, Unit> units = new(StringComparer.Ordinal)
             {
@@ -1158,12 +1160,8 @@ namespace Calcpad.Core
         {
             if ((!u._text?.StartsWith("VA") ?? true) &&
                 ElectricalUnits.TryGetValue(u, out var eu))
-            {
-                if (eu._text == "kV")
-                    return Units["V"];
-
                 return eu;
-            }
+
             return u;
         }
 
@@ -1779,7 +1777,7 @@ namespace Calcpad.Core
                 if (!s.Contains('^'))
                 {
                     var writer = new TextWriter(null, false);
-                    var ps = GetFraction(f) ?? 
+                    var ps = GetFraction(f) ??
                         (d < 0 ?
                             $"({writer.FormatNumberHelper(d, null)})" :
                             writer.FormatNumberHelper(d, null));
@@ -1796,7 +1794,7 @@ namespace Calcpad.Core
         private static string GetFraction(float f)
         {
             var uf = Math.Abs(f);
-            if (uf >= 1f) 
+            if (uf >= 1f)
                 return null;
 
             var s = f < 0 ? "-" : string.Empty;

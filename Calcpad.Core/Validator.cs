@@ -9,7 +9,9 @@ namespace Calcpad.Core
     {
         private const string CurrencyChars = "€£₤¥¢₽₹₩₪"; // For custom currency units
         private const string UnitSymbolChars = "°′″%‰‱";
-        private const string VarSymbolChars = ",_‾‴⁗";
+        // Combining marks (́ acute, ̄ macron, ̇ dot above, ̈ diaeresis)
+        // attach to a preceding base letter, so they're allowed inside an identifier but never as a starter.
+        private const string VarSymbolChars = ",_‾‴⁗́̄̇̈";
         private const string VarNonLetterChars = "℧∡";
         private const string VarLetterChars = "ϑϕøØ";
         private const string SuperscriptChars = "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾";
