@@ -51,10 +51,21 @@ namespace Calcpad.Core
         public void Cancel() => _parser?.Cancel();
         public void Pause() => _isPausedByUser = true;
 
-        private string HtmlId =>
-            Debug && (_loops.Count == 0 || _loops.Peek().Iteration == 1) ?
-            $" id=\"line-{_currentLine + 1}\" class=\"line\"" :
-            string.Empty;
+        // Debug mode emits class="line" + data-source-line on every iteration so the
+        // preview line-link arrows appear on repeated loop output too, but only stamps
+        // id="line-N" once (first loop pass or outside any loop) since the id is the
+        // scroll target and getElementById returns only the first match.
+        private string HtmlId
+        {
+            get
+            {
+                if (!Debug) return string.Empty;
+                var isFirstPass = _loops.Count == 0 || _loops.Peek().IsFirstPass;
+                return isFirstPass
+                    ? $" id=\"line-{_currentLine + 1}\" data-source-line=\"{_parser.Line}\" class=\"line\""
+                    : $" data-source-line=\"{_parser.Line}\" class=\"line\"";
+            }
+        }
 
         public void Parse(string sourceCode, bool calculate = true, bool getXml = true) =>
             Parse(sourceCode.AsSpan(), calculate, getXml);
@@ -91,6 +102,14 @@ namespace Calcpad.Core
                     {
                         if (IsEnabled())
                         {
+                            // Restore the source line from cache. Loop iterations reach
+                            // this fast path without re-reading the '\v' marker, so
+                            // without this _parser.Line would drift to whatever the last
+                            // non-cached line set — pulling data-source-line and error
+                            // targets off the actual source line.
+                            _parser.Line = currentLineCache.SourceLine != 0
+                                ? currentLineCache.SourceLine
+                                : _currentLine + 1;
                             _condition.SetCondition(-1);
                             _parser.IsCalculation = _isVal != -1;
                             ParseLine(currentLineCache.Tokens, Keyword.None);
@@ -143,7 +162,7 @@ namespace Calcpad.Core
                     _parser.IsConst = false;
                     var result = ParseKeyword(textSpan, ref keyword);
                     if (keyword != currentLineCache.Keyword)
-                        _lineCache[lineCache] = new(currentLineCache.Tokens, keyword);
+                        _lineCache[lineCache] = new(currentLineCache.Tokens, keyword, _parser.Line);
 
                     if (result == KeywordResult.Continue)
                         continue;
@@ -164,7 +183,7 @@ namespace Calcpad.Core
                             if (_isMarkdownOn)
                                 ParseMarkdown(tokens);
 
-                            _lineCache[_currentLine] = new(tokens, keyword);
+                            _lineCache[_currentLine] = new(tokens, keyword, _parser.Line);
                         }
                         _parser.HasInputFields = false;
                         ParseLine(tokens, keyword);

@@ -13,6 +13,11 @@ namespace Calcpad.Core
             protected int _iteration;
             internal int Id { get; }
             internal int Iteration => _iteration;
+            // The starting iteration count (a countdown that _iteration reaches on the
+            // final pass). Kept alongside _iteration so callers can tell "first pass"
+            // (Iteration == InitialCount) from "final pass" (Iteration == 1).
+            internal int InitialCount { get; }
+            internal bool IsFirstPass => _iteration == InitialCount;
             private protected Loop(int startLine, double count, int id)
             {
                 _startLine = startLine;
@@ -20,6 +25,7 @@ namespace Calcpad.Core
                     count = MaxCount;
 
                 _iteration = (int)count;
+                InitialCount = _iteration;
                 Id = id;
             }
             internal bool Iterate(ref int currentLine)

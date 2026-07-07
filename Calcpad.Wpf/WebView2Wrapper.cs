@@ -46,6 +46,16 @@ namespace Calcpad.Wpf
 
         internal async Task<string> GetLinkDataAsync()
         {
+            var (data, _) = await GetLinkDataAndClassAsync();
+            return data;
+        }
+
+        // Returns both the anchor's data-text and its className so the caller can
+        // tell a .lineLink click (data-text is a source line — navigate directly)
+        // from an error-link or line-num click (data-text may be an output line —
+        // may need the wrapped→unwrapped two-step).
+        internal async Task<(string Data, string ClassName)> GetLinkDataAndClassAsync()
+        {
             try
             {
                 var tagName = await InvokeScriptAsync<string>("document.activeElement.tagName");
@@ -53,17 +63,20 @@ namespace Calcpad.Wpf
                 {
                     var linkData = await InvokeScriptAsync<string>("document.activeElement.getAttribute('data-text')");
                     if (linkData != "undefined")
-                        return linkData;
+                    {
+                        var className = await InvokeScriptAsync<string>("document.activeElement.className || ''");
+                        return (linkData, className ?? string.Empty);
+                    }
                 }
                 else if (tagName == "SELECT")
                 {
                     var linkData = await InvokeScriptAsync<string>("document.activeElement.value");
                     if (linkData != "undefined")
-                        return linkData;
+                        return (linkData, string.Empty);
                 }
             }
             catch { }
-            return null;
+            return (null, string.Empty);
         }
 
         internal async Task<string> GetUnitsAsync()

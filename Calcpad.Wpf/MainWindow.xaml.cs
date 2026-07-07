@@ -528,11 +528,15 @@ namespace Calcpad.Wpf
 
         private int _scrollOutputToLine;
         private double _scrollOffset;
-        private async void LineClicked(string data)
+        private async void LineClicked(string data, bool isSourceLink = false)
         {
             if (int.TryParse(data, out var line) && line > 0)
             {
-                if (_highlighter.Defined.HasMacros && !IsUnwarpedCode)
+                // isSourceLink means the click came from a .lineLink arrow whose data-text
+                // is already the source line (from Calcpad.Core's data-source-line
+                // attribute), so the wrapped→unwrapped two-step below would misroute the
+                // scroll — skip it and navigate the editor directly.
+                if (!isSourceLink && _highlighter.Defined.HasMacros && !IsUnwarpedCode)
                 {
                     _scrollOffset = await _wv2Warper.GetVerticalPositionAsync(line);
                     _scrollOutputToLine = line;
@@ -3814,7 +3818,7 @@ namespace Calcpad.Wpf
 
         private async void WebViewer_LinkClicked()
         {
-            var s = await _wv2Warper.GetLinkDataAsync();
+            var (s, className) = await _wv2Warper.GetLinkDataAndClassAsync();
             if (s is null)
                 return;
 
@@ -3848,7 +3852,14 @@ namespace Calcpad.Wpf
                 else if (s == "cancel")
                     Cancel();
                 else if (IsCalculated || _parser.IsPaused)
-                    LineClicked(s);
+                {
+                    // .lineLink arrows carry the source line in data-text (Calcpad.Core's
+                    // data-source-line attribute), so they can skip the wrapped→unwrapped
+                    // two-step and navigate the editor directly. Error links and line-num
+                    // anchors go through the normal LineClicked path.
+                    var isSourceLink = className != null && className.Contains("lineLink");
+                    LineClicked(s, isSourceLink);
+                }
                 else if (!IsWebForm)
                     LinkClicked(s);
             }

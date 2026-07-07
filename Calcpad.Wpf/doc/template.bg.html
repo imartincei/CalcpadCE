@@ -887,8 +887,12 @@
                 });
 
                 $(".line:not(style, script)").each(function () {
-                    var line = $(this).prop("id").split("-")[1];
-                    var $lineLink = $('<a class="lineLink" href="#0" data-text="' + line + '" title="Code line ' + line + '">&larr;</a>');
+                    // data-source-line is stamped by Calcpad.Core (ExpressionParser)
+                    // on every emitted .line, including loop iterations past the first
+                    // where the id is dropped (id is the scroll anchor and must be unique).
+                    var line = $(this).attr("data-source-line");
+                    if (!line) return;
+                    var $lineLink = $('<a class="lineLink" href="#0" data-text="' + line + '" title="Source line ' + line + '">&larr;</a>');
                     $(this).append($lineLink);
                     $lineLink.hide();
                     $(this).hover(function () {
