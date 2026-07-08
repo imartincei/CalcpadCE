@@ -532,10 +532,6 @@ namespace Calcpad.Wpf
         {
             if (int.TryParse(data, out var line) && line > 0)
             {
-                // isSourceLink means the click came from a .lineLink arrow whose data-text
-                // is already the source line (from Calcpad.Core's data-source-line
-                // attribute), so the wrapped→unwrapped two-step below would misroute the
-                // scroll — skip it and navigate the editor directly.
                 if (!isSourceLink && _highlighter.Defined.HasMacros && !IsUnwarpedCode)
                 {
                     _scrollOffset = await _wv2Warper.GetVerticalPositionAsync(line);

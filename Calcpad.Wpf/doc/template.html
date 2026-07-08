@@ -887,9 +887,6 @@
                 });
 
                 $(".line:not(style, script)").each(function () {
-                    // data-source-line is stamped by Calcpad.Core (ExpressionParser)
-                    // on every emitted .line, including loop iterations past the first
-                    // where the id is dropped (id is the scroll anchor and must be unique).
                     var line = $(this).attr("data-source-line");
                     if (!line) return;
                     var $lineLink = $('<a class="lineLink" href="#0" data-text="' + line + '" title="Source line ' + line + '">&larr;</a>');

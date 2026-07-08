@@ -50,10 +50,6 @@ namespace Calcpad.Wpf
             return data;
         }
 
-        // Returns both the anchor's data-text and its className so the caller can
-        // tell a .lineLink click (data-text is a source line — navigate directly)
-        // from an error-link or line-num click (data-text may be an output line —
-        // may need the wrapped→unwrapped two-step).
         internal async Task<(string Data, string ClassName)> GetLinkDataAndClassAsync()
         {
             try
