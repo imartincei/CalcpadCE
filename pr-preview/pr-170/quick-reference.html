@@ -1,0 +1,3494 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="new-metadata-comments.html">
+      
+      
+        <link rel="next" href="examples/getting-started.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>How It Works - CalcpadCE Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="stylesheets/calcpad-output.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+  <script src="javascripts/jquery-3.6.3.min.js"></script>
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#how-it-works" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="CalcpadCE Documentation" class="md-header__button md-logo" aria-label="CalcpadCE Documentation" data-md-component="logo">
+      
+  <img src="media/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CalcpadCE Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              How It Works
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="index.html" class="md-tabs__link">
+          
+  
+  
+  Documentation
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="new-vscode-extension.html" class="md-tabs__link">
+          
+  
+  
+  New Apps and Features (beta)
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="quick-reference.html" class="md-tabs__link">
+          
+  
+  
+  Quick Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="examples/getting-started.html" class="md-tabs__link">
+          
+  
+  
+  Engineering Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="examples/simply-supported-beams.html" class="md-tabs__link">
+          
+  
+  
+  Structural Engineering Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="CalcpadCE Documentation" class="md-nav__button md-logo" aria-label="CalcpadCE Documentation" data-md-component="logo">
+      
+  <img src="media/logo.svg" alt="logo">
+
+    </a>
+    CalcpadCE Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Documentation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About CalcpadCE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="fields-of-application.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fields of Application
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="installation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="licensing-and-terms-of-use.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Licensing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="how-it-works.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="theoretical-background.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theoretical Background
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="writing-math.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Math
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reporting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reporting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="programming.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Programming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="results.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="working-with-files.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="constants.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Constants
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="variables.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="operators.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="brackets.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Brackets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="plotting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="numerical-methods.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Numerical Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="iterative-procedures.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iterative Procedures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="units.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Units
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="vectors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="high-performance-vectors-and-matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Performance Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    New Apps and Features (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    New Apps and Features (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-vscode-extension.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VS Code Extension
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-desktop-app.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop App
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-calcpad-panel-and-settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CalcPad Panel & Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-pdf-export.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PDF Export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-includes.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Includes and File Reads
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-linter.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linter and Diagnostics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-table-of-contents.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table of Contents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-web-deployment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running the Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-metadata-comments.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata Comments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Quick Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="quick-reference.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-language" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Language
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engineering Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Engineering Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/getting-started.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/areas.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Areas (15)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/volumes.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Volumes (15)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/geometrical.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometrical (24)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/fractals.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fractals (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/3d-plotting-drawing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D, Plotting, Drawing (7)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/interpolation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpolation (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/numerical.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Numerical (7)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/pendulums.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pendulums (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/waves.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waves (10)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/parametric-curves.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parametric Curves (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/elastic-analysis.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Elastic Analysis (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/finite-elements.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Finite Elements (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/fourier.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/special-math-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Special Math Functions (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/vectors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/vectors-high-performance.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors: High Performance (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/matrices-high-performance.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices: High Performance (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/multiline-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multiline Functions (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/custom-units.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Units (2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/formatting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Formatting (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/others.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Others (8)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Engineering Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Structural Engineering Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/simply-supported-beams.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simply Supported Beams (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/cantilevers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cantilevers (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/propped-cantilevers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Propped Cantilevers (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/continuous-beam.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Continuous Beam (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/deflections.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deflections (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/frames.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frames (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/fully-restrained-beams.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fully Restrained Beams (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/loads.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loads (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/nonlinear.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nonlinear (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/soil-mechanics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soil Mechanics (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/steel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Steel (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/structural-dynamics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Dynamics (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/reinforced-concrete.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete (12)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/reinforced-concrete-punching.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Punching (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/reinforced-concrete-plates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Plates (9)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/reinforced-concrete-seismic-detailing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Seismic Detailing (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-language" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Language
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h1>
+<ol>
+<li>
+<p><strong>Enter</strong> text and formulas into the "<strong>Code</strong>" box on the left.</p>
+</li>
+<li>
+<p>Press <strong>F5</strong> or click <img src="./media/image6.png" alt="" height="20"> to calculate.
+Results will appear in the "<strong>Output</strong>" box on the right as a professionally formatted Html <strong>report</strong>.</p>
+</li>
+<li>
+<p>Click <img src="./media/image7.png" alt="" height="20"> to <strong>print</strong> or <img src="./media/image8.png" alt="" height="20"> to <strong>copy</strong> the output.<br />
+    You can also <strong>export</strong> it to <strong>Html</strong> <img src="./media/image9.png" alt="" height="20">, <strong>PDF</strong> <img src="./media/image10.png" alt="" height="20"> or <strong>MS Word</strong> <img src="./media/image11.png" alt="" height="20"> document.</p>
+</li>
+</ol>
+<h2 id="the-language">The Language<a class="headerlink" href="#the-language" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Real numbers: digits 0 - 9 and decimal point "."</li>
+<li>Complex numbers: <code>re ± imi</code> (e.g. <code>3 - 2i</code>)</li>
+<li>Real vectors: <code>[v_1; v_2; v_3; …; v_n]</code></li>
+<li>Real matrices:<br />
+<code>[M_11; M_12; … ; M_1n | M_21; M_22; … ; M_2n … | M_m1; M_m2; … ; M_mn]</code></li>
+<li>Variables<ul>
+<li>all Unicode letters</li>
+<li>digits: 0 – 9</li>
+<li>comma: <strong>,</strong></li>
+<li>special symbols: <strong>′</strong> , <strong>″</strong> , <strong>‴</strong> , <strong>⁗</strong> , <strong>‾</strong> , <strong>ø</strong> , <strong>Ø</strong> , <strong>°</strong> , <strong>∡</strong></li>
+<li>superscripts: <strong>⁰</strong> , <strong>¹</strong> , <strong>²</strong> , <strong>³</strong> , <strong>⁴</strong> , <strong>⁵</strong> , <strong>⁶</strong> , <strong>⁷</strong> , <strong>⁸</strong> , <strong>⁹</strong> , <strong>ⁿ</strong> , <strong>⁺</strong> , <strong>⁻</strong></li>
+<li>subscripts: <strong>₀</strong> , <strong>₁</strong> , <strong>₂</strong> , <strong>₃</strong> , <strong>₄</strong> , <strong>₅</strong> , <strong>₆</strong> , <strong>₇</strong> , <strong>₈</strong> , <strong>₉</strong> , <strong>₊</strong> , <strong>₋</strong> , <strong>₌</strong> , <strong>₍</strong> , <strong>₎</strong></li>
+<li><strong>_</strong> (underscore) for subscript</li>
+<li>Any variable name must start with a letter. Names are case sensitive.</li>
+</ul>
+</li>
+<li>Custom functions type <em>f</em> (<em>x</em>; <em>y</em>; <em>z</em>; …)</li>
+<li>Constants:<br />
+<em>π</em>, <em>e</em>, <em>φ</em>, <em>γ</em>, <em>g</em>, <em>G</em>, <span class="arithmatex">\(M_E\)</span>, <span class="arithmatex">\(M_S\)</span>, <em>c</em>, <em>h</em>, <span class="arithmatex">\(μ_0\)</span>, <span class="arithmatex">\(ε_0\)</span>, <span class="arithmatex">\(k_e\)</span>, <em>e</em>, <span class="arithmatex">\(m_e\)</span>, <span class="arithmatex">\(m_p\)</span>, <span class="arithmatex">\(m_n\)</span>, <span class="arithmatex">\(N_A\)</span>, <em>σ</em>, <span class="arithmatex">\(k_B\)</span>, <em>R</em>, <em>F</em>, <span class="arithmatex">\(γ_c\)</span>, <span class="arithmatex">\(γ_s\)</span>, <span class="arithmatex">\(γ_a\)</span>, <span class="arithmatex">\(γ_g\)</span>, <span class="arithmatex">\(γ_w\)</span></li>
+<li><code>#const</code>: declares a constant (readonly) variable or function</li>
+<li>Comments: "Title" or 'text' in double or single quotes, respectively.  </li>
+<li><strong>HTML</strong>, <strong>CSS</strong>, <strong>JS</strong> and <strong>SVG</strong> are allowed.</li>
+</ul>
+<details class="info">
+<summary>Operators</summary>
+<ul>
+<li><code>!</code> - factorial</li>
+<li><code>^</code> - exponent</li>
+<li><code>/</code> - division</li>
+<li><code>÷</code> - force division bar in inline mode and slash in pro mode (<code>//</code>)</li>
+<li><code>\</code> - integer division</li>
+<li><code>⦼</code> - modulo (reminder, <code>%%</code>)</li>
+<li><code>*</code> - multiplication</li>
+<li><code>-</code> - minus</li>
+<li><code>+</code> - plus</li>
+<li><code>≡</code> - equal to (<code>==</code>)</li>
+<li><code>≠</code> - not equal to (<code>!=</code>)</li>
+<li><code>&lt;</code> - less than</li>
+<li><code>&gt;</code> - greater than</li>
+<li><code>≤</code> - less or equal (<code>&lt;=</code>)</li>
+<li><code>≥</code> - greater or equal (<code>&gt;=</code>)</li>
+<li><code>∧</code> - logical AND (<code>&amp;&amp;</code>)</li>
+<li><code>∨</code> - logical OR (<code>||</code>)</li>
+<li><code>∠</code> - phasor A∠φ (<code>&lt;&lt;</code>)</li>
+<li><code>⊕</code> - logical XOR (<code>^^</code>)</li>
+<li><code>=</code> - assignment or definition of a variable, function or macro</li>
+<li><code>←</code> - assignment to an outer level or global variable in block (<code>&lt;*</code>)</li>
+</ul>
+</details>
+<details class="info">
+<summary>Trigonometric</summary>
+<ul>
+<li>sin(<em>x</em>) - sine</li>
+<li>cos(<em>x</em>) - cosine</li>
+<li>tan(<em>x</em>) - tangent</li>
+<li>csc(<em>x</em>) - cosecant</li>
+<li>sec(<em>x</em>) - secant</li>
+<li>cot(<em>x</em>) - cotangent</li>
+<li><strong>Hyperbolic</strong><ul>
+<li>sinh(<em>x</em>) - hyperbolic sine</li>
+<li>cosh(<em>x</em>) - hyperbolic cosine</li>
+<li>tanh(<em>x</em>) - hyperbolic tangent</li>
+<li>csch(<em>x</em>) - hyperbolic cosecant</li>
+<li>sech(<em>x</em>) - hyperbolic secant</li>
+<li>coth(<em>x</em>) - hyperbolic cotangent</li>
+</ul>
+</li>
+<li><strong>Inverse trigonometric</strong><ul>
+<li>asin(<em>x</em>) - inverse sine</li>
+<li>acos(<em>x</em>) - inverse cosine</li>
+<li>atan(<em>x</em>) - inverse tangent</li>
+<li>atan2(<em>x</em>; <em>y</em>) - the angle whose tangent is the quotient of <em>y</em> and <em>x</em></li>
+<li>acsc(<em>x</em>) - inverse cosecant</li>
+<li>asec(<em>x</em>) - inverse secant</li>
+<li>acot(<em>x</em>) - inverse cotangent</li>
+</ul>
+</li>
+<li><strong>Inverse hyperbolic</strong><ul>
+<li>asinh(<em>x</em>) - inverse hyperbolic sine</li>
+<li>acosh(<em>x</em>) - inverse hyperbolic cosine</li>
+<li>atanh(<em>x</em>) - inverse hyperbolic tangent</li>
+<li>acsch(<em>x</em>) - inverse hyperbolic cosecant</li>
+<li>asech(<em>x</em>) - inverse hyperbolic secant</li>
+<li>acoth(<em>x</em>) - inverse hyperbolic cotangent</li>
+</ul>
+</li>
+</ul>
+</details>
+<details class="info">
+<summary>Logarithmic, Exponential &amp; Roots</summary>
+<ul>
+<li>log(<em>x</em>) - decimal logarithm</li>
+<li>ln(<em>x</em>) - natural logarithm</li>
+<li>log_2(<em>x</em>) - binary logarithm</li>
+<li>exp(<em>x</em>) - exponential function</li>
+<li>sqr(<em>x</em>) or sqrt(<em>x</em>) - square root</li>
+<li>cbrt(<em>x</em>) - cubic root</li>
+<li>root(<em>x</em>; <em>n</em>) - <em>n</em>-th root</li>
+</ul>
+</details>
+<details class="info">
+<summary>Rounding</summary>
+<ul>
+<li>round(<em>x</em>) - round to the nearest integer</li>
+<li>floor(<em>x</em>) - round to the smaller integer (towards -∞)</li>
+<li>ceiling(<em>x</em>) - round to the greater integer (towards +∞)</li>
+<li>trunc(<em>x</em>) - round to the smaller integer (towards zero)</li>
+</ul>
+</details>
+<details class="info">
+<summary>Integer</summary>
+<ul>
+<li>mod(<em>x</em>; <em>y</em>) - the reminder of an integer division</li>
+<li>gcd(<em>x</em>; <em>y</em>; <em>z</em>…) - the greatest common divisor of several integers</li>
+<li>lcm(<em>x</em>; <em>y</em>; <em>z</em>…) - the least common multiple of several integers</li>
+</ul>
+</details>
+<details class="info">
+<summary>Complex</summary>
+<ul>
+<li>re(<em>z</em>) - the real part of a complex number</li>
+<li>im(<em>z</em>) - the imaginary part of a complex number</li>
+<li>abs(<em>z</em>) - absolute value/magnitude</li>
+<li>phase(<em>z</em>) - the phase of a complex number</li>
+<li>conj(<em>z</em>) - the conjugate of a complex number</li>
+</ul>
+</details>
+<details class="info">
+<summary>Aggregate and Interpolation</summary>
+<ul>
+<li>min(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - minimum of multiple values</li>
+<li>max(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - maximum of multiple values</li>
+<li>sum(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - sum of multiple values</li>
+<li>sumsq(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - sum of squares  </li>
+<li>srss(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - square root of sum of squares</li>
+<li>average(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - average of multiple value</li>
+<li>product(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - product of multiple values</li>
+<li>mean(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - geometric mean</li>
+<li>take(<em>n</em>; <em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - returns the <em>n</em>-th element from the list</li>
+<li>line(<em>x</em>; <em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - linear interpolation</li>
+<li>spline(<em>x</em>; <em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - Hermite spline interpolation</li>
+</ul>
+</details>
+<details class="info">
+<summary>Conditional and Logical</summary>
+<ul>
+<li>if(<em>cond</em>; <em>value-if-true</em>; <em>value-if-false</em>) - conditional evaluation</li>
+<li>switch(<em>cond1</em>; <em>value1</em>; <em>cond2</em>; <em>value2</em>; …; <em>default</em>) - selective evaluation</li>
+<li>not(<em>x</em>) - logical "NOT"</li>
+<li>and(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - logical "AND"</li>
+<li>or(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - logical "OR"</li>
+<li>xor(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - logical "XOR"</li>
+</ul>
+</details>
+<details class="info">
+<summary>Other Functions</summary>
+<ul>
+<li>sign(<em>x</em>) - sign of a number</li>
+<li>random(<em>x</em>) - random number between 0 and <em>x</em></li>
+<li>getunits(<em>x</em>) - gets the units of <em>x</em> without the value. Returns 1 if <em>x</em> is unitless</li>
+<li>setunits(<em>x</em>; <em>u</em>) - sets the units <em>u</em> to <em>x</em>, where <em>x</em> can be scalar, vector or matrix</li>
+<li>clrunits(<em>x</em>) - clears the units from a scalar, vector or matrix <em>x</em></li>
+<li>hp(<em>x</em>) - converts <em>x</em> to its high-performance (hp) equivalent type</li>
+<li>ishp(<em>x</em>) - checks if the type of <em>x</em> is a high-performance (hp) vector or matrix</li>
+</ul>
+</details>
+<details class="info">
+<summary>Vector</summary>
+<ul>
+<li><strong>Creational</strong><ul>
+<li>vector(<em>n</em>) - creates an empty vector with length <em>n</em></li>
+<li>vector_hp(<em>n</em>) - creates an empty high performance (hp) vector with length <em>n</em></li>
+<li>range(<span class="arithmatex">\(x_1\)</span>; <span class="arithmatex">\(x_n\)</span>; <em>s</em>) - creates a vector with values spanning from <span class="arithmatex">\(x_1\)</span> to <span class="arithmatex">\(x_n\)</span> with step <em>s</em></li>
+<li>range_hp(<span class="arithmatex">\(x_1\)</span>; <span class="arithmatex">\(x_n\)</span>; <em>s</em>) - creates a high performance (hp) from a range of values as above</li>
+</ul>
+</li>
+<li><strong>Structural</strong><ul>
+<li>len( <span class="arithmatex">\(\vec{v}\)</span>) - returns the length of the vector <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>size(<span class="arithmatex">\(\vec{v}\)</span>) - the actual size of the vector <span class="arithmatex">\(\vec{v}\)</span> (the index of the last non-zero element)</li>
+<li>resize(<span class="arithmatex">\(\vec{v}\)</span>; <em>n</em>) - sets a new length <em>n</em> of the vector <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>fill(<span class="arithmatex">\(\vec{v}\)</span>; <em>x</em>) - fills the vector <span class="arithmatex">\(\vec{v}\)</span> with value <em>x</em></li>
+<li>join(<em>A</em> ; <span class="arithmatex">\(\vec{b}\)</span>; <em>c</em>…) - creates a vector by joining the arguments in the list – matrices, vectors and scalars</li>
+<li>slice(<span class="arithmatex">\(\vec{v}\)</span>; <span class="arithmatex">\(i_1\)</span>; <span class="arithmatex">\(i_2\)</span>) - returns the part of the vector <span class="arithmatex">\(\vec{v}\)</span> bounded by indexes <span class="arithmatex">\(i_1\)</span> and <span class="arithmatex">\(i_2\)</span> inclusive</li>
+<li>first( <span class="arithmatex">\(\vec{v}\)</span>; <em>n</em>) - the first <em>n</em> elements of the vector <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>last(<span class="arithmatex">\(\vec{v}\)</span>; <em>n</em>) - the last <em>n</em> elements of the vector <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>extract(<span class="arithmatex">\(\vec{v}\)</span>; <span class="arithmatex">\(\vec{i}\)</span>) - extracts those elements from <span class="arithmatex">\(\vec{v}\)</span> which indexes are contained in <span class="arithmatex">\(\vec{i}\)</span></li>
+</ul>
+</li>
+<li><strong>Data</strong><ul>
+<li>sort(<span class="arithmatex">\(\vec{v}\)</span>) - sorts the vector <span class="arithmatex">\(\vec{v}\)</span> in ascending order</li>
+<li>rsort(<span class="arithmatex">\(\vec{v}\)</span>) - sorts the vector <span class="arithmatex">\(\vec{v}\)</span> in descending order</li>
+<li>order(<span class="arithmatex">\(\vec{v}\)</span>) - the indexes of <span class="arithmatex">\(\vec{v}\)</span>, in ascending order by the elements of <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>revorder(<span class="arithmatex">\(\vec{v}\)</span>) - the indexes of <span class="arithmatex">\(\vec{v}\)</span>, in descending order by the elements of <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>reverse(<span class="arithmatex">\(\vec{v}\)</span>) - vector containing the elements of <span class="arithmatex">\(\vec{v}\)</span> in reverse order</li>
+<li>count(<span class="arithmatex">\(\vec{v}\)</span>; <em>x</em>; <em>i</em>) - the number of elements of <span class="arithmatex">\(\vec{v}\)</span> equal to <em>x</em> with index ≥ <em>i</em></li>
+<li>search(<span class="arithmatex">\(\vec{v}\)</span>; <em>x</em>; <em>i</em>) - the index of the first element in <span class="arithmatex">\(\vec{v}\)</span> with index ≥ <em>i</em> that is equal to <em>x</em></li>
+<li>find(<span class="arithmatex">\(\vec{v}\)</span>; <em>x</em>; <em>i</em>) or  </li>
+<li>find_eq(<span class="arithmatex">\(\vec{v}\)</span>; <em>x</em>; <em>i</em>) - the indexes of all elements in <span class="arithmatex">\(\vec{v}\)</span>, after the <em>i</em>-th, that are = <em>x</em></li>
+<li>find_ne(<span class="arithmatex">\(\vec{v}\)</span>; <em>x</em>; <em>i</em>) - the indexes of all elements in <span class="arithmatex">\(\vec{v}\)</span>, after the <em>i</em>-th , that are ≠ <em>x</em></li>
+<li>find_lt(<span class="arithmatex">\(\vec{v}\)</span>; <em>x</em>; <em>i</em>) - the indexes of all elements in <span class="arithmatex">\(\vec{v}\)</span>, after the <em>i</em>-th, that are &lt; <em>x</em></li>
+<li>find_le(<span class="arithmatex">\(\vec{v}\)</span>; <em>x</em>; <em>i</em>) - the indexes of all elements in <span class="arithmatex">\(\vec{v}\)</span>, after the <em>i</em>-th, that are ≤ <em>x</em></li>
+<li>find_gt(<span class="arithmatex">\(\vec{v}\)</span>; <em>x</em>; <em>i</em>) - the indexes of all elements in <span class="arithmatex">\(\vec{v}\)</span>, after the <em>i</em>-th, that are &gt; <em>x</em></li>
+<li>find_ge(<span class="arithmatex">\(\vec{v}\)</span>; <em>x</em>; <em>i</em>) - the indexes of all elements in <span class="arithmatex">\(\vec{v}\)</span>, after the <em>i</em>-th, that are ≥ <em>x</em></li>
+<li>lookup(<span class="arithmatex">\(\vec{a}\)</span>; <span class="arithmatex">\(\vec{b}\)</span>; <em>x</em>) or  </li>
+<li>lookup_eq(<span class="arithmatex">\(\vec{a}\)</span>; <span class="arithmatex">\(\vec{b}\)</span>; <em>x</em>) - all elements of <span class="arithmatex">\(\vec{a}\)</span> for which the corresponding elements of <span class="arithmatex">\(\vec{b}\)</span> are = <em>x</em></li>
+<li>lookup_ne(<span class="arithmatex">\(\vec{a}\)</span>; <span class="arithmatex">\(\vec{b}\)</span>; <em>x</em>) - all elements of <span class="arithmatex">\(\vec{a}\)</span> for which the corresponding elements of <span class="arithmatex">\(\vec{b}\)</span> are ≠ <em>x</em></li>
+<li>lookup_lt(<span class="arithmatex">\(\vec{a}\)</span>; <span class="arithmatex">\(\vec{b}\)</span>; <em>x</em>) - all elements of <span class="arithmatex">\(\vec{a}\)</span> for which the corresponding elements of <span class="arithmatex">\(\vec{b}\)</span> are &lt; <em>x</em></li>
+<li>lookup_le(<span class="arithmatex">\(\vec{a}\)</span>; <span class="arithmatex">\(\vec{b}\)</span>; <em>x</em>) - all elements of <span class="arithmatex">\(\vec{a}\)</span> for which the corresponding elements of <span class="arithmatex">\(\vec{b}\)</span> are ≤ <em>x</em></li>
+<li>lookup_gt(<span class="arithmatex">\(\vec{a}\)</span>; <span class="arithmatex">\(\vec{b}\)</span>; <em>x</em>) - all elements of <span class="arithmatex">\(\vec{a}\)</span> for which the corresponding elements of <span class="arithmatex">\(\vec{b}\)</span> are &gt; <em>x</em></li>
+<li>lookup_ge(<span class="arithmatex">\(\vec{a}\)</span>; <span class="arithmatex">\(\vec{b}\)</span>; <em>x</em>) - all elements of <span class="arithmatex">\(\vec{a}\)</span> for which the corresponding elements of <span class="arithmatex">\(\vec{b}\)</span> are ≥ <em>x</em></li>
+</ul>
+</li>
+<li><strong>Math</strong><ul>
+<li>norm_1(<span class="arithmatex">\(\vec{v}\)</span>) - <span class="arithmatex">\(L_1\)</span> (Manhattan) norm of the vector <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>norm(<span class="arithmatex">\(\vec{v}\)</span>) or norm_2(<span class="arithmatex">\(\vec{v}\)</span>) or  </li>
+<li>norm_e(<span class="arithmatex">\(\vec{v}\)</span>) - <span class="arithmatex">\(L_2\)</span> (Euclidean) norm of the vector <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>norm_p(<span class="arithmatex">\(\vec{v}\)</span>; <em>p</em>) - <span class="arithmatex">\(L_p\)</span> norm of the vector <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>norm_i(<span class="arithmatex">\(\vec{v}\)</span>) - <span class="arithmatex">\(L_∞\)</span> (infinity) norm of the vector <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>unit(<span class="arithmatex">\(\vec{v}\)</span>) - normalized form of the vector <span class="arithmatex">\(\vec{v}\)</span>(with <span class="arithmatex">\(L_2\)</span> norm = 1)</li>
+<li>dot(<span class="arithmatex">\(\vec{a}\)</span>; <span class="arithmatex">\(\vec{b}\)</span>) - scalar product of two vectors <span class="arithmatex">\(\vec{a}\)</span>and <span class="arithmatex">\(\vec{b}\)</span></li>
+<li>cross(<span class="arithmatex">\(\vec{a}\)</span>; <span class="arithmatex">\(\vec{b}\)</span>) - cross product of two vectors <span class="arithmatex">\(\vec{a}\)</span>and <span class="arithmatex">\(\vec{b}\)</span>(with length 2 or 3)</li>
+</ul>
+</li>
+</ul>
+</details>
+<details class="info">
+<summary>Matrix</summary>
+<ul>
+<li><strong>Creational</strong><ul>
+<li>matrix(<em>m</em>; <em>n</em>) - creates an empty matrix with dimensions <em>m</em>⨯<em>n</em></li>
+<li>identity(<em>n</em>) - creates an identity matrix with dimensions <em>n</em>⨯<em>n</em></li>
+<li>diagonal(<em>n</em>; <em>d</em>) - creates an <em>n</em>⨯<em>n</em> diagonal matrix and fills the diagonal with value <em>d</em></li>
+<li>column(<em>m</em>; <em>c</em>) - creates a column matrix with dimensions <em>m</em>⨯1, filled with value <em>c</em></li>
+<li>utriang(<em>n</em>) - creates an upper triangular matrix with dimensions <em>n</em>⨯<em>n</em></li>
+<li>ltriang(<em>n</em>) - creates a lower triangular matrix with dimensions <em>n</em>⨯<em>n</em></li>
+<li>symmetric(<em>n</em>) - creates a symmetric matrix with dimensions <em>n</em>⨯<em>n</em></li>
+<li>matrix_hp(<em>m</em>; <em>n</em>) - creates a high-performance matrix with dimensions <em>m</em>⨯<em>n</em></li>
+<li>identity_hp(<em>n</em>) - creates a high-performance identity matrix with dimensions <em>n</em>⨯<em>n</em></li>
+<li>diagonal_hp(<em>n</em>; <em>d</em>) - creates a high-performance <em>n</em>⨯<em>n</em> diagonal matrix filled with value <em>d</em></li>
+<li>column_hp(<em>m</em>; <em>c</em>) - creates a high-performance <em>m</em>⨯1 column matrix filled with value <em>c</em></li>
+<li>utriang_hp(<em>n</em>) - creates a high-performance <em>n</em>⨯<em>n</em> upper triangular matrix</li>
+<li>ltriang_hp(<em>n</em>) - creates a high-performance <em>n</em>⨯<em>n</em> lower triangular matrix</li>
+<li>symmetric_hp(<em>n</em>) - creates a high-performance symmetric matrix with dimensions <em>n</em>⨯<em>n</em></li>
+<li>vec2diag(<span class="arithmatex">\(\vec{v}\)</span>) - creates a diagonal matrix from the elements of vector <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>vec2row(<span class="arithmatex">\(\vec{v}\)</span>) - creates a row matrix from the elements of vector <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>vec2col(<span class="arithmatex">\(\vec{v}\)</span>) - creates a column matrix from the elements of vector <span class="arithmatex">\(\vec{v}\)</span></li>
+<li>join_cols(<span class="arithmatex">\(\vec{c_1}\)</span>;<span class="arithmatex">\(\vec{c_2}\)</span>;<span class="arithmatex">\(\vec{c_3}\)</span>…) - creates a matrix by joining column vectors</li>
+<li>join_rows(<span class="arithmatex">\(\vec{r_1}\)</span>;<span class="arithmatex">\(\vec{r_2}\)</span>;<span class="arithmatex">\(\vec{r_3}\)</span>…) - creates a matrix by joining row vectors</li>
+<li>augment(<em>A</em>; <em>B</em>; <em>C</em>…) - creates a matrix by appending matrices <em>A</em>; <em>B</em>; <em>C</em> side by side</li>
+<li>stack(<em>A</em>; <em>B</em>; <em>C</em>…) - creates a matrix by stacking matrices <em>A</em>; <em>B</em>; <em>C</em> one below the other</li>
+</ul>
+</li>
+<li><strong>Structural</strong><ul>
+<li>n_rows(<em>M</em>) - number of rows in matrix <em>M</em></li>
+<li>n_cols(<em>M</em>) - number of columns in matrix <em>M</em></li>
+<li>resize(<em>M</em>; <em>m</em>; <em>n</em>) - sets new dimensions <em>m</em> and <em>n</em> for matrix <em>M</em></li>
+<li>fill(<em>M</em>; <em>x</em>) - fills the matrix <em>M</em> with value <em>x</em></li>
+<li>fill_row(<em>M</em>; <em>i</em>; <em>x</em>) - fills the <em>i</em>-th row of matrix <em>M</em> with value <em>x</em></li>
+<li>fill_col(<em>M</em>; <em>j</em>; <em>x</em>) - fills the <em>j</em>-th column of matrix <em>M</em> with value <em>x</em></li>
+<li>copy(<em>A</em>; <em>B</em>; <em>i</em>; <em>j</em>) - copies all elements from <em>A</em> to <em>B</em>, starting from indexes <em>i</em> and <em>j</em> of <em>B</em></li>
+<li>add(<em>A</em>; <em>B</em>; <em>i</em>; <em>j</em>) - adds all elements from <em>A</em> to those of <em>B</em>, starting from indexes <em>i</em> and <em>j</em> of <em>B</em></li>
+<li>row(<em>M</em>; <em>i</em>) - extracts the <em>i</em>-th row of matrix <em>M</em> as a vector</li>
+<li>col(<em>M</em>; <em>j</em>) - extracts the <em>j</em>-th column of matrix <em>M</em> as a vector</li>
+<li>extract_rows(<em>M</em>; <em>i</em>⃗ ) - extracts the rows from matrix <em>M</em> whose indexes are contained in vector <em>i</em>⃗</li>
+<li>extract_cols(<em>M</em>; <em>j</em>⃗ ) - extracts the columns from matrix <em>M</em> whose indexes are contained in vector <em>j</em>⃗</li>
+<li>diag2vec(<em>M</em> ) - extracts the diagonal elements of matrix <em>M</em> to a vector</li>
+<li>submatrix(<em>M</em>; <span class="arithmatex">\(i_1\)</span>; <span class="arithmatex">\(i_2\)</span>; <span class="arithmatex">\(j_1\)</span>; <span class="arithmatex">\(j_2\)</span>) - extracts a submatrix of <em>M</em>, bounded between rows <span class="arithmatex">\(i_1\)</span> and <span class="arithmatex">\(i_2\)</span> and columns <span class="arithmatex">\(j_1\)</span> and <span class="arithmatex">\(j_2\)</span>, incl.</li>
+</ul>
+</li>
+<li><strong>Data</strong><ul>
+<li>sort_cols(<em>M</em>; <em>i</em>) - sorts the columns of <em>M</em> based on the values in row <em>i</em> in ascending order</li>
+<li>rsort_cols(<em>M</em>; <em>i</em>) - sorts the columns of <em>M</em> based on the values in row <em>i</em> in descending order</li>
+<li>sort_rows(<em>M</em>; <em>j</em>) - sorts the rows of <em>M</em> based on the values in column <em>j</em> in ascending order</li>
+<li>rsort_rows(<em>M</em>; <em>j</em>) - sorts the rows of <em>M</em> based on the values in column <em>j</em> in descending order</li>
+<li>order_cols(<em>M</em>; <em>i</em>) - the indexes of the columns of <em>M</em> in ascending order by the values in row <em>i</em></li>
+<li>revorder_cols(<em>M</em>; <em>i</em>) - the indexes of the columns of <em>M</em> in descending order by the values in row <em>i</em></li>
+<li>order_rows(<em>M</em>; <em>j</em>) - the indexes of the rows of <em>M</em> in ascending order by the values in column <em>j</em></li>
+<li>revorder_rows(<em>M</em>; <em>j</em>) - the indexes of the rows of <em>M</em> in descending order by the values in column <em>j</em></li>
+<li>mcount(<em>M</em>; <em>x</em>) - number of occurrences of value <em>x</em> in matrix <em>M</em></li>
+<li>msearch(<em>M</em>; <em>x</em>; <em>i</em>; <em>j</em>) - vector with the two indexes of the first occurrence of <em>x</em> in matrix <em>M</em>, starting from indexes <em>i</em> and <em>j</em></li>
+<li>mfind(<em>M</em>; <em>x</em>) - the indexes of all elements in matrix <em>M</em> equal to <em>x</em></li>
+<li>mfind_eq(<em>M</em>; <em>x</em>) - the indexes of all elements in matrix <em>M</em> equal to <em>x</em></li>
+<li>mfind_ne(<em>M</em>; <em>x</em>) - the indexes of all elements in matrix <em>M</em> not equal to <em>x</em></li>
+<li>mfind_lt(<em>M</em>; <em>x</em>) - the indexes of all elements in matrix <em>M</em> less than <em>x</em></li>
+<li>mfind_le(<em>M</em>; <em>x</em>) - the indexes of all elements in matrix <em>M</em> less than or equal to <em>x</em></li>
+<li>mfind_gt(<em>M</em>; <em>x</em>) - the indexes of all elements in matrix <em>M</em> greater than <em>x</em></li>
+<li>mfind_ge(<em>M</em>; <em>x</em>) - the indexes of all elements in matrix <em>M</em> greater than or equal to <em>x</em></li>
+<li>hlookup(<em>M</em>; <em>x</em>; <span class="arithmatex">\(i_1\)</span>; <span class="arithmatex">\(i_2\)</span>) - the values from row <span class="arithmatex">\(i_2\)</span> of <em>M</em>, for which the elements from row <span class="arithmatex">\(i_1\)</span> are equal to <em>x</em></li>
+<li>hlookup_eq(<em>M</em>; <em>x</em>; <span class="arithmatex">\(i_1\)</span>; <span class="arithmatex">\(i_2\)</span>) - the values from row <span class="arithmatex">\(i_2\)</span> of <em>M</em>, for which the elements from row <span class="arithmatex">\(i_1\)</span> are equal to <em>x</em></li>
+<li>hlookup_ne(<em>M</em>; <em>x</em>; <span class="arithmatex">\(i_1\)</span>; <span class="arithmatex">\(i_2\)</span>) - the values from row <span class="arithmatex">\(i_2\)</span> of <em>M</em>, for which the elements from row <span class="arithmatex">\(i_1\)</span> are not equal to <em>x</em></li>
+<li>hlookup_lt(<em>M</em>; <em>x</em>; <span class="arithmatex">\(i_1\)</span>; <span class="arithmatex">\(i_2\)</span>) - the values from row <span class="arithmatex">\(i_2\)</span> of <em>M</em>, for which the elements from row <span class="arithmatex">\(i_1\)</span> are less than <em>x</em></li>
+<li>hlookup_le(<em>M</em>; <em>x</em>; <span class="arithmatex">\(i_1\)</span>; <span class="arithmatex">\(i_2\)</span>) - the values from row <span class="arithmatex">\(i_2\)</span> of <em>M</em>, for which the elements from row <span class="arithmatex">\(i_1\)</span> are less than or equal to <em>x</em></li>
+<li>hlookup_gt(<em>M</em>; <em>x</em>; <span class="arithmatex">\(i_1\)</span>; <span class="arithmatex">\(i_2\)</span>) - the values from row <span class="arithmatex">\(i_2\)</span> of <em>M</em>, for which the elements from row <span class="arithmatex">\(i_1\)</span> are greater than <em>x</em></li>
+<li>hlookup_ge(<em>M</em>; <em>x</em>; <span class="arithmatex">\(i_1\)</span>; <span class="arithmatex">\(i_2\)</span>) - the values from row <span class="arithmatex">\(i_2\)</span> of <em>M</em>, for which the elements from row <span class="arithmatex">\(i_1\)</span> are greater than or equal to <em>x</em></li>
+<li>vlookup(<em>M</em>; <em>x</em>; <span class="arithmatex">\(j_1\)</span>; <span class="arithmatex">\(j_2\)</span>) - the values from column <span class="arithmatex">\(j_2\)</span> of <em>M</em>, for which the elements from column <span class="arithmatex">\(j_1\)</span> are equal to <em>x</em></li>
+<li>vlookup_eq(<em>M</em>; <em>x</em>; <span class="arithmatex">\(j_1\)</span>; <span class="arithmatex">\(j_2\)</span>) - the values from column <span class="arithmatex">\(j_2\)</span> of <em>M</em>, for which the elements from column <span class="arithmatex">\(j_1\)</span> are equal to <em>x</em></li>
+<li>vlookup_ne(<em>M</em>; <em>x</em>; <span class="arithmatex">\(j_1\)</span>; <span class="arithmatex">\(j_2\)</span>) - the values from column <span class="arithmatex">\(j_2\)</span> of <em>M</em>, for which the elements from column <span class="arithmatex">\(j_1\)</span> are not equal to <em>x</em></li>
+<li>vlookup_lt(<em>M</em>; <em>x</em>; <span class="arithmatex">\(j_1\)</span>; <span class="arithmatex">\(j_2\)</span>) - the values from column <span class="arithmatex">\(j_2\)</span> of <em>M</em>, for which the elements from column <span class="arithmatex">\(j_1\)</span> are less than <em>x</em></li>
+<li>vlookup_le(<em>M</em>; <em>x</em>; <span class="arithmatex">\(j_1\)</span>; <span class="arithmatex">\(j_2\)</span>) - the values from column <span class="arithmatex">\(j_2\)</span> of <em>M</em>, for which the elements from column <span class="arithmatex">\(j_1\)</span> are less than or equal to <em>x</em></li>
+<li>vlookup_gt(<em>M</em>; <em>x</em>; <span class="arithmatex">\(j_1\)</span>; <span class="arithmatex">\(j_2\)</span>) - the values from column <span class="arithmatex">\(j_2\)</span> of <em>M</em>, for which the elements from column <span class="arithmatex">\(j_1\)</span> are greater than <em>x</em></li>
+<li>vlookup_ge(<em>M</em>; <em>x</em>; <span class="arithmatex">\(j_1\)</span>; <span class="arithmatex">\(j_2\)</span>) - the values from column <span class="arithmatex">\(j_2\)</span> of <em>M</em>, for which the elements from column <span class="arithmatex">\(j_1\)</span> are greater than or equal to <em>x</em></li>
+</ul>
+</li>
+<li><strong>Math</strong><ul>
+<li>hprod(<em>A</em>; <em>B</em>) - Hadamard product of matrices <em>A</em> and <em>B</em></li>
+<li>fprod(<em>A</em>; <em>B</em>) - Frobenius product of matrices <em>A</em> and <em>B</em></li>
+<li>kprod(<em>A</em>; <em>B</em>) - Kronecker product of matrices <em>A</em> and <em>B</em></li>
+<li>mnorm(<em>M</em>) or  </li>
+<li>mnorm_2(<em>M</em>) - L2 norm of matrix <em>M</em></li>
+<li>mnorm_1(<em>M</em>) - L1 norm of matrix <em>M</em></li>
+<li>mnorm_2(<em>M</em>) - Frobenius norm of matrix <em>M</em></li>
+<li>mnorm_i(<em>M</em>) - L∞ norm of matrix <em>M</em></li>
+<li>cond(<em>M</em>) or  </li>
+<li>cond_e(<em>M</em>) - condition number of <em>M</em> based on the Euclidean norm of the matrix</li>
+<li>cond_1(<em>M</em>) - condition number of <em>M</em> based on the L1 norm</li>
+<li>cond_2(<em>M</em>) - condition number of <em>M</em> based on the L2 norm</li>
+<li>cond_i(<em>M</em>) - condition number of <em>M</em> based on the L∞ norm</li>
+<li>det(<em>M</em>) - determinant of matrix <em>M</em></li>
+<li>rank(<em>M</em>) - rank of matrix <em>M</em></li>
+<li>trace(<em>M</em>) - trace of matrix <em>M</em></li>
+<li>transp(<em>M</em>) - transpose of matrix <em>M</em></li>
+<li>adj(<em>M</em>) - adjugate of matrix <em>M</em></li>
+<li>cofactor(<em>M</em>) - cofactor matrix of <em>M</em></li>
+<li>eigenvals(<em>M</em>; <span class="arithmatex">\(n_е\)</span>) - the first <span class="arithmatex">\(n_е\)</span> eigenvalues of matrix <em>M</em> (or all if omitted)</li>
+<li>eigenvecs(<em>M</em>; <span class="arithmatex">\(n_е\)</span>) - the first <span class="arithmatex">\(n_е\)</span> eigenvectors of matrix <em>M</em> (or all if omitted)</li>
+<li>eigen(<em>M</em>; <span class="arithmatex">\(n_е\)</span>) - the first <span class="arithmatex">\(n_е\)</span> eigenvalues and eigenvectors of <em>M</em> (or all if omitted)</li>
+<li>cholesky(<em>M</em>) - Cholesky decomposition of a symmetric, positive-definite matrix <em>M</em></li>
+<li>lu(<em>M</em>) - LU decomposition of matrix <em>M</em></li>
+<li>qr(<em>M</em>) - QR decomposition of matrix <em>M</em></li>
+<li>svd(<em>M</em>) - singular value decomposition of <em>M</em></li>
+<li>inverse(<em>M</em>) - inverse of matrix <em>M</em></li>
+<li>lsolve(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>) - solves the system of linear equations <em>Ax</em> ⃗ = <span class="arithmatex">\(\vec{b}\)</span>using <span class="arithmatex">\(LDL^T\)</span> decomposition for symmetric matrices, and LU for non-symmetric</li>
+<li>clsolve(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>) - solves the linear matrix equation <em>Ax</em> ⃗ = <span class="arithmatex">\(\vec{b}\)</span>with symmetric, positive-definite coefficient matrix <em>A</em> using Cholesky decomposition</li>
+<li>slsolve(<em>A</em>; <span class="arithmatex">\(\vec{b}\)</span>) - solves the linear matrix equation <em>Ax</em> ⃗ = <span class="arithmatex">\(\vec{b}\)</span>with high-performance symmetric, positive-definite matrix <em>A</em> using preconditioned conjugate gradient (PCG) method</li>
+<li>msolve(<em>A</em>; <em>B</em>) - solves the generalized matrix equation <em>AX</em> = <em>B</em> using <span class="arithmatex">\(LDL^T\)</span> decomposition for symmetric matrices, and LU for non-symmetric</li>
+<li>cmsolve(<em>A</em>; <em>B</em>) - solves the generalized matrix equation <em>AX</em> = <em>B</em> with symmetric, positive-definite coefficient matrix <em>A</em> using Cholesky decomposition</li>
+<li>smsolve(<em>A</em>; <em>B</em>) - solves the generalized matrix equation <em>AX</em> = <em>B</em> with high-performance symmetric, positive-definite matrix <em>A</em> using preconditioned conjugate gradient (PCG) method</li>
+<li>matmul(<em>A</em>; <em>B</em>) - fast multiplication of square hp matrices using parallel Winograd  </li>
+<li>algorithm. The multiplication operator <em>A</em>*<em>B</em> uses it internally for all  </li>
+<li>square hp matrices of size 10 and larger</li>
+<li>fft(<em>M</em>) - performs fast Fourier transform of row-major matrix <em>M</em>. It must have one row for real data and two rows for complex</li>
+<li>ift(<em>M</em>) - performs inverse Fourier transform of row-major matrix <em>M</em>.  </li>
+<li>It must have one row for real data and two rows for complex</li>
+</ul>
+</li>
+<li><strong>Double interpolation</strong><ul>
+<li>take(<em>x</em>; <em>y</em>; <em>M</em>) - returns the element of matrix <em>M</em> at indexes <em>x</em> and <em>y</em></li>
+<li>line(<em>x</em>; <em>y</em>; <em>M</em>) - double linear interpolation from the elements of matrix <em>M</em> based on the values of <em>x</em> and <em>y</em></li>
+<li>spline(<em>x</em>; <em>y</em>; <em>M</em>) - double Hermite spline interpolation from the elements of matrix <em>M</em> based on the values of <em>x</em> and <em>y</em></li>
+<li><em>Tol</em> - target tolerance for the iterative PCG solver.  </li>
+</ul>
+</li>
+</ul>
+</details>
+<details class="info">
+<summary>Graphing and Plotting</summary>
+<ul>
+<li><code>$Plot { f(x) @ x = a : b }</code> - simple plot</li>
+<li><code>$Plot { x(t) | y(t) @ t = a : b }</code> - parametric</li>
+<li><code>$Plot { f_1(x) &amp; f_2(x) &amp; … @ x = a : b }</code> - multiple</li>
+<li><code>$Plot { x_1(t) | y_1(t) &amp; x_2(t) | y_2(t) &amp; … @ x = a : b }</code> - multiple parametric</li>
+<li><code>$Map { f(x; y) @ x = a : b &amp; y = c : d }</code> - 2D color map of a 3D surface</li>
+<li><em>PlotHeight</em> - height of plot area in pixels</li>
+<li><em>PlotWidth</em> - width of plot area in pixels</li>
+<li><em>PlotSVG</em> - draw plots in vector, SVG format (= 1) or raster, PNG (= 0)</li>
+<li><em>PlotAdaptive</em> - use adaptive mesh (= 1) for function plotting or uniform (= 0)</li>
+<li><em>PlotStep</em> - the size of the mesh for map plotting</li>
+<li><em>PlotPalette</em> - the number of color palette to be used for surface plots (0-9)</li>
+<li><em>PlotShadows</em> - draw surface plots with shadows</li>
+<li><em>PlotSmooth</em> - smooth gradient coloring (= 1) or isobands (= 0) for surface plots</li>
+<li><em>PlotLightDir</em> - direction to light source (0-7) clockwise.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Iterative &amp; Numerical Methods</summary>
+<ul>
+<li><code>$Root { f(x) = const @ x = a : b }</code> - root finding for f(x) = const</li>
+<li><code>$Root { f(x) @ x = a : b }</code> - root finding for f(x) = 0</li>
+<li><code>$Find { f(x) @ x = a : b }</code> - similar to above, but x is not required to be a precise solution</li>
+<li><code>$Sup { f(x) @ x = a : b }</code> - local maximum of a function</li>
+<li><code>$Inf { f(x) @ x = a : b }</code> - local minimum of a function</li>
+<li><code>$Area { f(x) @ x = a : b }</code> - adaptive Gauss-Lobatto numerical integration</li>
+<li><code>$Integral { f(x) @ x = a : b }</code> - Tanh-Sinh numerical integration</li>
+<li><code>$Slope { f(x) @ x = a }</code> - numerical differentiation by Richardson extrapolation</li>
+<li><code>$Derivative { f(x) @ x = a }</code> - numerical differentiation by complex step method</li>
+<li><code>$Sum { f(x) @ k = a : b }</code> - iterative sum</li>
+<li><code>$Product { f(k) @ k = a : b }</code> - iterative product</li>
+<li><code>$Repeat { f(k) @ k = a : b }</code> - iterative expression block with counter</li>
+<li><code>$While { condition; expressions }</code> - iterative expression block with condition</li>
+<li><code>$Block { expressions }</code> - multiline expression block</li>
+<li><code>$Inline { expressions }</code> - inline expression block</li>
+<li><em>Precision</em> - relative precision for numerical methods <span class="arithmatex">\([10^-2; 10^{-16}]\)</span> (default is <span class="arithmatex">\(10^-{12}\)</span>).</li>
+</ul>
+</details>
+<details class="info">
+<summary>Programming</summary>
+<ul>
+<li><strong>Program flow control</strong><ul>
+<li>Simple
+  <div class="language-text highlight"><pre><span></span><code>#if *condition*
+    *your code goes here*
+#end if
+</code></pre></div></li>
+<li>Alternative
+  <div class="language-text highlight"><pre><span></span><code>#if *condition*
+    *your code goes here*
+#else
+    *some other code*
+#end if
+</code></pre></div></li>
+<li>Complete
+  <div class="language-text highlight"><pre><span></span><code>#if *condition1*
+    *your code goes here*
+#else if *condition2*
+    *your code goes here*
+#else  
+    *some other code*
+#end if
+</code></pre></div></li>
+<li>You can add or omit as many "#else ifs" as needed.
+  Only one "#else" is allowed.
+  You can omit this too.</li>
+</ul>
+</li>
+<li><strong>Iteration blocks</strong><ul>
+<li>Simple
+  <div class="language-text highlight"><pre><span></span><code>#repeat *number of repetitions
+    your code goes here*
+#loop
+</code></pre></div></li>
+<li>With conditional break/continue
+  <div class="language-text highlight"><pre><span></span><code>#repeat *number of repetitions*
+    *your code goes here*
+#if *condition*
+    #break or #continue
+#end if
+*some more code*
+# loop
+</code></pre></div></li>
+<li>With counter
+  <div class="language-text highlight"><pre><span></span><code>#for counter = *start* : *end*
+    *your code goes here*
+#loop
+</code></pre></div></li>
+<li>With condition
+  <div class="language-text highlight"><pre><span></span><code>#while *condition*
+    *your code goes here*  
+#loop
+</code></pre></div></li>
+</ul>
+</li>
+<li><strong>Modules and macros/string variables</strong><ul>
+<li>Modules<ul>
+<li><code>#include *filename*</code> - include external file (module)</li>
+<li><code>#local</code> - start local section (not to be included)</li>
+<li><code>#global</code> - start global section (to be included)</li>
+</ul>
+</li>
+<li>Inline string variable: <code>#def variable_name$ = *content*</code></li>
+<li>Multiline string variable
+  <div class="language-text highlight"><pre><span></span><code>#def variable_name$
+    *content line 1*
+    *content line 2*
+    …
+#end def
+</code></pre></div></li>
+<li>Inline macro: <code>#def macro_name$(param1$; param2$; …) = *content*</code></li>
+<li>Multiline macro:
+        <code>code
+  #def macro_name$(param1$; param2$; …)  
+      *content line 1*
+      *content line 2*
+      …
+  #end def</code></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><strong>Breakpoints for step-by-step execution</strong><ul>
+<li><code>#pause</code> - calculates down to the current line and waits for the user to resume manually</li>
+<li><code>#input</code> - renders an input form to the current line and waits for user input.  </li>
+<li>Each of the above commands is effective after the current line until the end of the report or another command that overwrites it.</li>
+</ul>
+</li>
+</ul>
+</details>
+<details class="info">
+<summary>Import/Export of External Data</summary>
+<ul>
+<li>Text/CSV files<ul>
+<li><code>#read M from filename.txt@R1C1:R2C2 TYPE=R SEP=','</code> - read matrix <em>M</em> from a text/CSV file</li>
+<li><code>#write M to filename.txt@R1C1:R2C2 TYPE=N SEP=','</code> - write matrix <em>M</em> to a text/CSV file</li>
+<li><code>#append M to filename.txt@R1C1:R2C2 TYPE=N SEP=','</code> - append matrix <em>M</em> to a text/CSV file</li>
+</ul>
+</li>
+<li>Excel files (xlsx and xlsm)<ul>
+<li><code>#read M from filename.xlsx@Sheet1!A1:B2 TYPE=R</code> - read matrix <em>M</em> from an Excel file</li>
+<li><code>#write M to filename.xlsx@Sheet1!A1:B2 TYPE=N</code> - write matrix <em>M</em> to an Excel file</li>
+<li><code>#append M to filename.xlsx@Sheet1!A1:B2 TYPE=N</code> - append matrix <em>M</em> to an Excel file</li>
+</ul>
+</li>
+<li>Sheet, range, TYPE and SEP can be omitted.  </li>
+<li>For <code>#read</code> command, TYPE can be any of [R|D|C|S|U|L|V]. For hp matrices add _HP to the type.  </li>
+<li>For <code>#write</code> and <code>#append</code> commands, TYPE can be Y or N.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Output Control</summary>
+<ul>
+<li><code>#hide</code> - hide the report contents</li>
+<li><code>#show</code> - always show the contents (default)</li>
+<li><code>#pre</code> - show the next contents only before calculations</li>
+<li><code>#post</code> - show the next contents only after calculations</li>
+<li><code>#val</code> - show only the result, without the equation</li>
+<li><code>#equ</code> - show complete equations and results (default)</li>
+<li><code>#noc</code> - show only equations without results (no calculations)</li>
+<li><code>#nosub</code> - do not substitute variables (no substitution)</li>
+<li><code>#novar</code> - show equations only with substituted values (no variables)</li>
+<li><code>#varsub</code> - show equations with variables and substituted values (default)</li>
+<li><code>#round *n*</code> - rounds the output to <em>n</em> digits after the decimal point</li>
+<li><code>#round default</code> - restores rounding to the default settings</li>
+<li><code>#format *FFFF*</code> - specifies custom format string</li>
+<li><code>#format default</code> - restores the default formatting</li>
+<li><code>#md on</code> - enables markdown in comments</li>
+<li><code>#md off</code> - disables markdown in comments</li>
+<li><code>#phasor</code> - sets output format of complex numbers to polar phasor: A∠φ</li>
+<li><code>#complex</code> - sets output format of complex numbers to cartesian algebraic: a + ib.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Units</summary>
+<ul>
+<li>Units for trigonometric functions: <code>#deg</code> - degrees, <code>#rad</code> - radians, <code>#gra</code> - gradians</li>
+<li>Separator for target units: |</li>
+<li>Return angles with units: <em>ReturnAngleUnits</em> = 1</li>
+<li>Dimensionless: %, ‰, ‱, pcm, ppm, ppb, ppt, ppq</li>
+<li>Angle: °, ′, ″, deg, rad, grad, rev</li>
+</ul>
+<ul>
+<li><strong>Metric units (SI and compatible)</strong><ul>
+<li><strong>Mass:</strong> g, hg, kg, t, kt, Mt, Gt, dg, cg, mg, μg, Da (or u)</li>
+<li><strong>Length:</strong> m, km, dm, cm, mm, μm, nm, pm, AU, ly</li>
+<li><strong>Time:</strong> s, ms, μs, ns, ps, min, h, d, w, y</li>
+<li><strong>Frequency:</strong> Hz, kHz, MHz, GHz, THz, mHz, μHz, nHz, pHz, rpm</li>
+<li><strong>Speed:</strong> kmh</li>
+<li><strong>Electric current:</strong> A, kA, MA, GA, TA, mA, μA, nA, pA</li>
+<li><strong>Temperature:</strong> °C, Δ°C, K</li>
+<li><strong>Amount of substance:</strong> mol</li>
+<li><strong>Luminous intensity:</strong> cd</li>
+<li><strong>Area:</strong> a, daa, ha</li>
+<li><strong>Volume:</strong> L, daL, hL, dL, cL, mL, μL, nL, pL</li>
+<li><strong>Force:</strong> N, daN, hN, kN, MN, GN, TN, gf, kgf, tf, dyn</li>
+<li><strong>Moment:</strong> Nm, kNm</li>
+<li><strong>Pressure:</strong><br />
+  Pa, daPa, hPa, kPa, MPa, GPa, TPa, dPa, cPa, mPa, μPa, nPa, pPa,<br />
+  bar, mbar, μbar, atm, at, Torr, mmHg</li>
+<li><strong>Viscosity:</strong> P, cP, St, cSt</li>
+<li><strong>Energy work:</strong><br />
+  J, kJ, MJ, GJ, TJ, mJ, μJ, nJ, pJ,<br />
+  Wh, kWh, MWh, GWh, TWh, mWh, μWh, nWh, pWh,<br />
+  eV, keV, MeV, GeV, TeV, PeV, EeV, cal, kcal, erg</li>
+<li><strong>Power:</strong>
+  W, kW, MW, GW, TW, mW, μW, nW, pW, hpM, ks,<br />
+  VA, kVA, MVA, GVA, TVA, mVA, μVA, nVA, pVA,<br />
+  VAR, kVAR, MVAR, GVAR, TVAR, mVAR, μVAR, nVAR, pVAR</li>
+<li><strong>Electric charge:</strong> C, kC, MC, GC, TC, mC, μC, nC, pC, Ah, mAh</li>
+<li><strong>Potential:</strong> V, kV, MV, GV, TV, mV, μV, nV, pV</li>
+<li><strong>Capacitance:</strong> F, kF, MF, GF, TF, mF, μF, nF, pF</li>
+<li><strong>Resistance:</strong> Ω, kΩ, MΩ, GΩ, TΩ, mΩ, μΩ, nΩ, pΩ</li>
+<li><strong>Conductance:</strong> S, kS, MS, GS, TS, mS, μS, nS, pS, ℧, k℧, M℧, G℧, T℧, m℧, μ℧, n℧, p℧</li>
+<li><strong>Magnetic flux:</strong> Wb , kWb, MWb, GWb, TWb, mWb, μWb, nWb, pWb</li>
+<li><strong>Magnetic flux density:</strong> T, kT, MT, GT, TT, mT, μT, nT, pT</li>
+<li><strong>Inductance:</strong> H, kH, MH, GH, TH, mH, μH, nH, pH</li>
+<li><strong>Luminous flux:</strong> lm</li>
+<li><strong>Illuminance:</strong> lx</li>
+<li><strong>Radioactivity:</strong> Bq, kBq, MBq, GBq, TBq, mBq, μBq, nBq, pBq, Ci, Rd</li>
+<li><strong>Absorbed dose:</strong> Gy, kGy, MGy, GGy, TGy, mGy, μGy, nGy, pGy</li>
+<li><strong>Equivalent dose:</strong> Sv, kSv, MSv, GSv, TSv, mSv, μSv, nSv, pSv</li>
+<li><strong>Catalytic activity:</strong> kat</li>
+</ul>
+</li>
+<li><strong>Non-metric units (Imperial/US)</strong><ul>
+<li><strong>Mass:</strong> gr, dr, oz, lb (or lbm,  lb_m), kipm (or kip_m), st, qr,<br />
+  cwt (or  cwt_UK, cwt_US), ton (or ton_UK, ton_US), slug</li>
+<li><strong>Length:</strong> th, in, ft, yd, ch, fur, mi, ftm (or ftm_UK, ftm_US),<br />
+  cable (or cable_UK, cable_US), nmi, li, rod, pole, perch, lea</li>
+<li><strong>Speed:</strong> mph, knot</li>
+<li><strong>Temperature:</strong> °F, Δ°F, °R</li>
+<li><strong>Area:</strong> rood, ac</li>
+<li><strong>Volume, fluid:</strong> fl_oz, gi, pt, qt, gal, bbl, or:<br />
+  fl_oz_UK, gi_UK, pt_UK, qt_UK, gal_UK, bbl_UK,<br />
+  fl_oz_US, gi_US, pt_US, qt_US, gal_US, bbl_US</li>
+<li><strong>Volume, dry:</strong> (US) pt_dry, (US) qt_dry, (US) gal_dry, (US) bbl_dry,
+  pk (or pk_UK, pk_US), bu (or bu_UK, bu_US)</li>
+<li><strong>Force:</strong> ozf (or oz_f), lbf (or lb_f), kip (or kipf, kip_f), tonf (or  ton_f), pdl</li>
+<li><strong>Pressure:</strong> osi, osf psi, psf, ksi, ksf, tsi, tsf, inHg</li>
+<li><strong>Energy/work:</strong> BTU, therm (or  therm_UK, therm_US), quad</li>
+<li><strong>Power:</strong> hp, hpE, hpS</li>
+</ul>
+</li>
+<li>Custom units - .Name = expression.<br />
+  Names can include currency symbols: €, £, ₤, ¥, ¢, ₽, ₹, ₩, ₪.</li>
+</ul>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+  
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="javascripts/mathjax.js"></script>
+      
+        <script src="javascripts/mathjax/tex-chtml.js"></script>
+      
+    
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      $("body").on("click", ".fold > :first-child, .unfold > :first-child", function () {
+        var parent = $(this).parent();
+        if (parent.hasClass("fold")) {
+          parent.removeClass("fold").addClass("unfold");
+        } else {
+          parent.removeClass("unfold").addClass("fold");
+        }
+      });
+    });
+  </script>
+
+  </body>
+</html>

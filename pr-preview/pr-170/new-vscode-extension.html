@@ -1,0 +1,3667 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="high-performance-vectors-and-matrices.html">
+      
+      
+        <link rel="next" href="new-desktop-app.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>VS Code Extension - CalcpadCE Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="stylesheets/calcpad-output.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+  <script src="javascripts/jquery-3.6.3.min.js"></script>
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#vs-code-extension" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="CalcpadCE Documentation" class="md-header__button md-logo" aria-label="CalcpadCE Documentation" data-md-component="logo">
+      
+  <img src="media/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CalcpadCE Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              VS Code Extension
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="index.html" class="md-tabs__link">
+          
+  
+  
+  Documentation
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="new-vscode-extension.html" class="md-tabs__link">
+          
+  
+  
+  New Apps and Features (beta)
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="quick-reference.html" class="md-tabs__link">
+          
+  
+  
+  Quick Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="examples/getting-started.html" class="md-tabs__link">
+          
+  
+  
+  Engineering Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="examples/simply-supported-beams.html" class="md-tabs__link">
+          
+  
+  
+  Structural Engineering Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="CalcpadCE Documentation" class="md-nav__button md-logo" aria-label="CalcpadCE Documentation" data-md-component="logo">
+      
+  <img src="media/logo.svg" alt="logo">
+
+    </a>
+    CalcpadCE Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Documentation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About CalcpadCE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="fields-of-application.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fields of Application
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="installation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="licensing-and-terms-of-use.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Licensing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="how-it-works.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="theoretical-background.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theoretical Background
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="writing-math.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Math
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reporting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reporting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="programming.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Programming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="results.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="working-with-files.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="constants.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Constants
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="variables.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="operators.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="brackets.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Brackets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="plotting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="numerical-methods.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Numerical Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="iterative-procedures.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iterative Procedures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="units.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Units
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="vectors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="high-performance-vectors-and-matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Performance Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    New Apps and Features (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    New Apps and Features (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VS Code Extension
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="new-vscode-extension.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VS Code Extension
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installing-the-extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installing the extension
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#your-first-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Your first document
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-editor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The editor
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The editor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#syntax-highlighting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syntax highlighting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#autocomplete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autocomplete
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quick-type-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick-type symbols
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operator-replacement-and-auto-indent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operator replacement and auto-indent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formatting-hotkeys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formatting hotkeys
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#navigating-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Navigating symbols
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-completion-for-includes-and-data-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path completion for includes and data files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-calcpad-panel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The CalcPad panel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#live-preview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Live preview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Live preview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-on-demand-auto-run-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running on demand (Auto-Run off)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#errors-and-diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errors and diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exporting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exporting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-bundled-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The bundled engine
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The bundled engine">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#output-channels-for-troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output channels for troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-desktop-app.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop App
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-calcpad-panel-and-settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CalcPad Panel & Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-pdf-export.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PDF Export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-includes.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Includes and File Reads
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-linter.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linter and Diagnostics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-table-of-contents.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table of Contents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-web-deployment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running the Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-metadata-comments.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata Comments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Quick Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="quick-reference.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engineering Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Engineering Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/getting-started.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/areas.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Areas (15)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/volumes.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Volumes (15)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/geometrical.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometrical (24)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/fractals.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fractals (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/3d-plotting-drawing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D, Plotting, Drawing (7)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/interpolation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpolation (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/numerical.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Numerical (7)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/pendulums.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pendulums (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/waves.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waves (10)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/parametric-curves.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parametric Curves (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/elastic-analysis.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Elastic Analysis (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/finite-elements.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Finite Elements (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/fourier.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/special-math-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Special Math Functions (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/vectors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/vectors-high-performance.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors: High Performance (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/matrices-high-performance.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices: High Performance (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/multiline-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multiline Functions (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/custom-units.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Units (2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/formatting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Formatting (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/others.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Others (8)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Engineering Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Structural Engineering Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/simply-supported-beams.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simply Supported Beams (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/cantilevers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cantilevers (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/propped-cantilevers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Propped Cantilevers (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/continuous-beam.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Continuous Beam (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/deflections.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deflections (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/frames.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frames (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/fully-restrained-beams.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fully Restrained Beams (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/loads.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loads (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/nonlinear.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nonlinear (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/soil-mechanics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soil Mechanics (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/steel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Steel (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/structural-dynamics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Dynamics (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/reinforced-concrete.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete (12)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/reinforced-concrete-punching.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Punching (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/reinforced-concrete-plates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Plates (9)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/reinforced-concrete-seismic-detailing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Seismic Detailing (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installing-the-extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installing the extension
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#your-first-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Your first document
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-editor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The editor
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The editor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#syntax-highlighting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syntax highlighting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#autocomplete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autocomplete
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quick-type-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick-type symbols
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operator-replacement-and-auto-indent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operator replacement and auto-indent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formatting-hotkeys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formatting hotkeys
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#navigating-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Navigating symbols
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-completion-for-includes-and-data-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path completion for includes and data files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-calcpad-panel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The CalcPad panel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#live-preview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Live preview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Live preview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-on-demand-auto-run-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running on demand (Auto-Run off)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#errors-and-diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errors and diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exporting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exporting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-bundled-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The bundled engine
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The bundled engine">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#output-channels-for-troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output channels for troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="vs-code-extension">VS Code Extension<a class="headerlink" href="#vs-code-extension" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>Calcpad.Web only. The standalone WPF desktop application for Windows is separate and unaffected.</p>
+</blockquote>
+<p>The <strong>Calcpad VS Code extension</strong> turns Visual Studio Code into a full Calcpad authoring environment. You write <code>.cpd</code> files with syntax highlighting, autocomplete, and inline error checking, then render them to a live HTML report and export to PDF, Word, or HTML — all driven by the same calculation engine as the rest of Calcpad.</p>
+<p>For the Calcpad language itself, start with <strong><a href="writing-math.html">Writing Math</a></strong> and the <strong><a href="quick-reference.html">Quick Reference</a></strong>.</p>
+<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Visual Studio Code</strong> 1.82 or newer.</li>
+<li><strong>.NET runtime</strong> on your PATH. The extension bundles a local Calcpad server that it launches automatically; it needs <code>dotnet</code> to run it. Verify with <code>dotnet --info</code> in a terminal.</li>
+<li>A <strong>Chromium-based browser</strong> (Chrome, Edge, Chromium) for PDF export. See <a href="new-pdf-export.html">PDF Export</a>.</li>
+</ul>
+<h2 id="installing-the-extension">Installing the extension<a class="headerlink" href="#installing-the-extension" title="Permanent link">&para;</a></h2>
+<p>The extension is distributed as a <code>.vsix</code> package (it is not yet on the Marketplace).</p>
+<ol>
+<li>Obtain the <code>vscode-calcpad-&lt;version&gt;.vsix</code> file, or build it yourself from <code>Calcpad.Web/frontend/vscode-calcpad</code> with <code>npm run package:vsix</code>.</li>
+<li>In VS Code, open the <strong>Extensions</strong> view (<strong>Ctrl+Shift+X</strong>).</li>
+<li>Click the <strong>⋯</strong> menu at the top of the view → <strong>Install from VSIX…</strong> and select the file.</li>
+<li>Reload the window if prompted.</li>
+</ol>
+<p>Alternatively, from a terminal: <code>code --install-extension vscode-calcpad-&lt;version&gt;.vsix</code>.</p>
+<h2 id="your-first-document">Your first document<a class="headerlink" href="#your-first-document" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Create a new file and save it with a <strong><code>.cpd</code></strong> extension (for example <code>beam.cpd</code>). VS Code detects the <code>calcpad</code> language automatically. The <code>.cpdz</code> binary format is also recognized.</li>
+<li>
+<p>Type a calculation, for example:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="cs">&quot;Cantilever tip deflection</span>
+<span class="nv">P</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="na">kN</span>
+<span class="nv">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="na">m</span>
+<span class="nv">E</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">200</span><span class="na">GPa</span>
+<span class="nv">I</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">8.5</span><span class="na">e</span><span class="o">-</span><span class="m">5</span><span class="na">m</span><span class="o">^</span><span class="m">4</span>
+<span class="nv">δ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">P</span>·<span class="nv">L</span><span class="o">^</span><span class="m">3</span><span class="o">/</span><span class="p">(</span><span class="m">3</span>·<span class="nv">E</span>·<span class="nv">I</span><span class="p">)</span>
+</code></pre></div>
+</li>
+<li>
+<p>Click the <strong>CalcPad Preview</strong> button in the editor's top-right toolbar, or run <strong>CalcPad Preview</strong> from the Command Palette (<strong>Ctrl+Shift+P</strong>).</p>
+</li>
+</ol>
+<p>The preview opens in a side column and re-renders every time you edit. The bundled server starts automatically the first time you render — the first render may take a moment while it spins up.</p>
+<h2 id="the-editor">The editor<a class="headerlink" href="#the-editor" title="Permanent link">&para;</a></h2>
+<h3 id="syntax-highlighting">Syntax highlighting<a class="headerlink" href="#syntax-highlighting" title="Permanent link">&para;</a></h3>
+<p><code>.cpd</code> files get semantic highlighting: numbers, units, operators, variables, functions, macros, keywords, commands, file paths, and embedded HTML/Markdown/CSS/JS/SVG in comments are each colored distinctly. Highlighting updates per line as you type, for both dark and light themes.</p>
+<p>The extension also sets a few editor defaults for <code>.cpd</code> files so the language behaves predictably:</p>
+<ul>
+<li>The monospace font is <strong>JuliaMono</strong> (falls back to Cascadia Code / Consolas). Run <strong>CalcPad: Install JuliaMono Font</strong> from the Command Palette to install it if the glyphs look wrong.</li>
+<li><strong>Enter always inserts a newline</strong> — it never accepts a suggestion. Press <strong>Tab</strong> to accept a completion instead.</li>
+<li>Bracket matching is always on; bracket-pair colorization is off (Calcpad colors brackets itself).</li>
+</ul>
+<h3 id="autocomplete">Autocomplete<a class="headerlink" href="#autocomplete" title="Permanent link">&para;</a></h3>
+<p>As you type, the completion list offers:</p>
+<ul>
+<li><strong>Your own symbols first</strong> — variables, functions, macros, and custom units defined in the current document (and its <code>#include</code> files) are prioritized above built-ins.</li>
+<li><strong>Built-in functions</strong> with snippet placeholders — accept one and press <strong>Tab</strong> to jump between arguments.</li>
+<li><strong>Setting keys</strong> (<code>decimals</code>, <code>degrees</code>, <code>complex</code>, <code>units</code>, <code>colorScale</code>, …) where a setting is expected.</li>
+<li><strong><a href="new-metadata-comments.html">Metadata keys</a></strong> inside an HTML-comment block placed directly above a definition. The <strong>Metadata</strong> panel tab edits these through a form.</li>
+</ul>
+<h3 id="quick-type-symbols">Quick-type symbols<a class="headerlink" href="#quick-type-symbols" title="Permanent link">&para;</a></h3>
+<p>Type <code>~</code> followed by a key and press <strong>space</strong> to insert a Greek letter or math symbol. For example <code>~a</code> + space → <code>α</code>, <code>~p</code> + space → <code>π</code>, <code>~S</code> + space → <code>Σ</code>. The full set is shown in the <strong>Insert</strong> tab's Symbol Palette. Toggle this with the <code>quickTyping</code> setting in the CalcPad <strong>Settings</strong> tab.</p>
+<h3 id="operator-replacement-and-auto-indent">Operator replacement and auto-indent<a class="headerlink" href="#operator-replacement-and-auto-indent" title="Permanent link">&para;</a></h3>
+<p>Typing ASCII operators auto-converts them to Unicode: <code>&lt;=</code> → <code>≤</code>, <code>&gt;=</code> → <code>≥</code>, <code>!=</code> → <code>≠</code>. Block keywords indent automatically: <code>#if</code> / <code>#else</code> / <code>#end if</code>, <code>#for</code> / <code>#end for</code>, and <code>#def</code> / <code>#end def</code>.</p>
+<h3 id="formatting-hotkeys">Formatting hotkeys<a class="headerlink" href="#formatting-hotkeys" title="Permanent link">&para;</a></h3>
+<p>When the cursor is in a <code>.cpd</code> file, these hotkeys wrap the selection in HTML or Markdown markup. Whether HTML or Markdown is emitted depends on the <code>commentFormat</code> setting (<code>auto</code> / <code>html</code> / <code>markdown</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Keybinding</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ctrl+B</strong></td>
+<td>Bold</td>
+</tr>
+<tr>
+<td><strong>Ctrl+I</strong></td>
+<td>Italic</td>
+</tr>
+<tr>
+<td><strong>Ctrl+U</strong></td>
+<td>Underline</td>
+</tr>
+<tr>
+<td><strong>Ctrl+=</strong></td>
+<td>Subscript</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+=</strong></td>
+<td>Superscript</td>
+</tr>
+<tr>
+<td><strong>Ctrl+1</strong> … <strong>Ctrl+6</strong></td>
+<td>Headings 1–6</td>
+</tr>
+<tr>
+<td><strong>Ctrl+L</strong></td>
+<td>Paragraph</td>
+</tr>
+<tr>
+<td><strong>Ctrl+R</strong></td>
+<td>Line break</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+L</strong></td>
+<td>Bulleted list</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+N</strong></td>
+<td>Numbered list</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Q</strong></td>
+<td>Toggle <code>'</code> comment prefix</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+Q</strong></td>
+<td>Uncomment</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+V</strong></td>
+<td>Paste as comment (each line prefixed with <code>'</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>On macOS use <strong>Cmd</strong> instead of <strong>Ctrl</strong>. Turn the whole set off with the <code>enableFormattingHotkeys</code> setting if it conflicts with your other bindings.</p>
+<h2 id="navigating-symbols">Navigating symbols<a class="headerlink" href="#navigating-symbols" title="Permanent link">&para;</a></h2>
+<p>The extension provides IDE-grade navigation across variables, functions, macros, and custom units — including across <code>#include</code> files:</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Go to Definition</strong></td>
+<td><strong>Ctrl+Click</strong> or <strong>F12</strong> — jumps to the first assignment</td>
+</tr>
+<tr>
+<td><strong>Find All References</strong></td>
+<td><strong>Shift+Alt+F12</strong>, or right-click → <em>Find All References</em></td>
+</tr>
+<tr>
+<td><strong>Rename Symbol</strong></td>
+<td><strong>F2</strong> — renames occurrences in the current document only (not across <code>#include</code> files)</td>
+</tr>
+<tr>
+<td><strong>Hover</strong></td>
+<td>Point at a symbol for its signature, type, source file, and docs</td>
+</tr>
+</tbody>
+</table>
+<p>Hovering over a built-in function shows its signature, description, return type, per-parameter documentation, and a runnable example.</p>
+<h2 id="path-completion-for-includes-and-data-files">Path completion for includes and data files<a class="headerlink" href="#path-completion-for-includes-and-data-files" title="Permanent link">&para;</a></h2>
+<p>When you type a path after <code>#include</code>, <code>#read</code>, <code>#write</code>, or <code>#append</code>, the extension completes filenames from the workspace and from your configured library path:</p>
+<ul>
+<li><code>#include</code>: <code>.cpd</code>, <code>.txt</code></li>
+<li><code>#read</code> / <code>#write</code> / <code>#append</code>: <code>.cpd</code>, <code>.txt</code>, <code>.csv</code>, <code>.tsv</code>, <code>.xlsx</code>, <code>.xlsm</code>, <code>.xls</code></li>
+<li>Both <code>/</code> and <code>\</code> separators work, and it drills into subdirectories.</li>
+<li>Environment variables expand: <code>%VAR%</code> on Windows, <code>$VAR</code> on macOS/Linux.</li>
+</ul>
+<p>Point the library path (in the Settings tab) at a folder of reusable <code>.cpd</code> / <code>.txt</code> files and they show up in completion alongside workspace files — an easy way for a team to share a common library without copying it into every project.</p>
+<h2 id="the-calcpad-panel">The CalcPad panel<a class="headerlink" href="#the-calcpad-panel" title="Permanent link">&para;</a></h2>
+<p>Click the <strong>CalcPad</strong> icon in the activity bar (left edge) to open the panel. It has <strong>Files</strong> and <strong>Calcpad</strong> views, and the Calcpad view is organized into tabs (Insert, TOC, Settings, Variables, PDF, Formatting, Export, Errors). The view title bar has <strong>CalcPad: Run Preview</strong> (re-renders the active file and refreshes plots) and <strong>Stop Server</strong> buttons.</p>
+<p>The panel is the same across every Calcpad front end — see <strong><a href="new-calcpad-panel-and-settings.html">The CalcPad Panel &amp; Settings</a></strong> for a full walkthrough of each tab.</p>
+<h2 id="live-preview">Live preview<a class="headerlink" href="#live-preview" title="Permanent link">&para;</a></h2>
+<p>Two preview panels are available, each opening in its own editor column:</p>
+<table>
+<thead>
+<tr>
+<th>Panel</th>
+<th>How to open</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>HTML Preview</strong></td>
+<td>Preview button in the editor toolbar, or <em>CalcPad Preview</em> in the Command Palette</td>
+</tr>
+<tr>
+<td><strong>Unwrapped Preview</strong></td>
+<td>Eye button in the editor toolbar, or <em>CalcPad Preview Unwrapped</em></td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>Unwrapped</strong> preview shows the fully expanded source (macros and includes resolved) — useful for debugging what the engine actually computes.</p>
+<p>Both panels:</p>
+<ul>
+<li>Re-render automatically as you type when <strong>Auto-Run Preview</strong> is on (default).</li>
+<li>Follow the <code>previewTheme</code> setting (<code>light</code> / <code>dark</code> / <code>system</code>), using <code>darkBackground</code> for the dark background color.</li>
+<li>Embed local images so PDF/print output matches the preview.</li>
+</ul>
+<p>Right-click a preview → <strong>View Webview Source HTML</strong> to inspect the rendered markup.</p>
+<h3 id="running-on-demand-auto-run-off">Running on demand (Auto-Run off)<a class="headerlink" href="#running-on-demand-auto-run-off" title="Permanent link">&para;</a></h3>
+<p>When you turn <strong>Settings → Auto-Run Preview</strong> off, typing no longer re-renders the preview. Trigger the run yourself via any of:</p>
+<ul>
+<li><strong>Ctrl+Alt+X</strong> (works whenever a <code>.cpd</code> or plaintext editor has focus)</li>
+<li>Right-click in the editor → <strong>CalcPad: Run Preview</strong></li>
+<li>The <strong>CalcPad: Run Preview</strong> button in the CalcPad sidebar's view title bar</li>
+<li>The <em>CalcPad: Run Preview</em> command in the Command Palette</li>
+</ul>
+<p>Running also re-lints the document, refreshes syntax highlighting, and rebuilds the Export tab's plot list.</p>
+<h2 id="errors-and-diagnostics">Errors and diagnostics<a class="headerlink" href="#errors-and-diagnostics" title="Permanent link">&para;</a></h2>
+<p>Calcpad errors surface in VS Code's <strong>Problems</strong> panel (<strong>Ctrl+Shift+M</strong>) as standard diagnostics with Error / Warning / Information severities, each with a <code>CPD-XXXX</code> code. Click one to jump to the offending line. Control how much is shown with the linter minimum-severity setting. See <strong><a href="new-linter.html">Linter and Diagnostics</a></strong> for what each code means.</p>
+<p>For errors that occur inside hidden (<code>#hide</code>) regions — which don't appear in the preview — use the <strong>Errors</strong> tab in the sidebar to see the full list with source-line links.</p>
+<h2 id="exporting">Exporting<a class="headerlink" href="#exporting" title="Permanent link">&para;</a></h2>
+<p>All exports run through the same engine as the preview, so what you see is what you get.</p>
+<table>
+<thead>
+<tr>
+<th>Output</th>
+<th>How</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PDF</strong></td>
+<td><strong>Export CalcPad to PDF</strong> button in the editor toolbar, or <em>Export CalcPad to PDF</em></td>
+<td>Full-fidelity export with a native save dialog. Requires a Chromium browser — see <a href="new-pdf-export.html">PDF Export</a>.</td>
+</tr>
+<tr>
+<td><strong>PDF (print style)</strong></td>
+<td>Right-click editor → <em>Print CalcPad Preview to PDF</em></td>
+<td>Generated from the live preview.</td>
+</tr>
+<tr>
+<td><strong>HTML</strong></td>
+<td><strong>Save HTML…</strong> on the sidebar's <strong>Export</strong> tab, or <em>CalcPad: Save Source HTML…</em></td>
+<td>Renders and saves standalone HTML via a native dialog.</td>
+</tr>
+<tr>
+<td><strong>Word (.docx)</strong></td>
+<td><strong>Save Word…</strong> on the sidebar's <strong>Export</strong> tab, or <em>CalcPad: Save as Word Document…</em></td>
+<td>Renders, then converts to a Word document.</td>
+</tr>
+</tbody>
+</table>
+<p>Use the <strong>PDF</strong> tab in the panel to set the document title, timestamp format, page size, and header/footer before exporting. The <strong>Export</strong> tab also has a <strong>Plots</strong> section — a thumbnail list of every plot the document emits, each with an individual <strong>Save…</strong> button and a <strong>Download all (ZIP)</strong> button. See <a href="new-calcpad-panel-and-settings.html#export">The CalcPad Panel &amp; Settings → Export</a>.</p>
+<h2 id="settings">Settings<a class="headerlink" href="#settings" title="Permanent link">&para;</a></h2>
+<p>All Calcpad settings — math, plot, units, preview and color themes, editor features, linter severity, library path, and named configurations — live in the <strong>Settings</strong> tab of the CalcPad panel, <strong>not</strong> in VS Code's normal settings editor. Editing them there keeps them in sync with the extension and the server.</p>
+<p>See <strong><a href="new-calcpad-panel-and-settings.html#settings">The CalcPad Panel &amp; Settings → Settings</a></strong> for the full list.</p>
+<h2 id="the-bundled-engine">The bundled engine<a class="headerlink" href="#the-bundled-engine" title="Permanent link">&para;</a></h2>
+<p>The extension runs a local Calcpad engine to do all conversion and linting. You don't normally need to think about it:</p>
+<ul>
+<li>It <strong>starts automatically</strong> in the background when the extension activates.</li>
+<li>It <strong>auto-restarts</strong> on a crash (up to 3 retries) before asking you to refresh manually.</li>
+<li>It <strong>shuts down cleanly</strong> when the window closes.</li>
+</ul>
+<p>If something goes wrong, use <strong>Stop CalcPad Server</strong> and then <strong>Refresh Document</strong> to restart it. The server mode (<code>auto</code> / <code>local</code> / <code>remote</code>), URL (default <code>http://localhost:9420</code>), and <code>dotnet</code> path are configurable if you need a custom setup.</p>
+<h3 id="output-channels-for-troubleshooting">Output channels for troubleshooting<a class="headerlink" href="#output-channels-for-troubleshooting" title="Permanent link">&para;</a></h3>
+<p>Four VS Code output channels help diagnose problems (open the Output panel and pick from the dropdown):</p>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CalcPad Extension</strong></td>
+<td>Extension lifecycle, commands, errors</td>
+</tr>
+<tr>
+<td><strong>Calcpad Output HTML</strong></td>
+<td>Rendered HTML diagnostics</td>
+</tr>
+<tr>
+<td><strong>Calcpad Webview Console</strong></td>
+<td>Console messages from preview panels</td>
+</tr>
+<tr>
+<td><strong>CalcPad Server Debug</strong></td>
+<td>Output from the engine process</td>
+</tr>
+</tbody>
+</table>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Preview never renders / "server not ready"</td>
+<td>Confirm <code>dotnet --info</code> works. Then <strong>Stop CalcPad Server</strong> → <strong>Refresh Document</strong>. Check the <strong>CalcPad Server Debug</strong> output channel.</td>
+</tr>
+<tr>
+<td>PDF export fails</td>
+<td>Install a Chromium browser (Chrome/Edge/Chromium). See <a href="new-pdf-export.html">PDF Export</a>.</td>
+</tr>
+<tr>
+<td>Greek letters / symbols render as boxes</td>
+<td>Run <strong>CalcPad: Install JuliaMono Font</strong> and reload.</td>
+</tr>
+<tr>
+<td>Symbols not found across files</td>
+<td>Confirm the <code>#include</code> path resolves; set the library path if the file lives in a shared folder.</td>
+</tr>
+<tr>
+<td>Formatting hotkeys conflict with other bindings</td>
+<td>Disable <code>enableFormattingHotkeys</code> in the Settings tab.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="new-calcpad-panel-and-settings.html">The CalcPad Panel &amp; Settings</a> — the shared sidebar and all settings</li>
+<li><a href="new-desktop-app.html">Using the Desktop App</a></li>
+<li><a href="new-pdf-export.html">PDF Export</a> · <a href="new-includes.html">Includes and File Reads</a> · <a href="new-linter.html">Linter and Diagnostics</a> · <a href="new-table-of-contents.html">Table of Contents</a></li>
+<li><a href="writing-math.html">Writing Math</a> · <a href="quick-reference.html">Quick Reference</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+  
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="javascripts/mathjax.js"></script>
+      
+        <script src="javascripts/mathjax/tex-chtml.js"></script>
+      
+    
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      $("body").on("click", ".fold > :first-child, .unfold > :first-child", function () {
+        var parent = $(this).parent();
+        if (parent.hasClass("fold")) {
+          parent.removeClass("fold").addClass("unfold");
+        } else {
+          parent.removeClass("unfold").addClass("fold");
+        }
+      });
+    });
+  </script>
+
+  </body>
+</html>

@@ -1,0 +1,3554 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="reporting.html">
+      
+      
+        <link rel="next" href="results.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Programming - CalcpadCE Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="stylesheets/calcpad-output.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+  <script src="javascripts/jquery-3.6.3.min.js"></script>
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#programming" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="CalcpadCE Documentation" class="md-header__button md-logo" aria-label="CalcpadCE Documentation" data-md-component="logo">
+      
+  <img src="media/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CalcpadCE Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Programming
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="index.html" class="md-tabs__link">
+          
+  
+  
+  Documentation
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="new-vscode-extension.html" class="md-tabs__link">
+          
+  
+  
+  New Apps and Features (beta)
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="quick-reference.html" class="md-tabs__link">
+          
+  
+  
+  Quick Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="examples/getting-started.html" class="md-tabs__link">
+          
+  
+  
+  Engineering Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="examples/simply-supported-beams.html" class="md-tabs__link">
+          
+  
+  
+  Structural Engineering Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="CalcpadCE Documentation" class="md-nav__button md-logo" aria-label="CalcpadCE Documentation" data-md-component="logo">
+      
+  <img src="media/logo.svg" alt="logo">
+
+    </a>
+    CalcpadCE Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Documentation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About CalcpadCE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="fields-of-application.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fields of Application
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="installation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="licensing-and-terms-of-use.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Licensing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="how-it-works.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="theoretical-background.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theoretical Background
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="writing-math.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Math
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reporting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reporting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Programming
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="programming.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Programming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#input-forms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input Forms
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-ui-with-html-and-css" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced UI with Html and CSS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced UI with Html and CSS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#selection-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Selection Box
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#radio-buttons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Radio Buttons
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check Box
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conditional-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conditional Execution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iteration-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Iteration Blocks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interactive-step-by-step-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interactive (Step-by-Step) Execution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modules-include" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modules (Include)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#macros-and-string-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Macros and String Variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#importexport-of-external-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Import/Export of External Data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Import/Export of External Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#textcsv-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Text/CSV Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#excel-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Excel Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="results.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="working-with-files.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="constants.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Constants
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="variables.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="operators.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="brackets.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Brackets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="plotting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="numerical-methods.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Numerical Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="iterative-procedures.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iterative Procedures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="units.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Units
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="vectors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="high-performance-vectors-and-matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Performance Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    New Apps and Features (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    New Apps and Features (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-vscode-extension.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VS Code Extension
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-desktop-app.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop App
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-calcpad-panel-and-settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CalcPad Panel & Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-pdf-export.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PDF Export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-includes.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Includes and File Reads
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-linter.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linter and Diagnostics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-table-of-contents.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table of Contents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-web-deployment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running the Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-metadata-comments.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata Comments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Quick Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="quick-reference.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engineering Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Engineering Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/getting-started.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/areas.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Areas (15)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/volumes.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Volumes (15)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/geometrical.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometrical (24)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/fractals.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fractals (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/3d-plotting-drawing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D, Plotting, Drawing (7)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/interpolation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpolation (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/numerical.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Numerical (7)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/pendulums.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pendulums (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/waves.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waves (10)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/parametric-curves.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parametric Curves (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/elastic-analysis.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Elastic Analysis (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/finite-elements.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Finite Elements (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/fourier.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/special-math-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Special Math Functions (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/vectors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/vectors-high-performance.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors: High Performance (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/matrices-high-performance.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices: High Performance (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/multiline-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multiline Functions (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/custom-units.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Units (2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/formatting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Formatting (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/others.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Others (8)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Engineering Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Structural Engineering Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/simply-supported-beams.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simply Supported Beams (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/cantilevers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cantilevers (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/propped-cantilevers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Propped Cantilevers (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/continuous-beam.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Continuous Beam (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/deflections.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deflections (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/frames.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frames (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/fully-restrained-beams.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fully Restrained Beams (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/loads.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loads (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/nonlinear.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nonlinear (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/soil-mechanics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soil Mechanics (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/steel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Steel (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/structural-dynamics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Dynamics (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/reinforced-concrete.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete (12)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/reinforced-concrete-punching.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Punching (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/reinforced-concrete-plates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Plates (9)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/reinforced-concrete-seismic-detailing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Seismic Detailing (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#input-forms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input Forms
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-ui-with-html-and-css" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced UI with Html and CSS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced UI with Html and CSS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#selection-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Selection Box
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#radio-buttons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Radio Buttons
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check Box
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conditional-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conditional Execution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iteration-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Iteration Blocks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interactive-step-by-step-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interactive (Step-by-Step) Execution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modules-include" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modules (Include)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#macros-and-string-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Macros and String Variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#importexport-of-external-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Import/Export of External Data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Import/Export of External Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#textcsv-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Text/CSV Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#excel-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Excel Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="programming">Programming<a class="headerlink" href="#programming" title="Permanent link">&para;</a></h1>
+<h2 id="input-forms">Input Forms<a class="headerlink" href="#input-forms" title="Permanent link">&para;</a></h2>
+<p>If you have a long and complicated problem or you want to share your solution with others, it is a good idea to create an input form.
+It is very easy to do that with CalcpadCE.
+Just replace the values that need to be entered with question marks "<strong>?</strong>", e.g. "<em>a</em> = ?". Please note that after that, you will not be able to calculate the results directly by clicking <img src="./media/image6.png" alt="" height="20">. You must compile it first to an input form.
+For that purpose, click the <img src="./media/image34.png" alt="" height="20"> button or press <strong>F4</strong> from the keyboard.</p>
+<p>The code will hide, and the form will be loaded into the "<strong>Input</strong>" box at the full width of the main window.
+All texts and formulas will be rendered in Html format, protected from modification.
+Input boxes will be generated at every occurrence of the "<strong>?</strong>" symbol except those in comments.
+The ready-to-use input form will look as follows:</p>
+<p><img src="./media/image35.png" style="width:6.65977in;height:4.40945in" alt="Sample3" /></p>
+<p>Now you have to fill in the input boxes and click <img src="./media/image6.png" alt="" height="20"> to calculate the results.
+They are displayed in the "<strong>Output</strong>" box.</p>
+<p><img src="./media/image36.png" style="width:6.65977in;height:4.40945in" alt="Sample4" /></p>
+<p>In order to return to input mode, click again <img src="./media/image6.png" alt="" height="20"> to switch the button off.
+Input data will remain unchanged from the last input.
+If you need to modify the source code, you have to unlock it by clicking the <img src="./media/image34.png" alt="" height="20"> button.
+The "<strong>Code</strong>" box will show again at the left side of the main window.
+Input data will be attached to the question marks.
+If you hover the mouse over one of them, you will see the respective value.
+Click on the question mark to change it.
+When you finish editing the code, you can compile it back to input form.
+The input values will be filled in the respective fields.
+Finally, you can save the document as a "<strong>*.cpd</strong>" file.
+When you open such a file, it will be displayed directly into input form mode.
+This format is more convenient to use than a simple text file due to the following advantages:</p>
+<ul>
+<li>The user can see clearly which parameters should be entered.
+You can also provide pictures and additional explanations.
+This is more comprehensible for the user, especially if the program is developed by someone else;</li>
+</ul>
+<ul>
+<li>The rest of the source code is protected from modification, unless you unlock it on purpose.
+This prevents an inexperienced user from accidentally damaging the calculation formulas.</li>
+</ul>
+<p>If you save the document as a "<strong>*.cpdz</strong>" file, you will make the source code completely inaccessible.
+It will not be possible to unlock it inside CalcpadCE anymore.
+Also, no one could edit the file in external text editor, because it is encoded.
+That is how you can protect your source code from unauthorized copying, viewing and modification.</p>
+<p>You can put question marks "<strong>?</strong>" not only in variable definitions, but at any place in the code e.g.:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nt">?</span>
+</code></pre></div>
+<p>2 +
+<img alt="input field" src="media/Image%201.png" style="height: 32px; vertical-align: text-bottom; margin-bottom: -5px;" /></p>
+<p>Then, you can enter a value and calculate the result.
+This approach is not recommended for complicated problems, because the program logic gets unclear and difficult to understand.</p>
+<h2 id="advanced-ui-with-html-and-css">Advanced UI with Html and CSS<a class="headerlink" href="#advanced-ui-with-html-and-css" title="Permanent link">&para;</a></h2>
+<p>Besides simple input boxes, you can use some advanced UI elements like "<strong>select</strong>" (combo box), "<strong>radio</strong>" buttons and "<strong>checkboxes</strong>" in your worksheets.
+Since all the output from CalcpadCE is rendered as an Html document, you can use Html and CSS for that purpose.
+However, CalcpadCE accepts input only from text boxes.
+That is why, it is required to map every other UI element to some text box.
+This is performed by enclosing the text box into an outer html element (paragraph or div) with a certain <strong>id</strong>. The same id must be assigned as a <strong>name</strong> or <strong>data-target</strong> attribute of the source UI element.
+Then, the content of the source element's value attribute will be automatically filled in the target text box.
+You can use the following sample code:</p>
+<h3 id="selection-box">Selection Box<a class="headerlink" href="#selection-box" title="Permanent link">&para;</a></h3>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">&#39;Select an option: &lt;select name=&quot;**target1**&quot;&gt;</span>
+<span class="c1">&#39;&lt;option value=&quot;11;12&quot;&gt;x1; y1&lt;/option&gt;</span>
+<span class="c1">&#39;&lt;option value=&quot;21;22&quot;&gt;x2; y2&lt;/option&gt;</span>
+<span class="c1">&#39;&lt;option value=&quot;31;32&quot;&gt;x3; y3&lt;/option&gt;</span>
+<span class="c1">&#39;&lt;/select&gt;</span>
+<span class="c1">&#39;...</span>
+<span class="c1">&#39;&lt;p id=&quot;**target1**&quot;&gt; Values:&#39;</span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">21</span><span class="p">}</span><span class="c1">&#39;,&#39;</span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">22</span><span class="p">}</span><span class="c1">&#39;&lt;/p&gt;</span>
+</code></pre></div>
+<p><img alt="Dropdown and two input field" src="media/Image%2045.png" style="width: 300px" /></p>
+<h3 id="radio-buttons">Radio Buttons<a class="headerlink" href="#radio-buttons" title="Permanent link">&para;</a></h3>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">&#39;&lt;p&gt;Select:</span>
+<span class="c1">&#39;&lt;input name=&quot;target2&quot; type=&quot;radio&quot; id=&quot;opt1&quot; value=&quot;1&quot;/&gt;</span>
+<span class="c1">&#39;&lt;label for=&quot;opt1&quot;&gt;option 1&lt;/label&gt;</span>
+<span class="c1">&#39;&lt;input name=&quot;target2&quot; type=&quot;radio&quot; id=&quot;opt2&quot; value=&quot;2&quot;/&gt;</span>
+<span class="c1">&#39;&lt;label for=&quot;opt2&quot;&gt;option 2&lt;/label&gt;</span>
+<span class="c1">&#39;...</span>
+<span class="c1">&#39;&lt;p id=&quot;target2&quot;&gt;Value -&#39;</span><span class="nv">opt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">2</span><span class="p">}</span><span class="c1">&#39;&lt;/p&gt;</span>
+</code></pre></div>
+<p><img alt="Two radio buttons and an input field" src="media/Image%2046.png" style="width: 250px" /></p>
+<h3 id="check-box">Check Box<a class="headerlink" href="#check-box" title="Permanent link">&para;</a></h3>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">&#39;&lt;p&gt;&lt;input name=&quot;target3&quot; type=&quot;checkbox&quot; id=&quot;chk1&quot; value=&quot;3&quot;/&gt;</span>
+<span class="c1">&#39;&lt;label for=&quot;chk1&quot;&gt;Checkbox 1&lt;/label&gt;&lt;/p&gt;</span>
+<span class="c1">&#39;...</span>
+<span class="c1">&#39;&lt;p id=&quot;target3&quot;&gt;Value -&#39;</span><span class="nv">chk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">3</span><span class="p">}</span><span class="c1">&#39;&lt;/p&gt;</span>
+</code></pre></div>
+<p><img alt="Checkbox and an input field" src="media/Image%2047.png" style="width: 120px" /></p>
+<p>As you can see from the first example, one "value" attribute can contain multiple values, separated by semicolons ";". In this case, you have to provide the respective number of text boxes in the target paragraph.
+You can copy the above code, add as many options as you like and write your own labels and values.
+You can also change names and ids, but make sure that all source names match exactly the target ids, and no duplicate ids exist.</p>
+<h2 id="output-control">Output Control<a class="headerlink" href="#output-control" title="Permanent link">&para;</a></h2>
+<p>You can easily specify which parts of the code should be visible or hidden in the output.
+Unlike conditional execution, the hidden code is always calculated.
+It is just not displayed.
+The following keywords can be used for that purpose:</p>
+<ul>
+<li><code>#Hide</code> hides the contents after the current line;</li>
+<li><code>#Pre</code> shows the contents in "input" mode only (see <a href="#input-forms">Input forms</a> below);</li>
+<li><code>#Post</code> shows the contents in "output" mode and hides it in "input" mode;</li>
+<li><code>#Show</code> always shows the contents (revoke all other keywords);</li>
+</ul>
+<p>Each of the above keywords affects the content after the current line and overrides the previous one.
+You can use them to hide long and repetitive calculations that should not be visible.
+You can use the <code>#Pre</code> command to add some directions about filling the input data and <code>#Post</code> to hide the calculation algorithm during data input.</p>
+<p>You can also modify the display of the equations as follows:</p>
+<ul>
+<li><code>#Val</code> shows only the final result as a single value;</li>
+<li><code>#Equ</code> shows both the equation and the calculated result (default);</li>
+<li><code>#Noc</code> shows only the equation, without results (no calculations).</li>
+</ul>
+<p>Each of the above keywords overrides the other.
+You can use <code>#Val</code> to create a table with values, but without the formulas, like in Excel.</p>
+<h2 id="conditional-execution">Conditional Execution<a class="headerlink" href="#conditional-execution" title="Permanent link">&para;</a></h2>
+<p>Sometimes the solution has to continue in different ways, depending on some intermediate values.
+Such feature is included in CalcpadCE, similarly to other programming languages.
+It is called "conditional execution block" and has the following general form:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#If</span><span class="w"> </span><span class="nv">condition1</span>
+<span class="w">    </span><span class="nv">contents</span><span class="w"> </span><span class="nv">if</span><span class="w"> </span><span class="nv">condition1</span><span class="w"> </span><span class="nv">is</span><span class="w"> </span><span class="nv">satisfied</span>
+<span class="k">#Else If</span><span class="w"> </span><span class="nv">condition2</span>
+<span class="w">    </span><span class="nv">contents</span><span class="w"> </span><span class="nv">if</span><span class="w"> </span><span class="nv">condition2</span><span class="w"> </span><span class="nv">is</span><span class="w"> </span><span class="nv">satisfied</span>
+<span class="k">#Else If</span><span class="w"> </span><span class="nv">condition3</span>
+<span class="w">    </span><span class="nv">contents</span><span class="w"> </span><span class="nv">if</span><span class="w"> </span><span class="nv">condition3</span><span class="w"> </span><span class="nv">is</span><span class="w"> </span><span class="nv">satisfied</span>
+<span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="w"> </span><span class="p">.</span>
+<span class="k">#Else</span>
+<span class="w">    </span><span class="nv">contents</span><span class="w"> </span><span class="nv">if</span><span class="w"> </span><span class="nv">none</span><span class="w"> </span><span class="nv">of</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">conditions</span><span class="w"> </span><span class="nv">is</span><span class="w"> </span><span class="nv">satisfied</span>
+<span class="k">#end if</span>
+</code></pre></div>
+<p>Shorter forms are also possible:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#If</span><span class="w"> </span><span class="nv">condition</span>
+<span class="w">    </span><span class="nv">contents</span><span class="w"> </span><span class="nv">if</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">condition</span><span class="w"> </span><span class="nv">is</span><span class="w"> </span><span class="nv">satisfied</span>
+<span class="k">#Else</span>
+<span class="w">    </span><span class="nv">contents</span><span class="w"> </span><span class="nv">if</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">condition</span><span class="w"> </span><span class="nv">is</span><span class="w"> </span><span class="nv">not</span><span class="w"> </span><span class="nv">satisfied</span>
+<span class="k">#end if</span>
+</code></pre></div>
+<p>or:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#If</span><span class="w"> </span><span class="nv">condition</span>
+<span class="w">    </span><span class="nv">contents</span><span class="w"> </span><span class="nv">if</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">condition</span><span class="w"> </span><span class="nv">is</span><span class="w"> </span><span class="nv">satisfied</span>
+<span class="k">#end if</span>
+</code></pre></div>
+<p>Condition blocks affect not only the calculation path but also the report content like text and images.
+The "#" symbol must be the first one in the line.
+At the place of "<strong>condition</strong>" you can put any valid expression.
+Normally, a comparison is used like "#If <em>a</em> &lt; 0", but it is not obligatory.
+If it evaluates to any non-zero number, the condition is assumed to be satisfied.
+Otherwise, it is not satisfied.
+Any result which absolute value is ≤ 0.00000001 is assumed to be zero.</p>
+<p>Let us look again at the quadratic equation example that we used earlier.
+If we enter "<em>c</em> = 5", the discriminant will be negative, and the result will be NaN.
+This is not a very intelligent way to finish a program.
+What we need to do is to check if "<em>D</em> &lt; 0" and if so, to provide a comprehensible message.
+Otherwise, we have to calculate the roots.
+We can do this, using conditional execution, as follows:</p>
+<p><img src="./media/image37.png" style="width:6.3986in;height:2.48934in" alt="Sample2" /></p>
+<h2 id="iteration-blocks">Iteration Blocks<a class="headerlink" href="#iteration-blocks" title="Permanent link">&para;</a></h2>
+<p>You can have simple iterations inside a CalcpadCE program.
+For that purpose, you have to define a "<strong>repeat-loop</strong>" block:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#Repeat</span><span class="w"> </span><span class="nv">n</span>
+<span class="w">    </span><span class="nv">code</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">be</span><span class="w"> </span><span class="nv">executed</span><span class="w"> </span><span class="nv">repeatedly</span>
+<span class="k">#Loop</span>
+</code></pre></div>
+<p>The symbol <em>n</em> stands for the number of repetitions.
+Instead of <em>n</em>, you can put a number, variable or any valid expression.
+If the result of the expression is not integer, it is rounded to the nearest one.
+You can exit the repeat-loop cycle prematurely by putting <code>#Break</code> inside the block.
+It will make sense only if you combine it a conditional block.
+Otherwise, it will always break at the same line, without performing any loops.
+A typical "<strong>repeat-break-loop</strong>" will look like this:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#Repeat</span>
+<span class="w">    </span><span class="nv">code</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">be</span><span class="w"> </span><span class="nv">executed</span><span class="w"> </span><span class="nv">repeatedly</span>
+<span class="w">    </span><span class="k">#If</span><span class="w"> </span><span class="nv">condition</span>
+<span class="w">        </span><span class="k">#Break</span>
+<span class="w">    </span><span class="k">#End if</span>
+<span class="w">    </span><span class="nv">you</span><span class="w"> </span><span class="nv">can</span><span class="w"> </span><span class="nv">have</span><span class="w"> </span><span class="nv">more</span><span class="w"> </span><span class="nv">code</span><span class="w"> </span><span class="nv">here</span>
+<span class="k">#Loop</span>
+</code></pre></div>
+<p>You can also use <code>#Continue</code> instead of <code>#Break</code> inside the condition.
+The program will skip the remaining lines, return to the top of the loop block and continue with the next iteration.
+You can omit the number of repetitions <em>n</em> only if you are sure that the condition will be satisfied, and you will leave the loop sooner or later.
+However, to avoid infinite loops, the number of iterations is limited internally to 10 000 000.</p>
+<p>Besides repetitive calculations, you can use loops to generate repetitive report content (like table rows). If you want to hide the iteration details, you can use output control directives (see the previous section). For example, you can enclose the "repeat-loop" block with <code>#Hide</code> and <code>#Show</code> statements.</p>
+<p>Since version VM 7.0, two new iteration blocks were added: "for-loop" and "while-loop", as follows:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#For</span> <span class="nv">counter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">start</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">end</span>
+<span class="w">    </span><span class="nv">code</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">be</span><span class="w"> </span><span class="nv">executed</span><span class="w"> </span><span class="nv">repeatedly</span>
+<span class="w">    </span><span class="k">#Loop</span>
+<span class="k">#While</span> <span class="nv">condition</span>
+<span class="w">    </span><span class="nv">code</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">be</span><span class="w"> </span><span class="nv">executed</span><span class="w"> </span><span class="nv">repeatedly</span>
+<span class="k">#Loop</span>
+</code></pre></div>
+<h2 id="interactive-step-by-step-execution">Interactive (Step-by-Step) Execution<a class="headerlink" href="#interactive-step-by-step-execution" title="Permanent link">&para;</a></h2>
+<p>You can make a CalcpadCE worksheet to execute interactively (step-by-step) by defining "breakpoints" at certain lines.
+It will allow the user to review the intermediate results and enter some additional input data if needed.
+There are two special keywords you can use for that purpose:</p>
+<ul>
+<li><code>#Pause</code> calculates down to the current line, displays the results and waits for the user to resume;</li>
+<li><code>#Input</code> renders an input form to the current line and waits the user to enter data and resume.</li>
+</ul>
+<p>When the execution is paused, the program renders a message at the bottom of the report:</p>
+<p><span style="color: red";">Paused!</span>
+Press <strong>F5</strong> to continue or <strong>Esc</strong> to cancel.</p>
+<p>You can resume the execution by pressing <strong>F5</strong>, clicking the link or the <img src="./media/image6.png" alt="" height="20"> button again.
+You can have several breakpoints in a single worksheet.
+When you use the #Input keyword, the previous section is calculated before the current input form is displayed.
+In this way, the stages of calculation overlap as shown in the following example:</p>
+<p><img src="./media/image38.png" style="width:3.86746in;height:3.68349in" alt="Interactive" /></p>
+<p>Additionally, the user can press "<strong>Pause/Break</strong>" or "<strong>Ctrl + Alt + P</strong>" any time from the keyboard to pause the execution.
+The execution will pause at the current line as if <code>#Pause</code> is detected.</p>
+<h2 id="modules-include">Modules (Include)<a class="headerlink" href="#modules-include" title="Permanent link">&para;</a></h2>
+<p>CalcpadCE allows you to include content from external files in your worksheet.
+If you have pieces of code that is repeated in different worksheets, you can organize it in modules and reuse it multiple times.
+Also, if you have a longer worksheet, you can split it into modules that will be easier to maintain.
+Then, you can include them into the main file by using the following statement:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#include</span><span class="w"> </span><span class="nv">filename</span>
+</code></pre></div>
+<p>The "<em>filename</em>" must contain the full path to a local file.
+If the file is the same folder as the current one, you can specify only the filename.</p>
+<p>By default, CalcpadCE will include the whole contents of the external module.
+However, you can prevent some parts from inclusion by making them local.
+To start a "local" section in a module, add a new line, containing the <code>#local</code> keyword.
+To end a "local" section (or start a "global" one), add a new line with the <code>#global</code> keyword.
+CalcpadCE supports multiple levels of inclusions.
+That means that the included file, in its turn, can reference other files and so on.</p>
+<h2 id="macros-and-string-variables">Macros and String Variables<a class="headerlink" href="#macros-and-string-variables" title="Permanent link">&para;</a></h2>
+<p>Macros and string variables are convenient ways to organize your code inside a single file and prevent repetitions.
+They can be inline or multiline.
+Unlike string variables, macros can have parameters.
+You can define them by using the following statements:</p>
+<p>Inline string variable:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#def</span><span class="w"> </span><span class="nv">variable_name$</span><span class="w"> </span><span class="o">=</span> content
+</code></pre></div>
+<p>Multiline string variable:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#def</span><span class="w"> </span><span class="nv">variable_name</span>$
+<span class="w">    </span><span class="nv">content</span><span class="w"> </span><span class="nv">line</span><span class="w"> </span><span class="m">1</span>
+<span class="w">    </span><span class="nv">content</span><span class="w"> </span><span class="nv">line</span><span class="w"> </span><span class="m">2</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="k">#end def</span>
+</code></pre></div>
+<p>Inline string macro:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#def</span><span class="w"> </span><span class="o">*</span><span class="nv">macro_name</span>$<span class="p">(</span><span class="nv">param1</span>$<span class="p">;</span><span class="w"> </span><span class="nv">param2</span>$<span class="p">;...)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">content</span>
+</code></pre></div>
+<p>Multiline string macro:  </p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#def</span><span class="w"> </span><span class="nv">macro_name</span>$<span class="p">(</span><span class="nv">param1</span>$<span class="p">;</span><span class="w"> </span><span class="nv">param2</span>$<span class="p">;...)</span>
+    <span class="nv">content</span><span class="w"> </span><span class="nv">line</span><span class="w"> </span><span class="m">1</span>
+    <span class="nv">content</span><span class="w"> </span><span class="nv">line</span><span class="w"> </span><span class="m">2</span><span class="w">  </span>
+    <span class="p">...</span>
+<span class="k">#end def</span>
+</code></pre></div>
+<p>Names of string variables, macros, and their parameters can contain small and capital Latin letters and underscore "_". They must end with the "$" symbol.
+The contents can be virtually any string.
+It is not necessary to be a valid CalcpadCE expression, since it is not processed by the parser at this stage.
+However, other macro/string variable definitions are not allowed inside.
+You can insert only references to previously defined ones.
+Also, input fields "?" are not supported in macros yet.
+This feature will be developed in the next versions.
+You can use <code>#include</code> inside macros, but only if the included file does not contain other macros.</p>
+<p>After a string variable is defined, you can use it anywhere in the code by writing its name (with the ending "$"). The same is for macros, but you also need to specify values for parameters.
+Macros and string variables are preprocessed and rewritten before the actual parsing is performed.
+As a result, intermediate (unwrapped) code is generated.
+You can review it by checking the "<strong>Unwrapped code</strong>" checkbox below the "<strong>Output</strong>" window.</p>
+<p>If any errors occur during macro preprocessing, the unwrapped code is displayed, together with the errors.
+Line numbers in error descriptions refer to your initial code.
+If preprocessing is completed successfully, the unwrapped code is parsed and calculated as normal.
+If errors are detected at this stage, they are displayed in the output.
+Line numbers in error descriptions refer to the unwrapped code.
+You can go to the respective line by clicking the link on the line number.</p>
+<h2 id="importexport-of-external-data">Import/Export of External Data<a class="headerlink" href="#importexport-of-external-data" title="Permanent link">&para;</a></h2>
+<p>You can import and export numerical data from/to text, CSV and Excel files.
+Inside CalcpadCE, data should be stored in a matrix/vector variable.
+You can also read and write partial data by specifying the desired range.
+Structured storage of special matrices is supported for saving space.
+The following commands are available:</p>
+<h3 id="textcsv-files">Text/CSV Files<a class="headerlink" href="#textcsv-files" title="Permanent link">&para;</a></h3>
+<p>Reads data from the specified text/CSV file into the matrix/vector <em>M</em>. The file must exist:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#read</span><span class="w"> </span><span class="nv">M</span><span class="w"> </span><span class="nv">from</span><span class="w"> </span><span class="nv">filename</span><span class="p">.</span><span class="nv">txt</span><span class="p">@</span><span class="nv">R1C1</span><span class="p">:</span><span class="nv">R2C2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">R</span> <span class="nv">SEP</span><span class="o">=</span><span class="c1">&#39;,&#39;</span>
+</code></pre></div>
+<p>Writes data from matrix/vector <em>M</em> to the specified text/CSV file.
+If the file exists, it is entirely overwritten.
+Otherwise, a new file is created.
+In all cases, the path to the file must exist.</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#write</span> <span class="nv">M</span> <span class="nv">to</span> <span class="nv">filename</span><span class="p">.</span><span class="nv">txt</span><span class="p">@</span><span class="nv">R1C1</span><span class="p">:</span><span class="nv">R2C2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">N</span> <span class="nv">SEP</span><span class="o">=</span><span class="c1">&#39;,&#39;</span>
+</code></pre></div>
+<p>Appends data from matrix/vector <em>M</em> to the specified text/CSV file.
+If the file exists, the data is appended at the end of the existing file.
+Otherwise, a new file is created.
+In all cases, the path to the file must exist.</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#append</span> <span class="nv">M</span> <span class="nv">to</span> <span class="nv">filename</span><span class="p">.</span><span class="nv">txt</span><span class="p">@</span><span class="nv">R1C1</span><span class="p">:</span><span class="nv">R2C2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">N</span> <span class="nv">SEP</span><span class="o">=</span><span class="c1">&#39;,&#39;</span>
+</code></pre></div>
+<p>Command options:</p>
+<ul>
+<li><code>M</code> the name of the matrix/vector that contains the data [required];</li>
+<li><code>filename.txt</code> the name and path of the input/output file [required]. If the path is omitted, the file is assumed to be in the same folder.
+    Extension is required.
+    Any valid extension is allowed (except those for Excel), including <strong>txt</strong> and <strong>csv</strong>, as long as the data in the file is in text format;</li>
+<li><code>@R1C1:R2C2</code> data range in the input file [optional]:
+    - <code>R1C1</code> starting row and column indexes [optional]:
+    - <code>R1</code> row index: includes capital letter “R”, followed by the number of the row [optional];
+    - <code>C1</code>column index: capital letter “C”, followed by the number of the column [optional];
+    - <code>:R2C2</code> ending row (R2) and column (C2) indexes as above [optional];<p>Indexing starts at <strong>1</strong>. You can skip any of the starting and ending row/column indexes.
+  In this case, the default values of 1 and matrix dimensions are taken.
+  Starting indexes can be greater than ending ones.
+  Some examples are given below:</p>
+<p><img alt="CSV data showing example ranges" src="media/Image%2048.png" /></p>
+</li>
+</ul>
+<ul>
+<li><code>TYPE=R</code> The type of matrix/vector for structured storage [optional].<br />
+    For the <code>#read</code> command, TYPE can be any of the following capital letters:
+    - <code>R</code> rectangular matrix (default);
+    - <code>C</code> column matrix;
+    - <code>D</code> diagonal matrix;
+    - <code>S</code> symmetric skyline matrix;
+    - <code>L</code> lower triangular matrix;
+    - <code>U</code> upper triangular matrix;
+    - <code>V</code> vector.<p>If you want to use the high-performance version of the type, add <strong>_hp</strong> after the type letter.
+  For example: <strong>R_hp</strong> or <strong>S_hp</strong> .<br />
+  For column and diagonal matrices values can be stored either on a single line or in a column of one value per line.
+  For diagonal matrices only the values along the main diagonal are stored, for lower triangular - only below the main diagonal, and for symmetric and upper triangular - only above the main diagonal.
+  Vector values can be spread along multiple lines, but all are collected in a single vector consequently line-by-line.
+  Examples for structured storage are provided below:</p>
+<p><img alt="Matrix examples" src="media/Image%2049.png" /></p>
+<p>For the <code>#write</code> and <code>#append</code> commands TYPE can be one of the capital letters below:</p>
+<p>- <code>Y</code> Yes, the matrix structure is used;
+  - <code>N</code> No, the matrix structure is not used (default);</p>
+<p>If “<strong>N</strong>” is selected, all matrices are stored as rectangular, regardless their type and internal structure.
+  All elements after the last nonzero value on the row are skipped.
+- <code>SEP=','</code> separator [optional]. You must specify a single character in quotes.
+  For the #read command it must correspond to the actual separator used in the input file.</p>
+</li>
+</ul>
+<p>The minimum allowed syntax for the above commands if all optional keywords are skipped is:</p>
+<ul>
+<li><code>#read M from filename.txt</code> or</li>
+<li><code>#write M to filename.txt</code> or</li>
+<li><code>#append M to filename.txt</code></li>
+</ul>
+<h3 id="excel-files">Excel Files<a class="headerlink" href="#excel-files" title="Permanent link">&para;</a></h3>
+<p>Reads the data from the specified Excel file into the matrix/vector <em>M</em>. The file must exist as well as the specified worksheet:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#read</span> <span class="nv">M</span> <span class="nv">from</span> <span class="nv">filename</span><span class="p">.</span><span class="nv">xlsx</span><span class="p">@</span><span class="nv">Sheet1</span><span class="o">!</span><span class="nv">A1</span><span class="p">:</span><span class="nv">B2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">R</span>
+</code></pre></div>
+<p>Writes data from matrix/vector <em>M</em> to the specified Excel file.
+A new file with a single worksheet is created.
+If the file exists, it is entirely overwritten.
+The path to the file must exist;  </p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#write</span> <span class="nv">M</span> <span class="nv">to</span> <span class="nv">filename</span><span class="p">.</span><span class="nv">xlsx</span><span class="p">@</span><span class="nv">Sheet1</span><span class="o">!</span><span class="nv">A1</span><span class="p">:</span><span class="nv">B2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">N</span>
+</code></pre></div>
+<p>Appends data from matrix/vector <em>M</em> to the specified Excel file.
+If the file exists, the data is written in the existing file at the specified location.
+Otherwise, a new file is created.
+In all cases, the path to the file must exist.</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#append</span> <span class="nv">M</span> <span class="nv">to</span> <span class="nv">filename</span><span class="p">.</span><span class="nv">xlsx</span><span class="p">@</span><span class="nv">Sheet1</span><span class="o">!</span><span class="nv">A1</span><span class="p">:</span><span class="nv">B2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">N</span>
+</code></pre></div>
+<p>Command options:</p>
+<ul>
+<li><code>M</code> the name of the matrix/vector that contains the data [required];</li>
+<li><code>filename.xlsx</code> the name and path of the input/output file [required]. If the path is missing, the file is assumed to be in the same folder.
+    The supported extensions are <strong>xlsx</strong> and <strong>xlsm</strong>;</li>
+<li><code>@Sheet1</code> the name of the target worksheet [optional].
+    If omitted the first worksheet is used for existing files and Sheet1 is assumed for newly created worksheets.</li>
+<li><code>!A1:B2</code> target cell range [optional]:
+    - <code>A1</code> starting cell reference [optional], where A is the column name and 1 is the row index;
+    - <code>:B2</code> ending cell reference as above [optional];<br />
+    Column names start at <strong>A</strong>, and row numbers start at <strong>1</strong>. You can skip any of the starting and ending column/row references.
+    In this case, data is read to the first and last nonempty cells, respectively.
+    The starting cell references can be greater than the ending ones.
+    Examples for data import settings are provided below:<p><img alt="Excel addressing examples" src="media/Image%2050.png" /></p>
+<p>The behavior of data export commands <code>#write</code> and <code>#append</code> is a bit different.
+  The starting reference indicates the location of the first element <span class="arithmatex">\(M_{1,1}\)</span> of the output matrix.
+  So, even if it is greater than A1, it will not truncate the first rows and columns.
+  Unless bound by the ending reference, the entire matrix will be written after the specified location.
+  Otherwise, the remaining rows and columns after the ending reference will be truncated.
+  For example: <code>#write M to filename.xlsx@Sheet1!C2</code> will produce the following output:</p>
+<p><img alt="Excel example" src="media/Image%2051.png" style="width: 300px;" /></p>
+</li>
+</ul>
+<ul>
+<li><code>TYPE=R</code> type of matrix/vector for structured storage [optional]. The same rules apply as for text/CSV files above.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+  
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="javascripts/mathjax.js"></script>
+      
+        <script src="javascripts/mathjax/tex-chtml.js"></script>
+      
+    
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      $("body").on("click", ".fold > :first-child, .unfold > :first-child", function () {
+        var parent = $(this).parent();
+        if (parent.hasClass("fold")) {
+          parent.removeClass("fold").addClass("unfold");
+        } else {
+          parent.removeClass("unfold").addClass("fold");
+        }
+      });
+    });
+  </script>
+
+  </body>
+</html>

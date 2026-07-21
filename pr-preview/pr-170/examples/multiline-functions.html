@@ -1,0 +1,3114 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="CalcpadCE lets a function definition span multiple lines using  continuations and the if / $while constructs, so recursive, conditional and iterative routines fit into the same f(x; y; …) = … syntax as plain one-liners.">
+      
+      
+      
+      
+        <link rel="prev" href="matrices-high-performance.html">
+      
+      
+        <link rel="next" href="custom-units.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Multiline Functions (4) - CalcpadCE Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../stylesheets/calcpad-output.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+  <script src="../javascripts/jquery-3.6.3.min.js"></script>
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#multiline-functions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="CalcpadCE Documentation" class="md-header__button md-logo" aria-label="CalcpadCE Documentation" data-md-component="logo">
+      
+  <img src="../media/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CalcpadCE Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Multiline Functions (4)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../index.html" class="md-tabs__link">
+          
+  
+  
+  Documentation
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../new-vscode-extension.html" class="md-tabs__link">
+          
+  
+  
+  New Apps and Features (beta)
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../quick-reference.html" class="md-tabs__link">
+          
+  
+  
+  Quick Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="getting-started.html" class="md-tabs__link">
+          
+  
+  
+  Engineering Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="simply-supported-beams.html" class="md-tabs__link">
+          
+  
+  
+  Structural Engineering Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="CalcpadCE Documentation" class="md-nav__button md-logo" aria-label="CalcpadCE Documentation" data-md-component="logo">
+      
+  <img src="../media/logo.svg" alt="logo">
+
+    </a>
+    CalcpadCE Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Documentation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About CalcpadCE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fields-of-application.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fields of Application
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../licensing-and-terms-of-use.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Licensing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how-it-works.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../theoretical-background.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theoretical Background
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writing-math.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Math
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reporting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reporting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../programming.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Programming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../working-with-files.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../constants.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Constants
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variables.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../operators.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../brackets.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Brackets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plotting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../numerical-methods.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Numerical Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iterative-procedures.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iterative Procedures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../units.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Units
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vectors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../high-performance-vectors-and-matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Performance Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    New Apps and Features (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    New Apps and Features (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-vscode-extension.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VS Code Extension
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-desktop-app.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop App
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-calcpad-panel-and-settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CalcPad Panel & Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-pdf-export.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PDF Export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-includes.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Includes and File Reads
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-linter.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linter and Diagnostics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-table-of-contents.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table of Contents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-web-deployment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running the Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-metadata-comments.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata Comments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Quick Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-reference.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engineering Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Engineering Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="getting-started.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="areas.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Areas (15)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="volumes.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Volumes (15)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="geometrical.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometrical (24)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="fractals.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fractals (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="3d-plotting-drawing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D, Plotting, Drawing (7)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="interpolation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpolation (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="numerical.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Numerical (7)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="pendulums.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pendulums (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="waves.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waves (10)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="parametric-curves.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parametric Curves (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="elastic-analysis.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Elastic Analysis (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="finite-elements.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Finite Elements (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="fourier.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="special-math-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Special Math Functions (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="vectors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="vectors-high-performance.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors: High Performance (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="matrices-high-performance.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices: High Performance (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multiline Functions (4)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="multiline-functions.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multiline Functions (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cubic-roots-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cubic Roots Function
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fibonacci-numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fibonacci Numbers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#greatest-common-divisor-euclid-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Greatest Common Divisor - Euclid Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quadratic-roots-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quadratic Roots Function
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="custom-units.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Units (2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="formatting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Formatting (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="others.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Others (8)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Engineering Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Structural Engineering Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="simply-supported-beams.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simply Supported Beams (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="cantilevers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cantilevers (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="propped-cantilevers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Propped Cantilevers (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="continuous-beam.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Continuous Beam (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="deflections.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deflections (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="frames.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frames (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="fully-restrained-beams.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fully Restrained Beams (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="loads.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loads (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="nonlinear.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nonlinear (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="soil-mechanics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soil Mechanics (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="steel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Steel (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="structural-dynamics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Dynamics (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reinforced-concrete.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete (12)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reinforced-concrete-punching.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Punching (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reinforced-concrete-plates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Plates (9)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reinforced-concrete-seismic-detailing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Seismic Detailing (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cubic-roots-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cubic Roots Function
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fibonacci-numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fibonacci Numbers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#greatest-common-divisor-euclid-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Greatest Common Divisor - Euclid Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quadratic-roots-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quadratic Roots Function
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="multiline-functions">Multiline Functions<a class="headerlink" href="#multiline-functions" title="Permanent link">&para;</a></h1>
+<p><a href="https://calcpad-ce.org">CalcpadCE</a> lets a function definition span multiple lines using <code>_</code> continuations and the <code>if</code> / <code>$while</code> constructs, so recursive, conditional and iterative routines fit into the same <code>f(x; y; …) = …</code> syntax as plain one-liners.</p>
+<p>The four worksheets in this group show that pattern at work.
+<a href="#cubic-roots-function">Cubic Roots Function</a> packages the <a href="https://en.wikipedia.org/wiki/Cubic_equation">closed-form solution</a> of <span class="arithmatex">\(x^3 + a x^2 + b x + c = 0\)</span> as a single multiline call returning all three roots; <a href="#quadratic-roots-function">Quadratic Roots Function</a> does the same for <span class="arithmatex">\(a x^2 + b x + c = 0\)</span> with discriminant-based branching.
+<a href="#fibonacci-numbers">Fibonacci Numbers</a> defines <span class="arithmatex">\(fib(n)\)</span> recursively to illustrate self-referential calls, and <a href="#greatest-common-divisor-euclid-algorithm">Greatest Common Divisor - Euclid Algorithm</a> builds an iterative <span class="arithmatex">\(gcd(a, b)\)</span> around a <code>$while</code> block.</p>
+<p>Together the four pages serve as templates for any user-defined function that needs more than a single expression.</p>
+<h2 id="cubic-roots-function">Cubic Roots Function<a class="headerlink" href="#cubic-roots-function" title="Permanent link">&para;</a></h2>
+<p>Multiline cubic-roots function returning all three roots of <span class="arithmatex">\(x^3 + a x^2 + b x + c = 0\)</span> via the <a href="https://en.wikipedia.org/wiki/Cubic_equation">Cardano formula</a>, with discriminant-based real/complex branching.</p>
+<div class="example-grid">
+<figure>
+<figcaption>Code:</figcaption>
+<div class="highlight"><pre><span></span><code><span class="cs">&quot;Cubic Equation Roots Function</span>
+<span class="c1">&#39;For solving equations of type:&#39;</span><span class="nv">f</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">x</span><span class="o">^</span><span class="m">3</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">a</span><span class="o">*</span><span class="nv">x</span><span class="o">^</span><span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b</span><span class="o">*</span><span class="nv">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">c</span><span class="c1">&#39;= 0</span>
+
+<span class="k">#rad</span>
+<span class="nv">cubicRoots_1</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">Q</span><span class="p">;</span><span class="w"> </span><span class="nv">R</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">$block</span><span class="p">{</span>
+<span class="w">  </span><span class="nv">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nb">sign</span><span class="p">(</span><span class="nv">R</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="nv">R</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">sqr</span><span class="p">(</span><span class="nv">R</span><span class="o">^</span><span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">Q</span><span class="o">^</span><span class="m">3</span><span class="p">))</span><span class="o">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="m">3</span><span class="p">);</span>
+<span class="w">  </span><span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">if</span><span class="p">(</span><span class="nv">A</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="nv">a</span><span class="o">/</span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="nv">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">Q</span><span class="o">/</span><span class="nv">A</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">a</span><span class="o">/</span><span class="m">3</span><span class="p">);</span>
+<span class="w">  </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="nv">x_1</span><span class="p">]);</span>
+<span class="p">}</span>
+<span class="nv">cubicRoots_3</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">Q</span><span class="p">;</span><span class="w"> </span><span class="nv">R</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">$block</span><span class="p">{</span>
+<span class="w">  </span><span class="nv">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">acos</span><span class="p">(</span><span class="nv">R</span><span class="o">/</span><span class="nb">sqr</span><span class="p">(</span><span class="nv">Q</span><span class="o">^</span><span class="m">3</span><span class="p">));</span>
+<span class="w">  </span><span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">2</span><span class="o">*</span><span class="nb">sqr</span><span class="p">(</span><span class="nv">Q</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="nv">θ</span><span class="o">/</span><span class="m">3</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">a</span><span class="o">/</span><span class="m">3</span><span class="p">;</span>
+<span class="w">  </span><span class="nv">x_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">2</span><span class="o">*</span><span class="nb">sqr</span><span class="p">(</span><span class="nv">Q</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">((</span><span class="nv">θ</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">π</span><span class="p">)</span><span class="o">/</span><span class="m">3</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">a</span><span class="o">/</span><span class="m">3</span><span class="p">;</span>
+<span class="w">  </span><span class="nv">x_3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">2</span><span class="o">*</span><span class="nb">sqr</span><span class="p">(</span><span class="nv">Q</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">((</span><span class="nv">θ</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">π</span><span class="p">)</span><span class="o">/</span><span class="m">3</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">a</span><span class="o">/</span><span class="m">3</span><span class="p">;</span>
+<span class="w">  </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="nv">x_2</span><span class="p">;</span><span class="w"> </span><span class="nv">x_3</span><span class="p">]);</span>
+<span class="p">}</span>
+<span class="nv">cubicRoots</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="nv">c</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">$block</span><span class="p">{</span>
+<span class="w">  </span><span class="nv">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">a</span><span class="o">^</span><span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">3</span><span class="o">*</span><span class="nv">b</span><span class="p">)</span><span class="o">/</span><span class="m">9</span><span class="p">;</span>
+<span class="w">  </span><span class="nv">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="m">2</span><span class="o">*</span><span class="nv">a</span><span class="o">^</span><span class="m">3</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">9</span><span class="o">*</span><span class="nv">a</span><span class="o">*</span><span class="nv">b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">27</span><span class="o">*</span><span class="nv">c</span><span class="p">)</span><span class="o">/</span><span class="m">54</span><span class="p">;</span>
+<span class="w">  </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">if</span><span class="p">(</span><span class="nv">R</span><span class="o">^</span><span class="m">2</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nv">Q</span><span class="o">^</span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="nv">cubicRoots_3</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">Q</span><span class="p">;</span><span class="w"> </span><span class="nv">R</span><span class="p">);</span><span class="w"> </span><span class="nv">cubicRoots_1</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">Q</span><span class="p">;</span><span class="w"> </span><span class="nv">R</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">cubicRoots</span><span class="p">(</span><span class="o">-</span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="m">6</span><span class="p">)</span>
+<span class="k">#hide</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">6</span><span class="c1">&#39;, &#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">11</span><span class="c1">&#39;, &#39;</span><span class="nv">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">6</span>
+<span class="nv">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="nv">x</span><span class="m">.3</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">x</span><span class="m">.1</span><span class="p">)</span><span class="o">/</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">0.5</span><span class="p">)</span>
+<span class="nv">x_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">min</span><span class="p">(</span><span class="nv">x</span><span class="m">.1</span><span class="p">;</span><span class="w"> </span><span class="nv">x</span><span class="m">.3</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">d</span><span class="c1">&#39;,&#39;</span><span class="nv">x_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="nv">x</span><span class="m">.1</span><span class="p">;</span><span class="w"> </span><span class="nv">x</span><span class="m">.3</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">d</span>
+<span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">200</span><span class="c1">&#39;, &#39;</span><span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">150</span>
+<span class="k">#show</span>
+<span class="c1">&#39;Plot</span>
+<span class="nd">$Plot</span><span class="p">{</span><span class="nv">f</span><span class="p">(</span><span class="nv">ξ</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span><span class="w"> </span><span class="nv">x</span><span class="m">.1</span><span class="p">|</span><span class="m">0</span><span class="w"> </span><span class="p">&amp;</span><span class="w"> </span><span class="nv">x</span><span class="m">.2</span><span class="p">|</span><span class="m">0</span><span class="w"> </span><span class="p">&amp;</span><span class="w"> </span><span class="nv">x</span><span class="m">.3</span><span class="p">|</span><span class="m">0</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">ξ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">x_min</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">x_max</span><span class="p">}</span>
+</code></pre></div>
+
+</figure>
+<figure class="example-output">
+<figcaption>Rendered Output:</figcaption>
+<div class="calcpad-output"><!-- Multiline cubic-roots function returning all three roots of $x^3 + a x^2 + b x + c = 0$ via the [Cardano formula](https://en.wikipedia.org/wiki/Cubic_equation), with discriminant-based real/complex branching. --> 
+<div class="calcpad-h3">Cubic Equation Roots Function </div>
+<p>For solving equations of type: <span class="eq"><var>f</var> ( <var>x</var> )  = <var>x</var><sup>3</sup> + <var>a</var> · <var>x</var><sup>2</sup> + <var>b</var> · <var>x</var> + <var>c</var></span> = 0 </p>
+<p>&nbsp;</p>
+<p><span class="eq"><var>cubicRoots</var><sub>1</sub> ( <var>a</var>; <var>Q</var>; <var>R</var> )  = <small class="arr">🞀</small><span class="block"><var>A</var> = -<b>sign</b> ( <var>R</var> )  ·  ( <b class="b0">|</b>&hairsp;<var>R</var>&hairsp;<b class="b0">|</b> + &ensp;&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;<var>R</var><sup>2</sup> − <var>Q</var><sup>3</sup></span> ) <sup><span class="dvc">1<span class="dvl"></span>3</span></sup><br /> <var>x</var><sub>1</sub> = <span class="dvcs"><span class="c3">{</span><span class="dvs">if <var>A</var> ≡ 0: <span class="dvc">-<var>a</var><span class="dvl"></span>3</span><br />else: <var>A</var> + <span class="dvc"><var>Q</var><span class="dvl"></span><var>A</var></span> − <span class="dvc"><var>a</var><span class="dvl"></span>3</span></span></span><br /> <var>x</var> = <b>hp</b> ( <span class="b0">[</span><var>x</var><sub>1</sub>; <var>x</var><sub>1</sub>; <var>x</var><sub>1</sub><span class="b0">]</span> ) <br /> </span></span></p>
+<p><span class="eq"><var>cubicRoots</var><sub>3</sub> ( <var>a</var>; <var>Q</var>; <var>R</var> )  = <small class="arr">🞀</small><span class="block"><var>θ</var> = <b>acos</b><span class="b1">(</span><span class="dvc"><var>R</var><span class="dvl"></span>&ensp;&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;<var>Q</var><sup>3</sup></span></span><span class="b1">)</span><br /> <var>x</var><sub>1</sub> = -2 · &ensp;&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;<var>Q</var></span> · <b>cos</b><span class="b1">(</span><span class="dvc"><var>θ</var><span class="dvl"></span>3</span><span class="b1">)</span> − <span class="dvc"><var>a</var><span class="dvl"></span>3</span><br /> <var>x</var><sub>2</sub> = -2 · &ensp;&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;<var>Q</var></span> · <b>cos</b><span class="b1">(</span><span class="dvc"><var>θ</var> − 2 · <var>π</var><span class="dvl"></span>3</span><span class="b1">)</span> − <span class="dvc"><var>a</var><span class="dvl"></span>3</span><br /> <var>x</var><sub>3</sub> = -2 · &ensp;&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;<var>Q</var></span> · <b>cos</b><span class="b1">(</span><span class="dvc"><var>θ</var> + 2 · <var>π</var><span class="dvl"></span>3</span><span class="b1">)</span> − <span class="dvc"><var>a</var><span class="dvl"></span>3</span><br /> <var>x</var> = <b>hp</b> ( <span class="b0">[</span><var>x</var><sub>1</sub>; <var>x</var><sub>2</sub>; <var>x</var><sub>3</sub><span class="b0">]</span> ) <br /> </span></span></p>
+<p><span class="eq"><var>cubicRoots</var> ( <var>a</var>; <var>b</var>; <var>c</var> )  = <small class="arr">🞀</small><span class="block"><var>Q</var> = <span class="dvc"><var>a</var><sup>2</sup> − 3 · <var>b</var><span class="dvl"></span>9</span><br /> <var>R</var> = <span class="dvc">2 · <var>a</var><sup>3</sup> − 9 · <var>a</var> · <var>b</var> + 27 · <var>c</var><span class="dvl"></span>54</span><br /> <var>x</var> = <span class="dvcs"><span class="c1">{</span><span class="dvs">if <var>R</var><sup>2</sup> &lt; <var>Q</var><sup>3</sup>: <var>cubicRoots</var><sub>3</sub>  ( <var>a</var>; <var>Q</var>; <var>R</var> ) <br />else: <var>cubicRoots</var><sub>1</sub>  ( <var>a</var>; <var>Q</var>; <var>R</var> ) </span></span><br /> </span></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>x</var> = <var>cubicRoots</var>  ( -6; 11; -6 )  = <b class="b0">[</b>1 2 3<b class="b0">]</b></span></p>
+<p>Plot </p>
+<img class="plot" data-plot="png" src="data:image/png;base64,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" alt="Plot" style="width:201pt;"></div>
+</figure>
+</div>
+
+<h2 id="fibonacci-numbers">Fibonacci Numbers<a class="headerlink" href="#fibonacci-numbers" title="Permanent link">&para;</a></h2>
+<p>Recursive multiline definition of the <a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci</a> function <span class="arithmatex">\(fib(n)\)</span>, illustrating self-referential calls and conditional base cases.</p>
+<div class="example-grid">
+<figure>
+<figcaption>Code:</figcaption>
+<div class="highlight"><pre><span></span><code><span class="c1">&#39;Function:</span>
+<span class="nv">fib</span><span class="p">(</span><span class="nv">n</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">if</span><span class="p">(</span><span class="nv">n</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span>
+<span class="w">  </span><span class="nd">$block</span><span class="p">{</span>
+<span class="w">    </span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">;</span>
+<span class="w">    </span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">;</span>
+<span class="w">    </span><span class="nd">$repeat</span><span class="p">{</span>
+<span class="w">       </span><span class="nv">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span>
+<span class="w">       </span><span class="nv">a</span><span class="w"> </span><span class="o">←</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span>
+<span class="w">       </span><span class="nv">b</span><span class="w"> </span><span class="o">←</span><span class="w"> </span><span class="nv">c</span><span class="p">;</span>
+<span class="w">     </span><span class="p">@</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">}</span><span class="w"> </span>_
+<span class="w">  </span><span class="p">}</span><span class="w"> </span>_
+<span class="p">)</span>
+<span class="c1">&#39;Results:</span>
+<span class="k">#for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">9</span>
+<span class="w">    </span><span class="nv">fib</span><span class="p">(</span><span class="nv">i</span><span class="p">)</span>
+<span class="k">#loop</span>
+</code></pre></div>
+
+</figure>
+<figure class="example-output">
+<figcaption>Rendered Output:</figcaption>
+<div class="calcpad-output"><!-- Recursive multiline definition of the [Fibonacci](https://en.wikipedia.org/wiki/Fibonacci_number) function $fib(n)$, illustrating self-referential calls and conditional base cases. --> 
+<p>Function: </p>
+<p><span class="eq"><var>fib</var> ( <var>n</var> )  = <span class="dvcs"><span class="c1">{</span><span class="dvs">if <var>n</var> ≡ 1: 1<br />else: <small class="arr">🞀</small><span class="block"><var>a</var> = 0<br /> <var>b</var> = 1<br /> <span class="cond">$Repeat</span> <small class="arr">🞀</small><span class="block"><span class="cond">for</span> <var>k</var> = 1...<var>n</var> − 1<br /> <var>c</var> = <var>a</var> + <var>b</var><br /> <var>a</var> ← <var>b</var><br /> <var>b</var> ← <var>c</var><br /> </span></span></span></span></span></p>
+<p>Results: </p>
+<p><span class="eq"><var>fib</var>  ( <var>i</var> )  = <var>fib</var>  ( 1 )  = 1</span></p>
+<p><span class="eq"><var>fib</var>  ( <var>i</var> )  = <var>fib</var>  ( 2 )  = 1</span></p>
+<p><span class="eq"><var>fib</var>  ( <var>i</var> )  = <var>fib</var>  ( 3 )  = 2</span></p>
+<p><span class="eq"><var>fib</var>  ( <var>i</var> )  = <var>fib</var>  ( 4 )  = 3</span></p>
+<p><span class="eq"><var>fib</var>  ( <var>i</var> )  = <var>fib</var>  ( 5 )  = 5</span></p>
+<p><span class="eq"><var>fib</var>  ( <var>i</var> )  = <var>fib</var>  ( 6 )  = 8</span></p>
+<p><span class="eq"><var>fib</var>  ( <var>i</var> )  = <var>fib</var>  ( 7 )  = 13</span></p>
+<p><span class="eq"><var>fib</var>  ( <var>i</var> )  = <var>fib</var>  ( 8 )  = 21</span></p>
+<p><span class="eq"><var>fib</var>  ( <var>i</var> )  = <var>fib</var>  ( 9 )  = 34</span></p>
+</div>
+</figure>
+</div>
+
+<h2 id="greatest-common-divisor-euclid-algorithm">Greatest Common Divisor - Euclid Algorithm<a class="headerlink" href="#greatest-common-divisor-euclid-algorithm" title="Permanent link">&para;</a></h2>
+<p>Iterative greatest common divisor built around a <span class="arithmatex">\(while\)</span> block, implementing the classical <a href="https://en.wikipedia.org/wiki/Euclidean_algorithm">Euclid algorithm</a>.</p>
+<div class="example-grid">
+<figure>
+<figcaption>Code:</figcaption>
+<div class="highlight"><pre><span></span><code><span class="c1">&#39;Custom function:</span>
+<span class="nv">mygcd</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">$while</span><span class="p">{</span>
+<span class="w">  </span><span class="nv">b</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span>
+<span class="w">  </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span>
+<span class="w">  </span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">a</span><span class="o">⦼</span><span class="nv">b</span><span class="p">;</span>
+<span class="w">  </span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">t</span><span class="p">}</span>
+<span class="c1">&#39;Example:</span>
+<span class="nv">mygcd</span><span class="p">(</span><span class="m">1071</span><span class="p">;</span><span class="w"> </span><span class="m">462</span><span class="p">)</span>
+<span class="c1">&#39;Internal gcd function:</span>
+<span class="nb">gcd</span><span class="p">(</span><span class="m">1071</span><span class="p">;</span><span class="w"> </span><span class="m">462</span><span class="p">)</span>
+</code></pre></div>
+
+</figure>
+<figure class="example-output">
+<figcaption>Rendered Output:</figcaption>
+<div class="calcpad-output"><!-- Iterative greatest common divisor built around a $while$ block, implementing the classical [Euclid algorithm](https://en.wikipedia.org/wiki/Euclidean_algorithm). --> 
+<p>Custom function: </p>
+<p><span class="eq"><var>mygcd</var> ( <var>a</var>; <var>b</var> )  = <small class="arr">🞀</small><span class="block"><span class="cond">while</span> <var>b</var> &gt; 0<br /> <var>t</var> = <var>b</var><br /> <var>b</var> = <var>a</var> mod <var>b</var><br /> <var>a</var> = <var>t</var></span></span></p>
+<p>Example: </p>
+<p><span class="eq"><var>mygcd</var>  ( 1071; 462 )  = 21</span></p>
+<p>Internal gcd function: </p>
+<p><span class="eq"><b>gcd</b> ( 1071; 462 )  = 21</span></p>
+</div>
+</figure>
+</div>
+
+<h2 id="quadratic-roots-function">Quadratic Roots Function<a class="headerlink" href="#quadratic-roots-function" title="Permanent link">&para;</a></h2>
+<p>Multiline quadratic-roots function returning both roots of <span class="arithmatex">\(a x^2 + b x + c = 0\)</span> via the discriminant, with real/complex branching.</p>
+<div class="example-grid">
+<figure>
+<figcaption>Code:</figcaption>
+<div class="highlight"><pre><span></span><code><span class="cs">&quot;Quadratic Equation Roots function</span>
+<span class="c1">&#39;Multiline code block example:</span>
+<span class="nv">quadRoots</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="nv">c</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>_
+<span class="nd">$block</span><span class="p">{</span>
+<span class="w">    </span><span class="nv">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b</span><span class="o">^</span><span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">4</span><span class="o">*</span><span class="nv">a</span><span class="o">*</span><span class="nv">c</span><span class="p">;</span>
+<span class="w">    </span><span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="nv">b</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="nv">D</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="m">2</span><span class="o">*</span><span class="nv">a</span><span class="p">);</span>
+<span class="w">    </span><span class="nv">x_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="nv">b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="nv">D</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="m">2</span><span class="o">*</span><span class="nv">a</span><span class="p">);</span>
+<span class="w">    </span><span class="p">[</span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="nv">x_2</span><span class="p">];</span>
+<span class="p">}</span>
+<span class="nv">quadRoots</span><span class="p">(</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="m">5</span><span class="p">)</span>
+<span class="c1">&#39;Inline code block example:</span>
+<span class="nv">quadRoots</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="nv">c</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">$inline</span><span class="p">{</span><span class="nv">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b</span><span class="o">^</span><span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">4</span><span class="o">*</span><span class="nv">a</span><span class="o">*</span><span class="nv">c</span><span class="p">;</span><span class="w"> </span><span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="nv">b</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="nv">D</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="m">2</span><span class="o">*</span><span class="nv">a</span><span class="p">);</span><span class="w"> </span><span class="nv">x_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="nv">b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="nv">D</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="m">2</span><span class="o">*</span><span class="nv">a</span><span class="p">);</span><span class="w"> </span><span class="p">[</span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="nv">x_2</span><span class="p">]}</span>
+<span class="nv">quadRoots</span><span class="p">(</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="m">5</span><span class="p">)</span>
+</code></pre></div>
+
+</figure>
+<figure class="example-output">
+<figcaption>Rendered Output:</figcaption>
+<div class="calcpad-output"><!-- Multiline quadratic-roots function returning both roots of $a x^2 + b x + c = 0$ via the discriminant, with real/complex branching. --> 
+<div class="calcpad-h3">Quadratic Equation Roots function </div>
+<p>Multiline code block example: </p>
+<p><span class="eq"><var>quadRoots</var> ( <var>a</var>; <var>b</var>; <var>c</var> )  = <small class="arr">🞀</small><span class="block"><var>D</var> = <var>b</var><sup>2</sup> − 4 · <var>a</var> · <var>c</var><br /> <var>x</var><sub>1</sub> = <span class="dvc">-<var>b</var> − &ensp;&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;<var>D</var></span><span class="dvl"></span>2 · <var>a</var></span><br /> <var>x</var><sub>2</sub> = <span class="dvc">-<var>b</var> + &ensp;&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;<var>D</var></span><span class="dvl"></span>2 · <var>a</var></span><br /> <span class="b0">[</span><var>x</var><sub>1</sub>; <var>x</var><sub>2</sub><span class="b0">]</span><br /> </span></span></p>
+<p><span class="eq"><var>quadRoots</var>  ( 2; 3; -5 )  = <b class="b0">[</b>-2.5 1<b class="b0">]</b></span></p>
+<p>Inline code block example: </p>
+<p><span class="eq"><var>quadRoots</var> ( <var>a</var>; <var>b</var>; <var>c</var> )  = <small class="arr">🞀</small><span class="block"><var>D</var> = <var>b</var><sup>2</sup> − 4 · <var>a</var> · <var>c</var>; <var>x</var><sub>1</sub> = <span class="dvc">-<var>b</var> − &ensp;&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;<var>D</var></span><span class="dvl"></span>2 · <var>a</var></span>; <var>x</var><sub>2</sub> = <span class="dvc">-<var>b</var> + &ensp;&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;<var>D</var></span><span class="dvl"></span>2 · <var>a</var></span>; <span class="b0">[</span><var>x</var><sub>1</sub>; <var>x</var><sub>2</sub><span class="b0">]</span></span></span></p>
+<p><span class="eq"><var>quadRoots</var>  ( 2; 3; -5 )  = <b class="b0">[</b>-2.5 1<b class="b0">]</b></span></p>
+</div>
+</figure>
+</div>
+
+<p>Spotted an error? <a href="https://github.com/imartincei/CalcpadCE/tree/main/Examples/Engineering/Multiline%20Functions">Edit</a> these examples.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+  
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="../javascripts/mathjax/tex-chtml.js"></script>
+      
+    
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      $("body").on("click", ".fold > :first-child, .unfold > :first-child", function () {
+        var parent = $(this).parent();
+        if (parent.hasClass("fold")) {
+          parent.removeClass("fold").addClass("unfold");
+        } else {
+          parent.removeClass("unfold").addClass("fold");
+        }
+      });
+    });
+  </script>
+
+  </body>
+</html>
