@@ -910,6 +910,31 @@
         .dark-theme .line-num:hover {
             color: #569cd6; /* Light blue on hover in dark mode */
         }
+
+        /* Give the preview iframe a clearly visible vertical scrollbar. The
+           default scrollbar is nearly invisible; reserving the gutter with
+           overflow-y: scroll keeps the layout from shifting. Plain rgba values
+           are used since the iframe has no VS Code theme variables. */
+        html { overflow-y: scroll; }
+        body { min-height: 100vh; }
+        .code { overflow-y: auto; }
+        ::-webkit-scrollbar { width: 12px; height: 12px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(121,121,121,0.4); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(100,100,100,0.7); }
+        ::-webkit-scrollbar-thumb:active { background: rgba(85,85,85,0.9); }
+        ::-webkit-scrollbar-corner { background: transparent; }
+        /* Pin the arrow to its own line (position: relative on .line) and extend
+           it across the body's left margin so the whole gutter is a hover+click
+           target. */
+        .line { position: relative; }
+        /* Brief flash when the preview is focused to the editor's cursor line. */
+        .cpd-line-focus { background-color: rgba(120,170,255,0.28) !important; transition: background-color 0.3s ease !important; }
+        /* Find-in-preview highlights, driven from the parent (App.vue find widget). */
+        mark.cpd-find { background: rgba(234,179,8,0.45); color: inherit; border-radius: 2px; }
+        mark.cpd-find.cpd-find-current { background: rgba(249,115,22,0.95); color: #000; }
+        .lineLink { left: -3em !important; top: 0 !important; bottom: 0 !important; width: 3em !important; height: auto !important; font-size: 16pt !important; padding-right: 4pt !important; box-sizing: border-box !important; display: flex !important; align-items: center !important; justify-content: flex-end !important; opacity: 0 !important; transition: opacity 0.15s !important; }
+        .lineLink:hover { opacity: 1 !important; }
     </style>
     <script>
         document.addEventListener("DOMContentLoaded", function () {

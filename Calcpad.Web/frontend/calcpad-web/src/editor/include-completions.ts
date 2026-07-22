@@ -6,14 +6,14 @@ type Directive = typeof DIRECTIVES[number];
 const INCLUDE_EXTENSIONS = ['cpd', 'txt'];
 const DATA_EXTENSIONS = ['csv', 'tsv', 'xlsx', 'xlsm', 'xls'];
 
-interface DirectiveParse {
+export interface DirectiveParse {
     directive: Directive;
     pathStartCol: number;   // 0-indexed
     partialPath: string;
 }
 
 /** Ported from vscode-calcpad/calcpadIncludeCompletionProvider.ts. */
-function parseDirectiveLine(lineText: string): DirectiveParse | undefined {
+export function parseDirectiveLine(lineText: string): DirectiveParse | undefined {
     let i = 0;
     while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) i++;
     if (i >= lineText.length || lineText[i] !== '#') return undefined;

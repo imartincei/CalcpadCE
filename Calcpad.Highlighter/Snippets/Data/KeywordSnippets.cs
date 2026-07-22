@@ -381,6 +381,20 @@ namespace Calcpad.Highlighter.Snippets.Data
             },
             new SnippetItem
             {
+                Insert = "#split",
+                Description = "Split long equations after the \"=\" symbol onto a new indented line",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#wrap",
+                Description = "Wrap long equations at the end of the line (default)",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
                 Insert = "#round digits",
                 Description = "Round output to n digits after decimal point",
                 Category = "Output Control",

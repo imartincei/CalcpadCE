@@ -47,7 +47,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             }
             catch (JsonException)
             {
-                result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3417",
+                result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3412",
                     "malformed JSON in metadata comment");
                 return;
             }
@@ -62,7 +62,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     var value = returnProp.GetString();
                     if (!string.IsNullOrEmpty(value) && !DefinitionMetadata.ValidFunctionParamTypes.Contains(value))
                     {
-                        result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3416",
+                        result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3411",
                             "'" + value + "' is not a valid returnType. Expected value, vector, matrix, or any");
                     }
                 }
@@ -85,7 +85,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     if (!string.IsNullOrEmpty(value) && !validTypes.Contains(value))
                     {
                         var validList = isMacro ? "a valid TokenType name" : "value, vector, matrix, or any";
-                        result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3416",
+                        result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3411",
                             "'" + value + "' is not valid. Expected " + validList);
                     }
                 }

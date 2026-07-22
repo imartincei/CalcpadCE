@@ -24,8 +24,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         /// <summary>
         /// Validates the @ separator pattern in commands like $Repeat{expr @ variable = start : end}.
         /// Two passes folded into one (formerly ValidateCommandSyntax + ValidateCommandVariables):
-        ///   - CPD-3410: command syntax — exactly one variable token between @ and =, no numbers
-        ///   - CPD-3412: expression uses the declared loop variable
+        ///   - CPD-3406: command syntax — exactly one variable token between @ and =, no numbers
+        ///   - CPD-3408: expression uses the declared loop variable
         /// $Plot is exempt from both checks when the expression contains | or & (multi-function /
         /// parametric forms). $Map is exempt from the loop-variable check (allows multiple counters).
         /// </summary>
@@ -93,12 +93,12 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 var atAbsolutePos = atIndex;
                 var equalsAbsolutePos = equalsIndex >= 0 ? atIndex + 1 + equalsIndex : -1;
 
-                // --- Phase 1: command syntax (CPD-3410) ---
+                // --- Phase 1: command syntax (CPD-3406) ---
                 if (!skipSyntaxPhase)
                 {
                     if (equalsIndex < 0)
                     {
-                        result.AddError(i, atIndex, atIndex + 1, "CPD-3410",
+                        result.AddError(i, atIndex, atIndex + 1, "CPD-3406",
                             "Invalid command syntax: expected 'variable = start : end' after '@'");
                         continue;
                     }
@@ -118,23 +118,23 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
                     if (variableTokens.Count == 0)
                     {
-                        result.AddError(i, atAbsolutePos + 1, equalsAbsolutePos, "CPD-3410",
+                        result.AddError(i, atAbsolutePos + 1, equalsAbsolutePos, "CPD-3406",
                             "Invalid command syntax: expected variable name after '@'");
                     }
                     else if (variableTokens.Count > 1)
                     {
-                        result.AddError(i, atAbsolutePos + 1, equalsAbsolutePos, "CPD-3410",
+                        result.AddError(i, atAbsolutePos + 1, equalsAbsolutePos, "CPD-3406",
                             "Invalid command syntax: expected single variable name after '@'");
                     }
                     else if (numberTokens.Count > 0)
                     {
                         var firstNumber = numberTokens[0];
-                        result.AddError(i, firstNumber.Column, firstNumber.Column + firstNumber.Length, "CPD-3410",
+                        result.AddError(i, firstNumber.Column, firstNumber.Column + firstNumber.Length, "CPD-3406",
                             "Invalid command syntax: unexpected number '" + firstNumber.Text + "' between '@' and variable name");
                     }
                 }
 
-                // --- Phase 2: command variable matching (CPD-3412) ---
+                // --- Phase 2: command variable matching (CPD-3408) ---
                 // $Plot and $Map are exempt (different counter semantics). $Repeat is exempt
                 // too: its counter only controls the iteration count, so the body (which may be
                 // pure side-effect assignments) is not required to reference the loop variable.
@@ -186,7 +186,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 if (usedVariables.Count > 0 && !usesLoopVar)
                 {
                     var usedVarsList = string.Join(", ", usedVariables.Select(v => "'" + v + "'"));
-                    result.AddError(i, cmdStartIndex, atAbsolutePos, "CPD-3412",
+                    result.AddError(i, cmdStartIndex, atAbsolutePos, "CPD-3408",
                         "Expression uses " + usedVarsList + " but loop variable is '" + declaredVar + "'");
                 }
             }
@@ -736,7 +736,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 }
             }
 
-            // Note: Unused function warnings (CPD-3313) are not reported
+            // Note: Unused function warnings are not reported
             // Functions may be called from included files
         }
 

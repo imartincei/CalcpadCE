@@ -155,12 +155,11 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage2
                 result.AddError(stage2Line, col, endCol, "CPD-2204", "'" + macroName + "'", LineStage.Stage2);
             }
 
-            // Validate parameters (supporting param$=default optional syntax)
+            // Validate parameters
             if (!string.IsNullOrWhiteSpace(paramsStr))
             {
                 var parameters = ParameterParser.ParseParameters(paramsStr); // splits by ';'
                 var seenParams = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                bool seenOptional = false;
 
                 foreach (var param in parameters)
                 {
@@ -168,22 +167,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage2
                     if (string.IsNullOrWhiteSpace(param))
                         continue;
 
-                    // Split name from default at first '=' at depth 0 (param$=default syntax)
                     var paramName = param;
-                    int eqIdx = FindFirstEqualsAtDepth0(param);
-                    if (eqIdx >= 0)
-                    {
-                        paramName = param[..eqIdx].Trim();
-                        seenOptional = true;
-                    }
-                    else if (seenOptional)
-                    {
-                        // Required parameter after optional — flag it
-                        result.AddError(stage2Line, 0, line.Length, "CPD-2213",
-                            "'" + paramName.Trim() + "' is required but follows an optional parameter", LineStage.Stage2);
-                    }
 
-                    // Check for duplicate parameter names (using name-only part)
+                    // Check for duplicate parameter names
                     if (!seenParams.Add(paramName))
                     {
                         result.AddError(stage2Line, 0, line.Length, "CPD-2212",
@@ -214,19 +200,6 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage2
                     }
                 }
             }
-        }
-
-        /// <summary>Finds the index of the first '=' in a string at parenthesis depth 0.</summary>
-        private static int FindFirstEqualsAtDepth0(string s)
-        {
-            int depth = 0;
-            for (int i = 0; i < s.Length; i++)
-            {
-                if (s[i] == '(') depth++;
-                else if (s[i] == ')') depth--;
-                else if (s[i] == '=' && depth == 0) return i;
-            }
-            return -1;
         }
     }
 }

@@ -66,13 +66,13 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     var paramsStr = funcMatch.Groups[2].Value.Trim();
 
                     // Redefining a user-defined function is allowed - inform rather than error.
-                    // Built-in conflicts (CPD-3204) and macros ($) are handled separately.
+                    // Built-in conflicts (CPD-3203) and macros ($) are handled separately.
                     if (!funcName.EndsWith("$") && !CalcpadBuiltIns.Functions.Contains(funcName)
                         && !definedNames.Add(funcName))
                     {
                         var startPos = line.IndexOf(funcName, StringComparison.Ordinal);
                         var col = startPos >= 0 ? startPos : 0;
-                        result.AddInformation(i, col, col + funcName.Length, "CPD-3314",
+                        result.AddInformation(i, col, col + funcName.Length, "CPD-3313",
                             "Function '" + funcName + "' redefines an existing function");
                     }
 
@@ -83,45 +83,14 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                         var parenPos = line.IndexOf('(', startPos);
                         var endPos = line.IndexOf(')', parenPos);
                         if (endPos < 0) endPos = parenPos + 1;
-                        result.AddError(i, startPos >= 0 ? startPos : 0, endPos + 1, "CPD-3208",
+                        result.AddError(i, startPos >= 0 ? startPos : 0, endPos + 1, "CPD-3206",
                             "Function '" + funcName + "' must have at least one parameter");
-                    }
-                    else
-                    {
-                        // Validate required-before-optional ordering (CPD-3215)
-                        var paramParts = ParameterParser.ParseParameters(paramsStr);
-                        bool seenOptional = false;
-                        foreach (var paramPart in paramParts)
-                        {
-                            if (string.IsNullOrWhiteSpace(paramPart)) continue;
-                            int eqIdx = FindFirstEqualsAtDepth0(paramPart);
-                            if (eqIdx >= 0)
-                                seenOptional = true;
-                            else if (seenOptional)
-                            {
-                                var paramName = paramPart.Trim();
-                                result.AddError(i, 0, line.Length, "CPD-3215",
-                                    "Required parameter '" + paramName + "' follows an optional parameter in function '" + funcName + "'");
-                            }
-                        }
                     }
 
                     // Pass Stage3 line index - diagnostic extensions handle mapping
                     ValidateIdentifierName(funcName, line, i, false, result);
                 }
             }
-        }
-
-        private static int FindFirstEqualsAtDepth0(string s)
-        {
-            int depth = 0;
-            for (int i = 0; i < s.Length; i++)
-            {
-                if (s[i] == '(') depth++;
-                else if (s[i] == ')') depth--;
-                else if (s[i] == '=' && depth == 0) return i;
-            }
-            return -1;
         }
 
         private void ValidateIdentifierName(string identifier, string line, int stage3Line, bool isVariable, LinterResult result)
@@ -142,7 +111,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 var firstChar = identifier[0];
                 if (!char.IsLetter(firstChar) && !CalcpadCharacterHelpers.IsGreekLetter(firstChar) && !CalcpadCharacterHelpers.IsSpecialMathChar(firstChar))
                 {
-                    var code = isVariable ? "CPD-3201" : "CPD-3203";
+                    var code = isVariable ? "CPD-3201" : "CPD-3202";
                     result.AddError(stage3Line, col, endPos, code,
                         "Invalid character: '" + firstChar + "'. Variables, functions and units must begin with a letter or ∡");
                     return;
@@ -153,7 +122,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             // But user-defined function names cannot - they would shadow the built-in
             if (!isVariable && CalcpadBuiltIns.Functions.Contains(identifier))
             {
-                result.AddError(stage3Line, col, endPos, "CPD-3204",
+                result.AddError(stage3Line, col, endPos, "CPD-3203",
                     "Function name '" + identifier + "' conflicts with built-in function");
                 return;
             }
@@ -161,7 +130,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             // Check for conflict with built-in constants (WARNING - redefinition is allowed)
             if (CalcpadBuiltIns.CommonConstants.Contains(identifier))
             {
-                result.AddWarning(stage3Line, col, endPos, "CPD-3207",
+                result.AddWarning(stage3Line, col, endPos, "CPD-3205",
                     "Variable name '" + identifier + "' conflicts with built-in constant");
                 return; // Don't report additional conflicts
             }
@@ -169,7 +138,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             // Check for conflict with keywords (ERROR, only for variables)
             if (isVariable && IsKeywordName(identifier))
             {
-                result.AddError(stage3Line, col, endPos, "CPD-3205",
+                result.AddError(stage3Line, col, endPos, "CPD-3204",
                     "Variable name '" + identifier + "' conflicts with keyword");
                 return; // Don't report additional conflicts
             }

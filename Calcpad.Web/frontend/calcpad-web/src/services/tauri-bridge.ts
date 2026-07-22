@@ -739,8 +739,9 @@ export class TauriMessageBridge extends BaseMessageBridge {
             .replace(/\$([A-Za-z_][A-Za-z0-9_]*)/g, (_, n) => values[n] ?? '');
     }
 
-    public resolveIncludePath(rawFileName: string): string {
-        return pathResolve(this.activeTabSourceDir(), rawFileName);
+    public async resolveIncludePath(rawFileName: string): Promise<string> {
+        const expanded = await this.expandEnvVars(rawFileName);
+        return pathResolve(this.activeTabSourceDir(), expanded);
     }
 
     private activeTabFilePath(): string {

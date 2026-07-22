@@ -63,7 +63,7 @@ namespace Calcpad.Tests.HighlighterTests
             var staged = resolver.GetStagedContent(src);
             var result = new CalcpadLinter().Lint(staged, new LintIgnoreRegionParser().ExtractRegions(src));
 
-            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3416");
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3411");
         }
     }
 }

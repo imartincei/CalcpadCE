@@ -3,6 +3,54 @@ import * as path from 'path';
 import type { SymbolLocation } from 'calcpad-frontend';
 import { VSCodeFileSystem } from './adapters';
 
+/** Expands %VAR% (Windows) and $VAR / ${VAR} (POSIX) references against process.env. */
+export function expandEnvVars(input: string): string {
+    return input
+        .replace(/%([^%]+)%/g, (_, n) => process.env[n] ?? '')
+        .replace(/\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (_, n) => process.env[n] ?? '')
+        .replace(/\$([A-Za-z_][A-Za-z0-9_]*)/g, (_, n) => process.env[n] ?? '');
+}
+
+/**
+ * Resolve a raw `#include FILEPATH` path (as typed, possibly with %VAR%/$VAR
+ * env references) to a concrete `vscode.Location` pointing at the start of
+ * that file. Same lookup order as resolveSymbolLocation: document dir first,
+ * then a workspace-wide search; null if neither finds it.
+ */
+export async function resolveIncludeDirectiveLocation(
+    document: vscode.TextDocument,
+    rawPath: string,
+    fileSystem: VSCodeFileSystem,
+    outputChannel: vscode.OutputChannel,
+    logPrefix: string,
+): Promise<vscode.Location | null> {
+    const expanded = expandEnvVars(rawPath.trim());
+    if (!expanded) return null;
+    const start = new vscode.Position(0, 0);
+
+    const documentDir = path.dirname(document.uri.fsPath);
+    const relativeResolved = path.resolve(documentDir, expanded);
+    if (await fileSystem.exists(relativeResolved)) {
+        outputChannel.appendLine(`${logPrefix} Resolved include via document dir: ${relativeResolved}`);
+        return new vscode.Location(vscode.Uri.file(relativeResolved), start);
+    }
+
+    if (path.isAbsolute(expanded) && await fileSystem.exists(expanded)) {
+        outputChannel.appendLine(`${logPrefix} Resolved include via absolute path: ${expanded}`);
+        return new vscode.Location(vscode.Uri.file(expanded), start);
+    }
+
+    const pattern = '**/' + expanded.replace(/\\/g, '/');
+    const foundFiles = await vscode.workspace.findFiles(pattern, '**/node_modules/**', 1);
+    if (foundFiles.length > 0) {
+        outputChannel.appendLine(`${logPrefix} Resolved include via workspace search: ${foundFiles[0].fsPath}`);
+        return new vscode.Location(foundFiles[0], start);
+    }
+
+    outputChannel.appendLine(`${logPrefix} Include target not found: ${rawPath} (tried ${relativeResolved} and workspace search)`);
+    return null;
+}
+
 /**
  * Resolve a `SymbolLocation` (from the symbol-at-position endpoint) into a
  * concrete `vscode.Location` the editor can jump to.

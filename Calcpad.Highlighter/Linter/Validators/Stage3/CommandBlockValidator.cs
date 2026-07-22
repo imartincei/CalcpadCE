@@ -49,7 +49,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                         var statementIdx = fullLine.AsSpan().IndexOf(statement.AsSpan(), StringComparison.Ordinal);
                         var col = statementIdx >= 0 ? statementIdx + hashIdx : hashIdx;
 
-                        result.AddError(blockInfo.LineNumber, col, col + 1, "CPD-3409",
+                        result.AddError(blockInfo.LineNumber, col, col + 1, "CPD-3405",
                             "'#' directives are not allowed inside command blocks. Use if(), $Repeat, etc. instead");
                     }
                 }

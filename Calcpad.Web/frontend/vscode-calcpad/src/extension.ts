@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver } from 'calcpad-frontend';
+import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -15,6 +15,7 @@ import { CalcpadDefinitionsService } from './calcpadDefinitionsService';
 import { AutoIndenter } from './autoIndenter';
 import { ImageInserter } from './imageInserter';
 import { CalcpadDefinitionProvider } from './calcpadDefinitionProvider';
+import { CalcpadIncludeLinkProvider } from './calcpadIncludeLinkProvider';
 import { CalcpadReferenceProvider } from './calcpadReferenceProvider';
 import { CalcpadRenameProvider } from './calcpadRenameProvider';
 import { CalcpadHoverProvider } from './calcpadHoverProvider';
@@ -713,7 +714,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
 
         // Log to dedicated HTML output channel (without stealing focus)
         calcpadOutputHtmlChannel.clear();
-        calcpadOutputHtmlChannel.appendLine(apiResponse);
+        calcpadOutputHtmlChannel.appendLine(extractBodyHtml(apiResponse));
 
         outputChannel.appendLine(`HTML Length: ${apiResponse.length} characters`);
 
@@ -1394,6 +1395,10 @@ export async function activate(context: vscode.ExtensionContext) {
         outputChannel.appendLine('Initializing definition provider...');
         const definitionProviderDisposable = CalcpadDefinitionProvider.register(apiClient, outputChannel);
 
+        // Initialize #include link provider (always-underlined, clickable paths)
+        outputChannel.appendLine('Initializing include link provider...');
+        const includeLinkProviderDisposable = CalcpadIncludeLinkProvider.register(outputChannel);
+
         // Initialize reference provider (Find All References)
         outputChannel.appendLine('Initializing reference provider...');
         const referenceProviderDisposable = CalcpadReferenceProvider.register(apiClient, outputChannel);
@@ -1938,6 +1943,7 @@ export async function activate(context: vscode.ExtensionContext) {
             completionProviderDisposable,
             includeCompletionDisposable,
             definitionProviderDisposable,
+            includeLinkProviderDisposable,
             referenceProviderDisposable,
             renameProviderDisposable,
             hoverProviderDisposable,

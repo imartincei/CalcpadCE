@@ -13,13 +13,39 @@ export interface TabSnapshot extends TabState {
     isActive: boolean;
 }
 
-interface InternalTab extends TabState {
+/**
+ * Per-model document metadata (path, title, save baseline). Lives outside any
+ * single TabManager because a model can be shared by tabs in more than one
+ * group (see openLinked) — filePath/title/dirty describe the document, not a
+ * particular view of it, so they must stay in one place and be visible to
+ * every tab that shares the model.
+ */
+interface DocEntry {
+    filePath: string | null;
+    title: string;
+    savedVersionId: number;
+    refCount: number;
+    /** Fired after a save (or rename) so every tab sharing this model re-derives dirty/title. */
+    onChanged: Set<() => void>;
+}
+
+const docs = new WeakMap<monaco.editor.ITextModel, DocEntry>();
+
+function docFor(model: monaco.editor.ITextModel): DocEntry {
+    const d = docs.get(model);
+    if (!d) throw new Error('tab-manager: model has no document entry');
+    return d;
+}
+
+interface InternalTab {
+    id: string;
     model: monaco.editor.ITextModel;
     viewState: monaco.editor.ICodeEditorViewState | null;
-    /** model.getAlternativeVersionId() at the last save/load — used for dirty tracking. */
-    savedVersionId: number;
-    /** Disposable for the model's content-change subscription (for dirty tracking). */
+    dirty: boolean;
+    /** Disposable for the model's content-change subscription (dirty tracking). */
     contentSub: monaco.IDisposable;
+    /** Unsubscribe this tab from its DocEntry's onChanged set. */
+    unlisten: () => void;
 }
 
 export type TabsListener = (tabs: TabSnapshot[], activeId: string | null) => void;
@@ -37,6 +63,12 @@ export type TabRemovedListener = (tabId: string) => void;
  *
  * The TabManager is platform-agnostic — file I/O lives in the caller. It
  * just tracks `filePath` so the caller can decide what to read/write.
+ *
+ * A model may be shared by tabs in more than one TabManager (see
+ * openLinked/modelForTab) — used to split the same file into another editor
+ * group with live-synced content, same as VS Code's "split into new group".
+ * Models are refcounted across all TabManagers so the underlying document
+ * survives as long as any tab still references it.
  */
 export class TabManager {
     private tabs: InternalTab[] = [];
@@ -102,13 +134,29 @@ export class TabManager {
     }
 
     findByPath(filePath: string): TabState | null {
-        const t = this.tabs.find(t => t.filePath === filePath);
+        const t = this.tabs.find(t => docFor(t.model).filePath === filePath);
         return t ? this.toState(t) : null;
     }
 
     /** Lookup the Monaco model for the tab matching `filePath`, or null. */
     findModelByPath(filePath: string): monaco.editor.ITextModel | null {
-        return this.tabs.find(t => t.filePath === filePath)?.model ?? null;
+        return this.tabs.find(t => docFor(t.model).filePath === filePath)?.model ?? null;
+    }
+
+    /** The model backing a given tab, for handing off to openLinked() on another group. */
+    modelForTab(id: string): monaco.editor.ITextModel | null {
+        return this.tabs.find(t => t.id === id)?.model ?? null;
+    }
+
+    /**
+     * True if closing `id` would be the last tab (in any group) referencing
+     * its model — i.e. closing it actually discards unsaved content, rather
+     * than just closing one of several synced views onto it.
+     */
+    isLastReference(id: string): boolean {
+        const t = this.tabs.find(t => t.id === id);
+        if (!t) return true;
+        return docFor(t.model).refCount <= 1;
     }
 
     isDirty(id?: string): boolean {
@@ -121,11 +169,13 @@ export class TabManager {
     }
 
     getFilePath(id: string): string | null {
-        return this.tabs.find(t => t.id === id)?.filePath ?? null;
+        const t = this.tabs.find(t => t.id === id);
+        return t ? docFor(t.model).filePath : null;
     }
 
     getTitle(id: string): string | null {
-        return this.tabs.find(t => t.id === id)?.title ?? null;
+        const t = this.tabs.find(t => t.id === id);
+        return t ? docFor(t.model).title : null;
     }
 
     anyDirty(): boolean {
@@ -140,12 +190,16 @@ export class TabManager {
 
     /**
      * Create a new untitled tab with the given content (default empty) and
-     * activate it. Returns the new tab's id.
+     * activate it. Returns the new tab's id. `title` overrides the default
+     * "Untitled-N" label (used for read-view tabs like "Open Full HTML").
      */
-    newUntitled(content: string = ''): string {
-        this._untitledCounter += 1;
-        const title = `Untitled-${this._untitledCounter}`;
-        const tab = this.createTab({ title, filePath: null, content });
+    newUntitled(content: string = '', title?: string): string {
+        let label = title;
+        if (!label) {
+            this._untitledCounter += 1;
+            label = `Untitled-${this._untitledCounter}`;
+        }
+        const tab = this.createTab({ title: label, filePath: null, content });
         this.activate(tab.id);
         return tab.id;
     }
@@ -156,7 +210,7 @@ export class TabManager {
      * Returns the tab id.
      */
     openFile(filePath: string, content: string): string {
-        const existing = this.tabs.find(t => t.filePath === filePath);
+        const existing = this.tabs.find(t => docFor(t.model).filePath === filePath);
         if (existing) {
             this.activate(existing.id);
             return existing.id;
@@ -166,11 +220,12 @@ export class TabManager {
         // in place rather than stacking another tab. Matches VS Code's
         // "untitled-1 disappears when you open a file" behavior.
         const active = this.findActive();
-        if (active && active.filePath === null && active.model.getValue() === '' && !active.dirty) {
+        if (active && docFor(active.model).filePath === null && active.model.getValue() === '' && !active.dirty) {
+            const doc = docFor(active.model);
             active.model.setValue(content);
-            active.filePath = filePath;
-            active.title = baseName(filePath);
-            active.savedVersionId = active.model.getAlternativeVersionId();
+            doc.filePath = filePath;
+            doc.title = baseName(filePath);
+            doc.savedVersionId = active.model.getAlternativeVersionId();
             active.dirty = false;
             this.emit();
             return active.id;
@@ -178,6 +233,36 @@ export class TabManager {
 
         const tab = this.createTab({ title: baseName(filePath), filePath, content });
         this.activate(tab.id);
+        return tab.id;
+    }
+
+    /**
+     * Open a tab in this group that shares `model` with a tab elsewhere
+     * (typically another group's active tab, via modelForTab). Edits, saves
+     * and dirty state all stay in sync with every other tab sharing the
+     * model, since they're the same Monaco document — only the view state
+     * (cursor/scroll) is independent per tab.
+     */
+    openLinked(model: monaco.editor.ITextModel): string {
+        const doc = docFor(model);
+        doc.refCount += 1;
+        const id = `${this.idPrefix}tab-${++this._seq}`;
+        const onChanged = () => this.recomputeDirty(id);
+        doc.onChanged.add(onChanged);
+        const tab: InternalTab = {
+            id,
+            model,
+            viewState: null,
+            dirty: model.getAlternativeVersionId() !== doc.savedVersionId,
+            contentSub: model.onDidChangeContent(() => {
+                this.recomputeDirty(id);
+                for (const l of this.contentListeners) l(id);
+            }),
+            unlisten: () => doc.onChanged.delete(onChanged),
+        };
+        this.tabs.push(tab);
+        this.activate(tab.id);
+        this.emit();
         return tab.id;
     }
 
@@ -218,7 +303,8 @@ export class TabManager {
         const wasActive = id === this._activeId;
 
         tab.contentSub.dispose();
-        tab.model.dispose();
+        tab.unlisten();
+        this.releaseModel(tab.model);
         this.tabs.splice(idx, 1);
         for (const l of this.removedListeners) l(id);
 
@@ -244,23 +330,21 @@ export class TabManager {
 
     /**
      * Mark the active tab saved at its current content. Optionally update its
-     * file path / title (for save-as).
+     * file path / title (for save-as). Notifies every other tab sharing this
+     * model (e.g. a synced split of the same file) so their dirty/title
+     * state updates too.
      */
     markActiveSaved(opts?: { filePath?: string }): void {
         const t = this.findActive();
         if (!t) return;
+        const doc = docFor(t.model);
         if (opts?.filePath) {
-            t.filePath = opts.filePath;
-            t.title = baseName(opts.filePath);
+            doc.filePath = opts.filePath;
+            doc.title = baseName(opts.filePath);
         }
-        t.savedVersionId = t.model.getAlternativeVersionId();
-        if (t.dirty) {
-            t.dirty = false;
-            this.emit();
-        } else {
-            // Title or path may still have changed.
-            this.emit();
-        }
+        doc.savedVersionId = t.model.getAlternativeVersionId();
+        for (const l of doc.onChanged) l();
+        this.emit();
     }
 
     /**
@@ -273,7 +357,7 @@ export class TabManager {
         // Force dirty even though content matches the model's initial value:
         // set savedVersionId to a value the alternative-version-id can never
         // hit (it starts at 1 and only grows), so recomputeDirty sees a diff.
-        tab.savedVersionId = -1;
+        docFor(tab.model).savedVersionId = -1;
         tab.dirty = true;
         this.activate(tab.id);
         this.emit();
@@ -284,10 +368,11 @@ export class TabManager {
     reloadActive(content: string): void {
         const t = this.findActive();
         if (!t) return;
+        const doc = docFor(t.model);
         t.model.setValue(content);
-        t.savedVersionId = t.model.getAlternativeVersionId();
+        doc.savedVersionId = t.model.getAlternativeVersionId();
+        for (const l of doc.onChanged) l();
         if (t.dirty) {
-            t.dirty = false;
             this.emit();
         }
     }
@@ -321,7 +406,8 @@ export class TabManager {
         for (const t of this.tabs) {
             for (const l of this.removedListeners) l(t.id);
             t.contentSub.dispose();
-            t.model.dispose();
+            t.unlisten();
+            this.releaseModel(t.model);
         }
         this.tabs = [];
         this._activeId = null;
@@ -341,33 +427,48 @@ export class TabManager {
         const uri = monaco.Uri.parse(`inmemory:///${id}.cpd`);
         const model = monaco.editor.createModel(opts.content, 'calcpad', uri);
         const savedVersionId = model.getAlternativeVersionId();
+        const doc: DocEntry = {
+            filePath: opts.filePath,
+            title: opts.title,
+            savedVersionId,
+            refCount: 1,
+            onChanged: new Set(),
+        };
+        docs.set(model, doc);
+        const onChanged = () => this.recomputeDirty(id);
+        doc.onChanged.add(onChanged);
         const tab: InternalTab = {
             id,
-            title: opts.title,
-            filePath: opts.filePath,
             dirty: false,
             model,
             viewState: null,
-            savedVersionId,
             contentSub: model.onDidChangeContent(() => {
                 this.recomputeDirty(id);
                 for (const l of this.contentListeners) l(id);
             }),
+            unlisten: () => doc.onChanged.delete(onChanged),
         };
         this.tabs.push(tab);
         this.emit();
         return tab;
     }
 
+    /** Decrement a model's shared refcount, disposing it once no tab (in any group) references it. */
+    private releaseModel(model: monaco.editor.ITextModel): void {
+        const doc = docFor(model);
+        doc.refCount -= 1;
+        if (doc.refCount <= 0) model.dispose();
+    }
+
     /**
-     * Compare the model's alternative-version-id against the last-saved id.
-     * Equality means the user has undone all post-save edits — model is
-     * effectively clean again, so the dirty flag flips back off.
+     * Compare the model's alternative-version-id against the document's
+     * last-saved id. Equality means the user has undone all post-save edits —
+     * model is effectively clean again, so the dirty flag flips back off.
      */
     private recomputeDirty(id: string): void {
         const t = this.tabs.find(t => t.id === id);
         if (!t) return;
-        const next = t.model.getAlternativeVersionId() !== t.savedVersionId;
+        const next = t.model.getAlternativeVersionId() !== docFor(t.model).savedVersionId;
         if (next !== t.dirty) {
             t.dirty = next;
             this.emit();
@@ -379,7 +480,8 @@ export class TabManager {
     }
 
     private toState(t: InternalTab): TabState {
-        return { id: t.id, title: t.title, filePath: t.filePath, dirty: t.dirty };
+        const doc = docFor(t.model);
+        return { id: t.id, title: doc.title, filePath: doc.filePath, dirty: t.dirty };
     }
 
     private emit(): void {

@@ -1,12 +1,16 @@
 import * as vscode from 'vscode';
 import { CalcpadApiClient, SymbolAtPositionResponse } from 'calcpad-frontend';
 import { VSCodeLogger, VSCodeFileSystem } from './adapters';
-import { resolveSymbolLocation } from './calcpadLocationResolver';
+import { resolveSymbolLocation, resolveIncludeDirectiveLocation } from './calcpadLocationResolver';
+import { parseDirectiveLine } from './calcpadIncludeCompletionProvider';
 
 /**
- * Provides "Go to Definition" functionality for CalcPad functions, macros, and variables.
- * Asks the server which symbol is at the cursor (`symbol-at-position`) and
- * jumps to its first assignment location.
+ * Provides "Go to Definition" (Ctrl+click / F12) for CalcPad functions,
+ * macros, variables, and `#include` directives.
+ *
+ * For `#include FILEPATH` lines, clicking anywhere on the path jumps straight
+ * to that file. Otherwise asks the server which symbol is at the cursor
+ * (`symbol-at-position`) and jumps to its first assignment location.
  */
 export class CalcpadDefinitionProvider implements vscode.DefinitionProvider {
     private apiClient: CalcpadApiClient;
@@ -26,6 +30,12 @@ export class CalcpadDefinitionProvider implements vscode.DefinitionProvider {
         position: vscode.Position,
         token: vscode.CancellationToken
     ): Promise<vscode.Definition | null> {
+        const includeTarget = this.includePathAt(document, position);
+        if (includeTarget !== undefined) {
+            if (!includeTarget) return null;
+            return resolveIncludeDirectiveLocation(document, includeTarget, this.fileSystem, this.outputChannel, '[Definition]');
+        }
+
         const sym = await this.fetchSymbol(document, position);
         if (!sym) {
             this.outputChannel.appendLine('[Definition] No symbol at cursor position');
@@ -46,6 +56,19 @@ export class CalcpadDefinitionProvider implements vscode.DefinitionProvider {
         );
 
         return resolveSymbolLocation(document, definition, this.fileSystem, this.outputChannel, '[Definition]');
+    }
+
+    /**
+     * Returns the raw path text when `position` is on an `#include FILEPATH`
+     * line at or past where the path starts, `undefined` when the line isn't
+     * an include directive (fall through to symbol lookup).
+     */
+    private includePathAt(document: vscode.TextDocument, position: vscode.Position): string | undefined {
+        const line = document.lineAt(position.line).text;
+        const parsed = parseDirectiveLine(line);
+        if (!parsed || parsed.directive !== 'include') return undefined;
+        if (position.character < parsed.pathStartCol) return undefined;
+        return parsed.partialPath.trim();
     }
 
     private async fetchSymbol(document: vscode.TextDocument, position: vscode.Position): Promise<SymbolAtPositionResponse | null> {

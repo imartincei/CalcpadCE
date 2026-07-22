@@ -86,7 +86,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     if (!CalcpadBuiltIns.Commands.Contains(command))
                     {
                         // Pass Stage3 line index - diagnostic extensions handle mapping
-                        result.AddError(i, token.Column, token.Column + token.Length, "CPD-3404",
+                        result.AddError(i, token.Column, token.Column + token.Length, "CPD-3402",
                             "'" + command + "' is not a recognized command");
                     }
                 }
@@ -137,7 +137,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                         }
 
                         // Pass Stage3 line index - diagnostic extensions handle mapping
-                        result.AddError(i, token.Column, token.Column + token.Length, "CPD-3406",
+                        result.AddError(i, token.Column, token.Column + token.Length, "CPD-3403",
                             "'" + keyword + "' is not a recognized directive");
                     }
                 }
@@ -239,7 +239,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 if (hasMultipleInSegment && !hasCommand)
                 {
                     // Pass Stage3 line index - diagnostic extensions handle mapping
-                    result.AddWarning(i, 0, line.Length, "CPD-3407",
+                    result.AddWarning(i, 0, line.Length, "CPD-3404",
                         "multiple assignments on the same line");
                 }
             }
@@ -274,7 +274,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 if (lastToken.Type == TokenType.Operator && IsBinaryOperator(lastToken.Text))
                 {
                     // This is an incomplete expression
-                    result.AddError(i, lastToken.Column, lastToken.Column + lastToken.Length, "CPD-3411",
+                    result.AddError(i, lastToken.Column, lastToken.Column + lastToken.Length, "CPD-3407",
                         "expression cannot end with operator '" + lastToken.Text + "'");
                 }
                 // Check if line ends with assignment operator without a right-hand side
@@ -296,7 +296,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     if (!isComparison)
                     {
                         // Assignment without right-hand side
-                        result.AddError(i, lastToken.Column, lastToken.Column + lastToken.Length, "CPD-3411",
+                        result.AddError(i, lastToken.Column, lastToken.Column + lastToken.Length, "CPD-3407",
                             "incomplete assignment: missing right-hand side");
                     }
                 }
@@ -313,7 +313,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     var info = stage3.TypeTracker?.GetVariableInfo(name);
                     if (info != null && info.IsConst)
                     {
-                        result.AddError(line, column, column + name.Length, "CPD-3413",
+                        result.AddError(line, column, column + name.Length, "CPD-3409",
                             "cannot reassign constant '" + name + "'");
                     }
                 }
@@ -328,13 +328,13 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     if (info == null && !stage3.DefinedVariables.Contains(name))
                     {
                         // ← used on a variable that doesn't exist
-                        result.AddError(line, column, column + name.Length, "CPD-3414",
+                        result.AddError(line, column, column + name.Length, "CPD-3410",
                             "outer scope assignment to undefined variable '" + name + "'");
                     }
                     else if (info != null && info.IsConst)
                     {
                         // ← used on a const variable
-                        result.AddError(line, column, column + name.Length, "CPD-3413",
+                        result.AddError(line, column, column + name.Length, "CPD-3409",
                             "cannot reassign constant '" + name + "'");
                     }
                 }

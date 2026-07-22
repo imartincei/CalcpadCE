@@ -36,7 +36,6 @@ Every diagnostic has a `CPD-` code. The tables below group them by the kind of p
 | CPD-2210 | Error | Invalid character in macro name |
 | CPD-2211 | Error | Invalid character in macro parameter |
 | CPD-2212 | Error | Duplicate macro parameter |
-| CPD-2213 | Error | Required parameter after an optional one (macro) |
 
 ### Brackets and blocks
 
@@ -54,12 +53,11 @@ Every diagnostic has a `CPD-` code. The tables below group them by the kind of p
 | Code | Severity | Meaning |
 |------|----------|---------|
 | CPD-3201 | Error | Invalid variable name (must start with a letter) |
-| CPD-3203 | Error | Invalid function name |
-| CPD-3204 | Error | Function name conflicts with a built-in function |
-| CPD-3205 | Error | Variable name conflicts with a keyword |
-| CPD-3207 | Error | Variable name conflicts with a built-in constant |
-| CPD-3208 | Error | Function must have at least one parameter |
-| CPD-3215 | Error | Required parameter after an optional one (function) |
+| CPD-3202 | Error | Invalid function name |
+| CPD-3203 | Error | Function name conflicts with a built-in function |
+| CPD-3204 | Error | Variable name conflicts with a keyword |
+| CPD-3205 | Error | Variable name conflicts with a built-in constant |
+| CPD-3206 | Error | Function must have at least one parameter |
 
 ### Usage
 
@@ -77,23 +75,25 @@ Every diagnostic has a `CPD-` code. The tables below group them by the kind of p
 | CPD-3310 | Error | Undefined unit |
 | CPD-3311 | Error | Empty parameter in a function call |
 | CPD-3312 | Information | Unused variable |
+| CPD-3313 | Error | Redefinition of existing function |
 
 ### Semantics
 
 | Code | Severity | Meaning |
 |------|----------|---------|
 | CPD-3401 | Error | Invalid operator usage |
-| CPD-3404 | Error | Unknown command name |
-| CPD-3406 | Error | Unknown directive |
-| CPD-3407 | Warning | Invalid assignment |
-| CPD-3409 | Error | `#` directive not allowed inside a command block |
-| CPD-3410 | Error | Invalid command syntax |
-| CPD-3411 | Error | Incomplete expression |
-| CPD-3412 | Error | Command variable mismatch |
-| CPD-3413 | Error | Reassignment of a constant |
-| CPD-3414 | Error | Outer-scope assignment (`←`) to an undefined variable |
-| CPD-3416 | Warning | Invalid `paramType` value in a metadata comment |
-| CPD-3417 | Warning | Invalid metadata-comment JSON |
+| CPD-3402 | Error | Unknown command name |
+| CPD-3403 | Error | Unknown directive |
+| CPD-3404 | Warning | Invalid assignment |
+| CPD-3405 | Error | `#` directive not allowed inside a command block |
+| CPD-3406 | Error | Invalid command syntax |
+| CPD-3407 | Error | Incomplete expression |
+| CPD-3408 | Error | Command variable mismatch |
+| CPD-3409 | Error | Reassignment of a constant |
+| CPD-3410 | Error | Outer-scope assignment (`←`) to an undefined variable |
+| CPD-3411 | Warning | Invalid `paramType` value in a metadata comment |
+| CPD-3412 | Warning | Invalid metadata-comment JSON |
+| CPD-3413 | Error| Invalid #settings JSON |
 
 ### Formatting
 

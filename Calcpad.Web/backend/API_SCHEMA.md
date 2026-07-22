@@ -296,50 +296,63 @@ interface LintDiagnostic {
 |------|----------|-------------|
 | **Stage 1: Pre-include validation (CPD-11xx)** |||
 | CPD-1101 | Include | Malformed #include statement |
-| CPD-1102 | Include | Invalid #include file path |
-| CPD-1103 | Include | Missing #include filename |
+| CPD-1102 | Include | Missing #include filename |
 | **Stage 2: Macro definitions (CPD-22xx)** |||
 | CPD-2201 | Macro | Duplicate macro definition |
 | CPD-2202 | Macro | Macro name must end with '$' |
 | CPD-2203 | Macro | Macro parameter must end with '$' |
-| CPD-2204 | Macro | Invalid macro name |
+| CPD-2204 | Macro | Invalid macro name (must start with a letter) |
 | CPD-2205 | Macro | Malformed #def syntax |
 | CPD-2206 | Macro | Unmatched #def or #end def |
 | CPD-2207 | Macro | Nested macro definition not allowed |
 | CPD-2208 | Macro | Macro parameter must start with a letter |
-| CPD-2209 | Macro | Macro definition inside control block |
+| CPD-2209 | Macro | Macro definition inside a control block has no effect |
+| CPD-2210 | Macro | Invalid character in macro name |
+| CPD-2211 | Macro | Invalid character in macro parameter |
+| CPD-2212 | Macro | Duplicate macro parameter |
 | **Stage 3: Balance (CPD-31xx)** |||
 | CPD-3101 | Balance | Unmatched opening parenthesis |
 | CPD-3102 | Balance | Unmatched closing parenthesis |
 | CPD-3103 | Balance | Unmatched opening square bracket |
 | CPD-3104 | Balance | Unmatched closing square bracket |
-| CPD-3105 | Balance | Unmatched opening curly brace/control block |
+| CPD-3105 | Balance | Unmatched opening curly brace or control block |
 | CPD-3106 | Balance | Unmatched closing curly brace |
 | **Stage 3: Naming (CPD-32xx)** |||
-| CPD-3201 | Naming | Invalid variable name |
-| CPD-3202 | Naming | Variable name conflicts with built-in function |
-| CPD-3203 | Naming | Invalid function name |
-| CPD-3204 | Naming | Function name conflicts with built-in function |
-| CPD-3205 | Naming | Variable name conflicts with keyword |
+| CPD-3201 | Naming | Invalid variable name (must start with a letter) |
+| CPD-3202 | Naming | Invalid function name |
+| CPD-3203 | Naming | Function name conflicts with a built-in function |
+| CPD-3204 | Naming | Variable name conflicts with a keyword |
+| CPD-3205 | Naming | Variable name conflicts with a built-in constant |
+| CPD-3206 | Naming | Function must have at least one parameter |
 | **Stage 3: Usage (CPD-33xx)** |||
 | CPD-3301 | Usage | Undefined variable |
-| CPD-3302 | Usage | Function called with incorrect parameter count |
+| CPD-3302 | Usage | Function called with the wrong number of parameters |
 | CPD-3303 | Usage | Undefined macro |
-| CPD-3304 | Usage | Macro called with incorrect parameter count |
+| CPD-3304 | Usage | Macro called with the wrong number of parameters |
 | CPD-3305 | Usage | Undefined function |
 | CPD-3306 | Usage | Invalid element access |
 | CPD-3307 | Usage | Too few parameters |
 | CPD-3308 | Usage | Too many parameters |
-| CPD-3309 | Usage | Parameter type mismatch (warning) |
+| CPD-3309 | Usage | Parameter type mismatch |
+| CPD-3310 | Usage | Undefined unit |
+| CPD-3311 | Usage | Empty parameter in a function call |
+| CPD-3312 | Usage | Unused variable |
+| CPD-3313 | Usage | Redefinition of existing function |
 | **Stage 3: Semantic (CPD-34xx)** |||
 | CPD-3401 | Semantic | Invalid operator usage |
-| CPD-3402 | Semantic | Mismatched operator |
-| CPD-3403 | Semantic | Command must be at start of statement |
-| CPD-3404 | Semantic | Invalid command syntax |
-| CPD-3405 | Semantic | Invalid control structure syntax |
-| CPD-3406 | Semantic | Unknown directive |
-| CPD-3407 | Semantic | Invalid assignment |
-| CPD-3408 | Semantic | Invalid CustomUnit syntax |
+| CPD-3402 | Semantic | Unknown command name |
+| CPD-3403 | Semantic | Unknown directive |
+| CPD-3404 | Semantic | Invalid assignment |
+| CPD-3405 | Semantic | # directive not allowed inside a command block |
+| CPD-3406 | Semantic | Invalid command syntax |
+| CPD-3407 | Semantic | Incomplete expression |
+| CPD-3408 | Semantic | Command variable mismatch |
+| CPD-3409 | Semantic | Reassignment of a constant |
+| CPD-3410 | Semantic | Outer-scope assignment (←) to an undefined variable |
+| CPD-3411 | Semantic | Invalid paramType value in a metadata comment |
+| CPD-3412 | Semantic | Invalid metadata-comment JSON |
+| **Stage 3: Format (CPD-36xx)** |||
+| CPD-3601 | Format | Invalid format specifier |
 
 **Example Request:**
 ```json

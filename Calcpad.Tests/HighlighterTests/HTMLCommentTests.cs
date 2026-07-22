@@ -23,10 +23,10 @@ namespace Calcpad.Tests.HighlighterTests
                 .Where(d => d.Severity == LinterSeverity.Error)
                 .ToList();
 
-            // Line 6 (`x = = 2`) is inside a LintIgnore for CPD-3407 and CPD-3312.
-            // Line 8 (`x = 3`) has EndLintIgnore for CPD-3407 above it but CPD-3312
+            // Line 6 (`x = = 2`) is inside a LintIgnore for CPD-3404 and CPD-3312.
+            // Line 8 (`x = 3`) has EndLintIgnore for CPD-3404 above it but CPD-3312
             // remains suppressed, so any reassignment-style diagnostic on x is hidden.
-            // EndLintIgnore on line 9 names CPD-3412 which was never opened — a no-op.
+            // EndLintIgnore on line 9 names CPD-3408 which was never opened — a no-op.
             // Result: file should be error-free.
             Assert.True(
                 errors.Count == 0,

@@ -8,7 +8,7 @@ namespace Calcpad.Tests.HighlighterTests
     /// <summary>
     /// A command's scope variable (the identifier after '@') may collide with a unit name,
     /// e.g. 's' (second) in $Integral{cos(s^2) @ s = 0 : t}. It must still tokenize as the
-    /// loop variable, not a unit, so the command-syntax check (CPD-3410) doesn't misfire.
+    /// loop variable, not a unit, so the command-syntax check (CPD-3406) doesn't misfire.
     /// $Inf/$Sup additionally define an implicit &lt;counter&gt;_inf / &lt;counter&gt;_sup variable.
     /// </summary>
     public class CommandScopeVariableTests
@@ -29,7 +29,7 @@ namespace Calcpad.Tests.HighlighterTests
         [InlineData("q = $Integral{cos(m^2) @ m = 0 : 5}")]
         public void CommandScopeVariableCollidingWithUnit_NoSyntaxError(string src)
         {
-            Assert.Equal(0, Count(Lint(src), "CPD-3410"));
+            Assert.Equal(0, Count(Lint(src), "CPD-3406"));
         }
 
         [Fact]

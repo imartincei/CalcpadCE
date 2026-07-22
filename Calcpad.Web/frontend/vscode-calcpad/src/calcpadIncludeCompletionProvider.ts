@@ -7,7 +7,7 @@ type Directive = typeof DIRECTIVES[number];
 
 const INCLUDE_EXTENSIONS = ['cpd', 'txt'];
 
-interface DirectiveParse {
+export interface DirectiveParse {
     directive: Directive;
     /** Column index where the file path begins */
     pathStartCol: number;
@@ -26,7 +26,7 @@ interface DirectiveParse {
  * Returns undefined if the line isn't a recognized directive or
  * the cursor hasn't reached the file path portion yet.
  */
-function parseDirectiveLine(lineText: string): DirectiveParse | undefined {
+export function parseDirectiveLine(lineText: string): DirectiveParse | undefined {
     let i = 0;
 
     // Skip leading whitespace

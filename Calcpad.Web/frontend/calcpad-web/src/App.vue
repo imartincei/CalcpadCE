@@ -187,6 +187,7 @@
           @click="onCopyPreviewSelection"
         >Copy</button>
         <button class="tab-context-item" @click="onFindInPreview">Find… (Ctrl+F)</button>
+        <button v-if="onOpenFullHtmlRequest" class="tab-context-item" @click="onOpenFullHtml">Open Full HTML</button>
       </div>
 
       <!-- Bottom panel (Problems / Output) — reflects the ACTIVE group. -->
@@ -215,7 +216,7 @@
             v-model="activeOutputChannel"
             title="Output channel"
           >
-            <option v-for="ch in (['app', 'preview', 'server'] as OutputChannel[])" :key="ch" :value="ch">
+            <option v-for="ch in (['app', 'preview', 'server', 'html'] as OutputChannel[])" :key="ch" :value="ch">
               {{ OUTPUT_CHANNEL_LABELS[ch] }}
             </option>
           </select>
@@ -404,6 +405,7 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { extractBodyHtml } from 'calcpad-frontend'
 
 export interface ProblemItem {
   severity: number
@@ -467,6 +469,8 @@ const activeGroupLabel = computed(() => {
 // Monaco editor / write preview HTML for each group.
 const editorEls = new Map<string, HTMLElement>()
 const previewEls = new Map<string, HTMLIFrameElement>()
+// Last full (unstripped) HTML rendered per group, kept for "Open Full HTML".
+const previewHtmlByGroup = new Map<string, string>()
 
 function setEditorRef(id: string, el: unknown): void {
   if (el instanceof HTMLElement) editorEls.set(id, el)
@@ -571,6 +575,11 @@ const onTabCopyRelativePathRequest = ref<((groupId: string, id: string) => void)
 // Generic clipboard write. Set by the host (main.ts) to route through Tauri's
 // native clipboard on desktop; falls back to the Web Clipboard API otherwise.
 const onCopyTextRequest = ref<((text: string) => void) | null>(null)
+
+// Opens the full rendered HTML as raw text in a new (unsaved) editor tab in
+// the group the preview belongs to — mirrors vscode-calcpad's "View Webview
+// Source". Left null (button hidden) when the host doesn't wire it up.
+const onOpenFullHtmlRequest = ref<((groupId: string, html: string) => void) | null>(null)
 
 interface TabContextMenuState {
   x: number
@@ -750,6 +759,15 @@ function onFindInPreview(): void {
   openPreviewFind(groupId ?? activeGroupId.value)
 }
 
+function onOpenFullHtml(): void {
+  const groupId = previewContextMenu.value?.groupId
+  closePreviewContextMenu()
+  if (!groupId) return
+  const html = previewHtmlByGroup.get(groupId)
+  if (!html) return
+  onOpenFullHtmlRequest.value?.(groupId, html)
+}
+
 interface PreviewFindState {
   groupId: string
   query: string
@@ -914,7 +932,7 @@ const previewLoading = computed(() => previewLoadingGroups.value.size > 0)
 const bottomPanelOpen = ref(false)
 const activeBottomTab = ref<'problems' | 'output'>('problems')
 
-export type OutputChannel = 'app' | 'preview' | 'server'
+export type OutputChannel = 'app' | 'preview' | 'server' | 'html'
 
 export interface OutputLine {
   time: string
@@ -922,7 +940,7 @@ export interface OutputLine {
   label: string
   message: string
   channel: OutputChannel
-  /** For the per-group 'preview' channel: which group's preview emitted it. */
+  /** For the per-group 'preview'/'html' channels: which group emitted it. */
   groupId?: string
 }
 
@@ -930,18 +948,20 @@ const OUTPUT_CHANNEL_LABELS: Record<OutputChannel, string> = {
   app: 'CalcpadCE',
   preview: 'Preview Console',
   server: 'Server',
+  html: 'HTML Preview Output',
 }
 
 const outputLines = ref<OutputLine[]>([])
 const outputList = ref<HTMLElement | null>(null)
 const activeOutputChannel = ref<OutputChannel>('app')
 
-// The 'preview' channel is per-group (each split preview has its own console),
-// so filter it by the active group. 'app' / 'server' are global.
+// The 'preview'/'html' channels are per-group (each split preview has its own
+// console/rendered HTML), so filter them by the active group. 'app' / 'server'
+// are global.
 const filteredOutputLines = computed(() =>
   outputLines.value.filter(l =>
     l.channel === activeOutputChannel.value &&
-    (l.channel !== 'preview' || !l.groupId || l.groupId === activeGroupId.value)
+    ((l.channel !== 'preview' && l.channel !== 'html') || !l.groupId || l.groupId === activeGroupId.value)
   )
 )
 
@@ -973,7 +993,7 @@ function trimChannel(channel: OutputChannel): void {
 function setMaxOutputLines(n: number): void {
   if (!Number.isFinite(n) || n < 10) return
   maxOutputLinesPerChannel.value = Math.floor(n)
-  for (const ch of ['app', 'preview', 'server'] as OutputChannel[]) trimChannel(ch)
+  for (const ch of ['app', 'preview', 'server', 'html'] as OutputChannel[]) trimChannel(ch)
 }
 
 function appendOutput(
@@ -994,7 +1014,7 @@ function appendOutput(
   outputLines.value.push({ time, level, label: labels[level] ?? level, message, channel, groupId })
   trimChannel(channel)
   const visible = channel === activeOutputChannel.value &&
-    (channel !== 'preview' || !groupId || groupId === activeGroupId.value)
+    ((channel !== 'preview' && channel !== 'html') || !groupId || groupId === activeGroupId.value)
   if (wasAtBottom && visible) {
     nextTick(() => {
       const target = outputList.value
@@ -1093,8 +1113,19 @@ function setPreviewHtml(groupId: string, html: string, scrollToLine?: number): v
   const doc = frame.contentDocument
   if (!doc) return
   doc.open()
-  doc.write(injectPreviewConsole(injectLineLinks(injectScrollbarStyles(html), scrollToLine, groupId), groupId))
+  doc.write(injectPreviewConsole(injectLineLinks(html, scrollToLine, groupId), groupId))
   doc.close()
+  previewHtmlByGroup.set(groupId, html)
+  setPreviewHtmlOutput(groupId, html)
+}
+
+// Mirrors the last rendered preview into the 'html' output channel (body only,
+// so it matches what the print/export path also strips out) for debugging.
+// Each render replaces the group's prior line rather than appending, since old
+// output is immediately stale.
+function setPreviewHtmlOutput(groupId: string, html: string): void {
+  outputLines.value = outputLines.value.filter(l => !(l.channel === 'html' && l.groupId === groupId))
+  appendOutput('info', extractBodyHtml(html), 'html', groupId)
 }
 
 // Scroll a group's preview to a source line (editor -> preview sync). Posts to
@@ -1104,47 +1135,12 @@ function scrollPreviewToSourceLine(groupId: string, line: number): void {
   frame?.contentWindow?.postMessage({ type: 'scrollPreviewToLine', line }, '*')
 }
 
-// Give the preview iframe a clearly visible vertical scrollbar. The default
-// scrollbar is nearly invisible; reserving the gutter with `overflow-y: scroll`
-// keeps the layout from shifting. The iframe has no VS Code theme variables, so
-// use plain rgba values (mirrors vscode-calcpad's getScrollbarStyleScript).
-// The .code (unwrapped view) rule mirrors this on the code container so the
-// Tauri webview shows the same scrollbar for long code output.
-// The .lineLink override enlarges the hover arrow so it's easier to click.
-function injectScrollbarStyles(html: string): string {
-  const style = [
-    '<' + 'style>',
-    'html { overflow-y: scroll; }',
-    'body { min-height: 100vh; }',
-    '.code { overflow-y: auto; }',
-    '::-webkit-scrollbar { width: 12px; height: 12px; }',
-    '::-webkit-scrollbar-track { background: transparent; }',
-    '::-webkit-scrollbar-thumb { background: rgba(121,121,121,0.4); border-radius: 6px; }',
-    '::-webkit-scrollbar-thumb:hover { background: rgba(100,100,100,0.7); }',
-    '::-webkit-scrollbar-thumb:active { background: rgba(85,85,85,0.9); }',
-    '::-webkit-scrollbar-corner { background: transparent; }',
-    // Pin the arrow to its own line (position: relative on .line) and extend it
-    // across the body's left margin so the whole gutter is a hover+click target.
-    '.line { position: relative; }',
-    // Brief flash when the preview is focused to the editor's cursor line.
-    '.cpd-line-focus { background-color: rgba(120,170,255,0.28) !important; transition: background-color 0.3s ease !important; }',
-    // Find-in-preview highlights, driven from the parent (App.vue find widget).
-    'mark.cpd-find { background: rgba(234,179,8,0.45); color: inherit; border-radius: 2px; }',
-    'mark.cpd-find.cpd-find-current { background: rgba(249,115,22,0.95); color: #000; }',
-    '.lineLink { left: -3em !important; top: 0 !important; bottom: 0 !important; width: 3em !important; height: auto !important; font-size: 16pt !important; padding-right: 4pt !important; box-sizing: border-box !important; display: flex !important; align-items: center !important; justify-content: flex-end !important; opacity: 0 !important; transition: opacity 0.15s !important; }',
-    '.lineLink:hover { opacity: 1 !important; }',
-    '</' + 'style>',
-  ].join('\n')
-  const headIdx = html.indexOf('<head>')
-  if (headIdx >= 0) {
-    return html.slice(0, headIdx + 6) + style + html.slice(headIdx + 6)
-  }
-  return style + html
-}
-
 // Inject the line-link behaviour ported from vscode-calcpad. Posted messages
 // carry `groupId` so main.ts routes navigation to the group that owns this
-// preview (see App.vue's per-group iframes).
+// preview (see App.vue's per-group iframes). The scrollbar/line-focus/find-
+// highlight CSS these scripts rely on now lives in the backend's template.html
+// since it's static and applies to the print/export path too; only the
+// per-render behaviour (which needs groupId/scrollToLine) is injected here.
 function injectLineLinks(html: string, scrollToLine: number | undefined, groupId: string): string {
   const scrollTarget = typeof scrollToLine === 'number' ? String(scrollToLine) : 'null'
   const gid = JSON.stringify(groupId)
@@ -1251,11 +1247,11 @@ function injectLineLinks(html: string, scrollToLine: number | undefined, groupId
     "});",
   ].join('\n')
   const script = '<' + 'script>' + body + '</' + 'script>'
-  const bodyCloseIdx = html.lastIndexOf('</body>')
-  if (bodyCloseIdx >= 0) {
-    return html.slice(0, bodyCloseIdx) + script + html.slice(bodyCloseIdx)
+  const headIdx = html.indexOf('<head>')
+  if (headIdx >= 0) {
+    return html.slice(0, headIdx + 6) + script + html.slice(headIdx + 6)
   }
-  return html + script
+  return script + html
 }
 
 // Forward iframe console.* + uncaught errors to the parent window via
@@ -1455,5 +1451,6 @@ defineExpose({
   onTabCopyFullPathRequest,
   onTabCopyRelativePathRequest,
   onCopyTextRequest,
+  onOpenFullHtmlRequest,
 })
 </script>

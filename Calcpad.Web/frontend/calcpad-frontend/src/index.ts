@@ -85,6 +85,9 @@ export {
 } from './services/image-utils';
 export type { ImageStorageMode, PickedImage } from './services/image-utils';
 
+// --- HTML Body Extraction ------------------------------------------------------
+export { extractBodyHtml } from './services/html-body';
+
 // --- Plot Extraction + ZIP ---------------------------------------------------
 export { extractPlotsFromHtml } from './services/plot-extract';
 export type { ExtractedPlot } from './services/plot-extract';

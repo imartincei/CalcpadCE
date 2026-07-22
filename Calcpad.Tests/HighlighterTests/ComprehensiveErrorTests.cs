@@ -61,9 +61,9 @@ namespace Calcpad.Tests.HighlighterTests
                 { "macro_errors.cpd", "CPD-2212" },
 
                 // Naming errors (CPD-32xx)
-                { "naming_errors.cpd", "CPD-3205" },
-                { "naming_errors.cpd", "CPD-3207" }, // Warning: conflict with built-in constant is allowed
-                { "naming_errors.cpd", "CPD-3208" },
+                { "naming_errors.cpd", "CPD-3204" },
+                { "naming_errors.cpd", "CPD-3205" }, // Warning: conflict with built-in constant is allowed
+                { "naming_errors.cpd", "CPD-3206" },
 
                 // Usage errors (CPD-33xx)
                 { "usage_errors.cpd", "CPD-3301" },
@@ -76,15 +76,15 @@ namespace Calcpad.Tests.HighlighterTests
 
                 // Semantic errors (CPD-34xx)
                 { "semantic_errors.cpd", "CPD-3401" },
-                { "semantic_errors.cpd", "CPD-3406" },
-                { "semantic_errors.cpd", "CPD-3409" },
-                { "semantic_errors.cpd", "CPD-3411" },
-                { "semantic_errors.cpd", "CPD-3412" },
-                { "semantic_errors.cpd", "CPD-3414" },
+                { "semantic_errors.cpd", "CPD-3403" },
+                { "semantic_errors.cpd", "CPD-3405" },
+                { "semantic_errors.cpd", "CPD-3407" },
+                { "semantic_errors.cpd", "CPD-3408" },
+                { "semantic_errors.cpd", "CPD-3410" },
 
                 // Reassignment
-                { "reassignment_errors.cpd", "CPD-3413" },
-                { "reassignment_errors.cpd", "CPD-3414" },
+                { "reassignment_errors.cpd", "CPD-3409" },
+                { "reassignment_errors.cpd", "CPD-3410" },
             };
             return data;
         }
