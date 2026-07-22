@@ -23,6 +23,7 @@ namespace Calcpad.Highlighter.Linter
         private readonly CommandBlockValidator _commandBlockValidator = new();
         private readonly FormatValidator _formatValidator = new();
         private readonly HtmlCommentValidator _htmlCommentValidator = new();
+        private readonly SettingsValidator _settingsValidator = new();
 
         /// <summary>
         /// Lint code using pre-processed staged content from ContentResolver.
@@ -223,6 +224,7 @@ namespace Calcpad.Highlighter.Linter
             _commandBlockValidator.Validate(stage3, result, tokenProvider);
             _formatValidator.Validate(stage3, result, tokenProvider);
             _htmlCommentValidator.Validate(stage3, result, tokenProvider);
+            _settingsValidator.Validate(stage3, result, tokenProvider);
         }
     }
 }

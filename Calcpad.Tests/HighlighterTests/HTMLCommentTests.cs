@@ -1,6 +1,5 @@
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using Calcpad.Highlighter.HtmlComment;
 using Calcpad.Highlighter.Linter.Models;
 using Calcpad.Highlighter.Tokenizer;
@@ -36,20 +35,18 @@ namespace Calcpad.Tests.HighlighterTests
         }
 
         [Fact]
-        public void SettingsOverride_AppliesFourDecimalsToOutput()
+        public void SettingsDirective_AppliesFourDecimalsToOutput()
         {
+            // The file opens with `#settings {"decimals": 4}`; the engine must read it
+            // during parsing and render subsequent output with four decimals.
             var fullPath = Path.Combine(_fixture.ValidDir, TestFile);
             var source = File.ReadAllText(fullPath);
-
-            var settings = new Settings();
-            ApplyHtmlCommentSettings(source, settings);
-            Assert.Equal(4, settings.Math.Decimals);
 
             var macroParser = new MacroParser();
             var hasMacroErrors = macroParser.Parse(source, out var expanded, null, 0, false);
             Assert.False(hasMacroErrors);
 
-            var parser = new ExpressionParser { Settings = settings };
+            var parser = new ExpressionParser { Settings = new Settings() };
             parser.Parse(expanded, true, false);
             var html = parser.HtmlResult;
 
@@ -81,30 +78,6 @@ namespace Calcpad.Tests.HighlighterTests
             Assert.Equal("k", data.GetProperty("desc").GetString());
             Assert.Equal("value", data.GetProperty("paramTypes")[0].GetString());
             Assert.Equal("ndfdf", data.GetProperty("paramDesc")[0].GetString());
-        }
-
-        private static void ApplyHtmlCommentSettings(string source, Settings settings)
-        {
-            var tokens = new CalcpadTokenizer().Tokenize(source);
-            var blocks = new HtmlCommentParser().Parse(tokens);
-
-            foreach (var block in blocks)
-            {
-                if (block.Status != HtmlCommentParseStatus.Success || !block.Data.HasValue)
-                    continue;
-
-                if (!block.Data.Value.TryGetProperty("settings", out var settingsEl)
-                    || settingsEl.ValueKind != JsonValueKind.Object)
-                    continue;
-
-                if (settingsEl.TryGetProperty("decimals", out var decEl)
-                    && decEl.ValueKind == JsonValueKind.Number
-                    && decEl.TryGetInt32(out var dec))
-                {
-                    settings.Math.Decimals = dec;
-                }
-                return;
-            }
         }
 
         [Fact]

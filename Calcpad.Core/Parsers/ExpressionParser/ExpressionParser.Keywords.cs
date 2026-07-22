@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.Json;
 
 namespace Calcpad.Core
 {
@@ -49,6 +50,7 @@ namespace Calcpad.Core
             Append,
             Phasor,
             Complex,
+            Settings,
             SkipLine
         }
         private enum KeywordResult
@@ -212,6 +214,9 @@ namespace Calcpad.Core
                     break;
                 case Keyword.Complex:
                     _parser.Phasor = false;
+                    break;
+                case Keyword.Settings:
+                    ParseKeywordSettings(s);
                     break;
                 default:
                     if (keyword != Keyword.Global && keyword != Keyword.Local)
@@ -610,6 +615,104 @@ namespace Calcpad.Core
             }
             else
                 Settings.Math.FormatString = null;
+        }
+
+        private void ParseKeywordSettings(ReadOnlySpan<char> s)
+        {
+            if (s.Length <= 9) // #settings
+                return;
+
+            var json = s[9..].Trim();
+            if (json.IsWhiteSpace())
+                return;
+
+            try
+            {
+                using var doc = JsonDocument.Parse(json.ToString());
+                var root = doc.RootElement;
+                if (root.ValueKind != JsonValueKind.Object)
+                    return;
+
+                foreach (var prop in root.EnumerateObject())
+                    ApplySetting(prop.Name, prop.Value);
+            }
+            catch (JsonException)
+            {
+                AppendError(s.ToString(), string.Format(Messages.Invalid_settings_0, json.ToString()), _currentLine);
+            }
+        }
+
+        private void ApplySetting(string name, JsonElement value)
+        {
+            switch (name.ToLowerInvariant())
+            {
+                case "decimals":
+                    if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var dec))
+                        Settings.Math.Decimals = dec;
+                    break;
+                case "degrees":
+                    if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var deg))
+                    {
+                        Settings.Math.Degrees = deg;
+                        _parser.Degrees = deg;
+                    }
+                    break;
+                case "complex":
+                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                        _parser.SetComplex(value.GetBoolean());
+                    break;
+                case "substitute":
+                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                        Settings.Math.Substitute = value.GetBoolean();
+                    break;
+                case "formatequations":
+                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                        Settings.Math.FormatEquations = value.GetBoolean();
+                    break;
+                case "zerosmallmatrixelements":
+                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                        Settings.Math.ZeroSmallMatrixElements = value.GetBoolean();
+                    break;
+                case "maxoutputcount":
+                    if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var moc))
+                        Settings.Math.MaxOutputCount = moc;
+                    break;
+                case "units":
+                    if (value.ValueKind == JsonValueKind.String)
+                    {
+                        Settings.Units = value.GetString() ?? Settings.Units;
+                        _parser.SetVariable("Units", new RealValue(UnitsFactor()));
+                    }
+                    break;
+                case "isus":
+                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                    {
+                        Settings.IsUs = value.GetBoolean();
+                        Unit.IsUs = Settings.IsUs;
+                    }
+                    break;
+                case "vectorgraphics":
+                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                        Settings.Plot.VectorGraphics = value.GetBoolean();
+                    break;
+                case "colorscale":
+                    if (value.ValueKind == JsonValueKind.String &&
+                        Enum.TryParse<PlotSettings.ColorScales>(value.GetString(), true, out var cs))
+                        Settings.Plot.ColorScale = cs;
+                    break;
+                case "smoothscale":
+                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                        Settings.Plot.SmoothScale = value.GetBoolean();
+                    break;
+                case "shadows":
+                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                        Settings.Plot.Shadows = value.GetBoolean();
+                    break;
+                case "adaptiveplot":
+                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                        Settings.Plot.IsAdaptive = value.GetBoolean();
+                    break;
+            }
         }
 
         private void ParseKeywordMd(ReadOnlySpan<char> s)

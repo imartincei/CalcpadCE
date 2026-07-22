@@ -2,8 +2,8 @@ import { CalcpadApiClient } from '../../api/client';
 import { CalcpadSnippetService } from '../snippets';
 import { CalcpadDefinitionsService } from '../definitions';
 import { parseHeadings } from '../headings';
-import { findMetadataCommentBlock, analyzeMetadataLine, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver } from '../../text/metadata-comment';
-import type { MetadataCommentData, MetadataCommentBlock, DefinitionResolver } from '../../text/metadata-comment';
+import { serializeMetadataComment, findSettingsDirectiveLine, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from '../../text/metadata-comment';
+import type { MetadataCommentData, MetadataCommentBlock, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
 import type { DefinitionsResponse } from '../../types/api';
 import { getDefaultSettings, buildApiSettings } from '../../types/settings';
 import type { CalcpadSettings } from '../../types/settings';
@@ -639,30 +639,56 @@ export abstract class BaseMessageBridge {
         trailingQuote?: string;
         data: MetadataCommentData;
         isNew?: boolean;
+        settings?: SettingsValues;
     }): void {
         const editor = this.getActiveMonacoEditor();
         const model = editor?.getModel();
         if (!editor || !model || typeof msg.line !== 'number') return;
-        const lineNumber = msg.line + 1;
-        if (lineNumber < 1 || lineNumber > model.getLineCount()) return;
-        const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '');
-        const range = msg.isNew
-            ? { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }
-            : {
-                startLineNumber: lineNumber, startColumn: 1,
-                endLineNumber: lineNumber, endColumn: model.getLineMaxColumn(lineNumber),
-            };
-        editor.executeEdits('calcpad-metadata', [{
-            range,
-            text: msg.isNew ? newText + '\n' : newText,
-        }]);
 
-        // Re-emit context for the persisted comment so a repeated Apply edits it
-        // in place instead of inserting a duplicate.
+        const edits: { range: MonacoRangeLike; text: string }[] = [];
+
+        // Metadata comment (desc/params/lint/no-print) — only when it has content.
+        const lineNumber = msg.line + 1;
+        if (Object.keys(msg.data).length > 0 && lineNumber >= 1 && lineNumber <= model.getLineCount()) {
+            const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '');
+            edits.push(msg.isNew
+                ? { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }, text: newText + '\n' }
+                : { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: model.getLineMaxColumn(lineNumber) }, text: newText });
+        }
+
+        // Document-level #settings directive. Re-scan the current document so the
+        // edit targets the real line even if the comment above shifted it.
+        if (msg.settings) {
+            const directive = findSettingsDirectiveLine(model.getValue().split(/\r?\n/));
+            const hasSettings = Object.keys(msg.settings).length > 0;
+            if (hasSettings) {
+                const text = serializeSettingsDirective(msg.settings);
+                edits.push(directive.line !== null
+                    ? { range: { startLineNumber: directive.line + 1, startColumn: 1, endLineNumber: directive.line + 1, endColumn: model.getLineMaxColumn(directive.line + 1) }, text }
+                    : { range: { startLineNumber: 1, startColumn: 1, endLineNumber: 1, endColumn: 1 }, text: text + '\n' });
+            } else if (directive.line !== null) {
+                edits.push(this.deleteLineEdit(model, directive.line + 1));
+            }
+        }
+
+        if (edits.length === 0) return;
+        editor.executeEdits('calcpad-metadata', edits);
+
+        // Re-emit context (comment + refreshed settings) at the current cursor so a
+        // repeated Apply edits in place instead of inserting a duplicate.
+        const pos = editor.getPosition();
         const lines = model.getValue().split(/\r?\n/);
-        const block = findMetadataCommentBlock(lines, msg.line);
-        if (block) block.context = analyzeMetadataLine(lines, msg.line, this.definitionResolver());
+        const block = pos ? computeMetadataBlock(lines, pos.lineNumber - 1, this.definitionResolver()) : null;
         this.postToVue({ type: 'metadataContext', block });
+    }
+
+    /** Range edit that removes a whole 1-based line, handling the last-line case. */
+    private deleteLineEdit(model: MonacoModelLike, ln: number): { range: MonacoRangeLike; text: string } {
+        if (ln < model.getLineCount())
+            return { range: { startLineNumber: ln, startColumn: 1, endLineNumber: ln + 1, endColumn: 1 }, text: '' };
+        if (ln > 1)
+            return { range: { startLineNumber: ln - 1, startColumn: model.getLineMaxColumn(ln - 1), endLineNumber: ln, endColumn: model.getLineMaxColumn(ln) }, text: '' };
+        return { range: { startLineNumber: 1, startColumn: 1, endLineNumber: 1, endColumn: model.getLineMaxColumn(1) }, text: '' };
     }
 }
 

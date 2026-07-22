@@ -10,12 +10,23 @@ export interface MetadataCommentData {
     paramTypes?: string[];
     paramDesc?: string[];
     returnType?: string;
-    settings?: Record<string, string | number | boolean>;
     LintIgnore?: string[];
     EndLintIgnore?: string[];
     NoPrintStart?: boolean;
     NoPrintEnd?: boolean;
     [key: string]: unknown;
+}
+
+/** Recognized value shape of the `#settings` directive JSON payload. */
+export type SettingsValues = Record<string, string | number | boolean>;
+
+/**
+ * Location and parsed values of the document's `#settings` directive. `line` is
+ * the 0-based line of the first `#settings` directive, or null when none exists.
+ */
+export interface SettingsDirective {
+    line: number | null;
+    settings: SettingsValues;
 }
 
 /** A metadata comment located on a single document line. */
@@ -33,6 +44,13 @@ export interface MetadataCommentBlock {
     valid: boolean;
     /** Which properties actually apply to this line; set by the host. */
     context?: MetadataLineContext;
+    /**
+     * Current document-level settings from the `#settings` directive, and the
+     * 0-based line it lives on (null when absent). Independent of the cursor —
+     * the Properties tab edits these separately from the metadata comment.
+     */
+    settings?: SettingsValues;
+    settingsLine?: number | null;
     /**
      * True when no comment exists yet and this block is a synthetic template for
      * the definition under the cursor. Applying it inserts a new line rather than
@@ -248,6 +266,35 @@ export function serializeMetadataComment(data: MetadataCommentData, indent = '',
     return `${indent}'<!--${JSON.stringify(clean)}-->${trailingQuote}`;
 }
 
+const SETTINGS_DIRECTIVE_RE = /^\s*#settings\b\s*(\{.*\})\s*$/i;
+
+/**
+ * Locate the document's `#settings` directive (`#settings {...}`). The first
+ * one wins, mirroring the engine. Returns its 0-based line and parsed values,
+ * or `{ line: null, settings: {} }` when none is present. A present-but-malformed
+ * directive returns its line with empty settings so Apply overwrites it in place.
+ */
+export function findSettingsDirectiveLine(lines: string[]): SettingsDirective {
+    for (let i = 0; i < lines.length; i++) {
+        const match = SETTINGS_DIRECTIVE_RE.exec(lines[i]);
+        if (!match) continue;
+        try {
+            const parsed = JSON.parse(match[1]);
+            if (parsed && typeof parsed === 'object' && !Array.isArray(parsed))
+                return { line: i, settings: parsed as SettingsValues };
+        } catch {
+            // Malformed JSON — surface the line so Apply replaces it.
+        }
+        return { line: i, settings: {} };
+    }
+    return { line: null, settings: {} };
+}
+
+/** Build a `#settings` directive line from a settings object. */
+export function serializeSettingsDirective(settings: SettingsValues): string {
+    return `#settings ${JSON.stringify(settings)}`;
+}
+
 /** A recognized definition line and how many parameters it declares. */
 export interface MetadataDefinition {
     kind: Exclude<MetadataDefKind, null>;
@@ -338,6 +385,20 @@ export function analyzeMetadataLine(
  * metadata comment nor a definition.
  */
 export function computeMetadataBlock(
+    lines: string[],
+    cursorLine: number,
+    resolveDefinition: DefinitionResolver,
+): MetadataCommentBlock | null {
+    const block = computeCommentBlock(lines, cursorLine, resolveDefinition);
+    if (block) {
+        const directive = findSettingsDirectiveLine(lines);
+        block.settings = directive.settings;
+        block.settingsLine = directive.line;
+    }
+    return block;
+}
+
+function computeCommentBlock(
     lines: string[],
     cursorLine: number,
     resolveDefinition: DefinitionResolver,

@@ -24,7 +24,7 @@ The **Calcpad** view is organized into tabs:
 | **TOC** | Live table of contents built from your document headings. Click a heading to jump to that line. |
 | **Settings** | All calculation, plot, unit, theme, editor, and linter settings, plus named configurations. See [Settings](#settings). |
 | **Variables** | Everything defined in the document — macros, variables, functions, and custom units — with types and signatures. Click an entry to insert it; each is searchable. |
-| **Metadata** | Form-based editor for the [metadata comment](new-metadata-comments.md) at the cursor — descriptions, parameter/return types, per-file settings, lint-ignore, and no-print markers. Shown in hosts that track the editor cursor (currently VS Code). |
+| **Properties** | Form-based editor for the [metadata comment](new-metadata-comments.md) at the cursor — descriptions, parameter/return types, lint-ignore, and no-print markers — plus document settings, written as a [`#settings` directive](new-metadata-comments.md#document-settings). Shown in hosts that track the editor cursor (currently VS Code). |
 | **PDF** | Header/footer, page size, and layout options applied when you export to PDF. |
 | **Formatting** | Prettify options and the **Prettify Document** button. See [Formatting](#formatting-prettify). |
 | **Export** | **Save HTML…**, **Save Word…**, and per-plot / ZIP-all image export from any plots produced by the document. See [Export](#export). |

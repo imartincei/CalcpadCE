@@ -60,7 +60,7 @@ As you type, the completion list offers:
 - **Your own symbols first** — variables, functions, macros, and custom units defined in the current document (and its `#include` files) are prioritized above built-ins.
 - **Built-in functions** with snippet placeholders — accept one and press **Tab** to jump between arguments.
 - **Setting keys** (`decimals`, `degrees`, `complex`, `units`, `colorScale`, …) where a setting is expected.
-- **[Metadata keys](new-metadata-comments.md)** inside an HTML-comment block placed directly above a definition. The **Metadata** panel tab edits these through a form.
+- **[Metadata keys](new-metadata-comments.md)** inside an HTML-comment block placed directly above a definition. The **Properties** panel tab edits these through a form.
 
 ### Quick-type symbols
 

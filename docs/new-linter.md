@@ -113,7 +113,7 @@ prototype_var = 5
 
 Leave the list empty (`"LintIgnore": []`) to suppress *all* diagnostics inside the region.
 
-These markers are one kind of [metadata comment](new-metadata-comments.md); the **Metadata** panel tab can write them for you with a code picker.
+These markers are one kind of [metadata comment](new-metadata-comments.md); the **Properties** panel tab can write them for you with a code picker.
 
 ## Choosing how much to show (VS Code)
 

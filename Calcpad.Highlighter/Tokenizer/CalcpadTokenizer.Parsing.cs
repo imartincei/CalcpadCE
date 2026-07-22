@@ -33,6 +33,7 @@ namespace Calcpad.Highlighter.Tokenizer
 
                     var isInclude = false;
                     var isFormat = false;
+                    var isSettings = false;
                     if (_state.CurrentType == TokenType.Keyword)
                     {
                         isInclude = len == 8 &&
@@ -43,6 +44,10 @@ namespace Calcpad.Highlighter.Tokenizer
                             _builder[1] == 'f' &&
                             _builder[2] == 'o' &&
                             _builder[3] == 'r';
+                        isSettings = len == 9 &&
+                            _builder[1] == 's' &&
+                            _builder[2] == 'e' &&
+                            _builder[3] == 't';
                     }
 
                     Append(_state.CurrentType);
@@ -66,6 +71,12 @@ namespace Calcpad.Highlighter.Tokenizer
                         // Set start column to AFTER this space for the format specifier token
                         _state.TokenStartColumn = position + 1;
                     }
+                    else if (isSettings)
+                    {
+                        _state.CurrentType = TokenType.SettingsJson;
+                        // Set start column to AFTER this space for the JSON payload token
+                        _state.TokenStartColumn = position + 1;
+                    }
                     else
                     {
                         _state.CurrentType = TokenType.None;
@@ -73,11 +84,12 @@ namespace Calcpad.Highlighter.Tokenizer
                 }
 
                 // Emit whitespace as None type to preserve column positions
-                // But preserve FilePath, Include, and Format modes
+                // But preserve FilePath, Include, Format, and SettingsJson modes
                 var inFilePath = _state.CurrentType == TokenType.FilePath;
                 var inIncludeMode = _state.CurrentType == TokenType.Include;
                 var inFormatMode = _state.CurrentType == TokenType.Format;
-                if (inFilePath || inIncludeMode)
+                var inSettingsMode = _state.CurrentType == TokenType.SettingsJson;
+                if (inFilePath || inIncludeMode || inSettingsMode)
                 {
                     // For filepath/include, spaces within are part of the token
                     // But if this is the FIRST char (builder is empty), skip leading space

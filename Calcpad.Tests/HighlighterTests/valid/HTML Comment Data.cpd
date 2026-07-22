@@ -1,4 +1,4 @@
-'<!--{"settings": {"decimals": 4}}-->'
+#settings {"decimals": 4}
 '<!--{"desc": "description", "paramDesc": ["param1", "param2"], "paramTypes": ["value", "value"]}-->'
 #def macro$(param1$; param2$) = param1$ = param2$'test'
 macro$(param; 6.12345)

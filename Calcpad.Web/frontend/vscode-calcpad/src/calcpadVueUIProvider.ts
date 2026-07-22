@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, findMetadataCommentBlock, analyzeMetadataLine, computeMetadataBlock, buildDefinitionResolver } from 'calcpad-frontend';
-import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, DefinitionResolver, DefinitionsResponse } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, findSettingsDirectiveLine, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from 'calcpad-frontend';
+import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, DefinitionResolver, DefinitionsResponse, SettingsValues } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 
@@ -535,25 +535,47 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         trailingQuote?: string;
         data: MetadataCommentData;
         isNew?: boolean;
+        settings?: SettingsValues;
     }): Promise<void> {
         const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
         if (!editor || typeof data.line !== 'number') return;
-        if (data.line < 0 || data.line >= editor.document.lineCount) return;
 
-        const newText = serializeMetadataComment(data.data, data.indent ?? '', data.trailingQuote ?? '');
+        const document = editor.document;
+        const directive = data.settings
+            ? findSettingsDirectiveLine(document.getText().split(/\r?\n/))
+            : null;
+
         await editor.edit(editBuilder => {
-            if (data.isNew) {
-                editBuilder.insert(new vscode.Position(data.line, 0), newText + '\n');
-            } else {
-                editBuilder.replace(editor.document.lineAt(data.line).range, newText);
+            // Metadata comment (desc/params/lint/no-print) — only when it has content.
+            if (Object.keys(data.data).length > 0 && data.line >= 0 && data.line < document.lineCount) {
+                const newText = serializeMetadataComment(data.data, data.indent ?? '', data.trailingQuote ?? '');
+                if (data.isNew) {
+                    editBuilder.insert(new vscode.Position(data.line, 0), newText + '\n');
+                } else {
+                    editBuilder.replace(document.lineAt(data.line).range, newText);
+                }
+            }
+
+            // Document-level #settings directive.
+            if (data.settings && directive) {
+                const hasSettings = Object.keys(data.settings).length > 0;
+                if (hasSettings) {
+                    const text = serializeSettingsDirective(data.settings);
+                    if (directive.line !== null) {
+                        editBuilder.replace(document.lineAt(directive.line).range, text);
+                    } else {
+                        editBuilder.insert(new vscode.Position(0, 0), text + '\n');
+                    }
+                } else if (directive.line !== null) {
+                    editBuilder.delete(document.lineAt(directive.line).rangeIncludingLineBreak);
+                }
             }
         });
 
-        // Re-emit context for the persisted comment so a repeated Apply edits it
-        // in place instead of inserting a duplicate.
+        // Re-emit context (comment + refreshed settings) at the current cursor so a
+        // repeated Apply edits in place instead of inserting a duplicate.
         const lines = editor.document.getText().split(/\r?\n/);
-        const block = findMetadataCommentBlock(lines, data.line);
-        if (block) block.context = analyzeMetadataLine(lines, data.line, this._definitionResolver(editor.document.uri.toString()));
+        const block = computeMetadataBlock(lines, editor.selection.active.line, this._definitionResolver(editor.document.uri.toString()));
         this.updateMetadataContext(block);
     }
 

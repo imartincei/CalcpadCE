@@ -1,7 +1,7 @@
 <template>
   <div class="metadata-tab">
     <div class="metadata-container p-3">
-      <h3 class="section-title">Metadata Comment</h3>
+      <h3 class="section-title">Properties</h3>
 
       <template v-if="block">
         <p v-if="!block.valid" class="warning">
@@ -53,7 +53,7 @@
         </div>
 
         <div v-if="showSettings" class="field">
-          <label>Settings overrides</label>
+          <label>Settings (#settings directive)</label>
           <div v-for="(row, i) in model.settings" :key="'s' + i" class="list-row">
             <select v-model="row.key" @change="onSettingKeyChange(row)">
               <option value="">(select)</option>
@@ -164,7 +164,7 @@ import {
   METADATA_SETTINGS_KEYS,
   LINT_CODES,
 } from '../../text/metadata-comment'
-import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind } from '../../text/metadata-comment'
+import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind, SettingsValues } from '../../text/metadata-comment'
 
 interface Props {
   block?: MetadataCommentBlock | null
@@ -172,7 +172,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), { block: null })
 
 const emit = defineEmits<{
-  'apply': [data: MetadataCommentData]
+  'apply': [payload: { data: MetadataCommentData; settings: SettingsValues }]
 }>()
 
 const functionTypes = FUNCTION_PARAM_TYPES
@@ -182,7 +182,7 @@ const lintCodes = LINT_CODES
 
 type LintMode = 'off' | 'all' | 'specific'
 
-const KNOWN_KEYS = new Set(['desc', 'paramTypes', 'paramDesc', 'returnType', 'settings', 'LintIgnore', 'EndLintIgnore', 'NoPrintStart', 'NoPrintEnd'])
+const KNOWN_KEYS = new Set(['desc', 'paramTypes', 'paramDesc', 'returnType', 'LintIgnore', 'EndLintIgnore', 'NoPrintStart', 'NoPrintEnd'])
 
 interface SettingRow { key: string; value: string }
 
@@ -249,11 +249,9 @@ const showEndLint = computed(() =>
 // only offered on generic lines — or explicitly, via "Add field".
 const isDefinition = computed(() => defKind.value !== null)
 
-const showSettings = computed(() =>
-  noContext.value
-  || !isDefinition.value
-  || model.settings.length > 0
-  || added.has('settings'))
+// Settings drive the document-level #settings directive, not the cursor's
+// metadata comment, so the section is always available regardless of context.
+const showSettings = computed(() => true)
 
 const showLint = computed(() =>
   noContext.value
@@ -287,7 +285,6 @@ const addableFields = computed(() => {
   if (!showDesc.value) out.push({ id: 'desc', label: 'Description' })
   if (!showParams.value) out.push({ id: 'params', label: 'Parameter types & descriptions' })
   if (!showReturnType.value) out.push({ id: 'returnType', label: 'Return type' })
-  if (!showSettings.value) out.push({ id: 'settings', label: 'Settings overrides' })
   if (!showLint.value) out.push({ id: 'lint', label: 'Lint ignore' })
   if (!showNoPrint.value) out.push({ id: 'noprint', label: 'No-print region' })
   return out
@@ -298,9 +295,6 @@ function addField(id: string) {
   if (id === 'params') {
     if (model.paramTypes.length === 0) model.paramTypes.push('')
     if (model.paramDesc.length === 0) model.paramDesc.push('')
-  }
-  if (id === 'settings' && model.settings.length === 0) {
-    model.settings.push({ key: '', value: '' })
   }
 }
 
@@ -325,8 +319,9 @@ function populate() {
   model.paramTypes = Array.isArray(data.paramTypes) ? data.paramTypes.map(String) : []
   model.paramDesc = Array.isArray(data.paramDesc) ? data.paramDesc.map(String) : []
   model.returnType = typeof data.returnType === 'string' ? data.returnType : ''
-  model.settings = data.settings && typeof data.settings === 'object'
-    ? Object.entries(data.settings).map(([key, value]) => ({ key, value: String(value) }))
+  const settings = props.block?.settings
+  model.settings = settings && typeof settings === 'object'
+    ? Object.entries(settings).map(([key, value]) => ({ key, value: String(value) }))
     : []
   ;[model.startLintMode, model.startLintCodes] = readLintField(data.LintIgnore)
   ;[model.endLintMode, model.endLintCodes] = readLintField(data.EndLintIgnore)
@@ -382,11 +377,10 @@ function onApply() {
 
   if (model.returnType) data.returnType = model.returnType
 
-  const settings: Record<string, string | number | boolean> = {}
+  const settings: SettingsValues = {}
   for (const row of model.settings) {
     if (row.key) settings[row.key] = coerceSetting(row.key, row.value)
   }
-  if (Object.keys(settings).length) data.settings = settings
 
   const lintIgnore = lintFieldValue(model.startLintMode, model.startLintCodes)
   if (lintIgnore !== undefined) data.LintIgnore = lintIgnore
@@ -399,7 +393,7 @@ function onApply() {
   if (model.noPrintStart) data.NoPrintStart = true
   if (model.noPrintEnd) data.NoPrintEnd = true
 
-  emit('apply', data)
+  emit('apply', { data, settings })
 }
 
 // Identity of the target the form is bound to. Cursor jitter within the same
@@ -407,7 +401,7 @@ function onApply() {
 // user's unsaved edits, so only repopulate when the target actually changes.
 function blockSignature(b: MetadataCommentBlock | null | undefined): string {
   if (!b) return ''
-  return [b.line, b.isNew ? 1 : 0, b.rawJson, b.context?.defKind ?? '', b.context?.paramCount ?? ''].join('|')
+  return [b.line, b.isNew ? 1 : 0, b.rawJson, JSON.stringify(b.settings ?? {}), b.context?.defKind ?? '', b.context?.paramCount ?? ''].join('|')
 }
 
 let lastSignature = ''

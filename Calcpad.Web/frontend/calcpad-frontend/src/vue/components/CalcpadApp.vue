@@ -159,7 +159,7 @@ import CalcpadFilesTab from './CalcpadFilesTab.vue'
 import CalcpadErrorsTab from './CalcpadErrorsTab.vue'
 import CalcpadMetadataTab from './CalcpadMetadataTab.vue'
 import { postMessage } from '../services/messaging'
-import type { MetadataCommentBlock, MetadataCommentData } from '../../text/metadata-comment'
+import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '../../text/metadata-comment'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
 import type { CalcpadError } from '../../types/api'
@@ -243,7 +243,7 @@ const tabs = computed<Tab[]>(() => {
   // The metadata comment editor is driven by editor cursor tracking, available
   // in the VS Code webview and the desktop app (both host a real editor).
   if (props.versionConfig.isVSCode || props.versionConfig.isDesktop) {
-    base.push({ id: 'metadata', label: 'Metadata' })
+    base.push({ id: 'metadata', label: 'Properties' })
   }
   return base
 })
@@ -513,15 +513,19 @@ const handleUpdatePrettifyTrim = (enabled: boolean) => {
   postMessage({ type: 'updatePrettifyTrim', value: enabled })
 }
 
-const handleApplyMetadata = (data: MetadataCommentData) => {
+const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: SettingsValues }) => {
   if (!metadataBlock.value) return
+  // One message → one atomic edit covering both the metadata comment and the
+  // document-level #settings directive, so the two writes can't race or shift
+  // each other's line numbers.
   postMessage({
     type: 'updateMetadata',
     line: metadataBlock.value.line,
     indent: metadataBlock.value.indent,
     trailingQuote: metadataBlock.value.trailingQuote,
     isNew: metadataBlock.value.isNew,
-    data
+    data: payload.data,
+    settings: payload.settings
   })
 }
 

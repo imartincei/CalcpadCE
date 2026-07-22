@@ -1,17 +1,18 @@
 # Metadata Comments
 
-> Part of Calcpad.Web. The **Metadata** tab described here currently appears in the [VS Code extension](new-vscode-extension.md). The comments it writes are understood everywhere — the [linter](new-linter.md), the preview, and [PDF export](new-pdf-export.md) — no matter which editor created them.
+> Part of Calcpad.Web. The **Properties** tab described here currently appears in the [VS Code extension](new-vscode-extension.md). The comments it writes are understood everywhere — the [linter](new-linter.md), the preview, and [PDF export](new-pdf-export.md) — no matter which editor created them.
 
 Sometimes you want to tell Calcpad something about your document without that note showing up in the printed report — what a function's inputs mean, that a section is a work-in-progress the linter should leave alone, or that a block of scratch work shouldn't appear in the PDF.
 
-A **metadata comment** does exactly that. It looks like an ordinary comment, so it never clutters your output, but Calcpad reads the extra information inside it. You don't have to write these by hand: the **Metadata** tab in the CalcPad panel fills them in for you.
+A **metadata comment** does exactly that. It looks like an ordinary comment, so it never clutters your output, but Calcpad reads the extra information inside it. You don't have to write these by hand: the **Properties** tab in the CalcPad panel fills them in for you.
 
-## The Metadata tab
+## The Properties tab
 
-Open the [CalcPad panel](new-calcpad-panel-and-settings.md) and switch to the **Metadata** tab. Then click a line in your document, and the tab shows a small form for that line:
+Open the [CalcPad panel](new-calcpad-panel-and-settings.md) and switch to the **Properties** tab. Then click a line in your document, and the tab shows a small form for that line:
 
 - **On a definition** (a variable, function, macro, or custom unit) you can add a **description**, and for functions and macros, a **type and description for each parameter** and the **return type**. The parameter rows are filled in to match the definition automatically.
-- **On any other line** you get the document-wide options: **settings overrides**, **lint-ignore** regions, and **no-print** regions.
+- **Document settings** are always available. Editing them writes a [`#settings` directive](#document-settings) at the top of the file — not a metadata comment — so they take effect during calculation.
+- **On any other line** you also get the **lint-ignore** regions and **no-print** regions.
 
 Fill in what you want and click **Apply**. If the line doesn't have a metadata comment yet, one is created for you; if it does, it's updated in place. **Reset** throws away your edits and reloads what's currently there. Only the fields that make sense for the line are shown — use **Add field** if you want one that's hidden.
 
@@ -51,15 +52,15 @@ I(b; h) = b·h³/12
 
 Filling in parameter and return types also helps the [linter](new-linter.md) catch places where the function is called with the wrong kind of value.
 
-## Per-file settings
+## Document settings
 
-You can pin settings — decimals, angle units, and so on — to a document so it always renders the same way, no matter how the app is configured. Put a `settings` comment near the top of the file:
+You can pin settings — decimals, angle units, and so on — to a document so it always renders the same way, no matter how the app is configured. Use the `#settings` directive with a JSON object:
 
 ```text
-'<!--{"settings": {"decimals": 2, "degrees": 1, "units": "cm"}}-->
+#settings {"decimals": 2, "degrees": 1, "units": "cm"}
 ```
 
-If more than one appears, the first one wins, so keep it at the top. The settings you can set here are the same ones on the [Settings tab](new-calcpad-panel-and-settings.md#settings):
+Unlike the other properties on this tab, `#settings` is a real Calcpad directive, not a metadata comment — the engine reads it while calculating. It applies to **every line after it**, so you can change settings partway through a document by adding another `#settings` directive. If you keep one near the top, it configures the whole file; the **Properties** tab writes it there for you. The settings you can set are the same ones on the [Settings tab](new-calcpad-panel-and-settings.md#settings):
 
 | Setting | Values |
 |---------|--------|
@@ -89,7 +90,7 @@ prototype_var = 5
 '<!--{"EndLintIgnore": []}-->
 ```
 
-The **Metadata** tab has a picker for the codes, so you don't have to memorize them. See [Suppressing diagnostics](new-linter.md) for the details.
+The **Properties** tab has a picker for the codes, so you don't have to memorize them. See [Suppressing diagnostics](new-linter.md) for the details.
 
 ## Leaving sections out of the PDF
 

@@ -157,6 +157,8 @@ export type {
     DefinitionResolver,
     MetadataSettingKey,
     LintCode,
+    SettingsValues,
+    SettingsDirective,
 } from './text/metadata-comment';
 export {
     FUNCTION_PARAM_TYPES,
@@ -166,6 +168,8 @@ export {
     findMetadataCommentBlock,
     computeMetadataBlock,
     serializeMetadataComment,
+    findSettingsDirectiveLine,
+    serializeSettingsDirective,
     buildDefinitionResolver,
     analyzeMetadataLine,
 } from './text/metadata-comment';
