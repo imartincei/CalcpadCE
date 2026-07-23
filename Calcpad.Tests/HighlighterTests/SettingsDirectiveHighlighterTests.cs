@@ -31,21 +31,21 @@ namespace Calcpad.Tests.HighlighterTests
         {
             var result = Lint("#settings {\"decimals\": 4}\nx = 1");
             Assert.DoesNotContain(result.Diagnostics, d => d.Code == "CPD-3406");
-            Assert.DoesNotContain(result.Diagnostics, d => d.Code == "CPD-3418");
+            Assert.DoesNotContain(result.Diagnostics, d => d.Code == "CPD-3413");
         }
 
         [Fact]
-        public void SettingsDirective_MalformedJson_WarnsCpd3418()
+        public void SettingsDirective_MalformedJson_WarnsCpd3413()
         {
             var result = Lint("#settings {bad}\nx = 1");
-            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3418");
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3413");
         }
 
         [Fact]
-        public void SettingsDirective_UnknownKey_WarnsCpd3418()
+        public void SettingsDirective_UnknownKey_WarnsCpd3413()
         {
             var result = Lint("#settings {\"nonsense\": 4}\nx = 1");
-            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3418");
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3413");
         }
     }
 }

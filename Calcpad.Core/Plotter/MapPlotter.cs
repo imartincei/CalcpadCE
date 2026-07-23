@@ -108,9 +108,9 @@ namespace Calcpad.Core
 
         private void GetImageSize()
         {
-            var w = (int)(Parser.PlotWidth * ScreenScaleFactor);
-            var h = (int)(Parser.PlotHeight * ScreenScaleFactor);
-            _size = (int)(Parser.PlotStep * ScreenScaleFactor);
+            var w = (int)(Parser.GetSettingsVariable("PlotWidth", Settings.Width) * ScreenScaleFactor);
+            var h = (int)(Parser.GetSettingsVariable("PlotHeight", Settings.Height) * ScreenScaleFactor);
+            _size = (int)(Parser.GetSettingsVariable("PlotStep", Settings.Step) * ScreenScaleFactor);
             var d = (int)Math.Sqrt(w * w + h * h);
             if (_size == 0)
             {

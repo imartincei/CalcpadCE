@@ -693,24 +693,78 @@ namespace Calcpad.Core
                     break;
                 case "vectorgraphics":
                     if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
-                        Settings.Plot.VectorGraphics = value.GetBoolean();
+                    {
+                        var b = value.GetBoolean();
+                        Settings.Plot.VectorGraphics = b;
+                        _parser.SetVariable("PlotSVG", b ? 1d : 0d);
+                    }
                     break;
                 case "colorscale":
                     if (value.ValueKind == JsonValueKind.String &&
                         Enum.TryParse<PlotSettings.ColorScales>(value.GetString(), true, out var cs))
+                    {
                         Settings.Plot.ColorScale = cs;
+                        _parser.SetVariable("PlotPalette", (int)cs);
+                    }
                     break;
                 case "smoothscale":
                     if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
-                        Settings.Plot.SmoothScale = value.GetBoolean();
+                    {
+                        var b = value.GetBoolean();
+                        Settings.Plot.SmoothScale = b;
+                        _parser.SetVariable("PlotSmooth", b ? 1d : 0d);
+                    }
                     break;
                 case "shadows":
                     if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
-                        Settings.Plot.Shadows = value.GetBoolean();
+                    {
+                        var b = value.GetBoolean();
+                        Settings.Plot.Shadows = b;
+                        _parser.SetVariable("PlotShadows", b ? 1d : 0d);
+                    }
                     break;
                 case "adaptiveplot":
                     if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
-                        Settings.Plot.IsAdaptive = value.GetBoolean();
+                    {
+                        var b = value.GetBoolean();
+                        Settings.Plot.IsAdaptive = b;
+                        _parser.SetVariable("PlotAdaptive", b ? 1d : 0d);
+                    }
+                    break;
+                case "plotwidth":
+                    if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var pw))
+                    {
+                        Settings.Plot.Width = pw;
+                        _parser.SetVariable("PlotWidth", pw);
+                    }
+                    break;
+                case "plotheight":
+                    if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var ph))
+                    {
+                        Settings.Plot.Height = ph;
+                        _parser.SetVariable("PlotHeight", ph);
+                    }
+                    break;
+                case "plotstep":
+                    if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var ps))
+                    {
+                        Settings.Plot.Step = ps;
+                        _parser.SetVariable("PlotStep", ps);
+                    }
+                    break;
+                case "precision":
+                    if (value.ValueKind == JsonValueKind.Number && value.TryGetDouble(out var prec))
+                    {
+                        Settings.Math.Precision = prec;
+                        _parser.SetVariable("Precision", prec);
+                    }
+                    break;
+                case "tol":
+                    if (value.ValueKind == JsonValueKind.Number && value.TryGetDouble(out var tol))
+                    {
+                        Settings.Math.Tol = tol;
+                        _parser.SetVariable("Tol", tol);
+                    }
                     break;
             }
         }

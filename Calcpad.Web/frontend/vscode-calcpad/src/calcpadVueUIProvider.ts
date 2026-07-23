@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, findSettingsDirectiveLine, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from 'calcpad-frontend';
 import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, DefinitionResolver, DefinitionsResponse, SettingsValues } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
@@ -536,14 +536,14 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         data: MetadataCommentData;
         isNew?: boolean;
         settings?: SettingsValues;
+        settingsLine?: number | null;
     }): Promise<void> {
         const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
         if (!editor || typeof data.line !== 'number') return;
 
         const document = editor.document;
-        const directive = data.settings
-            ? findSettingsDirectiveLine(document.getText().split(/\r?\n/))
-            : null;
+        const settingsText = data.settings ? serializeSettingsDirective(data.settings) : '';
+        let insertedSettings = false;
 
         await editor.edit(editBuilder => {
             // Metadata comment (desc/params/lint/no-print) — only when it has content.
@@ -556,27 +556,50 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                 }
             }
 
-            // Document-level #settings directive.
-            if (data.settings && directive) {
+            // #settings directive under the cursor. `settingsLine` (0-based) points
+            // at the existing directive to rewrite, or null to create a new one at
+            // the cursor — so multiple directives can coexist, each edited in place.
+            if (data.settings) {
+                const dirLine = data.settingsLine ?? null;
+                const hasExisting = dirLine !== null && dirLine >= 0 && dirLine < document.lineCount;
                 const hasSettings = Object.keys(data.settings).length > 0;
                 if (hasSettings) {
-                    const text = serializeSettingsDirective(data.settings);
-                    if (directive.line !== null) {
-                        editBuilder.replace(document.lineAt(directive.line).range, text);
+                    if (hasExisting) {
+                        editBuilder.replace(document.lineAt(dirLine!).range, settingsText);
                     } else {
-                        editBuilder.insert(new vscode.Position(0, 0), text + '\n');
+                        editBuilder.insert(new vscode.Position(data.line, 0), settingsText + '\n');
+                        insertedSettings = true;
                     }
-                } else if (directive.line !== null) {
-                    editBuilder.delete(document.lineAt(directive.line).rangeIncludingLineBreak);
+                } else if (hasExisting) {
+                    editBuilder.delete(document.lineAt(dirLine!).rangeIncludingLineBreak);
                 }
             }
         });
+
+        // A freshly created directive: park the cursor on it so the re-emitted
+        // context binds to it and a repeated Apply edits in place, not duplicates.
+        if (insertedSettings) {
+            const lines = editor.document.getText().split(/\r?\n/);
+            const target = this._nearestLineMatching(lines, settingsText, data.line);
+            if (target !== null)
+                editor.selection = new vscode.Selection(target, lines[target].length, target, lines[target].length);
+        }
 
         // Re-emit context (comment + refreshed settings) at the current cursor so a
         // repeated Apply edits in place instead of inserting a duplicate.
         const lines = editor.document.getText().split(/\r?\n/);
         const block = computeMetadataBlock(lines, editor.selection.active.line, this._definitionResolver(editor.document.uri.toString()));
         this.updateMetadataContext(block);
+    }
+
+    /** 0-based index of the line equal to `text`, closest to `near`; null if none. */
+    private _nearestLineMatching(lines: string[], text: string, near: number): number | null {
+        let best: number | null = null;
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i] !== text) continue;
+            if (best === null || Math.abs(i - near) < Math.abs(best - near)) best = i;
+        }
+        return best;
     }
 
     public dispose() {

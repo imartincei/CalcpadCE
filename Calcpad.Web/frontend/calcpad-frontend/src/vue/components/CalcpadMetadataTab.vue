@@ -57,14 +57,14 @@
           <div v-for="(row, i) in model.settings" :key="'s' + i" class="list-row">
             <select v-model="row.key" @change="onSettingKeyChange(row)">
               <option value="">(select)</option>
-              <option v-for="s in settingKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.key }}</option>
+              <option v-for="s in settingKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.label }}</option>
             </select>
             <select v-if="settingType(row.key) === 'boolean'" v-model="row.value">
               <option value="true">true</option>
               <option value="false">false</option>
             </select>
             <select v-else-if="settingType(row.key) === 'enum'" v-model="row.value">
-              <option v-for="opt in settingOptions(row.key)" :key="opt" :value="opt">{{ opt }}</option>
+              <option v-for="opt in settingOptions(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
             </select>
             <input
               v-else
@@ -164,7 +164,7 @@ import {
   METADATA_SETTINGS_KEYS,
   LINT_CODES,
 } from '../../text/metadata-comment'
-import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind, SettingsValues } from '../../text/metadata-comment'
+import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind, SettingsValues, SettingOption } from '../../text/metadata-comment'
 
 interface Props {
   block?: MetadataCommentBlock | null
@@ -303,7 +303,7 @@ function settingType(key: string): MetadataSettingKind {
 }
 type MetadataSettingKind = 'number' | 'boolean' | 'string' | 'enum'
 
-function settingOptions(key: string): string[] {
+function settingOptions(key: string): SettingOption[] {
   return METADATA_SETTINGS_KEYS.find(s => s.key === key)?.options ?? []
 }
 
@@ -354,14 +354,17 @@ function lintFieldValue(mode: LintMode, codes: string[]): string[] | undefined {
   return codes.slice()
 }
 
-function coerceSetting(key: string, value: string): string | number | boolean {
+// Vue casts `<input type="number">` v-model to a number, so `value` may arrive
+// as a number (or boolean) rather than the string the row nominally holds.
+function coerceSetting(key: string, value: string | number | boolean): string | number | boolean {
   const type = settingType(key)
-  if (type === 'boolean') return value === 'true'
+  const str = String(value)
+  if (type === 'boolean') return str === 'true'
   if (type === 'number' || type === 'enum') {
-    const n = Number(value)
-    return Number.isFinite(n) && value.trim() !== '' ? n : value
+    const n = Number(str)
+    return Number.isFinite(n) && str.trim() !== '' ? n : str
   }
-  return value
+  return str
 }
 
 function onApply() {

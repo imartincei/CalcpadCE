@@ -8,7 +8,9 @@
             "formatEquations": true,
             "zeroSmallMatrixElements": true,
             "maxOutputCount": 20,
-            "formatString": ""
+            "formatString": "",
+            "precision": 1e-14,
+            "tol": 1e-6
         },
         "plot": {
             "isAdaptive": true,
@@ -19,7 +21,10 @@
             "colorScale": "Rainbow",
             "smoothScale": false,
             "shadows": true,
-            "lightDirection": "NorthWest"
+            "lightDirection": "NorthWest",
+            "width": 500,
+            "height": 300,
+            "step": 0
         },
         "server": {
             "url": "",

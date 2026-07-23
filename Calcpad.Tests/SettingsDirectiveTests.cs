@@ -27,6 +27,47 @@ namespace Calcpad.Tests
             Assert.DoesNotContain("8.7654", html); // y is not rendered at four decimals
         }
 
+        private static string PlotWidthStyle(string source)
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(Render(source), @"width:(\d+)pt");
+            return m.Success ? m.Groups[1].Value : null;
+        }
+
+        [Fact]
+        public void SettingsDirective_LaterDirective_OverridesEarlierVariable()
+        {
+            const string plot = "\n$Plot{ x^2 @ x = 0 : 2 }";
+            var variableOnly = PlotWidthStyle("PlotWidth = 800" + plot);
+            var directiveOnly = PlotWidthStyle("#settings {\"plotWidth\": 400}" + plot);
+            // #settings after the variable assignment must win (latest value).
+            var directiveAfterVariable = PlotWidthStyle("PlotWidth = 800\n#settings {\"plotWidth\": 400}" + plot);
+
+            Assert.NotNull(variableOnly);
+            Assert.NotEqual(variableOnly, directiveOnly);
+            Assert.Equal(directiveOnly, directiveAfterVariable);
+        }
+
+        [Fact]
+        public void SettingsDirective_LaterVariable_OverridesEarlierDirective()
+        {
+            const string plot = "\n$Plot{ x^2 @ x = 0 : 2 }";
+            var variableOnly = PlotWidthStyle("PlotWidth = 800" + plot);
+            // A variable assignment after the directive must win (latest value).
+            var variableAfterDirective = PlotWidthStyle("#settings {\"plotWidth\": 400}\nPlotWidth = 800" + plot);
+
+            Assert.NotNull(variableOnly);
+            Assert.Equal(variableOnly, variableAfterDirective);
+        }
+
+        [Fact]
+        public void SettingsDirective_SettingControllingVariable_StaysReadable()
+        {
+            // Applying a #settings key writes through to its special variable, so
+            // the variable resolves afterwards even without an explicit assignment.
+            var html = Render("#settings {\"plotWidth\": 400}\nw = PlotWidth");
+            Assert.Contains("400", html);
+        }
+
         [Fact]
         public void SettingsDirective_MalformedJson_ReportsError()
         {

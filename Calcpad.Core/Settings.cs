@@ -48,6 +48,8 @@ namespace Calcpad.Core
             }
         }
         public string FormatString { get; set; }
+        public double Precision { get; set; }
+        public double Tol { get; set; }
 
         public MathSettings()
         {
@@ -58,6 +60,8 @@ namespace Calcpad.Core
             FormatEquations = true;
             ZeroSmallMatrixElements = true;
             MaxOutputCount = 20;
+            Precision = 1e-14;
+            Tol = 1e-6;
         }
     }
 
@@ -66,7 +70,11 @@ namespace Calcpad.Core
     {
         private bool _shadows;
         public bool IsAdaptive { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int Step { get; set; }
         public double ScreenScaleFactor { get; set; } = 2.0;
+        // Obsolete: WPF-only, to be removed later.
         public string ImagePath { get; set; }
         public string ImageUri { get; set; }
         public bool VectorGraphics { get; set; }
@@ -108,6 +116,9 @@ namespace Calcpad.Core
         public PlotSettings()
         {
             IsAdaptive = true;
+            Width = 500;
+            Height = 300;
+            Step = 0;
             ImagePath = string.Empty;
             ImageUri = string.Empty;
             VectorGraphics = false;

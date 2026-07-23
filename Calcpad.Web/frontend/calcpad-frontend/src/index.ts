@@ -171,7 +171,7 @@ export {
     findMetadataCommentBlock,
     computeMetadataBlock,
     serializeMetadataComment,
-    findSettingsDirectiveLine,
+    settingsDirectiveOnLine,
     serializeSettingsDirective,
     buildDefinitionResolver,
     analyzeMetadataLine,

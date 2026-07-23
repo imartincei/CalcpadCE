@@ -19,6 +19,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             "decimals", "degrees", "complex", "substitute", "formatEquations",
             "zeroSmallMatrixElements", "maxOutputCount", "units", "isUs",
             "vectorGraphics", "colorScale", "smoothScale", "shadows", "adaptivePlot",
+            "plotWidth", "plotHeight", "plotStep", "precision", "tol",
         }.ToFrozenSet(System.StringComparer.OrdinalIgnoreCase);
 
         public void Validate(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
@@ -48,7 +49,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             }
             catch (JsonException)
             {
-                result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3418",
+                result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3413",
                     "malformed JSON in #settings directive");
                 return;
             }
@@ -57,7 +58,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             {
                 if (doc.RootElement.ValueKind != JsonValueKind.Object)
                 {
-                    result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3418",
+                    result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3413",
                         "#settings payload must be a JSON object");
                     return;
                 }
@@ -65,7 +66,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 foreach (var prop in doc.RootElement.EnumerateObject())
                 {
                     if (!KnownKeys.Contains(prop.Name))
-                        result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3418",
+                        result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3413",
                             "'" + prop.Name + "' is not a recognized setting");
                 }
             }

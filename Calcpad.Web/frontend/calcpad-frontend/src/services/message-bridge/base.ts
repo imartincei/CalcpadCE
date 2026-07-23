@@ -2,7 +2,7 @@ import { CalcpadApiClient } from '../../api/client';
 import { CalcpadSnippetService } from '../snippets';
 import { CalcpadDefinitionsService } from '../definitions';
 import { parseHeadings } from '../headings';
-import { serializeMetadataComment, findSettingsDirectiveLine, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from '../../text/metadata-comment';
+import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from '../../text/metadata-comment';
 import type { MetadataCommentData, MetadataCommentBlock, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
 import type { DefinitionsResponse } from '../../types/api';
 import { getDefaultSettings, buildApiSettings } from '../../types/settings';
@@ -640,6 +640,7 @@ export abstract class BaseMessageBridge {
         data: MetadataCommentData;
         isNew?: boolean;
         settings?: SettingsValues;
+        settingsLine?: number | null;
     }): void {
         const editor = this.getActiveMonacoEditor();
         const model = editor?.getModel();
@@ -656,23 +657,35 @@ export abstract class BaseMessageBridge {
                 : { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: model.getLineMaxColumn(lineNumber) }, text: newText });
         }
 
-        // Document-level #settings directive. Re-scan the current document so the
-        // edit targets the real line even if the comment above shifted it.
+        // #settings directive under the cursor. `settingsLine` (0-based) points at
+        // the existing directive to rewrite, or null to create a new one at the
+        // cursor — so multiple directives can coexist, each edited where it lives.
+        const settingsText = msg.settings ? serializeSettingsDirective(msg.settings) : '';
+        let insertedSettings = false;
         if (msg.settings) {
-            const directive = findSettingsDirectiveLine(model.getValue().split(/\r?\n/));
+            const dirLine = msg.settingsLine ?? null;
+            const hasExisting = dirLine !== null && dirLine >= 0 && dirLine < model.getLineCount();
             const hasSettings = Object.keys(msg.settings).length > 0;
             if (hasSettings) {
-                const text = serializeSettingsDirective(msg.settings);
-                edits.push(directive.line !== null
-                    ? { range: { startLineNumber: directive.line + 1, startColumn: 1, endLineNumber: directive.line + 1, endColumn: model.getLineMaxColumn(directive.line + 1) }, text }
-                    : { range: { startLineNumber: 1, startColumn: 1, endLineNumber: 1, endColumn: 1 }, text: text + '\n' });
-            } else if (directive.line !== null) {
-                edits.push(this.deleteLineEdit(model, directive.line + 1));
+                edits.push(hasExisting
+                    ? { range: { startLineNumber: dirLine! + 1, startColumn: 1, endLineNumber: dirLine! + 1, endColumn: model.getLineMaxColumn(dirLine! + 1) }, text: settingsText }
+                    : { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }, text: settingsText + '\n' });
+                insertedSettings = !hasExisting;
+            } else if (hasExisting) {
+                edits.push(this.deleteLineEdit(model, dirLine! + 1));
             }
         }
 
         if (edits.length === 0) return;
         editor.executeEdits('calcpad-metadata', edits);
+
+        // A freshly created directive: park the cursor on it so the re-emitted
+        // context binds to it and a repeated Apply edits in place, not duplicates.
+        if (insertedSettings) {
+            const target = this.nearestLineMatching(model.getValue().split(/\r?\n/), settingsText, msg.line);
+            if (target !== null)
+                editor.setPosition({ lineNumber: target + 1, column: model.getLineMaxColumn(target + 1) });
+        }
 
         // Re-emit context (comment + refreshed settings) at the current cursor so a
         // repeated Apply edits in place instead of inserting a duplicate.
@@ -680,6 +693,16 @@ export abstract class BaseMessageBridge {
         const lines = model.getValue().split(/\r?\n/);
         const block = pos ? computeMetadataBlock(lines, pos.lineNumber - 1, this.definitionResolver()) : null;
         this.postToVue({ type: 'metadataContext', block });
+    }
+
+    /** 0-based index of the line equal to `text`, closest to `near`; null if none. */
+    private nearestLineMatching(lines: string[], text: string, near: number): number | null {
+        let best: number | null = null;
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i] !== text) continue;
+            if (best === null || Math.abs(i - near) < Math.abs(best - near)) best = i;
+        }
+        return best;
     }
 
     /** Range edit that removes a whole 1-based line, handling the last-line case. */
