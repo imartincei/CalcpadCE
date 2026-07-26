@@ -121,6 +121,10 @@ export interface MetadataSettingKey {
     type: 'number' | 'boolean' | 'string' | 'enum';
     options?: SettingOption[];
     def: string | number | boolean;
+    /** Inclusive lower bound for `number` values. Mirrors Calcpad.Core's SettingsDto. */
+    min?: number;
+    /** Inclusive upper bound for `number` values; omit for open-ended. */
+    max?: number;
 }
 
 const COLOR_SCALE_OPTIONS: SettingOption[] = [
@@ -136,9 +140,13 @@ const COLOR_SCALE_OPTIONS: SettingOption[] = [
     { value: 'PurpleToYellow', label: 'Purple → Yellow' },
 ];
 
-/** Recognized keys for the `settings` overrides object. */
+/**
+ * Recognized keys for the `settings` overrides object (the `#settings` directive).
+ * Types and ranges mirror `Calcpad.Core`'s `SettingsDto` so the panel rejects the
+ * same values the engine would reject. Keep in sync with `Settings.cs`.
+ */
 export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
-    { key: 'decimals', label: 'Decimals', detail: 'Decimal places in output (0-15)', type: 'number', def: 4 },
+    { key: 'decimals', label: 'Decimals', detail: 'Decimal places in output (0 to 15)', type: 'number', def: 4, min: 0, max: 15 },
     {
         key: 'degrees', label: 'Angle units', detail: 'Angle unit: 0=radians, 1=degrees, 2=gradians', type: 'enum', def: 0,
         options: [{ value: '0', label: 'Radians' }, { value: '1', label: 'Degrees' }, { value: '2', label: 'Gradians' }],
@@ -147,19 +155,50 @@ export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
     { key: 'substitute', label: 'Substitute variables', detail: 'Substitute variable values into expressions', type: 'boolean', def: true },
     { key: 'formatEquations', label: 'Format equations', detail: 'Format equations in output', type: 'boolean', def: true },
     { key: 'zeroSmallMatrixElements', label: 'Zero small matrix elements', detail: 'Zero out near-zero matrix elements', type: 'boolean', def: true },
-    { key: 'maxOutputCount', label: 'Max output count', detail: 'Maximum output rows (5-100)', type: 'number', def: 20 },
+    { key: 'maxOutputCount', label: 'Max output count', detail: 'Maximum output rows (5 to 100)', type: 'number', def: 20, min: 5, max: 100 },
     { key: 'units', label: 'Default length unit', detail: 'Unit system string', type: 'string', def: 'm' },
     { key: 'vectorGraphics', label: 'Vector graphics', detail: 'Render plots as SVG', type: 'boolean', def: false },
     { key: 'colorScale', label: 'Plot color scale', detail: 'Plot color scale', type: 'enum', def: 'Rainbow', options: COLOR_SCALE_OPTIONS },
     { key: 'smoothScale', label: 'Smooth color scale', detail: 'Smooth color scale transitions', type: 'boolean', def: false },
     { key: 'shadows', label: 'Plot shadows', detail: 'Enable 3-D plot shadows', type: 'boolean', def: true },
     { key: 'adaptivePlot', label: 'Adaptive plotting', detail: 'Use adaptive sampling for plots', type: 'boolean', def: true },
-    { key: 'plotWidth', label: 'Plot width', detail: 'Width of the plot area in pixels', type: 'number', def: 500 },
-    { key: 'plotHeight', label: 'Plot height', detail: 'Height of the plot area in pixels', type: 'number', def: 300 },
-    { key: 'plotStep', label: 'Plot mesh step', detail: 'Mesh size for map plotting (0 = auto)', type: 'number', def: 0 },
-    { key: 'precision', label: 'Numerical precision', detail: 'Relative precision for numerical methods (1e-2 to 1e-15)', type: 'number', def: 1e-14 },
-    { key: 'tol', label: 'Solver tolerance', detail: 'Target tolerance for the iterative PCG solver', type: 'number', def: 1e-6 },
+    { key: 'plotWidth', label: 'Plot width', detail: 'Width of the plot area in pixels (at least 1)', type: 'number', def: 500, min: 1 },
+    { key: 'plotHeight', label: 'Plot height', detail: 'Height of the plot area in pixels (at least 1)', type: 'number', def: 300, min: 1 },
+    { key: 'plotStep', label: 'Plot mesh step', detail: 'Mesh size for map plotting in pixels (at least 0; 0 = auto)', type: 'number', def: 0, min: 0 },
+    { key: 'precision', label: 'Numerical precision', detail: 'Relative precision for numerical methods (1e-15 to 1e-2)', type: 'number', def: 1e-14, min: 1e-15, max: 1e-2 },
+    { key: 'tol', label: 'Solver tolerance', detail: 'Target tolerance for the iterative PCG/eigensolver (1e-15 to 1e-2)', type: 'number', def: 1e-6, min: 1e-15, max: 1e-2 },
 ];
+
+/** Looks up the definition for a `#settings` key. */
+export function settingSpec(key: string): MetadataSettingKey | undefined {
+    return METADATA_SETTINGS_KEYS.find(s => s.key === key);
+}
+
+function rangeMessage(spec: MetadataSettingKey): string {
+    if (spec.min !== undefined && spec.max !== undefined) return `${spec.label} must be between ${spec.min} and ${spec.max}`;
+    if (spec.min !== undefined) return `${spec.label} must be at least ${spec.min}`;
+    if (spec.max !== undefined) return `${spec.label} must be at most ${spec.max}`;
+    return '';
+}
+
+/**
+ * Returns an error message when `value` is not valid for `key`, else `null`.
+ * Mirrors the type/range checks in `Calcpad.Core`'s `SettingsDto.Validate`.
+ */
+export function validateSettingValue(key: string, value: string | number | boolean): string | null {
+    const spec = settingSpec(key);
+    if (!spec) return null;
+    if (spec.type === 'enum')
+        return spec.options?.some(o => o.value === String(value))
+            ? null
+            : `${spec.label} must be one of: ${spec.options?.map(o => o.label).join(', ')}`;
+    if (spec.type === 'number') {
+        const n = Number(value);
+        if (String(value).trim() === '' || !Number.isFinite(n)) return `${spec.label} must be a number`;
+        if (spec.min !== undefined && n < spec.min || spec.max !== undefined && n > spec.max) return rangeMessage(spec);
+    }
+    return null;
+}
 
 export interface LintCode {
     code: string;

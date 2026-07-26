@@ -54,24 +54,32 @@
 
         <div v-if="showSettings" class="field">
           <label>Settings (#settings directive)</label>
-          <div v-for="(row, i) in model.settings" :key="'s' + i" class="list-row">
-            <select v-model="row.key" @change="onSettingKeyChange(row)">
-              <option value="">(select)</option>
-              <option v-for="s in settingKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.label }}</option>
-            </select>
-            <select v-if="settingType(row.key) === 'boolean'" v-model="row.value">
-              <option value="true">true</option>
-              <option value="false">false</option>
-            </select>
-            <select v-else-if="settingType(row.key) === 'enum'" v-model="row.value">
-              <option v-for="opt in settingOptions(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
-            <input
-              v-else
-              :type="settingType(row.key) === 'number' ? 'number' : 'text'"
-              v-model="row.value"
-            />
-            <button class="icon-button" title="Remove" @click="model.settings.splice(i, 1)">✕</button>
+          <div v-for="(row, i) in model.settings" :key="'s' + i" class="setting-row">
+            <div class="list-row">
+              <select v-model="row.key" @change="onSettingKeyChange(row)">
+                <option value="">(select)</option>
+                <option v-for="s in settingKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.label }}</option>
+              </select>
+              <select v-if="settingType(row.key) === 'boolean'" v-model="row.value">
+                <option value="true">true</option>
+                <option value="false">false</option>
+              </select>
+              <select v-else-if="settingType(row.key) === 'enum'" v-model="row.value">
+                <option v-for="opt in settingOptions(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              </select>
+              <input
+                v-else
+                :type="settingType(row.key) === 'number' ? 'number' : 'text'"
+                :class="{ 'input-invalid': !!settingError(row) }"
+                :min="settingMin(row.key)"
+                :max="settingMax(row.key)"
+                :step="settingStep(row.key)"
+                v-model="row.value"
+              />
+              <span v-if="row.key" class="setting-info" :title="settingDetail(row.key)">ⓘ</span>
+              <button class="icon-button" title="Remove" @click="model.settings.splice(i, 1)">✕</button>
+            </div>
+            <div v-if="settingError(row)" class="setting-error">{{ settingError(row) }}</div>
           </div>
           <button class="add-button" @click="model.settings.push({ key: '', value: '' })">+ Add setting</button>
         </div>
@@ -148,7 +156,7 @@
         </div>
 
         <div class="actions">
-          <button class="primary-button" @click="onApply">Apply</button>
+          <button class="primary-button" :disabled="hasSettingErrors" :title="hasSettingErrors ? 'Fix the highlighted settings before applying' : undefined" @click="onApply">Apply</button>
           <button class="secondary-button" @click="populate">Reset</button>
         </div>
       </template>
@@ -162,6 +170,8 @@ import {
   FUNCTION_PARAM_TYPES,
   MACRO_PARAM_TYPES,
   METADATA_SETTINGS_KEYS,
+  settingSpec,
+  validateSettingValue,
   LINT_CODES,
 } from '../../text/metadata-comment'
 import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind, SettingsValues, SettingOption } from '../../text/metadata-comment'
@@ -307,6 +317,29 @@ function settingOptions(key: string): SettingOption[] {
   return METADATA_SETTINGS_KEYS.find(s => s.key === key)?.options ?? []
 }
 
+function settingDetail(key: string): string {
+  return settingSpec(key)?.detail ?? ''
+}
+
+function settingMin(key: string): number | undefined {
+  return settingSpec(key)?.min
+}
+
+function settingMax(key: string): number | undefined {
+  return settingSpec(key)?.max
+}
+
+function settingStep(key: string): string | undefined {
+  if (settingType(key) !== 'number') return undefined
+  return key === 'precision' || key === 'tol' ? 'any' : '1'
+}
+
+function settingError(row: SettingRow): string | null {
+  return row.key ? validateSettingValue(row.key, row.value) : null
+}
+
+const hasSettingErrors = computed(() => model.settings.some(r => !!settingError(r)))
+
 function onSettingKeyChange(row: SettingRow) {
   const def = METADATA_SETTINGS_KEYS.find(s => s.key === row.key)?.def
   row.value = def === undefined ? '' : String(def)
@@ -368,6 +401,7 @@ function coerceSetting(key: string, value: string | number | boolean): string | 
 }
 
 function onApply() {
+  if (hasSettingErrors.value) return
   const data: MetadataCommentData = { ...model.extra }
 
   if (model.desc.trim()) data.desc = model.desc.trim()
@@ -478,6 +512,32 @@ watch(
   align-items: center;
   gap: 6px;
   margin-bottom: 6px;
+}
+
+.setting-row {
+  margin-bottom: 6px;
+}
+
+.setting-row .list-row {
+  margin-bottom: 0;
+}
+
+.setting-info {
+  cursor: help;
+  color: var(--vscode-descriptionForeground);
+  font-size: 11px;
+}
+
+.setting-error {
+  color: var(--vscode-errorForeground, #f14c4c);
+  font-size: 11px;
+  margin-top: 2px;
+  margin-left: 2px;
+}
+
+.input-invalid {
+  border-color: var(--vscode-inputValidation-errorBorder, #f14c4c) !important;
+  outline: 1px solid var(--vscode-inputValidation-errorBorder, #f14c4c);
 }
 
 .sub-row {
@@ -604,8 +664,13 @@ watch(
   border-radius: 2px;
 }
 
-.primary-button:hover {
+.primary-button:hover:not(:disabled) {
   background: var(--vscode-button-hoverBackground);
+}
+
+.primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .secondary-button {

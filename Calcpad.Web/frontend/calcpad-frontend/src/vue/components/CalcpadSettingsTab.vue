@@ -31,6 +31,8 @@
               type="number"
               min="0"
               max="15"
+              :class="{ 'input-invalid': settingErrors.decimals }"
+              :title="settingErrors.decimals || undefined"
               @input="updateSettings"
             />
           </div>
@@ -105,6 +107,8 @@
               type="number"
               min="5"
               max="100"
+              :class="{ 'input-invalid': settingErrors.maxOutputCount }"
+              :title="settingErrors.maxOutputCount || undefined"
               @input="updateSettings"
             />
           </div>
@@ -121,6 +125,8 @@
               step="any"
               min="1e-15"
               max="1e-2"
+              :class="{ 'input-invalid': settingErrors.precision }"
+              :title="settingErrors.precision || undefined"
               @input="updateSettings"
             />
           </div>
@@ -137,6 +143,8 @@
               step="any"
               min="1e-15"
               max="1e-2"
+              :class="{ 'input-invalid': settingErrors.tol }"
+              :title="settingErrors.tol || undefined"
               @input="updateSettings"
             />
           </div>
@@ -252,6 +260,8 @@
               v-model.number="localSettings.plot.width"
               type="number"
               min="1"
+              :class="{ 'input-invalid': settingErrors.plotWidth }"
+              :title="settingErrors.plotWidth || undefined"
               @input="updateSettings"
             />
           </div>
@@ -266,6 +276,8 @@
               v-model.number="localSettings.plot.height"
               type="number"
               min="1"
+              :class="{ 'input-invalid': settingErrors.plotHeight }"
+              :title="settingErrors.plotHeight || undefined"
               @input="updateSettings"
             />
           </div>
@@ -280,6 +292,8 @@
               v-model.number="localSettings.plot.step"
               type="number"
               min="0"
+              :class="{ 'input-invalid': settingErrors.plotStep }"
+              :title="settingErrors.plotStep || undefined"
               @input="updateSettings"
             />
           </div>
@@ -641,6 +655,7 @@ import { ref, watch, computed, reactive } from 'vue'
 import type { Settings, ThemeInfo, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
 import { getDefaultSettings } from '../../types/settings'
+import { validateSettingValue } from '../../text/metadata-comment'
 
 // Props
 interface Props {
@@ -873,7 +888,24 @@ const anyVisible = computed(() =>
 )
 
 // Methods
+// Per-field validation against the ranges Calcpad.Core enforces. Invalid fields
+// are highlighted and block the settings from being applied (rather than clamped).
+const settingErrors = computed<Record<string, string | null>>(() => {
+  const { math, plot } = localSettings.value
+  return {
+    decimals: validateSettingValue('decimals', math.decimals),
+    maxOutputCount: validateSettingValue('maxOutputCount', math.maxOutputCount),
+    precision: validateSettingValue('precision', math.precision),
+    tol: validateSettingValue('tol', math.tol),
+    plotWidth: validateSettingValue('plotWidth', plot.width),
+    plotHeight: validateSettingValue('plotHeight', plot.height),
+    plotStep: validateSettingValue('plotStep', plot.step),
+  }
+})
+const hasSettingErrors = computed(() => Object.values(settingErrors.value).some(Boolean))
+
 const updateSettings = () => {
+  if (hasSettingErrors.value) return
   emit('updateSettings', localSettings.value)
 }
 
@@ -1241,6 +1273,11 @@ watch(
   font-size: 11px;
   color: var(--vscode-descriptionForeground);
   cursor: help;
+}
+
+.input-invalid {
+  border-color: var(--vscode-inputValidation-errorBorder, #f14c4c) !important;
+  outline: 1px solid var(--vscode-inputValidation-errorBorder, #f14c4c);
 }
 
 .setting-error {

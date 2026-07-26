@@ -616,25 +616,32 @@ namespace Calcpad.Core
             else
                 Settings.Math.FormatString = null;
         }
+        private const string SettingsKeyword = "#settings";
 
         private void ParseKeywordSettings(ReadOnlySpan<char> s)
         {
-            if (s.Length <= 9) // #settings
+            var json = s[SettingsKeyword.Length..].Trim();
+            if (json.IsEmpty)
+            {
+                AppendError(s.ToString(), string.Format(Messages.Invalid_settings_0, json.ToString()), _currentLine);
                 return;
-
-            var json = s[9..].Trim();
-            if (json.IsWhiteSpace())
-                return;
-
+            }
             try
             {
-                using var doc = JsonDocument.Parse(json.ToString());
-                var root = doc.RootElement;
-                if (root.ValueKind != JsonValueKind.Object)
+                var dto = SettingsDto.Parse(json.ToString());
+                if (dto is null)
                     return;
 
-                foreach (var prop in root.EnumerateObject())
-                    ApplySetting(prop.Name, prop.Value);
+                HashSet<SettingKey> invalid = null;
+                foreach (var error in dto.Validate())
+                {
+                    (invalid ??= []).Add(error.Key);
+                    AppendError(s.ToString(), error.Message, _currentLine);
+                }
+
+                foreach (SettingKey key in Enum.GetValues<SettingKey>())
+                    if (invalid is null || !invalid.Contains(key))
+                        ApplySetting(key, dto);
             }
             catch (JsonException)
             {
@@ -642,128 +649,124 @@ namespace Calcpad.Core
             }
         }
 
-        private void ApplySetting(string name, JsonElement value)
+        private void ApplySetting(SettingKey key, SettingsDto dto)
         {
-            switch (name.ToLowerInvariant())
+            switch (key)
             {
-                case "decimals":
-                    if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var dec))
-                        Settings.Math.Decimals = dec;
+                case SettingKey.Decimals:
+                    if (dto.Decimals.HasValue)
+                        Settings.Math.Decimals = dto.Decimals.Value;
                     break;
-                case "degrees":
-                    if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var deg))
+                case SettingKey.Degrees:
+                    if (dto.Degrees.HasValue)
                     {
-                        Settings.Math.Degrees = deg;
-                        _parser.Degrees = deg;
+                        Settings.Math.Degrees = dto.Degrees.Value;
+                        _parser.Degrees = dto.Degrees.Value;
                     }
                     break;
-                case "complex":
-                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
-                        _parser.SetComplex(value.GetBoolean());
+                case SettingKey.Complex:
+                    if (dto.Complex.HasValue)
+                        _parser.SetComplex(dto.Complex.Value);
                     break;
-                case "substitute":
-                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
-                        Settings.Math.Substitute = value.GetBoolean();
+                case SettingKey.Substitute:
+                    if (dto.Substitute.HasValue)
+                        Settings.Math.Substitute = dto.Substitute.Value;
                     break;
-                case "formatequations":
-                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
-                        Settings.Math.FormatEquations = value.GetBoolean();
+                case SettingKey.FormatEquations:
+                    if (dto.FormatEquations.HasValue)
+                        Settings.Math.FormatEquations = dto.FormatEquations.Value;
                     break;
-                case "zerosmallmatrixelements":
-                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
-                        Settings.Math.ZeroSmallMatrixElements = value.GetBoolean();
+                case SettingKey.ZeroSmallMatrixElements:
+                    if (dto.ZeroSmallMatrixElements.HasValue)
+                        Settings.Math.ZeroSmallMatrixElements = dto.ZeroSmallMatrixElements.Value;
                     break;
-                case "maxoutputcount":
-                    if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var moc))
-                        Settings.Math.MaxOutputCount = moc;
+                case SettingKey.MaxOutputCount:
+                    if (dto.MaxOutputCount.HasValue)
+                        Settings.Math.MaxOutputCount = dto.MaxOutputCount.Value;
                     break;
-                case "units":
-                    if (value.ValueKind == JsonValueKind.String)
+                case SettingKey.Units:
+                    if (dto.Units is not null)
                     {
-                        Settings.Units = value.GetString() ?? Settings.Units;
+                        Settings.Units = dto.Units;
                         _parser.SetVariable("Units", new RealValue(UnitsFactor()));
                     }
                     break;
-                case "isus":
-                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                case SettingKey.IsUs:
+                    if (dto.IsUs.HasValue)
                     {
-                        Settings.IsUs = value.GetBoolean();
-                        Unit.IsUs = Settings.IsUs;
+                        Settings.IsUs = dto.IsUs.Value;
+                        Unit.IsUs = dto.IsUs.Value;
                     }
                     break;
-                case "vectorgraphics":
-                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                case SettingKey.VectorGraphics:
+                    if (dto.VectorGraphics.HasValue)
                     {
-                        var b = value.GetBoolean();
-                        Settings.Plot.VectorGraphics = b;
-                        _parser.SetVariable("PlotSVG", b ? 1d : 0d);
+                        Settings.Plot.VectorGraphics = dto.VectorGraphics.Value;
+                        _parser.SetVariable("PlotSVG", dto.VectorGraphics.Value ? 1d : 0d);
                     }
                     break;
-                case "colorscale":
-                    if (value.ValueKind == JsonValueKind.String &&
-                        Enum.TryParse<PlotSettings.ColorScales>(value.GetString(), true, out var cs))
+                case SettingKey.ColorScale:
+                    if (dto.ColorScale is not null &&
+                        Enum.TryParse<PlotSettings.ColorScales>(dto.ColorScale, true, out var cs))
                     {
                         Settings.Plot.ColorScale = cs;
                         _parser.SetVariable("PlotPalette", (int)cs);
                     }
                     break;
-                case "smoothscale":
-                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                case SettingKey.SmoothScale:
+                    if (dto.SmoothScale.HasValue)
                     {
-                        var b = value.GetBoolean();
-                        Settings.Plot.SmoothScale = b;
-                        _parser.SetVariable("PlotSmooth", b ? 1d : 0d);
+                        Settings.Plot.SmoothScale = dto.SmoothScale.Value;
+                        _parser.SetVariable("PlotSmooth", dto.SmoothScale.Value ? 1d : 0d);
                     }
                     break;
-                case "shadows":
-                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                case SettingKey.Shadows:
+                    if (dto.Shadows.HasValue)
                     {
-                        var b = value.GetBoolean();
-                        Settings.Plot.Shadows = b;
-                        _parser.SetVariable("PlotShadows", b ? 1d : 0d);
+                        Settings.Plot.Shadows = dto.Shadows.Value;
+                        _parser.SetVariable("PlotShadows", dto.Shadows.Value ? 1d : 0d);
                     }
                     break;
-                case "adaptiveplot":
-                    if (value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                case SettingKey.AdaptivePlot:
+                    if (dto.AdaptivePlot.HasValue)
                     {
-                        var b = value.GetBoolean();
-                        Settings.Plot.IsAdaptive = b;
-                        _parser.SetVariable("PlotAdaptive", b ? 1d : 0d);
+                        Settings.Plot.IsAdaptive = dto.AdaptivePlot.Value;
+                        _parser.SetVariable("PlotAdaptive", dto.AdaptivePlot.Value ? 1d : 0d);
                     }
                     break;
-                case "plotwidth":
-                    if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var pw))
+                case SettingKey.PlotWidth:
+                    if (dto.PlotWidth.HasValue)
                     {
-                        Settings.Plot.Width = pw;
-                        _parser.SetVariable("PlotWidth", pw);
+                        Settings.Plot.Width = dto.PlotWidth.Value;
+                        _parser.SetVariable("PlotWidth", dto.PlotWidth.Value);
                     }
                     break;
-                case "plotheight":
-                    if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var ph))
+                case SettingKey.PlotHeight:
+                    if (dto.PlotHeight.HasValue)
                     {
-                        Settings.Plot.Height = ph;
-                        _parser.SetVariable("PlotHeight", ph);
+                        Settings.Plot.Height = dto.PlotHeight.Value;
+                        _parser.SetVariable("PlotHeight", dto.PlotHeight.Value);
                     }
                     break;
-                case "plotstep":
-                    if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var ps))
+                case SettingKey.PlotStep:
+                    if (dto.PlotStep.HasValue)
                     {
-                        Settings.Plot.Step = ps;
-                        _parser.SetVariable("PlotStep", ps);
+                        Settings.Plot.Step = dto.PlotStep.Value;
+                        _parser.SetVariable("PlotStep", dto.PlotStep.Value);
                     }
                     break;
-                case "precision":
-                    if (value.ValueKind == JsonValueKind.Number && value.TryGetDouble(out var prec))
+                case SettingKey.Precision:
+                    if (dto.Precision.HasValue)
                     {
-                        Settings.Math.Precision = prec;
-                        _parser.SetVariable("Precision", prec);
+                        Settings.Math.Precision = dto.Precision.Value;
+                        _parser.SetVariable("Precision", dto.Precision.Value);
                     }
                     break;
-                case "tol":
-                    if (value.ValueKind == JsonValueKind.Number && value.TryGetDouble(out var tol))
+                case SettingKey.Tol:
+                    if (dto.Tol.HasValue)
                     {
-                        Settings.Math.Tol = tol;
-                        _parser.SetVariable("Tol", tol);
+                        Settings.Math.Tol = dto.Tol.Value;
+                        _parser.SetVariable("Tol", dto.Tol.Value);
                     }
                     break;
             }

@@ -17,8 +17,10 @@ namespace Calcpad.Core
         {
             Left = (int)(1.5 * Margin);
             Right = (int)(0.75 * Margin);
-            Width = (int)(Parser.GetSettingsVariable("PlotWidth", Settings.Width) * ScreenScaleFactor) + Left + Right;
-            Height = (int)(Parser.GetSettingsVariable("PlotHeight", Settings.Height) * ScreenScaleFactor) + 2 * Margin;
+            var w = (int)Parser.GetSettingsVariable("PlotWidth", Settings.Width);
+            var h = (int)Parser.GetSettingsVariable("PlotHeight", Settings.Height);
+            Width = (int)(w * ScreenScaleFactor) + Left + Right;
+            Height = (int)(h * ScreenScaleFactor) + 2 * Margin;
         }
 
         internal string Plot(Func<IValue>[] fx, Func<IValue>[] fy, Variable var, double start, double end, Unit u)

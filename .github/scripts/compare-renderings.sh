@@ -7,14 +7,16 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 VENV_DIR="$SCRIPT_DIR/.venv"
+CLI_BUILD_DIR="$REPO_ROOT/cli-build"
 
 cleanup() {
-    rm -rf "$VENV_DIR"
+    rm -rf "$VENV_DIR" "$CLI_BUILD_DIR"
 }
 trap cleanup EXIT
 
 echo "Building Calcpad CLI..."
-dotnet build "$REPO_ROOT/Calcpad.Cli/Calcpad.Cli.csproj" -c Release
+rm -rf "$CLI_BUILD_DIR"
+dotnet publish "$REPO_ROOT/Calcpad.Cli/Calcpad.Cli.csproj" -c Release -o "$CLI_BUILD_DIR"
 
 echo "Setting up Python venv..."
 python3 -m venv "$VENV_DIR"

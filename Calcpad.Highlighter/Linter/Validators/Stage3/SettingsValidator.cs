@@ -1,6 +1,5 @@
-using System.Collections.Frozen;
-using System.Collections.Generic;
 using System.Text.Json;
+using Calcpad.Core;
 using Calcpad.Highlighter.Linter.Helpers;
 using Calcpad.Highlighter.Linter.Models;
 using Calcpad.Highlighter.Tokenizer.Models;
@@ -9,19 +8,12 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 {
     /// <summary>
     /// Validates the JSON payload of the #settings directive (`#settings {...}`).
-    /// Reports malformed JSON, non-object payloads, and unrecognized setting keys.
+    /// Reports malformed JSON, non-object payloads, unrecognized keys, wrong value
+    /// types, and out-of-range values. Recognized keys, types, and ranges come from
+    /// <see cref="SettingsDto"/> so the linter and the runtime parser stay in sync.
     /// </summary>
     public class SettingsValidator
     {
-        private static readonly FrozenSet<string> KnownKeys = new HashSet<string>(
-            System.StringComparer.OrdinalIgnoreCase)
-        {
-            "decimals", "degrees", "complex", "substitute", "formatEquations",
-            "zeroSmallMatrixElements", "maxOutputCount", "units", "isUs",
-            "vectorGraphics", "colorScale", "smoothScale", "shadows", "adaptivePlot",
-            "plotWidth", "plotHeight", "plotStep", "precision", "tol",
-        }.ToFrozenSet(System.StringComparer.OrdinalIgnoreCase);
-
         public void Validate(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
             for (int i = 0; i < stage3.Lines.Count; i++)
@@ -65,11 +57,26 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
                 foreach (var prop in doc.RootElement.EnumerateObject())
                 {
-                    if (!KnownKeys.Contains(prop.Name))
+                    if (!SettingsDto.KnownKeys.Contains(prop.Name))
                         result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3413",
                             "'" + prop.Name + "' is not a recognized setting");
                 }
             }
+
+            SettingsDto dto;
+            try
+            {
+                dto = SettingsDto.Parse(json);
+            }
+            catch (JsonException)
+            {
+                result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3413",
+                    "a #settings value has the wrong type");
+                return;
+            }
+
+            foreach (var error in dto.Validate())
+                result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3413", error.Message);
         }
     }
 }

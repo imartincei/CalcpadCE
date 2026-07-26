@@ -167,6 +167,8 @@ export {
     FUNCTION_PARAM_TYPES,
     MACRO_PARAM_TYPES,
     METADATA_SETTINGS_KEYS,
+    settingSpec,
+    validateSettingValue,
     LINT_CODES,
     findMetadataCommentBlock,
     computeMetadataBlock,
