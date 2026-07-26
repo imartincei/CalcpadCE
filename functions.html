@@ -1365,14 +1365,42 @@
   
   
     <li class="md-nav__item">
-      <a href="new-calcpad-panel-and-settings.html" class="md-nav__link">
+      <a href="new-calcpad-panel.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The CalcPad Panel & Settings
+    The CalcpadCE Panel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
   
 
     
@@ -3266,6 +3294,10 @@
 <td><code>lcm(x; y; z…)</code></td>
 <td>the least common multiple of several integers</td>
 </tr>
+<tr>
+<td><code>fact(n)</code></td>
+<td>factorial: multiplies all whole numbers from 1 up to <em>n</em>, e.g. <strong>fact</strong>(5) = 120. Works for whole numbers 0 to 170. Same as writing <em>n</em>!</td>
+</tr>
 </tbody>
 </table>
 <h2 id="complex">Complex<a class="headerlink" href="#complex" title="Permanent link">&para;</a></h2>
@@ -3429,6 +3461,14 @@
 <tr>
 <td><code>ishp(x)</code></td>
 <td>checks if the type of x is a high-performance (hp) vector or matrix</td>
+</tr>
+<tr>
+<td><code>timer(x)</code></td>
+<td>how many seconds the calculation has taken so far, measured up to the point where <em>x</em> is worked out. Useful for timing long calculations</td>
+</tr>
+<tr>
+<td><code>mandelbrot(x; y)</code></td>
+<td>tells you whether the point (<em>x</em>; <em>y</em>) belongs to the Mandelbrot set, mainly for plotting it. Returns "Undefined" for points inside the set, and a larger value the further outside a point lies</td>
 </tr>
 </tbody>
 </table>

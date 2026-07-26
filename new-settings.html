@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="new-includes.html">
+        <link rel="prev" href="new-calcpad-panel.html">
       
       
-        <link rel="next" href="new-table-of-contents.html">
+        <link rel="next" href="new-pdf-export.html">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Linter and Diagnostics - CalcpadCE Documentation</title>
+        <title>Settings - CalcpadCE Documentation</title>
       
     
     
@@ -75,7 +75,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#linter-and-diagnostics" class="md-skip">
+        <a href="#settings" class="md-skip">
           Skip to content
         </a>
       
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Linter and Diagnostics
+              Settings
             
           </span>
         </div>
@@ -1211,10 +1211,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="new-settings.html" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="new-settings.html" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1230,6 +1257,169 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#math" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Math
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#units" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Units
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preview-theme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preview theme
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#color-theme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Color theme
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#editor-font" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Editor Font
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#editor-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Editor features
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Library
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#linter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#named-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Named configurations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1295,37 +1485,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Linter and Diagnostics
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="new-linter.html" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="new-linter.html" class="md-nav__link">
         
   
   
@@ -1341,153 +1504,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#diagnostic-codes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Diagnostic codes
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Diagnostic codes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#includes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Includes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#macro-definitions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Macro definitions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#brackets-and-blocks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Brackets and blocks
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#naming" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Naming
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Usage
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#semantics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Semantics
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#formatting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Formatting
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#suppressing-diagnostics-lint-ignore" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Suppressing diagnostics (lint-ignore)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#choosing-how-much-to-show-vs-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Choosing how much to show (VS Code)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2908,104 +2924,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#diagnostic-codes" class="md-nav__link">
+  <a href="#math" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Diagnostic codes
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Diagnostic codes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#includes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Includes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#macro-definitions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Macro definitions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#brackets-and-blocks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Brackets and blocks
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#naming" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Naming
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Usage
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#semantics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Semantics
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#formatting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Formatting
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#suppressing-diagnostics-lint-ignore" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Suppressing diagnostics (lint-ignore)
+        Math
       
     </span>
   </a>
@@ -3013,10 +2935,120 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#choosing-how-much-to-show-vs-code" class="md-nav__link">
+  <a href="#plot" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Choosing how much to show (VS Code)
+        Plot
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#units" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Units
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preview-theme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preview theme
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#color-theme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Color theme
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#editor-font" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Editor Font
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#editor-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Editor features
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Library
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#linter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#named-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Named configurations
       
     </span>
   </a>
@@ -3051,373 +3083,165 @@
 
 
 
-<h1 id="linter-and-diagnostics">Linter and Diagnostics<a class="headerlink" href="#linter-and-diagnostics" title="Permanent link">&para;</a></h1>
+<h1 id="settings">Settings<a class="headerlink" href="#settings" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p>Calcpad.Web only (web editor, desktop app, and VS Code extension). Not available in the standalone WPF desktop application for Windows.</p>
+<p>Part of the <a href="new-calcpad-panel.html">CalcpadCE Panel</a>, shared across the <a href="new-vscode-extension.html">VS Code extension</a>, the <a href="new-desktop-app.html">desktop app</a>, and the web editor.</p>
 </blockquote>
-<p>Calcpad.Web checks your document as you write and flags problems before you ever run it.
-Each diagnostic has a short, stable code (like <code>CPD-3301</code>) so you can look up exactly what it means.</p>
-<p>Diagnostics appear:</p>
+<p>The <strong>Settings</strong> tab is the single place to control the calculation engine and the editor.
+Editing settings here keeps them in sync with the host and the server — in VS Code, do <strong>not</strong> use VS Code's own settings editor for these.</p>
+<h2 id="math">Math<a class="headerlink" href="#math" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Values</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Decimals</strong></td>
+<td>0–15</td>
+<td>Decimal places shown in results.</td>
+</tr>
+<tr>
+<td><strong>Angle Units</strong></td>
+<td>Radians / Degrees / Gradians</td>
+<td>Trigonometric angle setting.</td>
+</tr>
+<tr>
+<td><strong>Complex Numbers</strong></td>
+<td>on/off</td>
+<td>Enable complex-number arithmetic.</td>
+</tr>
+<tr>
+<td><strong>Substitute Variables</strong></td>
+<td>on/off</td>
+<td>Substitute variable values into the output.</td>
+</tr>
+<tr>
+<td><strong>Format Equations</strong></td>
+<td>on/off</td>
+<td><em>Professional</em> (on) renders equations in stacked math form; <em>Inline</em> (off) renders them on a single line.</td>
+</tr>
+<tr>
+<td><strong>Zero Small Matrix Elements</strong></td>
+<td>on/off</td>
+<td>Show very small matrix/vector values as <code>0</code> instead of using scientific notation.</td>
+</tr>
+<tr>
+<td><strong>Max Output Count</strong></td>
+<td>5–100</td>
+<td>Maximum number of rows/columns shown for large matrices and vectors.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="plot">Plot<a class="headerlink" href="#plot" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Values</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Adaptive Plotting</strong></td>
+<td>on/off</td>
+<td>Adaptively sample plotted functions.</td>
+</tr>
+<tr>
+<td><strong>Screen Scale Factor</strong></td>
+<td>0.1–5</td>
+<td>Scale of rendered plots/images.</td>
+</tr>
+<tr>
+<td><strong>Image Path</strong></td>
+<td>text</td>
+<td>Directory used for generated plot images.</td>
+</tr>
+<tr>
+<td><strong>Vector Graphics</strong></td>
+<td>on/off</td>
+<td>Emit SVG plots instead of raster images.</td>
+</tr>
+<tr>
+<td><strong>Color Scale</strong></td>
+<td>Rainbow / Grayscale / Hot / Cool / Jet / Parula</td>
+<td>Palette for 3D/surface plots.</td>
+</tr>
+<tr>
+<td><strong>Smooth Scale</strong></td>
+<td>on/off</td>
+<td>Smooth the color scale.</td>
+</tr>
+<tr>
+<td><strong>Shadows</strong></td>
+<td>on/off</td>
+<td>Render shadows on 3D surfaces.</td>
+</tr>
+<tr>
+<td><strong>Light Direction</strong></td>
+<td>text</td>
+<td>Light direction vector for 3D shading.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="units">Units<a class="headerlink" href="#units" title="Permanent link">&para;</a></h2>
 <ul>
-<li>In <strong>VS Code</strong> — as squiggles in the editor and entries in the Problems panel.</li>
-<li>In the <strong>desktop and web editors</strong> — as colored marks (red for errors, yellow for warnings, blue for information) at the spot with the problem, and in the <strong>Problems</strong> panel.</li>
+<li><strong>Default Input Length Unit</strong> — <code>m</code> / <code>cm</code> / <code>mm</code>. Used for <code>%u</code> placeholders in input forms.</li>
+<li><strong>Non-Metric Units</strong> — <strong>UK (Imperial)</strong> or <strong>US Customary</strong>. Selects the definition of bare unit names that differ between the two systems (<code>gal</code>, <code>ton</code>, <code>cwt</code>, <code>pt</code>, <code>qt</code>, <code>bbl</code>, <code>tonf</code>, <code>therm</code>, …). This lives on <code>Settings.IsUs</code> and is unified across the WPF app, the CLI, and the web/desktop/VS Code hosts.</li>
 </ul>
-<h2 id="diagnostic-codes">Diagnostic codes<a class="headerlink" href="#diagnostic-codes" title="Permanent link">&para;</a></h2>
-<p>Every diagnostic has a <code>CPD-</code> code.
-The tables below group them by the kind of problem.</p>
-<h3 id="includes">Includes<a class="headerlink" href="#includes" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Code</th>
-<th>Severity</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CPD-1101</td>
-<td>Error</td>
-<td>Malformed <code>#include</code> statement</td>
-</tr>
-<tr>
-<td>CPD-1102</td>
-<td>Error</td>
-<td>Missing <code>#include</code> filename</td>
-</tr>
-</tbody>
-</table>
-<h3 id="macro-definitions">Macro definitions<a class="headerlink" href="#macro-definitions" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Code</th>
-<th>Severity</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CPD-2201</td>
-<td>Error</td>
-<td>Duplicate macro definition</td>
-</tr>
-<tr>
-<td>CPD-2202</td>
-<td>Error</td>
-<td>Macro name must end with <code>$| | CPD-2203 | Error | Macro parameter must end with$</code></td>
-</tr>
-<tr>
-<td>CPD-2204</td>
-<td>Error</td>
-<td>Invalid macro name (must start with a letter)</td>
-</tr>
-<tr>
-<td>CPD-2205</td>
-<td>Error</td>
-<td>Malformed <code>#def</code> syntax</td>
-</tr>
-<tr>
-<td>CPD-2206</td>
-<td>Error</td>
-<td>Unmatched <code>#def</code> or <code>#end def</code></td>
-</tr>
-<tr>
-<td>CPD-2207</td>
-<td>Error</td>
-<td>Nested macro definition not allowed</td>
-</tr>
-<tr>
-<td>CPD-2208</td>
-<td>Error</td>
-<td>Macro parameter must start with a letter</td>
-</tr>
-<tr>
-<td>CPD-2209</td>
-<td>Warning</td>
-<td>Macro definition inside a control block has no effect</td>
-</tr>
-<tr>
-<td>CPD-2210</td>
-<td>Error</td>
-<td>Invalid character in macro name</td>
-</tr>
-<tr>
-<td>CPD-2211</td>
-<td>Error</td>
-<td>Invalid character in macro parameter</td>
-</tr>
-<tr>
-<td>CPD-2212</td>
-<td>Error</td>
-<td>Duplicate macro parameter</td>
-</tr>
-</tbody>
-</table>
-<h3 id="brackets-and-blocks">Brackets and blocks<a class="headerlink" href="#brackets-and-blocks" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Code</th>
-<th>Severity</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CPD-3101</td>
-<td>Error</td>
-<td>Unmatched opening parenthesis</td>
-</tr>
-<tr>
-<td>CPD-3102</td>
-<td>Error</td>
-<td>Unmatched closing parenthesis</td>
-</tr>
-<tr>
-<td>CPD-3103</td>
-<td>Error</td>
-<td>Unmatched opening square bracket</td>
-</tr>
-<tr>
-<td>CPD-3104</td>
-<td>Error</td>
-<td>Unmatched closing square bracket</td>
-</tr>
-<tr>
-<td>CPD-3105</td>
-<td>Error</td>
-<td>Unmatched opening curly brace or control block</td>
-</tr>
-<tr>
-<td>CPD-3106</td>
-<td>Error</td>
-<td>Unmatched closing curly brace</td>
-</tr>
-</tbody>
-</table>
-<h3 id="naming">Naming<a class="headerlink" href="#naming" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Code</th>
-<th>Severity</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CPD-3201</td>
-<td>Error</td>
-<td>Invalid variable name (must start with a letter)</td>
-</tr>
-<tr>
-<td>CPD-3202</td>
-<td>Error</td>
-<td>Invalid function name</td>
-</tr>
-<tr>
-<td>CPD-3203</td>
-<td>Error</td>
-<td>Function name conflicts with a built-in function</td>
-</tr>
-<tr>
-<td>CPD-3204</td>
-<td>Error</td>
-<td>Variable name conflicts with a keyword</td>
-</tr>
-<tr>
-<td>CPD-3205</td>
-<td>Error</td>
-<td>Variable name conflicts with a built-in constant</td>
-</tr>
-<tr>
-<td>CPD-3206</td>
-<td>Error</td>
-<td>Function must have at least one parameter</td>
-</tr>
-</tbody>
-</table>
-<h3 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Code</th>
-<th>Severity</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CPD-3301</td>
-<td>Error</td>
-<td>Undefined variable</td>
-</tr>
-<tr>
-<td>CPD-3302</td>
-<td>Error</td>
-<td>Function called with the wrong number of parameters</td>
-</tr>
-<tr>
-<td>CPD-3303</td>
-<td>Error</td>
-<td>Undefined macro</td>
-</tr>
-<tr>
-<td>CPD-3304</td>
-<td>Error</td>
-<td>Macro called with the wrong number of parameters</td>
-</tr>
-<tr>
-<td>CPD-3305</td>
-<td>Error</td>
-<td>Undefined function</td>
-</tr>
-<tr>
-<td>CPD-3306</td>
-<td>Warning</td>
-<td>Invalid element access</td>
-</tr>
-<tr>
-<td>CPD-3307</td>
-<td>Error</td>
-<td>Too few parameters</td>
-</tr>
-<tr>
-<td>CPD-3308</td>
-<td>Error</td>
-<td>Too many parameters</td>
-</tr>
-<tr>
-<td>CPD-3309</td>
-<td>Warning</td>
-<td>Parameter type mismatch</td>
-</tr>
-<tr>
-<td>CPD-3310</td>
-<td>Error</td>
-<td>Undefined unit</td>
-</tr>
-<tr>
-<td>CPD-3311</td>
-<td>Error</td>
-<td>Empty parameter in a function call</td>
-</tr>
-<tr>
-<td>CPD-3312</td>
-<td>Information</td>
-<td>Unused variable</td>
-</tr>
-<tr>
-<td>CPD-3313</td>
-<td>Error</td>
-<td>Redefinition of existing function</td>
-</tr>
-</tbody>
-</table>
-<h3 id="semantics">Semantics<a class="headerlink" href="#semantics" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Code</th>
-<th>Severity</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CPD-3401</td>
-<td>Error</td>
-<td>Invalid operator usage</td>
-</tr>
-<tr>
-<td>CPD-3402</td>
-<td>Error</td>
-<td>Unknown command name</td>
-</tr>
-<tr>
-<td>CPD-3403</td>
-<td>Error</td>
-<td>Unknown directive</td>
-</tr>
-<tr>
-<td>CPD-3404</td>
-<td>Warning</td>
-<td>Invalid assignment</td>
-</tr>
-<tr>
-<td>CPD-3405</td>
-<td>Error</td>
-<td><code>#</code> directive not allowed inside a command block</td>
-</tr>
-<tr>
-<td>CPD-3406</td>
-<td>Error</td>
-<td>Invalid command syntax</td>
-</tr>
-<tr>
-<td>CPD-3407</td>
-<td>Error</td>
-<td>Incomplete expression</td>
-</tr>
-<tr>
-<td>CPD-3408</td>
-<td>Error</td>
-<td>Command variable mismatch</td>
-</tr>
-<tr>
-<td>CPD-3409</td>
-<td>Error</td>
-<td>Reassignment of a constant</td>
-</tr>
-<tr>
-<td>CPD-3410</td>
-<td>Error</td>
-<td>Outer-scope assignment (<code>←</code>) to an undefined variable</td>
-</tr>
-<tr>
-<td>CPD-3411</td>
-<td>Warning</td>
-<td>Invalid <code>paramType</code> value in a metadata comment</td>
-</tr>
-<tr>
-<td>CPD-3412</td>
-<td>Warning</td>
-<td>Invalid metadata-comment JSON</td>
-</tr>
-</tbody>
-</table>
-<h3 id="formatting">Formatting<a class="headerlink" href="#formatting" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Code</th>
-<th>Severity</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CPD-3601</td>
-<td>Warning</td>
-<td>Invalid format specifier</td>
-</tr>
-</tbody>
-</table>
-<h2 id="suppressing-diagnostics-lint-ignore">Suppressing diagnostics (lint-ignore)<a class="headerlink" href="#suppressing-diagnostics-lint-ignore" title="Permanent link">&para;</a></h2>
-<p>To silence specific diagnostics in a section — for example, a prototype variable you haven't wired up yet — wrap it in <code>LintIgnore</code> / <code>EndLintIgnore</code> markers and list the codes to ignore:</p>
-<div class="language-text highlight"><pre><span></span><code>&#39;&lt;!--{&quot;LintIgnore&quot;: [&quot;CPD-3301&quot;]}--&gt;
-prototype_var = 5
-&#39;&lt;!--{&quot;EndLintIgnore&quot;: []}--&gt;
-</code></pre></div>
-<p>Leave the list empty (<code>"LintIgnore": []</code>) to suppress <em>all</em> diagnostics inside the region.</p>
-<p>These markers are one kind of <a href="new-metadata-comments.html">metadata comment</a>; the <strong>Metadata</strong> panel tab can write them for you with a code picker.</p>
-<h2 id="choosing-how-much-to-show-vs-code">Choosing how much to show (VS Code)<a class="headerlink" href="#choosing-how-much-to-show-vs-code" title="Permanent link">&para;</a></h2>
-<p>The <code>calcpad.linter.minimumSeverity</code> setting (<code>error</code> | <code>warning</code> | <code>information</code>, default <code>information</code>) hides diagnostics below the level you choose — set it to <code>warning</code> to see only warnings and errors, or <code>error</code> for errors alone.</p>
+<h2 id="server">Server<a class="headerlink" href="#server" title="Permanent link">&para;</a></h2>
+<p><strong>Remote Server URL</strong> — the address used when the host is configured to talk to a remote CalcpadCE server rather than a local one.</p>
+<h2 id="preview-theme">Preview theme<a class="headerlink" href="#preview-theme" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Theme</strong> — System / Light / Dark for the rendered preview.</li>
+<li><strong>Dark Mode Background</strong> — the background color used in dark mode (default <code>#1e1e1e</code>), with a <strong>Reset</strong> button.</li>
+</ul>
+<h2 id="color-theme">Color theme<a class="headerlink" href="#color-theme" title="Permanent link">&para;</a></h2>
+<p><strong>Color Theme</strong> — the syntax-highlighting theme, defaulting to <em>System</em> with the available dark and light themes grouped in the list.</p>
+<h2 id="editor-font">Editor Font<a class="headerlink" href="#editor-font" title="Permanent link">&para;</a></h2>
+<p>Desktop app only.
+Pick the Monaco editor's font family from:</p>
+<ul>
+<li><strong>JuliaMono</strong> (bundled default) or <strong>System Default</strong>.</li>
+<li>Any additional <code>.woff2</code>/<code>.woff</code>/<code>.ttf</code>/<code>.otf</code> files dropped into the desktop app's <em>fonts folder</em>. Use <strong>Open Fonts Folder</strong> to reveal it, drop your fonts in, then reopen the Font Family picker to pick them up.</li>
+</ul>
+<h2 id="editor-features">Editor features<a class="headerlink" href="#editor-features" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Enable Quick Typing</strong> — <code>~</code>-prefixed shortcuts expand to symbols (e.g. <code>~a</code> → <code>α</code>, <code>~'</code> → <code>′</code>).</li>
+<li><strong>Comment Format</strong> — Auto (detect <code>#md</code> on/off) / HTML / Markdown; controls what the formatting hotkeys emit.</li>
+<li><strong>Enable Formatting Hotkeys</strong> — the Ctrl+B / Ctrl+I / Ctrl+1–6 … bindings.</li>
+<li><strong>Sync Preview to Cursor Line</strong> — scroll the preview to follow the line the cursor is on.</li>
+<li><strong>Auto-Run Preview</strong> <em>(default on)</em> — when off, the preview only re-renders when the preview panel is first opened or a manual <strong>Run Preview</strong> is triggered (<strong>Ctrl+Alt+X</strong>, the ▶ Run button, the editor context menu, or the Server → Refresh menu in the desktop app). Turn this off for large documents where every keystroke re-render is too costly.</li>
+</ul>
+<h2 id="library">Library<a class="headerlink" href="#library" title="Permanent link">&para;</a></h2>
+<p><strong>Library Path</strong> — a directory of shared <code>.cpd</code>/<code>.txt</code> files that appear in <code>#include</code> / <code>#read</code> path completion, so a team can share a common library.
+Supports <code>%ENV%</code> variables.</p>
+<h2 id="linter">Linter<a class="headerlink" href="#linter" title="Permanent link">&para;</a></h2>
+<p><strong>Minimum Severity</strong> — Error / Warning / Information (all).
+The lowest severity surfaced as a diagnostic.</p>
+<h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Open Logs Folder</strong> — opens the folder holding server logs and the most recent crash dump.</li>
+<li><strong>Max Output Lines (per channel)</strong> <em>(web/desktop)</em> — 10–100000, default 1000. Number of lines retained in each Output panel channel before older lines are dropped. Lower values reduce memory use and keep the UI responsive when logs are noisy.</li>
+</ul>
+<h2 id="named-configurations">Named configurations<a class="headerlink" href="#named-configurations" title="Permanent link">&para;</a></h2>
+<p>The <strong>Configuration</strong> section lets you keep more than one named set of settings — for example a metric configuration with 3 decimals and an imperial one in degrees — and switch between them:</p>
+<ul>
+<li><strong>Active Config</strong> — pick the configuration to apply.</li>
+<li><strong>Save current settings as</strong> — type a name and click <strong>Save</strong> to store the current settings under it.</li>
+<li><strong>Open Settings Folder</strong> — reveal where configurations are stored.</li>
+<li><strong>Reset to Default</strong> — restore the default settings.</li>
+</ul>
+<p>Configurations persist between sessions in the VS Code extension and the desktop app.
+(The pure browser build does not yet mirror named configs.)</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="new-vscode-extension.html">Using the VS Code Extension</a> · <a href="new-desktop-app.html">Using the Desktop App</a></li>
-<li><a href="programming.html">Programming</a> · <a href="writing-math.html">Writing Math</a></li>
+<li><a href="new-calcpad-panel.html">The CalcpadCE Panel</a></li>
+<li><a href="new-linter.html">Linter</a> · <a href="new-pdf-export.html">PDF Export</a></li>
 </ul>
 
 

@@ -1317,10 +1317,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-calcpad-panel" class="md-nav__link">
+  <a href="#the-calcpadce-panel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The CalcPad panel
+        The CalcpadCE panel
       
     </span>
   </a>
@@ -1482,14 +1482,42 @@
   
   
     <li class="md-nav__item">
-      <a href="new-calcpad-panel-and-settings.html" class="md-nav__link">
+      <a href="new-calcpad-panel.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The CalcPad Panel & Settings
+    The CalcpadCE Panel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
   
 
     
@@ -3129,10 +3157,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-calcpad-panel" class="md-nav__link">
+  <a href="#the-calcpadce-panel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The CalcPad panel
+        The CalcpadCE panel
       
     </span>
   </a>
@@ -3271,12 +3299,13 @@
 <blockquote>
 <p>Calcpad.Web only. The standalone WPF desktop application for Windows is separate and unaffected.</p>
 </blockquote>
-<p>The <strong>Calcpad VS Code extension</strong> turns Visual Studio Code into a full Calcpad authoring environment. You write <code>.cpd</code> files with syntax highlighting, autocomplete, and inline error checking, then render them to a live HTML report and export to PDF, Word, or HTML — all driven by the same calculation engine as the rest of Calcpad.</p>
-<p>For the Calcpad language itself, start with <strong><a href="writing-math.html">Writing Math</a></strong> and the <strong><a href="quick-reference.html">Quick Reference</a></strong>.</p>
+<p>The <strong>CalcpadCE VS Code extension</strong> turns Visual Studio Code into a full CalcpadCE authoring environment.
+You write <code>.cpd</code> files with syntax highlighting, autocomplete, and inline error checking, then render them to a live HTML report and export to PDF, Word, or HTML — all driven by the same calculation engine as the rest of CalcpadCE.</p>
+<p>For the CalcpadCE language itself, start with <strong><a href="writing-math.html">Writing Math</a></strong> and the <strong><a href="quick-reference.html">Quick Reference</a></strong>.</p>
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Visual Studio Code</strong> 1.82 or newer.</li>
-<li><strong>.NET runtime</strong> on your PATH. The extension bundles a local Calcpad server that it launches automatically; it needs <code>dotnet</code> to run it. Verify with <code>dotnet --info</code> in a terminal.</li>
+<li><strong>.NET runtime</strong> on your PATH. The extension bundles a local CalcpadCE server that it launches automatically; it needs <code>dotnet</code> to run it. Verify with <code>dotnet --info</code> in a terminal.</li>
 <li>A <strong>Chromium-based browser</strong> (Chrome, Edge, Chromium) for PDF export. See <a href="new-pdf-export.html">PDF Export</a>.</li>
 </ul>
 <h2 id="installing-the-extension">Installing the extension<a class="headerlink" href="#installing-the-extension" title="Permanent link">&para;</a></h2>
@@ -3302,18 +3331,20 @@
 </code></pre></div>
 </li>
 <li>
-<p>Click the <strong>CalcPad Preview</strong> button in the editor's top-right toolbar, or run <strong>CalcPad Preview</strong> from the Command Palette (<strong>Ctrl+Shift+P</strong>).</p>
+<p>Click the <strong>CalcpadCE Preview</strong> button in the editor's top-right toolbar, or run <strong>CalcpadCE Preview</strong> from the Command Palette (<strong>Ctrl+Shift+P</strong>).</p>
 </li>
 </ol>
-<p>The preview opens in a side column and re-renders every time you edit. The bundled server starts automatically the first time you render — the first render may take a moment while it spins up.</p>
+<p>The preview opens in a side column and re-renders every time you edit.
+The bundled server starts automatically the first time you render — the first render may take a moment while it spins up.</p>
 <h2 id="the-editor">The editor<a class="headerlink" href="#the-editor" title="Permanent link">&para;</a></h2>
 <h3 id="syntax-highlighting">Syntax highlighting<a class="headerlink" href="#syntax-highlighting" title="Permanent link">&para;</a></h3>
-<p><code>.cpd</code> files get semantic highlighting: numbers, units, operators, variables, functions, macros, keywords, commands, file paths, and embedded HTML/Markdown/CSS/JS/SVG in comments are each colored distinctly. Highlighting updates per line as you type, for both dark and light themes.</p>
+<p><code>.cpd</code> files get semantic highlighting: numbers, units, operators, variables, functions, macros, keywords, commands, file paths, and embedded HTML/Markdown/CSS/JS/SVG in comments are each colored distinctly.
+Highlighting updates per line as you type, for both dark and light themes.</p>
 <p>The extension also sets a few editor defaults for <code>.cpd</code> files so the language behaves predictably:</p>
 <ul>
-<li>The monospace font is <strong>JuliaMono</strong> (falls back to Cascadia Code / Consolas). Run <strong>CalcPad: Install JuliaMono Font</strong> from the Command Palette to install it if the glyphs look wrong.</li>
+<li>The monospace font is <strong>JuliaMono</strong> (falls back to Cascadia Code / Consolas). Run <strong>CalcpadCE: Install JuliaMono Font</strong> from the Command Palette to install it if the glyphs look wrong.</li>
 <li><strong>Enter always inserts a newline</strong> — it never accepts a suggestion. Press <strong>Tab</strong> to accept a completion instead.</li>
-<li>Bracket matching is always on; bracket-pair colorization is off (Calcpad colors brackets itself).</li>
+<li>Bracket matching is always on; bracket-pair colorization is off (CalcpadCE colors brackets itself).</li>
 </ul>
 <h3 id="autocomplete">Autocomplete<a class="headerlink" href="#autocomplete" title="Permanent link">&para;</a></h3>
 <p>As you type, the completion list offers:</p>
@@ -3324,11 +3355,16 @@
 <li><strong><a href="new-metadata-comments.html">Metadata keys</a></strong> inside an HTML-comment block placed directly above a definition. The <strong>Metadata</strong> panel tab edits these through a form.</li>
 </ul>
 <h3 id="quick-type-symbols">Quick-type symbols<a class="headerlink" href="#quick-type-symbols" title="Permanent link">&para;</a></h3>
-<p>Type <code>~</code> followed by a key and press <strong>space</strong> to insert a Greek letter or math symbol. For example <code>~a</code> + space → <code>α</code>, <code>~p</code> + space → <code>π</code>, <code>~S</code> + space → <code>Σ</code>. The full set is shown in the <strong>Insert</strong> tab's Symbol Palette. Toggle this with the <code>quickTyping</code> setting in the CalcPad <strong>Settings</strong> tab.</p>
+<p>Type <code>~</code> followed by a key and press <strong>space</strong> to insert a Greek letter or math symbol.
+For example <code>~a</code> + space → <code>α</code>, <code>~p</code> + space → <code>π</code>, <code>~S</code> + space → <code>Σ</code>.
+The full set is shown in the <strong>Insert</strong> tab's Symbol Palette.
+Toggle this with the <code>quickTyping</code> setting in the CalcpadCE <strong>Settings</strong> tab.</p>
 <h3 id="operator-replacement-and-auto-indent">Operator replacement and auto-indent<a class="headerlink" href="#operator-replacement-and-auto-indent" title="Permanent link">&para;</a></h3>
-<p>Typing ASCII operators auto-converts them to Unicode: <code>&lt;=</code> → <code>≤</code>, <code>&gt;=</code> → <code>≥</code>, <code>!=</code> → <code>≠</code>. Block keywords indent automatically: <code>#if</code> / <code>#else</code> / <code>#end if</code>, <code>#for</code> / <code>#end for</code>, and <code>#def</code> / <code>#end def</code>.</p>
+<p>Typing ASCII operators auto-converts them to Unicode: <code>&lt;=</code> → <code>≤</code>, <code>&gt;=</code> → <code>≥</code>, <code>!=</code> → <code>≠</code>.
+Block keywords indent automatically: <code>#if</code> / <code>#else</code> / <code>#end if</code>, <code>#for</code> / <code>#end for</code>, and <code>#def</code> / <code>#end def</code>.</p>
 <h3 id="formatting-hotkeys">Formatting hotkeys<a class="headerlink" href="#formatting-hotkeys" title="Permanent link">&para;</a></h3>
-<p>When the cursor is in a <code>.cpd</code> file, these hotkeys wrap the selection in HTML or Markdown markup. Whether HTML or Markdown is emitted depends on the <code>commentFormat</code> setting (<code>auto</code> / <code>html</code> / <code>markdown</code>).</p>
+<p>When the cursor is in a <code>.cpd</code> file, these hotkeys wrap the selection in HTML or Markdown markup.
+Whether HTML or Markdown is emitted depends on the <code>commentFormat</code> setting (<code>auto</code> / <code>html</code> / <code>markdown</code>).</p>
 <table>
 <thead>
 <tr>
@@ -3391,7 +3427,8 @@
 </tr>
 </tbody>
 </table>
-<p>On macOS use <strong>Cmd</strong> instead of <strong>Ctrl</strong>. Turn the whole set off with the <code>enableFormattingHotkeys</code> setting if it conflicts with your other bindings.</p>
+<p>On macOS use <strong>Cmd</strong> instead of <strong>Ctrl</strong>.
+Turn the whole set off with the <code>enableFormattingHotkeys</code> setting if it conflicts with your other bindings.</p>
 <h2 id="navigating-symbols">Navigating symbols<a class="headerlink" href="#navigating-symbols" title="Permanent link">&para;</a></h2>
 <p>The extension provides IDE-grade navigation across variables, functions, macros, and custom units — including across <code>#include</code> files:</p>
 <table>
@@ -3430,9 +3467,11 @@
 <li>Environment variables expand: <code>%VAR%</code> on Windows, <code>$VAR</code> on macOS/Linux.</li>
 </ul>
 <p>Point the library path (in the Settings tab) at a folder of reusable <code>.cpd</code> / <code>.txt</code> files and they show up in completion alongside workspace files — an easy way for a team to share a common library without copying it into every project.</p>
-<h2 id="the-calcpad-panel">The CalcPad panel<a class="headerlink" href="#the-calcpad-panel" title="Permanent link">&para;</a></h2>
-<p>Click the <strong>CalcPad</strong> icon in the activity bar (left edge) to open the panel. It has <strong>Files</strong> and <strong>Calcpad</strong> views, and the Calcpad view is organized into tabs (Insert, TOC, Settings, Variables, PDF, Formatting, Export, Errors). The view title bar has <strong>CalcPad: Run Preview</strong> (re-renders the active file and refreshes plots) and <strong>Stop Server</strong> buttons.</p>
-<p>The panel is the same across every Calcpad front end — see <strong><a href="new-calcpad-panel-and-settings.html">The CalcPad Panel &amp; Settings</a></strong> for a full walkthrough of each tab.</p>
+<h2 id="the-calcpadce-panel">The CalcpadCE panel<a class="headerlink" href="#the-calcpadce-panel" title="Permanent link">&para;</a></h2>
+<p>Click the <strong>CalcpadCE</strong> icon in the activity bar (left edge) to open the panel.
+It has <strong>Files</strong> and <strong>CalcpadCE</strong> views, and the CalcpadCE view is organized into tabs (Insert, TOC, Settings, Variables, PDF, Formatting, Export, Errors).
+The view title bar has <strong>CalcpadCE: Run Preview</strong> (re-renders the active file and refreshes plots) and <strong>Stop Server</strong> buttons.</p>
+<p>The panel is the same across every CalcpadCE front end — see <strong><a href="new-calcpad-panel.html">The CalcpadCE Panel &amp; Settings</a></strong> for a full walkthrough of each tab.</p>
 <h2 id="live-preview">Live preview<a class="headerlink" href="#live-preview" title="Permanent link">&para;</a></h2>
 <p>Two preview panels are available, each opening in its own editor column:</p>
 <table>
@@ -3445,11 +3484,11 @@
 <tbody>
 <tr>
 <td><strong>HTML Preview</strong></td>
-<td>Preview button in the editor toolbar, or <em>CalcPad Preview</em> in the Command Palette</td>
+<td>Preview button in the editor toolbar, or <em>CalcpadCE Preview</em> in the Command Palette</td>
 </tr>
 <tr>
 <td><strong>Unwrapped Preview</strong></td>
-<td>Eye button in the editor toolbar, or <em>CalcPad Preview Unwrapped</em></td>
+<td>Eye button in the editor toolbar, or <em>CalcpadCE Preview Unwrapped</em></td>
 </tr>
 </tbody>
 </table>
@@ -3462,16 +3501,20 @@
 </ul>
 <p>Right-click a preview → <strong>View Webview Source HTML</strong> to inspect the rendered markup.</p>
 <h3 id="running-on-demand-auto-run-off">Running on demand (Auto-Run off)<a class="headerlink" href="#running-on-demand-auto-run-off" title="Permanent link">&para;</a></h3>
-<p>When you turn <strong>Settings → Auto-Run Preview</strong> off, typing no longer re-renders the preview. Trigger the run yourself via any of:</p>
+<p>When you turn <strong>Settings → Auto-Run Preview</strong> off, typing no longer re-renders the preview.
+Trigger the run yourself via any of:</p>
 <ul>
 <li><strong>Ctrl+Alt+X</strong> (works whenever a <code>.cpd</code> or plaintext editor has focus)</li>
-<li>Right-click in the editor → <strong>CalcPad: Run Preview</strong></li>
-<li>The <strong>CalcPad: Run Preview</strong> button in the CalcPad sidebar's view title bar</li>
-<li>The <em>CalcPad: Run Preview</em> command in the Command Palette</li>
+<li>Right-click in the editor → <strong>CalcpadCE: Run Preview</strong></li>
+<li>The <strong>CalcpadCE: Run Preview</strong> button in the CalcpadCE sidebar's view title bar</li>
+<li>The <em>CalcpadCE: Run Preview</em> command in the Command Palette</li>
 </ul>
 <p>Running also re-lints the document, refreshes syntax highlighting, and rebuilds the Export tab's plot list.</p>
 <h2 id="errors-and-diagnostics">Errors and diagnostics<a class="headerlink" href="#errors-and-diagnostics" title="Permanent link">&para;</a></h2>
-<p>Calcpad errors surface in VS Code's <strong>Problems</strong> panel (<strong>Ctrl+Shift+M</strong>) as standard diagnostics with Error / Warning / Information severities, each with a <code>CPD-XXXX</code> code. Click one to jump to the offending line. Control how much is shown with the linter minimum-severity setting. See <strong><a href="new-linter.html">Linter and Diagnostics</a></strong> for what each code means.</p>
+<p>CalcpadCE errors surface in VS Code's <strong>Problems</strong> panel (<strong>Ctrl+Shift+M</strong>) as standard diagnostics with Error / Warning / Information severities, each with a <code>CPD-XXXX</code> code.
+Click one to jump to the offending line.
+Control how much is shown with the linter minimum-severity setting.
+See <strong><a href="new-linter.html">Linter and Diagnostics</a></strong> for what each code means.</p>
 <p>For errors that occur inside hidden (<code>#hide</code>) regions — which don't appear in the preview — use the <strong>Errors</strong> tab in the sidebar to see the full list with source-line links.</p>
 <h2 id="exporting">Exporting<a class="headerlink" href="#exporting" title="Permanent link">&para;</a></h2>
 <p>All exports run through the same engine as the preview, so what you see is what you get.</p>
@@ -3486,38 +3529,43 @@
 <tbody>
 <tr>
 <td><strong>PDF</strong></td>
-<td><strong>Export CalcPad to PDF</strong> button in the editor toolbar, or <em>Export CalcPad to PDF</em></td>
+<td><strong>Export CalcpadCE to PDF</strong> button in the editor toolbar, or <em>Export CalcpadCE to PDF</em></td>
 <td>Full-fidelity export with a native save dialog. Requires a Chromium browser — see <a href="new-pdf-export.html">PDF Export</a>.</td>
 </tr>
 <tr>
 <td><strong>PDF (print style)</strong></td>
-<td>Right-click editor → <em>Print CalcPad Preview to PDF</em></td>
+<td>Right-click editor → <em>Print CalcpadCE Preview to PDF</em></td>
 <td>Generated from the live preview.</td>
 </tr>
 <tr>
 <td><strong>HTML</strong></td>
-<td><strong>Save HTML…</strong> on the sidebar's <strong>Export</strong> tab, or <em>CalcPad: Save Source HTML…</em></td>
+<td><strong>Save HTML…</strong> on the sidebar's <strong>Export</strong> tab, or <em>CalcpadCE: Save Source HTML…</em></td>
 <td>Renders and saves standalone HTML via a native dialog.</td>
 </tr>
 <tr>
 <td><strong>Word (.docx)</strong></td>
-<td><strong>Save Word…</strong> on the sidebar's <strong>Export</strong> tab, or <em>CalcPad: Save as Word Document…</em></td>
+<td><strong>Save Word…</strong> on the sidebar's <strong>Export</strong> tab, or <em>CalcpadCE: Save as Word Document…</em></td>
 <td>Renders, then converts to a Word document.</td>
 </tr>
 </tbody>
 </table>
-<p>Use the <strong>PDF</strong> tab in the panel to set the document title, timestamp format, page size, and header/footer before exporting. The <strong>Export</strong> tab also has a <strong>Plots</strong> section — a thumbnail list of every plot the document emits, each with an individual <strong>Save…</strong> button and a <strong>Download all (ZIP)</strong> button. See <a href="new-calcpad-panel-and-settings.html#export">The CalcPad Panel &amp; Settings → Export</a>.</p>
+<p>Use the <strong>PDF</strong> tab in the panel to set the document title, timestamp format, page size, and header/footer before exporting.
+The <strong>Export</strong> tab also has a <strong>Plots</strong> section — a thumbnail list of every plot the document emits, each with an individual <strong>Save…</strong> button and a <strong>Download all (ZIP)</strong> button.
+See <a href="new-calcpad-panel.html#export">The CalcpadCE Panel &amp; Settings → Export</a>.</p>
 <h2 id="settings">Settings<a class="headerlink" href="#settings" title="Permanent link">&para;</a></h2>
-<p>All Calcpad settings — math, plot, units, preview and color themes, editor features, linter severity, library path, and named configurations — live in the <strong>Settings</strong> tab of the CalcPad panel, <strong>not</strong> in VS Code's normal settings editor. Editing them there keeps them in sync with the extension and the server.</p>
-<p>See <strong><a href="new-calcpad-panel-and-settings.html#settings">The CalcPad Panel &amp; Settings → Settings</a></strong> for the full list.</p>
+<p>All CalcpadCE settings — math, plot, units, preview and color themes, editor features, linter severity, library path, and named configurations — live in the <strong>Settings</strong> tab of the CalcpadCE panel, <strong>not</strong> in VS Code's normal settings editor.
+Editing them there keeps them in sync with the extension and the server.</p>
+<p>See <strong><a href="new-calcpad-panel.html#settings">The CalcpadCE Panel &amp; Settings → Settings</a></strong> for the full list.</p>
 <h2 id="the-bundled-engine">The bundled engine<a class="headerlink" href="#the-bundled-engine" title="Permanent link">&para;</a></h2>
-<p>The extension runs a local Calcpad engine to do all conversion and linting. You don't normally need to think about it:</p>
+<p>The extension runs a local CalcpadCE engine to do all conversion and linting.
+You don't normally need to think about it:</p>
 <ul>
 <li>It <strong>starts automatically</strong> in the background when the extension activates.</li>
 <li>It <strong>auto-restarts</strong> on a crash (up to 3 retries) before asking you to refresh manually.</li>
 <li>It <strong>shuts down cleanly</strong> when the window closes.</li>
 </ul>
-<p>If something goes wrong, use <strong>Stop CalcPad Server</strong> and then <strong>Refresh Document</strong> to restart it. The server mode (<code>auto</code> / <code>local</code> / <code>remote</code>), URL (default <code>http://localhost:9420</code>), and <code>dotnet</code> path are configurable if you need a custom setup.</p>
+<p>If something goes wrong, use the Stop and Restart buttons on the CalcpadCE panel to stop/restart it.
+The server mode (<code>auto</code> / <code>local</code> / <code>remote</code>), URL (default <code>http://localhost:9420</code>), and <code>dotnet</code> path are configurable if you need a custom setup.</p>
 <h3 id="output-channels-for-troubleshooting">Output channels for troubleshooting<a class="headerlink" href="#output-channels-for-troubleshooting" title="Permanent link">&para;</a></h3>
 <p>Four VS Code output channels help diagnose problems (open the Output panel and pick from the dropdown):</p>
 <table>
@@ -3529,19 +3577,19 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>CalcPad Extension</strong></td>
+<td><strong>CalcpadCE Extension</strong></td>
 <td>Extension lifecycle, commands, errors</td>
 </tr>
 <tr>
-<td><strong>Calcpad Output HTML</strong></td>
+<td><strong>CalcpadCE Output HTML</strong></td>
 <td>Rendered HTML diagnostics</td>
 </tr>
 <tr>
-<td><strong>Calcpad Webview Console</strong></td>
+<td><strong>CalcpadCE Webview Console</strong></td>
 <td>Console messages from preview panels</td>
 </tr>
 <tr>
-<td><strong>CalcPad Server Debug</strong></td>
+<td><strong>CalcpadCE Server Debug</strong></td>
 <td>Output from the engine process</td>
 </tr>
 </tbody>
@@ -3557,19 +3605,11 @@
 <tbody>
 <tr>
 <td>Preview never renders / "server not ready"</td>
-<td>Confirm <code>dotnet --info</code> works. Then <strong>Stop CalcPad Server</strong> → <strong>Refresh Document</strong>. Check the <strong>CalcPad Server Debug</strong> output channel.</td>
+<td>Click refresh icon in the CalcpadCE panel to try restarting a server that crashed or failed to start. Check the <strong>CalcpadCE Server Debug</strong> output channel.</td>
 </tr>
 <tr>
 <td>PDF export fails</td>
 <td>Install a Chromium browser (Chrome/Edge/Chromium). See <a href="new-pdf-export.html">PDF Export</a>.</td>
-</tr>
-<tr>
-<td>Greek letters / symbols render as boxes</td>
-<td>Run <strong>CalcPad: Install JuliaMono Font</strong> and reload.</td>
-</tr>
-<tr>
-<td>Symbols not found across files</td>
-<td>Confirm the <code>#include</code> path resolves; set the library path if the file lives in a shared folder.</td>
 </tr>
 <tr>
 <td>Formatting hotkeys conflict with other bindings</td>
@@ -3579,7 +3619,7 @@
 </table>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="new-calcpad-panel-and-settings.html">The CalcPad Panel &amp; Settings</a> — the shared sidebar and all settings</li>
+<li><a href="new-calcpad-panel.html">The CalcpadCE Panel &amp; Settings</a> — the shared sidebar and all settings</li>
 <li><a href="new-desktop-app.html">Using the Desktop App</a></li>
 <li><a href="new-pdf-export.html">PDF Export</a> · <a href="new-includes.html">Includes and File Reads</a> · <a href="new-linter.html">Linter and Diagnostics</a> · <a href="new-table-of-contents.html">Table of Contents</a></li>
 <li><a href="writing-math.html">Writing Math</a> · <a href="quick-reference.html">Quick Reference</a></li>

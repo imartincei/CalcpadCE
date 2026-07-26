@@ -1186,14 +1186,42 @@
   
   
     <li class="md-nav__item">
-      <a href="new-calcpad-panel-and-settings.html" class="md-nav__link">
+      <a href="new-calcpad-panel.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The CalcPad Panel & Settings
+    The CalcpadCE Panel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
   
 
     
@@ -2860,7 +2888,7 @@
 <h1 id="includes-and-file-reads">Includes and File Reads<a class="headerlink" href="#includes-and-file-reads" title="Permanent link">&para;</a></h1>
 <p><code>#include</code> and <code>#read</code> let you pull in other files, and both can follow chains of files.</p>
 <h2 id="reusing-code-with-include">Reusing code with <code>#include</code><a class="headerlink" href="#reusing-code-with-include" title="Permanent link">&para;</a></h2>
-<p><code>#include</code> inlines another Calcpad file's source into your document at parse time, so you can keep shared constants, functions, and macros in one place and reuse them everywhere:</p>
+<p><code>#include</code> inlines another CalcpadCE file's source into your document at parse time, so you can keep shared constants, functions, and macros in one place and reuse them everywhere:</p>
 <div class="language-text highlight"><pre><span></span><code>&#39; top.cpd
 #include shared/constants.cpd
 #include shared/helpers.cpd
@@ -2883,7 +2911,7 @@
 <tbody>
 <tr>
 <td>What it brings in</td>
-<td>Calcpad source code</td>
+<td>CalcpadCE source code</td>
 <td>Data (CSV, TSV, Excel, JSON)</td>
 </tr>
 <tr>
