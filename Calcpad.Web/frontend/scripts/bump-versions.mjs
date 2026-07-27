@@ -8,6 +8,7 @@
 //   * calcpad-desktop/src-tauri/Cargo.toml (package.version)
 //   * calcpad-desktop/src-tauri/Cargo.lock (calcpad-desktop [[package]] entry)
 //   * calcpad-desktop/src-tauri/tauri.conf.json (version)
+//   * calcpad-desktop/packaging/arch/PKGBUILD (pkgver, and pkgrel back to 1)
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -101,3 +102,16 @@ if (existsSync(cargoLock)) {
 updateJson(resolve(frontendRoot, 'calcpad-desktop/src-tauri/tauri.conf.json'), j => {
     const p = j.version; j.version = next; return p;
 });
+
+// A new upstream version restarts the Arch package revision at 1.
+const pkgbuild = resolve(frontendRoot, 'calcpad-desktop/packaging/arch/PKGBUILD');
+if (existsSync(pkgbuild)) {
+    const src = readFileSync(pkgbuild, 'utf8');
+    const updated = src
+        .replace(/^(pkgver=)(.*)$/m, (_, a, prev) => {
+            console.log(`calcpad-desktop/packaging/arch/PKGBUILD: ${prev} -> ${next}`);
+            return a + next;
+        })
+        .replace(/^pkgrel=.*$/m, 'pkgrel=1');
+    writeFileSync(pkgbuild, updated);
+}

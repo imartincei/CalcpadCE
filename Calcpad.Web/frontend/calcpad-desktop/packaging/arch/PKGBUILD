@@ -1,0 +1,75 @@
+# Maintainer: Isaiah Martin <isaiah.m@cornerstoneaec.com>
+#
+# Packages the tree that build-desktop.sh already produced, so the resulting
+# .pkg.tar.zst comes from the same build as the .deb and .rpm rather than a
+# separately-fetched release artifact.
+#
+# Usage:
+#   cd Calcpad.Web/frontend/calcpad-desktop
+#   ./build-desktop.sh --bundles=deb          # any target works; this only
+#                                             # needs the binary + sidecar
+#   cd packaging/arch && makepkg -f
+
+pkgname=calcpad-ce
+pkgver=0.3.0
+pkgrel=1
+pkgdesc='CalcpadCE desktop editor — Vue frontend with an embedded ASP.NET Core server'
+arch=('x86_64' 'aarch64')
+url='https://github.com/imartincei/CalcpadCE'
+license=('MIT')
+depends=('webkit2gtk-4.1' 'gtk3' 'libsoup3')
+source=('CalcpadCE.desktop')
+sha256sums=('SKIP')
+
+# The sidecar is a self-contained .NET publish whose native libraries already
+# ship stripped; a strip pass rewrites them for no measurable size win and
+# libSkiaSharp.so actually grows. !debug avoids a debug package with no symbols
+# to put in it.
+options=('!strip' '!debug')
+
+_srcroot="$startdir/../.."
+
+case "$CARCH" in
+    x86_64)  _triple='x86_64-unknown-linux-gnu' ;;
+    aarch64) _triple='aarch64-unknown-linux-gnu' ;;
+esac
+
+package() {
+    local reldir="$_srcroot/src-tauri/target/$_triple/release"
+    local bindir="$_srcroot/src-tauri/binaries"
+    local icons="$_srcroot/src-tauri/icons"
+
+    if [[ ! -f "$reldir/calcpad-desktop" ]]; then
+        error "No build output at $reldir/calcpad-desktop — run build-desktop.sh first."
+        return 1
+    fi
+    if [[ ! -f "$bindir/Calcpad.Server" ]]; then
+        error "No published sidecar at $bindir/Calcpad.Server — run build-desktop.sh first."
+        return 1
+    fi
+
+    install -Dm755 "$reldir/calcpad-desktop" "$pkgdir/usr/bin/calcpad-desktop"
+
+    # Mirrors bundle.resources in tauri.linux.conf.json so the payload matches
+    # what the deb and rpm bundlers install.
+    local libdir="$pkgdir/usr/lib/CalcpadCE"
+    install -Dm755 -t "$libdir" "$bindir"/*.so
+    install -Dm755 -t "$libdir" "$bindir/Calcpad.Server" "$bindir/createdump"
+    install -Dm644 -t "$libdir" "$bindir"/*.dll "$bindir"/*.json "$bindir/template.html"
+    install -Dm644 -t "$libdir/Fonts" "$bindir"/Fonts/*
+    install -Dm644 -t "$libdir/bg" "$bindir"/bg/*
+    install -Dm644 -t "$libdir/zh" "$bindir"/zh/*
+
+    install -Dm644 "$srcdir/CalcpadCE.desktop" \
+        "$pkgdir/usr/share/applications/CalcpadCE.desktop"
+
+    install -Dm644 "$icons/32x32.png" \
+        "$pkgdir/usr/share/icons/hicolor/32x32/apps/calcpad-desktop.png"
+    install -Dm644 "$icons/128x128.png" \
+        "$pkgdir/usr/share/icons/hicolor/128x128/apps/calcpad-desktop.png"
+    install -Dm644 "$icons/128x128@2x.png" \
+        "$pkgdir/usr/share/icons/hicolor/256x256/apps/calcpad-desktop.png"
+
+    install -Dm644 "$_srcroot/../../../LICENSE" \
+        "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

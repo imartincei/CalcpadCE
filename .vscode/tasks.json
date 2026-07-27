@@ -335,6 +335,42 @@
             "problemMatcher": []
         },
         {
+            "label": "Desktop: Bundle .rpm (Linux)",
+            "type": "shell",
+            "group": "build",
+            "linux": {
+                "command": "bash",
+                "args": [
+                    "${workspaceFolder}/Calcpad.Web/frontend/calcpad-desktop/build-desktop.sh",
+                    "--bundles=rpm"
+                ]
+            },
+            "windows": { "command": "echo", "args": [".rpm can only be built on Linux"] },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Desktop: Bundle Arch Package (Linux)",
+            "type": "shell",
+            "group": "build",
+            "linux": {
+                "command": "makepkg",
+                "args": ["-f"],
+                "options": {
+                    "cwd": "${workspaceFolder}/Calcpad.Web/frontend/calcpad-desktop/packaging/arch"
+                }
+            },
+            "windows": { "command": "echo", "args": ["Arch packages can only be built on Linux"] },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Desktop: Bundle All",
             "type": "shell",
             "group": "build",

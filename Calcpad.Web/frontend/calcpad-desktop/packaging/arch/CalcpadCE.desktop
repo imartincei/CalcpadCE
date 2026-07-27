@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=CalcpadCE
+Comment=CalcpadCE desktop editor
+Exec=calcpad-desktop %f
+Icon=calcpad-desktop
+Terminal=false
+Categories=Development;
+StartupWMClass=calcpad-desktop
+MimeType=application/x-calcpadce;

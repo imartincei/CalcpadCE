@@ -4,7 +4,7 @@
     "beforeBuildCommand": "rm -rf ../calcpad-web/dist && ./local-npm.sh --prefix ../calcpad-frontend run build && ./local-npm.sh --prefix ../calcpad-web run build"
   },
   "bundle": {
-    "targets": ["deb", "appimage"],
+    "targets": ["deb", "rpm", "appimage"],
     "resources": {
       "binaries/*.so": "./",
       "binaries/*.dll": "./",
@@ -18,6 +18,9 @@
     },
     "linux": {
       "deb": {
+        "depends": []
+      },
+      "rpm": {
         "depends": []
       }
     }

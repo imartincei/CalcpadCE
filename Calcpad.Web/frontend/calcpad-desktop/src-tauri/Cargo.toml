@@ -3,6 +3,7 @@ name = "calcpad-desktop"
 version = "0.3.0"
 description = "CalcpadCE desktop shell"
 authors = ["Isaiah Martin"]
+license = "MIT"
 edition = "2021"
 rust-version = "1.77"
 
