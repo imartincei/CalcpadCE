@@ -3,7 +3,7 @@ import { CalcpadSnippetService } from '../snippets';
 import { CalcpadDefinitionsService } from '../definitions';
 import { parseHeadings } from '../headings';
 import { findMetadataCommentBlock, analyzeMetadataLine, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver } from '../../text/metadata-comment';
-import type { MetadataCommentData, MetadataCommentBlock, DefinitionResolver } from '../../text/metadata-comment';
+import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, DefinitionResolver } from '../../text/metadata-comment';
 import type { DefinitionsResponse } from '../../types/api';
 import { getDefaultSettings, buildApiSettings } from '../../types/settings';
 import type { CalcpadSettings } from '../../types/settings';
@@ -635,8 +635,10 @@ export abstract class BaseMessageBridge {
      */
     private handleUpdateMetadata(msg: {
         line: number;
+        endLine?: number;
         indent?: string;
         trailingQuote?: string;
+        layout?: MetadataLayout;
         data: MetadataCommentData;
         isNew?: boolean;
     }): void {
@@ -645,12 +647,13 @@ export abstract class BaseMessageBridge {
         if (!editor || !model || typeof msg.line !== 'number') return;
         const lineNumber = msg.line + 1;
         if (lineNumber < 1 || lineNumber > model.getLineCount()) return;
-        const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '');
+        const endLineNumber = (msg.endLine ?? msg.line) + 1;
+        const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '', msg.layout);
         const range = msg.isNew
             ? { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }
             : {
                 startLineNumber: lineNumber, startColumn: 1,
-                endLineNumber: lineNumber, endColumn: model.getLineMaxColumn(lineNumber),
+                endLineNumber: endLineNumber, endColumn: model.getLineMaxColumn(endLineNumber),
             };
         editor.executeEdits('calcpad-metadata', [{
             range,

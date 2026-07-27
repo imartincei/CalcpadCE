@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, findMetadataCommentBlock, analyzeMetadataLine, computeMetadataBlock, buildDefinitionResolver } from 'calcpad-frontend';
-import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, DefinitionResolver, DefinitionsResponse } from 'calcpad-frontend';
+import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 
@@ -531,8 +531,10 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
      */
     private async _handleUpdateMetadata(data: {
         line: number;
+        endLine?: number;
         indent?: string;
         trailingQuote?: string;
+        layout?: MetadataLayout;
         data: MetadataCommentData;
         isNew?: boolean;
     }): Promise<void> {
@@ -540,12 +542,14 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         if (!editor || typeof data.line !== 'number') return;
         if (data.line < 0 || data.line >= editor.document.lineCount) return;
 
-        const newText = serializeMetadataComment(data.data, data.indent ?? '', data.trailingQuote ?? '');
+        const newText = serializeMetadataComment(data.data, data.indent ?? '', data.trailingQuote ?? '', data.layout);
+        const endLine = Math.min(data.endLine ?? data.line, editor.document.lineCount - 1);
         await editor.edit(editBuilder => {
             if (data.isNew) {
                 editBuilder.insert(new vscode.Position(data.line, 0), newText + '\n');
             } else {
-                editBuilder.replace(editor.document.lineAt(data.line).range, newText);
+                const range = editor.document.lineAt(data.line).range.with({ end: editor.document.lineAt(endLine).range.end });
+                editBuilder.replace(range, newText);
             }
         });
 

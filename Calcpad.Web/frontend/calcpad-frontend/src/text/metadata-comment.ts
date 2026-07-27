@@ -18,19 +18,40 @@ export interface MetadataCommentData {
     [key: string]: unknown;
 }
 
-/** A metadata comment located on a single document line. */
-export interface MetadataCommentBlock {
-    /** 0-based line index containing the comment */
-    line: number;
-    /** Leading whitespace of the line */
+/** One physical line of a metadata comment and the JSON keys it carries. */
+export interface MetadataLayoutSegment {
+    /** Leading whitespace of the physical line */
     indent: string;
-    /** Closing comment quote (`'`) if the line ends with one, else '' */
+    /** Top-level JSON keys living on this line, in document order */
+    keys: string[];
+}
+
+/**
+ * Physical line layout of a multi-line metadata comment, used to round-trip
+ * edits without reflowing: existing keys stay on their line, new keys append to
+ * the last line, and a line whose keys are all removed collapses away.
+ */
+export interface MetadataLayout {
+    segments: MetadataLayoutSegment[];
+}
+
+/** A metadata comment occupying one or more document lines. */
+export interface MetadataCommentBlock {
+    /** 0-based line index where the comment opens */
+    line: number;
+    /** 0-based line index where the comment closes (equals {@link line} when single-line) */
+    endLine: number;
+    /** Leading whitespace of the opening line */
+    indent: string;
+    /** Closing comment quote (`'`) if the closing line ends with one, else '' */
     trailingQuote: string;
-    /** Raw text between `<!--` and `-->`, trimmed */
+    /** Raw JSON between `<!--` and `-->`, continuation lines joined, trimmed */
     rawJson: string;
     /** Parsed object, or null when the JSON is malformed */
     data: MetadataCommentData | null;
     valid: boolean;
+    /** Physical line layout, set only for multi-line comments. */
+    layout?: MetadataLayout;
     /** Which properties actually apply to this line; set by the host. */
     context?: MetadataLineContext;
     /**
@@ -177,59 +198,188 @@ export const LINT_CODES: LintCode[] = [
     { code: 'CPD-3601', description: 'Invalid format specifier' },
 ];
 
-/**
- * Detect a single-line metadata comment (`'<!--{...}-->`) on the cursor's line.
- * Mirrors the tokenizer/linter rules: the line must open with a comment quote
- * (`'` or `"`) and contain a `<!--{ ... }-->` block that closes on the same
- * line. Multi-line blocks are out of scope (returns null) so edits round-trip
- * losslessly. Returns null when the cursor line holds no such comment.
- */
-export function findMetadataCommentBlock(lines: string[], cursorLine: number): MetadataCommentBlock | null {
-    if (cursorLine < 0 || cursorLine >= lines.length) return null;
+const LEADING_WS = /^[ \t]*/;
 
-    const lineText = lines[cursorLine];
-    const indentLen = getIndentLength(lineText);
-    const indent = lineText.slice(0, indentLen);
-    const rest = lineText.slice(indentLen);
+/** Leading whitespace of a line. */
+function leadingWhitespace(line: string): string {
+    return line.match(LEADING_WS)?.[0] ?? '';
+}
 
+/** Drop a trailing `_` line-continuation marker (and its whitespace) from a fragment. */
+function stripContinuation(fragment: string): string {
+    const trimmed = fragment.replace(/\s+$/, '');
+    return trimmed.endsWith('_') ? trimmed.slice(0, -1) : trimmed;
+}
+
+/** True when the line opens a metadata comment: a comment quote followed by `<!--`. */
+function isMetadataOpener(line: string): boolean {
+    const rest = line.slice(getIndentLength(line));
     const quote = rest[0];
-    if (quote !== "'" && quote !== '"') return null;
+    return (quote === "'" || quote === '"') && rest.includes('<!--');
+}
 
-    const openIdx = rest.indexOf('<!--');
-    if (openIdx < 0) return null;
-    const afterOpen = rest.slice(openIdx + 4);
-    const closeIdx = afterOpen.indexOf('-->');
-    if (closeIdx < 0) return null;
+/**
+ * Locate the opening line of the metadata comment that contains {@link cursorLine},
+ * walking back over `_` continuation lines. Returns -1 when the cursor isn't on a
+ * metadata comment (opener or one of its continuation lines).
+ */
+function findBlockStart(lines: string[], cursorLine: number): number {
+    if (isMetadataOpener(lines[cursorLine])) return cursorLine;
+    let i = cursorLine;
+    while (i > 0 && lines[i - 1].replace(/\s+$/, '').endsWith('_')) i--;
+    return i !== cursorLine && isMetadataOpener(lines[i]) ? i : -1;
+}
 
-    const rawJson = afterOpen.slice(0, closeIdx).trim();
-    if (!rawJson.startsWith('{')) return null;
+/**
+ * Scan a JSON object string and return each top-level key with the character
+ * offset of its opening quote. Used to map keys onto the physical lines they sit
+ * on for structure-preserving edits.
+ */
+function scanTopLevelKeys(json: string): { key: string; offset: number }[] {
+    const keys: { key: string; offset: number }[] = [];
+    let depth = 0, inString = false, escaped = false, expectKey = false, quoteStart = -1;
+    for (let i = 0; i < json.length; i++) {
+        const c = json[i];
+        if (inString) {
+            if (escaped) { escaped = false; continue; }
+            if (c === '\\') { escaped = true; continue; }
+            if (c === '"') {
+                inString = false;
+                if (depth === 1 && expectKey) {
+                    let j = i + 1;
+                    while (j < json.length && /\s/.test(json[j])) j++;
+                    if (json[j] === ':') {
+                        keys.push({ key: JSON.parse(json.slice(quoteStart, i + 1)), offset: quoteStart });
+                        expectKey = false;
+                    }
+                }
+            }
+            continue;
+        }
+        if (c === '"') { inString = true; quoteStart = i; continue; }
+        if (c === '{' || c === '[') { depth++; if (c === '{' && depth === 1) expectKey = true; continue; }
+        if (c === '}' || c === ']') { depth--; continue; }
+        if (depth === 1) {
+            if (c === ',') expectKey = true;
+            else if (c === ':') expectKey = false;
+        }
+    }
+    return keys;
+}
 
-    const afterClose = afterOpen.slice(closeIdx + 3).trim();
-    const trailingQuote = afterClose === quote ? quote : '';
-
-    let data: MetadataCommentData | null = null;
-    let valid = false;
+/** Parse a JSON object string into metadata data, or null when malformed. */
+function parseMetadataJson(rawJson: string): { data: MetadataCommentData | null; valid: boolean } {
     try {
         const parsed = JSON.parse(rawJson);
         if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-            data = parsed as MetadataCommentData;
-            valid = true;
+            return { data: parsed as MetadataCommentData, valid: true };
         }
     } catch {
         // Malformed JSON — surfaced to the UI via valid === false
     }
-
-    return { line: cursorLine, indent, trailingQuote, rawJson, data, valid };
+    return { data: null, valid: false };
 }
 
 /**
- * Build a metadata-comment line from a data object, preserving the original
- * indentation and trailing comment quote. Empty strings and empty objects are
- * dropped so the serialized comment stays minimal. Empty arrays are kept: they
- * are meaningful for the LintIgnore/EndLintIgnore region markers, and the panel
- * never emits empty paramTypes/paramDesc arrays in the first place.
+ * Detect the metadata comment (`'<!--{...}-->`) that contains the cursor's line.
+ * Mirrors the tokenizer/linter rules: the block opens with a comment quote
+ * (`'` or `"`) followed by `<!--{`, and either closes with `-->` on the same
+ * line or continues across `_`-terminated lines until `-->`. The cursor may sit
+ * on any physical line of a multi-line block. Returns null when the cursor line
+ * holds no such comment.
  */
-export function serializeMetadataComment(data: MetadataCommentData, indent = '', trailingQuote = ''): string {
+export function findMetadataCommentBlock(lines: string[], cursorLine: number): MetadataCommentBlock | null {
+    if (cursorLine < 0 || cursorLine >= lines.length) return null;
+
+    const startLine = findBlockStart(lines, cursorLine);
+    if (startLine < 0) return null;
+
+    const openerText = lines[startLine];
+    const indent = leadingWhitespace(openerText);
+    const rest = openerText.slice(indent.length);
+    const quote = rest[0];
+    const afterOpen = rest.slice(rest.indexOf('<!--') + 4);
+
+    const sameLineClose = afterOpen.indexOf('-->');
+    if (sameLineClose >= 0) {
+        const rawJson = afterOpen.slice(0, sameLineClose).trim();
+        if (!rawJson.startsWith('{')) return null;
+        const afterClose = afterOpen.slice(sameLineClose + 3).trim();
+        const trailingQuote = afterClose === quote ? quote : '';
+        const { data, valid } = parseMetadataJson(rawJson);
+        return { line: startLine, endLine: startLine, indent, trailingQuote, rawJson, data, valid };
+    }
+
+    // Multi-line: collect one JSON fragment (and its indent) per physical line.
+    const fragments = [stripContinuation(afterOpen)];
+    const indents = [indent];
+    let endLine = -1;
+    let trailingQuote = '';
+    for (let i = startLine + 1; i < lines.length; i++) {
+        const line = lines[i];
+        indents.push(leadingWhitespace(line));
+        const closeIdx = line.indexOf('-->');
+        if (closeIdx >= 0) {
+            fragments.push(line.slice(0, closeIdx));
+            const afterClose = line.slice(closeIdx + 3).trim();
+            trailingQuote = afterClose === quote ? quote : '';
+            endLine = i;
+            break;
+        }
+        fragments.push(stripContinuation(line));
+    }
+    if (endLine < 0) return null;
+    if (cursorLine > endLine) return null;
+
+    const rawJson = fragments.join('\n').trim();
+    if (!rawJson.startsWith('{')) return null;
+    const { data, valid } = parseMetadataJson(fragments.join('\n'));
+
+    return {
+        line: startLine,
+        endLine,
+        indent,
+        trailingQuote,
+        rawJson,
+        data,
+        valid,
+        layout: buildLayout(fragments, indents),
+    };
+}
+
+/** Distribute a multi-line comment's top-level keys onto the physical lines they occupy. */
+function buildLayout(fragments: string[], indents: string[]): MetadataLayout {
+    const joined = fragments.join('\n');
+    const segments: MetadataLayoutSegment[] = fragments.map((_, i) => ({ indent: indents[i], keys: [] }));
+
+    const starts: number[] = [];
+    let acc = 0;
+    for (const fragment of fragments) {
+        starts.push(acc);
+        acc += fragment.length + 1; // +1 for the joining '\n'
+    }
+    const segmentOf = (offset: number): number => {
+        let idx = 0;
+        for (let i = 0; i < starts.length; i++) {
+            if (offset >= starts[i]) idx = i;
+            else break;
+        }
+        return idx;
+    };
+
+    for (const { key, offset } of scanTopLevelKeys(joined)) {
+        segments[segmentOf(offset)].keys.push(key);
+    }
+    return { segments };
+}
+
+/**
+ * Drop keys that shouldn't be serialized: undefined/null, empty strings, and
+ * empty objects (e.g. an empty `settings`). Empty arrays are kept — they carry
+ * meaning for the LintIgnore/EndLintIgnore region markers, and the panel never
+ * emits empty paramTypes/paramDesc arrays in the first place.
+ */
+function cleanMetadata(data: MetadataCommentData): Record<string, unknown> {
     const clean: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(data)) {
         if (value === undefined || value === null) continue;
@@ -237,7 +387,49 @@ export function serializeMetadataComment(data: MetadataCommentData, indent = '',
         if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value as object).length === 0) continue;
         clean[key] = value;
     }
-    return `${indent}'<!--${JSON.stringify(clean)}-->${trailingQuote}`;
+    return clean;
+}
+
+/**
+ * Build a metadata-comment from a data object, preserving the original
+ * indentation and trailing comment quote. When {@link layout} describes an
+ * existing multi-line comment, edits round-trip in place: existing keys keep
+ * their line, new keys append to the last line, and a line whose keys are all
+ * removed collapses away (its `_` continuation dropped). Without a layout — a
+ * new or single-line comment — everything serializes onto one line.
+ */
+export function serializeMetadataComment(
+    data: MetadataCommentData,
+    indent = '',
+    trailingQuote = '',
+    layout?: MetadataLayout,
+): string {
+    const clean = cleanMetadata(data);
+    const singleLine = () => `${indent}'<!--${JSON.stringify(clean)}-->${trailingQuote}`;
+    if (!layout || layout.segments.length === 0) return singleLine();
+
+    const present = new Set<string>();
+    const segments = layout.segments.map(seg => ({
+        indent: seg.indent,
+        keys: seg.keys.filter(k => {
+            if (k in clean) { present.add(k); return true; }
+            return false;
+        }),
+    }));
+    const added = Object.keys(clean).filter(k => !present.has(k));
+    if (added.length) segments[segments.length - 1].keys.push(...added);
+
+    const kept = segments.filter(seg => seg.keys.length > 0);
+    if (kept.length === 0) return singleLine();
+
+    const renderKeys = (keys: string[]) =>
+        keys.map(k => `${JSON.stringify(k)}:${JSON.stringify(clean[k])}`).join(',');
+
+    let out = `${indent}'<!--{` + renderKeys(kept[0].keys);
+    for (let i = 1; i < kept.length; i++) {
+        out += `, _\n${kept[i].indent}` + renderKeys(kept[i].keys);
+    }
+    return out + `}-->${trailingQuote}`;
 }
 
 /** A recognized definition line and how many parameters it declares. */
@@ -355,6 +547,7 @@ export function computeMetadataBlock(
         }
         return {
             line: cursorLine,
+            endLine: cursorLine,
             indent,
             trailingQuote: '',
             rawJson: '',
@@ -373,6 +566,7 @@ export function computeMetadataBlock(
     const region = analyzeMetadataLine(lines, cursorLine, resolveDefinition);
     return {
         line: cursorLine,
+        endLine: cursorLine,
         indent,
         trailingQuote: '',
         rawJson: '',

@@ -518,8 +518,10 @@ const handleApplyMetadata = (data: MetadataCommentData) => {
   postMessage({
     type: 'updateMetadata',
     line: metadataBlock.value.line,
+    endLine: metadataBlock.value.endLine,
     indent: metadataBlock.value.indent,
     trailingQuote: metadataBlock.value.trailingQuote,
+    layout: metadataBlock.value.layout,
     isNew: metadataBlock.value.isNew,
     data
   })

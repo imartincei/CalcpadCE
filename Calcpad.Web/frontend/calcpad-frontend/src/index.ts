@@ -161,6 +161,8 @@ export {
 export type {
     MetadataCommentData,
     MetadataCommentBlock,
+    MetadataLayout,
+    MetadataLayoutSegment,
     MetadataLineContext,
     MetadataDefKind,
     MetadataDefinition,
