@@ -643,6 +643,8 @@ export abstract class BaseMessageBridge {
         isNew?: boolean;
         settings?: SettingsValues;
         settingsLine?: number | null;
+        settingsEndLine?: number | null;
+        settingsLayout?: MetadataLayout;
     }): void {
         const editor = this.getActiveMonacoEditor();
         const model = editor?.getModel();
@@ -651,22 +653,51 @@ export abstract class BaseMessageBridge {
         const edits: { range: MonacoRangeLike; text: string }[] = [];
 
         // Metadata comment (desc/params/lint/no-print) — only when it has content.
+        // A multi-line comment spans line..endLine; layout preserves its shape.
         const lineNumber = msg.line + 1;
-        if (lineNumber < 1 || lineNumber > model.getLineCount()) return;
-        const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '');
-        const range = msg.isNew
-            ? { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }
-            : {
-                startLineNumber: lineNumber, startColumn: 1,
-                endLineNumber: lineNumber, endColumn: model.getLineMaxColumn(lineNumber),
-            };
-        editor.executeEdits('calcpad-metadata', [{
-            range,
-            text: msg.isNew ? newText + '\n' : newText,
-        }]);
+        if (Object.keys(msg.data).length > 0 && lineNumber >= 1 && lineNumber <= model.getLineCount()) {
+            const endLineNumber = (msg.endLine ?? msg.line) + 1;
+            const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '', msg.layout);
+            edits.push(msg.isNew
+                ? { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }, text: newText + '\n' }
+                : { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: endLineNumber, endColumn: model.getLineMaxColumn(endLineNumber) }, text: newText });
+        }
 
-        // Re-emit context for the persisted comment so a repeated Apply edits it
-        // in place instead of inserting a duplicate.
+        // #settings directive under the cursor. `settingsLine` (0-based) points at
+        // the existing directive to rewrite, or null to create a new one at the
+        // cursor — so multiple directives can coexist, each edited where it lives.
+        const settingsText = msg.settings ? serializeSettingsDirective(msg.settings, msg.settingsLayout) : '';
+        let insertedSettings = false;
+        if (msg.settings) {
+            const dirLine = msg.settingsLine ?? null;
+            const dirEndLine = msg.settingsEndLine ?? dirLine;
+            const hasExisting = dirLine !== null && dirLine >= 0 && dirLine < model.getLineCount();
+            const hasSettings = Object.keys(msg.settings).length > 0;
+            if (hasSettings) {
+                edits.push(hasExisting
+                    ? { range: { startLineNumber: dirLine! + 1, startColumn: 1, endLineNumber: dirEndLine! + 1, endColumn: model.getLineMaxColumn(dirEndLine! + 1) }, text: settingsText }
+                    : { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }, text: settingsText + '\n' });
+                insertedSettings = !hasExisting;
+            } else if (hasExisting) {
+                for (let ln = dirEndLine! + 1; ln >= dirLine! + 1; ln--)
+                    edits.push(this.deleteLineEdit(model, ln));
+            }
+        }
+
+        if (edits.length === 0) return;
+        editor.executeEdits('calcpad-metadata', edits);
+
+        // A freshly created directive: park the cursor on it so the re-emitted
+        // context binds to it and a repeated Apply edits in place, not duplicates.
+        if (insertedSettings) {
+            const target = this.nearestLineMatching(model.getValue().split(/\r?\n/), settingsText, msg.line);
+            if (target !== null)
+                editor.setPosition({ lineNumber: target + 1, column: model.getLineMaxColumn(target + 1) });
+        }
+
+        // Re-emit context (comment + refreshed settings) at the current cursor so a
+        // repeated Apply edits in place instead of inserting a duplicate.
+        const pos = editor.getPosition();
         const lines = model.getValue().split(/\r?\n/);
         const block = pos ? computeMetadataBlock(lines, pos.lineNumber - 1, this.definitionResolver()) : null;
         this.postToVue({ type: 'metadataContext', block });

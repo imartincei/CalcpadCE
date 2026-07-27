@@ -575,7 +575,9 @@ const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: Set
     isNew: metadataBlock.value.isNew,
     data: payload.data,
     settings: payload.settings,
-    settingsLine: metadataBlock.value.settingsLine ?? null
+    settingsLine: metadataBlock.value.settingsLine ?? null,
+    settingsEndLine: metadataBlock.value.settingsEndLine ?? metadataBlock.value.settingsLine ?? null,
+    settingsLayout: metadataBlock.value.settingsLayout
   })
 }
 

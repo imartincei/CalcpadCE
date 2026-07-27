@@ -539,25 +539,65 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         isNew?: boolean;
         settings?: SettingsValues;
         settingsLine?: number | null;
+        settingsEndLine?: number | null;
+        settingsLayout?: MetadataLayout;
     }): Promise<void> {
         const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
         if (!editor || typeof data.line !== 'number') return;
 
         const document = editor.document;
-        const settingsText = data.settings ? serializeSettingsDirective(data.settings) : '';
+        const settingsText = data.settings ? serializeSettingsDirective(data.settings, data.settingsLayout) : '';
         let insertedSettings = false;
 
-        const newText = serializeMetadataComment(data.data, data.indent ?? '', data.trailingQuote ?? '');
         await editor.edit(editBuilder => {
-            if (data.isNew) {
-                editBuilder.insert(new vscode.Position(data.line, 0), newText + '\n');
-            } else {
-                editBuilder.replace(editor.document.lineAt(data.line).range, newText);
+            // Metadata comment (desc/params/lint/no-print) — only when it has
+            // content. A multi-line comment spans line..endLine; layout preserves
+            // its shape (existing keys in place, new keys on the last line).
+            if (Object.keys(data.data).length > 0 && data.line >= 0 && data.line < document.lineCount) {
+                const newText = serializeMetadataComment(data.data, data.indent ?? '', data.trailingQuote ?? '', data.layout);
+                if (data.isNew) {
+                    editBuilder.insert(new vscode.Position(data.line, 0), newText + '\n');
+                } else {
+                    const endLine = Math.min(data.endLine ?? data.line, document.lineCount - 1);
+                    const range = document.lineAt(data.line).range.with({ end: document.lineAt(endLine).range.end });
+                    editBuilder.replace(range, newText);
+                }
+            }
+
+            // #settings directive under the cursor. `settingsLine` (0-based) points
+            // at the existing directive to rewrite, or null to create a new one at
+            // the cursor — so multiple directives can coexist, each edited in place.
+            if (data.settings) {
+                const dirLine = data.settingsLine ?? null;
+                const dirEndLine = Math.min(data.settingsEndLine ?? dirLine ?? 0, document.lineCount - 1);
+                const hasExisting = dirLine !== null && dirLine >= 0 && dirLine < document.lineCount;
+                const hasSettings = Object.keys(data.settings).length > 0;
+                if (hasSettings) {
+                    if (hasExisting) {
+                        const range = document.lineAt(dirLine!).range.with({ end: document.lineAt(dirEndLine).range.end });
+                        editBuilder.replace(range, settingsText);
+                    } else {
+                        editBuilder.insert(new vscode.Position(data.line, 0), settingsText + '\n');
+                        insertedSettings = true;
+                    }
+                } else if (hasExisting) {
+                    const start = document.lineAt(dirLine!).range.start;
+                    editBuilder.delete(new vscode.Range(start, document.lineAt(dirEndLine).rangeIncludingLineBreak.end));
+                }
             }
         });
 
-        // Re-emit context for the persisted comment so a repeated Apply edits it
-        // in place instead of inserting a duplicate.
+        // A freshly created directive: park the cursor on it so the re-emitted
+        // context binds to it and a repeated Apply edits in place, not duplicates.
+        if (insertedSettings) {
+            const lines = editor.document.getText().split(/\r?\n/);
+            const target = this._nearestLineMatching(lines, settingsText, data.line);
+            if (target !== null)
+                editor.selection = new vscode.Selection(target, lines[target].length, target, lines[target].length);
+        }
+
+        // Re-emit context (comment + refreshed settings) at the current cursor so a
+        // repeated Apply edits in place instead of inserting a duplicate.
         const lines = editor.document.getText().split(/\r?\n/);
         const block = computeMetadataBlock(lines, editor.selection.active.line, this._definitionResolver(editor.document.uri.toString()));
         this.updateMetadataContext(block);

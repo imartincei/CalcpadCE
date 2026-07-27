@@ -21,24 +21,15 @@ export interface MetadataCommentData {
 export type SettingsValues = Record<string, string | number | boolean>;
 
 /**
- * Location and parsed values of a `#settings` directive. `line` is its 0-based
- * line, or null when the queried position holds no directive.
+ * Location and parsed values of a `#settings` directive. `line`/`endLine` are its
+ * 0-based opening/closing lines (equal when single-line), or null when the queried
+ * position holds no directive. `layout` is set only for a multi-line directive.
  */
 export interface SettingsDirective {
     line: number | null;
+    endLine?: number;
     settings: SettingsValues;
-}
-
-/** Recognized value shape of the `#settings` directive JSON payload. */
-export type SettingsValues = Record<string, string | number | boolean>;
-
-/**
- * Location and parsed values of a `#settings` directive. `line` is its 0-based
- * line, or null when the queried position holds no directive.
- */
-export interface SettingsDirective {
-    line: number | null;
-    settings: SettingsValues;
+    layout?: MetadataLayout;
 }
 
 /** One physical line of a metadata comment and the JSON keys it carries. */
@@ -85,6 +76,10 @@ export interface MetadataCommentBlock {
      */
     settings?: SettingsValues;
     settingsLine?: number | null;
+    /** Closing line of a multi-line `#settings` directive (equals settingsLine when single-line). */
+    settingsEndLine?: number | null;
+    /** Physical line layout of a multi-line `#settings` directive. */
+    settingsLayout?: MetadataLayout;
     /**
      * True when no comment exists yet and this block is a synthetic template for
      * the definition under the cursor. Applying it inserts a new line rather than
@@ -311,6 +306,11 @@ function stripContinuation(fragment: string): string {
     return trimmed.endsWith('_') ? trimmed.slice(0, -1) : trimmed;
 }
 
+/** True when the line ends with a `_` line-continuation marker. */
+function endsWithContinuation(line: string): boolean {
+    return line.replace(/\s+$/, '').endsWith('_');
+}
+
 /** True when the line opens a metadata comment: a comment quote followed by `<!--`. */
 function isMetadataOpener(line: string): boolean {
     const rest = line.slice(getIndentLength(line));
@@ -319,15 +319,15 @@ function isMetadataOpener(line: string): boolean {
 }
 
 /**
- * Locate the opening line of the metadata comment that contains {@link cursorLine},
- * walking back over `_` continuation lines. Returns -1 when the cursor isn't on a
- * metadata comment (opener or one of its continuation lines).
+ * Locate the opening line of the `_`-continued block containing {@link cursorLine},
+ * walking back over continuation lines until {@link isOpener} matches. Returns -1
+ * when the cursor isn't on such a block (its opener or a continuation line).
  */
-function findBlockStart(lines: string[], cursorLine: number): number {
-    if (isMetadataOpener(lines[cursorLine])) return cursorLine;
+function findContinuationStart(lines: string[], cursorLine: number, isOpener: (line: string) => boolean): number {
+    if (isOpener(lines[cursorLine])) return cursorLine;
     let i = cursorLine;
-    while (i > 0 && lines[i - 1].replace(/\s+$/, '').endsWith('_')) i--;
-    return i !== cursorLine && isMetadataOpener(lines[i]) ? i : -1;
+    while (i > 0 && endsWithContinuation(lines[i - 1])) i--;
+    return i !== cursorLine && isOpener(lines[i]) ? i : -1;
 }
 
 /**
@@ -391,7 +391,7 @@ function parseMetadataJson(rawJson: string): { data: MetadataCommentData | null;
 export function findMetadataCommentBlock(lines: string[], cursorLine: number): MetadataCommentBlock | null {
     if (cursorLine < 0 || cursorLine >= lines.length) return null;
 
-    const startLine = findBlockStart(lines, cursorLine);
+    const startLine = findContinuationStart(lines, cursorLine, isMetadataOpener);
     if (startLine < 0) return null;
 
     const openerText = lines[startLine];
@@ -491,6 +491,43 @@ function cleanMetadata(data: MetadataCommentData): Record<string, unknown> {
 }
 
 /**
+ * Serialize a cleaned key/value object across the physical lines described by
+ * {@link layout}, wrapped by {@link opener}`{` … `}`{@link closer}. Existing keys
+ * stay on their line, keys not on any line append to the last line, and a line
+ * whose keys are all removed collapses away (its `_` continuation dropped).
+ * Returns null when no keys remain, so callers can fall back to a single line.
+ */
+function serializeWithLayout(
+    clean: Record<string, unknown>,
+    layout: MetadataLayout,
+    opener: string,
+    closer: string,
+): string | null {
+    const present = new Set<string>();
+    const segments = layout.segments.map(seg => ({
+        indent: seg.indent,
+        keys: seg.keys.filter(k => {
+            if (k in clean) { present.add(k); return true; }
+            return false;
+        }),
+    }));
+    const added = Object.keys(clean).filter(k => !present.has(k));
+    if (added.length) segments[segments.length - 1].keys.push(...added);
+
+    const kept = segments.filter(seg => seg.keys.length > 0);
+    if (kept.length === 0) return null;
+
+    const renderKeys = (keys: string[]) =>
+        keys.map(k => `${JSON.stringify(k)}:${JSON.stringify(clean[k])}`).join(',');
+
+    let out = `${opener}{` + renderKeys(kept[0].keys);
+    for (let i = 1; i < kept.length; i++) {
+        out += `, _\n${kept[i].indent}` + renderKeys(kept[i].keys);
+    }
+    return out + `}${closer}`;
+}
+
+/**
  * Build a metadata-comment from a data object, preserving the original
  * indentation and trailing comment quote. When {@link layout} describes an
  * existing multi-line comment, edits round-trip in place: existing keys keep
@@ -505,60 +542,62 @@ export function serializeMetadataComment(
     layout?: MetadataLayout,
 ): string {
     const clean = cleanMetadata(data);
-    const singleLine = () => `${indent}'<!--${JSON.stringify(clean)}-->${trailingQuote}`;
-    if (!layout || layout.segments.length === 0) return singleLine();
-
-    const present = new Set<string>();
-    const segments = layout.segments.map(seg => ({
-        indent: seg.indent,
-        keys: seg.keys.filter(k => {
-            if (k in clean) { present.add(k); return true; }
-            return false;
-        }),
-    }));
-    const added = Object.keys(clean).filter(k => !present.has(k));
-    if (added.length) segments[segments.length - 1].keys.push(...added);
-
-    const kept = segments.filter(seg => seg.keys.length > 0);
-    if (kept.length === 0) return singleLine();
-
-    const renderKeys = (keys: string[]) =>
-        keys.map(k => `${JSON.stringify(k)}:${JSON.stringify(clean[k])}`).join(',');
-
-    let out = `${indent}'<!--{` + renderKeys(kept[0].keys);
-    for (let i = 1; i < kept.length; i++) {
-        out += `, _\n${kept[i].indent}` + renderKeys(kept[i].keys);
-    }
-    return out + `}-->${trailingQuote}`;
+    const singleLine = `${indent}'<!--${JSON.stringify(clean)}-->${trailingQuote}`;
+    if (!layout || layout.segments.length === 0) return singleLine;
+    return serializeWithLayout(clean, layout, `${indent}'<!--`, `-->${trailingQuote}`) ?? singleLine;
 }
 
-const SETTINGS_DIRECTIVE_RE = /^\s*#settings\b\s*(\{.*\})\s*$/i;
+const SETTINGS_OPEN_RE = /^\s*#settings\b\s*/i;
 
 /**
- * Parse the `#settings` directive on a single 0-based line, or null when that
- * line isn't a directive. `#settings` directives are cursor-local: the panel
- * edits the one the cursor sits on and can create new ones elsewhere, so a
- * document may hold several (each applies to the lines below it). A
- * present-but-malformed directive returns its line with empty settings so Apply
- * overwrites it in place.
+ * Parse the `#settings` directive containing the 0-based {@link line}, or null
+ * when that line isn't part of one. Like a metadata comment, the directive's JSON
+ * may span multiple physical lines via `_` continuation, and the cursor can sit
+ * on any of them. `#settings` directives are cursor-local: the panel edits the
+ * one the cursor sits on and can create new ones elsewhere, so a document may
+ * hold several (each applies to the lines below it). A present-but-malformed
+ * directive returns its span with empty settings so Apply overwrites it in place.
  */
 export function settingsDirectiveOnLine(lines: string[], line: number): SettingsDirective | null {
     if (line < 0 || line >= lines.length) return null;
-    const match = SETTINGS_DIRECTIVE_RE.exec(lines[line]);
-    if (!match) return null;
-    try {
-        const parsed = JSON.parse(match[1]);
-        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed))
-            return { line, settings: parsed as SettingsValues };
-    } catch {
-        // Malformed JSON — surface the line so Apply replaces it.
+
+    const start = findContinuationStart(lines, line, l => SETTINGS_OPEN_RE.test(l));
+    if (start < 0) return null;
+
+    const openerLen = lines[start].match(SETTINGS_OPEN_RE)![0].length;
+    const fragments = [stripContinuation(lines[start].slice(openerLen))];
+    const indents = [leadingWhitespace(lines[start])];
+    let endLine = start;
+    if (endsWithContinuation(lines[start])) {
+        for (let i = start + 1; i < lines.length; i++) {
+            indents.push(leadingWhitespace(lines[i]));
+            fragments.push(stripContinuation(lines[i]));
+            endLine = i;
+            if (!endsWithContinuation(lines[i])) break;
+        }
     }
-    return { line, settings: {} };
+    if (line > endLine) return null;
+
+    const joined = fragments.join('\n');
+    try {
+        const parsed = JSON.parse(joined);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed))
+            return { line: start, endLine, settings: parsed as SettingsValues, layout: buildLayout(fragments, indents) };
+    } catch {
+        // Malformed JSON — surface the span so Apply replaces it.
+    }
+    return { line: start, endLine, settings: {} };
 }
 
-/** Build a `#settings` directive line from a settings object. */
-export function serializeSettingsDirective(settings: SettingsValues): string {
-    return `#settings ${JSON.stringify(settings)}`;
+/**
+ * Build a `#settings` directive from a settings object. With {@link layout} the
+ * directive round-trips a multi-line block in place (see {@link serializeWithLayout});
+ * otherwise it serializes onto one line.
+ */
+export function serializeSettingsDirective(settings: SettingsValues, layout?: MetadataLayout): string {
+    const singleLine = `#settings ${JSON.stringify(settings)}`;
+    if (!layout || layout.segments.length === 0) return singleLine;
+    return serializeWithLayout(settings, layout, '#settings ', '') ?? singleLine;
 }
 
 /** A recognized definition line and how many parameters it declares. */
@@ -663,6 +702,8 @@ export function computeMetadataBlock(
         const directive = settingsDirectiveOnLine(lines, cursorLine);
         block.settings = directive?.settings ?? {};
         block.settingsLine = directive?.line ?? null;
+        block.settingsEndLine = directive?.endLine ?? directive?.line ?? null;
+        block.settingsLayout = directive?.layout;
     }
     return block;
 }
