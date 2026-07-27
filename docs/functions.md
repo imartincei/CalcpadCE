@@ -75,6 +75,7 @@ CalcpadCE includes a library with common math functions, ready to use.
 | `mod(x; y)` | the remainder of an integer division |
 | `gcd(x; y; z…)` | the greatest common divisor of several integers |
 | `lcm(x; y; z…)` | the least common multiple of several integers |
+| `fact(n)` | factorial: multiplies all whole numbers from 1 up to *n*, e.g. **fact**(5) = 120. Works for whole numbers 0 to 170. Same as writing *n*! |
 
 ## Complex
 
@@ -125,6 +126,8 @@ CalcpadCE includes a library with common math functions, ready to use.
 | `clrunits(x)` | clears the units from a scalar, vector or matrix *x* |
 | `hp(x)` | converts x to its high-performance (hp) equivalent type |
 | `ishp(x)` | checks if the type of x is a high-performance (hp) vector or matrix |
+| `timer(x)` | how many seconds the calculation has taken so far, measured up to the point where *x* is worked out. Useful for timing long calculations |
+| `mandelbrot(x; y)` | tells you whether the point (*x*; *y*) belongs to the Mandelbrot set, mainly for plotting it. Returns "Undefined" for points inside the set, and a larger value the further outside a point lies |
 
 Vector and Matrix functions are described in their sections.
 

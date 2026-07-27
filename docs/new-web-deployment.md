@@ -1,8 +1,8 @@
-# Running the Calcpad Server
+# Running the CalcpadCE Server
 
-> Calcpad.Web only. The standalone WPF desktop application for Windows is separate and unaffected.
-
-The desktop app and the VS Code extension start the Calcpad calculation server for you, so most people never run it by hand. But you can also run it directly — for example, to point several tools at one shared instance, or to script conversions and calls against its API. This page covers running the server and the API it exposes.
+The desktop app and the VS Code extension start the CalcpadCE calculation server for you, so most people will never run it by hand.
+However, people who are familiar with coding can also run it directly — for example, to point several tools at one shared instance, or to script conversions and calls against its API.
+This page covers running the server and the API it exposes.
 
 > **Localhost only.** This build runs the server bound to your own machine (`localhost`, `127.0.0.1`, or `::1`) only. If you point it at any other address, it refuses to start. There is no multi-user hosting, authentication, or shared file storage in this build.
 
@@ -13,7 +13,8 @@ cd Calcpad.Web/backend
 dotnet run
 ```
 
-By default the server listens on `http://localhost:9420`. To change the port, set `CALCPAD_PORT`, or pass a full bind URL with `--urls` — as long as it still points at a loopback address.
+By default the server listens on `http://localhost:9420`.
+To change the port, set `CALCPAD_PORT`, or pass a full bind URL with `--urls` — as long as it still points at a loopback address.
 
 ## API endpoints
 
@@ -30,7 +31,7 @@ By default the server listens on `http://localhost:9420`. To change the port, se
 | `/api/calcpad/lint` | POST | Run the linter and return diagnostics |
 | `/api/calcpad/definitions` | POST | List macros, functions, variables, and units |
 | `/api/calcpad/find-references` | POST | Every occurrence of each symbol |
-| `/api/calcpad/prettify` | POST | Pretty-print Calcpad source |
+| `/api/calcpad/prettify` | POST | Pretty-print CalcpadCE source |
 | `/api/calcpad/snippets` | GET | Snippets, optionally filtered by category |
 | `/api/calcpad/debug-crash` | GET | Record a client-side crash in the server log |
 
@@ -40,7 +41,7 @@ The full request/response schema lives at [Calcpad.Web/backend/API_SCHEMA.md](..
 
 Most POST endpoints accept a request with these fields:
 
-- `content` — the Calcpad source code
+- `content` — the CalcpadCE source code
 - `settings` — math / plot / unit configuration
 - `theme` — `"light"` or `"dark"`
 - `sourceFilePath` — the document's file path, used to resolve relative `#include` paths against the file's folder
@@ -71,7 +72,8 @@ Three dictionaries (`variables`, `functions`, `macros`), each mapping a symbol n
 
 ### Highlight
 
-An array of `{ line, column, length, type, typeId, text? }`. The `text` field is omitted by default; pass `includeText: true` to include it.
+An array of `{ line, column, length, type, typeId, text? }`.
+The `text` field is omitted by default; pass `includeText: true` to include it.
 
 ### Lint
 

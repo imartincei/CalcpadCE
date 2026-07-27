@@ -2,7 +2,8 @@
 
 > Calcpad.Web only (web editor, desktop app, and VS Code extension). Not available in the standalone WPF desktop application for Windows.
 
-Calcpad.Web checks your document as you write and flags problems before you ever run it. Each diagnostic has a short, stable code (like `CPD-3301`) so you can look up exactly what it means.
+Calcpad.Web checks your document as you write and flags problems before you ever run it.
+Each diagnostic has a short, stable code (like `CPD-3301`) so you can look up exactly what it means.
 
 Diagnostics appear:
 
@@ -11,7 +12,8 @@ Diagnostics appear:
 
 ## Diagnostic codes
 
-Every diagnostic has a `CPD-` code. The tables below group them by the kind of problem.
+Every diagnostic has a `CPD-` code.
+The tables below group them by the kind of problem.
 
 ### Includes
 

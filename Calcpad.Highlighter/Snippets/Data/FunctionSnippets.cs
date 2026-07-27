@@ -510,6 +510,18 @@ namespace Calcpad.Highlighter.Snippets.Data
                     new SnippetParameter { Name = "values", Type = ParameterType.Various, Description = "Two or more integers, vectors, or matrices", IsVariadic = true }
                 ]
             },
+            new SnippetItem
+            {
+                Insert = "fact(§)",
+                IsElementWise = true,
+                Description = "Factorial",
+                Documentation = "Returns `n!` = 1·2·3·…·n, the product of all positive integers up to `n`. The argument must be a dimensionless integer in the range 0 to 170; larger values overflow. Equivalent to the postfix `!` operator.",
+                Example = "fact(5)  ' returns 120",
+                Category = "Functions/Integer",
+                KeywordType = "Function",
+                ReturnTypeDescription = "Positive integer",
+                Parameters = [new SnippetParameter { Name = "n", Type = ParameterType.Integer, Description = "Integer from 0 to 170" }]
+            },
 
             // ============================================
             // COMPLEX NUMBER FUNCTIONS
@@ -1154,6 +1166,32 @@ namespace Calcpad.Highlighter.Snippets.Data
                 KeywordType = "Function",
                 ReturnTypeDescription = "Boolean (0 or 1)",
                 Parameters = [new SnippetParameter { Name = "x", Type = ParameterType.Any, Description = "Value to check" }]
+            },
+            new SnippetItem
+            {
+                Insert = "timer(§)",
+                Description = "Elapsed time in seconds",
+                Documentation = "Returns the time in seconds elapsed since the calculation started. The argument is a value the timer depends on, so it is evaluated after that value; pass the expression whose runtime you want to measure.",
+                Example = "timer(x)  ' seconds elapsed up to the evaluation of x",
+                Category = "Functions/Other",
+                KeywordType = "Function",
+                ReturnTypeDescription = "Scalar in seconds",
+                Parameters = [new SnippetParameter { Name = "x", Type = ParameterType.Any, Description = "Value the timer depends on" }]
+            },
+            new SnippetItem
+            {
+                Insert = "mandelbrot(§; §)",
+                Description = "Mandelbrot set escape value",
+                Documentation = "Returns a smooth escape-time value for the point `(x, y)` in the complex plane, used to render the Mandelbrot set. Points that belong to the set (do not escape) return `Undefined`. The result carries the units of `x`.",
+                Example = "mandelbrot(-0.5; 0.5)",
+                Category = "Functions/Other",
+                KeywordType = "Function",
+                ReturnTypeDescription = "Scalar (or Undefined inside the set)",
+                Parameters =
+                [
+                    new SnippetParameter { Name = "x", Type = ParameterType.Scalar, Description = "Real part" },
+                    new SnippetParameter { Name = "y", Type = ParameterType.Scalar, Description = "Imaginary part" }
+                ]
             },
         ];
     }

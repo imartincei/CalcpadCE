@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { spawn, execSync, ChildProcess } from 'child_process';
 import type { ILogger } from 'calcpad-frontend';
+import { decodeExitCode, buildCrashRecord } from 'calcpad-frontend';
 
 interface LockFileContents {
     pid: number;
@@ -356,7 +357,7 @@ export class BaseServerManager {
             const decoded = decodeExitCode(code);
             this.log(`[exit] Server process exited (code=${code}${decoded ? ` ${decoded}` : ''}, signal=${signal})`);
             if (code !== null && code !== 0) {
-                this.persistCrashRecord(code, signal, decoded);
+                this.persistCrashRecord(code, signal);
             }
             this._isRunning = false;
             // Don't null out serverProcess during startup — waitForReady checks
@@ -725,8 +726,8 @@ export class BaseServerManager {
      * Always writes to a fixed `last-crash.txt`, so each crash overwrites the previous
      * record (matching the dump-file rolling-overwrite policy).
      */
-    private persistCrashRecord(code: number | null, signal: NodeJS.Signals | null, decoded: string): void {
-        this.writeCrashTxt(code, signal, decoded);
+    private persistCrashRecord(code: number | null, signal: NodeJS.Signals | null): void {
+        this.writeCrashTxt(code, signal);
     }
 
     /**
@@ -745,31 +746,27 @@ export class BaseServerManager {
      * Both paths share this writer so the on-disk format is identical. Last
      * writer wins, which is fine — they pull from the same sources.
      */
-    private writeCrashTxt(code: number | null, signal: NodeJS.Signals | null, decoded: string): void {
+    private writeCrashTxt(code: number | null, signal: NodeJS.Signals | null): void {
         try {
             const crashDir = path.join(this.basePath, 'bin', 'logs');
             fs.mkdirSync(crashDir, { recursive: true });
             const file = path.join(crashDir, 'last-crash.txt');
-            const sections: string[] = [];
-            sections.push('Calcpad.Server crash record');
-            sections.push(`Timestamp: ${new Date().toISOString()}`);
-            if (code !== null || signal !== null) {
-                const hex = ((code ?? 0) >>> 0).toString(16).toUpperCase();
-                sections.push(`Exit code: ${code} (0x${hex})${decoded ? ' ' + decoded : ''}`);
-                sections.push(`Signal: ${signal ?? '(none)'}`);
-            }
-            sections.push('');
-            sections.push('--- last stderr ---');
-            sections.push(this._lastCrashOutput.join('\n') || '(empty)');
-            sections.push('');
 
             const reportPath = path.join(crashDir, 'last-crash.dmp.crashreport.json');
-            const formatted = formatCrashReportJson(reportPath);
-            if (formatted) {
-                sections.push('--- managed traceback ---', formatted, '');
-            }
+            let reportJson: string | null = null;
+            try { reportJson = fs.readFileSync(reportPath, 'utf-8'); } catch { /* no dump report */ }
 
-            fs.writeFileSync(file, sections.join('\n'), 'utf-8');
+            // buildCrashRecord (calcpad-frontend) owns the format so this and the
+            // Tauri desktop shell emit an identical record.
+            const record = buildCrashRecord({
+                timestampIso: new Date().toISOString(),
+                code,
+                signal,
+                stderrTail: this._lastCrashOutput.join('\n'),
+                reportJson,
+            });
+
+            fs.writeFileSync(file, record, 'utf-8');
             this.mainLogger.appendLine(`[ServerManager] Crash record written: ${file}`);
         } catch (err) {
             this.log(`Warning: could not write crash record: ${err instanceof Error ? err.message : String(err)}`);
@@ -807,7 +804,7 @@ export class BaseServerManager {
             if (mtimeMs > this._lastSeenDumpMtimeMs) {
                 this._lastSeenDumpMtimeMs = mtimeMs;
                 this.log(`Detected fresh crash dump (mtime=${new Date(mtimeMs).toISOString()})`);
-                this.writeCrashTxt(null, null, '');
+                this.writeCrashTxt(null, null);
             }
         }, 5000);
     }
@@ -821,85 +818,6 @@ export class BaseServerManager {
 }
 
 /**
- * Parse a .NET createdump `*.crashreport.json` and render the crashed thread's
- * managed exception + stack as a traceback-style block. Returns null if the file
- * is missing or doesn't match the expected shape — `writeCrashTxt` still emits
- * the exit-code/stderr portion in that case.
- *
- * Frames are written in the order createdump produced them (most-recent-first).
- * Managed frames show method_name + defining assembly; native frames show the
- * unmanaged symbol if known, otherwise just the module.
- */
-function formatCrashReportJson(reportPath: string): string | null {
-    let raw: string;
-    try {
-        raw = fs.readFileSync(reportPath, 'utf-8');
-    } catch {
-        return null;
-    }
-
-    interface StackFrame {
-        is_managed?: string;
-        method_name?: string;
-        filename?: string;
-        unmanaged_name?: string;
-        native_module?: string;
-    }
-    interface Thread {
-        crashed?: string;
-        native_thread_id?: string;
-        managed_exception_type?: string;
-        managed_exception_hresult?: string;
-        stack_frames?: StackFrame[];
-    }
-    interface Payload {
-        process_name?: string;
-        configuration?: { version?: string; architecture?: string };
-        threads?: Thread[];
-    }
-
-    let parsed: { payload?: Payload };
-    try {
-        parsed = JSON.parse(raw);
-    } catch {
-        return null;
-    }
-    const payload = parsed?.payload;
-    if (!payload || !Array.isArray(payload.threads)) return null;
-
-    const crashed = payload.threads.find(t => t?.crashed === 'true');
-    if (!crashed) return null;
-
-    const out: string[] = [];
-    out.push(`Process: ${payload.process_name ?? '(unknown)'}`);
-    const cfg = payload.configuration;
-    if (cfg) out.push(`Runtime: ${cfg.version ?? '(unknown)'} (${cfg.architecture ?? '?'})`);
-
-    if (crashed.managed_exception_type) {
-        out.push('');
-        const hr = crashed.managed_exception_hresult ? ` (HRESULT ${crashed.managed_exception_hresult})` : '';
-        out.push(`Exception: ${crashed.managed_exception_type}${hr}`);
-    }
-
-    const frames = Array.isArray(crashed.stack_frames) ? crashed.stack_frames : [];
-    out.push('');
-    out.push(`Stack trace (most recent call first, thread ${crashed.native_thread_id ?? '?'}):`);
-    if (frames.length === 0) {
-        out.push('  (no frames)');
-    }
-    for (const f of frames) {
-        if (f?.is_managed === 'true' && f.method_name) {
-            out.push(`  at ${f.method_name}${f.filename ? `  [${f.filename}]` : ''}`);
-        } else if (f?.unmanaged_name) {
-            out.push(`  at ${f.unmanaged_name}  [${f.native_module ?? 'native'}]`);
-        } else if (f?.native_module) {
-            out.push(`  at <native>  [${f.native_module}]`);
-        }
-    }
-    return out.join('\n');
-}
-
-/**
  * True when a libuv spawn-error code indicates Windows (or another OS) refused to
  * start the executable. EACCES/EPERM cover Defender, SmartScreen, AppLocker, and
  * NTFS permission denials; we treat all of them the same and tell the user to
@@ -907,24 +825,4 @@ function formatCrashReportJson(reportPath: string): string | null {
  */
 function isPermissionDeniedCode(code: string | null | undefined): boolean {
     return code === 'EACCES' || code === 'EPERM';
-}
-
-/**
- * Map common Windows exit codes from the .NET runtime to a human-readable label.
- * These codes come back through Node as signed 32-bit integers, so we mask to
- * unsigned before comparison.
- */
-function decodeExitCode(code: number | null): string {
-    if (code === null) return '';
-    const u = code >>> 0;
-    switch (u) {
-        case 0x00000000: return '(success)';
-        case 0xC0000005: return '(STATUS_ACCESS_VIOLATION)';
-        case 0xC00000FD: return '(STATUS_STACK_OVERFLOW)';
-        case 0xC000013A: return '(STATUS_CONTROL_C_EXIT — Ctrl+C)';
-        case 0x80131623: return '(COR_E_FAILFAST — Environment.FailFast)';
-        case 0x80131506: return '(COR_E_EXECUTIONENGINE)';
-        case 0x80131500: return '(CLR generic exception)';
-        default: return `(0x${u.toString(16).toUpperCase()})`;
-    }
 }

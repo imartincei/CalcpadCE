@@ -17,11 +17,13 @@ Write a heading as a comment line that starts with `'` followed by one to six `#
 '# Section 2
 ```
 
-These become `<h1>`–`<h6>` headings in your report. Every heading automatically gets a unique link target, so you can link to any section — the table of contents uses these targets to jump around the document.
+These become `<h1>`–`<h6>` headings in your report.
+Every heading automatically gets a unique link target, so you can link to any section — the table of contents uses these targets to jump around the document.
 
 ## Building the list
 
-Add a small script block to your document to generate the nested list. Point it at the container where the list should appear:
+Add a small script block to your document to generate the nested list.
+Point it at the container where the list should appear:
 
 ```js
 window.addEventListener('load', () => {

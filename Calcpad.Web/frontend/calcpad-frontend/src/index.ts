@@ -102,6 +102,13 @@ export type { ExportRequest } from './services/message-bridge/base';
 export type { TocHeading } from './services/headings';
 export { parseHeadings } from './services/headings';
 
+export {
+    decodeExitCode,
+    formatCrashReportPayload,
+    buildCrashRecord,
+} from './services/crash-report';
+export type { CrashRecordInput } from './services/crash-report';
+
 // --- Text Analysis -----------------------------------------------------------
 export {
     OPERATOR_REPLACEMENTS,

@@ -4,7 +4,7 @@
 
 ## Reusing code with `#include`
 
-`#include` inlines another Calcpad file's source into your document at parse time, so you can keep shared constants, functions, and macros in one place and reuse them everywhere:
+`#include` inlines another CalcpadCE file's source into your document at parse time, so you can keep shared constants, functions, and macros in one place and reuse them everywhere:
 
 ```text
 ' top.cpd
@@ -23,7 +23,7 @@ Both bring in outside content, but they do different jobs:
 
 | | `#include` | `#read` |
 |--------|-----------|---------|
-| What it brings in | Calcpad source code | Data (CSV, TSV, Excel, JSON) |
+| What it brings in | CalcpadCE source code | Data (CSV, TSV, Excel, JSON) |
 | When it happens | At parse time — the source is inlined | At run time — the data is loaded into a variable |
 | Result | The included code becomes part of your document | You get a matrix or vector variable to compute with |
 

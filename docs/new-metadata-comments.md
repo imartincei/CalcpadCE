@@ -14,11 +14,14 @@ Open the [CalcPad panel](new-calcpad-panel-and-settings.md) and switch to the **
 - **Document settings** are always available. Editing them writes a [`#settings` directive](#document-settings) at the top of the file — not a metadata comment — so they take effect during calculation.
 - **On any other line** you also get the **lint-ignore** regions and **no-print** regions.
 
-Fill in what you want and click **Apply**. If the line doesn't have a metadata comment yet, one is created for you; if it does, it's updated in place. **Reset** throws away your edits and reloads what's currently there. Only the fields that make sense for the line are shown — use **Add field** if you want one that's hidden.
+Fill in what you want and click **Apply**.
+If the line doesn't have a metadata comment yet, one is created for you; if it does, it's updated in place.
+**Reset** throws away your edits and reloads what's currently there.
+Only the fields that make sense for the line are shown — use **Add field** if you want one that's hidden.
 
 ## What they look like
 
-A metadata comment is a normal Calcpad comment (it starts with `'` or `"`) with an HTML comment storing a JSON string `<!--{ … }-->`:
+A metadata comment is a normal CalcpadCE comment (it starts with `'` or `"`) with an HTML comment storing a JSON string `<!--{ … }-->`:
 
 ```text
 '<!--{"desc": "Cross-sectional area"}-->
@@ -31,7 +34,7 @@ A few things to know:
 
 - Notes about a definition go on the line **directly above** it.
 - The whole comment has to stay on **one line** unless you use _ line separators.
-- If the text inside gets garbled, Calcpad just ignores it and the linter points it out.
+- If the text inside gets garbled, CalcpadCE just ignores it and the linter points it out.
 - Toggling line wrapping with **Alt+Z** can make these easier to read fully or take up less space.
 
 ## Documenting a definition
@@ -41,7 +44,7 @@ Put this on the line above a variable, function, macro, or custom unit:
 | Field | What it's for |
 |-------|---------------|
 | **Description** | A sentence explaining what the definition is. |
-| **Parameter types** | The kind of value each input expects. Functions take `value`, `vector`, `matrix`, or `any`; macros use Calcpad's token names. |
+| **Parameter types** | The kind of value each input expects. Functions take `value`, `vector`, `matrix`, or `any`; macros use CalcpadCE's token names. |
 | **Parameter descriptions** | A short note for each input, in order. |
 | **Return type** | What a function gives back: `value`, `vector`, `matrix`, or `any`. |
 
@@ -78,11 +81,13 @@ Unlike the other properties on this tab, `#settings` is a real Calcpad directive
 | `shadows` | `true` / `false` — shadows on 3-D surfaces |
 | `adaptivePlot` | `true` / `false` — adaptive plot sampling |
 
-`colorScale` can be `None`, `Gray`, `Rainbow`, `Terrain`, `VioletToYellow`, `GreenToYellow`, `Blues`, `BlueToYellow`, `BlueToRed`, or `PurpleToYellow`. Anything the app doesn't recognize is ignored.
+`colorScale` can be `None`, `Gray`, `Rainbow`, `Terrain`, `VioletToYellow`, `GreenToYellow`, `Blues`, `BlueToYellow`, `BlueToRed`, or `PurpleToYellow`.
+Anything the app doesn't recognize is ignored.
 
 ## Quieting the linter
 
-If the [linter](new-linter.md) flags something that isn't actually a problem, you can silence it for a stretch of the document. Wrap those lines between a `LintIgnore` and an `EndLintIgnore` marker, listing the warning codes to hide (or leave the list empty to hide/unhide everything):
+If the [linter](new-linter.md) flags something that isn't actually a problem, you can silence it for a stretch of the document.
+Wrap those lines between a `LintIgnore` and an `EndLintIgnore` marker, listing the warning codes to hide (or leave the list empty to hide/unhide everything):
 
 ```text
 '<!--{"LintIgnore": ["CPD-3301"]}-->
@@ -102,11 +107,12 @@ debug_x = 5
 '<!--{"NoPrintEnd": true}-->
 ```
 
-The section still shows in the preview but is dropped from the PDF. See [Excluding sections from the PDF](new-pdf-export.md) for more detail.
+The section still shows in the preview but is dropped from the PDF.
+See [Excluding sections from the PDF](new-pdf-export.md) for more detail.
 
 ## See also
 
-- [The CalcPad Panel & Settings](new-calcpad-panel-and-settings.md)
+- [The CalcpadCE Panel & Settings](new-calcpad-panel.md)
 - [Linter and Diagnostics](new-linter.md) — the lint-ignore markers
 - [PDF Export](new-pdf-export.md) — the no-print markers
 - [Using the VS Code Extension](new-vscode-extension.md)

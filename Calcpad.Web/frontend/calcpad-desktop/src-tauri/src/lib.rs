@@ -499,6 +499,45 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     if let Some(dir) = &log_dir {
         command.env("CALCPAD_LOG_DIR", dir);
     }
+
+    // Enable the .NET runtime's on-crash minidump (createdump). StackOverflow,
+    // FailFast and access violations bypass AppDomain.UnhandledException, so the
+    // server's own FileLogger never sees them — the runtime-level dump is the
+    // only trace. These vars must be set before the runtime boots (setting them
+    // from inside the server is too late), which is why this lives here and not
+    // in Program.cs. Mirrors the VS Code extension's spawn config.
+    //
+    // The dump goes to the writable logs/ dir (CRASH_DIR, falling back to the
+    // locally-resolved log dir or temp) because on an AppImage the resource dir
+    // beside the apphost is read-only. Fixed filename — each crash overwrites the
+    // last, matching the one-server-at-a-time model.
+    let dump_dir = crash_dir()
+        .map(|p| p.to_path_buf())
+        .or_else(|| log_dir.clone())
+        .unwrap_or_else(std::env::temp_dir);
+    let _ = std::fs::create_dir_all(&dump_dir);
+    let dump_path = dump_dir.join("last-crash.dmp");
+    command
+        .env("DOTNET_DbgEnableMiniDump", "1")
+        .env("DOTNET_DbgMiniDumpType", "2")
+        .env("DOTNET_DbgMiniDumpName", &dump_path)
+        .env("DOTNET_EnableCrashReport", "1");
+
+    // createdump ships beside the apphost, but resource packaging can drop the
+    // executable bit; without +x the runtime fails to spawn it on crash. Re-set
+    // it best-effort — a no-op on read-only installs where the bit already
+    // survived (the same packaging that keeps the apphost runnable).
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let createdump = exe_dir.join("createdump");
+        if let Ok(meta) = std::fs::metadata(&createdump) {
+            let mut perms = meta.permissions();
+            perms.set_mode(0o755);
+            let _ = std::fs::set_permissions(&createdump, perms);
+        }
+    }
+
     #[cfg(windows)]
     {
         // The apphost is a console subsystem binary; without this it pops up
@@ -668,6 +707,7 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
         let app_for_wait = app.clone();
         let tx_url = tx_url.clone();
         let tail = tail.clone();
+        let dump_path = dump_path.clone();
         tauri::async_runtime::spawn(async move {
             // `killed` distinguishes an explicit stop (kill_rx fired — restart,
             // menu Stop, window close) from an unexpected exit. We must NOT
@@ -706,10 +746,17 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
                 // duplicate here anyway — if the sidecar died before .NET's
                 // AppDomain.UnhandledException could fire (SIGKILL, StackOverflow,
                 // FailFast), that's the only trace of the tail we'll have.
+                // Point at the runtime minidump if createdump produced one for
+                // this crash (StackOverflow/FailFast/AV leave a dump but no tail).
+                let dump_note = match std::fs::metadata(&dump_path) {
+                    Ok(m) => format!("Minidump: {} ({} bytes)", dump_path.display(), m.len()),
+                    Err(_) => format!("Minidump: none at {}", dump_path.display()),
+                };
                 let body = format!(
                     "=== Calcpad.Server sidecar exited unexpectedly ===\n\
                      Time (unix ms): {ms}\n\
-                     Exit code: {code:?}\n\n\
+                     Exit code: {code:?}\n\
+                     {dump_note}\n\n\
                      --- Sidecar stdio tail ---\n{tail}\n",
                     ms = unix_millis(),
                     code = exit_code,
@@ -1012,11 +1059,14 @@ pub fn run() {
             // Pin the on-disk locations the panic hook + draft commands need.
             // app_data_dir is per-user and writable on all supported platforms.
             if let Ok(data_dir) = app.path().app_data_dir() {
-                let crash = data_dir.join("crashes");
+                // Crash artifacts (panic/sidecar reports, the .NET minidump and
+                // its crashreport.json, last-crash.txt) go in the same logs/ dir
+                // as the server's own logs — one place, matching the VS Code side.
+                let logs = data_dir.join("logs");
                 let drafts = data_dir.join("drafts");
-                let _ = std::fs::create_dir_all(&crash);
+                let _ = std::fs::create_dir_all(&logs);
                 let _ = std::fs::create_dir_all(&drafts);
-                let _ = CRASH_DIR.set(crash);
+                let _ = CRASH_DIR.set(logs);
                 let _ = DRAFTS_DIR.set(drafts);
             }
 

@@ -7,24 +7,25 @@ Calcpad.Web can export your report to a print-ready PDF that matches the on-scre
 Set the options below in the sidebar's **PDF** tab, then export:
 
 - **Desktop app** — **File → Export PDF…**
-- **VS Code** — *CalcPad: Export to PDF*
+- **VS Code** — *CalcpadCE: Export to PDF*
 - **Web editor** — the PDF button on the sidebar's **PDF** tab
 
 ## Browser requirement
 
-PDF export renders the report using a **Chromium-based browser** (Google Chrome, Microsoft Edge, or Chromium). The app looks for one already installed on your system; if it can't find one, it downloads a minimal headless build automatically the first time you export.
+PDF export renders the report using a **Chromium-based browser** (Google Chrome, Microsoft Edge, or Chromium).
+The app looks for one already installed on your system; if it can't find one, it downloads a minimal headless build automatically the first time you export.
 
 On Linux, if no browser is found the app shows you the exact package to install for your distribution:
 
 | Distribution | Install command |
 |--------------|-----------------|
-| Arch / CachyOS / Manjaro / EndeavourOS / Garuda | `yay -S ungoogled-chromium-bin` (or `sudo pacman -S chromium`) |
+| Arch / CachyOS / Manjaro / EndeavourOS / Garuda | `sudo pacman -S chromium` or `yay -S ungoogled-chromium-bin` |
 | Debian / Ubuntu / Mint | `sudo apt install chromium` |
 | Fedora / RHEL / Rocky / Alma | `sudo dnf install chromium` |
 | openSUSE | `sudo zypper install chromium` |
 | Alpine | `sudo apk add chromium` |
 | macOS | `brew install --cask google-chrome` |
-| Windows | install Microsoft Edge or Google Chrome |
+| Windows | Install Microsoft Edge or Google Chrome |
 
 ## Page setup
 
@@ -83,4 +84,4 @@ Every option you can set for a PDF export:
 ## See also
 
 - [Using the Desktop App](new-desktop-app.md) · [Using the VS Code Extension](new-vscode-extension.md)
-- [The CalcPad Panel & Settings](new-calcpad-panel-and-settings.md)
+- [The CalcpadCE Panel & Settings](new-calcpad-panel.md)
