@@ -53,7 +53,8 @@ namespace Calcpad.Highlighter.Tokenizer
         private void ParseComment(char c)
         {
             // Skip comment parsing when in Include mode (quoted filename is not a comment)
-            if (_state.CurrentType == TokenType.Include)
+            // or SettingsJson mode (quotes belong to the JSON payload, not a comment)
+            if (_state.CurrentType == TokenType.Include || _state.CurrentType == TokenType.SettingsJson)
                 return;
 
             // Cyrillic auto-comment

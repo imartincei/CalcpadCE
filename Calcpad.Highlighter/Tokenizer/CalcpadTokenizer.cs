@@ -175,7 +175,8 @@ namespace Calcpad.Highlighter.Tokenizer
 
                 // Units mode tracking
                 if (!_state.IsPlot && _state.MatrixCount == 0 &&
-                    _state.CurrentType != TokenType.Comment && c == '|')
+                    _state.CurrentType != TokenType.Comment &&
+                    _state.CurrentType != TokenType.SettingsJson && c == '|')
                 {
                     _state.IsUnits = true;
                 }
@@ -267,6 +268,12 @@ namespace Calcpad.Highlighter.Tokenizer
                     {
                         _builder.Append(c);
                     }
+                }
+                else if (_state.CurrentType == TokenType.SettingsJson)
+                {
+                    // #settings {json} - consume the whole JSON payload as a single token;
+                    // quotes, braces and colons all belong to the JSON, not to Calcpad syntax.
+                    _builder.Append(c);
                 }
                 else if (c == '$' && _builder.Length > 0)
                 {

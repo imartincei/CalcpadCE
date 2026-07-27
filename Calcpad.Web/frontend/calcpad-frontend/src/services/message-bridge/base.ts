@@ -2,8 +2,8 @@ import { CalcpadApiClient } from '../../api/client';
 import { CalcpadSnippetService } from '../snippets';
 import { CalcpadDefinitionsService } from '../definitions';
 import { parseHeadings } from '../headings';
-import { findMetadataCommentBlock, analyzeMetadataLine, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver } from '../../text/metadata-comment';
-import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, DefinitionResolver } from '../../text/metadata-comment';
+import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from '../../text/metadata-comment';
+import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
 import type { DefinitionsResponse } from '../../types/api';
 import { getDefaultSettings, buildApiSettings } from '../../types/settings';
 import type { CalcpadSettings } from '../../types/settings';
@@ -641,19 +641,24 @@ export abstract class BaseMessageBridge {
         layout?: MetadataLayout;
         data: MetadataCommentData;
         isNew?: boolean;
+        settings?: SettingsValues;
+        settingsLine?: number | null;
     }): void {
         const editor = this.getActiveMonacoEditor();
         const model = editor?.getModel();
         if (!editor || !model || typeof msg.line !== 'number') return;
+
+        const edits: { range: MonacoRangeLike; text: string }[] = [];
+
+        // Metadata comment (desc/params/lint/no-print) — only when it has content.
         const lineNumber = msg.line + 1;
         if (lineNumber < 1 || lineNumber > model.getLineCount()) return;
-        const endLineNumber = (msg.endLine ?? msg.line) + 1;
-        const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '', msg.layout);
+        const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '');
         const range = msg.isNew
             ? { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }
             : {
                 startLineNumber: lineNumber, startColumn: 1,
-                endLineNumber: endLineNumber, endColumn: model.getLineMaxColumn(endLineNumber),
+                endLineNumber: lineNumber, endColumn: model.getLineMaxColumn(lineNumber),
             };
         editor.executeEdits('calcpad-metadata', [{
             range,
@@ -663,9 +668,27 @@ export abstract class BaseMessageBridge {
         // Re-emit context for the persisted comment so a repeated Apply edits it
         // in place instead of inserting a duplicate.
         const lines = model.getValue().split(/\r?\n/);
-        const block = findMetadataCommentBlock(lines, msg.line);
-        if (block) block.context = analyzeMetadataLine(lines, msg.line, this.definitionResolver());
+        const block = pos ? computeMetadataBlock(lines, pos.lineNumber - 1, this.definitionResolver()) : null;
         this.postToVue({ type: 'metadataContext', block });
+    }
+
+    /** 0-based index of the line equal to `text`, closest to `near`; null if none. */
+    private nearestLineMatching(lines: string[], text: string, near: number): number | null {
+        let best: number | null = null;
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i] !== text) continue;
+            if (best === null || Math.abs(i - near) < Math.abs(best - near)) best = i;
+        }
+        return best;
+    }
+
+    /** Range edit that removes a whole 1-based line, handling the last-line case. */
+    private deleteLineEdit(model: MonacoModelLike, ln: number): { range: MonacoRangeLike; text: string } {
+        if (ln < model.getLineCount())
+            return { range: { startLineNumber: ln, startColumn: 1, endLineNumber: ln + 1, endColumn: 1 }, text: '' };
+        if (ln > 1)
+            return { range: { startLineNumber: ln - 1, startColumn: model.getLineMaxColumn(ln - 1), endLineNumber: ln, endColumn: model.getLineMaxColumn(ln) }, text: '' };
+        return { range: { startLineNumber: 1, startColumn: 1, endLineNumber: 1, endColumn: model.getLineMaxColumn(1) }, text: '' };
     }
 }
 

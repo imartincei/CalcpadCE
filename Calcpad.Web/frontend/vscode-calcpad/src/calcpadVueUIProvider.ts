@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, findMetadataCommentBlock, analyzeMetadataLine, computeMetadataBlock, buildDefinitionResolver } from 'calcpad-frontend';
-import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from 'calcpad-frontend';
+import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse, SettingsValues } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 
@@ -537,28 +537,40 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         layout?: MetadataLayout;
         data: MetadataCommentData;
         isNew?: boolean;
+        settings?: SettingsValues;
+        settingsLine?: number | null;
     }): Promise<void> {
         const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
         if (!editor || typeof data.line !== 'number') return;
-        if (data.line < 0 || data.line >= editor.document.lineCount) return;
 
-        const newText = serializeMetadataComment(data.data, data.indent ?? '', data.trailingQuote ?? '', data.layout);
-        const endLine = Math.min(data.endLine ?? data.line, editor.document.lineCount - 1);
+        const document = editor.document;
+        const settingsText = data.settings ? serializeSettingsDirective(data.settings) : '';
+        let insertedSettings = false;
+
+        const newText = serializeMetadataComment(data.data, data.indent ?? '', data.trailingQuote ?? '');
         await editor.edit(editBuilder => {
             if (data.isNew) {
                 editBuilder.insert(new vscode.Position(data.line, 0), newText + '\n');
             } else {
-                const range = editor.document.lineAt(data.line).range.with({ end: editor.document.lineAt(endLine).range.end });
-                editBuilder.replace(range, newText);
+                editBuilder.replace(editor.document.lineAt(data.line).range, newText);
             }
         });
 
         // Re-emit context for the persisted comment so a repeated Apply edits it
         // in place instead of inserting a duplicate.
         const lines = editor.document.getText().split(/\r?\n/);
-        const block = findMetadataCommentBlock(lines, data.line);
-        if (block) block.context = analyzeMetadataLine(lines, data.line, this._definitionResolver(editor.document.uri.toString()));
+        const block = computeMetadataBlock(lines, editor.selection.active.line, this._definitionResolver(editor.document.uri.toString()));
         this.updateMetadataContext(block);
+    }
+
+    /** 0-based index of the line equal to `text`, closest to `near`; null if none. */
+    private _nearestLineMatching(lines: string[], text: string, near: number): number | null {
+        let best: number | null = null;
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i] !== text) continue;
+            if (best === null || Math.abs(i - near) < Math.abs(best - near)) best = i;
+        }
+        return best;
     }
 
     public dispose() {

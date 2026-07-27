@@ -47,7 +47,7 @@ namespace Calcpad.Core
         {
             get
             {
-                var precision = GetSettingsVariable("Precision", 1e-14);
+                var precision = GetSettingsVariable("Precision", _settings.Precision);
                 return precision switch
                 {
                     < 1e-15 => 1e-15,
@@ -61,7 +61,7 @@ namespace Calcpad.Core
         {
             get
             {
-                var tol = GetSettingsVariable("Tol", 1e-6);
+                var tol = GetSettingsVariable("Tol", _settings.Tol);
                 return tol switch
                 {
                     < 1e-15 => 1e-15,
@@ -83,11 +83,8 @@ namespace Calcpad.Core
         internal bool ShowWarnings { get; set; } = true;
         internal bool Phasor { get; set; } = false;
         public int Degrees { get => _calc.Degrees;  set => _calc.Degrees = value; }
-        internal int PlotWidth => (int)GetSettingsVariable("PlotWidth", 500);
-        internal int PlotHeight => (int)GetSettingsVariable("PlotHeight", 300);
         internal double PlotSVG => GetSettingsVariable("PlotSVG", double.NaN);
         internal double PlotAdaptive => GetSettingsVariable("PlotAdaptive", double.NaN);
-        internal int PlotStep => (int)GetSettingsVariable("PlotStep", 0);
         internal bool IsConst { get; set; } = false;
 
         public const char DecimalSymbol = '.';

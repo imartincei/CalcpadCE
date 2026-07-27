@@ -6,9 +6,14 @@
     <IsComplex>false</IsComplex>
     <Substitute>true</Substitute>
     <FormatEquations>true</FormatEquations>
+    <Precision>1E-14</Precision>
+    <Tol>1E-06</Tol>
   </Math>
   <Plot>
     <IsAdaptive>true</IsAdaptive>
+    <Width>500</Width>
+    <Height>300</Height>
+    <Step>0</Step>
     <ScreenScaleFactor>2</ScreenScaleFactor>
     <ImagePath />
     <ImageUri />

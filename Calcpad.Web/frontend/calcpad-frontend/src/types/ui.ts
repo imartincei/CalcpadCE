@@ -38,6 +38,7 @@ export interface UiSettings {
   plot: {
     isAdaptive: boolean;
     screenScaleFactor: number;
+    /** @deprecated WPF-only, to be removed later. */
     imagePath: string;
     imageUri: string;
     vectorGraphics: boolean;

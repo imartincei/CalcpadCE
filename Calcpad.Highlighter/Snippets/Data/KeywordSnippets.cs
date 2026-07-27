@@ -423,6 +423,13 @@ namespace Calcpad.Highlighter.Snippets.Data
             },
             new SnippetItem
             {
+                Insert = "#settings {\"decimals\": 4, \"units\": \"cm\"}",
+                Description = "Override engine settings for subsequent lines via JSON",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
                 Insert = "#phasor",
                 Description = "Set complex number output to polar phasor (A angle phi)",
                 Category = "Output Control",

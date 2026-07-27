@@ -3,7 +3,7 @@
        hosting can segfault when the native context menu tries to render inside
        the embedded webview. Blocking the default menu everywhere is safer than
        relying on children to opt in. -->
-  <div class="calcpad-vue-ui" @contextmenu.prevent>
+  <div class="calcpad-vue-ui" :class="{ split: isSplit }" @contextmenu.prevent>
     <!-- Activity icons: only shown when the host app enables extra tabs (desktop).
          VS Code webview keeps a single Calcpad view. -->
     <div v-if="versionConfig.isDesktop" class="activity-icons" role="tablist">
@@ -31,33 +31,41 @@
       @close-folder="handleCloseFolder"
     />
 
-    <div v-show="!versionConfig.isDesktop || activeView === 'calcpad'" class="calcpad-view">
+    <div v-show="!versionConfig.isDesktop || activeView === 'calcpad'" class="calcpad-view" :class="{ split: isSplit }">
+    <div v-for="(pane, paneIndex) in panes" :key="pane.id" class="calcpad-pane">
     <div class="tab-container">
       <button
         v-for="tab in tabs"
         :key="tab.id"
-        :class="['tab', { active: activeTab === tab.id }]"
-        @click="switchTab(tab.id)"
+        :class="['tab', { active: pane.activeTab === tab.id }]"
+        @click="activateTab(pane, tab.id)"
       >
         {{ tab.label }}
       </button>
+      <button
+        class="pane-action"
+        :title="isSplit ? 'Close this panel' : 'Split panel'"
+        :aria-label="isSplit ? 'Close this panel' : 'Split panel'"
+        @click="isSplit ? closePane(paneIndex) : splitPane()"
+        v-html="isSplit ? CLOSE_ICON : SPLIT_ICON"
+      ></button>
     </div>
 
     <div class="tab-content">
       <CalcpadInsertTab
-        v-if="activeTab === 'insert'"
+        v-if="pane.activeTab === 'insert'"
         :insert-items="insertItems"
         @insert-text="handleInsertText"
         @insert-image="handleInsertImage"
       />
       <CalcpadTocTab
-        v-else-if="activeTab === 'toc'"
+        v-else-if="pane.activeTab === 'toc'"
         :headings="tocHeadings"
         :loading="tocLoading"
         @go-to-line="handleGoToLine"
       />
       <CalcpadSettingsTab
-        v-else-if="activeTab === 'settings'"
+        v-else-if="pane.activeTab === 'settings'"
         :settings="settings"
         :initial-preview-theme="previewTheme"
         :initial-color-theme="colorTheme"
@@ -99,20 +107,20 @@
         @update-editor-font-family="handleUpdateEditorFontFamily"
       />
       <CalcpadVariablesTab
-        v-else-if="activeTab === 'variables'"
+        v-else-if="pane.activeTab === 'variables'"
         :variables-data="variablesData"
         :loading="variablesLoading"
         @insert-text="handleInsertText"
       />
       <CalcpadPdfTab
-        v-else-if="activeTab === 'pdf'"
+        v-else-if="pane.activeTab === 'pdf'"
         :pdf-settings="pdfSettings"
         @update-pdf-settings="handleUpdatePdfSettings"
         @reset-pdf-settings="handleResetPdfSettings"
         @generate-pdf="handleGeneratePdf"
       />
       <CalcpadFormattingTab
-        v-else-if="activeTab === 'formatting'"
+        v-else-if="pane.activeTab === 'formatting'"
         :indent-style="prettifyIndentStyle"
         :indent-size="prettifyIndentSize"
         :trim-trailing-whitespace="prettifyTrimTrailing"
@@ -122,7 +130,7 @@
         @update-trim-trailing="handleUpdatePrettifyTrim"
       />
       <CalcpadExportTab
-        v-else-if="activeTab === 'export'"
+        v-else-if="pane.activeTab === 'export'"
         :plots="plots"
         :loading="plotsLoading"
         @save-html="handleSaveSourceHtml"
@@ -132,22 +140,23 @@
         @save-plots-zip="handleSavePlotsZip"
       />
       <CalcpadErrorsTab
-        v-else-if="activeTab === 'errors'"
+        v-else-if="pane.activeTab === 'errors'"
         :errors="convertErrors"
         @go-to-line="handleGoToLine"
       />
       <CalcpadMetadataTab
-        v-else-if="activeTab === 'metadata'"
+        v-else-if="pane.activeTab === 'metadata'"
         :block="metadataBlock"
         @apply="handleApplyMetadata"
       />
+    </div>
     </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import CalcpadInsertTab from './CalcpadInsertTab.vue'
 import CalcpadTocTab from './CalcpadTocTab.vue'
 import CalcpadSettingsTab from './CalcpadSettingsTab.vue'
@@ -159,7 +168,7 @@ import CalcpadFilesTab from './CalcpadFilesTab.vue'
 import CalcpadErrorsTab from './CalcpadErrorsTab.vue'
 import CalcpadMetadataTab from './CalcpadMetadataTab.vue'
 import { postMessage } from '../services/messaging'
-import type { MetadataCommentBlock, MetadataCommentData } from '../../text/metadata-comment'
+import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '../../text/metadata-comment'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
 import type { CalcpadError } from '../../types/api'
@@ -193,8 +202,17 @@ const activeView = ref<string>('calcpad')
 const openedFolder = ref<string | null>(null)
 const fileTreeRoots = ref<FileNode[]>([])
 
-// State
-const activeTab = ref('insert')
+// Split icon (two stacked rows) and close icon for the per-pane action button.
+const SPLIT_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="2" y1="8" x2="14" y2="8"/></svg>'
+const CLOSE_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" xmlns="http://www.w3.org/2000/svg"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>'
+
+// The side panel can be split into two panes, each with its own active tab.
+// A pane's `id` is a stable key for v-for so switching a pane's tab doesn't
+// remount the other pane.
+interface Pane { id: number; activeTab: string }
+let paneSeq = 0
+const panes = ref<Pane[]>([{ id: paneSeq++, activeTab: 'insert' }])
+const isSplit = computed(() => panes.value.length > 1)
 const insertItems = ref<InsertItem[]>([])
 const settings = ref<Settings>()
 const previewTheme = ref('system')
@@ -243,7 +261,7 @@ const tabs = computed<Tab[]>(() => {
   // The metadata comment editor is driven by editor cursor tracking, available
   // in the VS Code webview and the desktop app (both host a real editor).
   if (props.versionConfig.isVSCode || props.versionConfig.isDesktop) {
-    base.push({ id: 'metadata', label: 'Metadata' })
+    base.push({ id: 'metadata', label: 'Properties' })
   }
   return base
 })
@@ -303,8 +321,22 @@ const setDirectoryChildren = (parentPath: string, children: FileNode[]) => {
   walk(fileTreeRoots.value)
 }
 
-const switchTab = (tabId: string) => {
-  activeTab.value = tabId
+// Add a second pane, defaulting it to a tab other than the first pane's so the
+// split shows two different tabs immediately.
+const splitPane = () => {
+  if (panes.value.length >= 2) return
+  const first = panes.value[0].activeTab
+  const second = tabs.value.find(t => t.id !== first)?.id ?? first
+  panes.value.push({ id: paneSeq++, activeTab: second })
+}
+
+const closePane = (index: number) => {
+  if (panes.value.length <= 1) return
+  panes.value.splice(index, 1)
+}
+
+const activateTab = (pane: Pane, tabId: string) => {
+  pane.activeTab = tabId
 
   // Request fresh data when switching to variables tab
   if (tabId === 'variables') {
@@ -334,6 +366,12 @@ const switchTab = (tabId: string) => {
     plotsLoading.value = true
     postMessage({ type: 'getPlots' })
   }
+}
+
+// Host-facing entry point (focusTab message, defineExpose): always targets the
+// first pane so external callers don't need to know about the split.
+const switchTab = (tabId: string) => {
+  activateTab(panes.value[0], tabId)
 }
 
 const handleSaveSourceHtml = () => {
@@ -487,6 +525,15 @@ const handleGeneratePdf = () => {
   })
 }
 
+// Ctrl+E exports PDF in the desktop app only; VS Code owns its own keybindings.
+const handleExportShortcut = (event: KeyboardEvent) => {
+  if (event.key.toLowerCase() === 'e' && (event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey) {
+    event.preventDefault()
+    event.stopPropagation()
+    handleGeneratePdf()
+  }
+}
+
 const handleGoToLine = (line: number) => {
   postMessage({
     type: 'goToLine',
@@ -513,8 +560,11 @@ const handleUpdatePrettifyTrim = (enabled: boolean) => {
   postMessage({ type: 'updatePrettifyTrim', value: enabled })
 }
 
-const handleApplyMetadata = (data: MetadataCommentData) => {
+const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: SettingsValues }) => {
   if (!metadataBlock.value) return
+  // One message → one atomic edit covering both the metadata comment and the
+  // document-level #settings directive, so the two writes can't race or shift
+  // each other's line numbers.
   postMessage({
     type: 'updateMetadata',
     line: metadataBlock.value.line,
@@ -523,7 +573,9 @@ const handleApplyMetadata = (data: MetadataCommentData) => {
     trailingQuote: metadataBlock.value.trailingQuote,
     layout: metadataBlock.value.layout,
     isNew: metadataBlock.value.isNew,
-    data
+    data: payload.data,
+    settings: payload.settings,
+    settingsLine: metadataBlock.value.settingsLine ?? null
   })
 }
 
@@ -624,6 +676,7 @@ onMounted(() => {
 
   if (props.versionConfig.isDesktop) {
     postMessage({ type: 'getOpenedFolder' })
+    window.addEventListener('keydown', handleExportShortcut, true)
   }
 
   // Debug message
@@ -631,6 +684,13 @@ onMounted(() => {
     type: 'debug',
     message: 'CalcpadVueApp mounted successfully'
   })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('message', handleMessage)
+  if (props.versionConfig.isDesktop) {
+    window.removeEventListener('keydown', handleExportShortcut, true)
+  }
 })
 </script>
 
@@ -694,6 +754,37 @@ onMounted(() => {
   display: block;
 }
 
+/* Split mode: the view becomes a vertical flex column of independently
+ * scrolling panes. The root switches to height:100% so panes fill the sidebar
+ * where the host gives it a definite height (calcpad-web/desktop); in the VS
+ * Code webview (body-scroll, no definite height) it degrades to natural flow
+ * with both panes fully expanded. */
+.calcpad-vue-ui.split {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.calcpad-vue-ui.split .calcpad-view {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.calcpad-view.split {
+  display: flex;
+  flex-direction: column;
+}
+
+.calcpad-view.split .calcpad-pane {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.calcpad-view.split .calcpad-pane + .calcpad-pane {
+  border-top: 2px solid var(--vscode-widget-border);
+}
+
 .tab-container {
   display: flex;
   flex-wrap: wrap;
@@ -726,6 +817,31 @@ onMounted(() => {
   background: var(--vscode-tab-activeBackground);
   color: var(--vscode-tab-activeForeground);
   border-bottom: 2px solid var(--vscode-tab-activeBorder);
+}
+
+/* Split / close button pinned to the right end of the tab strip. */
+.pane-action {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--vscode-tab-inactiveForeground);
+  cursor: pointer;
+  border-radius: 0;
+  transition: all 0.2s ease;
+}
+
+.pane-action:hover {
+  background: var(--vscode-tab-hoverBackground);
+  color: var(--vscode-tab-activeForeground);
+}
+
+.pane-action :deep(svg) {
+  display: block;
 }
 
 .tab-content {

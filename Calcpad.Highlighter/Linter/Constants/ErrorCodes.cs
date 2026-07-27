@@ -69,6 +69,7 @@ namespace Calcpad.Highlighter.Linter.Constants
             ["CPD-3410"] = "Outer-scope assignment (←) to an undefined variable",
             ["CPD-3411"] = "Invalid paramType value in a metadata comment",
             ["CPD-3412"] = "Invalid metadata-comment JSON",
+            ["CPD-3413"] = "Invalid #settings JSON",
 
             // Stage 3: Format (CPD-36xx)
             ["CPD-3601"] = "Invalid format specifier"

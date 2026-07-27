@@ -57,34 +57,9 @@ export interface InsertData {
   [key: string]: InsertCategory
 }
 
-export interface Settings {
-  math: {
-    decimals: number
-    degrees: number
-    isComplex: boolean
-    substitute: boolean
-    formatEquations: boolean
-    zeroSmallMatrixElements: boolean
-    maxOutputCount: number
-    formatString: string
-  }
-  plot: {
-    isAdaptive: boolean
-    screenScaleFactor: number
-    imagePath: string
-    imageUri: string
-    vectorGraphics: boolean
-    colorScale: string
-    smoothScale: boolean
-    shadows: boolean
-    lightDirection: string
-  }
-  server: {
-    url: string
-  }
-  units: string
-  isUs: boolean
-}
+// The app-level settings shape is defined once in types/settings.ts; the Vue UI
+// consumes it under the name `Settings`.
+export type { CalcpadSettings as Settings } from '../../types/settings'
 
 export interface VariableItem {
   name: string

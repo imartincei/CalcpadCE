@@ -9,10 +9,27 @@ import {
     formatCustomUnitCompletion,
     type CompletionData,
     type CompletionKind,
+    METADATA_SETTINGS_KEYS,
+    type MetadataSettingKey,
 } from 'calcpad-frontend';
 import { CalcpadInsertManager, InsertItem } from './calcpadInsertManager';
 import { CalcpadDefinitionsService } from './calcpadDefinitionsService';
 import { buildBuiltinDocMarkdown } from './calcpadBuiltinDocs';
+
+/**
+ * Build the tab-stop snippet for a setting's value from its catalog entry.
+ * Booleans and enums become choice lists; numeric enums (e.g. degrees) and
+ * numbers stay unquoted, strings are quoted.
+ */
+function settingSnippetValue(s: MetadataSettingKey): string {
+    if (s.type === 'boolean') return '${1|true,false|}';
+    if (s.type === 'enum' && s.options?.length) {
+        const choices = s.options.map(o => o.value).join(',');
+        return typeof s.def === 'number' ? `\${1|${choices}|}` : `"\${1|${choices}|}"`;
+    }
+    if (s.type === 'string') return `"\${1:${s.def}}"`;
+    return `\${1:${s.def}}`;
+}
 
 const VSCODE_KIND_MAP: Record<CompletionKind, vscode.CompletionItemKind> = {
     macro: vscode.CompletionItemKind.Class,
@@ -384,22 +401,13 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
         return items;
     }
 
-    /** Valid settings keys from FileSettingsExtractor */
-    private static readonly SETTINGS_KEYS: Array<{key: string; detail: string; value: string}> = [
-        { key: 'decimals', detail: 'Decimal places in output (0-15)', value: '${1:4}' },
-        { key: 'degrees', detail: 'Angle unit: 0=radians, 1=degrees, 2=gradians', value: '${1:0}' },
-        { key: 'complex', detail: 'Enable complex number mode', value: '${1|true,false|}' },
-        { key: 'substitute', detail: 'Substitute variable values into expressions', value: '${1|true,false|}' },
-        { key: 'formatEquations', detail: 'Format equations in output', value: '${1|true,false|}' },
-        { key: 'zeroSmallMatrixElements', detail: 'Zero out near-zero matrix elements', value: '${1|true,false|}' },
-        { key: 'maxOutputCount', detail: 'Maximum output rows (5-100)', value: '${1:20}' },
-        { key: 'units', detail: 'Unit system string', value: '"${1}"' },
-        { key: 'vectorGraphics', detail: 'Render plots as SVG', value: '${1|true,false|}' },
-        { key: 'colorScale', detail: 'Plot color scale', value: '"${1|None,Gray,Rainbow,Terrain,VioletToYellow,GreenToYellow,Blues,BlueToYellow,BlueToRed,PurpleToYellow|}"' },
-        { key: 'smoothScale', detail: 'Smooth color scale transitions', value: '${1|true,false|}' },
-        { key: 'shadows', detail: 'Enable 3-D plot shadows', value: '${1|true,false|}' },
-        { key: 'adaptivePlot', detail: 'Use adaptive sampling for plots', value: '${1|true,false|}' },
-    ];
+    /** Valid #settings keys, derived from the shared METADATA_SETTINGS_KEYS catalog. */
+    private static readonly SETTINGS_KEYS: Array<{key: string; detail: string; value: string}> =
+        METADATA_SETTINGS_KEYS.map(s => ({
+            key: s.key,
+            detail: s.detail,
+            value: settingSnippetValue(s),
+        }));
 
     /**
      * Get completion items for settings object keys
