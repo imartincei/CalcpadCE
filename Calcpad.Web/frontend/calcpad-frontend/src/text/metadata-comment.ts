@@ -12,8 +12,6 @@ export interface MetadataCommentData {
     returnType?: string;
     LintIgnore?: string[];
     EndLintIgnore?: string[];
-    NoPrintStart?: boolean;
-    NoPrintEnd?: boolean;
     [key: string]: unknown;
 }
 
@@ -113,8 +111,6 @@ export interface MetadataLineContext {
     hasDefinition: boolean;
     /** True when an unclosed LintIgnore region is open at this line. */
     insideOpenLintRegion: boolean;
-    /** True when an unclosed NoPrint region is open at this line. */
-    insideOpenNoPrintRegion: boolean;
 }
 
 /** Valid `paramTypes` values for custom functions (f(x;y) = ...). */
@@ -661,14 +657,11 @@ export function analyzeMetadataLine(
     }
 
     let insideOpenLintRegion = false;
-    let insideOpenNoPrintRegion = false;
     for (let i = 0; i < commentLine; i++) {
         const block = findMetadataCommentBlock(lines, i);
         if (!block?.valid || !block.data) continue;
         if (block.data.EndLintIgnore !== undefined) insideOpenLintRegion = false;
         if (block.data.LintIgnore !== undefined) insideOpenLintRegion = true;
-        if (block.data.NoPrintEnd !== undefined) insideOpenNoPrintRegion = false;
-        if (block.data.NoPrintStart !== undefined) insideOpenNoPrintRegion = true;
     }
 
     return {
@@ -676,7 +669,6 @@ export function analyzeMetadataLine(
         defKind: definition?.kind ?? null,
         hasDefinition: definition !== null,
         insideOpenLintRegion,
-        insideOpenNoPrintRegion,
     };
 }
 

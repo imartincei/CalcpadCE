@@ -16,9 +16,16 @@ namespace Calcpad.Core
             Show,
             Pre,
             Post,
+            End_Hide,
+            End_Show,
+            End_Pre,
+            End_Post,
             Val,
             Equ,
             Noc,
+            End_Val,
+            End_Equ,
+            End_Noc,
             NoSub,
             NoVar,
             VarSub,
@@ -122,30 +129,27 @@ namespace Calcpad.Core
 
             switch (keyword)
             {
-                case Keyword.Hide:
-                    _isVisible = false;
-                    break;
-                case Keyword.Show:
-                    _isVisible = true;
-                    break;
-                case Keyword.Pre:
-                    _isVisible = !_calculate;
-                    break;
-                case Keyword.Post:
-                    _isVisible = _calculate;
+                case Keyword.Hide: SetVisibility(s, 5, false); break;
+                case Keyword.Show: SetVisibility(s, 5, true); break;
+                case Keyword.Pre: SetVisibility(s, 4, !ForPrint); break;
+                case Keyword.Post: SetVisibility(s, 5, true); break; // TODO: hide in #UI mode once that lands
+                case Keyword.End_Hide:
+                case Keyword.End_Show:
+                case Keyword.End_Pre:
+                case Keyword.End_Post:
+                    _isVisible = _visibilityStack.Count > 0 ? _visibilityStack.Pop() : true;
                     break;
                 case Keyword.Input:
                     return ParseKeywordInput();
                 case Keyword.Pause:
                     return ParseKeywordPause();
-                case Keyword.Val:
-                    _isVal = 1;
-                    break;
-                case Keyword.Equ:
-                    _isVal = 0;
-                    break;
-                case Keyword.Noc:
-                    _isVal = -1;
+                case Keyword.Val: SetOutputMode(s, 4, 1); break;
+                case Keyword.Equ: SetOutputMode(s, 4, 0); break;
+                case Keyword.Noc: SetOutputMode(s, 4, -1); break;
+                case Keyword.End_Val:
+                case Keyword.End_Equ:
+                case Keyword.End_Noc:
+                    _isVal = _outputModeStack.Count > 0 ? _outputModeStack.Pop() : 0;
                     break;
                 case Keyword.NoSub:
                     _parser.VariableSubstitution = MathParser.VariableSubstitutionOptions.VariablesOnly;
@@ -224,6 +228,48 @@ namespace Calcpad.Core
                     break;
             }
             return KeywordResult.Continue;
+        }
+
+        private void SetVisibility(ReadOnlySpan<char> s, int kwdLength, bool value)
+        {
+            _visibilityStack.Push(_isVisible);
+            if (IsDirectiveConditionMet(s, kwdLength))
+                _isVisible = value;
+        }
+
+        private void SetOutputMode(ReadOnlySpan<char> s, int kwdLength, int value)
+        {
+            _outputModeStack.Push(_isVal);
+            if (IsDirectiveConditionMet(s, kwdLength))
+                _isVal = value;
+        }
+
+        private bool IsDirectiveConditionMet(ReadOnlySpan<char> s, int kwdLength)
+        {
+            if (!_condition.IsSatisfied)
+                return false;
+
+            if (s.Length <= kwdLength)
+                return true;
+
+            var expr = s[kwdLength..].Trim();
+            if (expr.IsWhiteSpace())
+                return true;
+
+            if (!_calculate)
+                return false;
+
+            try
+            {
+                _parser.Parse(expr);
+                _parser.Calculate();
+                return Condition.IsTrue(_parser.Result);
+            }
+            catch (MathParserException ex)
+            {
+                AppendError(s.ToString(), ex.Message, _currentLine);
+                return false;
+            }
         }
 
         KeywordResult ParseKeywordInput()

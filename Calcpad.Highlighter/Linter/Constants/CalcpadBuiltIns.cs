@@ -218,8 +218,9 @@ namespace Calcpad.Highlighter.Linter.Constants
         {
             "#else", "#end if", "#end def", "#loop", "#break", "#continue",
             "#local", "#global", "#pause", "#input",
-            "#hide", "#show", "#pre", "#post",
-            "#val", "#equ", "#noc", "#nosub", "#novar", "#varsub",
+            "#end hide", "#end show", "#end pre", "#end post",
+            "#nosub", "#novar", "#varsub",
+            "#end val", "#end equ", "#end noc",
             "#split", "#wrap", "#phasor", "#complex",
             "#rad", "#deg", "#gra",
             "#html", "#cpd", "#markdown"

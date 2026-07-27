@@ -663,9 +663,9 @@ namespace Calcpad.Server.Controllers
         public string Theme { get; set; } = "light"; // "light" or "dark"
 
         /// <summary>
-        /// When true, strip <c>NoPrintStart</c>/<c>NoPrintEnd</c> regions from the source
-        /// before conversion. The frontend should set this for renders destined for PDF
-        /// so those sections do not appear in print output.
+        /// When true, resolves <c>#pre</c>/<c>#post</c> directives for print output
+        /// (<c>#pre</c> content is hidden, <c>#post</c> content is shown). The frontend
+        /// should set this for renders destined for PDF.
         /// </summary>
         public bool ForPrint { get; set; } = false;
 

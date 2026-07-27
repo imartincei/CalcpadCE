@@ -261,31 +261,6 @@ namespace Calcpad.Highlighter.Snippets.Data
             },
 
             // ============================================
-            // HTML COMMENTS - NO-PRINT REGION
-            // ============================================
-            new SnippetItem
-            {
-                Insert = "'<!--{\"NoPrintStart\": true}-->\n\n'<!--{\"NoPrintEnd\": true}-->",
-                Description = "Exclude a region of content from PDF/print output",
-                Label = "No-print region",
-                Category = "HTML Comments"
-            },
-            new SnippetItem
-            {
-                Insert = "'<!--{\"NoPrintStart\": true}-->",
-                Description = "Start a region excluded from PDF/print output",
-                Label = "No-print region start",
-                Category = "HTML Comments"
-            },
-            new SnippetItem
-            {
-                Insert = "'<!--{\"NoPrintEnd\": true}-->",
-                Description = "End a region excluded from PDF/print output",
-                Label = "No-print region end",
-                Category = "HTML Comments"
-            },
-
-            // ============================================
             // SVG GRAPHICS - CONTAINER
             // ============================================
             new SnippetItem

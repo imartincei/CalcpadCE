@@ -121,6 +121,15 @@ namespace Calcpad.Core
 
             internal void Check(Complex value)
             {
+                var result = IsTrue(value);
+                if (result)
+                    IsFound = true;
+                Change(result, Type);
+                IsUnchecked = false;
+            }
+
+            internal static bool IsTrue(Complex value)
+            {
                 if (!value.IsReal)
                     throw Exceptions.ConditionComplex();
 
@@ -128,11 +137,7 @@ namespace Calcpad.Core
                 if (double.IsNaN(d) || double.IsInfinity(d))
                     throw Exceptions.ConditionResultInvalid(d.ToString());
 
-                var result = Math.Abs(d) > 1e-12;
-                if (result)
-                    IsFound = true;
-                Change(result, Type);
-                IsUnchecked = false;
+                return Math.Abs(d) > 1e-12;
             }
 
             internal void Check() => IsUnchecked = false;

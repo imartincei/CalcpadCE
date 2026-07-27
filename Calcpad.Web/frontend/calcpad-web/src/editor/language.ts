@@ -1,7 +1,7 @@
 import * as monaco from 'monaco-editor';
 
 /**
- * Monarch tokenizer for CalcPad — provides basic syntax highlighting
+ * Monarch tokenizer for CalcpadCE — provides basic syntax highlighting
  * as a fallback before semantic tokens arrive from the server.
  */
 export const calcpadLanguage: monaco.languages.IMonarchLanguage = {
@@ -15,8 +15,12 @@ export const calcpadLanguage: monaco.languages.IMonarchLanguage = {
         '#include', '#read', '#write',
         '#local', '#global', '#round', '#pause',
         '#val', '#equ', '#noc', '#show', '#hide', '#pre', '#post',
+        '#end val', '#end equ', '#end noc', '#end show', '#end hide', '#end pre', '#end post',
         '#deg', '#rad', '#gra',
         '#md on', '#md off',
+        '#const', '#break', '#continue', '#append', '#format', '#settings', '#split',
+        '#wrap', '#phasor', '#complex', '#input', '#nosub', '#novar', '#varsub',
+        '#cpd', '#html', '#markdown',
     ],
 
     operators: [

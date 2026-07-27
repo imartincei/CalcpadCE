@@ -312,49 +312,98 @@ namespace Calcpad.Highlighter.Snippets.Data
             new SnippetItem
             {
                 Insert = "#show",
-                Description = "Show the output contents (default)",
+                Description = "Show the output contents (default). Optionally takes a condition, e.g. '#show x == 5'.",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#hide",
-                Description = "Hide the output contents",
+                Description = "Hide the output contents. Optionally takes a condition, e.g. '#hide x == 5'.",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#pre",
-                Description = "Show contents only before calculations",
+                Description = "Show contents only on screen, not when printing/exporting to PDF. Optionally takes a condition.",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#post",
-                Description = "Show contents only after calculations",
+                Description = "Show contents (in the preview and when printing/exporting to PDF). Optionally takes a condition.",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end hide",
+                Description = "Restore the visibility state in effect before the matching #hide",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end show",
+                Description = "Restore the visibility state in effect before the matching #show",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end pre",
+                Description = "Restore the visibility state in effect before the matching #pre",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end post",
+                Description = "Restore the visibility state in effect before the matching #post",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#val",
-                Description = "Show only the result, without the equation",
+                Description = "Show only the result, without the equation. Optionally takes a condition.",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#equ",
-                Description = "Show complete equations and results (default)",
+                Description = "Show complete equations and results (default). Optionally takes a condition.",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#noc",
-                Description = "Show equations without results (no calculations)",
+                Description = "Show equations without results (no calculations). Optionally takes a condition.",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end val",
+                Description = "Restore the output mode in effect before the matching #val",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end equ",
+                Description = "Restore the output mode in effect before the matching #equ",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end noc",
+                Description = "Restore the output mode in effect before the matching #noc",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },

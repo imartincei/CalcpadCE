@@ -130,18 +130,6 @@
           </template>
         </div>
 
-        <div v-if="showNoPrint" class="field">
-          <label>No-print region</label>
-          <label class="checkbox-label">
-            <input type="checkbox" v-model="model.noPrintStart" />
-            Start no-print region here
-          </label>
-          <label v-if="showEndNoPrint" class="checkbox-label">
-            <input type="checkbox" v-model="model.noPrintEnd" />
-            End no-print region here
-          </label>
-        </div>
-
         <div v-if="addableFields.length" class="field add-field">
           <label>Add field</label>
           <div class="sub-row">
@@ -192,7 +180,7 @@ const lintCodes = LINT_CODES
 
 type LintMode = 'off' | 'all' | 'specific'
 
-const KNOWN_KEYS = new Set(['desc', 'paramTypes', 'paramDesc', 'returnType', 'LintIgnore', 'EndLintIgnore', 'NoPrintStart', 'NoPrintEnd'])
+const KNOWN_KEYS = new Set(['desc', 'paramTypes', 'paramDesc', 'returnType', 'LintIgnore', 'EndLintIgnore'])
 
 interface SettingRow { key: string; value: string }
 
@@ -206,8 +194,6 @@ const model = reactive({
   startLintCodes: [] as string[],
   endLintMode: 'off' as LintMode,
   endLintCodes: [] as string[],
-  noPrintStart: false,
-  noPrintEnd: false,
   extra: {} as Record<string, unknown>,
 })
 
@@ -271,21 +257,6 @@ const showLint = computed(() =>
   || !!props.block?.context?.insideOpenLintRegion
   || added.has('lint'))
 
-// No-print regions mark content excluded from PDF/print output. Like lint
-// markers they aren't tied to a definition, so they're offered on generic lines.
-const showNoPrint = computed(() =>
-  noContext.value
-  || !isDefinition.value
-  || model.noPrintStart
-  || model.noPrintEnd
-  || !!props.block?.context?.insideOpenNoPrintRegion
-  || added.has('noprint'))
-
-// The End marker only makes sense inside an open region, or when this comment
-// already carries one so it stays editable.
-const showEndNoPrint = computed(() =>
-  noContext.value || !!props.block?.context?.insideOpenNoPrintRegion || model.noPrintEnd)
-
 // On a definition line the panel already shows exactly the fields that apply, so
 // "Add field" is only offered for the null case (a comment not attached to a
 // variable/function/macro), where the definition-oriented fields are hidden.
@@ -296,7 +267,6 @@ const addableFields = computed(() => {
   if (!showParams.value) out.push({ id: 'params', label: 'Parameter types & descriptions' })
   if (!showReturnType.value) out.push({ id: 'returnType', label: 'Return type' })
   if (!showLint.value) out.push({ id: 'lint', label: 'Lint ignore' })
-  if (!showNoPrint.value) out.push({ id: 'noprint', label: 'No-print region' })
   return out
 })
 
@@ -358,8 +328,6 @@ function populate() {
     : []
   ;[model.startLintMode, model.startLintCodes] = readLintField(data.LintIgnore)
   ;[model.endLintMode, model.endLintCodes] = readLintField(data.EndLintIgnore)
-  model.noPrintStart = !!data.NoPrintStart
-  model.noPrintEnd = !!data.NoPrintEnd
   const extra: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(data)) {
     if (!KNOWN_KEYS.has(key)) extra[key] = value
@@ -424,11 +392,6 @@ function onApply() {
 
   const endLintIgnore = lintFieldValue(model.endLintMode, model.endLintCodes)
   if (endLintIgnore !== undefined) data.EndLintIgnore = endLintIgnore
-
-  // Only emit the markers when on — the backend treats a present key as active
-  // regardless of value, so an off marker must be omitted, not written false.
-  if (model.noPrintStart) data.NoPrintStart = true
-  if (model.noPrintEnd) data.NoPrintEnd = true
 
   emit('apply', { data, settings })
 }

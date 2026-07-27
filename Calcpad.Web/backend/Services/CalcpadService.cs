@@ -7,7 +7,6 @@ namespace Calcpad.Server.Services
     {
         private readonly string _tempDirectory;
         private readonly string _htmlTemplate;
-        private static readonly NoPrintRegionStripper _noPrintRegionStripper = new();
 
         public CalcpadService()
         {
@@ -58,11 +57,6 @@ namespace Calcpad.Server.Services
                 FileLogger.LogInfo("Starting conversion", $"Content length: {calcpadContent.Length}, Has settings: {settings != null}, Force unwrapped: {forceUnwrappedCode}, For print: {forPrint}");
                 FileLogger.LogInfo("Content preview:", calcpadContent.Substring(0, Math.Min(200, calcpadContent.Length)));
 
-                // When generating for PDF, strip NoPrintStart/NoPrintEnd regions from the source
-                // before any further processing so they never enter the macro/expression pipeline.
-                if (forPrint)
-                    calcpadContent = _noPrintRegionStripper.Strip(calcpadContent);
-
                 // 1. Use Calcpad.Core settings directly (defaults are set in constructors).
                 //    Per-file overrides now come from the #settings directive, handled in Core.
                 Settings coreSettings = settings ?? new Settings();
@@ -109,7 +103,7 @@ namespace Calcpad.Server.Services
                         // Debug mode makes Calcpad.Core emit per-line anchors (id="line-N" class="line")
                         // and the error-summary boxes that the interactive preview uses for line links.
                         // Keep it off for print/PDF so exported output has no navigation anchors.
-                        var parser = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, Debug = !forPrint };
+                        var parser = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, Debug = !forPrint, ForPrint = forPrint };
                         parser.Parse(outputText, true, captureOpenXml);
                         htmlResult = RemoveEmptyParagraphs(parser.HtmlResult);
                         errors.AddRange(parser.Errors);

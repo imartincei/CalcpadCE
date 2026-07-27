@@ -20,6 +20,8 @@ namespace Calcpad.Core
         private int _decimals;
         private bool _calculate;
         private bool _isVisible;
+        private readonly Stack<bool> _visibilityStack = new();
+        private readonly Stack<int> _outputModeStack = new();
         private bool _isPausedByUser;
         private int _pauseCharCount;
         private bool _isMarkdownOn;
@@ -43,6 +45,7 @@ namespace Calcpad.Core
         }
         public bool IsPaused => _startLine > 0;
         public bool Debug { get; set; }
+        public bool ForPrint { get; set; }
         public bool ShowWarnings { get; set; } = true;
         public readonly List<string> OpenXmlExpressions = new(100);
 
@@ -459,6 +462,7 @@ namespace Calcpad.Core
                 _condition = new();
                 _loops.Clear();
                 _isVal = 0;
+                _outputModeStack.Clear();
                 _parser.SetVariable("Units", new RealValue(UnitsFactor()));
                 _previousKeyword = Keyword.None;
                 _isMarkdownOn = false;
@@ -476,6 +480,7 @@ namespace Calcpad.Core
             _parser.IsEnabled = _calculate;
             _currentLine = _startLine - 1;
             _isVisible = true;
+            _visibilityStack.Clear();
         }
 
         private void Finalize(int lineCount)

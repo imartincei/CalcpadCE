@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Calcpad.Highlighter.Linter.Helpers
 {
@@ -25,22 +26,40 @@ namespace Calcpad.Highlighter.Linter.Helpers
     }
 
     /// <summary>
+    /// Visibility mode set by the #show / #hide / #pre / #post directives (mirrors
+    /// ExpressionParser's _isVisible, driven by ForPrint for #pre/#post).
+    /// </summary>
+    public enum VisibilityMode
+    {
+        Shown,
+        Hidden,
+        ScreenOnly,
+        PrintOnly
+    }
+
+    /// <summary>
     /// Tracks the running state of Calcpad's mode directives as lines are visited in order.
     /// Calcpad has several independent directive categories, and within each the most recent
     /// directive wins (see ExpressionParser.ParseKeyword):
-    ///   - output value:  #equ / #val / #noc
+    ///   - output value:  #equ / #val / #noc (and #end equ / #end val / #end noc)
     ///   - scope:          #global / #local
     ///   - markdown:       #md [on] / #md off
     ///   - substitution:   #varsub / #nosub / #novar
     ///   - angle:          #rad / #deg / #gra
     ///   - line breaking:  #wrap / #split
     ///   - number type:    #complex / #phasor
-    ///   - visibility:     #show / #hide / #pre / #post
-    /// Only the categories consumed by the tooling are tracked; the rest are ignored.
+    ///   - visibility:     #show / #hide / #pre / #post (and #end show / #end hide / #end pre / #end post)
+    /// Only the categories consumed by the tooling are tracked; the rest are ignored. The #end
+    /// forms pop back to the state in effect before the matching opener (default state if there
+    /// is none), mirroring ExpressionParser's _visibilityStack / _outputModeStack.
     /// </summary>
     public sealed class DirectiveState
     {
+        private readonly Stack<OutputMode> _outputStack = new();
+        private readonly Stack<VisibilityMode> _visibilityStack = new();
+
         public OutputMode Output { get; private set; } = OutputMode.Equations;
+        public VisibilityMode Visibility { get; private set; } = VisibilityMode.Shown;
         public ScopeMode Scope { get; private set; } = ScopeMode.Global;
         public bool IsMarkdownOn { get; private set; }
 
@@ -50,12 +69,46 @@ namespace Calcpad.Highlighter.Linter.Helpers
         /// </summary>
         public void Apply(ReadOnlySpan<char> trimmedLine)
         {
-            if (Matches(trimmedLine, "#equ"))
+            if (Matches(trimmedLine, "#end val") || Matches(trimmedLine, "#end equ") || Matches(trimmedLine, "#end noc"))
+                Output = _outputStack.Count > 0 ? _outputStack.Pop() : OutputMode.Equations;
+            else if (Matches(trimmedLine, "#equ"))
+            {
+                _outputStack.Push(Output);
                 Output = OutputMode.Equations;
+            }
             else if (Matches(trimmedLine, "#val"))
+            {
+                _outputStack.Push(Output);
                 Output = OutputMode.Values;
+            }
             else if (Matches(trimmedLine, "#noc"))
+            {
+                _outputStack.Push(Output);
                 Output = OutputMode.NoCalculation;
+            }
+            else if (Matches(trimmedLine, "#end hide") || Matches(trimmedLine, "#end show") ||
+                     Matches(trimmedLine, "#end pre") || Matches(trimmedLine, "#end post"))
+                Visibility = _visibilityStack.Count > 0 ? _visibilityStack.Pop() : VisibilityMode.Shown;
+            else if (Matches(trimmedLine, "#hide"))
+            {
+                _visibilityStack.Push(Visibility);
+                Visibility = VisibilityMode.Hidden;
+            }
+            else if (Matches(trimmedLine, "#show"))
+            {
+                _visibilityStack.Push(Visibility);
+                Visibility = VisibilityMode.Shown;
+            }
+            else if (Matches(trimmedLine, "#pre"))
+            {
+                _visibilityStack.Push(Visibility);
+                Visibility = VisibilityMode.ScreenOnly;
+            }
+            else if (Matches(trimmedLine, "#post"))
+            {
+                _visibilityStack.Push(Visibility);
+                Visibility = VisibilityMode.PrintOnly;
+            }
             else if (Matches(trimmedLine, "#global"))
                 Scope = ScopeMode.Global;
             else if (Matches(trimmedLine, "#local"))
