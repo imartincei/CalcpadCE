@@ -75,7 +75,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#running-the-calcpad-server" class="md-skip">
+        <a href="#running-the-calcpadce-server" class="md-skip">
           Skip to content
         </a>
       
@@ -1186,14 +1186,42 @@
   
   
     <li class="md-nav__item">
-      <a href="new-calcpad-panel-and-settings.html" class="md-nav__link">
+      <a href="new-calcpad-panel.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The CalcPad Panel & Settings
+    The CalcpadCE Panel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
   
 
     
@@ -3001,11 +3029,10 @@
 
 
 
-<h1 id="running-the-calcpad-server">Running the Calcpad Server<a class="headerlink" href="#running-the-calcpad-server" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p>Calcpad.Web only. The standalone WPF desktop application for Windows is separate and unaffected.</p>
-</blockquote>
-<p>The desktop app and the VS Code extension start the Calcpad calculation server for you, so most people never run it by hand. But you can also run it directly — for example, to point several tools at one shared instance, or to script conversions and calls against its API. This page covers running the server and the API it exposes.</p>
+<h1 id="running-the-calcpadce-server">Running the CalcpadCE Server<a class="headerlink" href="#running-the-calcpadce-server" title="Permanent link">&para;</a></h1>
+<p>The desktop app and the VS Code extension start the CalcpadCE calculation server for you, so most people will never run it by hand.
+However, people who are familiar with coding can also run it directly — for example, to point several tools at one shared instance, or to script conversions and calls against its API.
+This page covers running the server and the API it exposes.</p>
 <blockquote>
 <p><strong>Localhost only.</strong> This build runs the server bound to your own machine (<code>localhost</code>, <code>127.0.0.1</code>, or <code>::1</code>) only. If you point it at any other address, it refuses to start. There is no multi-user hosting, authentication, or shared file storage in this build.</p>
 </blockquote>
@@ -3013,7 +3040,8 @@
 <div class="language-bash highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>Calcpad.Web/backend
 dotnet<span class="w"> </span>run
 </code></pre></div>
-<p>By default the server listens on <code>http://localhost:9420</code>. To change the port, set <code>CALCPAD_PORT</code>, or pass a full bind URL with <code>--urls</code> — as long as it still points at a loopback address.</p>
+<p>By default the server listens on <code>http://localhost:9420</code>.
+To change the port, set <code>CALCPAD_PORT</code>, or pass a full bind URL with <code>--urls</code> — as long as it still points at a loopback address.</p>
 <h2 id="api-endpoints">API endpoints<a class="headerlink" href="#api-endpoints" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -3082,7 +3110,7 @@ dotnet<span class="w"> </span>run
 <tr>
 <td><code>/api/calcpad/prettify</code></td>
 <td>POST</td>
-<td>Pretty-print Calcpad source</td>
+<td>Pretty-print CalcpadCE source</td>
 </tr>
 <tr>
 <td><code>/api/calcpad/snippets</code></td>
@@ -3100,7 +3128,7 @@ dotnet<span class="w"> </span>run
 <h2 id="common-request-fields">Common request fields<a class="headerlink" href="#common-request-fields" title="Permanent link">&para;</a></h2>
 <p>Most POST endpoints accept a request with these fields:</p>
 <ul>
-<li><code>content</code> — the Calcpad source code</li>
+<li><code>content</code> — the CalcpadCE source code</li>
 <li><code>settings</code> — math / plot / unit configuration</li>
 <li><code>theme</code> — <code>"light"</code> or <code>"dark"</code></li>
 <li><code>sourceFilePath</code> — the document's file path, used to resolve relative <code>#include</code> paths against the file's folder</li>
@@ -3122,7 +3150,8 @@ dotnet<span class="w"> </span>run
 </code></pre></div>
 <p><code>isAssignment: true</code> marks a definition or reassignment.</p>
 <h3 id="highlight">Highlight<a class="headerlink" href="#highlight" title="Permanent link">&para;</a></h3>
-<p>An array of <code>{ line, column, length, type, typeId, text? }</code>. The <code>text</code> field is omitted by default; pass <code>includeText: true</code> to include it.</p>
+<p>An array of <code>{ line, column, length, type, typeId, text? }</code>.
+The <code>text</code> field is omitted by default; pass <code>includeText: true</code> to include it.</p>
 <h3 id="lint">Lint<a class="headerlink" href="#lint" title="Permanent link">&para;</a></h3>
 <div class="language-typescript highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nx">errorCount</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">,</span>
