@@ -84,6 +84,70 @@
           <button class="add-button" @click="model.settings.push({ key: '', value: '' })">+ Add setting</button>
         </div>
 
+        <div v-if="showUi" class="field">
+          <label>#UI Control</label>
+          <p v-if="uiBlock && !uiBlock.valid" class="warning">
+            This #UI directive contains invalid JSON. Applying will replace it with the values below.
+          </p>
+
+          <div class="sub-row">
+            <span class="sub-label">Type</span>
+            <select v-model="model.ui.type">
+              <option v-for="opt in uiTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+          <div class="sub-row">
+            <span class="sub-label">Mode</span>
+            <select v-model="model.ui.mode">
+              <option v-for="opt in uiModeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+          <div class="sub-row">
+            <span class="sub-label">Style class</span>
+            <input type="text" v-model="model.ui.style" />
+          </div>
+          <div class="sub-row">
+            <span class="sub-label">Report style class</span>
+            <input type="text" v-model="model.ui.reportStyle" />
+          </div>
+
+          <template v-if="model.ui.type === 'datagrid'">
+            <div class="sub-row">
+              <span class="sub-label">Rows</span>
+              <input type="number" min="0" v-model.number="model.ui.rows" />
+            </div>
+            <div class="sub-row">
+              <span class="sub-label">Columns</span>
+              <input type="number" min="0" v-model.number="model.ui.columns" />
+            </div>
+
+            <label>Column headers</label>
+            <div v-for="(_, i) in model.ui.columnHeaders" :key="'ch' + i" class="list-row">
+              <input type="text" v-model="model.ui.columnHeaders[i]" />
+              <button class="icon-button" title="Remove" @click="model.ui.columnHeaders.splice(i, 1)">✕</button>
+            </div>
+            <button class="add-button" @click="model.ui.columnHeaders.push('')">+ Add column header</button>
+
+            <label>Row headers</label>
+            <div v-for="(_, i) in model.ui.rowHeaders" :key="'rh' + i" class="list-row">
+              <input type="text" v-model="model.ui.rowHeaders[i]" />
+              <button class="icon-button" title="Remove" @click="model.ui.rowHeaders.splice(i, 1)">✕</button>
+            </div>
+            <button class="add-button" @click="model.ui.rowHeaders.push('')">+ Add row header</button>
+          </template>
+
+          <template v-if="model.ui.type === 'dropdown' || model.ui.type === 'radio'">
+            <label>Options (key / value)</label>
+            <div v-for="(_, i) in model.ui.keys" :key="'kv' + i" class="list-row">
+              <input type="text" placeholder="Key" v-model="model.ui.keys[i]" />
+              <input type="text" placeholder="Value" v-model="model.ui.values[i]" />
+              <button class="icon-button" title="Remove" @click="removeUiOption(i)">✕</button>
+            </div>
+            <button class="add-button" @click="model.ui.keys.push(''); model.ui.values.push('')">+ Add option</button>
+            <div v-if="uiKeysValuesError" class="setting-error">{{ uiKeysValuesError }}</div>
+          </template>
+        </div>
+
         <div v-if="showLint" class="field">
           <label>Lint ignore</label>
 
@@ -144,7 +208,7 @@
         </div>
 
         <div class="actions">
-          <button class="primary-button" :disabled="hasSettingErrors" :title="hasSettingErrors ? 'Fix the highlighted settings before applying' : undefined" @click="onApply">Apply</button>
+          <button class="primary-button" :disabled="hasSettingErrors || hasUiErrors" :title="(hasSettingErrors || hasUiErrors) ? 'Fix the highlighted fields before applying' : undefined" @click="onApply">Apply</button>
           <button class="secondary-button" @click="populate">Reset</button>
         </div>
       </template>
@@ -159,10 +223,13 @@ import {
   MACRO_PARAM_TYPES,
   METADATA_SETTINGS_KEYS,
   settingSpec,
+  specForKey,
   validateSettingValue,
   LINT_CODES,
 } from '../../text/metadata-comment'
 import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind, SettingsValues, SettingOption } from '../../text/metadata-comment'
+import { UI_PROPERTY_KEYS } from '../../text/ui-directive'
+import type { UiDirectiveData } from '../../text/ui-directive'
 
 interface Props {
   block?: MetadataCommentBlock | null
@@ -170,7 +237,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), { block: null })
 
 const emit = defineEmits<{
-  'apply': [payload: { data: MetadataCommentData; settings: SettingsValues }]
+  'apply': [payload: { data: MetadataCommentData; settings: SettingsValues; ui?: UiDirectiveData }]
 }>()
 
 const functionTypes = FUNCTION_PARAM_TYPES
@@ -195,6 +262,18 @@ const model = reactive({
   endLintMode: 'off' as LintMode,
   endLintCodes: [] as string[],
   extra: {} as Record<string, unknown>,
+  ui: {
+    type: '',
+    mode: '',
+    style: '',
+    reportStyle: '',
+    rows: '' as number | '',
+    columns: '' as number | '',
+    columnHeaders: [] as string[],
+    rowHeaders: [] as string[],
+    keys: [] as string[],
+    values: [] as string[],
+  },
 })
 
 // Fields the user opted into via "Add field" even though the cursor context
@@ -248,6 +327,29 @@ const isDefinition = computed(() => defKind.value !== null)
 // Settings drive the document-level #settings directive, not the cursor's
 // metadata comment, so the section is always available regardless of context.
 const showSettings = computed(() => true)
+
+// The #UI section only makes sense when the cursor sits on an actual #UI
+// line — unlike the comment/settings sections, there's nothing to synthesize
+// (a #UI line requires a pre-existing variable assignment).
+const uiBlock = computed(() => props.block?.uiDirective ?? null)
+const showUi = computed(() => !!uiBlock.value)
+
+const uiTypeOptions = specForKey(UI_PROPERTY_KEYS, 'type')?.options ?? []
+const uiModeOptions = specForKey(UI_PROPERTY_KEYS, 'mode')?.options ?? []
+
+const uiKeysValuesError = computed(() => {
+  if (!showUi.value) return null
+  if (model.ui.type !== 'dropdown' && model.ui.type !== 'radio') return null
+  return model.ui.keys.length === model.ui.values.length
+    ? null
+    : 'Keys and values must have the same number of entries'
+})
+const hasUiErrors = computed(() => !!uiKeysValuesError.value)
+
+function removeUiOption(i: number) {
+  model.ui.keys.splice(i, 1)
+  model.ui.values.splice(i, 1)
+}
 
 const showLint = computed(() =>
   noContext.value
@@ -334,6 +436,18 @@ function populate() {
   }
   model.extra = extra
 
+  const uiData = uiBlock.value?.data ?? {}
+  model.ui.type = typeof uiData.type === 'string' ? uiData.type : ''
+  model.ui.mode = typeof uiData.mode === 'string' ? uiData.mode : ''
+  model.ui.style = typeof uiData.style === 'string' ? uiData.style : ''
+  model.ui.reportStyle = typeof uiData.reportStyle === 'string' ? uiData.reportStyle : ''
+  model.ui.rows = typeof uiData.rows === 'number' ? uiData.rows : ''
+  model.ui.columns = typeof uiData.columns === 'number' ? uiData.columns : ''
+  model.ui.columnHeaders = Array.isArray(uiData.columnHeaders) ? uiData.columnHeaders.map(String) : []
+  model.ui.rowHeaders = Array.isArray(uiData.rowHeaders) ? uiData.rowHeaders.map(String) : []
+  model.ui.keys = Array.isArray(uiData.keys) ? uiData.keys.map(String) : []
+  model.ui.values = Array.isArray(uiData.values) ? uiData.values.map(String) : []
+
   // Pre-size the parameter rows to the definition's parameter count so the
   // form matches the signature without the user adding rows by hand.
   const paramCount = props.block?.context?.paramCount ?? 0
@@ -369,7 +483,7 @@ function coerceSetting(key: string, value: string | number | boolean): string | 
 }
 
 function onApply() {
-  if (hasSettingErrors.value) return
+  if (hasSettingErrors.value || hasUiErrors.value) return
   const data: MetadataCommentData = { ...model.extra }
 
   if (model.desc.trim()) data.desc = model.desc.trim()
@@ -393,7 +507,26 @@ function onApply() {
   const endLintIgnore = lintFieldValue(model.endLintMode, model.endLintCodes)
   if (endLintIgnore !== undefined) data.EndLintIgnore = endLintIgnore
 
-  emit('apply', { data, settings })
+  let ui: UiDirectiveData | undefined
+  if (showUi.value) {
+    ui = {}
+    if (model.ui.type) ui.type = model.ui.type
+    if (model.ui.mode) ui.mode = model.ui.mode
+    if (model.ui.style.trim()) ui.style = model.ui.style.trim()
+    if (model.ui.reportStyle.trim()) ui.reportStyle = model.ui.reportStyle.trim()
+    if (model.ui.rows !== '') ui.rows = Number(model.ui.rows)
+    if (model.ui.columns !== '') ui.columns = Number(model.ui.columns)
+    const columnHeaders = model.ui.columnHeaders.filter(h => h.trim() !== '')
+    if (columnHeaders.length) ui.columnHeaders = columnHeaders
+    const rowHeaders = model.ui.rowHeaders.filter(h => h.trim() !== '')
+    if (rowHeaders.length) ui.rowHeaders = rowHeaders
+    if (model.ui.keys.length) {
+      ui.keys = model.ui.keys.slice()
+      ui.values = model.ui.values.slice()
+    }
+  }
+
+  emit('apply', { data, settings, ui })
 }
 
 // Identity of the target the form is bound to. Cursor jitter within the same
@@ -401,7 +534,11 @@ function onApply() {
 // user's unsaved edits, so only repopulate when the target actually changes.
 function blockSignature(b: MetadataCommentBlock | null | undefined): string {
   if (!b) return ''
-  return [b.line, b.isNew ? 1 : 0, b.rawJson, JSON.stringify(b.settings ?? {}), b.context?.defKind ?? '', b.context?.paramCount ?? ''].join('|')
+  return [
+    b.line, b.isNew ? 1 : 0, b.rawJson, JSON.stringify(b.settings ?? {}),
+    b.context?.defKind ?? '', b.context?.paramCount ?? '',
+    b.uiDirective?.line ?? '', b.uiDirective?.rawJson ?? '',
+  ].join('|')
 }
 
 let lastSignature = ''

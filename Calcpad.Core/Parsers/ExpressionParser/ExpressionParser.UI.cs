@@ -87,16 +87,7 @@ namespace Calcpad.Core
             while (cursor < s.Length && s[cursor] == ' ')
                 ++cursor;
 
-            string uiType = null,
-                uiStyle = null,
-                uiReportStyle = null,
-                uiMode = null;
-            string[] uiColumnHeaders = null,
-                uiRowHeaders = null,
-                uiKeys = null,
-                uiValues = null;
-            int uiRows = 0, uiColumns = 0;
-
+            var properties = new UiDto();
             if (cursor < s.Length && s[cursor] == '{')
             {
                 var braceEnd = s.IndexOf('}');
@@ -108,18 +99,7 @@ namespace Calcpad.Core
                 }
                 try
                 {
-                    using var doc = JsonDocument.Parse(s[cursor..(braceEnd + 1)].ToString());
-                    var root = doc.RootElement;
-                    uiType = GetJsonString(root, "type");
-                    uiStyle = GetJsonString(root, "style");
-                    uiReportStyle = GetJsonString(root, "reportStyle");
-                    uiMode = GetJsonString(root, "mode");
-                    uiRows = GetJsonInt(root, "rows");
-                    uiColumns = GetJsonInt(root, "columns");
-                    uiColumnHeaders = GetJsonStringArray(root, "columnHeaders");
-                    uiRowHeaders = GetJsonStringArray(root, "rowHeaders");
-                    uiKeys = GetJsonStringArray(root, "keys");
-                    uiValues = GetJsonStringArray(root, "values");
+                    properties = UiDto.Parse(s[cursor..(braceEnd + 1)].ToString()) ?? new UiDto();
                 }
                 catch (JsonException)
                 {
@@ -132,25 +112,16 @@ namespace Calcpad.Core
             else
                 _uiSkipChars = cursor;
 
-            if (uiMode is not null && !uiMode.Equals("number", StringComparison.OrdinalIgnoreCase))
+            var errors = properties.Validate();
+            if (errors.Count > 0)
             {
-                AppendError(s.ToString(), Messages.String_mode_is_not_supported_by_the_UI_keyword, _currentLine);
+                foreach (var error in errors)
+                    AppendError(s.ToString(), error.Message, _currentLine);
+
                 return KeywordResult.None;
             }
-            if (uiType is "dropdown" or "radio")
-            {
-                if (uiKeys is null || uiValues is null)
-                {
-                    AppendError(s.ToString(), string.Format(Messages.The_UI_0_requires_both_keys_and_values_arrays, uiType), _currentLine);
-                    return KeywordResult.None;
-                }
-                if (uiKeys.Length != uiValues.Length)
-                {
-                    AppendError(s.ToString(), string.Format(Messages.The_UI_0_keys_and_values_arrays_must_have_the_same_length, uiType), _currentLine);
-                    return KeywordResult.None;
-                }
-            }
 
+            int uiRows = properties.Rows ?? 0, uiColumns = properties.Columns ?? 0;
             var hasDeclaredShape = uiRows > 0 && uiColumns > 0;
             _lineUiControls = [];
             foreach (var assignment in EnumerateAssignments(s[_uiSkipChars..]))
@@ -161,7 +132,7 @@ namespace Calcpad.Core
                     return KeywordResult.None;
                 }
 
-                var type = uiType ?? (IsDatagridRhs(assignment.Rhs) ? "datagrid" : "entry");
+                var type = properties.Type ?? (IsDatagridRhs(assignment.Rhs) ? "datagrid" : "entry");
                 int rows = uiRows, columns = uiColumns;
                 if (type == "datagrid" && !hasDeclaredShape)
                 {
@@ -175,18 +146,18 @@ namespace Calcpad.Core
                 _lineUiControls.Add(new UiPropertyMetadata
                 {
                     Type = type,
-                    Style = uiStyle,
-                    ReportStyle = uiReportStyle,
+                    Style = properties.Style,
+                    ReportStyle = properties.ReportStyle,
                     VariableName = assignment.Name,
                     DeclarationKey = declarationKey,
                     Key = key,
                     Rows = rows,
                     Columns = columns,
                     HasDeclaredShape = hasDeclaredShape,
-                    ColumnHeaders = uiColumnHeaders,
-                    RowHeaders = uiRowHeaders,
-                    Keys = uiKeys,
-                    Values = uiValues
+                    ColumnHeaders = properties.ColumnHeaders,
+                    RowHeaders = properties.RowHeaders,
+                    Keys = properties.Keys,
+                    Values = properties.Values
                 });
             }
             if (_lineUiControls.Count == 0)
@@ -327,29 +298,6 @@ namespace Calcpad.Core
             while (start < s.Length && s[start] == ' ')
                 ++start;
             return start;
-        }
-
-        private static string GetJsonString(JsonElement root, string name) =>
-            root.TryGetProperty(name, out var p) && p.ValueKind == JsonValueKind.String ?
-            p.GetString() :
-            null;
-
-        private static int GetJsonInt(JsonElement root, string name) =>
-            root.TryGetProperty(name, out var p) && p.ValueKind == JsonValueKind.Number ?
-            p.GetInt32() :
-            0;
-
-        private static string[] GetJsonStringArray(JsonElement root, string name)
-        {
-            if (!root.TryGetProperty(name, out var p) || p.ValueKind != JsonValueKind.Array)
-                return null;
-
-            var values = new string[p.GetArrayLength()];
-            var i = 0;
-            foreach (var el in p.EnumerateArray())
-                values[i++] = el.GetString() ?? string.Empty;
-
-            return values;
         }
 
         /// <summary>

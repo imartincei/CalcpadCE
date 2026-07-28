@@ -183,7 +183,9 @@ export {
     MACRO_PARAM_TYPES,
     METADATA_SETTINGS_KEYS,
     settingSpec,
+    specForKey,
     validateSettingValue,
+    validateCatalogValue,
     LINT_CODES,
     findMetadataCommentBlock,
     computeMetadataBlock,
@@ -193,3 +195,13 @@ export {
     buildDefinitionResolver,
     analyzeMetadataLine,
 } from './text/metadata-comment';
+export type {
+    UiDirectiveData,
+    UiDirectiveBlock,
+    UiPropertyKey,
+} from './text/ui-directive';
+export {
+    UI_PROPERTY_KEYS,
+    findUiDirectiveBlock,
+    serializeUiDirective,
+} from './text/ui-directive';

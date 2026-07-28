@@ -400,6 +400,16 @@
           "command": "vscode-calcpad.previewUnwrapped",
           "when": "resourceLangId == plaintext || resourceLangId == calcpad",
           "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.toggleUiReport",
+          "when": "activeWebviewPanelId == htmlPreviewUi",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.saveUiValues",
+          "when": "activeWebviewPanelId == htmlPreviewUi",
+          "group": "navigation"
         }
       ],
       "webview/context": [

@@ -4,6 +4,8 @@ import { CalcpadDefinitionsService } from '../definitions';
 import { parseHeadings } from '../headings';
 import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from '../../text/metadata-comment';
 import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
+import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
+import type { UiDirectiveData } from '../../text/ui-directive';
 import type { DefinitionsResponse } from '../../types/api';
 import { getDefaultSettings, buildApiSettings } from '../../types/settings';
 import type { CalcpadSettings } from '../../types/settings';
@@ -645,6 +647,8 @@ export abstract class BaseMessageBridge {
         settingsLine?: number | null;
         settingsEndLine?: number | null;
         settingsLayout?: MetadataLayout;
+        ui?: UiDirectiveData;
+        uiLine?: number | null;
     }): void {
         const editor = this.getActiveMonacoEditor();
         const model = editor?.getModel();
@@ -681,6 +685,21 @@ export abstract class BaseMessageBridge {
             } else if (hasExisting) {
                 for (let ln = dirEndLine! + 1; ln >= dirLine! + 1; ln--)
                     edits.push(this.deleteLineEdit(model, ln));
+            }
+        }
+
+        // #UI directive at the cursor. Always a single-line replace — a #UI
+        // line never shares a physical line with the comment or #settings
+        // edits above, so this never overlaps them.
+        if (msg.ui && typeof msg.uiLine === 'number' && msg.uiLine >= 0 && msg.uiLine < model.getLineCount()) {
+            const uiLineNumber = msg.uiLine + 1;
+            const uiLineText = model.getValue().split(/\r?\n/)[msg.uiLine];
+            const uiBlock = findUiDirectiveBlock([uiLineText], 0);
+            if (uiBlock) {
+                edits.push({
+                    range: { startLineNumber: uiLineNumber, startColumn: 1, endLineNumber: uiLineNumber, endColumn: model.getLineMaxColumn(uiLineNumber) },
+                    text: serializeUiDirective(msg.ui, uiBlock),
+                });
             }
         }
 

@@ -27,5 +27,14 @@
 ' String variable on the left hand side - CPD-3303 as well
 #UI j$ = 1
 
+' Negative grid size
+#UI {"type": "datagrid", "rows": -1, "columns": 2} k = [1; 2]
+
+' More headers than the declared grid has cells
+#UI {"type": "datagrid", "rows": 1, "columns": 2, "columnHeaders": ["a", "b", "c"]} m = [1; 2]
+
+' Property with the wrong value type
+#UI {"rows": "two"} n = 1
+
 ' No assignment
 #UI {"type": "entry"}

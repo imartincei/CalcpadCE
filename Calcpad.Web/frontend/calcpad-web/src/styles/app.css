@@ -532,10 +532,12 @@ select option {
     min-height: 32px;
 }
 
+/* Backdrop shown only until the rendered document paints its own background,
+   so it follows the app theme rather than flashing white in dark mode. */
 .preview-frame {
     flex: 1;
     border: none;
-    background: #fff;
+    background: var(--vscode-editor-background, #1e1e1e);
 }
 
 /* Bottom panel (Problems / Output) */

@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Text.Json;
+using Calcpad.Core;
 using Calcpad.Highlighter.Linter.Helpers;
 using Calcpad.Highlighter.Linter.Models;
 
@@ -8,23 +8,16 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 {
     /// <summary>
     /// Validates the optional JSON block of the #UI directive (`#UI {...} name = value`).
-    /// Reports an unclosed or malformed block, unrecognized keys, dropdown/radio option
-    /// lists that are missing or of unequal length, and the string mode that
-    /// ExpressionParser rejects. Mirrors the checks in ExpressionParser.ParseKeywordUi.
+    /// Reports an unclosed or malformed block and unrecognized keys, then defers to
+    /// <see cref="UiDto"/> for the property rules, so the linter and ExpressionParser
+    /// reject the same payloads with the same wording. What stays here is what the
+    /// payload alone cannot decide: that the line assigns something, and that it does
+    /// not assign a string variable.
     /// </summary>
     public class UiValidator
     {
         private const string Code = "CPD-3415";
         private const string Keyword = "#ui";
-
-        private static readonly HashSet<string> KnownKeys =
-        [
-            "type", "mode", "style", "reportStyle", "rows", "columns",
-            "columnHeaders", "rowHeaders", "keys", "values"
-        ];
-
-        private static readonly string[] KnownTypes =
-            ["entry", "datagrid", "dropdown", "radio", "checkbox"];
 
         public void Validate(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
@@ -51,7 +44,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             var end = line.Length;
             if (cursor >= end)
             {
-                Reporter(result, lineIndex, afterKeyword, end).Warn("#UI requires a variable assignment");
+                Reporter(result, lineIndex, afterKeyword, end).Warn(Messages.The_UI_keyword_requires_a_variable_assignment);
                 return;
             }
 
@@ -61,7 +54,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 var braceEnd = line.IndexOf('}', cursor);
                 if (braceEnd < 0)
                 {
-                    Reporter(result, lineIndex, cursor, end).Warn("#UI has an unclosed JSON block, missing '}'");
+                    Reporter(result, lineIndex, cursor, end).Warn(Messages.Improper_format_for_UI_keyword_Missing_closing_brace);
                     return;
                 }
                 if (!ValidateJson(line[cursor..(braceEnd + 1)], Reporter(result, lineIndex, cursor, braceEnd + 1)))
@@ -73,49 +66,39 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             var assignment = line.AsSpan(jsonEnd);
             var eqIndex = assignment.IndexOf('=');
             if (eqIndex < 0 || assignment[..eqIndex].IsWhiteSpace())
-                Reporter(result, lineIndex, jsonEnd, end).Warn("#UI requires a variable assignment");
+                Reporter(result, lineIndex, jsonEnd, end).Warn(Messages.The_UI_keyword_requires_a_variable_assignment);
             else if (assignment[..eqIndex].TrimEnd().EndsWith("$", StringComparison.Ordinal))
-                Reporter(result, lineIndex, jsonEnd, end).Warn("#UI does not support string variables");
+                Reporter(result, lineIndex, jsonEnd, end).Warn(Messages.String_mode_is_not_supported_by_the_UI_keyword);
         }
 
         private static bool ValidateJson(string json, DirectiveJsonReporter reporter)
         {
-            using var doc = reporter.TryParse(json);
-            if (doc is null)
-                return false;
-
-            var root = doc.RootElement;
-            reporter.CheckKnownKeys(root, KnownKeys.Contains, "#UI property");
-
-            var type = GetString(root, "type");
-            if (type is not null && Array.IndexOf(KnownTypes, type) < 0)
-                reporter.Warn($"'{type}' is not a recognized #UI type, expected one of {string.Join(", ", KnownTypes)}");
-
-            var mode = GetString(root, "mode");
-            if (mode is not null && !string.Equals(mode, "number", StringComparison.OrdinalIgnoreCase))
-                reporter.Warn("#UI does not support string variables");
-
-            if (type is "dropdown" or "radio")
+            using (var doc = reporter.TryParse(json))
             {
-                var keys = ArrayLength(root, "keys");
-                var values = ArrayLength(root, "values");
-                if (keys < 0 || values < 0)
-                    reporter.Warn($"#UI {type} requires both 'keys' and 'values' arrays");
-                else if (keys != values)
-                    reporter.Warn($"#UI {type} has {keys} keys but {values} values, the arrays must be the same length");
+                if (doc is null)
+                    return false;
+
+                reporter.CheckKnownKeys(doc.RootElement, UiDto.KnownKeys.Contains, "#UI property");
             }
+
+            UiDto properties;
+            try
+            {
+                properties = UiDto.Parse(json);
+            }
+            catch (JsonException)
+            {
+                // A wrong value type stops deserialization but not the checks below, which
+                // only need to know where the block ends.
+                reporter.Warn(Messages.A_UI_value_has_the_wrong_type);
+                return true;
+            }
+
+            foreach (var error in properties.Validate())
+                reporter.Warn(error.Message);
+
             return true;
         }
-
-        private static string GetString(JsonElement root, string name) =>
-            root.TryGetProperty(name, out var p) && p.ValueKind == JsonValueKind.String ?
-            p.GetString() :
-            null;
-
-        private static int ArrayLength(JsonElement root, string name) =>
-            root.TryGetProperty(name, out var p) && p.ValueKind == JsonValueKind.Array ?
-            p.GetArrayLength() :
-            -1;
 
         private static int FirstNonSpace(string line)
         {

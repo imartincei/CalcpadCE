@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Calcpad.Tests
@@ -288,8 +289,31 @@ namespace Calcpad.Tests
         [InlineData("#UI {\"mode\": \"string\"} x = 1")]
         [InlineData("#UI name$ = 1")]
         [InlineData("#UI x")]
+        [InlineData("#UI {\"type\": \"slider\"} x = 1")]
+        [InlineData("#UI {\"rows\": -1} x = 1")]
+        [InlineData("#UI {\"type\": \"datagrid\", \"columns\": 2, \"columnHeaders\": [\"a\", \"b\", \"c\"]} T = [1; 2]")]
+        [InlineData("#UI {\"rows\": \"two\"} x = 1")]
+        [InlineData("#UI {\"style\": 5} x = 1")]
         public void InvalidDirective_ReportsAnError(string source) =>
             Assert.Contains("err", Render(source, enableUi: true));
+
+        /// <summary>
+        /// A rejected payload must not leave a half configured control behind - the line
+        /// renders as it would without the keyword, plus the error.
+        /// </summary>
+        [Fact]
+        public void InvalidDirective_RendersNoControl() =>
+            Assert.DoesNotContain("calcpad-ui-", Render("#UI {\"type\": \"slider\"} x = 1", enableUi: true));
+
+        [Fact]
+        public void ParserAndLinter_RejectTheSameProperties()
+        {
+            var properties = new UiDto { Type = "slider", Rows = -1, Mode = "string" };
+            var messages = properties.Validate().Select(e => e.Message).ToArray();
+            Assert.Equal(3, messages.Length);
+            foreach (var message in messages)
+                Assert.Contains(message, Render("#UI {\"type\": \"slider\", \"rows\": -1, \"mode\": \"string\"} x = 1", enableUi: true));
+        }
 
         [Fact]
         public void InactiveConditionalBranch_RendersNoControl()

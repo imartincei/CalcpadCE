@@ -185,6 +185,14 @@ namespace Calcpad.Highlighter.Linter
                 context.DefinedMacros[kvp.Key] = kvp.Value;
             }
 
+            if (stage3Result.MacroExpansions != null)
+            {
+                foreach (var kvp in stage3Result.MacroExpansions)
+                {
+                    context.MacroExpansions[kvp.Key] = kvp.Value;
+                }
+            }
+
             // Convert custom units to HashSet of names
             context.CustomUnits = stage3Result.CustomUnits.Select(u => u.Name).ToHashSet();
 

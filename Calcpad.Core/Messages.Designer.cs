@@ -1672,7 +1672,7 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to #UI {0}: both &apos;keys&apos; and &apos;values&apos; arrays are required..
+        // /   Looks up a localized string similar to #UI {0} requires both &apos;keys&apos; and &apos;values&apos; arrays..
         // / </summary>
         public static string The_UI_0_requires_both_keys_and_values_arrays {
             get {
@@ -1681,11 +1681,47 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to #UI {0}: &apos;keys&apos; and &apos;values&apos; arrays must have the same length..
+        // /   Looks up a localized string similar to #UI {0} has {1} keys but {2} values, the &apos;keys&apos; and &apos;values&apos; arrays must have the same length..
         // / </summary>
         public static string The_UI_0_keys_and_values_arrays_must_have_the_same_length {
             get {
                 return ResourceManager.GetString("The_UI_0_keys_and_values_arrays_must_have_the_same_length", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to &apos;{0}&apos; is not a recognized #UI type, expected one of {1}..
+        // / </summary>
+        public static string The_UI_type_0_is_not_recognized_expected_one_of_1 {
+            get {
+                return ResourceManager.GetString("The_UI_type_0_is_not_recognized_expected_one_of_1", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to #UI &apos;{0}&apos; must not be negative..
+        // / </summary>
+        public static string The_UI_0_must_not_be_negative {
+            get {
+                return ResourceManager.GetString("The_UI_0_must_not_be_negative", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to #UI &apos;{0}&apos; has {1} entries but the grid has {2} {3}..
+        // / </summary>
+        public static string The_UI_0_has_1_entries_but_the_grid_has_2_3 {
+            get {
+                return ResourceManager.GetString("The_UI_0_has_1_entries_but_the_grid_has_2_3", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to A #UI value has the wrong type..
+        // / </summary>
+        public static string A_UI_value_has_the_wrong_type {
+            get {
+                return ResourceManager.GetString("A_UI_value_has_the_wrong_type", resourceCulture);
             }
         }
     }

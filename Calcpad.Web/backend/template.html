@@ -789,8 +789,17 @@
             background-color: #FFE1E1; /* Light red background */
         }
 
-        /* Dark theme styles */
+        /* Dark theme styles. The theme class lands on <body>, but color-scheme
+           only reaches the canvas, native controls and scrollbars from the root
+           -- without it WebKitGTK paints them with its light defaults. The
+           declaration is repeated on the body for engines without :has(). */
+        html:has(> body.dark-theme) {
+            color-scheme: dark;
+        }
+
         .dark-theme {
+            color-scheme: dark;
+            accent-color: #4fc1ff;
             background-color: #1e1e1e;
             color: #d4d4d4;
         }
@@ -845,6 +854,43 @@
 
         .dark-theme .roundBox:hover {
             background-color: #5d3437; /* Slightly lighter red on hover */
+        }
+
+        .dark-theme a {
+            color: #4fc1ff; /* Light blue - the UA default is unreadable on dark */
+        }
+
+        .dark-theme a:hover {
+            background-color: #264f78; /* Dark blue instead of the light #e9f6ff */
+        }
+
+        /* .lineLink / .line-num set their own colors at a specificity the
+           .dark-theme link rules above would otherwise outrank. */
+        .dark-theme .lineLink {
+            color: #b0e0ff;
+        }
+
+        .dark-theme .lineLink:hover,
+        .dark-theme .line-num:hover {
+            background: none;
+        }
+
+        .dark-theme .eq u,
+        .dark-theme input,
+        .dark-theme select {
+            background-color: #3f3a26; /* Dark analogue of LightYellow */
+            color: #e8dca8;
+        }
+
+        .dark-theme input[type="text"],
+        .dark-theme select {
+            border-color: #5f5940;
+            box-shadow: 0.06em 0.06em 0.5em rgba(0, 0, 0, 0.5);
+        }
+
+        .dark-theme input[type="text"]:focus {
+            color: #fff8d6;
+            box-shadow: 0.1em 0.1em 1em rgba(0, 0, 0, 0.7);
         }
 
         /* Dark theme code syntax highlighting */

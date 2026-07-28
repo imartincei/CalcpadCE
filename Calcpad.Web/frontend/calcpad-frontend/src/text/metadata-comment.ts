@@ -1,4 +1,6 @@
 import { getIndentLength } from './comment-formatting';
+import { findUiDirectiveBlock } from './ui-directive';
+import type { UiDirectiveBlock } from './ui-directive';
 
 /**
  * Parsed shape of a Calcpad definition-metadata comment
@@ -84,6 +86,13 @@ export interface MetadataCommentBlock {
      * replacing {@link line}.
      */
     isNew?: boolean;
+    /**
+     * The `#UI` directive at the cursor's line, if any. Independent of
+     * {@link line}/{@link endLine} (which belong to the metadata comment) —
+     * a `#UI` line and a metadata comment/`#settings` directive never share a
+     * physical line, so the three bindings never conflict.
+     */
+    uiDirective?: UiDirectiveBlock | null;
 }
 
 /** Kind of definition a metadata comment documents, or null when none follows. */
@@ -193,12 +202,27 @@ export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
     { key: 'tol', label: 'Solver tolerance', detail: 'Target tolerance for the iterative PCG/eigensolver (1e-15 to 1e-2)', type: 'number', def: 1e-6, min: 1e-15, max: 1e-2 },
 ];
 
-/** Looks up the definition for a `#settings` key. */
-export function settingSpec(key: string): MetadataSettingKey | undefined {
-    return METADATA_SETTINGS_KEYS.find(s => s.key === key);
+/** A catalog entry generic enough to cover both `MetadataSettingKey` and `UiPropertyKey`. */
+interface CatalogKeySpec {
+    key: string;
+    label: string;
+    type: string;
+    options?: SettingOption[];
+    min?: number;
+    max?: number;
 }
 
-function rangeMessage(spec: MetadataSettingKey): string {
+/** Looks up a key's spec in an arbitrary catalog (`METADATA_SETTINGS_KEYS`, `UI_PROPERTY_KEYS`, ...). */
+export function specForKey<T extends CatalogKeySpec>(catalog: T[], key: string): T | undefined {
+    return catalog.find(s => s.key === key);
+}
+
+/** Looks up the definition for a `#settings` key. */
+export function settingSpec(key: string): MetadataSettingKey | undefined {
+    return specForKey(METADATA_SETTINGS_KEYS, key);
+}
+
+function rangeMessage(spec: CatalogKeySpec): string {
     if (spec.min !== undefined && spec.max !== undefined) return `${spec.label} must be between ${spec.min} and ${spec.max}`;
     if (spec.min !== undefined) return `${spec.label} must be at least ${spec.min}`;
     if (spec.max !== undefined) return `${spec.label} must be at most ${spec.max}`;
@@ -206,11 +230,17 @@ function rangeMessage(spec: MetadataSettingKey): string {
 }
 
 /**
- * Returns an error message when `value` is not valid for `key`, else `null`.
- * Mirrors the type/range checks in `Calcpad.Core`'s `SettingsDto.Validate`.
+ * Returns an error message when `value` is not valid for `key` in {@link catalog},
+ * else `null`. Mirrors the type/range checks in `Calcpad.Core`'s `SettingsDto.Validate`
+ * for {@link METADATA_SETTINGS_KEYS}; reused as-is for other catalogs (e.g. `UI_PROPERTY_KEYS`)
+ * since the enum/number checks are catalog-agnostic.
  */
-export function validateSettingValue(key: string, value: string | number | boolean): string | null {
-    const spec = settingSpec(key);
+export function validateCatalogValue<T extends CatalogKeySpec>(
+    catalog: T[],
+    key: string,
+    value: string | number | boolean,
+): string | null {
+    const spec = specForKey(catalog, key);
     if (!spec) return null;
     if (spec.type === 'enum')
         return spec.options?.some(o => o.value === String(value))
@@ -222,6 +252,14 @@ export function validateSettingValue(key: string, value: string | number | boole
         if (spec.min !== undefined && n < spec.min || spec.max !== undefined && n > spec.max) return rangeMessage(spec);
     }
     return null;
+}
+
+/**
+ * Returns an error message when `value` is not valid for `key`, else `null`.
+ * Mirrors the type/range checks in `Calcpad.Core`'s `SettingsDto.Validate`.
+ */
+export function validateSettingValue(key: string, value: string | number | boolean): string | null {
+    return validateCatalogValue(METADATA_SETTINGS_KEYS, key, value);
 }
 
 export interface LintCode {
@@ -696,6 +734,11 @@ export function computeMetadataBlock(
         block.settingsLine = directive?.line ?? null;
         block.settingsEndLine = directive?.endLine ?? directive?.line ?? null;
         block.settingsLayout = directive?.layout;
+
+        // Bind the #UI section to the directive under the cursor (if any). No
+        // synthetic/isNew case here — a #UI line requires a pre-existing
+        // variable assignment the panel can't fabricate.
+        block.uiDirective = findUiDirectiveBlock(lines, cursorLine);
     }
     return block;
 }

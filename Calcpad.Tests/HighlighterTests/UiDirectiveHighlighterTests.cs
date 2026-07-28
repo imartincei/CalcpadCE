@@ -66,7 +66,7 @@ namespace Calcpad.Tests.HighlighterTests
 
         [Fact]
         public void UnclosedBrace_IsReported() =>
-            Assert.Contains("unclosed", Assert.Single(Messages("#UI {\"type\": \"entry\" a = 1")));
+            Assert.Contains("Missing closing brace", Assert.Single(Messages("#UI {\"type\": \"entry\" a = 1")));
 
         [Fact]
         public void MalformedJson_IsReported() =>
@@ -96,11 +96,40 @@ namespace Calcpad.Tests.HighlighterTests
         [InlineData("#UI {\"mode\": \"string\"} a = 1")]
         [InlineData("#UI a$ = 1")]
         public void StringMode_IsReported(string source) =>
-            Assert.Contains(Messages(source), m => m.Contains("does not support string variables"));
+            Assert.Contains(Messages(source), m => m.Contains("String mode is not supported"));
 
         [Fact]
         public void MissingAssignment_IsReported() =>
             Assert.Contains("requires a variable assignment", Assert.Single(Messages("#UI {\"type\": \"entry\"}")));
+
+        [Theory]
+        [InlineData("#UI {\"rows\": -1} a = 1", "'rows' must not be negative")]
+        [InlineData("#UI {\"columns\": -2} a = 1", "'columns' must not be negative")]
+        public void NegativeGridSize_IsReported(string source, string expected) =>
+            Assert.Contains(expected, Assert.Single(Messages(source)));
+
+        [Theory]
+        [InlineData("#UI {\"columns\": 2, \"columnHeaders\": [\"a\", \"b\", \"c\"]} T = [1; 2]", "3 entries but the grid has 2 columns")]
+        [InlineData("#UI {\"rows\": 1, \"rowHeaders\": [\"r1\", \"r2\"]} T = [1; 2]", "2 entries but the grid has 1 rows")]
+        public void MoreHeadersThanCells_IsReported(string source, string expected) =>
+            Assert.Contains(expected, Assert.Single(Messages(source)));
+
+        /// <summary>
+        /// An omitted size is auto-detected from the right hand side, which the JSON block
+        /// cannot see, so headers are only counted against a size the payload declared.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI {\"columnHeaders\": [\"a\", \"b\", \"c\"]} T = [1; 2]")]
+        [InlineData("#UI {\"columns\": 3, \"columnHeaders\": [\"a\"]} T = [1; 2; 3]")]
+        public void HeaderCount_IsNotReportedWithoutADeclaredSize(string source) =>
+            Assert.Empty(Messages(source));
+
+        [Theory]
+        [InlineData("#UI {\"rows\": \"two\"} a = 1")]
+        [InlineData("#UI {\"keys\": \"a\"} a = 1")]
+        [InlineData("#UI {\"style\": 5} a = 1")]
+        public void WrongValueType_IsReported(string source) =>
+            Assert.Contains("wrong type", Assert.Single(Messages(source)));
 
         /// <summary>
         /// The first identifier on a line is a definition even when its name happens to be a

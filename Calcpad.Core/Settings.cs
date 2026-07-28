@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json;
 
 namespace Calcpad.Core
 {
@@ -27,12 +26,10 @@ namespace Calcpad.Core
         Tol
     }
 
-    public readonly record struct SettingError(SettingKey Key, string Message);
-
     /// <summary>
     /// JSON payload of the <c>#settings {...}</c> directive.
     /// </summary>
-    public sealed class SettingsDto
+    public sealed class SettingsDto : DirectiveDto<SettingsDto, SettingKey>
     {
         public int? Decimals { get; set; }
         public int? Degrees { get; set; }
@@ -54,25 +51,14 @@ namespace Calcpad.Core
         public double? Precision { get; set; }
         public double? Tol { get; set; }
 
-        private static readonly JsonSerializerOptions Options = new() { PropertyNameCaseInsensitive = true };
-
-        /// <summary>Recognized keys, derived from <see cref="SettingKey"/> (case-insensitive).</summary>
-        public static readonly IReadOnlySet<string> KnownKeys =
-            new HashSet<string>(Enum.GetNames(typeof(SettingKey)), StringComparer.OrdinalIgnoreCase);
-
-        /// <summary>Deserializes a <c>#settings</c> JSON payload. Throws <see cref="JsonException"/> on malformed JSON or a wrong value type.</summary>
-        public static SettingsDto Parse(string json) => JsonSerializer.Deserialize<SettingsDto>(json, Options);
-
         /// <summary>
-        /// Returns an entry for every provided value that is outside its allowed range.
         /// Bounds mirror how <c>Calcpad.Core</c> constrains each value: <c>decimals</c> and
         /// <c>maxOutputCount</c> match their setter clamps, <c>precision</c>/<c>tol</c> match the
         /// solver's read clamp, <c>degrees</c> is a hard array index (0..2), and the plot
         /// dimensions only require a positive size (Core imposes no upper bound).
         /// </summary>
-        public IReadOnlyList<SettingError> Validate()
+        protected override void Validate(List<DirectiveError<SettingKey>> errors)
         {
-            var errors = new List<SettingError>();
             CheckRange(errors, SettingKey.Decimals, "decimals", Decimals, 0, 15);
             CheckRange(errors, SettingKey.Degrees, "degrees", Degrees, 0, 2);
             CheckRange(errors, SettingKey.MaxOutputCount, "maxOutputCount", MaxOutputCount, 5, 100);
@@ -83,18 +69,6 @@ namespace Calcpad.Core
             CheckRange(errors, SettingKey.Tol, "tol", Tol, 1e-15, 1e-2);
             if (ColorScale is not null && !Enum.TryParse<PlotSettings.ColorScales>(ColorScale, true, out _))
                 errors.Add(new(SettingKey.ColorScale, $"'colorScale' must be one of: {string.Join(", ", Enum.GetNames(typeof(PlotSettings.ColorScales)))}"));
-            return errors;
-        }
-
-        private static void CheckRange<T>(List<SettingError> errors, SettingKey key, string name, T? value, double min, double? max) where T : struct, IConvertible
-        {
-            if (value is null)
-                return;
-            var d = value.Value.ToDouble(null);
-            if (d < min || max.HasValue && d > max.Value)
-                errors.Add(new(key, max.HasValue
-                    ? $"'{name}' must be between {min} and {max.Value}"
-                    : $"'{name}' must be at least {min}"));
         }
     }
 

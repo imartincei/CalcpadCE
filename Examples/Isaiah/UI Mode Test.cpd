@@ -1,0 +1,108 @@
+"UI Mode Test File
+'<p>Exercises every #UI JSON property, #UI inside macros/conditionals/loops, and the two documented error cases.</p>
+
+'<h3>1. Every #UI JSON property</h3>
+
+'CSS classes for "style" / "reportStyle"
+#val
+'<style>
+'  .calcpad-ui-input.highlight { background-color: #eeeeee; border: 1px solid #aaaaaa; }
+'  .calcpad-ui-dropdown.primary { font-weight: 600; }
+'  .calcpad-ui-radio.compact .calcpad-ui-radio-label { margin-right: 4px; }
+'  .calcpad-ui-checkbox.switch { accent-color: #2a8f3f; }
+'  .calcpad-ui-datagrid.bordered { border: 2px solid #444444; }
+'  p.boxed { border: 1px solid #cccccc; padding: 2px 4px; }
+'</style>
+#end val
+
+'type - auto-detected as "entry"
+#UI L = 10m
+L
+
+'type - explicit "entry"
+#UI {"type": "entry"} W = 5m
+W
+
+'mode - explicit "number" (the only accepted value)
+#UI {"mode": "number"} n = 4
+n
+
+'style - class applied only in UI mode
+#UI {"type": "entry", "style": "highlight"} depth = 2m
+depth
+
+'reportStyle - class applied only when the report is rendered
+#UI {"reportStyle": "boxed"} P = 25kN
+P
+
+'style and reportStyle together
+#UI {"style": "highlight", "reportStyle": "boxed"} q = 3kN/m
+q
+
+'type "datagrid" - shape auto-detected from a vector literal
+#UI v = [1; 2; 3]
+v
+
+'type "datagrid" - shape auto-detected from a matrix literal
+#UI M = [1; 2; 3 | 4; 5; 6]
+M
+
+'type "datagrid" - shape auto-detected from vector()/matrix() constructors
+#UI Z = vector(5)
+Z
+#UI G = matrix(3; 4)
+G
+
+'type "datagrid" - explicit rows, columns, columnHeaders, rowHeaders
+#UI {"type": "datagrid", "style": "bordered", "rows": 2, "columns": 3, "columnHeaders": ["a", "b", "c"], "rowHeaders": ["r1", "r2"]} T = [0; 0; 0 | 0; 0; 0]
+T
+
+'type "dropdown" with keys and values
+#UI {"type": "dropdown", "style": "primary", "keys": ["Low", "Med", "High"], "values": ["1", "2", "3"]} grade = 1
+grade
+
+'type "radio" with keys and values
+#UI {"type": "radio", "style": "compact", "keys": ["Steel", "Concrete"], "values": ["200GPa", "25GPa"]} E = 200GPa
+E
+
+'type "checkbox" toggles between 1 and 0
+#UI {"type": "checkbox", "style": "switch"} flag = 1
+flag
+
+'<h3>2. #UI inside a macro</h3>
+
+#def Beam$(span$)
+	#UI {"type": "entry", "style": "highlight"} load = 10kN/m
+	M = load*span$^2/8
+	#val
+	'<p>Midspan moment for span = 'span$' and load = 'load' is M = 'M'</p>
+	#equ
+#end def
+Beam$(6m)
+
+'<h3>3. #UI inside conditionals and loops</h3>
+
+'Conditional - only the taken branch renders a control
+#UI {"type": "checkbox"} useSteel = 1
+#if useSteel ≡ 1
+	#UI E2 = 200GPa
+#else
+	#UI E2 = 25GPa
+#end if
+E2
+
+'Loop - one control instance per pass
+#repeat 3
+	#UI y = 2
+	y
+#loop
+
+'<h3>4. #UI around an expression without assignment - errors in UI mode</h3>
+'<p>Expected error: "The #UI keyword requires a variable assignment."</p>
+
+#UI {"type": "entry"}
+
+'<h3>5. #UI with assignment but not a simple numerical value - errors from Core</h3>
+'<p>Expected error: "#UI directives do not support expressions."</p>
+
+#UI {"type": "entry"} k = sin(E2)

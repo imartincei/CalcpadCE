@@ -646,7 +646,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
     outputChannel.appendLine(`Content length: ${content.length} characters`);
 
     // Update panel title with current file name
-    const activeEditor = vscode.window.activeTextEditor;
+    const activeEditor = vscode.window.activeTextEditor ?? previewSourceEditor;
     if (activeEditor) {
         const fileName = activeEditor.document.fileName.split('/').pop() || 'CalcpadCE';
         panel.title = enableUi ? `CalcpadCE Input - ${fileName}`

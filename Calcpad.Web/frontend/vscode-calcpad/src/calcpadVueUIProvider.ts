@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from 'calcpad-frontend';
-import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse, SettingsValues } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective } from 'calcpad-frontend';
+import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse, SettingsValues, UiDirectiveData } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 
@@ -541,6 +541,8 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         settingsLine?: number | null;
         settingsEndLine?: number | null;
         settingsLayout?: MetadataLayout;
+        ui?: UiDirectiveData;
+        uiLine?: number | null;
     }): Promise<void> {
         const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
         if (!editor || typeof data.line !== 'number') return;
@@ -584,6 +586,15 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     const start = document.lineAt(dirLine!).range.start;
                     editBuilder.delete(new vscode.Range(start, document.lineAt(dirEndLine).rangeIncludingLineBreak.end));
                 }
+            }
+
+            // #UI directive at the cursor. Always a single-line replace — a #UI
+            // line never shares a physical line with the comment or #settings
+            // edits above, so this never overlaps them.
+            if (data.ui && typeof data.uiLine === 'number' && data.uiLine >= 0 && data.uiLine < document.lineCount) {
+                const currentLine = document.lineAt(data.uiLine);
+                const uiBlock = findUiDirectiveBlock([currentLine.text], 0);
+                if (uiBlock) editBuilder.replace(currentLine.range, serializeUiDirective(data.ui, uiBlock));
             }
         });
 

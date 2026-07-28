@@ -169,6 +169,7 @@ import CalcpadErrorsTab from './CalcpadErrorsTab.vue'
 import CalcpadMetadataTab from './CalcpadMetadataTab.vue'
 import { postMessage } from '../services/messaging'
 import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '../../text/metadata-comment'
+import type { UiDirectiveData } from '../../text/ui-directive'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
 import type { CalcpadError } from '../../types/api'
@@ -560,11 +561,11 @@ const handleUpdatePrettifyTrim = (enabled: boolean) => {
   postMessage({ type: 'updatePrettifyTrim', value: enabled })
 }
 
-const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: SettingsValues }) => {
+const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: SettingsValues; ui?: UiDirectiveData }) => {
   if (!metadataBlock.value) return
-  // One message → one atomic edit covering both the metadata comment and the
-  // document-level #settings directive, so the two writes can't race or shift
-  // each other's line numbers.
+  // One message → one atomic edit covering the metadata comment, the
+  // document-level #settings directive, and the #UI directive at the cursor,
+  // so the writes can't race or shift each other's line numbers.
   postMessage({
     type: 'updateMetadata',
     line: metadataBlock.value.line,
@@ -577,7 +578,9 @@ const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: Set
     settings: payload.settings,
     settingsLine: metadataBlock.value.settingsLine ?? null,
     settingsEndLine: metadataBlock.value.settingsEndLine ?? metadataBlock.value.settingsLine ?? null,
-    settingsLayout: metadataBlock.value.settingsLayout
+    settingsLayout: metadataBlock.value.settingsLayout,
+    ui: payload.ui,
+    uiLine: metadataBlock.value.uiDirective?.line ?? null,
   })
 }
 
