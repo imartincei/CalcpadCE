@@ -1,0 +1,736 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Web;
+
+namespace Calcpad.Core
+{
+    public partial class ExpressionParser
+    {
+        private sealed class UiPropertyMetadata
+        {
+            public string Type { get; init; }
+            public string Style { get; init; }
+            public string ReportStyle { get; init; }
+            public string VariableName { get; init; }
+            /// <summary>Grid cells captured for the widget; set while the value is prepared.</summary>
+            public string DataValues { get; set; }
+            /// <summary>"name:n", n being the ordinal of this declaration among same named ones.</summary>
+            public string DeclarationKey { get; init; }
+            /// <summary>
+            /// The control identity: <see cref="DeclarationKey"/>, with ":p" or ":p.q"
+            /// appended inside loops for the enclosing pass numbers.
+            /// </summary>
+            public string Key { get; init; }
+            public int Rows { get; init; }
+            public int Columns { get; init; }
+            /// <summary>True when the JSON declared both rows and columns, rather than them
+            /// being auto-detected. Only then is the right hand side literal reshaped.</summary>
+            public bool HasDeclaredShape { get; init; }
+            public string[] ColumnHeaders { get; init; }
+            public string[] RowHeaders { get; init; }
+            public string[] Keys { get; init; }
+            public string[] Values { get; init; }
+        }
+
+        /// <summary>
+        /// When true, #UI keywords inject interactive input elements into the HTML output
+        /// and #post blocks are hidden. When false, #UI lines render exactly as they would
+        /// without the keyword, apart from an optional "reportStyle" class.
+        /// </summary>
+        public bool EnableUi { get; set; }
+
+        /// <summary>
+        /// Maps #UI control keys to override values. An entry here replaces the right hand
+        /// side of the annotated assignment before it is evaluated. Applied in both UI and
+        /// report mode, so a report shows the values that were entered.
+        /// Keys are the control identity emitted in data-ui-var, e.g. "name:2" or "name:2:3"
+        /// inside a loop. Progressively broader forms are accepted as fallbacks: "name:2"
+        /// covers every pass of that declaration, a bare "name" covers every declaration.
+        /// </summary>
+        public Dictionary<string, string> UiOverrides { get; set; }
+
+        /// <summary>
+        /// The controls declared on the current line, in source order. A #UI line may carry
+        /// several assignments separated by inline comments - <c>#UI 'd ='d = 1', 'x = 2'</c> -
+        /// and each one becomes its own control, sharing the line's JSON properties but
+        /// keyed and overridden separately.
+        /// </summary>
+        private List<UiPropertyMetadata> _lineUiControls;
+        /// <summary>How far <see cref="TakeUiControl"/> has consumed <see cref="_lineUiControls"/>.</summary>
+        private int _uiTakeIndex;
+        private int _uiSkipChars;
+        private readonly Dictionary<string, int> _uiVarCounts = [];
+        private readonly Dictionary<(string Name, int Line, int Occurrence), int> _uiDeclarationIndex = [];
+        /// <summary>Occurrences of each name so far on the current line, so a name used twice gets two keys.</summary>
+        private readonly Dictionary<string, int> _uiLineOccurrences = [];
+
+        /// <summary>True when the current line declared any #UI control.</summary>
+        private bool HasUiControls => _lineUiControls is { Count: > 0 };
+
+        private const int UiKeywordLength = 3; // "#ui"
+        private const char ThinSpace = '\u2009'; // MathParser separates a value from its unit with this
+
+        /// <summary>
+        /// Parses the #UI keyword arguments from the line. The JSON block is optional -
+        /// type and grid size are auto-detected from the expression when it is omitted.
+        /// Always computes _uiSkipChars so the prefix is stripped before tokenization.
+        /// One control is recorded per assignment on the line; each is consumed later,
+        /// once MathParser has rendered the expression it belongs to.
+        /// </summary>
+        private KeywordResult ParseKeywordUi(ReadOnlySpan<char> s)
+        {
+            ResetUiState();
+            var cursor = UiKeywordLength;
+            while (cursor < s.Length && s[cursor] == ' ')
+                ++cursor;
+
+            string uiType = null,
+                uiStyle = null,
+                uiReportStyle = null,
+                uiMode = null;
+            string[] uiColumnHeaders = null,
+                uiRowHeaders = null,
+                uiKeys = null,
+                uiValues = null;
+            int uiRows = 0, uiColumns = 0;
+
+            if (cursor < s.Length && s[cursor] == '{')
+            {
+                var braceEnd = s.IndexOf('}');
+                if (braceEnd < 0)
+                {
+                    AppendError(s.ToString(), Messages.Improper_format_for_UI_keyword_Missing_closing_brace, _currentLine);
+                    _uiSkipChars = s.Length;
+                    return KeywordResult.None;
+                }
+                try
+                {
+                    using var doc = JsonDocument.Parse(s[cursor..(braceEnd + 1)].ToString());
+                    var root = doc.RootElement;
+                    uiType = GetJsonString(root, "type");
+                    uiStyle = GetJsonString(root, "style");
+                    uiReportStyle = GetJsonString(root, "reportStyle");
+                    uiMode = GetJsonString(root, "mode");
+                    uiRows = GetJsonInt(root, "rows");
+                    uiColumns = GetJsonInt(root, "columns");
+                    uiColumnHeaders = GetJsonStringArray(root, "columnHeaders");
+                    uiRowHeaders = GetJsonStringArray(root, "rowHeaders");
+                    uiKeys = GetJsonStringArray(root, "keys");
+                    uiValues = GetJsonStringArray(root, "values");
+                }
+                catch (JsonException)
+                {
+                    AppendError(s.ToString(), Messages.Improper_format_for_UI_keyword_Invalid_JSON, _currentLine);
+                    _uiSkipChars = SkipSpaces(s, UiKeywordLength);
+                    return KeywordResult.None;
+                }
+                _uiSkipChars = SkipSpaces(s, braceEnd + 1);
+            }
+            else
+                _uiSkipChars = cursor;
+
+            if (uiMode is not null && !uiMode.Equals("number", StringComparison.OrdinalIgnoreCase))
+            {
+                AppendError(s.ToString(), Messages.String_mode_is_not_supported_by_the_UI_keyword, _currentLine);
+                return KeywordResult.None;
+            }
+            if (uiType is "dropdown" or "radio")
+            {
+                if (uiKeys is null || uiValues is null)
+                {
+                    AppendError(s.ToString(), string.Format(Messages.The_UI_0_requires_both_keys_and_values_arrays, uiType), _currentLine);
+                    return KeywordResult.None;
+                }
+                if (uiKeys.Length != uiValues.Length)
+                {
+                    AppendError(s.ToString(), string.Format(Messages.The_UI_0_keys_and_values_arrays_must_have_the_same_length, uiType), _currentLine);
+                    return KeywordResult.None;
+                }
+            }
+
+            var hasDeclaredShape = uiRows > 0 && uiColumns > 0;
+            _lineUiControls = [];
+            foreach (var assignment in EnumerateAssignments(s[_uiSkipChars..]))
+            {
+                if (assignment.Name.EndsWith('$'))
+                {
+                    AppendError(s.ToString(), Messages.String_mode_is_not_supported_by_the_UI_keyword, _currentLine);
+                    return KeywordResult.None;
+                }
+
+                var type = uiType ?? (IsDatagridRhs(assignment.Rhs) ? "datagrid" : "entry");
+                int rows = uiRows, columns = uiColumns;
+                if (type == "datagrid" && !hasDeclaredShape)
+                {
+                    if (assignment.Rhs.Length > 1 && assignment.Rhs[0] == '[' && assignment.Rhs[^1] == ']')
+                        AutoDetectGridSize(assignment.Rhs, ref rows, ref columns);
+                    else
+                        AutoDetectGridSizeFromFunction(assignment.Rhs, ref rows, ref columns);
+                }
+
+                var (declarationKey, key) = GetUiKey(assignment.Name);
+                _lineUiControls.Add(new UiPropertyMetadata
+                {
+                    Type = type,
+                    Style = uiStyle,
+                    ReportStyle = uiReportStyle,
+                    VariableName = assignment.Name,
+                    DeclarationKey = declarationKey,
+                    Key = key,
+                    Rows = rows,
+                    Columns = columns,
+                    HasDeclaredShape = hasDeclaredShape,
+                    ColumnHeaders = uiColumnHeaders,
+                    RowHeaders = uiRowHeaders,
+                    Keys = uiKeys,
+                    Values = uiValues
+                });
+            }
+            if (_lineUiControls.Count == 0)
+            {
+                _lineUiControls = null;
+                AppendError(s.ToString(), Messages.The_UI_keyword_requires_a_variable_assignment, _currentLine);
+            }
+            return KeywordResult.None;
+        }
+
+        /// <summary>
+        /// Every assignment on the line, in source order. The line's code and comment
+        /// segments alternate, so each code segment holds at most one assignment; segments
+        /// that assign nothing - a bare output expression - contribute no control.
+        /// </summary>
+        private static List<(string Name, string Rhs)> EnumerateAssignments(ReadOnlySpan<char> s)
+        {
+            var found = new List<(string, string)>();
+            foreach (var segment in s.EnumerateComments())
+            {
+                if (!IsCode(segment))
+                    continue;
+
+                var i = segment.IndexOf('=');
+                if (i < 1)
+                    continue;
+
+                var name = segment[..i].Trim().ToString();
+                if (name.Length != 0)
+                    found.Add((name, segment[(i + 1)..].Trim().ToString()));
+            }
+            return found;
+        }
+
+        /// <summary>
+        /// The control for the expression about to be rendered, or null when it declares
+        /// none. Matched by variable name rather than by position, so a segment that is not
+        /// an assignment - or any mismatch between comment splitting and tokenization -
+        /// simply renders as it normally would.
+        /// </summary>
+        private UiPropertyMetadata TakeUiControl(string expression)
+        {
+            if (!HasUiControls)
+                return null;
+
+            var eqIndex = IndexOfAssignment(expression);
+            if (eqIndex < 1)
+                return null;
+
+            var name = ExtractVariableName(expression.AsSpan(0, eqIndex));
+            for (var i = _uiTakeIndex; i < _lineUiControls.Count; ++i)
+            {
+                if (_lineUiControls[i].VariableName != name)
+                    continue;
+
+                _uiTakeIndex = i + 1;
+                return _lineUiControls[i];
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Builds the identity of a control: the variable name, the ordinal of its
+        /// declaration among same named ones, and the enclosing loop passes.
+        ///
+        /// The ordinal is keyed on the source line, so re-running a line - which is what a
+        /// loop does - reuses it rather than advancing the count. It is assigned even when
+        /// the line is inside an unsatisfied #if, so flipping a branch does not renumber the
+        /// controls that follow it. Loop passes then separate the repeats of one declaration.
+        /// </summary>
+        private (string DeclarationKey, string Key) GetUiKey(string varName)
+        {
+            var occurrence = _uiLineOccurrences.GetValueOrDefault(varName);
+            _uiLineOccurrences[varName] = occurrence + 1;
+            var id = (varName, _currentLine, occurrence);
+            if (!_uiDeclarationIndex.TryGetValue(id, out var ordinal))
+            {
+                ordinal = _uiVarCounts.GetValueOrDefault(varName) + 1;
+                _uiVarCounts[varName] = ordinal;
+                _uiDeclarationIndex[id] = ordinal;
+            }
+            var declarationKey = $"{varName}:{ordinal}";
+            if (_loops.Count == 0)
+                return (declarationKey, declarationKey);
+
+            var passes = new int[_loops.Count];
+            var i = _loops.Count;
+            foreach (var loop in _loops) // enumerates innermost first
+                passes[--i] = loop.Pass;
+
+            return (declarationKey, $"{declarationKey}:{string.Join('.', passes)}");
+        }
+
+        /// <summary>True for a segment of <see cref="CommentEnumerator"/> that is code, not a comment.</summary>
+        private static bool IsCode(ReadOnlySpan<char> segment) =>
+            !segment.IsEmpty && segment[0] != '\'' && segment[0] != '"';
+
+        /// <summary>
+        /// Index of the assignment '=' in <paramref name="s"/>, ignoring inline comments.
+        /// A #UI line usually labels its control with one, and the label can itself contain
+        /// an '=' - <c>#UI '2&amp;middot;&lt;i&gt;r&lt;/i&gt; ='d = 1</c>. Returns -1 when
+        /// the line makes no assignment.
+        /// </summary>
+        private static int IndexOfAssignment(ReadOnlySpan<char> s)
+        {
+            // Segments are the consumed prefix each time, so their lengths sum to the offset.
+            var offset = 0;
+            foreach (var segment in s.EnumerateComments())
+            {
+                if (IsCode(segment))
+                {
+                    var i = segment.IndexOf('=');
+                    if (i >= 0)
+                        return offset + i;
+                }
+                offset += segment.Length;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// The variable name on the left of the assignment, with the inline comment that
+        /// labels the control removed - it is display text, not part of the name.
+        /// </summary>
+        private static string ExtractVariableName(ReadOnlySpan<char> lhs)
+        {
+            var sb = new StringBuilder();
+            foreach (var segment in lhs.EnumerateComments())
+            {
+                if (IsCode(segment))
+                    sb.Append(segment);
+            }
+            return sb.ToString().Trim();
+        }
+
+        private static int SkipSpaces(ReadOnlySpan<char> s, int start)
+        {
+            while (start < s.Length && s[start] == ' ')
+                ++start;
+            return start;
+        }
+
+        private static string GetJsonString(JsonElement root, string name) =>
+            root.TryGetProperty(name, out var p) && p.ValueKind == JsonValueKind.String ?
+            p.GetString() :
+            null;
+
+        private static int GetJsonInt(JsonElement root, string name) =>
+            root.TryGetProperty(name, out var p) && p.ValueKind == JsonValueKind.Number ?
+            p.GetInt32() :
+            0;
+
+        private static string[] GetJsonStringArray(JsonElement root, string name)
+        {
+            if (!root.TryGetProperty(name, out var p) || p.ValueKind != JsonValueKind.Array)
+                return null;
+
+            var values = new string[p.GetArrayLength()];
+            var i = 0;
+            foreach (var el in p.EnumerateArray())
+                values[i++] = el.GetString() ?? string.Empty;
+
+            return values;
+        }
+
+        /// <summary>
+        /// True when the right hand side is a vector/matrix literal or a vector()/matrix() call.
+        /// </summary>
+        private static bool IsDatagridRhs(ReadOnlySpan<char> rhs) =>
+            rhs.Length > 1 && rhs[0] == '[' && rhs[^1] == ']' ||
+            StartsWithFunction(rhs, "vector") ||
+            StartsWithFunction(rhs, "matrix");
+
+        /// <summary>
+        /// Checks if rhs starts with a function name followed by optional whitespace then '('.
+        /// </summary>
+        private static bool StartsWithFunction(ReadOnlySpan<char> rhs, ReadOnlySpan<char> funcName)
+        {
+            if (!rhs.StartsWith(funcName, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            var rest = rhs[funcName.Length..].TrimStart();
+            return rest.Length > 0 && rest[0] == '(';
+        }
+
+        /// <summary>
+        /// Auto-detects rows and columns from a vector/matrix literal.
+        /// '|' separates rows, ';' separates elements within a row, so a vector
+        /// [1; 2; 3] is displayed as a single row of three columns.
+        /// </summary>
+        private static void AutoDetectGridSize(ReadOnlySpan<char> rhs, ref int rows, ref int columns)
+        {
+            var bracketStart = rhs.IndexOf('[');
+            var bracketEnd = rhs.LastIndexOf(']');
+            if (bracketStart < 0 || bracketEnd <= bracketStart)
+                return;
+
+            var content = rhs[(bracketStart + 1)..bracketEnd];
+            var pipeIndex = content.IndexOf('|');
+            var firstRow = pipeIndex < 0 ? content : content[..pipeIndex];
+            if (rows == 0)
+                rows = pipeIndex < 0 ? 1 : content.Count('|') + 1;
+            if (columns == 0)
+                columns = firstRow.Count(';') + 1;
+        }
+
+        /// <summary>
+        /// Auto-detects rows and columns from a vector(n) or matrix(m; n) call.
+        /// </summary>
+        private static void AutoDetectGridSizeFromFunction(ReadOnlySpan<char> rhs, ref int rows, ref int columns)
+        {
+            var parenStart = rhs.IndexOf('(');
+            var parenEnd = rhs.LastIndexOf(')');
+            if (parenStart < 0 || parenEnd <= parenStart)
+                return;
+
+            var args = rhs[(parenStart + 1)..parenEnd].Trim();
+            if (StartsWithFunction(rhs, "vector"))
+            {
+                if (int.TryParse(args, out var n) && n > 0)
+                {
+                    if (rows == 0) rows = 1;
+                    if (columns == 0) columns = n;
+                }
+                return;
+            }
+            var semicolon = args.IndexOf(';');
+            if (semicolon > 0 &&
+                int.TryParse(args[..semicolon].Trim(), out var m) && m > 0 &&
+                int.TryParse(args[(semicolon + 1)..].Trim(), out var k) && k > 0)
+            {
+                if (rows == 0) rows = m;
+                if (columns == 0) columns = k;
+            }
+        }
+
+        /// <summary>
+        /// Rewrites the assignment before MathParser evaluates it: fits a datagrid literal
+        /// to the declared shape, applies any override, then captures the resulting cells
+        /// for the grid widget. Only the override runs in report mode - it is the entered
+        /// value - while the declared shape describes the grid and so applies to the form.
+        /// </summary>
+        private string PrepareUiExpression(UiPropertyMetadata ui, string expression)
+        {
+            var isDatagrid = ui.Type == "datagrid";
+            if (isDatagrid && EnableUi)
+                expression = ResizeDatagridMatrixToFit(ui, expression);
+
+            var overridden = ApplyUiOverride(ui, expression);
+            if (overridden is not null)
+                expression = overridden;
+
+            if (isDatagrid)
+                CaptureDatagridValues(ui, expression);
+
+            return expression;
+        }
+
+        /// <summary>
+        /// Fits the right hand side literal to the rows and columns the JSON block declared,
+        /// keeping the values already written: cells beyond the literal become 0, and cells
+        /// beyond the declared shape are dropped. A right hand side that is not a bracket
+        /// literal - vector(n), matrix(m; n) - is left alone, since it sizes itself.
+        /// </summary>
+        private static string ResizeDatagridMatrixToFit(UiPropertyMetadata ui, string expression)
+        {
+            if (!ui.HasDeclaredShape)
+                return expression;
+
+            var bracketStart = expression.IndexOf('[');
+            var bracketEnd = expression.LastIndexOf(']');
+            if (bracketStart < 0 || bracketEnd <= bracketStart)
+                return expression;
+
+            var cells = SplitMatrixLiteral(expression[(bracketStart + 1)..bracketEnd]);
+            var sb = new StringBuilder();
+            for (var r = 0; r < ui.Rows; ++r)
+            {
+                if (r > 0)
+                    sb.Append(" | ");
+
+                for (var c = 0; c < ui.Columns; ++c)
+                {
+                    if (c > 0)
+                        sb.Append("; ");
+
+                    var value = r < cells.Count && c < cells[r].Length ? cells[r][c] : string.Empty;
+                    sb.Append(value.Length == 0 ? "0" : value);
+                }
+            }
+            return string.Concat(expression.AsSpan(0, bracketStart + 1), sb.ToString(), expression.AsSpan(bracketEnd));
+        }
+
+        /// <summary>
+        /// Splits the inside of a vector/matrix literal into rows of cells.
+        /// '|' separates rows, ';' separates cells within a row.
+        /// </summary>
+        private static List<string[]> SplitMatrixLiteral(string content)
+        {
+            var rows = new List<string[]>();
+            foreach (var row in content.Split('|'))
+            {
+                var cells = row.Split(';');
+                for (var i = 0; i < cells.Length; ++i)
+                    cells[i] = cells[i].Trim();
+
+                rows.Add(cells);
+            }
+            return rows;
+        }
+
+        /// <summary>
+        /// Captures the datagrid cell values so they can be handed to the grid widget.
+        /// Bracket literals are taken as written; vector(n)/matrix(m; n) produce zeros.
+        /// </summary>
+        private static void CaptureDatagridValues(UiPropertyMetadata ui, string expression)
+        {
+            var eqIndex = IndexOfAssignment(expression);
+            if (eqIndex < 0)
+                return;
+
+            var rhs = expression[(eqIndex + 1)..].Trim();
+            var bracketStart = rhs.IndexOf('[');
+            var bracketEnd = rhs.LastIndexOf(']');
+            if (bracketStart >= 0 && bracketEnd > bracketStart)
+            {
+                ui.DataValues = rhs[(bracketStart + 1)..bracketEnd].Replace(" ", "");
+                return;
+            }
+            var row = string.Join(";", Enumerable.Repeat("0", ui.Columns));
+            ui.DataValues = string.Join("|", Enumerable.Repeat(row, ui.Rows));
+        }
+
+        /// <summary>
+        /// Substitutes the override value into the assignment before MathParser sees it.
+        /// Returns null when no override applies, so the caller keeps the original text.
+        /// </summary>
+        private string ApplyUiOverride(UiPropertyMetadata ui, string expression)
+        {
+            // Narrowest match wins: this exact control, then every pass of this declaration,
+            // then every declaration of the name - the last being what a hand written
+            // override for a variable that appears only once looks like.
+            if (UiOverrides is null ||
+                !UiOverrides.TryGetValue(ui.Key, out var value) &&
+                !UiOverrides.TryGetValue(ui.DeclarationKey, out value) &&
+                !UiOverrides.TryGetValue(ui.VariableName, out value))
+                return null;
+
+            var eqIndex = IndexOfAssignment(expression);
+            if (eqIndex < 0)
+                return null;
+
+            var lhs = expression[..(eqIndex + 1)];
+            var rhs = expression[(eqIndex + 1)..].TrimStart();
+            if (ui.Type == "datagrid")
+            {
+                var bracketEnd = rhs.LastIndexOf(']');
+                return bracketEnd < 0 || rhs.IndexOf('[') < 0 ?
+                    null :
+                    $"{lhs} {value}{rhs[(bracketEnd + 1)..]}";
+            }
+            var i = 0;
+            while (i < rhs.Length && IsNumericChar(rhs[i]))
+                ++i;
+
+            return i == 0 ? null : $"{lhs} {value}{rhs[i..]}";
+        }
+
+        private static bool IsNumericChar(char c) =>
+            c is >= '0' and <= '9' or '.' or '-' or '+' or 'e' or 'E';
+
+        /// <summary>
+        /// Returns the data-ui-* attributes for the element wrapping the whole line.
+        /// </summary>
+        private string GetUiAttributes(UiPropertyMetadata ui)
+        {
+            var sb = new StringBuilder()
+                .Append($" data-ui-type=\"{ui.Type}\"")
+                .Append($" data-ui-line=\"{_parser.Line}\"")
+                .Append($" data-ui-var=\"{HttpUtility.HtmlAttributeEncode(ui.Key)}\"");
+            if (ui.Style is not null)
+                sb.Append($" data-ui-style=\"{HttpUtility.HtmlAttributeEncode(ui.Style)}\"");
+            if (ui.Type == "datagrid")
+                sb.Append($" data-ui-rows=\"{ui.Rows}\" data-ui-columns=\"{ui.Columns}\"");
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Merges the "reportStyle" class into the attribute string produced by HtmlId,
+        /// which already carries a class in Debug mode.
+        /// </summary>
+        private string AddReportStyle(UiPropertyMetadata ui, string attributes)
+        {
+            var style = ui.ReportStyle;
+            if (string.IsNullOrEmpty(style))
+                return attributes;
+
+            const string classAttr = "class=\"";
+            var i = attributes.IndexOf(classAttr, StringComparison.Ordinal);
+            return i < 0 ?
+                $"{attributes} class=\"{HttpUtility.HtmlAttributeEncode(style)}\"" :
+                attributes.Insert(i + classAttr.Length, HttpUtility.HtmlAttributeEncode(style) + " ");
+        }
+
+        /// <summary>
+        /// Replaces the result part of the rendered equation with the matching input control.
+        /// </summary>
+        private string InjectUiInput(UiPropertyMetadata ui, string equationHtml) =>
+            ui.Type switch
+            {
+                "dropdown" => InjectUiControl(equationHtml, v => BuildUiDropdown(ui, v)),
+                "radio" => InjectUiControl(equationHtml, v => BuildUiRadio(ui, v)),
+                "checkbox" => InjectUiControl(equationHtml, v => BuildUiCheckbox(ui, v)),
+                _ => InjectUiControl(equationHtml, v => BuildUiEntry(ui, v))
+            };
+
+        private string InjectUiControl(string equationHtml, Func<string, string> build)
+        {
+            const string assignOp = " = ";
+            var lastAssign = equationHtml.LastIndexOf(assignOp, StringComparison.Ordinal);
+            if (lastAssign < 0)
+                return equationHtml;
+
+            var resultStart = lastAssign + assignOp.Length;
+            SplitValueAndUnit(equationHtml[resultStart..], out var value, out var unitHtml);
+            return equationHtml[..resultStart] + build(value) + unitHtml;
+        }
+
+        private static string UiClass(UiPropertyMetadata ui, string baseClass) =>
+            HttpUtility.HtmlAttributeEncode(ui.Style is null ?
+                baseClass :
+                $"{baseClass} {ui.Style}");
+
+        /// <summary>
+        /// The control identity plus the source line it came from, so a host can write an
+        /// edited value back into the document. The line matches the "data-source-line" the
+        /// wrapping tag carries, i.e. 1 based and mapped back through macro expansion.
+        /// </summary>
+        private string UiBinding(UiPropertyMetadata ui) =>
+            $" data-ui-var=\"{HttpUtility.HtmlAttributeEncode(ui.Key)}\" data-ui-line=\"{_parser.Line}\"";
+
+        private string BuildUiEntry(UiPropertyMetadata ui, string value) =>
+            $"<input type=\"text\" class=\"{UiClass(ui, "calcpad-ui-input")}\" value=\"{HttpUtility.HtmlAttributeEncode(value)}\"{UiBinding(ui)}>";
+
+        private string BuildUiDropdown(UiPropertyMetadata ui, string value)
+        {
+            var sb = new StringBuilder()
+                .Append($"<select class=\"{UiClass(ui, "calcpad-ui-dropdown")}\"{UiBinding(ui)}>");
+            for (int i = 0, len = ui.Keys.Length; i < len; ++i)
+            {
+                var selected = ui.Values[i] == value ? " selected" : string.Empty;
+                sb.Append($"<option value=\"{HttpUtility.HtmlAttributeEncode(ui.Values[i])}\"{selected}>")
+                  .Append($"{HttpUtility.HtmlEncode(ui.Keys[i])}</option>");
+            }
+            return sb.Append("</select>").ToString();
+        }
+
+        private string BuildUiRadio(UiPropertyMetadata ui, string value)
+        {
+            var group = HttpUtility.HtmlAttributeEncode($"ui-radio-{ui.Key}");
+            var sb = new StringBuilder()
+                .Append($"<span class=\"{UiClass(ui, "calcpad-ui-radio")}\"{UiBinding(ui)}>");
+            for (int i = 0, len = ui.Keys.Length; i < len; ++i)
+            {
+                var isChecked = ui.Values[i] == value ? " checked" : string.Empty;
+                sb.Append("<label class=\"calcpad-ui-radio-label\">")
+                  .Append($"<input type=\"radio\" name=\"{group}\" value=\"{HttpUtility.HtmlAttributeEncode(ui.Values[i])}\"{isChecked}>")
+                  .Append($" {HttpUtility.HtmlEncode(ui.Keys[i])}</label>");
+            }
+            return sb.Append("</span>").ToString();
+        }
+
+        private string BuildUiCheckbox(UiPropertyMetadata ui, string value)
+        {
+            var isChecked = value.Trim() == "1" ? " checked" : string.Empty;
+            return $"<input type=\"checkbox\" class=\"{UiClass(ui, "calcpad-ui-checkbox")}\"{UiBinding(ui)}{isChecked}>";
+        }
+
+        /// <summary>
+        /// Strips the matrix rendering from a datagrid line, keeping only "v = " so the
+        /// grid widget can take its place below.
+        /// </summary>
+        private static string StripDatagridRhs(string equationHtml)
+        {
+            var eqIndex = equationHtml.IndexOf(" = ", StringComparison.Ordinal);
+            if (eqIndex >= 0)
+                return equationHtml[..(eqIndex + 3)];
+
+            eqIndex = equationHtml.IndexOf('=');
+            return eqIndex < 0 ? equationHtml : equationHtml[..(eqIndex + 1)] + " ";
+        }
+
+        /// <summary>
+        /// Returns the grid container. Emitted after the closing tag of the line so it is a
+        /// block level sibling rather than nested inside inline elements.
+        /// </summary>
+        private string BuildUiDatagrid(UiPropertyMetadata ui)
+        {
+            var sb = new StringBuilder()
+                .Append($"<div class=\"{UiClass(ui, "calcpad-ui-datagrid")}\"{UiBinding(ui)}")
+                .Append($" data-ui-rows=\"{ui.Rows}\" data-ui-columns=\"{ui.Columns}\"")
+                .Append($" data-ui-values=\"{HttpUtility.HtmlAttributeEncode(ui.DataValues ?? string.Empty)}\"");
+            if (ui.ColumnHeaders is not null)
+                sb.Append($" data-ui-col-headers=\"{HttpUtility.HtmlAttributeEncode(string.Join(",", ui.ColumnHeaders))}\"");
+            if (ui.RowHeaders is not null)
+                sb.Append($" data-ui-row-headers=\"{HttpUtility.HtmlAttributeEncode(string.Join(",", ui.RowHeaders))}\"");
+
+            return sb.Append("></div>").ToString();
+        }
+
+        /// <summary>
+        /// Splits a result fragment like "5 &lt;i&gt;ft&lt;/i&gt;" into value and unit markup,
+        /// so the unit stays outside the input control.
+        /// </summary>
+        private static void SplitValueAndUnit(string resultHtml, out string value, out string unitHtml)
+        {
+            var unitStart = resultHtml.IndexOf("<i>", StringComparison.Ordinal);
+            if (unitStart < 0)
+                unitStart = resultHtml.IndexOf("<sup", StringComparison.Ordinal);
+
+            if (unitStart < 0)
+            {
+                value = resultHtml.Trim();
+                unitHtml = string.Empty;
+            }
+            else if (unitStart == 0)
+            {
+                value = string.Empty;
+                unitHtml = resultHtml;
+            }
+            else
+            {
+                value = resultHtml[..unitStart].TrimEnd(ThinSpace, ' ');
+                unitHtml = ThinSpace + resultHtml[unitStart..];
+            }
+        }
+
+        private void ResetUiState()
+        {
+            _lineUiControls = null;
+            _uiTakeIndex = 0;
+            _uiSkipChars = 0;
+            _uiLineOccurrences.Clear();
+        }
+    }
+}

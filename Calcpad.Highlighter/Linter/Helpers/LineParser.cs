@@ -193,6 +193,67 @@ namespace Calcpad.Highlighter.Linter.Helpers
         }
 
         /// <summary>
+        /// Directives whose remainder is an expression rather than a name, path or payload.
+        /// Longer keywords come first so "#else if" wins over "#else" and "#end val" is not
+        /// mistaken for "#val". Everything absent here takes no expression at all, e.g.
+        /// #include, #settings, #def, #deg, #loop.
+        /// </summary>
+        private static readonly string[] ExpressionDirectives =
+        [
+            "#else if", "#while", "#repeat", "#round", "#post", "#hide", "#show",
+            "#pre", "#val", "#equ", "#noc", "#for", "#if", "#ui"
+        ];
+
+        /// <summary>
+        /// Returns the column in <paramref name="line"/> where a directive's trailing
+        /// expression starts, or -1 when the directive takes no expression or none was
+        /// written. Callers use it to validate the expression while ignoring the keyword,
+        /// e.g. the condition of '#hide x ≡ 5' or the assignment of '#UI {...} L = 10m'.
+        /// </summary>
+        public static int GetDirectiveExpressionStart(string line)
+        {
+            var i = 0;
+            while (i < line.Length && char.IsWhiteSpace(line[i]))
+                ++i;
+
+            var rest = line.AsSpan(i);
+            foreach (var directive in ExpressionDirectives)
+            {
+                if (!rest.StartsWith(directive, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var after = i + directive.Length;
+                // Reject a longer identifier that merely starts with the keyword, e.g. #iffy.
+                if (after < line.Length && !char.IsWhiteSpace(line[after]) && line[after] != '{')
+                    continue;
+
+                while (after < line.Length && char.IsWhiteSpace(line[after]))
+                    ++after;
+
+                // #UI carries an optional JSON block before the assignment.
+                if (after < line.Length && line[after] == '{' &&
+                    directive.Equals("#ui", StringComparison.OrdinalIgnoreCase))
+                {
+                    var braceEnd = line.IndexOf('}', after);
+                    if (braceEnd < 0)
+                        return -1;
+
+                    after = braceEnd + 1;
+                    while (after < line.Length && char.IsWhiteSpace(line[after]))
+                        ++after;
+                }
+                if (after >= line.Length)
+                    return -1;
+
+                // 'default' is a keyword argument of #round, not an identifier to resolve.
+                return line.AsSpan(after).Trim().Equals("default", StringComparison.OrdinalIgnoreCase) ?
+                    -1 :
+                    after;
+            }
+            return -1;
+        }
+
+        /// <summary>
         /// Checks if the trimmed line is a #def statement.
         /// </summary>
         public static bool IsDefStatement(string trimmedLine)

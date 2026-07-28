@@ -334,12 +334,22 @@ namespace Calcpad.Highlighter.ContentResolution
                 var lineNumber = lineEntry.Key;
                 var tokens = lineEntry.Value;
 
-                // Skip empty/comment/directive lines (same filtering as the linter)
+                // Skip empty/comment lines (same filtering as the linter). Directives are
+                // scanned from their expression onwards, so '#UI L = 10m' still registers
+                // an assignment while the keyword itself is ignored.
                 if (lineNumber < 0 || lineNumber >= lines.Count)
                     continue;
                 var line = lines[lineNumber];
-                if (LineParser.ShouldSkipLine(line) || LineParser.IsDirectiveLine(line.Trim()))
+                if (LineParser.ShouldSkipLine(line))
                     continue;
+
+                var expressionStart = 0;
+                if (LineParser.IsDirectiveLine(line.Trim()))
+                {
+                    expressionStart = LineParser.GetDirectiveExpressionStart(line);
+                    if (expressionStart < 0)
+                        continue;
+                }
 
                 // Find first Variable token on the line
                 Token? firstVar = null;
@@ -347,6 +357,8 @@ namespace Calcpad.Highlighter.ContentResolution
                 for (int t = 0; t < tokens.Count; t++)
                 {
                     var token = tokens[t];
+                    if (token.Column < expressionStart)
+                        continue;
 
                     if (firstVar == null && token.Type == TokenType.Variable)
                         firstVar = token;

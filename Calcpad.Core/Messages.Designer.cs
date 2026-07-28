@@ -1634,5 +1634,59 @@ namespace Calcpad.Core {
                 return ResourceManager.GetString("Vectors_and_matrices_are_not_supported_in_complex_mode", resourceCulture);
             }
         }
+
+        // / <summary>
+        // /   Looks up a localized string similar to Improper format for #UI keyword. Missing closing brace &apos;}&apos;..
+        // / </summary>
+        public static string Improper_format_for_UI_keyword_Missing_closing_brace {
+            get {
+                return ResourceManager.GetString("Improper_format_for_UI_keyword_Missing_closing_brace", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to Improper format for #UI keyword. Invalid JSON..
+        // / </summary>
+        public static string Improper_format_for_UI_keyword_Invalid_JSON {
+            get {
+                return ResourceManager.GetString("Improper_format_for_UI_keyword_Invalid_JSON", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to The #UI keyword requires a variable assignment..
+        // / </summary>
+        public static string The_UI_keyword_requires_a_variable_assignment {
+            get {
+                return ResourceManager.GetString("The_UI_keyword_requires_a_variable_assignment", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to String mode is not supported by the #UI keyword..
+        // / </summary>
+        public static string String_mode_is_not_supported_by_the_UI_keyword {
+            get {
+                return ResourceManager.GetString("String_mode_is_not_supported_by_the_UI_keyword", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to #UI {0}: both &apos;keys&apos; and &apos;values&apos; arrays are required..
+        // / </summary>
+        public static string The_UI_0_requires_both_keys_and_values_arrays {
+            get {
+                return ResourceManager.GetString("The_UI_0_requires_both_keys_and_values_arrays", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to #UI {0}: &apos;keys&apos; and &apos;values&apos; arrays must have the same length..
+        // / </summary>
+        public static string The_UI_0_keys_and_values_arrays_must_have_the_same_length {
+            get {
+                return ResourceManager.GetString("The_UI_0_keys_and_values_arrays_must_have_the_same_length", resourceCulture);
+            }
+        }
     }
 }

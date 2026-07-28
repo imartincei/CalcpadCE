@@ -85,6 +85,9 @@ namespace Calcpad.Tests.HighlighterTests
                 // Reassignment
                 { "reassignment_errors.cpd", "CPD-3409" },
                 { "reassignment_errors.cpd", "CPD-3410" },
+
+                // #UI directive
+                { "ui_errors.cpd", "CPD-3415" },
             };
             return data;
         }

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml } from 'calcpad-frontend';
+import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -32,6 +32,37 @@ let wrappedPanel: vscode.WebviewPanel | undefined = undefined;
 let unwrappedPanel: vscode.WebviewPanel | undefined = undefined;
 let previewUpdateTimeout: NodeJS.Timeout | unknown = undefined;
 let previewSourceEditor: vscode.TextEditor | undefined = undefined;
+
+// The #UI input form is its own panel, with the report preview opening to its
+// right so entered values and their effect are visible side by side. Its
+// presence is what "UI mode is on" means. Values stay in memory until the user
+// runs "Save UI Values", which writes them into the document.
+let uiPanel: vscode.WebviewPanel | undefined = undefined;
+// The print report that accompanies the input form, showing what the entered
+// values produce. Opened to the form's right and closable on its own.
+let uiReportPanel: vscode.WebviewPanel | undefined = undefined;
+const uiOverrides = new UiOverrideStore();
+const uiOverridesDirty = new Set<string>();
+
+type PreviewKind = 'regular' | 'unwrapped' | 'ui' | 'uiReport';
+
+function previewPanelFor(kind: PreviewKind): vscode.WebviewPanel | undefined {
+    switch (kind) {
+        case 'regular': return wrappedPanel;
+        case 'unwrapped': return unwrappedPanel;
+        case 'ui': return uiPanel;
+        default: return uiReportPanel;
+    }
+}
+
+/** Re-renders every open preview panel from the given document. */
+async function refreshPreviewPanels(document: vscode.TextDocument): Promise<void> {
+    const text = document.getText();
+    if (wrappedPanel) await updatePreviewContent(wrappedPanel, text, document.uri, false);
+    if (unwrappedPanel) await updatePreviewContent(unwrappedPanel, text, document.uri, true);
+    if (uiPanel) await updatePreviewContent(uiPanel, text, document.uri, false, undefined, true);
+    if (uiReportPanel) await updatePreviewContent(uiReportPanel, text, document.uri, false, undefined, false, true);
+}
 let linter: CalcpadServerLinter;
 let definitionsService: CalcpadDefinitionsService;
 let serverManager: CalcpadServerManager | undefined;
@@ -344,7 +375,9 @@ function sanitizeServerHtml(html: string): string {
 }
 
 function getVsCodeApiInitScript(): string {
-    return `<script>const vscode = acquireVsCodeApi();</script>`;
+    // acquireVsCodeApi may only be called once per webview, so publish the handle
+    // for the backend's #UI event script rather than letting it acquire its own.
+    return `<script>const vscode = acquireVsCodeApi(); window.__calcpadVsCode = vscode;</script>`;
 }
 
 function getErrorNavigationScript(): string {
@@ -603,8 +636,12 @@ function getLineLinkScript(scrollToLine?: number): string {
     `;
 }
 
-async function updatePreviewContent(panel: vscode.WebviewPanel, content: string, sourceFileUri: vscode.Uri, unwrapped: boolean = false, scrollToLine?: number) {
-    const mode = unwrapped ? 'unwrapped' : 'wrapped';
+async function updatePreviewContent(panel: vscode.WebviewPanel, content: string, sourceFileUri: vscode.Uri, unwrapped: boolean = false, scrollToLine?: number, enableUi: boolean = false, forPrint: boolean = false) {
+    const docKey = sourceFileUri.toString();
+    if ((enableUi || forPrint) && !uiOverrides.has(docKey) && !uiOverridesDirty.has(docKey))
+        uiOverrides.readFromSource(docKey, content);
+
+    const mode = enableUi ? 'ui' : forPrint ? 'report' : unwrapped ? 'unwrapped' : 'wrapped';
     outputChannel.appendLine(`Starting updatePreviewContent (${mode})...`);
     outputChannel.appendLine(`Content length: ${content.length} characters`);
 
@@ -612,7 +649,10 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
     const activeEditor = vscode.window.activeTextEditor;
     if (activeEditor) {
         const fileName = activeEditor.document.fileName.split('/').pop() || 'CalcpadCE';
-        panel.title = unwrapped ? `CalcpadCE Preview Unwrapped - ${fileName}` : `CalcpadCE Preview - ${fileName}`;
+        panel.title = enableUi ? `CalcpadCE Input - ${fileName}`
+            : forPrint ? `CalcpadCE Report - ${fileName}`
+            : unwrapped ? `CalcpadCE Preview Unwrapped - ${fileName}`
+            : `CalcpadCE Preview - ${fileName}`;
     }
 
     // Check if content is empty
@@ -694,7 +734,12 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
                 settings: settings,
                 theme: theme,
                 forceUnwrappedCode: unwrapped,
-                sourceFilePath: sourceFileUri.fsPath
+                sourceFilePath: sourceFileUri.fsPath,
+                enableUi: enableUi,
+                forPrint: forPrint,
+                // The plain preview shows the document as written; entered values
+                // belong to the input form and the report that accompanies it.
+                uiOverrides: enableUi || forPrint ? uiOverrides.toRecord(docKey) : undefined
             }),
             signal: AbortSignal.timeout(10000)
         });
@@ -1065,7 +1110,7 @@ function postPreviewSourceLine(line: number) {
     unwrappedPanel?.webview.postMessage(msg);
 }
 
-function handlePreviewMessage(message: any, kind: 'regular' | 'unwrapped') {
+function handlePreviewMessage(message: any, kind: PreviewKind) {
     switch (message.type) {
         case 'navigateToLine': {
             const sourceEditor = previewSourceEditor;
@@ -1089,6 +1134,19 @@ function handlePreviewMessage(message: any, kind: 'regular' | 'unwrapped') {
             calcpadWebviewConsoleChannel.appendLine(`[${timestamp}] [${level}] ${message.message}`);
             break;
         }
+        // A #UI control was edited in the preview. Record the value and re-render
+        // so dependent results recalculate.
+        case 'uiValueChange': {
+            const sourceEditor = previewSourceEditor;
+            if (!sourceEditor || kind !== 'ui') break;
+            const docKey = sourceEditor.document.uri.toString();
+            if (!uiOverrides.set(docKey, String(message.varName), String(message.newValue))) break;
+            uiOverridesDirty.add(docKey);
+            // Refreshes the form (so the control keeps the entered value) and the
+            // report panel beside it (so the result updates).
+            void refreshPreviewPanels(sourceEditor.document);
+            break;
+        }
         default:
             break;
     }
@@ -1098,7 +1156,7 @@ function handlePreviewMessage(message: any, kind: 'regular' | 'unwrapped') {
 // stacked directly below the wrapped one so the two-step navigation reads top→bottom.
 // `scrollToLine` (an output line) is baked into the rendered HTML so the unwrapped
 // view scrolls to it on load without a postMessage race.
-async function showPreview(kind: 'regular' | 'unwrapped', scrollToLine?: number) {
+async function showPreview(kind: PreviewKind, scrollToLine?: number) {
     // When invoked from a preview line-link click the webview is focused, so there is
     // no active *text* editor — fall back to the editor that spawned the preview.
     const activeEditor = vscode.window.activeTextEditor ?? previewSourceEditor;
@@ -1111,11 +1169,13 @@ async function showPreview(kind: 'regular' | 'unwrapped', scrollToLine?: number)
     previewSourceEditor = activeEditor;
 
     const unwrapped = kind === 'unwrapped';
-    const existing = kind === 'regular' ? wrappedPanel : unwrappedPanel;
+    const enableUi = kind === 'ui';
+    const forPrint = kind === 'uiReport';
+    const existing = previewPanelFor(kind);
 
     if (existing) {
         existing.reveal(existing.viewColumn ?? vscode.ViewColumn.Beside, true);
-        await updatePreviewContent(existing, activeEditor.document.getText(), activeEditor.document.uri, unwrapped, scrollToLine);
+        await updatePreviewContent(existing, activeEditor.document.getText(), activeEditor.document.uri, unwrapped, scrollToLine, enableUi, forPrint);
         return;
     }
 
@@ -1128,9 +1188,17 @@ async function showPreview(kind: 'regular' | 'unwrapped', scrollToLine?: number)
         wrappedPanel.reveal(wrappedPanel.viewColumn, false);
     }
 
+    const viewType = enableUi ? 'htmlPreviewUi'
+        : forPrint ? 'htmlPreviewUiReport'
+        : unwrapped ? 'htmlPreviewUnwrapped'
+        : 'htmlPreview';
+    const title = enableUi ? 'CalcpadCE Input'
+        : forPrint ? 'CalcpadCE Report'
+        : unwrapped ? 'CalcpadCE Preview Unwrapped'
+        : 'CalcpadCE Preview';
     const panel = vscode.window.createWebviewPanel(
-        unwrapped ? 'htmlPreviewUnwrapped' : 'htmlPreview',
-        unwrapped ? 'CalcpadCE Preview Unwrapped' : 'CalcpadCE Preview',
+        viewType,
+        title,
         unwrapped && wrappedPanel ? vscode.ViewColumn.Active : vscode.ViewColumn.Beside,
         {
             enableScripts: true,
@@ -1140,6 +1208,10 @@ async function showPreview(kind: 'regular' | 'unwrapped', scrollToLine?: number)
 
     if (kind === 'regular') {
         wrappedPanel = panel;
+    } else if (kind === 'ui') {
+        uiPanel = panel;
+    } else if (kind === 'uiReport') {
+        uiReportPanel = panel;
     } else {
         unwrappedPanel = panel;
         // Stack the unwrapped preview below the wrapped one when both are open.
@@ -1151,21 +1223,27 @@ async function showPreview(kind: 'regular' | 'unwrapped', scrollToLine?: number)
     panel.onDidDispose(() => {
         if (kind === 'regular') {
             wrappedPanel = undefined;
+        } else if (kind === 'ui') {
+            uiPanel = undefined;
+            // The report only exists to accompany the form.
+            uiReportPanel?.dispose();
+        } else if (kind === 'uiReport') {
+            uiReportPanel = undefined;
         } else {
             unwrappedPanel = undefined;
         }
-        if (!wrappedPanel && !unwrappedPanel) {
+        if (!wrappedPanel && !unwrappedPanel && !uiPanel && !uiReportPanel) {
             previewSourceEditor = undefined;
         }
     });
 
     panel.webview.onDidReceiveMessage(message => handlePreviewMessage(message, kind));
 
-    await updatePreviewContent(panel, activeEditor.document.getText(), activeEditor.document.uri, unwrapped, scrollToLine);
+    await updatePreviewContent(panel, activeEditor.document.getText(), activeEditor.document.uri, unwrapped, scrollToLine, enableUi, forPrint);
 }
 
 function schedulePreviewUpdate() {
-    if (!wrappedPanel && !unwrappedPanel) return;
+    if (!wrappedPanel && !unwrappedPanel && !uiPanel && !uiReportPanel) return;
 
     const activeEditor = vscode.window.activeTextEditor;
     if (!activeEditor) return;
@@ -1183,12 +1261,7 @@ function schedulePreviewUpdate() {
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
         previewSourceEditor = editor;
-        if (wrappedPanel) {
-            await updatePreviewContent(wrappedPanel, editor.document.getText(), editor.document.uri, false);
-        }
-        if (unwrappedPanel) {
-            await updatePreviewContent(unwrappedPanel, editor.document.getText(), editor.document.uri, true);
-        }
+        await refreshPreviewPanels(editor.document);
     }, 500);
 }
 
@@ -1521,13 +1594,8 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         // Refresh preview(s) if open
-        if (activeEditor && (wrappedPanel || unwrappedPanel)) {
-            if (wrappedPanel) {
-                await updatePreviewContent(wrappedPanel, activeEditor.document.getText(), activeEditor.document.uri, false);
-            }
-            if (unwrappedPanel) {
-                await updatePreviewContent(unwrappedPanel, activeEditor.document.getText(), activeEditor.document.uri, true);
-            }
+        if (activeEditor && (wrappedPanel || unwrappedPanel || uiPanel || uiReportPanel)) {
+            await refreshPreviewPanels(activeEditor.document);
             outputChannel.appendLine('[Settings] Preview refreshed');
         }
 
@@ -1540,22 +1608,12 @@ export async function activate(context: vscode.ExtensionContext) {
     vueUiProvider.onPreviewThemeChanged = async () => {
         const activeEditor = vscode.window.activeTextEditor;
         if (!activeEditor) return;
-        if (wrappedPanel) {
-            await updatePreviewContent(wrappedPanel, activeEditor.document.getText(), activeEditor.document.uri, false);
-        }
-        if (unwrappedPanel) {
-            await updatePreviewContent(unwrappedPanel, activeEditor.document.getText(), activeEditor.document.uri, true);
-        }
+        await refreshPreviewPanels(activeEditor.document);
     };
     vueUiProvider.onSettingsChanged = async () => {
         const activeEditor = vscode.window.activeTextEditor;
         if (!activeEditor) return;
-        if (wrappedPanel) {
-            await updatePreviewContent(wrappedPanel, activeEditor.document.getText(), activeEditor.document.uri, false);
-        }
-        if (unwrappedPanel) {
-            await updatePreviewContent(unwrappedPanel, activeEditor.document.getText(), activeEditor.document.uri, true);
-        }
+        await refreshPreviewPanels(activeEditor.document);
     };
     const vueUiProviderDisposable = vscode.window.registerWebviewViewProvider(
         CalcpadVueUIProvider.viewType,
@@ -1574,11 +1632,72 @@ export async function activate(context: vscode.ExtensionContext) {
         showPreview('unwrapped');
     });
 
+    // Opens the input form, with the report preview to its right so the effect of
+    // each entered value is visible. Toggling off closes the form and leaves the
+    // report open.
+    const toggleUiModeCommand = vscode.commands.registerCommand('vscode-calcpad.toggleUiMode', async () => {
+        if (uiPanel) {
+            uiPanel.dispose();
+            outputChannel.appendLine('[UI] Input mode disabled');
+            return;
+        }
+        outputChannel.appendLine('[UI] Input mode enabled');
+        await showPreview('ui');
+        // Opened after the form and while it holds focus, so Beside puts the
+        // report in the column to its right rather than replacing it.
+        await showPreview('uiReport');
+        const form = previewPanelFor('ui');
+        form?.reveal(form.viewColumn, false);
+    });
+
+    // Shows or hides the report beside the input form, mirroring the desktop's
+    // toggle. Closing the panel directly does the same thing.
+    const toggleUiReportCommand = vscode.commands.registerCommand('vscode-calcpad.toggleUiReport', async () => {
+        if (uiReportPanel) {
+            uiReportPanel.dispose();
+            return;
+        }
+        if (!uiPanel) {
+            vscode.window.showInformationMessage('The report accompanies the #UI input form — enable input mode first.');
+            return;
+        }
+        await showPreview('uiReport');
+        const form = previewPanelFor('ui');
+        form?.reveal(form.viewColumn, false);
+    });
+
+    // Writes the entered #UI values into the document as a uiOverrides metadata
+    // comment, so they are restored the next time it opens.
+    const saveUiValuesCommand = vscode.commands.registerCommand('vscode-calcpad.saveUiValues', async () => {
+        const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
+        if (!editor) {
+            vscode.window.showErrorMessage('No active editor found');
+            return;
+        }
+        const docKey = editor.document.uri.toString();
+        const overrides = uiOverrides.toRecord(docKey);
+        if (!overrides) {
+            vscode.window.showInformationMessage('No #UI values have been entered.');
+            return;
+        }
+
+        const original = editor.document.getText();
+        const updated = writeUiOverrides(original, overrides);
+        if (updated !== original) {
+            const fullRange = new vscode.Range(
+                editor.document.positionAt(0),
+                editor.document.positionAt(original.length));
+            await editor.edit(edit => edit.replace(fullRange, updated));
+        }
+        uiOverridesDirty.delete(docKey);
+        vscode.window.showInformationMessage(`Saved ${Object.keys(overrides).length} #UI value(s) to the document.`);
+    });
+
     const focusPreviewToLineCommand = vscode.commands.registerCommand('vscode-calcpad.focusPreviewToLine', async () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
         const line = editor.selection.active.line + 1;
-        if (!wrappedPanel && !unwrappedPanel) {
+        if (!wrappedPanel && !unwrappedPanel && !uiPanel && !uiReportPanel) {
             await showPreview('regular');
             // Wait for the webview to load its DOMContentLoaded listener before posting.
             setTimeout(() => postPreviewSourceLine(line), 600);
@@ -1868,7 +1987,7 @@ export async function activate(context: vscode.ExtensionContext) {
         updateMetadataContext(editor);
         if (editor && (editor.document.languageId === 'calcpad' || editor.document.languageId === 'plaintext')) {
             // Update preview if any panel is open
-            if (wrappedPanel || unwrappedPanel) {
+            if (wrappedPanel || unwrappedPanel || uiPanel || uiReportPanel) {
                 schedulePreviewUpdate();
             }
             // Update Variables tab
@@ -1886,7 +2005,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (metadataContextTimeout) clearTimeout(metadataContextTimeout);
         metadataContextTimeout = setTimeout(() => updateMetadataContext(event.textEditor), 150);
 
-        if (!wrappedPanel && !unwrappedPanel) return;
+        if (!wrappedPanel && !unwrappedPanel && !uiPanel && !uiReportPanel) return;
         if (!CalcpadSettingsManager.getInstance().getExtraBool('previewCursorSync', false)) return;
         if (cursorSyncTimeout) clearTimeout(cursorSyncTimeout);
         cursorSyncTimeout = setTimeout(() => {
@@ -1911,6 +2030,9 @@ export async function activate(context: vscode.ExtensionContext) {
             disposable,
             previewCommand,
             previewUnwrappedCommand,
+            toggleUiModeCommand,
+            toggleUiReportCommand,
+            saveUiValuesCommand,
             focusPreviewToLineCommand,
             onDidChangeTextEditorSelection,
             showInsertCommand,

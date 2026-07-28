@@ -447,6 +447,20 @@ select option {
     position: relative;
 }
 
+/* #UI input mode hides the editor, so the form gets the whole window. */
+.preview-pane.fullscreen {
+    width: auto;
+    flex: 1;
+    border-left: none;
+}
+
+/* Report pane beside the input form. Splits the window with it, so the
+   fullscreen form's flex:1 and this one each take half. */
+.ui-print-pane {
+    width: auto;
+    flex: 1;
+}
+
 /* Find-in-preview widget (VS Code editor-find analog), floated top-right. */
 .preview-find {
     position: absolute;

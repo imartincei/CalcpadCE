@@ -2,9 +2,9 @@ namespace Calcpad.Tests
 {
     public class VisibilityDirectiveTests
     {
-        private static string Render(string source, bool forPrint = false)
+        private static string Render(string source, bool forPrint = false, bool enableUi = false)
         {
-            var parser = new ExpressionParser { Settings = new Settings(), ForPrint = forPrint };
+            var parser = new ExpressionParser { Settings = new Settings(), ForPrint = forPrint, EnableUi = enableUi };
             parser.Parse(source, true, false);
             return parser.HtmlResult;
         }
@@ -68,20 +68,27 @@ namespace Calcpad.Tests
             Assert.Contains("bbb2", html);
         }
 
+        private const string PrePostSource = "#pre\naaa1 = 1\n#end pre\n#post\nbbb2 = 2\n#end post";
+
         [Fact]
         public void Pre_HidesOnPrint_ShowsOnScreen()
         {
-            // #post stays visible in the preview regardless of ForPrint (hiding it
-            // there is deferred to a future #UI mode); only #pre reacts to ForPrint.
-            const string source = "#pre\naaa1 = 1\n#end pre\n#post\nbbb2 = 2\n#end post";
-
-            var onScreen = Render(source, forPrint: false);
+            var onScreen = Render(PrePostSource, forPrint: false);
             Assert.Contains("aaa1", onScreen);
             Assert.Contains("bbb2", onScreen);
 
-            var forPrint = Render(source, forPrint: true);
+            var forPrint = Render(PrePostSource, forPrint: true);
             Assert.DoesNotContain("aaa1", forPrint);
             Assert.Contains("bbb2", forPrint);
+        }
+
+        [Fact]
+        public void Post_HidesInUiMode()
+        {
+            // #pre is the input form, #post is the report; only one of them shows at a time.
+            var uiMode = Render(PrePostSource, enableUi: true);
+            Assert.Contains("aaa1", uiMode);
+            Assert.DoesNotContain("bbb2", uiMode);
         }
 
         [Fact]

@@ -7,7 +7,7 @@ import { calcpadDarkTheme, calcpadLightTheme } from './theme';
  * Call this once before creating any editors.
  */
 export function registerCalcpadLanguage(): void {
-    monaco.languages.register({ id: 'calcpad', extensions: ['.cpd'] });
+    monaco.languages.register({ id: 'calcpad', extensions: ['.cpd', '.cpdz'] });
     monaco.languages.setMonarchTokensProvider('calcpad', calcpadLanguage);
     monaco.languages.setLanguageConfiguration('calcpad', calcpadLanguageConfiguration);
 }

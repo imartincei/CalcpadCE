@@ -25,6 +25,9 @@ export type {
     CalcpadError,
     CalcpadErrorSource,
     ConvertResult,
+    UiConvertOptions,
+    CpdzDecodeResponse,
+    CpdzEncodeResponse,
 } from './types/api';
 export { CalcpadTokenType, CalcpadTypeId } from './types/api';
 
@@ -93,6 +96,9 @@ export { extractPlotsFromHtml } from './services/plot-extract';
 export type { ExtractedPlot } from './services/plot-extract';
 export { buildZip } from './services/zip-writer';
 export type { ZipEntry } from './services/zip-writer';
+export { UiOverrideStore, readUiOverrides, writeUiOverrides } from './services/ui-overrides';
+export { isCompiledPath, COMPILED_EXTENSION } from './services/cpdz';
+export type { UiOverrides, UiValueChange } from './services/ui-overrides';
 
 // --- Message Bridge (base class) --------------------------------------------
 export { BaseMessageBridge } from './services/message-bridge/base';

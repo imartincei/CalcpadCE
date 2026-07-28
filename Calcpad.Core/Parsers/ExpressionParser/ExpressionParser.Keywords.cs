@@ -58,6 +58,7 @@ namespace Calcpad.Core
             Phasor,
             Complex,
             Settings,
+            Ui,
             SkipLine
         }
         private enum KeywordResult
@@ -132,7 +133,7 @@ namespace Calcpad.Core
                 case Keyword.Hide: SetVisibility(s, 5, false); break;
                 case Keyword.Show: SetVisibility(s, 5, true); break;
                 case Keyword.Pre: SetVisibility(s, 4, !ForPrint); break;
-                case Keyword.Post: SetVisibility(s, 5, true); break; // TODO: hide in #UI mode once that lands
+                case Keyword.Post: SetVisibility(s, 5, !EnableUi); break;
                 case Keyword.End_Hide:
                 case Keyword.End_Show:
                 case Keyword.End_Pre:
@@ -222,6 +223,8 @@ namespace Calcpad.Core
                 case Keyword.Settings:
                     ParseKeywordSettings(s);
                     break;
+                case Keyword.Ui:
+                    return ParseKeywordUi(s);
                 default:
                     if (keyword != Keyword.Global && keyword != Keyword.Local)
                         return KeywordResult.None;

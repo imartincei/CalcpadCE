@@ -21,7 +21,9 @@
       :aria-orientation="'vertical'"
       :aria-expanded="sidebarVisible"
     ></div>
-    <div class="editor-pane">
+    <!-- UI mode is a data-entry view, so the preview takes the whole window and
+         the editor steps aside until the user exits it. -->
+    <div v-show="!uiModeFullscreen" class="editor-pane">
       <div class="editor-toolbar" @contextmenu.prevent>
         <span class="spacer"></span>
         <button
@@ -294,7 +296,7 @@
       </div>
     </div>
 
-    <div v-if="previewVisible" class="preview-pane">
+    <div v-if="previewVisible" class="preview-pane" :class="{ fullscreen: uiModeFullscreen }">
       <div class="preview-toolbar" @contextmenu.prevent>
         <span>Preview</span>
         <div class="preview-mode-group">
@@ -310,9 +312,34 @@
             @click="setPreviewMode('unwrapped')"
             title="Body markup only"
           >Unwrapped</button>
+          <button
+            class="toolbar-btn"
+            :class="{ active: previewMode === 'ui' }"
+            @click="setPreviewMode('ui')"
+            title="#UI input form — #post content is hidden"
+          >Input</button>
         </div>
         <span class="spacer"></span>
-        <button class="toolbar-btn" @click="togglePreview">✕</button>
+        <button
+          v-if="uiModeFullscreen"
+          class="toolbar-btn"
+          :class="{ active: uiPrintVisible }"
+          @click="toggleUiPrint"
+          title="Show the report the entered values produce"
+        >Report</button>
+        <button
+          v-if="previewMode === 'ui' && uiOverridesDirty"
+          class="toolbar-btn"
+          @click="onSaveUiOverrides"
+          title="Write the entered values into the document so they survive a reload"
+        >Save values</button>
+        <button
+          v-if="uiModeFullscreen"
+          class="toolbar-btn"
+          @click="exitUiMode"
+          title="Return to the editor"
+        >Exit input mode</button>
+        <button v-else class="toolbar-btn" @click="togglePreview">✕</button>
       </div>
       <!-- One preview iframe per editor group, stacked to mirror the editor
            split. allow-scripts is required so the injected console-interception
@@ -340,16 +367,16 @@
       </div>
 
       <div class="preview-frames">
-        <template v-for="(group, gi) in groups" :key="'pv-' + group.id">
+        <template v-for="(group, gi) in previewGroups" :key="'pv-' + group.id">
           <iframe
             class="preview-frame"
-            :class="{ 'active-group': group.id === activeGroupId && isSplit }"
-            :style="editorGroupStyle(gi)"
+            :class="{ 'active-group': group.id === activeGroupId && isSplit && !uiModeFullscreen }"
+            :style="previewGroupStyle(gi)"
             :ref="el => setPreviewRef(group.id, el)"
             sandbox="allow-same-origin allow-scripts"
           ></iframe>
           <div
-            v-if="gi === 0 && isSplit"
+            v-if="gi === 0 && isSplit && !uiModeFullscreen"
             class="group-divider"
             :class="{ dragging: draggingEditorDivider }"
             @mousedown="onEditorDividerMouseDown"
@@ -361,6 +388,26 @@
           <div class="preview-spinner"></div>
           <span>Calculating…</span>
         </div>
+      </div>
+    </div>
+
+    <!-- Report companion to the input form: the print layout of the document
+         with the entered values applied, so the effect of each entry is visible
+         while filling it in. Toggled from the input toolbar. -->
+    <div v-if="uiModeFullscreen && uiPrintVisible" class="preview-pane ui-print-pane">
+      <div class="preview-toolbar" @contextmenu.prevent>
+        <span>Report</span>
+        <span class="spacer"></span>
+        <button class="toolbar-btn" @click="toggleUiPrint" title="Hide the report">✕</button>
+      </div>
+      <div class="preview-frames">
+        <iframe
+          v-if="activeGroup"
+          class="preview-frame"
+          :style="{ flex: '1 1 0', minHeight: '0' }"
+          :ref="el => setUiPrintRef(activeGroup.id, el)"
+          sandbox="allow-same-origin allow-scripts"
+        ></iframe>
       </div>
     </div>
 
@@ -419,7 +466,13 @@ export interface ProblemItem {
   endColumn: number
 }
 
-export type PreviewMode = 'wrapped' | 'unwrapped'
+/**
+ * 'ui' renders `#UI` lines as interactive controls and hides `#post` content;
+ * it can show the print layout alongside (see `uiPrintVisible`). 'wrapped' and
+ * 'unwrapped' are the on-screen report and the code listing, both of which
+ * render the document's own values rather than anything entered in the form.
+ */
+export type PreviewMode = 'wrapped' | 'unwrapped' | 'ui'
 
 // Preview mode is shared across both groups. `onGotoProblem` targets the
 // active group's editor (main.ts resolves it).
@@ -427,6 +480,17 @@ const onGotoProblem = ref<((problem: ProblemItem) => void) | null>(null)
 const onPreviewToggled = ref<((visible: boolean) => void) | null>(null)
 const onPreviewModeChanged = ref<((mode: PreviewMode) => void) | null>(null)
 const previewMode = ref<PreviewMode>('wrapped')
+
+// True while the active document holds #UI values that aren't in its source yet.
+const uiOverridesDirty = ref(false)
+const onSaveUiOverridesRequest = ref<(() => void) | null>(null)
+
+/** UI mode hands the whole window to the input form; the editor is hidden. */
+const uiModeFullscreen = computed(() => previewVisible.value && previewMode.value === 'ui')
+
+// The report pane beside the input form, toggled like the preview pane itself.
+const uiPrintVisible = ref(false)
+const onUiPrintToggled = ref<((visible: boolean) => void) | null>(null)
 
 // ---- Tab strip / editor groups ----
 export interface TabUiState {
@@ -469,6 +533,8 @@ const activeGroupLabel = computed(() => {
 // Monaco editor / write preview HTML for each group.
 const editorEls = new Map<string, HTMLElement>()
 const previewEls = new Map<string, HTMLIFrameElement>()
+// Iframes of the report pane shown beside the input form in UI mode.
+const uiPrintEls = new Map<string, HTMLIFrameElement>()
 // Last full (unstripped) HTML rendered per group, kept for "Open Full HTML".
 const previewHtmlByGroup = new Map<string, string>()
 
@@ -480,6 +546,10 @@ function setPreviewRef(id: string, el: unknown): void {
   if (el instanceof HTMLIFrameElement) previewEls.set(id, el)
   else previewEls.delete(id)
 }
+function setUiPrintRef(id: string, el: unknown): void {
+  if (el instanceof HTMLIFrameElement) uiPrintEls.set(id, el)
+  else uiPrintEls.delete(id)
+}
 function getEditorContainer(id: string): HTMLElement | null {
   return editorEls.get(id) ?? null
 }
@@ -487,6 +557,19 @@ function getEditorContainer(id: string): HTMLElement | null {
 // ---- Split ratio (top group's fraction of the stack height) ----
 const editorSplitRatio = ref<number>(0.5)
 const draggingEditorDivider = ref(false)
+
+/**
+ * The input form is a single-document view: a split would stack two forms, and
+ * with the same file open in both they would share one set of entered values and
+ * fight over it. So UI mode renders only the active group, full height.
+ */
+const previewGroups = computed(() =>
+  uiModeFullscreen.value ? [activeGroup.value].filter(Boolean) : groups.value)
+
+function previewGroupStyle(index: number): Record<string, string> {
+  if (uiModeFullscreen.value) return { flex: '1 1 0', minHeight: '0' }
+  return editorGroupStyle(index)
+}
 
 function editorGroupStyle(index: number): Record<string, string> {
   if (!isSplit.value) return { flex: '1 1 0', minHeight: '0' }
@@ -1102,6 +1185,19 @@ function getPreviewMode(): PreviewMode {
   return previewMode.value
 }
 
+function setUiOverridesDirty(dirty: boolean): void {
+  uiOverridesDirty.value = dirty
+}
+
+function onSaveUiOverrides(): void {
+  onSaveUiOverridesRequest.value?.()
+}
+
+/** Leaves the fullscreen input form for the report view, bringing the editor back. */
+function exitUiMode(): void {
+  setPreviewMode('wrapped')
+}
+
 function setPreviewLoading(groupId: string, loading: boolean): void {
   if (loading) previewLoadingGroups.value.add(groupId)
   else previewLoadingGroups.value.delete(groupId)
@@ -1117,6 +1213,28 @@ function setPreviewHtml(groupId: string, html: string, scrollToLine?: number): v
   doc.close()
   previewHtmlByGroup.set(groupId, html)
   setPreviewHtmlOutput(groupId, html)
+}
+
+/**
+ * Writes the report that accompanies the input form. It is a read-only rendering,
+ * so it gets neither the line links nor the console interception the main preview
+ * needs — and no #UI event script, since it carries no controls.
+ */
+function setUiPrintHtml(groupId: string, html: string): void {
+  const doc = uiPrintEls.get(groupId)?.contentDocument
+  if (!doc) return
+  doc.open()
+  doc.write(html)
+  doc.close()
+}
+
+function isUiPrintVisible(): boolean {
+  return uiPrintVisible.value
+}
+
+function toggleUiPrint(): void {
+  uiPrintVisible.value = !uiPrintVisible.value
+  onUiPrintToggled.value?.(uiPrintVisible.value)
 }
 
 // Mirrors the last rendered preview into the 'html' output channel (body only,
@@ -1261,6 +1379,9 @@ function injectPreviewConsole(html: string, groupId: string): string {
   const gid = JSON.stringify(groupId)
   const body = [
     '(function() {',
+    // Published before the patch guard so it is always set: the backend's #UI
+    // event script reads it to tag its messages with the owning group.
+    '  window.__calcpadGroupId = ' + gid + ';',
     '  if (window.__calcpadConsolePatched) return;',
     '  window.__calcpadConsolePatched = true;',
     '  var GROUP_ID = ' + gid + ';',
@@ -1434,6 +1555,11 @@ defineExpose({
   onPreviewModeChanged,
   setPreviewMode,
   getPreviewMode,
+  setUiOverridesDirty,
+  onSaveUiOverridesRequest,
+  setUiPrintHtml,
+  isUiPrintVisible,
+  onUiPrintToggled,
   appendOutput,
   clearOutput,
   showOutput,

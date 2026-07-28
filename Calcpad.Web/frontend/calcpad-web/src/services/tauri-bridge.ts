@@ -32,6 +32,7 @@ import {
     IMAGE_EXTENSIONS,
     bytesToBase64,
     isImageExtension,
+    isCompiledPath,
     mimeFromExtension,
     type PickedImage,
 } from 'calcpad-frontend';
@@ -144,6 +145,9 @@ export class TauriMessageBridge extends BaseMessageBridge {
     private _extraSettings: CalcpadExtras = getDefaultExtras();
     readonly ready: Promise<void>;
     private _lastDialogDir: string | null = null;
+    // Original bytes of each open .cpdz, kept only for the composite archives that
+    // bundle images — re-encoding needs them to preserve the non-code entries.
+    private readonly _compiledOriginals = new Map<string, Uint8Array | undefined>();
     private _resolvedLibraryPath: string | null | undefined = undefined;
     private _activePresetName: string = DEFAULT_PRESET_NAME;
     private _appDataDir: string = '';
@@ -535,23 +539,45 @@ export class TauriMessageBridge extends BaseMessageBridge {
             multiple: false,
             defaultPath: this.getDialogDefaultPath(),
             filters: [
-                { name: 'CalcpadCE Files', extensions: ['cpd'] },
+                { name: 'CalcpadCE Files', extensions: ['cpd', 'cpdz'] },
+                { name: 'CalcpadCE Compiled', extensions: ['cpdz'] },
                 { name: 'All Files', extensions: ['*'] },
             ],
         });
         if (!selected || Array.isArray(selected)) return null;
         this.rememberDialogDir(selected);
-        const content = await readTextFile(selected);
+        const content = await this.readFile(selected);
         return { path: selected, content };
     }
 
     async saveFile(filePath: string, content: string): Promise<void> {
         this.rememberDialogDir(filePath);
+        if (isCompiledPath(filePath)) {
+            await this.writeCompiled(filePath, content);
+            return;
+        }
         await writeTextFile(filePath, content);
     }
 
     async readFile(filePath: string): Promise<string> {
-        return readTextFile(filePath);
+        if (!isCompiledPath(filePath)) return readTextFile(filePath);
+
+        const bytes = await fsReadFile(filePath);
+        const decoded = await this.apiClient.decodeCpdz(bytes);
+        if (!decoded) throw new Error(`Could not read the compiled worksheet ${filePath}`);
+        // Kept so a composite archive's images survive the next save.
+        this._compiledOriginals.set(filePath, decoded.composite ? bytes : undefined);
+        return decoded.content;
+    }
+
+    /**
+     * Writes a .cpdz, re-encoding from the current text. A composite archive is
+     * rebuilt from the bytes captured on read, so its images are carried over.
+     */
+    private async writeCompiled(filePath: string, content: string): Promise<void> {
+        const encoded = await this.apiClient.encodeCpdz(content, this._compiledOriginals.get(filePath));
+        if (!encoded) throw new Error(`Could not write the compiled worksheet ${filePath}`);
+        await fsWriteFile(filePath, encoded);
     }
 
     async getRecentFiles(): Promise<string[]> {
@@ -587,12 +613,13 @@ export class TauriMessageBridge extends BaseMessageBridge {
             defaultPath: this.getSaveDialogDefaultPath(),
             filters: [
                 { name: 'CalcpadCE Files', extensions: ['cpd'] },
+                { name: 'CalcpadCE Compiled', extensions: ['cpdz'] },
                 { name: 'All Files', extensions: ['*'] },
             ],
         });
         if (!filePath) return null;
         this.rememberDialogDir(filePath);
-        await writeTextFile(filePath, content);
+        await this.saveFile(filePath, content);
         return filePath;
     }
 

@@ -13,6 +13,9 @@ import type {
     PrettifyResponse,
     CalcpadError,
     ConvertResult,
+    UiConvertOptions,
+    CpdzDecodeResponse,
+    CpdzEncodeResponse,
 } from '../types/api';
 import type { SnippetsResponse } from '../types/snippets';
 
@@ -88,6 +91,26 @@ export class CalcpadApiClient {
         return this.post<SymbolAtPositionResponse>('/api/calcpad/symbol-at-position', request, 'SymbolAtPosition');
     }
 
+    /**
+     * Decodes a compiled `.cpdz` worksheet to its source text. `composite` marks the
+     * archive form that bundles images: its bytes must be handed back to
+     * {@link encodeCpdz} on save or those images are lost.
+     */
+    public async decodeCpdz(data: Uint8Array): Promise<CpdzDecodeResponse | null> {
+        return this.post<CpdzDecodeResponse>(
+            '/api/calcpad/cpdz/decode', { data: toBase64(data) }, 'DecodeCpdz');
+    }
+
+    /**
+     * Encodes source text as a `.cpdz` worksheet. Pass the bytes of the file being
+     * overwritten as `original` so a composite archive keeps its other entries.
+     */
+    public async encodeCpdz(content: string, original?: Uint8Array): Promise<Uint8Array | null> {
+        const result = await this.post<CpdzEncodeResponse>('/api/calcpad/cpdz/encode',
+            { content, original: original ? toBase64(original) : undefined }, 'EncodeCpdz');
+        return result ? fromBase64(result.data) : null;
+    }
+
     public async snippets(): Promise<SnippetsResponse | null> {
         return this.get<SnippetsResponse>('/api/calcpad/snippets', 'Snippets');
     }
@@ -101,13 +124,19 @@ export class CalcpadApiClient {
         return this.post<PrettifyResponse>('/api/calcpad/prettify', request, 'Prettify');
     }
 
+    /**
+     * @param ui Interactive `#UI` mode. `enableUi` renders `#UI` lines as controls and
+     *   hides `#post` content; `uiOverrides` replaces the right hand side of annotated
+     *   assignments and applies in both modes, so a report reflects entered values.
+     */
     public async convert(
         content: string,
         settings: unknown,
         outputFormat: string = 'html',
         forPrint: boolean = false,
         sourceFilePath?: string,
-        theme?: 'light' | 'dark'
+        theme?: 'light' | 'dark',
+        ui?: UiConvertOptions
     ): Promise<ArrayBuffer | ConvertResult | null> {
         return this.serialize(async () => {
             const url = this.baseUrl + '/api/calcpad/convert';
@@ -115,7 +144,11 @@ export class CalcpadApiClient {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, settings, outputFormat, forPrint, sourceFilePath, theme }),
+                    body: JSON.stringify({
+                        content, settings, outputFormat, forPrint, sourceFilePath, theme,
+                        enableUi: ui?.enableUi ?? false,
+                        uiOverrides: ui?.uiOverrides,
+                    }),
                     signal: AbortSignal.timeout(60000),
                 });
                 if (!response.ok) return null;
@@ -271,4 +304,24 @@ export function parseConvertErrorHeader(response: Response): CalcpadError[] {
     } catch {
         return [];
     }
+}
+
+/**
+ * Base64 helpers for the binary `.cpdz` endpoints. Chunked so a large worksheet
+ * doesn't blow the argument limit of String.fromCharCode.
+ */
+function toBase64(bytes: Uint8Array): string {
+    let binary = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+    }
+    return btoa(binary);
+}
+
+function fromBase64(data: string): Uint8Array {
+    const binary = atob(data);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
 }

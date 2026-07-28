@@ -1,0 +1,31 @@
+' CPD-3415: invalid #UI format
+
+' Unclosed JSON block
+#UI {"type": "entry" a = 1
+
+' Malformed JSON
+#UI {not json} b = 1
+
+' Unrecognized property
+#UI {"colour": "red"} d = 1
+
+' Unrecognized control type
+#UI {"type": "slider"} e = 1
+
+' Dropdown without the option arrays
+#UI {"type": "dropdown"} f = 1
+
+' Radio with only one of the two arrays
+#UI {"type": "radio", "keys": ["Steel", "Concrete"]} g = 1
+
+' Option arrays of unequal length
+#UI {"type": "dropdown", "keys": ["Low", "Med", "High"], "values": ["1", "2"]} h = 1
+
+' String mode is not supported
+#UI {"mode": "string"} i = 1
+
+' String variable on the left hand side - CPD-3303 as well
+#UI j$ = 1
+
+' No assignment
+#UI {"type": "entry"}

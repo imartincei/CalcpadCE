@@ -39,7 +39,9 @@ namespace Calcpad.Server.Controllers
                 }
 
                 var forceUnwrapped = unwrap || request.ForceUnwrappedCode;
-                var (htmlResult, _, errors) = _calcpadService.Convert(request.Content, request.Settings, forceUnwrapped, request.Theme, request.SourceFilePath, request.ForPrint);
+                var (htmlResult, _, errors) = _calcpadService.Convert(
+                    request.Content, request.Settings, forceUnwrapped, request.Theme, request.SourceFilePath,
+                    request.ForPrint, captureOpenXml: false, request.EnableUi, request.UiOverrides);
                 if (unwrap)
                 {
                     htmlResult = ProcessDataTextLinks(htmlResult);
@@ -57,6 +59,47 @@ namespace Calcpad.Server.Controllers
             {
                 FileLogger.LogError("Convert request failed", ex);
                 return StatusCode(500, $"Error processing Calcpad content: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Decodes a compiled <c>.cpdz</c> worksheet to its source text. Accepts both the
+        /// plain deflate form and the composite archive that bundles images.
+        /// </summary>
+        [HttpPost("cpdz/decode")]
+        public IActionResult DecodeCpdz([FromBody] CpdzDecodeRequest request)
+        {
+            try
+            {
+                var result = CpdzCodec.Decode(Convert.FromBase64String(request.Data));
+                return Ok(new CpdzDecodeResponse { Content = result.Text, Composite = result.IsComposite });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("cpdz decode failed", ex);
+                return BadRequest(new { error = "Not a valid .cpdz file", message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Encodes source text as a <c>.cpdz</c> worksheet. Pass the file's current bytes
+        /// as <c>Original</c> when overwriting, so a composite archive keeps its images.
+        /// </summary>
+        [HttpPost("cpdz/encode")]
+        public IActionResult EncodeCpdz([FromBody] CpdzEncodeRequest request)
+        {
+            try
+            {
+                var original = string.IsNullOrEmpty(request.Original)
+                    ? null
+                    : Convert.FromBase64String(request.Original);
+                var bytes = CpdzCodec.Encode(request.Content, original);
+                return Ok(new CpdzEncodeResponse { Data = Convert.ToBase64String(bytes) });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("cpdz encode failed", ex);
+                return StatusCode(500, new { error = "Failed to encode .cpdz", message = ex.Message });
             }
         }
 
@@ -674,6 +717,56 @@ namespace Calcpad.Server.Controllers
         /// #include and #read paths against the parent file's directory.
         /// </summary>
         public string? SourceFilePath { get; set; }
+
+        /// <summary>
+        /// When true, <c>#UI</c> lines render as interactive controls and <c>#post</c>
+        /// content is hidden. When false the document renders as a report, exactly as
+        /// it would without the <c>#UI</c> keywords.
+        /// </summary>
+        public bool EnableUi { get; set; } = false;
+
+        /// <summary>
+        /// Values entered into <c>#UI</c> controls, keyed by the control identity the
+        /// preview reports in <c>data-ui-var</c> (e.g. <c>"L:1"</c>). Applied in both
+        /// modes, so a report shows the values that were actually entered.
+        /// </summary>
+        public Dictionary<string, string>? UiOverrides { get; set; }
+    }
+
+    public class CpdzDecodeRequest
+    {
+        /// <summary>Base64 of the file's raw bytes.</summary>
+        public string Data { get; set; } = string.Empty;
+    }
+
+    public class CpdzDecodeResponse
+    {
+        /// <summary>The decoded Calcpad source.</summary>
+        public string Content { get; set; } = string.Empty;
+
+        /// <summary>
+        /// True when the file is a composite archive bundling images. Its bytes must be
+        /// passed back as <c>Original</c> on encode, or those images are lost.
+        /// </summary>
+        public bool Composite { get; set; }
+    }
+
+    public class CpdzEncodeRequest
+    {
+        /// <summary>The Calcpad source to compile.</summary>
+        public string Content { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Base64 of the file being overwritten, when there is one. A composite archive
+        /// keeps every entry but the code, so bundled images survive the save.
+        /// </summary>
+        public string? Original { get; set; }
+    }
+
+    public class CpdzEncodeResponse
+    {
+        /// <summary>Base64 of the encoded file's bytes.</summary>
+        public string Data { get; set; } = string.Empty;
     }
 
     public class HighlightRequest

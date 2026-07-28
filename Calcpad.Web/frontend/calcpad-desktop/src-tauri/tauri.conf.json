@@ -50,6 +50,16 @@
         "mimeType": "application/x-calcpadce",
         "role": "Editor",
         "rank": "Default"
+      },
+      {
+        "ext": [
+          "cpdz"
+        ],
+        "name": "CalcpadCE Compiled Worksheet",
+        "description": "CalcpadCE compiled worksheet, opened as an input form",
+        "mimeType": "application/x-calcpadce-compiled",
+        "role": "Editor",
+        "rank": "Default"
       }
     ],
     "category": "DeveloperTool",

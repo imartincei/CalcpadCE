@@ -6,7 +6,14 @@ import CalcpadAppVue from 'calcpad-frontend/vue/components/CalcpadApp.vue';
 import { initMessaging } from 'calcpad-frontend/vue/services/messaging';
 import { MessageBridge } from './services/message-bridge';
 import { buildApiSettings } from 'calcpad-frontend/types/settings';
-import { findMetadataCommentBlock, serializeMetadataComment, buildDefinitionResolver } from 'calcpad-frontend';
+import {
+    findMetadataCommentBlock,
+    serializeMetadataComment,
+    buildDefinitionResolver,
+    UiOverrideStore,
+    writeUiOverrides,
+    isCompiledPath,
+} from 'calcpad-frontend';
 import { registerCalcpadLanguage, registerCalcpadTheme, remeasureEditorFontsWhenReady, resolveEditorFontFamily } from './editor/setup';
 import { setAppTheme, coerceAppTheme } from './editor/app-theme';
 import { registerSemanticTokensProvider } from './editor/semantic-tokens';
@@ -153,7 +160,7 @@ async function showServerBlockedDialog(details: string): Promise<void> {
     }
 }
 
-type PreviewMode = 'wrapped' | 'unwrapped';
+type PreviewMode = 'wrapped' | 'unwrapped' | 'ui';
 
 async function bootstrap(): Promise<void> {
     let serverUrl: string;
@@ -332,10 +339,63 @@ async function bootstrap(): Promise<void> {
     // by the wrapped->unwrapped two-step in the 'navigateToLine' handler.
     const pendingPreviewScrollLine = new Map<string, number>();
 
+    // Values entered into #UI controls. Held in memory so typing in a form never
+    // dirties the file; "Save values" writes them into the document.
+    const uiOverrides = new UiOverrideStore();
+    // Documents whose in-memory values have not been written back yet.
+    const uiOverridesDirty = new Set<string>();
+
+    /**
+     * A .cpdz is a compiled worksheet: it is distributed to be filled in, not read
+     * or edited, so it opens straight into the input form with the editor locked.
+     * Entered values can still be saved back — the file is decoded and re-encoded
+     * around the uiOverrides comment, so no source is exposed on the way through.
+     */
+    function applyCompiledWorksheetMode(group: EditorGroup): void {
+        const activeId = group.tabs.activeId;
+        const path = activeId ? group.tabs.getFilePath(activeId) : null;
+        const compiled = !!path && isCompiledPath(path);
+        group.editor.updateOptions({ readOnly: compiled });
+        if (compiled && appInstance.getPreviewMode() !== 'ui') {
+            if (!appInstance.isPreviewVisible()) appInstance.togglePreview();
+            appInstance.setPreviewMode('ui');
+        }
+    }
+
+    /**
+     * Key that #UI values are stored under. The file path, so the same document
+     * open in two tabs or two groups shares one set of entered values rather than
+     * silently diverging. Unsaved documents fall back to the tab key, which is the
+     * only thing that tells them apart.
+     */
+    function uiDocKeyFor(group: EditorGroup): string {
+        const activeId = group.tabs.activeId;
+        return (activeId && group.tabs.getFilePath(activeId)) || docKeyFor(group);
+    }
+
+    function activeUiDocKey(): string {
+        return uiDocKeyFor(activeGroup);
+    }
+
+    function refreshUiDirtyIndicator(): void {
+        appInstance.setUiOverridesDirty(uiOverridesDirty.has(activeUiDocKey()));
+    }
+
+    /**
+     * Seeds a document's overrides from a saved uiOverrides comment the first time
+     * it is rendered in UI mode, so entered values survive reopening the file.
+     */
+    function seedUiOverrides(group: EditorGroup, content: string): void {
+        const docKey = uiDocKeyFor(group);
+        if (uiOverrides.has(docKey) || uiOverridesDirty.has(docKey)) return;
+        uiOverrides.readFromSource(docKey, content);
+    }
+
     const PREVIEW_LOADING_DELAY_MS = 400;
 
     async function refreshPreviewFor(group: EditorGroup): Promise<void> {
         if (!appInstance.isPreviewVisible()) return;
+        if (appInstance.getPreviewMode() === 'ui' && group !== activeGroup) return;
 
         const content = group.editor.getValue();
         const settings = activeBridge.getSettings();
@@ -358,9 +418,15 @@ async function bootstrap(): Promise<void> {
         );
         let result;
         try {
+            if (mode === 'ui') seedUiOverrides(group, content);
+            // The preview shows the document as written. Entered values belong to
+            // the input form and the report beside it, not to a view of the source.
+            const ui = mode === 'ui'
+                ? { enableUi: true, uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }
+                : undefined;
             result = mode === 'unwrapped'
                 ? await activeBridge.api.convertUnwrapped(content, apiSettings, fileContext.sourceFilePath, theme)
-                : await activeBridge.api.convert(content, apiSettings, 'html', false, fileContext.sourceFilePath, theme);
+                : await activeBridge.api.convert(content, apiSettings, 'html', false, fileContext.sourceFilePath, theme, ui);
         } finally {
             window.clearTimeout(loadingTimer);
             appInstance.setPreviewLoading(group.id, false);
@@ -385,9 +451,38 @@ async function bootstrap(): Promise<void> {
                 data: { type: 'updateConvertErrors', errors: result.errors },
             }));
         }
+
+        if (mode === 'ui' && appInstance.isUiPrintVisible())
+            await refreshUiPrintFor(group, content, apiSettings, fileContext.sourceFilePath, theme);
+    }
+
+    /**
+     * Renders the report that sits beside the input form: the print layout, with
+     * the entered values applied, so #post content and the results they produce
+     * are visible while filling the form in.
+     */
+    async function refreshUiPrintFor(
+        group: EditorGroup,
+        content: string,
+        apiSettings: unknown,
+        sourceFilePath: string | undefined,
+        theme: 'light' | 'dark',
+    ): Promise<void> {
+        const result = await activeBridge.api.convert(
+            content, apiSettings, 'html', true, sourceFilePath, theme,
+            { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) });
+        if (!result || result instanceof ArrayBuffer) return;
+
+        const html = tauriBridge ? await tauriBridge.inlineDocumentImages(result.html) : result.html;
+        appInstance.setUiPrintHtml(group.id, html);
     }
 
     function refreshAllPreviews(): void {
+        // UI mode renders the active group only — the other has no iframe.
+        if (appInstance.getPreviewMode() === 'ui') {
+            void refreshPreviewFor(activeGroup);
+            return;
+        }
         for (const g of groups.values()) void refreshPreviewFor(g);
     }
 
@@ -425,6 +520,7 @@ async function bootstrap(): Promise<void> {
         // Refresh active-group-scoped UI (Problems panel, sidebar TOC, preview).
         refreshProblemsFor(group);
         activeBridge.refreshHeadings();
+        refreshUiDirtyIndicator();
         if (appInstance.isPreviewVisible()) void refreshPreviewFor(group);
     }
 
@@ -588,6 +684,7 @@ async function bootstrap(): Promise<void> {
 
         // On tab switch within this group, re-emit markers + re-lint + repaint.
         group.tabs.onActiveModelChanged(() => {
+            applyCompiledWorksheetMode(group);
             refreshProblemsFor(group);
             // Re-lint: content-change events don't fire on tab switch, so the
             // debounced lint in setupDiagnostics never re-runs for the new model.
@@ -648,6 +745,12 @@ async function bootstrap(): Promise<void> {
     async function splitEditor(): Promise<void> {
         if (groups.size >= 2) {
             activeGroup.editor.focus();
+            return;
+        }
+        // The input form owns the window and shows one document; a second group
+        // would have nowhere to render and would share this one's entered values.
+        if (appInstance.getPreviewMode() === 'ui' && appInstance.isPreviewVisible()) {
+            appInstance.appendOutput('info', 'Exit input mode to split the editor.');
             return;
         }
         const source = activeGroup;
@@ -883,6 +986,18 @@ async function bootstrap(): Promise<void> {
             return;
         }
 
+        // A #UI control was edited in the preview. Record the value and re-render
+        // that group so dependent results recalculate.
+        if (data.type === 'uiValueChange') {
+            const group = (data.groupId && groups.get(data.groupId)) || activeGroup;
+            const docKey = uiDocKeyFor(group);
+            if (!uiOverrides.set(docKey, String(data.varName), String(data.newValue))) return;
+            uiOverridesDirty.add(docKey);
+            refreshUiDirtyIndicator();
+            void refreshPreviewFor(group);
+            return;
+        }
+
         // Preview -> editor navigation. An 'output' line comes from the true
         // wrapped view; when the document has macros/includes that line only
         // makes sense in the unwrapped view, so flip the pane to unwrapped
@@ -1010,7 +1125,7 @@ async function bootstrap(): Promise<void> {
 
     // Initialize preview mode from saved extra setting (Tauri) or default (web).
     const savedMode = (editorBridge.getExtraSetting('previewMode') as PreviewMode | undefined);
-    if (savedMode === 'wrapped' || savedMode === 'unwrapped') {
+    if (savedMode === 'wrapped' || savedMode === 'unwrapped' || savedMode === 'ui') {
         appInstance.setPreviewMode(savedMode);
     }
 
@@ -1033,7 +1148,37 @@ async function bootstrap(): Promise<void> {
 
     appInstance.onPreviewModeChanged = (mode: PreviewMode) => {
         editorBridge.setExtraSetting('previewMode', mode);
+        refreshUiDirtyIndicator();
         refreshAllPreviews();
+    };
+
+    // The report pane renders on demand; showing it needs a fresh convert.
+    appInstance.onUiPrintToggled = () => {
+        // The new iframe only exists after Vue has patched the DOM.
+        void nextTick(refreshAllPreviews);
+    };
+
+    // "Save values": write the entered #UI values into the active document as a
+    // uiOverrides metadata comment, so they are restored the next time it opens.
+    appInstance.onSaveUiOverridesRequest = () => {
+        const docKey = activeUiDocKey();
+        const overrides = uiOverrides.toRecord(docKey);
+        if (!overrides) return;
+
+        const model = activeGroup.editor.getModel();
+        if (!model) return;
+
+        const updated = writeUiOverrides(model.getValue(), overrides);
+        if (updated !== model.getValue()) {
+            // Edited through the model rather than the editor: a compiled worksheet
+            // locks the editor, which would reject executeEdits. Undo is preserved.
+            model.pushStackElement();
+            model.pushEditOperations([], [{ range: model.getFullModelRange(), text: updated }], () => null);
+            model.pushStackElement();
+        }
+        uiOverridesDirty.delete(docKey);
+        refreshUiDirtyIndicator();
+        appInstance.appendOutput('info', `Saved ${Object.keys(overrides).length} #UI value(s) to the document.`);
     };
 
     // Refresh all previews when the preview pane is first opened.
@@ -1259,6 +1404,8 @@ async function bootstrap(): Promise<void> {
             const newPath = await tauriBridge!.saveFileAs(content);
             if (!newPath) return false;
             tabs.markActiveSaved({ filePath: newPath });
+            // Saving as .cpdz turns the tab into a compiled worksheet.
+            applyCompiledWorksheetMode(activeGroup);
             await tauriBridge!.addRecentFile(newPath);
             await deleteDraft(active.id);
             return true;
@@ -1270,6 +1417,7 @@ async function bootstrap(): Promise<void> {
             const newPath = await tauriBridge!.saveFileAs(content);
             if (!newPath) return false;
             tabs.markActiveSaved({ filePath: newPath });
+            applyCompiledWorksheetMode(activeGroup);
             await tauriBridge!.addRecentFile(newPath);
             if (active) await deleteDraft(active.id);
             return true;

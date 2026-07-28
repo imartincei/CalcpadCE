@@ -43,7 +43,9 @@ namespace Calcpad.Server.Services
             string theme = "light",
             string? sourceFilePath = null,
             bool forPrint = false,
-            bool captureOpenXml = false)
+            bool captureOpenXml = false,
+            bool enableUi = false,
+            Dictionary<string, string>? uiOverrides = null)
         {
             if (string.IsNullOrWhiteSpace(calcpadContent))
             {
@@ -60,6 +62,10 @@ namespace Calcpad.Server.Services
                 // 1. Use Calcpad.Core settings directly (defaults are set in constructors).
                 //    Per-file overrides now come from the #settings directive, handled in Core.
                 Settings coreSettings = settings ?? new Settings();
+
+                // Printed output is a report by definition, so it never carries controls.
+                // Overrides still apply - the report shows the values that were entered.
+                enableUi &= !forPrint;
 
                 // 2. Parse macros and includes (server reads referenced files from disk).
                 var macroParser = new MacroParser
@@ -103,7 +109,15 @@ namespace Calcpad.Server.Services
                         // Debug mode makes Calcpad.Core emit per-line anchors (id="line-N" class="line")
                         // and the error-summary boxes that the interactive preview uses for line links.
                         // Keep it off for print/PDF so exported output has no navigation anchors.
-                        var parser = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, Debug = !forPrint, ForPrint = forPrint };
+                        var parser = new ExpressionParser
+                        {
+                            Settings = coreSettings,
+                            SourceFilePath = sourceFilePath,
+                            Debug = !forPrint,
+                            ForPrint = forPrint,
+                            EnableUi = enableUi,
+                            UiOverrides = uiOverrides
+                        };
                         parser.Parse(outputText, true, captureOpenXml);
                         htmlResult = RemoveEmptyParagraphs(parser.HtmlResult);
                         errors.AddRange(parser.Errors);
@@ -118,7 +132,7 @@ namespace Calcpad.Server.Services
                 }
 
                 // 6. Apply HTML wrapper with theme support
-                var finalHtml = WrapHtmlResult(htmlResult, theme);
+                var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);
                 FileLogger.LogInfo("Conversion completed successfully", $"Output length: {finalHtml.Length}");
 
                 return (finalHtml, openXmlExpressions, errors);
@@ -492,7 +506,7 @@ tan_angle = tan(angle°)";
             );
         }
 
-        private string WrapHtmlResult(string htmlContent, string theme = "light")
+        private string WrapHtmlResult(string htmlContent, string theme = "light", bool enableUi = false)
         {
             // Use the comprehensive HTML template with theme support
             var themeClass = theme.ToLower() == "dark" ? " class=\"dark-theme\"" : "";
@@ -502,12 +516,27 @@ tan_angle = tan(angle°)";
             // template CSS (e.g. Jost*), so they don't depend on OS installation,
             // and expose window.__calcpadFonts for any other client-side use.
             // Injected before </head> so it runs before any module scripts in body.
-            var fontMarkup = BundledFonts.GetFontFaceStyleTag() + BundledFonts.GetInjectionScript();
-            if (!string.IsNullOrEmpty(fontMarkup))
+            var headMarkup = BundledFonts.GetFontFaceStyleTag() + BundledFonts.GetInjectionScript();
+
+            // The datagrid libraries are large, so they only go in when a grid is
+            // actually present. jspreadsheet has to be defined before the event
+            // script runs, hence <head> rather than alongside it.
+            if (enableUi && htmlContent.Contains("calcpad-ui-datagrid", StringComparison.Ordinal))
+                headMarkup += BundledUiAssets.GetHeadMarkup();
+
+            if (!string.IsNullOrEmpty(headMarkup))
             {
                 var headCloseIdx = templateWithTheme.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);
                 if (headCloseIdx >= 0)
-                    templateWithTheme = templateWithTheme.Insert(headCloseIdx, fontMarkup);
+                    templateWithTheme = templateWithTheme.Insert(headCloseIdx, headMarkup);
+            }
+
+            // Report and print output carry no controls, so they get no event script.
+            if (enableUi)
+            {
+                var bodyCloseIdx = templateWithTheme.LastIndexOf("</body>", StringComparison.OrdinalIgnoreCase);
+                if (bodyCloseIdx >= 0)
+                    templateWithTheme = templateWithTheme.Insert(bodyCloseIdx, UiPreviewScript.GetScriptTag());
             }
 
             return templateWithTheme.Replace("{{CONTENT}}", htmlContent);

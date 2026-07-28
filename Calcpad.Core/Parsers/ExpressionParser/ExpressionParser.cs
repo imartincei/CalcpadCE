@@ -92,6 +92,9 @@ namespace Calcpad.Core
             {
                 while (++_currentLine < lineCount)
                 {
+                    // #UI metadata is scoped to the line that declared it. Clearing here
+                    // covers the paths that skip ParseLine, e.g. an unsatisfied condition.
+                    ResetUiState();
                     ref var currentLineCache = ref _lineCache[_currentLine];
                     var keyword = currentLineCache.Keyword;
                     if (keyword == Keyword.SkipLine)
@@ -176,7 +179,8 @@ namespace Calcpad.Core
                             tokens = _lineCache[_currentLine].Tokens;
                         else
                         {
-                            var skipChars = keyword == Keyword.Const ? 7 : _condition.KeywordLength;
+                            var skipChars = keyword == Keyword.Ui ? _uiSkipChars :
+                                keyword == Keyword.Const ? 7 : _condition.KeywordLength;
                             tokens = GetTokens(textSpan[skipChars..]);
                             if (_isMarkdownOn)
                                 ParseMarkdown(tokens);
@@ -387,7 +391,17 @@ namespace Calcpad.Core
                         if (_isVal != 1)
                         {
                             htmlId = HtmlId;
-                            AppendHtmlLineStart(lineType, isIndent);
+                            // Line level attributes describe one control, so they only apply
+                            // when the line declares exactly one; the per control attributes
+                            // on the inputs themselves are what the preview script reads.
+                            if (HasUiControls)
+                            {
+                                htmlId = EnableUi
+                                    ? _lineUiControls.Count == 1 ? htmlId + GetUiAttributes(_lineUiControls[0]) : htmlId
+                                    : AddReportStyle(_lineUiControls[0], htmlId);
+                            }
+
+                            AppendHtmlLineStart(lineType, isIndent, htmlId);
                         }
                         if (lineType == TokenTypes.Html && !string.IsNullOrEmpty(htmlId))
                             tokens[0] = new Token(InsertAttribute(tokens[0].Value, htmlId), TokenTypes.Html);
@@ -398,6 +412,15 @@ namespace Calcpad.Core
                         ParseTokens(tokens, true, getXml);
                         if (_isVal != 1)
                             AppendHtmlLineEnd(lineType, keyword == Keyword.If);
+
+                        // A grid replaces the matrix rendering, so it goes after the closing
+                        // tag as a block level sibling rather than inside it.
+                        if (EnableUi && HasUiControls)
+                        {
+                            foreach (var ui in _lineUiControls)
+                                if (ui.Type == "datagrid")
+                                    _sb.AppendLine(BuildUiDatagrid(ui));
+                        }
                     }
                 }
                 else
@@ -412,15 +435,15 @@ namespace Calcpad.Core
                 }
             }
 
-            void AppendHtmlLineStart(TokenTypes lineType, bool isIndent)
+            void AppendHtmlLineStart(TokenTypes lineType, bool isIndent, string htmlId)
             {
                 if (isIndent)
                     _sb.Append("</div>");
 
                 if (lineType == TokenTypes.Heading)
-                    _sb.Append($"<h3{HtmlId}>");
+                    _sb.Append($"<h3{htmlId}>");
                 else if (lineType != TokenTypes.Html)
-                    _sb.Append($"<p{HtmlId}>");
+                    _sb.Append($"<p{htmlId}>");
             }
 
             void AppendHtmlLineEnd(TokenTypes lineType, bool indent)
@@ -466,6 +489,8 @@ namespace Calcpad.Core
                 _parser.SetVariable("Units", new RealValue(UnitsFactor()));
                 _previousKeyword = Keyword.None;
                 _isMarkdownOn = false;
+                _uiVarCounts.Clear();
+                _uiDeclarationIndex.Clear();
                 OpenXmlExpressions.Clear();
             }
             else
@@ -481,6 +506,7 @@ namespace Calcpad.Core
             _currentLine = _startLine - 1;
             _isVisible = true;
             _visibilityStack.Clear();
+            ResetUiState();
         }
 
         private void Finalize(int lineCount)
@@ -542,8 +568,13 @@ namespace Calcpad.Core
                 {
                     try
                     {
-                        var cacheID = token.CacheID;
-                        if (cacheID < 0)
+                        var ui = TakeUiControl(token.Value);
+                        // #UI lines can be rewritten by an override, so they never use the
+                        // equation cache - the cached form would be the pre-override one.
+                        var cacheID = ui is null ? token.CacheID : -1;
+                        if (ui is not null)
+                            _parser.Parse(PrepareUiExpression(ui, token.Value));
+                        else if (cacheID < 0)
                         {
                             _parser.Parse(token.Value);
                             if (isLoop)
@@ -564,6 +595,11 @@ namespace Calcpad.Core
                             else
                             {
                                 var html = _parser.ToHtml();
+                                if (EnableUi && ui is not null)
+                                    html = ui.Type == "datagrid" ?
+                                        StripDatagridRhs(html) :
+                                        InjectUiInput(ui, html);
+
                                 if (getXml && Settings.Math.FormatEquations)
                                 {
                                     var xml = _parser.ToXml();

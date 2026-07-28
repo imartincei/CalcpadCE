@@ -244,6 +244,21 @@
         "icon": "$(eye)"
       },
       {
+        "command": "vscode-calcpad.toggleUiMode",
+        "title": "CalcpadCE: Toggle #UI Input Mode",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "vscode-calcpad.toggleUiReport",
+        "title": "CalcpadCE: Toggle #UI Report Pane",
+        "icon": "$(book)"
+      },
+      {
+        "command": "vscode-calcpad.saveUiValues",
+        "title": "CalcpadCE: Save #UI Values to Document",
+        "icon": "$(save)"
+      },
+      {
         "command": "vscode-calcpad.focusPreviewToLine",
         "title": "CalcpadCE: Focus Preview to Line",
         "icon": "$(target)"
@@ -372,7 +387,7 @@
           "group": "navigation"
         },
         {
-          "command": "vscode-calcpad.showInsert",
+          "command": "vscode-calcpad.toggleUiMode",
           "when": "resourceLangId == plaintext || resourceLangId == calcpad",
           "group": "navigation"
         },
@@ -385,17 +400,27 @@
           "command": "vscode-calcpad.previewUnwrapped",
           "when": "resourceLangId == plaintext || resourceLangId == calcpad",
           "group": "navigation"
-        },
-        {
-          "command": "vscode-calcpad.insertImage",
-          "when": "resourceLangId == plaintext || resourceLangId == calcpad",
-          "group": "navigation"
         }
       ],
       "webview/context": [
         {
           "command": "vscode-calcpad.viewWebviewSource",
           "when": "webviewId == htmlPreview || webviewId == htmlPreviewUnwrapped",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.toggleUiReport",
+          "when": "webviewId == htmlPreviewUi",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.saveUiValues",
+          "when": "webviewId == htmlPreviewUi",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.toggleUiMode",
+          "when": "webviewId == htmlPreviewUi || webviewId == htmlPreviewUiReport",
           "group": "navigation"
         }
       ],

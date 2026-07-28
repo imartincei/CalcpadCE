@@ -301,3 +301,30 @@ export interface ConvertResult {
     html: string;
     errors: CalcpadError[];
 }
+
+export interface CpdzDecodeResponse {
+    /** The decoded Calcpad source. */
+    content: string;
+    /**
+     * True when the file is a composite archive bundling images. Its original bytes
+     * must be passed back on encode, or those images are lost.
+     */
+    composite: boolean;
+}
+
+export interface CpdzEncodeResponse {
+    /** Base64 of the encoded file's bytes. */
+    data: string;
+}
+
+/** Interactive `#UI` options for a convert request. */
+export interface UiConvertOptions {
+    /** Render `#UI` lines as controls and hide `#post` content. */
+    enableUi?: boolean;
+    /**
+     * Values to substitute, keyed by the control identity the preview reports in
+     * `data-ui-var` (`"L:1"`, or `"L:1:2"` for the second pass of a loop). A bare
+     * `"L"` covers every declaration of that name.
+     */
+    uiOverrides?: Record<string, string>;
+}

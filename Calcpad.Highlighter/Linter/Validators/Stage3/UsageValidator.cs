@@ -210,13 +210,22 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
                 var trimmed = line.Trim();
 
+                // Most directives take no expression, but conditions (#hide x ≡ 5), loop
+                // bounds and #UI assignments do, and the identifiers in those still have to
+                // resolve. Check from the expression onwards, skipping the keyword itself.
+                // Captured before Apply so that the condition of '#noc x ≡ 5' is still checked;
+                // it is evaluated by the parser even though the block it opens is not.
+                var wasNoCalculation = directives.Output == OutputMode.NoCalculation;
+                var expressionStart = 0;
                 if (LineParser.IsDirectiveLine(trimmed))
                 {
                     directives.Apply(trimmed);
-                    continue;
+                    expressionStart = LineParser.GetDirectiveExpressionStart(line);
+                    if (expressionStart < 0)
+                        continue;
                 }
 
-                if (directives.Output == OutputMode.NoCalculation)
+                if (wasNoCalculation)
                     continue;
 
                 // Skip undefined variable checks for function definitions with command blocks
@@ -235,6 +244,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
                 foreach (var token in tokens)
                 {
+                    if (token.Column < expressionStart)
+                        continue;
+
                     // Skip LocalVariable tokens - these are function params, loop vars, command scope vars
                     // The tokenizer has already identified them as locally scoped
                     if (token.Type == TokenType.LocalVariable)

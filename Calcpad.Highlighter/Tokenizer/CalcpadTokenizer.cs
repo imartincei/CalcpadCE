@@ -523,11 +523,19 @@ namespace Calcpad.Highlighter.Tokenizer
             // Track that a code token has been seen (non-comment content).
             // This must happen before TrackDefinitions so the flag is available
             // for the next token's ResolveType call.
+            // What the flag marks is the first identifier position on the line, so only a
+            // token that can occupy a value position ends it. Directive keywords, brackets
+            // and operators do not: the expression a directive introduces starts after the
+            // keyword, and after its JSON block in the case of #UI. Without this,
+            // "#UI a = 5" resolves 'a' as the Are unit while a bare "a = 5" correctly
+            // resolves it as a variable definition.
             if (_beforeFirstCodeToken &&
                 type != TokenType.Comment && type != TokenType.Tag &&
                 type != TokenType.HtmlComment && type != TokenType.HtmlContent &&
                 type != TokenType.Css && type != TokenType.JavaScript &&
-                type != TokenType.Svg)
+                type != TokenType.Svg &&
+                type != TokenType.Keyword && type != TokenType.ControlBlockKeyword &&
+                type != TokenType.Bracket && type != TokenType.Operator)
             {
                 _beforeFirstCodeToken = false;
             }

@@ -51,6 +51,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="Fonts\**\*.*" />
+    <!-- jspreadsheet-ce + jsuites, inlined by BundledUiAssets so #UI datagrids
+         render offline and inside the sandboxed preview iframe. -->
+    <Content Include="UiAssets\**\*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="UiAssets\**\*.*" />
+    <Content Remove="UiAssets\README.md" />
+    <EmbeddedResource Remove="UiAssets\README.md" />
+    <None Include="UiAssets\README.md" />
   </ItemGroup>
 
   <!-- Exclude non-.NET subdirectories from dotnet build/publish output -->

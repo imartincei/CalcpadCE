@@ -104,15 +104,13 @@ namespace Calcpad.Highlighter.Tokenizer
                         return TokenType.Variable;
                     // If not a known variable, fall back to unit if it's a valid unit name
                     // This handles cases like "5*ft" where ft should be a unit (not a variable)
-                    // Exceptions:
-                    // - After #const keyword, the identifier is a variable definition,
-                    //   not a unit reference (e.g., "#const h = 6" where h is "hour" unit)
-                    // - Before the first code token on a line, the identifier is likely a
-                    //   variable definition (e.g., "a = 42" where "a" is also the Are unit).
-                    //   Falling back to Units here would prevent it from entering _definedVariables,
-                    //   causing all subsequent uses to cascade as Units too.
+                    // Exception: at the first identifier position on a line the identifier is
+                    // a variable definition (e.g. "a = 42", or "#const h = 6" and "#UI L = 10m"
+                    // where the directive keyword precedes it). Falling back to Units there
+                    // would keep it out of _definedVariables, cascading every later use to
+                    // Units as well. Positions after the first still resolve units normally,
+                    // so the "ft" in "x = 5*ft" stays a unit.
                     if (IsKnownUnit(text) &&
-                        !_state.Keyword.Equals("#const", StringComparison.OrdinalIgnoreCase) &&
                         !_beforeFirstCodeToken &&
                         !_state.IsDataExchangeKeyword)
                         return TokenType.Units;
