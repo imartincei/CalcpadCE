@@ -64,6 +64,7 @@ nav:
     - PDF Export: new-pdf-export.md
     - Includes and File Reads: new-includes.md
     - Linter and Diagnostics: new-linter.md
+    - UI Mode: new-ui-mode.md
     - Table of Contents: new-table-of-contents.md
     - Running the Server: new-web-deployment.md
     - Metadata Comments: new-metadata-comments.md

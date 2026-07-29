@@ -419,7 +419,10 @@ namespace Calcpad.Core
                         {
                             foreach (var ui in _lineUiControls)
                                 if (ui.Type == "datagrid")
+                                {
+                                    ResolveDatagridShape(ui);
                                     _sb.AppendLine(BuildUiDatagrid(ui));
+                                }
                         }
                     }
                 }
@@ -596,18 +599,23 @@ namespace Calcpad.Core
                             {
                                 var html = _parser.ToHtml();
                                 if (EnableUi && ui is not null)
+                                    // The grid follows the line as a sibling, so the equation
+                                    // it stands for leaves nothing behind.
                                     html = ui.Type == "datagrid" ?
-                                        StripDatagridRhs(html) :
+                                        string.Empty :
                                         InjectUiInput(ui, html);
 
-                                if (getXml && Settings.Math.FormatEquations)
+                                if (html.Length != 0)
                                 {
-                                    var xml = _parser.ToXml();
-                                    OpenXmlExpressions.Add(xml);
-                                    _sb.Append($"<span class=\"eq\" id=\"eq-{OpenXmlExpressions.Count - 1}\">{html}</span>");
+                                    if (getXml && Settings.Math.FormatEquations)
+                                    {
+                                        var xml = _parser.ToXml();
+                                        OpenXmlExpressions.Add(xml);
+                                        _sb.Append($"<span class=\"eq\" id=\"eq-{OpenXmlExpressions.Count - 1}\">{html}</span>");
+                                    }
+                                    else
+                                        _sb.Append($"<span class=\"eq\">{html}</span>");
                                 }
-                                else
-                                    _sb.Append($"<span class=\"eq\">{html}</span>");
                             }
                         }
                     }

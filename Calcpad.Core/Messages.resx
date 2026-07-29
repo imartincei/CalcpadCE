@@ -592,6 +592,9 @@
   <data name="The_UI_keyword_requires_a_variable_assignment" xml:space="preserve">
     <value>The #UI keyword requires a variable assignment.</value>
   </data>
+  <data name="UI_directives_do_not_support_expressions" xml:space="preserve">
+    <value>#UI directives do not support expressions.</value>
+  </data>
   <data name="String_mode_is_not_supported_by_the_UI_keyword" xml:space="preserve">
     <value>String mode is not supported by the #UI keyword.</value>
   </data>

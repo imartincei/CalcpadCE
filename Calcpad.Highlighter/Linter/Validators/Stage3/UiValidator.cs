@@ -63,12 +63,26 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 jsonEnd = braceEnd + 1;
             }
 
-            var assignment = line.AsSpan(jsonEnd);
-            var eqIndex = assignment.IndexOf('=');
-            if (eqIndex < 0 || assignment[..eqIndex].IsWhiteSpace())
-                Reporter(result, lineIndex, jsonEnd, end).Warn(Messages.The_UI_keyword_requires_a_variable_assignment);
-            else if (assignment[..eqIndex].TrimEnd().EndsWith("$", StringComparison.Ordinal))
-                Reporter(result, lineIndex, jsonEnd, end).Warn(Messages.String_mode_is_not_supported_by_the_UI_keyword);
+            var reporter = Reporter(result, lineIndex, jsonEnd, end);
+            var assignments = UiSyntax.EnumerateAssignments(line.AsSpan(jsonEnd));
+            if (assignments.Count == 0)
+            {
+                reporter.Warn(Messages.The_UI_keyword_requires_a_variable_assignment);
+                return;
+            }
+            foreach (var (name, rhs) in assignments)
+            {
+                if (name.EndsWith('$'))
+                {
+                    reporter.Warn(Messages.String_mode_is_not_supported_by_the_UI_keyword);
+                    return;
+                }
+                if (!UiSyntax.IsValue(rhs))
+                {
+                    reporter.Warn(Messages.UI_directives_do_not_support_expressions);
+                    return;
+                }
+            }
         }
 
         private static bool ValidateJson(string json, DirectiveJsonReporter reporter)

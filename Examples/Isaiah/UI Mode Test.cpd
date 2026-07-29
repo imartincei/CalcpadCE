@@ -24,7 +24,7 @@ L
 W
 
 'mode - explicit "number" (the only accepted value)
-#UI {"mode": "number"} n = 4
+#UI {"mode":"number"} n = 4
 n
 
 'style - class applied only in UI mode
@@ -50,7 +50,14 @@ M
 'type "datagrid" - shape auto-detected from vector()/matrix() constructors
 #UI Z = vector(5)
 Z
+
 #UI G = matrix(3; 4)
+G
+
+'Custom rows/cols
+#UI r = 5
+#UI c = 6
+#UI {"type":"datagrid"} G = matrix(r; c)
 G
 
 'type "datagrid" - explicit rows, columns, columnHeaders, rowHeaders
@@ -66,7 +73,7 @@ grade
 E
 
 'type "checkbox" toggles between 1 and 0
-#UI {"type": "checkbox", "style": "switch"} flag = 1
+#UI {"type": "checkbox", "style": "switch"} 'Flag'flag = 1
 flag
 
 '<h3>2. #UI inside a macro</h3>
@@ -102,7 +109,11 @@ E2
 
 #UI {"type": "entry"}
 
-'<h3>5. #UI with assignment but not a simple numerical value - errors from Core</h3>
-'<p>Expected error: "#UI directives do not support expressions."</p>
+'<h3>5. #UI assigned an expression rather than a value - errors in both modes</h3>
+'<p>Expected error: "#UI directives do not support expressions." A control overwrites the
+'right hand side with whatever was entered, so only a value, a vector or a matrix can be
+'annotated. Reported by the linter as well.</p>
 
-#UI {"type": "entry"} k = sin(E2)
+#UI {"type": "entry"} k = max(E2)
+#UI {"type": "entry"} k2 = 2*E2
+#UI k3 = [1; sqrt(4)]

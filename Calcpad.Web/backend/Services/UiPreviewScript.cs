@@ -166,8 +166,44 @@ namespace Calcpad.Server.Services
         });
     });
 
+    // What a control may produce. The entered text replaces the right hand side of the
+    // assignment in the source, and #UI only annotates values, so anything that is not a
+    // number would turn the line into an error. There is no exponent form - MathParser
+    // reads the 'e' of 2.5e6 as a unit. PARTIAL additionally passes the states a number
+    // goes through while it is being typed - '-', '1.' - which are filtered on the way in
+    // but never posted.
+    var NUMBER = /^[-+]?(\d+\.?\d*|\.\d+)$/;
+    var PARTIAL = /^[-+]?(\d+\.?\d*|\.\d*)?$/;
+
     document.querySelectorAll('.calcpad-ui-input').forEach(function (input) {
-        input.addEventListener('change', function () { change(input, input.value); });
+        input.setAttribute('inputmode', 'decimal');
+        // The text the filter last let through, and the last complete number, which an
+        // abandoned edit - a field left holding '-' - falls back to.
+        var typed = input.value;
+        var committed = input.value;
+        input.addEventListener('input', function () {
+            if (PARTIAL.test(input.value)) {
+                typed = input.value;
+                return;
+            }
+            var caret = input.selectionStart - (input.value.length - typed.length);
+            input.value = typed;
+            try { input.setSelectionRange(caret, caret); } catch (e) { }
+        });
+        input.addEventListener('change', function () {
+            // '12.' is a number as far as the field is concerned, but not as the right
+            // hand side of the assignment it is written into.
+            var value = input.value.trim().replace(/\.$/, '');
+            if (!NUMBER.test(value)) {
+                input.value = committed;
+                typed = committed;
+                return;
+            }
+            input.value = value;
+            committed = value;
+            typed = value;
+            change(input, value);
+        });
         input.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') input.blur();
         });
@@ -232,6 +268,15 @@ namespace Calcpad.Server.Services
                 data: data,
                 minDimensions: [cols, rows],
                 columns: columns,
+                // The grid is sized by the #UI directive's row/col count, so the ways a user
+                // could resize or annotate it are taken out of the context menu and keyboard.
+                allowInsertRow: false,
+                allowManualInsertRow: false,
+                allowDeleteRow: false,
+                allowInsertColumn: false,
+                allowManualInsertColumn: false,
+                allowDeleteColumn: false,
+                allowComments: false,
                 tableOverflow: true,
                 tableWidth: Math.min(cols * 85 + 50, 600) + 'px',
                 tableHeight: Math.min(rows * 28 + 30, 400) + 'px'
@@ -243,10 +288,10 @@ namespace Calcpad.Server.Services
 
             var created = jspreadsheet(container, {
                 worksheets: [worksheet],
+                about: false,
+                allowExport: false,
                 onchange: emit,
                 onpaste: emit,
-                oninsertrow: emit,
-                ondeleterow: emit,
                 onselection: trackPosition,
                 onblur: flushNow
             });
@@ -272,7 +317,7 @@ namespace Calcpad.Server.Services
                     emit();
                     return;
                 }
-                var grid = sheet.getData ? sheet.getData() : [];
+                var grid = numbersOnly(sheet, sheet.getData ? sheet.getData() : []);
                 var literal = grid.length === 1 ?
                     '[' + grid[0].join('; ') + ']' :
                     '[' + grid.map(function (row) { return row.join('; '); }).join(' | ') + ']';
@@ -285,6 +330,23 @@ namespace Calcpad.Server.Services
                 flush();
             }
         });
+    }
+
+    // Every cell becomes an element of a matrix literal, so one holding text - typed or
+    // pasted in - is put back to 0, in the grid as well as in what gets posted.
+    function numbersOnly(sheet, grid) {
+        for (var r = 0; r < grid.length; r++) {
+            for (var c = 0; c < grid[r].length; c++) {
+                var cell = String(grid[r][c]).trim();
+                if (NUMBER.test(cell)) {
+                    grid[r][c] = cell;
+                    continue;
+                }
+                grid[r][c] = '0';
+                if (sheet.setValueFromCoords) sheet.setValueFromCoords(c, r, '0');
+            }
+        }
+        return grid;
     }
 
     function splitAttr(el, name) {

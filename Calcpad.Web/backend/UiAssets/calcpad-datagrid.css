@@ -1,0 +1,142 @@
+/* Customizations for the #UI datagrid widget. Inlined after the jsuites and
+   jspreadsheet stylesheets, so a rule here outranks the library's at equal
+   specificity - which the template's own style block does not, being at the top
+   of the head while the library CSS goes in at the end of it.
+
+   The grid lives in the preview document, where the dark theme is the
+   "dark-theme" class on the body element; scope a rule with ".dark-theme" to
+   theme it.
+
+   Keep html tags, and above all the head and body ones, out of this file even
+   inside a comment: the whole of it is inlined into the head, ahead of the real
+   tags, and extractBodyHtml goes looking for the first of those. */
+
+/* Dark theme. jspreadsheet ships light only - white cells, #f3f3f3 headers,
+   #ccc grid lines, black selection outlines - so every colour it sets has to be
+   restated here. The palette is the template's: #1e1e1e page, #252526 surfaces,
+   #3e3e42 borders, #d4d4d4 text. */
+
+.dark-theme .jss_worksheet {
+    background-color: #252526;
+    border-right-color: #3e3e42;
+    border-bottom-color: #3e3e42;
+}
+
+.dark-theme .jss_worksheet > thead > tr > td,
+.dark-theme .jss_worksheet > tbody > tr > td,
+.dark-theme .jss_worksheet > tfoot > tr > td {
+    border-top-color: #3e3e42;
+    border-left-color: #3e3e42;
+    color: #d4d4d4;
+}
+
+/* Headers, row numbers and the select-all corner. */
+.dark-theme .jss_worksheet > thead > tr > td,
+.dark-theme .jss_worksheet > tfoot > tr > td,
+.dark-theme .jss_worksheet > tbody > tr > td:first-child {
+    background-color: #2d2d30;
+}
+
+.dark-theme .jss_worksheet > thead > tr > td.selected,
+.dark-theme .jss_worksheet > tbody > tr.selected > td:first-child {
+    background-color: #4a4a50;
+}
+
+/* The library tints the selection with black at 5% and outlines it in solid
+   black, neither of which registers on a dark surface. */
+.dark-theme .jss_worksheet .selection,
+.dark-theme .jss_worksheet .highlight {
+    background-color: rgba(79, 193, 255, 0.14);
+}
+
+.dark-theme .jss_worksheet .highlight-selected {
+    background-color: transparent;
+}
+
+.dark-theme .jss_worksheet .highlight-top {
+    border-top-color: #4fc1ff;
+    box-shadow: 0 -1px #3e3e42;
+}
+
+.dark-theme .jss_worksheet .highlight-left {
+    border-left-color: #4fc1ff;
+    box-shadow: -1px 0 #3e3e42;
+}
+
+.dark-theme .jss_worksheet .highlight-right {
+    border-right-color: #4fc1ff;
+}
+
+.dark-theme .jss_worksheet .highlight-bottom {
+    border-bottom-color: #4fc1ff;
+}
+
+.dark-theme .jss_worksheet .selection-top,
+.dark-theme .jss_worksheet .copying-top {
+    border-top-color: #d4d4d4;
+}
+
+.dark-theme .jss_worksheet .selection-left,
+.dark-theme .jss_worksheet .copying-left {
+    border-left-color: #d4d4d4;
+}
+
+.dark-theme .jss_worksheet .selection-right,
+.dark-theme .jss_worksheet .copying-right {
+    border-right-color: #d4d4d4;
+}
+
+.dark-theme .jss_worksheet .selection-bottom,
+.dark-theme .jss_worksheet .copying-bottom {
+    border-bottom-color: #d4d4d4;
+}
+
+/* The fill handle: a black square outlined in white, which reads as a white
+   dot on dark until both are swapped. */
+.dark-theme .jss_corner {
+    background-color: #4fc1ff;
+    border-color: #1e1e1e;
+}
+
+/* The cell editor is a bare input, so the template's dark styling for text
+   inputs - a filled yellow-brown box - would otherwise cut into the grid. */
+.dark-theme .jss_worksheet > tbody > tr > td > input,
+.dark-theme .jss_worksheet > tbody > tr > td > textarea {
+    background-color: transparent;
+    color: #d4d4d4;
+    box-shadow: none;
+}
+
+.dark-theme .jss_content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dark-theme .jss_content::-webkit-scrollbar-thumb {
+    background: rgba(121, 121, 121, 0.4);
+}
+
+.dark-theme .jss_worksheet .error {
+    border-color: #f48771;
+}
+
+/* The right click menu is a jsuites component, outside the grid element but
+   still inside the themed document. */
+.dark-theme .jcontextmenu {
+    background: #252526;
+    color: #d4d4d4;
+    border-color: #3e3e42;
+    box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.dark-theme .jcontextmenu > div a {
+    color: #d4d4d4;
+}
+
+.dark-theme .jcontextmenu > div:hover {
+    background: #37373d;
+}
+
+.dark-theme .jcontextmenu .jcontextmenu-disabled a,
+.dark-theme .jcontextmenu .jcontextmenu-disabled::before {
+    color: #6b6b6b;
+}

@@ -84,6 +84,80 @@ A local webserver will spawn to serve the rendered documentation:
 
 `mkdocs serve`
 
+## Customizing the `#UI` Datagrid
+
+A `#UI` datagrid is a [jspreadsheet CE](https://github.com/jspreadsheet/ce) 5.0.4 widget
+hydrated in the preview by `UiPreviewScript`. The `"style"` class of the `#UI` directive lands on
+the outer `.calcpad-ui-datagrid` container only — everything inside the grid is the library's
+markup, so restyling it means writing CSS against the library's own classes.
+
+That CSS belongs in **`Calcpad.Web/backend/UiAssets/calcpad-datagrid.css`**.
+
+### Why that file and not `template.html`
+
+`BundledUiAssets.GetHeadMarkup()` inlines the grid assets into `<head>` immediately before
+`</head>` (see the `enableUi` block in `Calcpad.Web/backend/Services/CalcpadService.cs`), while
+the template's own `<style>` block sits at the *top* of `<head>`. Rules in `template.html`
+therefore lose to jspreadsheet's at equal specificity — which is why the preview CSS in there
+carries so many `!important`s.
+
+`calcpad-datagrid.css` is inlined **last**, after both `jsuites.min.css` and
+`jspreadsheet.min.css`, so plain rules win on source order alone. It is also optional: if it
+ever goes missing from a deployment the grids still render. That is unlike the four library
+files, whose absence disables datagrids entirely (`BundledUiAssets` logs a warning and returns
+no head markup rather than emitting a grid container with no library behind it).
+
+### Selectors
+
+jspreadsheet CE 5.0.4 exposes one custom property, `--jss-border-color`; everything else is
+plain rules.
+
+| Part | Selector |
+|------|----------|
+| Whole widget | `.jss_container`, `.jss_spreadsheet` |
+| Scroll box | `.jss_content` |
+| Cells | `.jss_worksheet > tbody > tr > td` |
+| Column headers | `.jss_worksheet > thead > tr > td` |
+| Row headers | `.jss_worksheet > tbody > tr > td:first-child` |
+| Corner / select-all | `.jss_corner`, `.jss_selectall` |
+| Context menu | `.jcontextmenu`, `.jcontextmenu div` |
+| CE footer link | `.jss_about` |
+
+### Things to know when writing rules
+
+- **Dark mode** is `class="dark-theme"` on the `<body>` of the preview document, so a themed
+  rule is scoped `.dark-theme .jss_worksheet > tbody > tr > td { … }`. The file already carries a
+  full dark palette — `#1e1e1e` page, `#252526` surfaces, `#3e3e42` borders, `#d4d4d4` text,
+  `#4fc1ff` selection — matching the template's. jspreadsheet ships light only, so every colour
+  it sets has to be restated; extend those rules rather than starting a second palette.
+- **Column widths are inline.** The script sets `width: 80` per column, plus `tableWidth` and
+  `tableHeight`, on the worksheet definition in `UiPreviewScript.cs`. Those become inline
+  `<col>`/element styles, which CSS cannot override without `!important` — change them in
+  `UiPreviewScript.cs` instead.
+- **No HTML tags in the file, not even inside a comment.** The whole stylesheet is inlined into
+  `<head>` ahead of the real tags, and `extractBodyHtml` looks for the first `<head>`/`<body>`
+  it finds.
+
+### Rebuilding
+
+The head markup is cached per server process, so a changed stylesheet needs a restart.
+
+```sh
+dotnet build Calcpad.Web/backend/Calcpad.Server.csproj
+```
+
+`UiAssets/**` is both `Content` (copied to the output directory) and an `EmbeddedResource`, and
+`BundledUiAssets.Load` prefers the filesystem copy in `<output>/UiAssets/`. For a quick
+iteration you can edit that copy directly and restart the server — no rebuild — but the edit
+must go back into `Calcpad.Web/backend/UiAssets/` to survive.
+
+Then re-stage the sidecar for whichever host you are testing:
+
+```sh
+cd Calcpad.Web/frontend/calcpad-desktop && ./stage-sidecar.sh   # desktop app
+cd Calcpad.Web/frontend/vscode-calcpad && npm run sync-server   # VS Code extension
+```
+
 ## Creating a Release
 
 Releasing is automated via GitHub Actions.

@@ -339,35 +339,42 @@ namespace Calcpad.Highlighter.Snippets.Data
             },
             new SnippetItem
             {
-                Insert = "#UI",
-                Description = "Expose the following assignment as an input control in UI mode, e.g. '#UI L = 10m'. Ignored when rendering a report.",
+                Insert = "#UI L = 10m",
+                Description = "Expose the following assignment as an input control in UI mode. Ignored when rendering a report.",
                 Category = "UI Inputs",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
-                Insert = "#UI {\"type\": \"datagrid\", \"rows\": 2, \"columns\": 3, \"columnHeaders\": [\"a\", \"b\", \"c\"]} ",
+                Insert = "#UI {\"type\": \"datagrid\", \"rows\": 2, \"columns\": 3, \"columnHeaders\": [\"a\", \"b\", \"c\"]} M = [1; 2; 3 | 4; 5; 6]",
                 Description = "Editable grid for a vector or matrix. Rows and columns are auto-detected from the right hand side when omitted.",
                 Category = "UI Inputs",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
-                Insert = "#UI {\"type\": \"dropdown\", \"keys\": [\"Low\", \"High\"], \"values\": [\"1\", \"2\"]} ",
+                Insert = "#UI v = [1; 2; 3]",
+                Description = "Editable grid whose size is auto-detected from the vector or matrix assigned to it.",
+                Category = "UI Inputs",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#UI {\"type\": \"dropdown\", \"keys\": [\"Low\", \"High\"], \"values\": [\"1\", \"2\"]} x = 1",
                 Description = "Drop-down list. 'keys' are the labels shown, 'values' are substituted into the calculation.",
                 Category = "UI Inputs",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
-                Insert = "#UI {\"type\": \"radio\", \"keys\": [\"Steel\", \"Concrete\"], \"values\": [\"200GPa\", \"25GPa\"]} ",
+                Insert = "#UI {\"type\": \"radio\", \"keys\": [\"Steel\", \"Concrete\"], \"values\": [\"200GPa\", \"25GPa\"]} E = 200GPa",
                 Description = "Radio button group. 'keys' are the labels shown, 'values' are substituted into the calculation.",
                 Category = "UI Inputs",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
-                Insert = "#UI {\"type\": \"checkbox\"} ",
+                Insert = "#UI {\"type\": \"checkbox\"} b = 1",
                 Description = "Checkbox toggling the value between 1 and 0.",
                 Category = "UI Inputs",
                 KeywordType = "Keyword"

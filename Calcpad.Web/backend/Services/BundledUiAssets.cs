@@ -15,6 +15,14 @@ namespace Calcpad.Server.Services
         // Load order matters: jspreadsheet reads the jSuites global at parse time.
         private static readonly string[] StyleSheets = ["jsuites.min.css", "jspreadsheet.min.css"];
         private static readonly string[] Scripts = ["jsuites.min.js", "jspreadsheet.min.js"];
+        /// <summary>Our own datagrid rules, inlined last so they override the library's.</summary>
+        private const string CustomStyleSheet = "calcpad-datagrid.css";
+
+        // jSuites installs the document listeners that dismiss an open context menu once
+        // per window, guarding on this global. The iframe previews reuse their window
+        // across document.write, so the listeners would stay bound to the discarded
+        // document and clicking away would leave the datagrid's menu open.
+        private const string ResetStateControl = "<script>delete window.jSuitesStateControl;</script>";
 
         private static string? _cachedHeadMarkup;
         private static readonly object _lock = new();
@@ -32,7 +40,7 @@ namespace Calcpad.Server.Services
             {
                 if (_cachedHeadMarkup != null) return _cachedHeadMarkup;
 
-                var sb = new StringBuilder();
+                var sb = new StringBuilder(ResetStateControl);
                 var missing = new List<string>();
                 foreach (var (fileName, tag) in StyleSheets.Select(f => (f, "style"))
                              .Concat(Scripts.Select(f => (f, "script"))))
@@ -45,6 +53,12 @@ namespace Calcpad.Server.Services
                     }
                     sb.Append('<').Append(tag).Append('>').Append(content).Append("</").Append(tag).Append('>');
                 }
+
+                // Unlike the libraries this one is ours to edit, and a grid without it is
+                // still a working grid, so it is not part of the completeness check.
+                var custom = Load(CustomStyleSheet);
+                if (custom != null)
+                    sb.Append("<style>").Append(custom).Append("</style>");
 
                 if (missing.Count > 0)
                 {

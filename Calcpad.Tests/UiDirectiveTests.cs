@@ -76,6 +76,43 @@ namespace Calcpad.Tests
             Assert.DoesNotContain("value=\"10 m\"", html);
         }
 
+        /// <summary>
+        /// Only the number belongs in the input. A compound unit wraps its parts in a span
+        /// and the angle units carry no markup at all, so neither the first tag nor the
+        /// first &lt;i&gt; marks where the value ends.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI q = 3kN/m", "3")]
+        [InlineData("#UI a = 9.81m/s^2", "9.81")]
+        [InlineData("#UI T = 20°C", "20")]
+        [InlineData("#UI t = 12°", "12")]
+        [InlineData("#UI r = 50%", "50")]
+        [InlineData("#UI z = -3.5", "-3.5")]
+        [InlineData("#UI n = 4", "4")]
+        public void Entry_HoldsTheValueWithoutAnyOfTheUnit(string source, string value)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.Contains($"value=\"{value}\"", html);
+            // Unit markup that ended up inside the attribute would arrive encoded.
+            Assert.DoesNotContain("&lt;", html);
+        }
+
+        /// <summary>
+        /// A control overwrites the right hand side with what was entered, so it can only
+        /// annotate a literal value - never something computed.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI {\"type\": \"entry\"} k = sin(2)")]
+        [InlineData("#UI k = 1 + 2")]
+        [InlineData("#UI k = 2*L\nL = 1m")]
+        [InlineData("#UI v = [1; sqrt(4)]")]
+        public void AssignedExpression_IsAnError(string source)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.Contains("do not support expressions", html);
+            Assert.DoesNotContain("calcpad-ui", html);
+        }
+
         [Fact]
         public void InlineComment_IsNotMistakenForTheAssignment()
         {
@@ -174,6 +211,35 @@ namespace Calcpad.Tests
             Assert.Contains("class=\"calcpad-ui-input highlight\"",
                 Render("#UI {\"style\": \"highlight\"} d = 2m", enableUi: true));
 
+        /// <summary>
+        /// Only an entry shows its variable name - it labels the number in the box. The
+        /// other controls stand on their own, so the author labels them with plain text.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI {\"type\": \"checkbox\"} flag = 1", "flag")]
+        [InlineData("#UI {\"type\": \"dropdown\", \"keys\": [\"Low\"], \"values\": [\"1\"]} grade = 1", "grade")]
+        [InlineData("#UI {\"type\": \"radio\", \"keys\": [\"Steel\"], \"values\": [\"200GPa\"]} E = 200GPa", "E")]
+        [InlineData("#UI v = [1; 2; 3]", "v")]
+        public void Control_HidesTheVariableNameInUiMode(string source, string name)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.DoesNotContain($">{name}<", html);
+            Assert.DoesNotContain(" = ", html);
+        }
+
+        [Fact]
+        public void Entry_KeepsTheVariableNameInUiMode() =>
+            Assert.Contains(" = ", Render("#UI L = 10m", enableUi: true));
+
+        [Fact]
+        public void Radio_DropsTheUnitOfTheSelectedValue() =>
+            Assert.DoesNotContain("<i>",
+                Render("#UI {\"type\": \"radio\", \"keys\": [\"Steel\"], \"values\": [\"200GPa\"]} E = 200GPa", enableUi: true));
+
+        [Fact]
+        public void Datagrid_LeavesNoEquationBehindInUiMode() =>
+            Assert.DoesNotContain("<span class=\"eq\">", Render("#UI v = [1; 2; 3]", enableUi: true));
+
         [Fact]
         public void Checkbox_IsCheckedWhenTheValueIsOne()
         {
@@ -199,6 +265,33 @@ namespace Calcpad.Tests
             Assert.Contains("name=\"ui-radio-r:1\" value=\"2\"", html);
         }
 
+        [Fact]
+        public void Radio_ChecksTheOptionMatchingAUnitValue()
+        {
+            var html = Render("#UI {\"type\": \"radio\", \"keys\": [\"Steel\", \"Concrete\"], \"values\": [\"200GPa\", \"25GPa\"]} E = 200GPa", enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("value=\"200GPa\" checked", html);
+            Assert.Contains("value=\"25GPa\">", html);
+        }
+
+        [Fact]
+        public void Radio_OverrideReplacesTheWholeValueWithItsUnit()
+        {
+            var overrides = new Dictionary<string, string> { ["E:1"] = "25GPa" };
+            var html = Render("#UI {\"type\": \"radio\", \"keys\": [\"Steel\", \"Concrete\"], \"values\": [\"200GPa\", \"25GPa\"]} E = 200GPa\nE", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("value=\"25GPa\" checked", html);
+        }
+
+        [Fact]
+        public void Dropdown_OverrideReplacesTheWholeValueWithItsUnit()
+        {
+            var overrides = new Dictionary<string, string> { ["E:1"] = "25GPa" };
+            var html = Render("#UI {\"type\": \"dropdown\", \"keys\": [\"Steel\", \"Concrete\"], \"values\": [\"200GPa\", \"25GPa\"]} E = 200GPa\nE", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("<option value=\"25GPa\" selected>", html);
+        }
+
         [Theory]
         [InlineData("#UI v = [1; 2; 3]", 1, 3, "1;2;3")]
         [InlineData("#UI M = [1; 2; 3 | 4; 5; 6]", 2, 3, "1;2;3|4;5;6")]
@@ -209,6 +302,28 @@ namespace Calcpad.Tests
             var html = Render(source, enableUi: true);
             Assert.Contains($"data-ui-rows=\"{rows}\" data-ui-columns=\"{columns}\"", html);
             Assert.Contains($"data-ui-values=\"{values}\"", html);
+        }
+
+        [Theory]
+        [InlineData("#UI r = 3\n#UI c = 4\n#UI {\"type\": \"datagrid\"} G = matrix(r; c)", 3, 4)]
+        [InlineData("x = [1; 2; 3]\ny = [1; 2]\n#UI G = matrix(len(x); len(y))", 3, 2)]
+        [InlineData("n = 5\n#UI Z = vector(n)", 1, 5)]
+        public void Datagrid_ComputedSize_TakesItsShapeFromTheValue(string source, int rows, int columns)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains($"data-ui-rows=\"{rows}\" data-ui-columns=\"{columns}\"", html);
+        }
+
+        [Fact]
+        public void Datagrid_ComputedSize_KeepsTheEnteredValues()
+        {
+            // There is no literal in the source to write into, so the entered one replaces
+            // the whole constructor call.
+            var overrides = new Dictionary<string, string> { ["G:1"] = "[1; 2 | 3; 4]" };
+            var html = Render("#UI r = 2\n#UI {\"type\": \"datagrid\"} G = matrix(r; r)\nG", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("data-ui-values=\"1;2|3;4\"", html);
         }
 
         [Fact]

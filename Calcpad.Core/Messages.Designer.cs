@@ -1663,6 +1663,15 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
+        // /   Looks up a localized string similar to #UI directives do not support expressions..
+        // / </summary>
+        public static string UI_directives_do_not_support_expressions {
+            get {
+                return ResourceManager.GetString("UI_directives_do_not_support_expressions", resourceCulture);
+            }
+        }
+
+        // / <summary>
         // /   Looks up a localized string similar to String mode is not supported by the #UI keyword..
         // / </summary>
         public static string String_mode_is_not_supported_by_the_UI_keyword {

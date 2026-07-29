@@ -142,5 +142,14 @@ namespace Calcpad.Highlighter.Parsing
         {
             return c < 128 && AsciiTypes[c] == CharClass.Delimiter;
         }
+
+        /// <summary>
+        /// True for the characters ;|&amp;@:({[ that continue a line implicitly when they are the
+        /// last non-whitespace character outside a comment. Matches Calcpad.Core's line extensions.
+        /// </summary>
+        public static bool IsLineExtension(char c)
+        {
+            return IsDelimiter(c) || c == '(' || c == '{' || c == '[';
+        }
     }
 }

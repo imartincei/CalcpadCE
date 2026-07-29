@@ -65,6 +65,22 @@ namespace Calcpad.Tests.HighlighterTests
             Assert.Empty(Messages(source));
 
         [Fact]
+        public void EverySnippet_IsValidCode()
+        {
+            var snippets = Calcpad.Highlighter.Snippets.SnippetRegistry.AllSnippets
+                .Where(s => s.Category == "UI Inputs")
+                .Select(s => s.Insert)
+                .ToArray();
+
+            Assert.NotEmpty(snippets);
+            foreach (var snippet in snippets)
+                // CPD-3312 is inherent to a snippet on its own - nothing reads the variable it defines.
+                Assert.Empty(Lint(snippet).Diagnostics
+                    .Where(d => d.Code != "CPD-3312")
+                    .Select(d => $"{d.Code}: {d.Message}"));
+        }
+
+        [Fact]
         public void UnclosedBrace_IsReported() =>
             Assert.Contains("Missing closing brace", Assert.Single(Messages("#UI {\"type\": \"entry\" a = 1")));
 
@@ -101,6 +117,36 @@ namespace Calcpad.Tests.HighlighterTests
         [Fact]
         public void MissingAssignment_IsReported() =>
             Assert.Contains("requires a variable assignment", Assert.Single(Messages("#UI {\"type\": \"entry\"}")));
+
+        [Theory]
+        [InlineData("#UI {\"type\": \"entry\"} k = sin(E)")]
+        [InlineData("#UI k = 2*E")]
+        [InlineData("#UI k = E")]
+        [InlineData("#UI k = 1 + 2")]
+        [InlineData("#UI v = [1; 2*E]")]
+        [InlineData("#UI Z = 2*vector(3)")]
+        [InlineData("#UI G = matrix(2; 2) + 1")]
+        public void AssignedExpression_IsReported(string source) =>
+            Assert.Contains(Messages(source), m => m.Contains("do not support expressions"));
+
+        [Theory]
+        [InlineData("#UI L = 10m")]
+        [InlineData("#UI q = -3.5kN/m")]
+        [InlineData("#UI I = 2500000mm^4")]
+        [InlineData("#UI a = 9.81m/s^2")]
+        [InlineData("#UI t = 12°")]
+        [InlineData("#UI r = 50%")]
+        [InlineData("#UI v = [1; 2m; 3]")]
+        [InlineData("#UI M = [1; 2 | 3; 4]")]
+        [InlineData("#UI Z = vector(5)")]
+        [InlineData("#UI G = matrix(3; 4)")]
+        // A computed size is sized from the value the call produces, so it is a grid too.
+        [InlineData("#UI Z = vector(n)")]
+        [InlineData("#UI G = matrix(r; c)")]
+        [InlineData("#UI G = matrix(len(x); len(y))")]
+        [InlineData("#UI '2&middot;<i>r</i> ='d = 1")]
+        public void AssignedValue_IsAccepted(string source) =>
+            Assert.Empty(Messages(source));
 
         [Theory]
         [InlineData("#UI {\"rows\": -1} a = 1", "'rows' must not be negative")]

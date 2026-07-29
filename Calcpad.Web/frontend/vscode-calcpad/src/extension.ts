@@ -43,6 +43,9 @@ let uiPanel: vscode.WebviewPanel | undefined = undefined;
 let uiReportPanel: vscode.WebviewPanel | undefined = undefined;
 const uiOverrides = new UiOverrideStore();
 const uiOverridesDirty = new Set<string>();
+// Document the input form is currently showing, so its values can be prompted
+// about and dropped when the form closes.
+let uiPanelDocKey: string | undefined = undefined;
 
 type PreviewKind = 'regular' | 'unwrapped' | 'ui' | 'uiReport';
 
@@ -53,6 +56,65 @@ function previewPanelFor(kind: PreviewKind): vscode.WebviewPanel | undefined {
         case 'ui': return uiPanel;
         default: return uiReportPanel;
     }
+}
+
+/**
+ * Writes a document's entered #UI values into it as a uiOverrides metadata
+ * comment. Returns how many were written, or null when none were entered.
+ */
+async function saveUiValuesFor(document: vscode.TextDocument): Promise<number | null> {
+    const docKey = document.uri.toString();
+    const overrides = uiOverrides.toRecord(docKey);
+    if (!overrides) return null;
+
+    const original = document.getText();
+    const updated = writeUiOverrides(original, overrides);
+    if (updated !== original) {
+        const edit = new vscode.WorkspaceEdit();
+        edit.replace(
+            document.uri,
+            new vscode.Range(document.positionAt(0), document.positionAt(original.length)),
+            updated);
+        await vscode.workspace.applyEdit(edit);
+        // The values are only "saved" once they reach the file — a form filled in
+        // and left dirty in the editor is exactly what the user asked to avoid.
+        if (!document.isUntitled) await document.save();
+    }
+    uiOverridesDirty.delete(docKey);
+    return Object.keys(overrides).length;
+}
+
+/**
+ * Closing the input form discards the values entered into it — they only live in
+ * memory until written into the document — so offer to save the unwritten ones
+ * first, then drop them so the next session starts from the document again.
+ *
+ * `allowCancel` keeps the values when the modal is dismissed (Cancel / Escape) and
+ * returns false, for callers that can still back out of what they were doing. Where
+ * the form is already gone there is nothing to back out of, so dismissing it is
+ * taken as "Don't Save".
+ */
+async function discardUiValues(docKey: string | undefined, allowCancel = false): Promise<boolean> {
+    if (!docKey) return true;
+    if (uiOverridesDirty.has(docKey)) {
+        const choice = await vscode.window.showWarningMessage(
+            'Save the values entered in the #UI input form?',
+            {
+                modal: true,
+                detail: 'Input mode is closing. Unsaved values are discarded.',
+            },
+            'Save', "Don't Save");
+        if (allowCancel && choice === undefined) return false;
+        const document = vscode.workspace.textDocuments.find(d => d.uri.toString() === docKey);
+        if (choice === 'Save' && document) {
+            const count = await saveUiValuesFor(document);
+            if (count !== null)
+                vscode.window.showInformationMessage(`Saved ${count} #UI value(s) to the document.`);
+        }
+    }
+    uiOverrides.clear(docKey);
+    uiOverridesDirty.delete(docKey);
+    return true;
 }
 
 /** Re-renders every open preview panel from the given document. */
@@ -640,6 +702,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
     const docKey = sourceFileUri.toString();
     if ((enableUi || forPrint) && !uiOverrides.has(docKey) && !uiOverridesDirty.has(docKey))
         uiOverrides.readFromSource(docKey, content);
+    if (enableUi) uiPanelDocKey = docKey;
 
     const mode = enableUi ? 'ui' : forPrint ? 'report' : unwrapped ? 'unwrapped' : 'wrapped';
     outputChannel.appendLine(`Starting updatePreviewContent (${mode})...`);
@@ -1227,6 +1290,11 @@ async function showPreview(kind: PreviewKind, scrollToLine?: number) {
             uiPanel = undefined;
             // The report only exists to accompany the form.
             uiReportPanel?.dispose();
+            // Closing the panel directly leaves input mode too; the toggle command
+            // has already dealt with the values when it comes through there.
+            const docKey = uiPanelDocKey;
+            uiPanelDocKey = undefined;
+            void discardUiValues(docKey);
         } else if (kind === 'uiReport') {
             uiReportPanel = undefined;
         } else {
@@ -1637,6 +1705,9 @@ export async function activate(context: vscode.ExtensionContext) {
     // report open.
     const toggleUiModeCommand = vscode.commands.registerCommand('vscode-calcpad.toggleUiMode', async () => {
         if (uiPanel) {
+            // Prompted before the panel goes away, so the form is still on screen
+            // while the message box asks about its values. Cancel leaves it open.
+            if (!await discardUiValues(uiPanelDocKey, true)) return;
             uiPanel.dispose();
             outputChannel.appendLine('[UI] Input mode disabled');
             return;
@@ -1674,23 +1745,12 @@ export async function activate(context: vscode.ExtensionContext) {
             vscode.window.showErrorMessage('No active editor found');
             return;
         }
-        const docKey = editor.document.uri.toString();
-        const overrides = uiOverrides.toRecord(docKey);
-        if (!overrides) {
+        const count = await saveUiValuesFor(editor.document);
+        if (count === null) {
             vscode.window.showInformationMessage('No #UI values have been entered.');
             return;
         }
-
-        const original = editor.document.getText();
-        const updated = writeUiOverrides(original, overrides);
-        if (updated !== original) {
-            const fullRange = new vscode.Range(
-                editor.document.positionAt(0),
-                editor.document.positionAt(original.length));
-            await editor.edit(edit => edit.replace(fullRange, updated));
-        }
-        uiOverridesDirty.delete(docKey);
-        vscode.window.showInformationMessage(`Saved ${Object.keys(overrides).length} #UI value(s) to the document.`);
+        vscode.window.showInformationMessage(`Saved ${count} #UI value(s) to the document.`);
     });
 
     const focusPreviewToLineCommand = vscode.commands.registerCommand('vscode-calcpad.focusPreviewToLine', async () => {
@@ -1983,9 +2043,26 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     // Update preview and variables when active editor changes
-    const onDidChangeActiveTextEditor = vscode.window.onDidChangeActiveTextEditor(editor => {
+    const onDidChangeActiveTextEditor = vscode.window.onDidChangeActiveTextEditor(async editor => {
         updateMetadataContext(editor);
         if (editor && (editor.document.languageId === 'calcpad' || editor.document.languageId === 'plaintext')) {
+            // The input form follows the active editor, so switching documents takes
+            // the form's values with it. Prompt as if the form were closing, since
+            // for the outgoing document it is, and drop them so the incoming one is
+            // seeded from its own uiOverrides comment. There is no veto for an editor
+            // switch that has already happened, so Cancel switches back instead —
+            // uiPanelDocKey still points at the outgoing document, which keeps the
+            // resulting second pass through here from prompting again.
+            if (uiPanel && uiPanelDocKey && uiPanelDocKey !== editor.document.uri.toString()) {
+                const outgoing = uiPanelDocKey;
+                if (!await discardUiValues(outgoing, true)) {
+                    const document = vscode.workspace.textDocuments.find(d => d.uri.toString() === outgoing);
+                    if (document)
+                        await vscode.window.showTextDocument(document, { viewColumn: editor.viewColumn, preview: false });
+                    return;
+                }
+                uiPanelDocKey = undefined;
+            }
             // Update preview if any panel is open
             if (wrappedPanel || unwrappedPanel || uiPanel || uiReportPanel) {
                 schedulePreviewUpdate();

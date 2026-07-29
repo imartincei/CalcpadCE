@@ -945,6 +945,9 @@ async function bootstrap(): Promise<void> {
         level: 'info' | 'debug' | 'warn' | 'error',
     ) => (...args: any[]) => {
         orig.apply(console, args);
+        // Monaco's ConsoleLogger emits styled `%c INFO`/`%c  ERR` lines whose CSS
+        // argument only produces noise in the panel; leave those to devtools.
+        if (typeof args[0] === 'string' && args[0].startsWith('%c')) return;
         appInstance.appendOutput(level, args.map(fmtConsoleArg).join(' '));
     };
 
@@ -1079,12 +1082,16 @@ async function bootstrap(): Promise<void> {
     // ---- Tab-strip user actions (dispatched by group id) ----
     // The Tauri branch overrides the close handlers with save-prompt-aware
     // versions; on web there's nothing to save, so a plain close is correct.
-    appInstance.onTabActivate = (groupId: string, id: string) => {
+    async function activateTab(groupId: string, id: string): Promise<void> {
         const g = groups.get(groupId);
         if (!g) return;
+        if (g === activeGroup && g.tabs.activeId === id) return;
+        if (!await confirmLeaveUiDoc()) return;
         if (activeGroup !== g) setActiveGroup(g);
         g.tabs.activate(id);
-    };
+    }
+
+    appInstance.onTabActivate = (groupId: string, id: string) => { void activateTab(groupId, id); };
     appInstance.onTabCloseRequest = (groupId: string, id: string) => {
         groups.get(groupId)?.tabs.close(id);
     };
@@ -1158,9 +1165,13 @@ async function bootstrap(): Promise<void> {
         void nextTick(refreshAllPreviews);
     };
 
+    // Writes the active tab to disk. Set by the Tauri branch below; on web there
+    // is no file behind the document, so the model edit is all there is.
+    let persistActiveTab: (() => Promise<boolean>) | null = null;
+
     // "Save values": write the entered #UI values into the active document as a
     // uiOverrides metadata comment, so they are restored the next time it opens.
-    appInstance.onSaveUiOverridesRequest = () => {
+    async function saveUiOverrides(): Promise<void> {
         const docKey = activeUiDocKey();
         const overrides = uiOverrides.toRecord(docKey);
         if (!overrides) return;
@@ -1178,8 +1189,48 @@ async function bootstrap(): Promise<void> {
         }
         uiOverridesDirty.delete(docKey);
         refreshUiDirtyIndicator();
+        // The values are only "saved" once they reach the file — a form filled in
+        // and left dirty in the editor is exactly what the user asked to avoid.
+        await persistActiveTab?.();
         appInstance.appendOutput('info', `Saved ${Object.keys(overrides).length} #UI value(s) to the document.`);
-    };
+    }
+
+    appInstance.onSaveUiOverridesRequest = () => { void saveUiOverrides(); };
+
+    /**
+     * Leaving the input form discards the entered values — they only live in memory
+     * until written into the document — so prompt for unwritten ones first. Returns
+     * false to keep the form open when the user cancels.
+     */
+    async function leaveUiDoc(): Promise<boolean> {
+        const docKey = activeUiDocKey();
+        if (uiOverridesDirty.has(docKey)) {
+            const choice = await appInstance.showConfirm({
+                title: 'Unsaved input values',
+                message: 'Save the values entered in the input form before exiting? They are discarded otherwise.',
+                yesLabel: 'Save',
+                noLabel: "Don't Save",
+            });
+            if (choice === 'cancel') return false;
+            if (choice === 'yes') await saveUiOverrides();
+        }
+        uiOverrides.clear(docKey);
+        uiOverridesDirty.delete(docKey);
+        refreshUiDirtyIndicator();
+        return true;
+    }
+
+    appInstance.onExitUiModeRequest = leaveUiDoc;
+
+    /**
+     * The input form always shows the active document, so switching documents takes
+     * the form's values with it. Prompt as if the form were closing, since for that
+     * document it is. Returns false when the user cancels the switch.
+     */
+    async function confirmLeaveUiDoc(): Promise<boolean> {
+        if (!appInstance.isPreviewVisible() || appInstance.getPreviewMode() !== 'ui') return true;
+        return await leaveUiDoc();
+    }
 
     // Refresh all previews when the preview pane is first opened.
     appInstance.onPreviewToggled = (visible: boolean) => {
@@ -1345,6 +1396,8 @@ async function bootstrap(): Promise<void> {
          */
         async function loadFile(path: string): Promise<void> {
             const inActive = tabs.findByPath(path);
+            if (inActive && inActive.id === tabs.activeId) return;
+            if (!await confirmLeaveUiDoc()) return;
             if (inActive) {
                 tabs.activate(inActive.id);
                 return;
@@ -1411,6 +1464,8 @@ async function bootstrap(): Promise<void> {
             return true;
         }
 
+        persistActiveTab = saveActive;
+
         async function saveAsActive(): Promise<boolean> {
             const active = tabs.activeTab;
             const content = tabs.activeModel?.getValue() ?? '';
@@ -1432,9 +1487,13 @@ async function bootstrap(): Promise<void> {
         async function tryCloseTab(group: EditorGroup, id: string): Promise<boolean> {
             const target = group.tabs.all.find(t => t.id === id);
             if (!target) return true;
+            // Closing the document the input form is showing takes its values away.
+            if (group === activeGroup && id === group.tabs.activeId && !await confirmLeaveUiDoc()) return false;
             // Activate the group + tab so the editor shows what's being asked about.
             if (activeGroup !== group) setActiveGroup(group);
-            if (target.dirty && group.tabs.isLastReference(id)) {
+            // Re-read the dirty flag: saving the input form's values above may have
+            // written the file already.
+            if (group.tabs.isDirty(id) && group.tabs.isLastReference(id)) {
                 if (id !== group.tabs.activeId) group.tabs.activate(id);
                 const choice = await appInstance.showConfirm({
                     title: 'Unsaved changes',
@@ -1581,6 +1640,13 @@ async function bootstrap(): Promise<void> {
         };
 
         appInstance.onCopyTextRequest = (text: string) => { void writeClipboardText(text); };
+        appInstance.onClipboardReadRequest = async () => {
+            try {
+                return await tauriClipboard.readText();
+            } catch {
+                return '';
+            }
+        };
 
         appInstance.onTabCopyFullPathRequest = (groupId: string, id: string) => {
             const g = groups.get(groupId);
@@ -1638,11 +1704,15 @@ async function bootstrap(): Promise<void> {
         async function runClipboardAction(
             action: 'cut' | 'copy' | 'paste' | 'select-all' | 'undo' | 'redo' | 'find' | 'replace',
         ): Promise<void> {
-            if (action === 'copy' || action === 'cut') {
-                // A real DOM selection (e.g. text picked inside the hover panel,
-                // parameter hints, or output) takes priority over the editor's
-                // own model selection, since Monaco renders the main text via
-                // its own selection overlay rather than native browser selection.
+            // A real DOM selection (e.g. text picked inside the hover panel,
+            // parameter hints, or output) takes priority over the editor's own
+            // model selection, since Monaco renders the main text via its own
+            // selection overlay rather than native browser selection.
+            // Copy only: WebKit reports the selection of a focused text control
+            // here as well, and Monaco keeps the editor selection in a hidden
+            // textarea - so a cut routed this way wrote the text to the
+            // clipboard and left the document untouched.
+            if (action === 'copy') {
                 const domText = window.getSelection()?.toString() ?? '';
                 if (domText) {
                     try { await tauriClipboard.writeText(domText); } catch { /* ignored */ }
@@ -1701,6 +1771,11 @@ async function bootstrap(): Promise<void> {
                 editor.focus();
                 editor.trigger('menu', cmd, null);
                 return;
+            }
+            // A focused preview frame (the #UI input form, above all) handles the
+            // action against whichever control it is sitting in.
+            if (action === 'cut' || action === 'copy' || action === 'paste') {
+                if (appInstance.runFocusedPreviewClipboardAction(action)) return;
             }
             // Fallback for sidebar / preview / etc.
             const el = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
@@ -1994,11 +2069,9 @@ async function bootstrap(): Promise<void> {
             // Ctrl+1..9 → activate Nth tab in the active group (Ctrl+9 = last).
             if (e.key >= '1' && e.key <= '9' && !e.shiftKey && !e.altKey) {
                 const n = parseInt(e.key, 10);
-                if (n === 9) {
-                    activeGroup.tabs.activateByIndex(activeGroup.tabs.count - 1);
-                } else {
-                    activeGroup.tabs.activateByIndex(n - 1);
-                }
+                const index = n === 9 ? activeGroup.tabs.count - 1 : n - 1;
+                const target = activeGroup.tabs.all[index];
+                if (target) void activateTab(activeGroup.id, target.id);
                 e.preventDefault();
             }
         });
@@ -2011,6 +2084,10 @@ async function bootstrap(): Promise<void> {
             isExiting = true;
 
             try {
+                if (!await confirmLeaveUiDoc()) {
+                    isExiting = false;
+                    return;
+                }
                 // Walk every dirty tab across all groups one at a time, like VS
                 // Code does on window-close. Reuses tryCloseTab so the prompt
                 // copy + save-as fallback are identical to manual tab close.

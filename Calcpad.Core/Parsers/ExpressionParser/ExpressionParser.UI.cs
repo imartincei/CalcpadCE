@@ -24,8 +24,10 @@ namespace Calcpad.Core
             /// appended inside loops for the enclosing pass numbers.
             /// </summary>
             public string Key { get; init; }
-            public int Rows { get; init; }
-            public int Columns { get; init; }
+            /// <summary>Grid rows; filled in from the evaluated value when the source sized
+            /// the grid with an expression, so not known until the line has been calculated.</summary>
+            public int Rows { get; set; }
+            public int Columns { get; set; }
             /// <summary>True when the JSON declared both rows and columns, rather than them
             /// being auto-detected. Only then is the right hand side literal reshaped.</summary>
             public bool HasDeclaredShape { get; init; }
@@ -124,11 +126,16 @@ namespace Calcpad.Core
             int uiRows = properties.Rows ?? 0, uiColumns = properties.Columns ?? 0;
             var hasDeclaredShape = uiRows > 0 && uiColumns > 0;
             _lineUiControls = [];
-            foreach (var assignment in EnumerateAssignments(s[_uiSkipChars..]))
+            foreach (var assignment in UiSyntax.EnumerateAssignments(s[_uiSkipChars..]))
             {
                 if (assignment.Name.EndsWith('$'))
                 {
                     AppendError(s.ToString(), Messages.String_mode_is_not_supported_by_the_UI_keyword, _currentLine);
+                    return KeywordResult.None;
+                }
+                if (!UiSyntax.IsValue(assignment.Rhs))
+                {
+                    AppendError(s.ToString(), Messages.UI_directives_do_not_support_expressions, _currentLine);
                     return KeywordResult.None;
                 }
 
@@ -166,30 +173,6 @@ namespace Calcpad.Core
                 AppendError(s.ToString(), Messages.The_UI_keyword_requires_a_variable_assignment, _currentLine);
             }
             return KeywordResult.None;
-        }
-
-        /// <summary>
-        /// Every assignment on the line, in source order. The line's code and comment
-        /// segments alternate, so each code segment holds at most one assignment; segments
-        /// that assign nothing - a bare output expression - contribute no control.
-        /// </summary>
-        private static List<(string Name, string Rhs)> EnumerateAssignments(ReadOnlySpan<char> s)
-        {
-            var found = new List<(string, string)>();
-            foreach (var segment in s.EnumerateComments())
-            {
-                if (!IsCode(segment))
-                    continue;
-
-                var i = segment.IndexOf('=');
-                if (i < 1)
-                    continue;
-
-                var name = segment[..i].Trim().ToString();
-                if (name.Length != 0)
-                    found.Add((name, segment[(i + 1)..].Trim().ToString()));
-            }
-            return found;
         }
 
         /// <summary>
@@ -251,10 +234,6 @@ namespace Calcpad.Core
             return (declarationKey, $"{declarationKey}:{string.Join('.', passes)}");
         }
 
-        /// <summary>True for a segment of <see cref="CommentEnumerator"/> that is code, not a comment.</summary>
-        private static bool IsCode(ReadOnlySpan<char> segment) =>
-            !segment.IsEmpty && segment[0] != '\'' && segment[0] != '"';
-
         /// <summary>
         /// Index of the assignment '=' in <paramref name="s"/>, ignoring inline comments.
         /// A #UI line usually labels its control with one, and the label can itself contain
@@ -267,7 +246,7 @@ namespace Calcpad.Core
             var offset = 0;
             foreach (var segment in s.EnumerateComments())
             {
-                if (IsCode(segment))
+                if (UiSyntax.IsCode(segment))
                 {
                     var i = segment.IndexOf('=');
                     if (i >= 0)
@@ -287,7 +266,7 @@ namespace Calcpad.Core
             var sb = new StringBuilder();
             foreach (var segment in lhs.EnumerateComments())
             {
-                if (IsCode(segment))
+                if (UiSyntax.IsCode(segment))
                     sb.Append(segment);
             }
             return sb.ToString().Trim();
@@ -342,7 +321,9 @@ namespace Calcpad.Core
         }
 
         /// <summary>
-        /// Auto-detects rows and columns from a vector(n) or matrix(m; n) call.
+        /// Auto-detects rows and columns from a vector(n) or matrix(m; n) call written with
+        /// literal counts. Computed ones - matrix(r; c), matrix(len(x); len(y)) - are left
+        /// for <see cref="ResolveDatagridShape"/> to read off the evaluated value.
         /// </summary>
         private static void AutoDetectGridSizeFromFunction(ReadOnlySpan<char> rhs, ref int rows, ref int columns)
         {
@@ -369,6 +350,25 @@ namespace Calcpad.Core
                 if (rows == 0) rows = m;
                 if (columns == 0) columns = k;
             }
+        }
+
+        /// <summary>
+        /// Fills in a grid shape the source did not spell out - matrix(r; c),
+        /// matrix(len(x); len(y)) - from the vector or matrix the line evaluated to, a vector
+        /// being a single row. Runs once the line has been calculated, which is why the
+        /// grid element is the one carrying the shape the widget reads.
+        /// </summary>
+        private void ResolveDatagridShape(UiPropertyMetadata ui)
+        {
+            if (ui.Rows > 0 && ui.Columns > 0)
+                return;
+
+            var (rows, columns) = _parser.GetVariableShape(ui.VariableName);
+            if (ui.Rows == 0)
+                ui.Rows = rows;
+
+            if (ui.Columns == 0)
+                ui.Columns = columns;
         }
 
         /// <summary>
@@ -491,11 +491,19 @@ namespace Calcpad.Core
             var rhs = expression[(eqIndex + 1)..].TrimStart();
             if (ui.Type == "datagrid")
             {
+                // A grid sized by vector(n)/matrix(m; n) has no literal to write into, so the
+                // entered one takes the place of the whole call.
                 var bracketEnd = rhs.LastIndexOf(']');
                 return bracketEnd < 0 || rhs.IndexOf('[') < 0 ?
-                    null :
+                    $"{lhs} {value}" :
                     $"{lhs} {value}{rhs[(bracketEnd + 1)..]}";
             }
+            // A dropdown or radio picks one of the declared values, which carries its own
+            // unit, so it replaces the whole right hand side. An entry holds the number
+            // alone - the unit stays in the markup beside it - so only the number is swapped.
+            if (ui.Type is "dropdown" or "radio")
+                return $"{lhs} {value}";
+
             var i = 0;
             while (i < rhs.Length && IsNumericChar(rhs[i]))
                 ++i;
@@ -542,27 +550,73 @@ namespace Calcpad.Core
 
         /// <summary>
         /// Replaces the result part of the rendered equation with the matching input control.
+        /// An entry keeps the "name = " prefix and the unit around it, since it shows the
+        /// number itself; the other controls stand alone, so the whole equation gives way to
+        /// them and any label is the text the author writes beside the directive.
         /// </summary>
         private string InjectUiInput(UiPropertyMetadata ui, string equationHtml) =>
             ui.Type switch
             {
-                "dropdown" => InjectUiControl(equationHtml, v => BuildUiDropdown(ui, v)),
-                "radio" => InjectUiControl(equationHtml, v => BuildUiRadio(ui, v)),
-                "checkbox" => InjectUiControl(equationHtml, v => BuildUiCheckbox(ui, v)),
-                _ => InjectUiControl(equationHtml, v => BuildUiEntry(ui, v))
+                "dropdown" => ReplaceEquation(equationHtml, (v, u) => BuildUiDropdown(ui, SelectedValue(v, u))),
+                "radio" => ReplaceEquation(equationHtml, (v, u) => BuildUiRadio(ui, SelectedValue(v, u))),
+                "checkbox" => ReplaceEquation(equationHtml, (v, _) => BuildUiCheckbox(ui, v)),
+                _ => InjectUiControl(equationHtml, (v, _) => BuildUiEntry(ui, v))
             };
 
-        private string InjectUiControl(string equationHtml, Func<string, string> build)
+        private static string InjectUiControl(string equationHtml, Func<string, string, string> build)
+        {
+            var resultStart = ResultStart(equationHtml);
+            if (resultStart < 0)
+                return equationHtml;
+
+            SplitValueAndUnit(equationHtml[resultStart..], out var value, out var unitHtml);
+            return equationHtml[..resultStart] + build(value, unitHtml) + unitHtml;
+        }
+
+        /// <summary>
+        /// Renders the control in place of the whole equation. The value and unit are still
+        /// read off it, since a dropdown or radio needs them to tell which of its values is
+        /// the current one.
+        /// </summary>
+        private static string ReplaceEquation(string equationHtml, Func<string, string, string> build)
+        {
+            var resultStart = ResultStart(equationHtml);
+            if (resultStart < 0)
+                return equationHtml;
+
+            SplitValueAndUnit(equationHtml[resultStart..], out var value, out var unitHtml);
+            return build(value, unitHtml);
+        }
+
+        /// <summary>Index just past the last " = " of the rendered equation, or -1.</summary>
+        private static int ResultStart(string equationHtml)
         {
             const string assignOp = " = ";
             var lastAssign = equationHtml.LastIndexOf(assignOp, StringComparison.Ordinal);
-            if (lastAssign < 0)
-                return equationHtml;
-
-            var resultStart = lastAssign + assignOp.Length;
-            SplitValueAndUnit(equationHtml[resultStart..], out var value, out var unitHtml);
-            return equationHtml[..resultStart] + build(value) + unitHtml;
+            return lastAssign < 0 ? -1 : lastAssign + assignOp.Length;
         }
+
+        /// <summary>
+        /// The rendered result as a declared value looks - number and unit, no markup and
+        /// no spaces - so it can be matched against the "values" the JSON block listed.
+        /// </summary>
+        private static string SelectedValue(string value, string unitHtml)
+        {
+            var sb = new StringBuilder(StripSpaces(value));
+            var inTag = false;
+            foreach (var c in unitHtml)
+            {
+                if (c == '<')
+                    inTag = true;
+                else if (c == '>')
+                    inTag = false;
+                else if (!inTag && c is not (' ' or ThinSpace))
+                    sb.Append(c);
+            }
+            return sb.ToString();
+        }
+
+        private static string StripSpaces(string s) => s.Replace(" ", string.Empty);
 
         private static string UiClass(UiPropertyMetadata ui, string baseClass) =>
             HttpUtility.HtmlAttributeEncode(ui.Style is null ?
@@ -586,7 +640,7 @@ namespace Calcpad.Core
                 .Append($"<select class=\"{UiClass(ui, "calcpad-ui-dropdown")}\"{UiBinding(ui)}>");
             for (int i = 0, len = ui.Keys.Length; i < len; ++i)
             {
-                var selected = ui.Values[i] == value ? " selected" : string.Empty;
+                var selected = StripSpaces(ui.Values[i]) == value ? " selected" : string.Empty;
                 sb.Append($"<option value=\"{HttpUtility.HtmlAttributeEncode(ui.Values[i])}\"{selected}>")
                   .Append($"{HttpUtility.HtmlEncode(ui.Keys[i])}</option>");
             }
@@ -600,7 +654,7 @@ namespace Calcpad.Core
                 .Append($"<span class=\"{UiClass(ui, "calcpad-ui-radio")}\"{UiBinding(ui)}>");
             for (int i = 0, len = ui.Keys.Length; i < len; ++i)
             {
-                var isChecked = ui.Values[i] == value ? " checked" : string.Empty;
+                var isChecked = StripSpaces(ui.Values[i]) == value ? " checked" : string.Empty;
                 sb.Append("<label class=\"calcpad-ui-radio-label\">")
                   .Append($"<input type=\"radio\" name=\"{group}\" value=\"{HttpUtility.HtmlAttributeEncode(ui.Values[i])}\"{isChecked}>")
                   .Append($" {HttpUtility.HtmlEncode(ui.Keys[i])}</label>");
@@ -612,20 +666,6 @@ namespace Calcpad.Core
         {
             var isChecked = value.Trim() == "1" ? " checked" : string.Empty;
             return $"<input type=\"checkbox\" class=\"{UiClass(ui, "calcpad-ui-checkbox")}\"{UiBinding(ui)}{isChecked}>";
-        }
-
-        /// <summary>
-        /// Strips the matrix rendering from a datagrid line, keeping only "v = " so the
-        /// grid widget can take its place below.
-        /// </summary>
-        private static string StripDatagridRhs(string equationHtml)
-        {
-            var eqIndex = equationHtml.IndexOf(" = ", StringComparison.Ordinal);
-            if (eqIndex >= 0)
-                return equationHtml[..(eqIndex + 3)];
-
-            eqIndex = equationHtml.IndexOf('=');
-            return eqIndex < 0 ? equationHtml : equationHtml[..(eqIndex + 1)] + " ";
         }
 
         /// <summary>
@@ -648,14 +688,14 @@ namespace Calcpad.Core
 
         /// <summary>
         /// Splits a result fragment like "5 &lt;i&gt;ft&lt;/i&gt;" into value and unit markup,
-        /// so the unit stays outside the input control.
+        /// so the unit stays outside the input control. The value is plain text, so the
+        /// markup begins where the unit does - splitting on the first tag rather than on
+        /// the first &lt;i&gt; keeps a compound unit, which wraps its parts in a span,
+        /// whole instead of cutting into it.
         /// </summary>
         private static void SplitValueAndUnit(string resultHtml, out string value, out string unitHtml)
         {
-            var unitStart = resultHtml.IndexOf("<i>", StringComparison.Ordinal);
-            if (unitStart < 0)
-                unitStart = resultHtml.IndexOf("<sup", StringComparison.Ordinal);
-
+            var unitStart = resultHtml.IndexOf('<');
             if (unitStart < 0)
             {
                 value = resultHtml.Trim();
@@ -671,6 +711,17 @@ namespace Calcpad.Core
                 value = resultHtml[..unitStart].TrimEnd(ThinSpace, ' ');
                 unitHtml = ThinSpace + resultHtml[unitStart..];
             }
+            // The angle units are written straight after the number, without markup of
+            // their own, so they have to be split off the value by hand.
+            var i = value.Length;
+            while (i > 0 && value[i - 1] is '°' or '′' or '″')
+                --i;
+
+            if (i == value.Length)
+                return;
+
+            unitHtml = value[i..] + unitHtml;
+            value = value[..i];
         }
 
         private void ResetUiState()

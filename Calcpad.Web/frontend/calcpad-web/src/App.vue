@@ -174,24 +174,6 @@
         >Copy All</button>
       </div>
 
-      <!-- Preview context menu. Layered over the iframe in place of the broken
-           native WebView menu (see injectLineLinks). -->
-      <div
-        v-if="previewContextMenu"
-        class="tab-context-menu"
-        :style="{ left: previewContextMenu.x + 'px', top: previewContextMenu.y + 'px' }"
-        @mousedown.stop
-        @click.stop
-      >
-        <button
-          class="tab-context-item"
-          :disabled="!previewContextMenu.selection"
-          @click="onCopyPreviewSelection"
-        >Copy</button>
-        <button class="tab-context-item" @click="onFindInPreview">Find… (Ctrl+F)</button>
-        <button v-if="onOpenFullHtmlRequest" class="tab-context-item" @click="onOpenFullHtml">Open Full HTML</button>
-      </div>
-
       <!-- Bottom panel (Problems / Output) — reflects the ACTIVE group. -->
       <div v-if="bottomPanelOpen" class="bottom-panel">
         <div class="bottom-panel-header">
@@ -411,6 +393,36 @@
       </div>
     </div>
 
+    <!-- Preview context menu. Layered over the iframe in place of the broken
+         native WebView menu (see injectLineLinks). Positioned in viewport
+         coordinates and kept outside the editor pane, which is hidden while the
+         input form is fullscreen. -->
+    <div
+      v-if="previewContextMenu"
+      class="tab-context-menu"
+      :style="{ left: previewContextMenu.x + 'px', top: previewContextMenu.y + 'px' }"
+      @mousedown.stop
+      @click.stop
+    >
+      <button
+        v-if="previewContextMenu.editable"
+        class="tab-context-item"
+        @click="onPreviewClipboard('cut')"
+      >Cut (Ctrl+X)</button>
+      <button
+        class="tab-context-item"
+        :disabled="!previewContextMenu.selection && !previewContextMenu.editable"
+        @click="onPreviewClipboard('copy')"
+      >Copy (Ctrl+C)</button>
+      <button
+        v-if="previewContextMenu.editable"
+        class="tab-context-item"
+        @click="onPreviewClipboard('paste')"
+      >Paste (Ctrl+V)</button>
+      <button class="tab-context-item" @click="onFindInPreview">Find… (Ctrl+F)</button>
+      <button v-if="onOpenFullHtmlRequest" class="tab-context-item" @click="onOpenFullHtml">Open Full HTML</button>
+    </div>
+
     <!-- Confirm dialog. HTML modal instead of a native dialog for cross-platform
          consistency between web and desktop. -->
     <div v-if="confirmState" class="modal-backdrop" @click.self="resolveConfirm('cancel')">
@@ -484,6 +496,8 @@ const previewMode = ref<PreviewMode>('wrapped')
 // True while the active document holds #UI values that aren't in its source yet.
 const uiOverridesDirty = ref(false)
 const onSaveUiOverridesRequest = ref<(() => void) | null>(null)
+// Asked before the input form closes; false keeps it open (the user cancelled).
+const onExitUiModeRequest = ref<(() => Promise<boolean>) | null>(null)
 
 /** UI mode hands the whole window to the input form; the editor is hidden. */
 const uiModeFullscreen = computed(() => previewVisible.value && previewMode.value === 'ui')
@@ -658,6 +672,10 @@ const onTabCopyRelativePathRequest = ref<((groupId: string, id: string) => void)
 // Generic clipboard write. Set by the host (main.ts) to route through Tauri's
 // native clipboard on desktop; falls back to the Web Clipboard API otherwise.
 const onCopyTextRequest = ref<((text: string) => void) | null>(null)
+// Read counterpart, set by the desktop host only. Its presence is what marks a
+// WebView whose frames have no usable native clipboard, so the preview takes
+// over its own Ctrl+C/X/V (see injectPreviewClipboard).
+const onClipboardReadRequest = ref<(() => Promise<string>) | null>(null)
 
 // Opens the full rendered HTML as raw text in a new (unsaved) editor tab in
 // the group the preview belongs to — mirrors vscode-calcpad's "View Webview
@@ -823,6 +841,7 @@ interface PreviewContextMenuState {
   y: number
   groupId: string
   selection: string
+  editable: boolean
 }
 const previewContextMenu = ref<PreviewContextMenuState | null>(null)
 
@@ -830,10 +849,154 @@ function closePreviewContextMenu(): void {
   previewContextMenu.value = null
 }
 
-function onCopyPreviewSelection(): void {
-  const m = previewContextMenu.value
-  if (m?.selection) copyText(m.selection)
+function onPreviewClipboard(action: PreviewClipboardAction): void {
+  const groupId = previewContextMenu.value?.groupId
   closePreviewContextMenu()
+  if (groupId) void runPreviewClipboardAction(groupId, action)
+}
+
+// ---- Clipboard inside the preview (#UI input form) ----
+type PreviewClipboardAction = 'cut' | 'copy' | 'paste'
+
+// The slice of jspreadsheet the input form's datagrids are driven through.
+interface PreviewSheet {
+  selectedCell?: [number, number, number, number]
+  getData(): string[][]
+  setValueFromCoords(x: number, y: number, value: string): void
+  paste(x: number, y: number, text: string): void
+}
+
+// Clipboard-capable frames are addressed by group, with the report pane beside
+// the input form distinguished by a prefix since it shares its group's id.
+const UI_PRINT_FRAME = 'ui-print:'
+
+function clipboardFrame(frameId: string): HTMLIFrameElement | null {
+  return frameId.startsWith(UI_PRINT_FRAME)
+    ? uiPrintEls.get(frameId.slice(UI_PRINT_FRAME.length)) ?? null
+    : previewEls.get(frameId) ?? null
+}
+
+function frameSheet(frame: HTMLIFrameElement | null): PreviewSheet | null {
+  const win = frame?.contentWindow as
+    (Window & { jspreadsheet?: { current?: PreviewSheet } }) | null | undefined
+  const sheet = win?.jspreadsheet?.current
+  return sheet?.selectedCell ? sheet : null
+}
+
+// The value field the frame is sitting in. A datagrid keeps its position in the
+// library rather than in the focused element, so its own inputs (the hidden
+// copy textarea, an open cell editor) belong to the sheet path instead.
+function frameInput(frame: HTMLIFrameElement | null): HTMLInputElement | HTMLTextAreaElement | null {
+  const el = frame?.contentDocument?.activeElement as HTMLElement | null
+  if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return null
+  if (el.closest('.calcpad-ui-datagrid')) return null
+  return el as HTMLInputElement | HTMLTextAreaElement
+}
+
+function previewHasEditableTarget(groupId: string): boolean {
+  const frame = previewEls.get(groupId) ?? null
+  return frameInput(frame) !== null || frameSheet(frame) !== null
+}
+
+async function readClipboardText(): Promise<string> {
+  if (onClipboardReadRequest.value) return await onClipboardReadRequest.value()
+  try { return await navigator.clipboard.readText() } catch { return '' }
+}
+
+// The #UI script filters keystrokes on 'input' and commits the field on
+// 'change'; a programmatic edit raises neither. An edit that has not produced a
+// number is left uncommitted rather than reverted, so the text stays put.
+const UI_NUMBER = /^[-+]?(\d+\.?\d*|\.\d+)$/
+
+function commitPreviewInput(input: HTMLInputElement | HTMLTextAreaElement): void {
+  input.dispatchEvent(new Event('input', { bubbles: true }))
+  if (UI_NUMBER.test(input.value.trim())) input.dispatchEvent(new Event('change', { bubbles: true }))
+}
+
+/**
+ * Runs a clipboard action against whatever the frame is focused on — a value
+ * field, a datagrid selection, or the document selection for a plain copy.
+ * Needed because the desktop WebView leaves the frame's own clipboard inert.
+ */
+async function runPreviewClipboardAction(frameId: string, action: PreviewClipboardAction): Promise<void> {
+  const frame = clipboardFrame(frameId)
+  const input = frameInput(frame)
+  if (input) {
+    const start = input.selectionStart ?? 0
+    const end = input.selectionEnd ?? start
+    if (action === 'paste') {
+      const text = (await readClipboardText()).trim()
+      if (!text) return
+      input.setRangeText(text, start, end, 'end')
+      commitPreviewInput(input)
+      return
+    }
+    if (end === start) return
+    copyText(input.value.substring(start, end))
+    if (action === 'cut') {
+      input.setRangeText('', start, end, 'end')
+      commitPreviewInput(input)
+    }
+    return
+  }
+
+  const sheet = frameSheet(frame)
+  if (sheet) {
+    const [sx, sy, ex, ey] = sheet.selectedCell!
+    const x1 = Math.min(sx, ex), x2 = Math.max(sx, ex)
+    const y1 = Math.min(sy, ey), y2 = Math.max(sy, ey)
+    if (action === 'paste') {
+      const text = await readClipboardText()
+      if (text) sheet.paste(x1, y1, text)
+      return
+    }
+    const data = sheet.getData()
+    const rows: string[] = []
+    for (let r = y1; r <= y2; r++) rows.push(data[r].slice(x1, x2 + 1).join('\t'))
+    copyText(rows.join('\n'))
+    // Every cell is an element of a matrix literal, so a cleared one is a zero.
+    if (action === 'cut')
+      for (let r = y1; r <= y2; r++)
+        for (let c = x1; c <= x2; c++) sheet.setValueFromCoords(c, r, '0')
+    return
+  }
+
+  if (action === 'paste') return
+  const selection = frame?.contentWindow?.getSelection()?.toString() ?? ''
+  if (selection) copyText(selection)
+}
+
+// One Ctrl+V can reach here twice — from the frame's key handler and from the
+// host's menu accelerator — depending on whether the WebView consumed the key,
+// and a paste that lands twice inserts the text twice. Only the key-driven
+// routes are deduplicated; a context-menu click is always meant.
+let lastPreviewClipboard = { action: '', at: 0 }
+
+function isRepeatedPreviewClipboard(action: PreviewClipboardAction): boolean {
+  const at = performance.now()
+  const repeated = action === lastPreviewClipboard.action && at - lastPreviewClipboard.at < 250
+  lastPreviewClipboard = { action, at }
+  return repeated
+}
+
+/**
+ * Routes a host's native Edit menu into a focused preview / report frame.
+ * Returns false when neither holds focus, leaving the host to handle the action
+ * itself.
+ */
+function runFocusedPreviewClipboardAction(action: PreviewClipboardAction): boolean {
+  const focused = document.activeElement
+  for (const [groupId, el] of previewEls) {
+    if (el !== focused) continue
+    if (!isRepeatedPreviewClipboard(action)) void runPreviewClipboardAction(groupId, action)
+    return true
+  }
+  for (const [groupId, el] of uiPrintEls) {
+    if (el !== focused) continue
+    if (!isRepeatedPreviewClipboard(action)) void runPreviewClipboardAction(UI_PRINT_FRAME + groupId, action)
+    return true
+  }
+  return false
 }
 
 function onFindInPreview(): void {
@@ -994,7 +1157,13 @@ function onPreviewWindowMessage(e: MessageEvent): void {
       y: rect.top + (Number(data.y) || 0),
       groupId: data.groupId,
       selection: typeof data.selection === 'string' ? data.selection : '',
+      editable: previewHasEditableTarget(data.groupId),
     }
+    return
+  }
+  if (data.type === 'previewClipboardAction') {
+    const action = data.action as PreviewClipboardAction
+    if (!isRepeatedPreviewClipboard(action)) void runPreviewClipboardAction(data.frameId, action)
     return
   }
   if (data.type === 'previewFindOpen') {
@@ -1166,7 +1335,8 @@ function onSidebarHandleMouseDown(e: MouseEvent): void {
   window.addEventListener('mouseup', onUp)
 }
 
-function togglePreview(): void {
+async function togglePreview(): Promise<void> {
+  if (previewVisible.value && previewMode.value === 'ui' && !await confirmExitUiMode()) return
   previewVisible.value = !previewVisible.value
   onPreviewToggled.value?.(previewVisible.value)
 }
@@ -1175,10 +1345,20 @@ function isPreviewVisible(): boolean {
   return previewVisible.value
 }
 
-function setPreviewMode(mode: PreviewMode): void {
+async function setPreviewMode(mode: PreviewMode): Promise<void> {
   if (previewMode.value === mode) return
+  if (previewMode.value === 'ui' && !await confirmExitUiMode()) return
   previewMode.value = mode
   onPreviewModeChanged.value?.(mode)
+}
+
+/**
+ * Runs the host's leave-input-mode handler, which prompts for unsaved values and
+ * then discards them. Returns false when the user cancelled and the form should
+ * stay open.
+ */
+async function confirmExitUiMode(): Promise<boolean> {
+  return await onExitUiModeRequest.value?.() ?? true
 }
 
 function getPreviewMode(): PreviewMode {
@@ -1195,7 +1375,7 @@ function onSaveUiOverrides(): void {
 
 /** Leaves the fullscreen input form for the report view, bringing the editor back. */
 function exitUiMode(): void {
-  setPreviewMode('wrapped')
+  void setPreviewMode('wrapped')
 }
 
 function setPreviewLoading(groupId: string, loading: boolean): void {
@@ -1209,7 +1389,10 @@ function setPreviewHtml(groupId: string, html: string, scrollToLine?: number): v
   const doc = frame.contentDocument
   if (!doc) return
   doc.open()
-  doc.write(injectPreviewConsole(injectLineLinks(html, scrollToLine, groupId), groupId))
+  doc.write(injectPreviewConsole(
+    injectPreviewClipboard(injectLineLinks(html, scrollToLine, groupId), groupId),
+    groupId,
+  ))
   doc.close()
   previewHtmlByGroup.set(groupId, html)
   setPreviewHtmlOutput(groupId, html)
@@ -1218,13 +1401,14 @@ function setPreviewHtml(groupId: string, html: string, scrollToLine?: number): v
 /**
  * Writes the report that accompanies the input form. It is a read-only rendering,
  * so it gets neither the line links nor the console interception the main preview
- * needs — and no #UI event script, since it carries no controls.
+ * needs — and no #UI event script, since it carries no controls. It does get the
+ * clipboard bridge, since copying a result out of it is otherwise dead.
  */
 function setUiPrintHtml(groupId: string, html: string): void {
   const doc = uiPrintEls.get(groupId)?.contentDocument
   if (!doc) return
   doc.open()
-  doc.write(html)
+  doc.write(injectPreviewClipboard(html, UI_PRINT_FRAME + groupId))
   doc.close()
 }
 
@@ -1275,7 +1459,12 @@ function injectLineLinks(html: string, scrollToLine: number | undefined, groupId
     "    var sel = ''; try { sel = String(window.getSelection() || ''); } catch (_e) {}",
     "    try { window.parent.postMessage({ type: type, x: e ? e.clientX : 0, y: e ? e.clientY : 0, selection: sel, groupId: GROUP_ID }, '*'); } catch (_e2) {}",
     "  };",
-    "  document.addEventListener('contextmenu', function(e) { e.preventDefault(); postMenu('previewContextMenu', e); });",
+    // Datagrids bring their own menu, so a right-click inside one is left alone.
+    "  document.addEventListener('contextmenu', function(e) {",
+    "    var t = e.target;",
+    "    if (t && t.closest && t.closest('.jss_container, .calcpad-ui-datagrid')) return;",
+    "    e.preventDefault(); postMenu('previewContextMenu', e);",
+    "  });",
     "  document.addEventListener('pointerdown', function() { postMenu('previewContextMenuDismiss', null); });",
     "  document.addEventListener('keydown', function(e) {",
     "    if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === 'F')) {",
@@ -1364,12 +1553,43 @@ function injectLineLinks(html: string, scrollToLine: number | undefined, groupId
     "  });",
     "});",
   ].join('\n')
+  return insertHeadScript(html, body)
+}
+
+function insertHeadScript(html: string, body: string): string {
   const script = '<' + 'script>' + body + '</' + 'script>'
   const headIdx = html.indexOf('<head>')
   if (headIdx >= 0) {
     return html.slice(0, headIdx + 6) + script + html.slice(headIdx + 6)
   }
   return script + html
+}
+
+// Hand the frame's Ctrl+C/X/V to the parent, which owns the only working
+// clipboard on a host whose WebView leaves the frame's inert (WebKitGTK, in the
+// desktop app). Capture phase with propagation stopped, so the datagrid library
+// never sees the keys either: its own Ctrl+X would clear the cells before the
+// copy could read them, and its paste depends on an event that never fires.
+// Only injected where the host has offered a clipboard to route through — in a
+// browser the frame's native handling is the better one.
+function injectPreviewClipboard(html: string, frameId: string): string {
+  if (!onClipboardReadRequest.value) return html
+  const id = JSON.stringify(frameId)
+  const body = [
+    '(function() {',
+    '  var FRAME_ID = ' + id + ';',
+    "  var ACTIONS = { c: 'copy', x: 'cut', v: 'paste' };",
+    "  document.addEventListener('keydown', function(e) {",
+    '    if ((!e.ctrlKey && !e.metaKey) || e.altKey || e.shiftKey) return;',
+    "    var action = ACTIONS[(e.key || '').toLowerCase()];",
+    '    if (!action) return;',
+    '    e.preventDefault();',
+    '    e.stopImmediatePropagation();',
+    "    try { window.parent.postMessage({ type: 'previewClipboardAction', action: action, frameId: FRAME_ID }, '*'); } catch (_e) {}",
+    '  }, true);',
+    '})();',
+  ].join('\n')
+  return insertHeadScript(html, body)
 }
 
 // Forward iframe console.* + uncaught errors to the parent window via
@@ -1557,6 +1777,7 @@ defineExpose({
   getPreviewMode,
   setUiOverridesDirty,
   onSaveUiOverridesRequest,
+  onExitUiModeRequest,
   setUiPrintHtml,
   isUiPrintVisible,
   onUiPrintToggled,
@@ -1577,6 +1798,8 @@ defineExpose({
   onTabCopyFullPathRequest,
   onTabCopyRelativePathRequest,
   onCopyTextRequest,
+  onClipboardReadRequest,
+  runFocusedPreviewClipboardAction,
   onOpenFullHtmlRequest,
 })
 </script>

@@ -177,6 +177,21 @@ namespace Calcpad.Core
             }
         }
 
+        /// <summary>
+        /// The shape of a variable holding a vector or a matrix, a vector counting as a
+        /// single row. Both counts are 0 for anything else, including a variable that has
+        /// not been assigned - as none has when the document is parsed without calculating.
+        /// </summary>
+        internal (int Rows, int Columns) GetVariableShape(string name) =>
+            !_variables.TryGetValue(name, out var v) || !v.IsInitialized
+                ? (0, 0)
+                : v.Value switch
+                {
+                    Vector vector => (1, vector.Length),
+                    Matrix matrix => (matrix.RowCount, matrix.ColCount),
+                    _ => (0, 0)
+                };
+
         internal Variable GetVariableRef(string name)
         {
             if (_variables.TryGetValue(name, out Variable v))

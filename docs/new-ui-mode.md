@@ -1,0 +1,323 @@
+# UI Mode
+
+> Calcpad.Web only (web editor, desktop app, and VS Code extension). Not available in the standalone WPF desktop application for Windows.
+
+UI mode turns a worksheet into a **fill-in form**. Mark the inputs of your calculation with the
+`#UI` keyword, switch the preview to input mode, and those lines are rendered as text boxes,
+drop-downs, radio buttons, checkboxes or editable grids instead of plain results. Type a new
+value and the whole document recalculates.
+
+The same file is still an ordinary worksheet. When the report is rendered — the normal preview,
+a PDF, a Word export — the `#UI` keyword does nothing at all: the line looks exactly as it
+would without it. You write one document, and it doubles as its own input form.
+
+```text
+#UI L = 6m
+#UI q = 25kN/m
+M = q*L^2/8
+```
+
+In report mode this is three ordinary lines. In UI mode `L` and `q` become text boxes and `M`
+follows whatever you type into them.
+
+## Turning it on
+
+**VS Code**
+
+| Command | What it does |
+|---------|--------------|
+| `CalcpadCE: Toggle #UI Input Mode` | Opens (or closes) the input form panel |
+| `CalcpadCE: Toggle #UI Report Pane` | Shows the report the entered values produce, beside the form |
+| `CalcpadCE: Save #UI Values to Document` | Writes the values you entered into the file |
+
+Closing the form asks whether to save the values first; declining discards them.
+
+**Web editor and desktop app**
+
+The preview toolbar has three modes — **Wrapped**, **Unwrapped** and **Input**. Choosing
+**Input** hands the whole window to the form and hides the editor. While it is open the toolbar
+offers **Report** (show the report the entered values produce), **Save values** (appears once
+you have changed something) and **Exit input mode**.
+
+## `#post` is hidden in UI mode
+
+`#post` blocks are suppressed while the form is on screen and shown again in the report. Put the
+parts of the document that are output — result tables, conclusions, long derivations — inside a
+`#post` block, and the form stays a short list of inputs.
+
+```text
+#UI L = 6m
+#post
+'<p>Span used: 'L'</p>
+#end post
+```
+
+## Writing a `#UI` line
+
+```text
+#UI [{ JSON properties }] name = value
+```
+
+The JSON block is optional. Without it the control type and, for grids, the number of rows and
+columns are worked out from the right-hand side.
+
+`#UI` annotates an **assignment**, and only one whose right-hand side is a plain value:
+
+| Right-hand side | Accepted | Example |
+|-----------------|----------|---------|
+| Number, with or without a unit | ✔ | `#UI L = 10m`, `#UI n = 4`, `#UI q = 3kN/m` |
+| Vector or matrix literal | ✔ | `#UI v = [1; 2; 3]`, `#UI M = [1; 2 \| 3; 4]` |
+| `vector()` / `matrix()` constructor | ✔ | `#UI Z = vector(5)`, `#UI G = matrix(r; c)` |
+| An expression | ✘ | `#UI k = 2*E`, `#UI k = max(v)`, `#UI v = [1; sqrt(4)]` |
+| A string variable (`name$`) | ✘ | `#UI s$ = ...` |
+
+An expression is rejected because a control **overwrites** the right-hand side with whatever was
+entered — the expression would be gone the moment someone used the form. Compute from the
+inputs on a following, unannotated line instead.
+
+Exponent notation is not a value here either: `2.5e6` reads as `2.5` with a unit `e6`. Write
+`2500000` or `2.5*10^6` on a separate line.
+
+### Labels
+
+An inline comment on the line labels the control. The comment is display text, so it may
+contain its own `=`:
+
+```text
+#UI 'Span, 'L = 6m
+#UI '2&middot;<i>r</i> ='d = 100mm
+```
+
+### Several controls on one line
+
+Comment segments separate assignments, so one `#UI` line can declare more than one control.
+They share the line's JSON properties but are saved and overridden separately.
+
+```text
+#UI 'b = 'b = 200mm', 'h = 'h = 400mm
+```
+
+## JSON properties
+
+| Property | Type | Applies to | Meaning |
+|----------|------|-----------|---------|
+| `type` | string | all | `entry`, `datagrid`, `dropdown`, `radio`, `checkbox`. Auto-detected when omitted |
+| `mode` | string | all | Only `number` is accepted; string inputs are not supported |
+| `style` | string | all | CSS class(es) added to the control **in UI mode** |
+| `reportStyle` | string | all | CSS class(es) added to the line **in the report** |
+| `rows` | number | datagrid | Grid rows. Auto-detected when omitted |
+| `columns` | number | datagrid | Grid columns. Auto-detected when omitted |
+| `rowHeaders` | array | datagrid | Row header labels |
+| `columnHeaders` | array | datagrid | Column header labels |
+| `keys` | array | dropdown, radio | The labels shown to the user |
+| `values` | array | dropdown, radio | The values substituted into the calculation, one per key |
+
+`keys` and `values` are both required for a drop-down or radio group, and must be the same
+length. Header arrays must not be longer than the grid dimension they label.
+
+## The control types
+
+### `entry` — a text box
+
+The default for a numeric right-hand side. The unit stays in the document beside the box, so
+only the number is editable; the box accepts digits, a decimal point and a sign, and rejects
+anything else as you type.
+
+```text
+#UI L = 10m
+#UI {"type": "entry"} W = 5m
+```
+
+### `dropdown` — a list
+
+`keys` are shown, `values` are substituted. A value may carry its own unit, so a drop-down can
+switch units as well as magnitudes.
+
+```text
+#UI {"type": "dropdown", "keys": ["Low", "Medium", "High"], "values": ["1", "2", "3"]} grade = 1
+```
+
+### `radio` — a button group
+
+Same `keys`/`values` pairing as a drop-down, laid out as radio buttons.
+
+```text
+#UI {"type": "radio", "keys": ["Steel", "Concrete"], "values": ["200GPa", "25GPa"]} E = 200GPa
+```
+
+### `checkbox` — a 1/0 toggle
+
+Checked is `1`, unchecked is `0`. Pairs naturally with `#if`.
+
+```text
+#UI {"type": "checkbox"} useSteel = 1
+```
+
+### `datagrid` — an editable grid
+
+The default whenever the right-hand side is a vector/matrix literal or a `vector()`/`matrix()`
+call. `|` separates rows and `;` separates cells, so `[1; 2; 3]` is one row of three.
+
+```text
+#UI v = [1; 2; 3]
+#UI M = [1; 2; 3 | 4; 5; 6]
+#UI Z = vector(5)
+#UI G = matrix(3; 4)
+```
+
+Sizes computed at run time work too — `matrix(r; c)`, `matrix(len(x); len(y))` — the grid is
+sized from the value the line produced.
+
+Declaring `rows` and `columns` explicitly fits the literal to that shape: missing cells become
+`0`, extra ones are dropped.
+
+```text
+#UI {"type": "datagrid", "rows": 2, "columns": 3, "columnHeaders": ["a", "b", "c"], "rowHeaders": ["r1", "r2"]} T = [0; 0; 0 | 0; 0; 0]
+```
+
+The grid's size comes from the directive, so rows and columns cannot be inserted or deleted in
+the form. Every cell becomes an element of a matrix literal, so a cell holding text — typed or
+pasted in — is put back to `0`.
+
+## Styling with CSS
+
+Two properties attach classes, and they never both apply at once:
+
+- **`style`** — added to the input control itself, and only in UI mode.
+- **`reportStyle`** — added to the element wrapping the line, and only in the report.
+
+So `style` is how the form looks, `reportStyle` is how the printed line looks, and you can set
+both on one directive to style each independently.
+
+### The base classes
+
+Every control also carries a class of its own, which is what your class combines with:
+
+| Type | Element | Base class |
+|------|---------|-----------|
+| `entry` | `<input type="text">` | `calcpad-ui-input` |
+| `dropdown` | `<select>` | `calcpad-ui-dropdown` |
+| `radio` | `<span>` wrapping the buttons | `calcpad-ui-radio`, each button's `<label>` is `calcpad-ui-radio-label` |
+| `checkbox` | `<input type="checkbox">` | `calcpad-ui-checkbox` |
+| `datagrid` | `<div>` holding the grid | `calcpad-ui-datagrid` |
+
+Write your selector as the base class plus your own class, so it only hits the controls you
+marked: `.calcpad-ui-input.highlight`, not `.highlight`. A `reportStyle` class lands on the
+line's element, which is a paragraph, so target it as `p.boxed`.
+
+### Where to put the style sheet
+
+Put the CSS in a comment block, and wrap that block in `#val` … `#end val` so the lines are
+emitted as written instead of each being wrapped in a paragraph — a `<p>` tag inserted into the
+middle of a `<style>` element breaks the rules around it.
+
+```text
+#val
+'<style>
+'  .calcpad-ui-input.highlight { background-color: #eeeeee; border: 1px solid #aaaaaa; }
+'  .calcpad-ui-dropdown.primary { font-weight: 600; }
+'  .calcpad-ui-radio.compact .calcpad-ui-radio-label { margin-right: 4px; }
+'  .calcpad-ui-checkbox.switch { accent-color: #2a8f3f; }
+'  .calcpad-ui-datagrid.bordered { border: 2px solid #444444; }
+'  p.boxed { border: 1px solid #cccccc; padding: 2px 4px; }
+'</style>
+#end val
+```
+
+Then name the classes on the directives:
+
+```text
+#UI {"style": "highlight"} depth = 2m
+#UI {"reportStyle": "boxed"} P = 25kN
+#UI {"style": "highlight", "reportStyle": "boxed"} q = 3kN/m
+#UI {"type": "dropdown", "style": "primary", "keys": ["Low", "High"], "values": ["1", "2"]} g = 1
+#UI {"type": "radio", "style": "compact", "keys": ["Steel", "Concrete"], "values": ["200GPa", "25GPa"]} E = 200GPa
+#UI {"type": "checkbox", "style": "switch"} flag = 1
+#UI {"type": "datagrid", "style": "bordered"} T = [1; 2 | 3; 4]
+```
+
+`depth` is highlighted in the form and unremarkable in the report; `P` is boxed in the report
+and an ordinary text box in the form; `q` gets both.
+
+Several classes can be listed at once — `"style": "highlight wide"` — and the usual document
+style sheet applies too, so anything you can select with CSS you can style here.
+
+### Inside a datagrid
+
+A grid is a third-party widget, so a `style` class reaches its outer container but not the cells,
+headers or context menu inside it. Those are styled by a stylesheet that ships with the
+application, not from the document — see *Customizing the `#UI` Datagrid* in `DEVELOPER.md`.
+Column widths and the grid's overall size are set by the preview script and are not adjustable
+from CSS at all.
+
+## Saving what was entered
+
+Values you type live in memory: filling in a form never dirties the file on its own. Saving
+them writes them into a metadata comment at the top of the document, which is what restores
+them the next time you open it:
+
+```text
+'<!--{"uiOverrides":{"L:1":"8","q:1":"30"}}-->
+```
+
+The keys are control identities: the variable name, then which declaration of that name it is
+(`L:1` is the first `L`), and inside a loop the pass numbers as well (`y:1:2`). A saved value
+replaces the right-hand side of its assignment in **both** modes, so the report shows the
+numbers that were entered. Hand-writing an entry works too, and a broader key covers more
+controls — `L:1` covers every pass of that declaration, a bare `L` covers every declaration of
+the name.
+
+See [Metadata Comments](new-metadata-comments.md) for the comment format itself.
+
+## `#UI` in macros, conditions and loops
+
+The keyword works anywhere a normal assignment does.
+
+```text
+#def Beam$(span$)
+	#UI load = 10kN/m
+	M = load*span$^2/8
+#end def
+Beam$(6m)
+```
+
+Inside `#if` only the taken branch renders a control, and flipping the branch does not renumber
+the controls that follow:
+
+```text
+#UI {"type": "checkbox"} useSteel = 1
+#if useSteel ≡ 1
+	#UI E = 200GPa
+#else
+	#UI E = 25GPa
+#end if
+```
+
+Inside a loop each pass renders its own control, and each is entered separately:
+
+```text
+#repeat 3
+	#UI y = 2
+	y
+#loop
+```
+
+## Diagnostics
+
+`#UI` problems are reported under `CPD-3415`, by the linter as you type and by the calculation
+engine when you run the document:
+
+| Message | Cause |
+|---------|-------|
+| The `#UI` keyword requires a variable assignment. | The line assigns nothing |
+| `#UI` directives do not support expressions. | The right-hand side is computed, not a value |
+| String mode is not supported by the `#UI` keyword. | The variable ends with `$`, or `"mode"` is not `number` |
+| Improper format for `#UI` keyword. Missing closing brace. | The JSON block is unterminated |
+| Improper format for `#UI` keyword. Invalid JSON. | The block is not valid JSON |
+| A `#UI` value has the wrong type. | A property was given the wrong kind of value |
+| The `#UI` type '…' is not recognized… | `"type"` is not one of the five |
+| The `#UI` … requires both keys and values arrays. | A drop-down or radio group is missing one |
+| The `#UI` … keys and values arrays must have the same length. | They are paired, so the counts must match |
+| The `#UI` … has *n* entries but the grid has *m* … | More headers than rows or columns |
+
+See [Linter and Diagnostics](new-linter.md) for how diagnostics are surfaced.

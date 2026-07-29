@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Calcpad.Highlighter.Parsing;
 
 namespace Calcpad.Highlighter.ContentResolution
 {
@@ -9,13 +10,6 @@ namespace Calcpad.Highlighter.ContentResolution
     /// </summary>
     public partial class ContentResolver
     {
-        /// <summary>
-        /// Characters that allow implicit line continuation when at end of line (not in a comment).
-        /// From Calcpad.Wpf UserDefined.cs: "_;|&@:({["
-        /// Note: '_' is handled separately as explicit continuation with space before it.
-        /// </summary>
-        private static readonly HashSet<char> LineExtensionChars = new HashSet<char> { ';', '|', '&', '@', ':', '(', '{', '[' };
-
         /// <summary>
         /// STAGE 1: Process line continuations only
         /// Line continuation occurs when:
@@ -211,7 +205,7 @@ namespace Calcpad.Highlighter.ContentResolution
 
             // Check for implicit line continuation (ends with one of the special characters)
             var lastChar = lineSpan[lastCharPosInLine];
-            bool hasImplicitContinuation = LineExtensionChars.Contains(lastChar);
+            bool hasImplicitContinuation = CharClassifier.IsLineExtension(lastChar);
 
             // Always return actual bracket depths - they're used to track unbalanced delimiters
             return (false, hasImplicitContinuation, line, parenDepth, bracketDepth, braceDepth);

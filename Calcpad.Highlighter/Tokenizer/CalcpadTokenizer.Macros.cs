@@ -388,12 +388,12 @@ namespace Calcpad.Highlighter.Tokenizer
             }
         }
 
-        private void ParseMacroArgs(char c)
+        private void ParseMacroArgs(char c, int position)
         {
             // If we have pre-tokenized data from body substitution, use that instead
             if (_macroCallPreTokenized != null)
             {
-                ParseMacroArgsPreTokenized(c);
+                ParseMacroArgsPreTokenized(c, position);
                 return;
             }
 
@@ -748,27 +748,29 @@ namespace Calcpad.Highlighter.Tokenizer
 
         /// <summary>
         /// Handles macro argument characters when pre-tokenized data is available.
-        /// Emits pre-computed tokens for each argument and handles structural characters (;, (, )) normally.
+        /// Emits pre-computed tokens for each argument and handles the call's own structural
+        /// characters (the argument separators and the closing paren). Parens and semicolons
+        /// nested deeper than the call belong to an argument and are already covered by its
+        /// pre-tokenized tokens, so they are only counted here, never emitted again.
         /// </summary>
-        private void ParseMacroArgsPreTokenized(char c)
+        private void ParseMacroArgsPreTokenized(char c, int position)
         {
             // Emit pre-computed tokens for current arg if not yet done
             if (!_macroArgPreEmitted &&
                 _state.CurrentMacroArgIndex < _macroCallPreTokenized.Count)
             {
-                var argTokens = _macroCallPreTokenized[_state.CurrentMacroArgIndex];
-                foreach (var token in argTokens)
+                foreach (var token in _macroCallPreTokenized[_state.CurrentMacroArgIndex])
                 {
                     _result.AddToken(token);
                 }
-                // Advance TokenStartColumn to end of the emitted tokens
-                if (argTokens.Count > 0)
-                {
-                    var lastToken = argTokens[argTokens.Count - 1];
-                    _state.TokenStartColumn = lastToken.Column + lastToken.Length;
-                }
                 _macroArgPreEmitted = true;
             }
+
+            // Structural characters carry their own column, so the token cursor is set from
+            // the character position instead of accumulating over skipped argument content.
+            // Only the call's own closing paren and its argument separators sit at call depth;
+            // the opening paren was already emitted by ParseBrackets.
+            var atCallDepth = _state.BracketCount <= _state.MacroArgs;
 
             if (c == '(' || c == ')')
             {
@@ -776,7 +778,7 @@ namespace Calcpad.Highlighter.Tokenizer
                     _state.BracketCount++;
                 else
                 {
-                    if (_state.BracketCount <= _state.MacroArgs)
+                    if (atCallDepth)
                     {
                         _state.MacroArgs = 0;
                         _state.CurrentMacroCall = null;
@@ -787,18 +789,23 @@ namespace Calcpad.Highlighter.Tokenizer
                     _state.BracketCount--;
                 }
 
-                _builder.Clear();
-                _builder.Append(c);
-                _state.CurrentType = TokenType.Bracket;
-                Append(TokenType.Bracket);
+                if (c == ')' && atCallDepth)
+                {
+                    _builder.Clear();
+                    _builder.Append(c);
+                    _state.TokenStartColumn = position;
+                    _state.CurrentType = TokenType.Bracket;
+                    Append(TokenType.Bracket);
+                }
 
                 if (_state.TextComment != '\0' && c == ')' && _state.BracketCount == 0)
                     _state.CurrentType = TokenType.Comment;
             }
-            else if (c == ';')
+            else if (c == ';' && atCallDepth)
             {
                 _builder.Clear();
                 _builder.Append(c);
+                _state.TokenStartColumn = position;
                 _state.CurrentType = TokenType.Operator;
                 Append(TokenType.Operator);
 
