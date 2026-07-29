@@ -57,8 +57,8 @@
         :title="buildTooltip(item)"
       >
         <div class="item-display">{{ formatDisplayText(item) }}</div>
-        <div v-if="item.description" class="item-description">
-          {{ item.description }}
+        <div v-if="formatSecondaryText(item)" class="item-description">
+          {{ formatSecondaryText(item) }}
         </div>
         <div v-if="item.categoryPath" class="item-category">
           {{ item.categoryPath }}
@@ -214,10 +214,21 @@ const buildTreeFromItems = (items: InsertItem[]): TreeNode => {
   return tree
 }
 
+// Markup snippets insert long, multi-line code. Their buttons show the friendly
+// name and the tooltip carries the code — the reverse of every other category,
+// where the tag itself is short enough to be the button text.
+const MARKUP_CATEGORIES = new Set(['HTML', 'Metadata Properties', 'SVG', 'Markdown'])
+
+const isMarkupItem = (item: InsertItem): boolean =>
+  MARKUP_CATEGORIES.has((item.categoryPath ?? '').split(' > ')[0])
+
 // Format display text (uses label if available, falls back to tag).
 // Appends (~shortcut) for items with quick typing support.
 const formatDisplayText = (item: InsertItem): string => {
-  const display = replaceParameterPlaceholders(item.label || item.tag, item)
+  const name = isMarkupItem(item)
+    ? item.label || item.description || item.tag
+    : item.label || item.tag
+  const display = replaceParameterPlaceholders(name, item)
   if (item.quickType) {
     return display + ' (~' + item.quickType + ')'
   }
@@ -228,11 +239,21 @@ const formatInsertText = (item: InsertItem): string => {
   return replaceParameterPlaceholders(item.tag, item)
 }
 
+// Secondary line under the display text in search results. Markup items show
+// their code there, since their description is already the display text.
+const formatSecondaryText = (item: InsertItem): string =>
+  isMarkupItem(item) ? formatInsertText(item) : (item.description ?? '')
+
 // Helper: Build a plain-text tooltip carrying the same information the
 // source-code hover shows (description, documentation, parameters with
 // type/optional/variadic, return type, element-wise note, example).
 const buildTooltip = (item: InsertItem): string => {
   const lines: string[] = []
+
+  if (isMarkupItem(item)) {
+    lines.push(formatInsertText(item))
+    lines.push('')
+  }
 
   if (item.description) {
     lines.push(item.description)

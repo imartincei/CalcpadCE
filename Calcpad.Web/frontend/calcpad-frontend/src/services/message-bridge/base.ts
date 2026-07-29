@@ -6,7 +6,7 @@ import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBl
 import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
 import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
 import type { UiDirectiveData } from '../../text/ui-directive';
-import type { DefinitionsResponse } from '../../types/api';
+import type { DefinitionsResponse, ExportVariant } from '../../types/api';
 import { getDefaultSettings, buildApiSettings } from '../../types/settings';
 import type { CalcpadSettings } from '../../types/settings';
 import { DEFAULT_PDF_SETTINGS } from '../../types/pdf-settings';
@@ -41,6 +41,50 @@ export type QuickPickFn = <T>(opts: {
     options: QuickPickOption<T>[];
 }) => Promise<T | null>;
 
+/**
+ * The convert-request fields a given export variant renders with. `unwrapped` goes to a
+ * different endpoint entirely, hence the flag rather than a field.
+ *
+ * No variant carries line anchors: an exported file is read, not navigated, so the per-line
+ * ids and error-summary boxes the preview relies on are always suppressed.
+ */
+export interface VariantRender {
+    forPrint: boolean;
+    enableUi: boolean;
+    unwrap: boolean;
+    /** Whether the entered `#UI` values apply to this rendering. */
+    useOverrides: boolean;
+    /** Suffix for the save dialog's title, e.g. "Export Preview PDF". */
+    label: string;
+}
+
+/**
+ * `report` is the default: the print layout, with `#pre` hidden and the entered `#UI` values
+ * applied. `preview` is what the results pane shows. `input` is the form itself — `enableUi`
+ * needs `forPrint` false, since the server drops UI mode for print output.
+ */
+export function variantRender(variant: ExportVariant): VariantRender {
+    switch (variant) {
+        case 'preview':
+            return { forPrint: false, enableUi: false, unwrap: false, useOverrides: false, label: 'Preview' };
+        case 'input':
+            return { forPrint: false, enableUi: true, unwrap: false, useOverrides: true, label: 'Input Form' };
+        case 'unwrapped':
+            return { forPrint: false, enableUi: false, unwrap: true, useOverrides: false, label: 'Unwrapped' };
+        default:
+            return { forPrint: true, enableUi: false, unwrap: false, useOverrides: true, label: '' };
+    }
+}
+
+/**
+ * Save-dialog title naming the variant, so four PDF buttons don't all open an identically
+ * titled dialog. The default report variant stays unqualified: "Export PDF".
+ */
+function exportDialogTitle(verb: string, format: string, variant: ExportVariant): string {
+    const label = variantRender(variant).label;
+    return label ? `${verb} ${label} ${format}` : `${verb} ${format}`;
+}
+
 /** Base64 payloads above this size prompt a "save to file instead?" warning. */
 const BASE64_WARN_BYTES = 250 * 1024;
 
@@ -64,6 +108,7 @@ export abstract class BaseMessageBridge {
     protected settings: CalcpadSettings;
     protected _onInsertText: ((text: string) => void) | null = null;
     protected quickPick: QuickPickFn | null = null;
+    private _uiOverridesProvider: (() => Record<string, string> | undefined) | null = null;
     private _cachedPlots: ExtractedPlot[] = [];
 
     constructor(serverUrl: string, logger?: ILogger) {
@@ -93,6 +138,28 @@ export abstract class BaseMessageBridge {
     /** Host injects a modal list picker used by the image-storage prompt. */
     setQuickPick(fn: QuickPickFn): void {
         this.quickPick = fn;
+    }
+
+    /**
+     * Host injects a lookup for the active document's entered `#UI` values. The store lives
+     * with the editor groups (it is keyed per document), so the bridge can't own it — but
+     * report and input-form exports need it to render what the user actually typed.
+     */
+    setUiOverridesProvider(fn: () => Record<string, string> | undefined): void {
+        this._uiOverridesProvider = fn;
+    }
+
+    protected activeUiOverrides(): Record<string, string> | undefined {
+        return this._uiOverridesProvider?.() ?? undefined;
+    }
+
+    /** The `#UI` options an export of `variant` should render with. */
+    protected uiOptionsFor(variant: ExportVariant): { enableUi: boolean; uiOverrides?: Record<string, string> } {
+        const render = variantRender(variant);
+        return {
+            enableUi: render.enableUi,
+            uiOverrides: render.useOverrides ? this.activeUiOverrides() : undefined,
+        };
     }
 
     /** Send updated TOC headings to the Vue sidebar. */
@@ -175,13 +242,13 @@ export abstract class BaseMessageBridge {
                 this.handleGetPdfSettings();
                 break;
             case 'generatePdf':
-                this.handleGeneratePdf();
+                this.handleGeneratePdf(message.variant);
                 break;
             case 'saveSourceHtml':
-                this.handleSaveSourceHtml();
+                this.handleSaveSourceHtml(message.variant);
                 break;
             case 'saveDocx':
-                this.handleSaveDocx();
+                this.handleSaveDocx(message.variant);
                 break;
             case 'getPlots':
                 this.handleGetPlots();
@@ -259,6 +326,7 @@ export abstract class BaseMessageBridge {
         content: string,
         apiSettings: unknown,
         sourceFilePath: string | undefined,
+        variant: ExportVariant,
     ): Promise<ArrayBuffer | null>;
 
     protected buildSettingsResponseExtras(): Record<string, unknown> | Promise<Record<string, unknown>> { return {}; }
@@ -398,9 +466,18 @@ export abstract class BaseMessageBridge {
     }
 
     private handleGetPdfSettings(): void {
+        this.postToVue({ type: 'pdfSettingsResponse', settings: this.getStoredPdfOptions() });
+    }
+
+    /** The persisted PDF options (page size, header/footer, title), for the `/pdf` endpoint. */
+    protected getStoredPdfOptions(): Record<string, unknown> {
         const stored = this.getExtraSetting('pdfSettings');
-        const settings = stored ? JSON.parse(stored) : { ...DEFAULT_PDF_SETTINGS };
-        this.postToVue({ type: 'pdfSettingsResponse', settings });
+        if (!stored) return { ...DEFAULT_PDF_SETTINGS };
+        try {
+            return JSON.parse(stored);
+        } catch {
+            return { ...DEFAULT_PDF_SETTINGS };
+        }
     }
 
     private async handleInsertImage(): Promise<void> {
@@ -487,34 +564,61 @@ export abstract class BaseMessageBridge {
         return mode;
     }
 
-    private async handleSaveSourceHtml(): Promise<void> {
+    private async handleSaveSourceHtml(variant: ExportVariant = 'report'): Promise<void> {
         const content = this.getActiveEditorContent();
         const apiSettings = buildApiSettings(this.settings);
         const { sourceFilePath } = await this.buildFileContext(content);
-        const result = await this.apiClient.convert(content, apiSettings, 'html', false, sourceFilePath);
-        if (!result || result instanceof ArrayBuffer) return;
+        const html = await this.renderForExport(content, apiSettings, sourceFilePath, variant);
+        if (html == null) return;
         await this.saveExportedFile({
             defaultName: 'calcpad-output.html',
-            data: result.html,
+            data: html,
             mime: 'text/html;charset=utf-8',
             extensions: ['html', 'htm'],
-            dialogTitle: 'Save HTML',
+            dialogTitle: exportDialogTitle('Save', 'HTML', variant),
         });
     }
 
-    private async handleSaveDocx(): Promise<void> {
+    private async handleSaveDocx(variant: ExportVariant = 'report'): Promise<void> {
+        const render = variantRender(variant);
+        // A form and a code listing have no meaningful Word rendering, so the Export tab
+        // doesn't offer them; guard anyway rather than emit a nonsense document.
+        if (render.enableUi || render.unwrap) return;
         const content = this.getActiveEditorContent();
         const apiSettings = buildApiSettings(this.settings);
         const { sourceFilePath } = await this.buildFileContext(content);
-        const buf = await this.apiClient.convertDocx(content, apiSettings, sourceFilePath);
+        const buf = await this.apiClient.convertDocx(content, apiSettings, sourceFilePath, {
+            forPrint: render.forPrint,
+            uiOverrides: render.useOverrides ? this.activeUiOverrides() : undefined,
+        });
         if (!buf) return;
         await this.saveExportedFile({
             defaultName: 'calcpad-output.docx',
             data: buf,
             mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             extensions: ['docx'],
-            dialogTitle: 'Save Word Document',
+            dialogTitle: exportDialogTitle('Save', 'Word Document', variant),
         });
+    }
+
+    /**
+     * Render `variant` to HTML for writing to a file: never with line anchors, and with the
+     * entered `#UI` values only where the variant calls for them. Also the first half of the
+     * PDF pipeline, which feeds this HTML to `/pdf`.
+     */
+    protected async renderForExport(
+        content: string,
+        apiSettings: unknown,
+        sourceFilePath: string | undefined,
+        variant: ExportVariant,
+    ): Promise<string | null> {
+        const render = variantRender(variant);
+        const result = render.unwrap
+            ? await this.apiClient.convertUnwrapped(content, apiSettings, sourceFilePath)
+            : await this.apiClient.convert(
+                content, apiSettings, 'html', render.forPrint, sourceFilePath, undefined,
+                this.uiOptionsFor(variant), false);
+        return result && !(result instanceof ArrayBuffer) ? result.html : null;
     }
 
     private async handleGetPlots(): Promise<void> {
@@ -570,7 +674,7 @@ export abstract class BaseMessageBridge {
         });
     }
 
-    private async handleGeneratePdf(): Promise<void> {
+    private async handleGeneratePdf(variant: ExportVariant = 'report'): Promise<void> {
         if (!(await this.runPdfPreflight())) return;
 
         const content = this.getActiveEditorContent();
@@ -578,14 +682,14 @@ export abstract class BaseMessageBridge {
         const { sourceFilePath } = await this.buildFileContext(content);
 
         try {
-            const pdfBytes = await this.generatePdfBytes(content, apiSettings, sourceFilePath);
+            const pdfBytes = await this.generatePdfBytes(content, apiSettings, sourceFilePath, variant);
             if (!pdfBytes) return;
             const savedPath = await this.saveExportedFile({
                 defaultName: 'calcpad-output.pdf',
                 data: pdfBytes,
                 mime: 'application/pdf',
                 extensions: ['pdf'],
-                dialogTitle: 'Export PDF',
+                dialogTitle: exportDialogTitle('Export', 'PDF', variant),
             });
             if (savedPath) await this.onPdfSaved(savedPath);
         } catch (err) {

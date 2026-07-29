@@ -25,9 +25,9 @@ import {
     serializeSettingsBlob,
     getExtraBool,
     getExtraNumber,
-    getExtraObject,
 } from 'calcpad-frontend/types/settings';
 import type { CalcpadSettings, CalcpadExtras } from 'calcpad-frontend/types/settings';
+import type { ExportVariant } from 'calcpad-frontend/types/api';
 import {
     IMAGE_EXTENSIONS,
     bytesToBase64,
@@ -385,23 +385,19 @@ export class TauriMessageBridge extends BaseMessageBridge {
         content: string,
         apiSettings: unknown,
         sourceFilePath: string | undefined,
+        variant: ExportVariant,
     ): Promise<ArrayBuffer | null> {
-        const baseUrl = this.apiClient.getBaseUrl();
-        const htmlResp = await fetch(`${baseUrl}/api/calcpad/convert`, {
+        const rendered = await this.renderForExport(content, apiSettings, sourceFilePath, variant);
+        if (rendered == null) throw new Error('HTML convert produced no output');
+
+        // The headless browser has no filesystem access, so on-disk images have to travel
+        // as data URIs.
+        const html = await inlineLocalImages(rendered, this.activeTabDirectory());
+
+        const pdfResp = await fetch(`${this.apiClient.getBaseUrl()}/api/calcpad/pdf`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content, settings: apiSettings, forPrint: true, sourceFilePath }),
-            signal: AbortSignal.timeout(30000),
-        });
-        if (!htmlResp.ok) throw new Error(`HTML convert returned ${htmlResp.status}`);
-        let html = await htmlResp.text();
-
-        html = await inlineLocalImages(html, this.activeTabDirectory());
-
-        const pdfResp = await fetch(`${baseUrl}/api/calcpad/pdf`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ html, options: this.getPdfOptions() }),
+            body: JSON.stringify({ html, options: this.getStoredPdfOptions() }),
             signal: AbortSignal.timeout(60000),
         });
         if (!pdfResp.ok) throw new Error(`PDF endpoint returned ${pdfResp.status}`);
@@ -835,10 +831,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     // ---- Server log + browser-missing warning ----
-
-    private getPdfOptions(): unknown {
-        return getExtraObject<Record<string, unknown>>(this._extraSettings, 'pdfSettings', {});
-    }
 
     private async handleGetServerLog(): Promise<void> {
         const path = await this.getServerLogPath();

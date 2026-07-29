@@ -26,6 +26,7 @@ export type {
     CalcpadErrorSource,
     ConvertResult,
     UiConvertOptions,
+    ExportVariant,
     CpdzDecodeResponse,
     CpdzEncodeResponse,
 } from './types/api';
@@ -101,8 +102,8 @@ export { isCompiledPath, COMPILED_EXTENSION } from './services/cpdz';
 export type { UiOverrides, UiValueChange } from './services/ui-overrides';
 
 // --- Message Bridge (base class) --------------------------------------------
-export { BaseMessageBridge } from './services/message-bridge/base';
-export type { ExportRequest } from './services/message-bridge/base';
+export { BaseMessageBridge, variantRender } from './services/message-bridge/base';
+export type { ExportRequest, VariantRender } from './services/message-bridge/base';
 
 // --- Headings / TOC ----------------------------------------------------------
 export type { TocHeading } from './services/headings';

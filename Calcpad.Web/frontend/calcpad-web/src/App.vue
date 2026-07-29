@@ -280,26 +280,32 @@
 
     <div v-if="previewVisible" class="preview-pane" :class="{ fullscreen: uiModeFullscreen }">
       <div class="preview-toolbar" @contextmenu.prevent>
-        <span>Preview</span>
+        <span>Results</span>
         <div class="preview-mode-group">
           <button
             class="toolbar-btn"
-            :class="{ active: previewMode === 'wrapped' }"
-            @click="setPreviewMode('wrapped')"
-            title="Full HTML document"
-          >Wrapped</button>
+            :class="{ active: resultMode === 'preview' }"
+            @click="setResultMode('preview')"
+            title="The document as written — #pre and #post both shown, entered #UI values ignored"
+          >Preview</button>
           <button
             class="toolbar-btn"
-            :class="{ active: previewMode === 'unwrapped' }"
-            @click="setPreviewMode('unwrapped')"
-            title="Body markup only"
+            :class="{ active: resultMode === 'unwrapped' }"
+            @click="setResultMode('unwrapped')"
+            title="The source listing, with macros and includes resolved"
           >Unwrapped</button>
           <button
             class="toolbar-btn"
-            :class="{ active: previewMode === 'ui' }"
-            @click="setPreviewMode('ui')"
+            :class="{ active: resultMode === 'ui' }"
+            @click="setResultMode('ui')"
             title="#UI input form — #post content is hidden"
           >Input</button>
+          <button
+            class="toolbar-btn"
+            :class="{ active: resultMode === 'report' }"
+            @click="setResultMode('report')"
+            title="The print layout — #pre hidden, entered #UI values applied"
+          >Report</button>
         </div>
         <span class="spacer"></span>
         <button
@@ -310,7 +316,13 @@
           title="Show the report the entered values produce"
         >Report</button>
         <button
-          v-if="previewMode === 'ui' && uiOverridesDirty"
+          v-if="resultMode === 'report' || resultMode === 'ui'"
+          class="toolbar-btn"
+          @click="onPrintReport"
+          title="Export the report — #pre hidden, entered #UI values applied — as a PDF"
+        >Print PDF</button>
+        <button
+          v-if="resultMode === 'ui' && uiOverridesDirty"
           class="toolbar-btn"
           @click="onSaveUiOverrides"
           title="Write the entered values into the document so they survive a reload"
@@ -479,28 +491,35 @@ export interface ProblemItem {
 }
 
 /**
- * 'ui' renders `#UI` lines as interactive controls and hides `#post` content;
- * it can show the print layout alongside (see `uiPrintVisible`). 'wrapped' and
- * 'unwrapped' are the on-screen report and the code listing, both of which
- * render the document's own values rather than anything entered in the form.
+ * What the results pane shows.
+ *
+ * - 'preview' — the document as written: `#pre` and `#post` both rendered, and the
+ *   values in the source rather than anything entered in the form.
+ * - 'unwrapped' — the source listing, macros and includes resolved.
+ * - 'ui' — `#UI` lines as interactive controls, `#post` hidden. Takes over the window
+ *   and can show the report alongside (see `uiPrintVisible`).
+ * - 'report' — the print layout: `#pre` hidden and the entered `#UI` values applied,
+ *   without leaving the editor for the form.
  */
-export type PreviewMode = 'wrapped' | 'unwrapped' | 'ui'
+export type ResultMode = 'preview' | 'unwrapped' | 'ui' | 'report'
 
-// Preview mode is shared across both groups. `onGotoProblem` targets the
+// Result mode is shared across both groups. `onGotoProblem` targets the
 // active group's editor (main.ts resolves it).
 const onGotoProblem = ref<((problem: ProblemItem) => void) | null>(null)
 const onPreviewToggled = ref<((visible: boolean) => void) | null>(null)
-const onPreviewModeChanged = ref<((mode: PreviewMode) => void) | null>(null)
-const previewMode = ref<PreviewMode>('wrapped')
+const onResultModeChanged = ref<((mode: ResultMode) => void) | null>(null)
+const resultMode = ref<ResultMode>('preview')
 
 // True while the active document holds #UI values that aren't in its source yet.
 const uiOverridesDirty = ref(false)
 const onSaveUiOverridesRequest = ref<(() => void) | null>(null)
 // Asked before the input form closes; false keeps it open (the user cancelled).
 const onExitUiModeRequest = ref<(() => Promise<boolean>) | null>(null)
+// "Print PDF" on the report/input toolbar; the host runs the report PDF export.
+const onPrintReportRequest = ref<(() => void) | null>(null)
 
 /** UI mode hands the whole window to the input form; the editor is hidden. */
-const uiModeFullscreen = computed(() => previewVisible.value && previewMode.value === 'ui')
+const uiModeFullscreen = computed(() => previewVisible.value && resultMode.value === 'ui')
 
 // The report pane beside the input form, toggled like the preview pane itself.
 const uiPrintVisible = ref(false)
@@ -1024,6 +1043,9 @@ const previewFind = ref<PreviewFindState | null>(null)
 const previewFindInput = ref<HTMLInputElement | null>(null)
 
 function openPreviewFind(groupId: string): void {
+  // Search runs against a group's preview iframe, so a frame without one — the report
+  // pane beside the input form — has nothing to open the widget over.
+  if (!previewEls.has(groupId)) return
   const existing = previewFind.value
   previewFind.value = {
     groupId,
@@ -1336,7 +1358,7 @@ function onSidebarHandleMouseDown(e: MouseEvent): void {
 }
 
 async function togglePreview(): Promise<void> {
-  if (previewVisible.value && previewMode.value === 'ui' && !await confirmExitUiMode()) return
+  if (previewVisible.value && resultMode.value === 'ui' && !await confirmExitUiMode()) return
   previewVisible.value = !previewVisible.value
   onPreviewToggled.value?.(previewVisible.value)
 }
@@ -1345,11 +1367,11 @@ function isPreviewVisible(): boolean {
   return previewVisible.value
 }
 
-async function setPreviewMode(mode: PreviewMode): Promise<void> {
-  if (previewMode.value === mode) return
-  if (previewMode.value === 'ui' && !await confirmExitUiMode()) return
-  previewMode.value = mode
-  onPreviewModeChanged.value?.(mode)
+async function setResultMode(mode: ResultMode): Promise<void> {
+  if (resultMode.value === mode) return
+  if (resultMode.value === 'ui' && !await confirmExitUiMode()) return
+  resultMode.value = mode
+  onResultModeChanged.value?.(mode)
 }
 
 /**
@@ -1361,8 +1383,8 @@ async function confirmExitUiMode(): Promise<boolean> {
   return await onExitUiModeRequest.value?.() ?? true
 }
 
-function getPreviewMode(): PreviewMode {
-  return previewMode.value
+function getResultMode(): ResultMode {
+  return resultMode.value
 }
 
 function setUiOverridesDirty(dirty: boolean): void {
@@ -1373,9 +1395,13 @@ function onSaveUiOverrides(): void {
   onSaveUiOverridesRequest.value?.()
 }
 
+function onPrintReport(): void {
+  onPrintReportRequest.value?.()
+}
+
 /** Leaves the fullscreen input form for the report view, bringing the editor back. */
 function exitUiMode(): void {
-  void setPreviewMode('wrapped')
+  void setResultMode('report')
 }
 
 function setPreviewLoading(groupId: string, loading: boolean): void {
@@ -1399,16 +1425,17 @@ function setPreviewHtml(groupId: string, html: string, scrollToLine?: number): v
 }
 
 /**
- * Writes the report that accompanies the input form. It is a read-only rendering,
- * so it gets neither the line links nor the console interception the main preview
- * needs — and no #UI event script, since it carries no controls. It does get the
- * clipboard bridge, since copying a result out of it is otherwise dead.
+ * Writes the report that accompanies the input form. It carries no controls, so it needs
+ * no #UI event script, and nothing in it logs, so it needs no console interception. It does
+ * get the clipboard bridge — copying a result out of it is otherwise dead — and the line
+ * links, so a result traces back to the line that produced it.
  */
 function setUiPrintHtml(groupId: string, html: string): void {
   const doc = uiPrintEls.get(groupId)?.contentDocument
   if (!doc) return
+  const frameId = UI_PRINT_FRAME + groupId
   doc.open()
-  doc.write(injectPreviewClipboard(html, UI_PRINT_FRAME + groupId))
+  doc.write(injectPreviewClipboard(injectLineLinks(html, undefined, groupId, frameId), frameId))
   doc.close()
 }
 
@@ -1443,12 +1470,23 @@ function scrollPreviewToSourceLine(groupId: string, line: number): void {
 // highlight CSS these scripts rely on now lives in the backend's template.html
 // since it's static and applies to the print/export path too; only the
 // per-render behaviour (which needs groupId/scrollToLine) is injected here.
-function injectLineLinks(html: string, scrollToLine: number | undefined, groupId: string): string {
+//
+// `frameId` addresses the iframe itself and only differs for the report pane beside
+// the input form, which shares its group's id: navigation still targets the group's
+// editor, while the menu and find widget belong to whichever frame was clicked.
+function injectLineLinks(
+  html: string,
+  scrollToLine: number | undefined,
+  groupId: string,
+  frameId: string = groupId,
+): string {
   const scrollTarget = typeof scrollToLine === 'number' ? String(scrollToLine) : 'null'
   const gid = JSON.stringify(groupId)
+  const fid = JSON.stringify(frameId)
   const body = [
     "document.addEventListener('DOMContentLoaded', function() {",
     "  var GROUP_ID = " + gid + ";",
+    "  var FRAME_ID = " + fid + ";",
     "  var post = function(line, lineType) {",
     "    try { window.parent.postMessage({ type: 'navigateToLine', line: line, lineType: lineType, groupId: GROUP_ID }, '*'); } catch (e) {}",
     "  };",
@@ -1457,7 +1495,7 @@ function injectLineLinks(html: string, scrollToLine: number | undefined, groupId
     // right-click nets an open menu and any other click dismisses it.
     "  var postMenu = function(type, e) {",
     "    var sel = ''; try { sel = String(window.getSelection() || ''); } catch (_e) {}",
-    "    try { window.parent.postMessage({ type: type, x: e ? e.clientX : 0, y: e ? e.clientY : 0, selection: sel, groupId: GROUP_ID }, '*'); } catch (_e2) {}",
+    "    try { window.parent.postMessage({ type: type, x: e ? e.clientX : 0, y: e ? e.clientY : 0, selection: sel, groupId: FRAME_ID }, '*'); } catch (_e2) {}",
     "  };",
     // Datagrids bring their own menu, so a right-click inside one is left alone.
     "  document.addEventListener('contextmenu', function(e) {",
@@ -1469,7 +1507,7 @@ function injectLineLinks(html: string, scrollToLine: number | undefined, groupId
     "  document.addEventListener('keydown', function(e) {",
     "    if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === 'F')) {",
     "      e.preventDefault();",
-    "      try { window.parent.postMessage({ type: 'previewFindOpen', groupId: GROUP_ID }, '*'); } catch (_e) {}",
+    "      try { window.parent.postMessage({ type: 'previewFindOpen', groupId: FRAME_ID }, '*'); } catch (_e) {}",
     "    }",
     "  });",
     "  var isCodeView = !!document.querySelector('.line-num');",
@@ -1772,12 +1810,13 @@ defineExpose({
   setProblems,
   onGotoProblem,
   onPreviewToggled,
-  onPreviewModeChanged,
-  setPreviewMode,
-  getPreviewMode,
+  onResultModeChanged,
+  setResultMode,
+  getResultMode,
   setUiOverridesDirty,
   onSaveUiOverridesRequest,
   onExitUiModeRequest,
+  onPrintReportRequest,
   setUiPrintHtml,
   isUiPrintVisible,
   onUiPrintToggled,

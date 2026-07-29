@@ -1,21 +1,25 @@
 <template>
   <div class="export-tab">
     <div class="export-container p-3">
-      <div class="header-actions">
-        <button
-          class="btn"
-          @click="$emit('saveHtml')"
-          :title="'Save the rendered HTML for the current document'"
-        >
-          Save HTML…
-        </button>
-        <button
-          class="btn"
-          @click="$emit('saveDocx')"
-          :title="'Export the current document as a Word .docx file'"
-        >
-          Save Word…
-        </button>
+      <div v-for="group in EXPORT_GROUPS" :key="group.variant" class="export-group">
+        <h3 class="export-group-title">{{ group.label }}</h3>
+        <p class="export-group-detail">{{ group.detail }}</p>
+        <div class="header-actions">
+          <button class="btn" @click="$emit('savePdf', group.variant)" :title="`Save this document's ${group.label.toLowerCase()} as a PDF`">
+            Save PDF…
+          </button>
+          <button
+            v-if="group.word"
+            class="btn"
+            @click="$emit('saveDocx', group.variant)"
+            :title="`Save this document's ${group.label.toLowerCase()} as a Word .docx file`"
+          >
+            Save Word…
+          </button>
+          <button class="btn" @click="$emit('saveHtml', group.variant)" :title="`Save this document's ${group.label.toLowerCase()} as standalone HTML`">
+            Save HTML…
+          </button>
+        </div>
       </div>
 
       <div class="plots-section">
@@ -67,6 +71,8 @@
 </template>
 
 <script setup lang="ts">
+import type { ExportVariant } from '../../types/api'
+
 export interface PlotSummary {
   index: number
   ext: 'png' | 'svg'
@@ -74,14 +80,44 @@ export interface PlotSummary {
   sizeBytes: number
 }
 
+// Report first: it is the default rendering everywhere else, so it reads as the one to
+// reach for. A form and a code listing have no meaningful Word form, hence `word: false`.
+const EXPORT_GROUPS: { variant: ExportVariant; label: string; detail: string; word: boolean }[] = [
+  {
+    variant: 'report',
+    label: 'Report',
+    detail: '#pre hidden, #post shown, entered #UI values applied.',
+    word: true,
+  },
+  {
+    variant: 'preview',
+    label: 'Preview',
+    detail: 'What the results pane shows: #pre and #post, document values.',
+    word: true,
+  },
+  {
+    variant: 'input',
+    label: 'Input form',
+    detail: 'The #UI form itself, #post hidden. Exported controls are static.',
+    word: false,
+  },
+  {
+    variant: 'unwrapped',
+    label: 'Unwrapped',
+    detail: 'The source listing with macros and includes resolved.',
+    word: false,
+  },
+]
+
 defineProps<{
   plots: PlotSummary[]
   loading: boolean
 }>()
 
 defineEmits<{
-  saveHtml: []
-  saveDocx: []
+  savePdf: [variant: ExportVariant]
+  saveHtml: [variant: ExportVariant]
+  saveDocx: [variant: ExportVariant]
   refreshPlots: []
   savePlot: [index: number]
   savePlotsZip: []
@@ -110,6 +146,24 @@ function formatSize(bytes: number): string {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+}
+
+.export-group + .export-group {
+  margin-top: 14px;
+}
+
+.export-group-title {
+  margin: 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.8;
+}
+
+.export-group-detail {
+  margin: 2px 0 6px;
+  font-size: 11px;
+  opacity: 0.7;
 }
 
 .plots-section {

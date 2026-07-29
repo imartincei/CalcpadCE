@@ -3,13 +3,14 @@
 > Calcpad.Web only (web editor, desktop app, and VS Code extension). Not available in the standalone WPF desktop application for Windows.
 
 UI mode turns a worksheet into a **fill-in form**. Mark the inputs of your calculation with the
-`#UI` keyword, switch the preview to input mode, and those lines are rendered as text boxes,
-drop-downs, radio buttons, checkboxes or editable grids instead of plain results. Type a new
-value and the whole document recalculates.
+`#UI` keyword, switch the results pane to input mode, and those lines are rendered as text
+boxes, drop-downs, radio buttons, checkboxes or editable grids instead of plain results. Type a
+new value and the whole document recalculates.
 
-The same file is still an ordinary worksheet. When the report is rendered — the normal preview,
-a PDF, a Word export — the `#UI` keyword does nothing at all: the line looks exactly as it
-would without it. You write one document, and it doubles as its own input form.
+The same file is still an ordinary worksheet. Anywhere the document is rendered as a document —
+the preview, a report, a PDF, a Word export — the `#UI` keyword changes nothing about how the
+line looks. What it does carry across is the *values*: a report renders the numbers that were
+entered into the form. You write one document, and it doubles as its own input form.
 
 ```text
 #UI L = 6m
@@ -17,8 +18,8 @@ would without it. You write one document, and it doubles as its own input form.
 M = q*L^2/8
 ```
 
-In report mode this is three ordinary lines. In UI mode `L` and `q` become text boxes and `M`
-follows whatever you type into them.
+Preview and Report show three ordinary lines. In Input mode `L` and `q` become text boxes and
+`M` follows whatever you type into them.
 
 ## Turning it on
 
@@ -27,30 +28,58 @@ follows whatever you type into them.
 | Command | What it does |
 |---------|--------------|
 | `CalcpadCE: Toggle #UI Input Mode` | Opens (or closes) the input form panel |
-| `CalcpadCE: Toggle #UI Report Pane` | Shows the report the entered values produce, beside the form |
+| `CalcpadCE: Toggle Report Preview` | Opens the report — beside the form, or on its own |
+| `CalcpadCE: Print Report to PDF` | Exports the report as a PDF |
 | `CalcpadCE: Save #UI Values to Document` | Writes the values you entered into the file |
 
-Closing the form asks whether to save the values first; declining discards them.
+Closing the form asks whether to save the values first; declining discards them. The report
+preview is not tied to the form: open it on its own to read the print layout beside the editor,
+and it stays open when the form closes. While the form or the report has focus, both the
+**Print Report to PDF** and the report toggle appear as buttons in the panel's title bar.
 
 **Web editor and desktop app**
 
-The preview toolbar has three modes — **Wrapped**, **Unwrapped** and **Input**. Choosing
-**Input** hands the whole window to the form and hides the editor. While it is open the toolbar
-offers **Report** (show the report the entered values produce), **Save values** (appears once
-you have changed something) and **Exit input mode**.
+The results toolbar — labelled **Results** — has four modes:
 
-## `#post` is hidden in UI mode
+| Mode | What it shows |
+|------|---------------|
+| **Preview** | The document as written: `#pre` and `#post` both rendered, source values |
+| **Unwrapped** | The source listing, with macros and includes resolved |
+| **Input** | The `#UI` form. Takes over the window and hides the editor |
+| **Report** | The print layout: `#pre` hidden, entered `#UI` values applied |
 
-`#post` blocks are suppressed while the form is on screen and shown again in the report. Put the
-parts of the document that are output — result tables, conclusions, long derivations — inside a
-`#post` block, and the form stays a short list of inputs.
+The same modes are in the native menu under **View → Result Mode**. In **Input** the toolbar
+also offers **Report** (the report beside the form), **Save values** (once you have changed
+something) and **Exit input mode**, which leaves you in **Report**. In **Input** and **Report**
+a **Print PDF** button exports the report.
+
+## `#pre` and `#post`
+
+The two directives split a document into the part that is filled in and the part that is read
+back. `#pre` is hidden in a report; `#post` is hidden while the form is on screen:
+
+| | `#pre` shown | `#post` shown | Entered `#UI` values applied |
+|---|---|---|---|
+| **Preview** | yes | yes | no |
+| **Input** | yes | no | yes |
+| **Report** | no | yes | yes |
+
+So put the parts of the document that are output — result tables, conclusions, long derivations
+— inside a `#post` block, and the form stays a short list of inputs. Put instructions for
+whoever fills the form in inside `#pre`, and they stay out of the report.
 
 ```text
+#pre
+'<p>Enter the span below.</p>
+#end pre
 #UI L = 6m
 #post
 '<p>Span used: 'L'</p>
 #end post
 ```
+
+**Preview** is the mode to write in: it shows everything at once, and it deliberately ignores
+entered values so you always see what the document itself says.
 
 ## Writing a `#UI` line
 
@@ -103,8 +132,8 @@ They share the line's JSON properties but are saved and overridden separately.
 |----------|------|-----------|---------|
 | `type` | string | all | `entry`, `datagrid`, `dropdown`, `radio`, `checkbox`. Auto-detected when omitted |
 | `mode` | string | all | Only `number` is accepted; string inputs are not supported |
-| `style` | string | all | CSS class(es) added to the control **in UI mode** |
-| `reportStyle` | string | all | CSS class(es) added to the line **in the report** |
+| `style` | string | all | CSS class(es) added to the control, **in Input mode only** |
+| `reportStyle` | string | all | CSS class(es) added to the line **wherever it is not a control** |
 | `rows` | number | datagrid | Grid rows. Auto-detected when omitted |
 | `columns` | number | datagrid | Grid columns. Auto-detected when omitted |
 | `rowHeaders` | array | datagrid | Row header labels |
@@ -183,10 +212,11 @@ pasted in — is put back to `0`.
 
 Two properties attach classes, and they never both apply at once:
 
-- **`style`** — added to the input control itself, and only in UI mode.
-- **`reportStyle`** — added to the element wrapping the line, and only in the report.
+- **`style`** — added to the input control itself, and only in Input mode.
+- **`reportStyle`** — added to the element wrapping the line, everywhere the line is *not* a
+  control: Preview, Report, and every export but the input form.
 
-So `style` is how the form looks, `reportStyle` is how the printed line looks, and you can set
+So `style` is how the form looks, `reportStyle` is how the plain line looks, and you can set
 both on one directive to style each independently.
 
 ### The base classes
@@ -262,12 +292,38 @@ them the next time you open it:
 
 The keys are control identities: the variable name, then which declaration of that name it is
 (`L:1` is the first `L`), and inside a loop the pass numbers as well (`y:1:2`). A saved value
-replaces the right-hand side of its assignment in **both** modes, so the report shows the
-numbers that were entered. Hand-writing an entry works too, and a broader key covers more
-controls — `L:1` covers every pass of that declaration, a bare `L` covers every declaration of
-the name.
+replaces the right-hand side of its assignment in the form and in the report, so the report
+shows the numbers that were entered. Hand-writing an entry works too, and a broader key covers
+more controls — `L:1` covers every pass of that declaration, a bare `L` covers every declaration
+of the name.
 
 See [Metadata Comments](new-metadata-comments.md) for the comment format itself.
+
+Values do not have to be saved to be exported: an export made while the form is filled in uses
+what is currently entered. Saving is what makes them survive closing the document.
+
+## Exporting
+
+Exports come in variants, one per rendering, and **report is the default** — a plain "Export
+PDF" from the menu, the toolbar, or a command gives you the report:
+
+| Variant | Contents | Formats |
+|---------|----------|---------|
+| **Report** (default) | `#pre` hidden, `#post` shown, entered `#UI` values applied | PDF, HTML, Word |
+| **Preview** | `#pre` and `#post` both shown, the document's own values | PDF, HTML, Word |
+| **Input form** | The form itself, `#post` hidden, entered values in the controls | PDF, HTML |
+| **Unwrapped** | The source listing, macros and includes resolved | PDF, HTML |
+
+The non-default variants live in the **Export** tab of the sidebar, which groups its buttons by
+variant, and in the desktop app's **File → Export** submenu. The input form and the unwrapped
+listing have no Word form.
+
+Two things to know about the exported files:
+
+- None of them carry line numbers or the error-summary boxes the on-screen views use for
+  navigation. Those belong to the screen; a file is read, not clicked through.
+- An exported **input form** is static. Its controls render, but nothing is behind them to
+  recalculate — it is a picture of the form, useful for printing a blank or filled-in sheet.
 
 ## `#UI` in macros, conditions and loops
 

@@ -869,6 +869,67 @@ fn assign_to_job_object(pid: u32) {
 fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     let sep = || PredefinedMenuItem::separator(app);
 
+    // Grouped by what gets rendered. The unsuffixed ids are the report — the default
+    // variant everywhere — so they stay stable; `:preview`, `:input` and `:unwrapped`
+    // name one explicitly. The frontend parses `export-<format>[:<variant>]`.
+    // A form and a code listing have no meaningful Word form, so neither offers one.
+    let export = Submenu::with_items(
+        app,
+        "Export",
+        true,
+        &[
+            &MenuItem::with_id(app, "export-pdf", "Report PDF...", true, None::<&str>)?,
+            &MenuItem::with_id(app, "export-html", "Report HTML...", true, None::<&str>)?,
+            &MenuItem::with_id(app, "export-docx", "Report Word...", true, None::<&str>)?,
+            &sep()?,
+            &MenuItem::with_id(app, "export-pdf:preview", "Preview PDF...", true, None::<&str>)?,
+            &MenuItem::with_id(
+                app,
+                "export-html:preview",
+                "Preview HTML...",
+                true,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                "export-docx:preview",
+                "Preview Word...",
+                true,
+                None::<&str>,
+            )?,
+            &sep()?,
+            &MenuItem::with_id(
+                app,
+                "export-pdf:input",
+                "Input Form PDF...",
+                true,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                "export-html:input",
+                "Input Form HTML...",
+                true,
+                None::<&str>,
+            )?,
+            &sep()?,
+            &MenuItem::with_id(
+                app,
+                "export-pdf:unwrapped",
+                "Unwrapped PDF...",
+                true,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                "export-html:unwrapped",
+                "Unwrapped HTML...",
+                true,
+                None::<&str>,
+            )?,
+        ],
+    )?;
+
     let file = Submenu::with_items(
         app,
         "File",
@@ -888,9 +949,7 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
             &sep()?,
             &MenuItem::with_id(app, "close-tab", "Close Tab", true, Some("CmdOrCtrl+W"))?,
             &sep()?,
-            &MenuItem::with_id(app, "export-pdf", "Export PDF...", true, None::<&str>)?,
-            &MenuItem::with_id(app, "export-html", "Export HTML...", true, None::<&str>)?,
-            &MenuItem::with_id(app, "export-docx", "Export Word...", true, None::<&str>)?,
+            &export,
             &sep()?,
             &MenuItem::with_id(app, "quit", "Quit", true, Some("CmdOrCtrl+Q"))?,
         ],
@@ -956,17 +1015,33 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
                 None::<&str>,
             )?,
             &sep()?,
+            // Same order as the results toolbar. "Preview" shows #pre and #post with the
+            // document's own values; "Report" hides #pre and applies entered #UI values.
             &MenuItem::with_id(
                 app,
-                "preview-mode:wrapped",
-                "Preview Mode: Wrapped",
+                "result-mode:preview",
+                "Result Mode: Preview",
                 true,
                 None::<&str>,
             )?,
             &MenuItem::with_id(
                 app,
-                "preview-mode:unwrapped",
-                "Preview Mode: Unwrapped",
+                "result-mode:unwrapped",
+                "Result Mode: Unwrapped",
+                true,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                "result-mode:ui",
+                "Result Mode: Input",
+                true,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                "result-mode:report",
+                "Result Mode: Report",
                 true,
                 None::<&str>,
             )?,

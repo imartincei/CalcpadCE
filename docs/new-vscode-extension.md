@@ -135,16 +135,20 @@ The panel is the same across every CalcpadCE front end — see **[The CalcpadCE 
 
 ## Live preview
 
-Two preview panels are available, each opening in its own editor column:
+Three preview panels are available, each opening in its own editor column:
 
-| Panel | How to open |
-|-------|-------------|
-| **HTML Preview** | Preview button in the editor toolbar, or *CalcpadCE Preview* in the Command Palette |
-| **Unwrapped Preview** | Eye button in the editor toolbar, or *CalcpadCE Preview Unwrapped* |
+| Panel | How to open | What it shows |
+|-------|-------------|---------------|
+| **HTML Preview** | Preview button in the editor toolbar, or *CalcpadCE Preview* in the Command Palette | The document as written — both `#pre` and `#post`, source values |
+| **Unwrapped Preview** | Eye button in the editor toolbar, or *CalcpadCE Preview Unwrapped* | The fully expanded source (macros and includes resolved) — useful for debugging what the engine actually computes |
+| **Report Preview** | Book button in the editor toolbar, or *CalcpadCE: Toggle Report Preview* | The print layout — `#pre` hidden and entered `#UI` values applied |
 
-The **Unwrapped** preview shows the fully expanded source (macros and includes resolved) — useful for debugging what the engine actually computes.
+The Report preview opens on its own beside the editor, or alongside the `#UI` input form when
+that is open, and it keeps its line links so a result traces back to the line that produced it.
+With it (or the input form) focused, **CalcpadCE: Print Report to PDF** appears as a button in
+the panel's title bar. See **[UI Mode](new-ui-mode.md)**.
 
-Both panels:
+All panels:
 
 - Re-render automatically as you type when **Auto-Run Preview** is on (default).
 - Follow the `previewTheme` setting (`light` / `dark` / `system`), using `darkBackground` for the dark background color.
@@ -177,12 +181,19 @@ For errors that occur inside hidden (`#hide`) regions — which don't appear in 
 
 All exports run through the same engine as the preview, so what you see is what you get.
 
-| Output | How | Notes |
-|--------|-----|-------|
-| **PDF** | **Export CalcpadCE to PDF** button in the editor toolbar, or *Export CalcpadCE to PDF* | Full-fidelity export with a native save dialog. Requires a Chromium browser — see [PDF Export](new-pdf-export.md). |
-| **PDF (print style)** | Right-click editor → *Print CalcpadCE Preview to PDF* | Generated from the live preview. |
-| **HTML** | **Save HTML…** on the sidebar's **Export** tab, or *CalcpadCE: Save Source HTML…* | Renders and saves standalone HTML via a native dialog. |
-| **Word (.docx)** | **Save Word…** on the sidebar's **Export** tab, or *CalcpadCE: Save as Word Document…* | Renders, then converts to a Word document. |
+Every export is a **report** by default: `#pre` hidden, `#post` shown, and the values entered
+into the `#UI` form applied.
+
+| Output | How |
+|--------|-----|
+| **PDF** | **Export CalcpadCE to PDF** button in the editor toolbar, or *Export CalcpadCE to PDF*. Requires a Chromium browser — see [PDF Export](new-pdf-export.md). |
+| **PDF (report)** | **CalcpadCE: Print Report to PDF** — the same export, also a title-bar button on the report and input-form panels |
+| **HTML** | **Save HTML…** on the sidebar's **Export** tab, or *CalcpadCE: Save Source HTML…* |
+| **Word (.docx)** | **Save Word…** on the sidebar's **Export** tab, or *CalcpadCE: Save as Word Document…* |
+
+The sidebar's **Export** tab also offers the other renderings, grouped by variant: **Preview**
+(PDF, HTML, Word), **Input form** (PDF, HTML) and **Unwrapped** (PDF, HTML). No exported file
+carries the line numbers or error boxes the preview panels use for navigation.
 
 Use the **PDF** tab in the panel to set the document title, timestamp format, page size, and header/footer before exporting.
 The **Export** tab also has a **Plots** section — a thumbnail list of every plot the document emits, each with an individual **Save…** button and a **Download all (ZIP)** button.

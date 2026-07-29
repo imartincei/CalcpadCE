@@ -29,7 +29,7 @@ The **CalcpadCE** view is organized into tabs:
 | **Metadata** | Form-based editor for the [metadata comment](new-metadata-comments.md) at the cursor — descriptions, parameter/return types, per-file settings, lint-ignore, and no-print markers. |
 | **PDF** | Header/footer, page size, and layout options applied when you export to PDF. |
 | **Formatting** | Prettify options and the **Prettify Document** button. See [Formatting](#formatting-prettify). |
-| **Export** | **Save HTML…**, **Save Word…**, and per-plot / ZIP-all image export from any plots produced by the document. See [Export](#export). |
+| **Export** | PDF / HTML / Word save actions, grouped by which rendering they capture, plus per-plot and ZIP-all image export from any plots produced by the document. See [Export](#export). |
 | **Errors** | Full list of calculation errors from the engine, each linking to its source line. |
 
 ### Insert
@@ -88,12 +88,19 @@ See [PDF Export](new-pdf-export.md) for more information about the options.
 
 ### Export
 
-Renders the current document through the backend and offers several save actions:
+Renders the current document through the backend and saves the result. The buttons are grouped
+by *which* rendering gets saved — **Report** first, since that is the default everywhere else:
 
-| Button | Result |
-|--------|--------|
-| **Save HTML…** | Saves a standalone `.html` of the rendered report. |
-| **Save Word…** | Converts the report to a Word `.docx`. |
+| Group | Buttons | What it captures |
+|-------|---------|------------------|
+| **Report** | Save PDF… · Save Word… · Save HTML… | `#pre` hidden, `#post` shown, entered `#UI` values applied |
+| **Preview** | Save PDF… · Save Word… · Save HTML… | What the results pane shows: `#pre` and `#post`, the document's own values |
+| **Input form** | Save PDF… · Save HTML… | The `#UI` form itself, `#post` hidden. The saved controls are static |
+| **Unwrapped** | Save PDF… · Save HTML… | The source listing, macros and includes resolved |
+
+Word is offered for the report and the preview only — a fill-in form and a code listing have no
+meaningful Word rendering. See **[UI Mode → Exporting](new-ui-mode.md)** for what each variant
+is for. PDF uses the page setup from the **PDF** tab.
 
 Below those, the **Plots** section lists every plot the document emits, each with a thumbnail, filename, and size:
 

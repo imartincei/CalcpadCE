@@ -202,16 +202,18 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     break;
                 }
 
+                // The Export tab names which rendering it wants; the PDF tab's Generate
+                // button sends none, and the commands default to the report.
                 case 'generatePdf':
-                    vscode.commands.executeCommand('vscode-calcpad.printToPdf');
+                    vscode.commands.executeCommand('vscode-calcpad.printToPdf', data.variant);
                     break;
 
                 case 'saveSourceHtml':
-                    vscode.commands.executeCommand('vscode-calcpad.saveSourceHtml');
+                    vscode.commands.executeCommand('vscode-calcpad.saveSourceHtml', data.variant);
                     break;
 
                 case 'saveDocx':
-                    vscode.commands.executeCommand('vscode-calcpad.saveDocx');
+                    vscode.commands.executeCommand('vscode-calcpad.saveDocx', data.variant);
                     break;
 
                 case 'getPlots':

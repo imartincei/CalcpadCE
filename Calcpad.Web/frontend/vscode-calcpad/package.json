@@ -2,7 +2,7 @@
   "name": "vscode-calcpad",
   "displayName": "VS Code CalcpadCE",
   "description": "Calculator extension for VS Code",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "imartincei",
   "repository": "https://github.com/imartincei/vscode-calcpad",
   "icon": "calcpad-icon.png",
@@ -250,7 +250,7 @@
       },
       {
         "command": "vscode-calcpad.toggleUiReport",
-        "title": "CalcpadCE: Toggle #UI Report Pane",
+        "title": "CalcpadCE: Toggle Report Preview",
         "icon": "$(book)"
       },
       {
@@ -269,7 +269,7 @@
       },
       {
         "command": "vscode-calcpad.printToPdf",
-        "title": "Print CalcpadCE Preview to PDF",
+        "title": "CalcpadCE: Print Report to PDF",
         "icon": "$(file-pdf)"
       },
       {
@@ -403,7 +403,12 @@
         },
         {
           "command": "vscode-calcpad.toggleUiReport",
-          "when": "activeWebviewPanelId == htmlPreviewUi",
+          "when": "resourceLangId == plaintext || resourceLangId == calcpad || activeWebviewPanelId == htmlPreviewUi",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.printToPdf",
+          "when": "activeWebviewPanelId == htmlPreviewUi || activeWebviewPanelId == htmlPreviewUiReport",
           "group": "navigation"
         },
         {
@@ -421,6 +426,11 @@
         {
           "command": "vscode-calcpad.toggleUiReport",
           "when": "webviewId == htmlPreviewUi",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.printToPdf",
+          "when": "webviewId == htmlPreviewUi || webviewId == htmlPreviewUiReport",
           "group": "navigation"
         },
         {

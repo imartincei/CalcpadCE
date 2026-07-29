@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides } from 'calcpad-frontend';
-import type { PdfSettings as FrontendPdfSettings } from 'calcpad-frontend';
+import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, variantRender } from 'calcpad-frontend';
+import type { PdfSettings as FrontendPdfSettings, ExportVariant } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
 import { CalcpadVueUIProvider } from './calcpadVueUIProvider';
@@ -802,7 +802,10 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
                 forPrint: forPrint,
                 // The plain preview shows the document as written; entered values
                 // belong to the input form and the report that accompanies it.
-                uiOverrides: enableUi || forPrint ? uiOverrides.toRecord(docKey) : undefined
+                uiOverrides: enableUi || forPrint ? uiOverrides.toRecord(docKey) : undefined,
+                // The report is a print layout, but on screen beside the editor, so it
+                // keeps the line links that forPrint would otherwise suppress.
+                includeLineAnchors: forPrint ? true : undefined
             }),
             signal: AbortSignal.timeout(10000)
         });
@@ -888,17 +891,16 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
 }
 
 /**
- * Convert a Calcpad document to PDF on the server and write the bytes to
- * <paramref name="saveUri"/>. Pure I/O — no UI prompts. Used by
- * <see cref="runPdfExportCommand"/>, which handles the editor lookup, save
- * dialog, progress notification, and "Open PDF" follow-up.
+ * Render a document for export. `variant` decides what the file contains — see
+ * `variantRender` in calcpad-frontend, which the desktop and web exports share, so all
+ * three front ends agree on what "report" or "preview" means. Line anchors are always
+ * off: an exported file is read, not navigated.
  */
-async function generatePdfToFile(
+async function renderForExport(
     documentContent: string,
     sourceFileUri: vscode.Uri,
-    saveUri: vscode.Uri,
-    progress?: vscode.Progress<{ increment?: number; message?: string }>
-): Promise<void> {
+    variant: ExportVariant,
+): Promise<string> {
     const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
     const apiBaseUrl = settingsManager.getServerUrl();
     if (!apiBaseUrl) throw new Error('Server URL not configured');
@@ -908,27 +910,52 @@ async function generatePdfToFile(
     }
 
     const settings = await settingsManager.getApiSettings();
+    const render = variantRender(variant);
+    const endpoint = render.unwrap ? '/api/calcpad/convert?unwrap=true' : '/api/calcpad/convert';
 
-    progress?.report({ increment: 20, message: 'Converting to HTML...' });
-
-    const sourceDir = path.dirname(sourceFileUri.fsPath);
-
-    // Step 1: Convert calcpad content to HTML
-    const htmlResponse = await fetch(`${apiBaseUrl}/api/calcpad/convert`, {
+    const response = await fetch(`${apiBaseUrl}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             content: documentContent,
             settings: settings,
             sourceFilePath: sourceFileUri.fsPath,
-            forPrint: true
+            forPrint: render.forPrint,
+            enableUi: render.enableUi,
+            uiOverrides: render.useOverrides ? uiOverrides.toRecord(sourceFileUri.toString()) : undefined,
+            includeLineAnchors: false,
         }),
         signal: AbortSignal.timeout(30000)
     });
-    if (!htmlResponse.ok) {
-        throw new Error(`Server returned ${htmlResponse.status}`);
+    if (!response.ok) {
+        throw new Error(`Server returned ${response.status}`);
     }
-    let html = await htmlResponse.text();
+    return await response.text();
+}
+
+/**
+ * Convert a Calcpad document to PDF on the server and write the bytes to
+ * <paramref name="saveUri"/>. Pure I/O — no UI prompts. Used by
+ * <see cref="runPdfExportCommand"/>, which handles the editor lookup, save
+ * dialog, progress notification, and "Open PDF" follow-up.
+ */
+async function generatePdfToFile(
+    documentContent: string,
+    sourceFileUri: vscode.Uri,
+    saveUri: vscode.Uri,
+    variant: ExportVariant = 'report',
+    progress?: vscode.Progress<{ increment?: number; message?: string }>
+): Promise<void> {
+    const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
+    const apiBaseUrl = settingsManager.getServerUrl();
+    if (!apiBaseUrl) throw new Error('Server URL not configured');
+
+    progress?.report({ increment: 20, message: 'Converting to HTML...' });
+
+    const sourceDir = path.dirname(sourceFileUri.fsPath);
+
+    // Step 1: Convert calcpad content to HTML
+    let html = await renderForExport(documentContent, sourceFileUri, variant);
 
     // Inline local images as base64 data URIs so the headless browser can
     // render them (it has no access to the local filesystem).
@@ -961,11 +988,14 @@ async function generatePdfToFile(
 
 /**
  * Editor → save dialog → generate → "Open PDF" prompt. Shared entry point for
- * both <c>vscode-calcpad.exportToPdf</c> and <c>vscode-calcpad.printToPdf</c>;
- * the two commands are functionally identical so they delegate here.
+ * <c>vscode-calcpad.exportToPdf</c> and <c>vscode-calcpad.printToPdf</c>, which
+ * both produce the report; the Export tab passes other variants through.
  */
-async function runPdfExportCommand(): Promise<void> {
-    const activeEditor = vscode.window.activeTextEditor;
+async function runPdfExportCommand(variant: ExportVariant = 'report'): Promise<void> {
+    // The Print Report button lives on the report and input panels' title bars, so the
+    // webview holds focus and there is no active *text* editor — fall back to the editor
+    // the previews were opened from.
+    const activeEditor = vscode.window.activeTextEditor ?? previewSourceEditor;
     if (!activeEditor) {
         vscode.window.showErrorMessage('No active CalcpadCE document found');
         return;
@@ -993,6 +1023,7 @@ async function runPdfExportCommand(): Promise<void> {
                 activeEditor.document.getText(),
                 activeEditor.document.uri,
                 saveUri,
+                variant,
                 progress
             );
         });
@@ -1014,22 +1045,15 @@ async function runPdfExportCommand(): Promise<void> {
 /**
  * Convert the active CalcPad document to HTML on the server, then save
  * the result via a native Save dialog. Used by the Export tab's
- * "Save HTML…" button.
+ * "Save HTML…" buttons, which pick the variant.
  */
-async function saveSourceHtml() {
-    const activeEditor = vscode.window.activeTextEditor;
+async function saveSourceHtml(variant: ExportVariant = 'report') {
+    const activeEditor = vscode.window.activeTextEditor ?? previewSourceEditor;
     if (!activeEditor) {
         vscode.window.showErrorMessage('No active CalcpadCE document found');
         return;
     }
     try {
-        const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
-        const apiBaseUrl = settingsManager.getServerUrl();
-        if (!apiBaseUrl) {
-            vscode.window.showErrorMessage('Server URL not configured');
-            return;
-        }
-
         const currentDir = path.dirname(activeEditor.document.fileName);
         const baseFilename = path.basename(activeEditor.document.fileName, path.extname(activeEditor.document.fileName));
         const defaultPath = path.join(currentDir, baseFilename + '.html');
@@ -1044,24 +1068,8 @@ async function saveSourceHtml() {
             title: 'Generating HTML…',
             cancellable: false,
         }, async () => {
-            const settings = await settingsManager.getApiSettings();
-            const documentContent = activeEditor.document.getText();
-
-            const response = await fetch(`${apiBaseUrl}/api/calcpad/convert`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    content: documentContent,
-                    settings,
-                    sourceFilePath: activeEditor.document.uri.fsPath,
-                    forPrint: false,
-                }),
-                signal: AbortSignal.timeout(30000),
-            });
-            if (!response.ok) {
-                throw new Error(`Server returned ${response.status}`);
-            }
-            const html = await response.text();
+            const html = await renderForExport(
+                activeEditor.document.getText(), activeEditor.document.uri, variant);
             await vscode.workspace.fs.writeFile(saveUri, new TextEncoder().encode(html));
         });
 
@@ -1080,11 +1088,14 @@ async function saveSourceHtml() {
 }
 
 /**
- * Convert the active CalcPad document to DOCX (Word) on the server and
- * save the result. Used by the Export tab's "Save Word…" button.
+ * Convert the active CalcPad document to DOCX (Word) on the server and save the result.
+ * Used by the Export tab's "Save Word…" buttons, which offer the report and the preview
+ * only — a form and a code listing have no meaningful Word rendering.
  */
-async function saveDocx() {
-    const activeEditor = vscode.window.activeTextEditor;
+async function saveDocx(variant: ExportVariant = 'report') {
+    const render = variantRender(variant);
+    if (render.enableUi || render.unwrap) return;
+    const activeEditor = vscode.window.activeTextEditor ?? previewSourceEditor;
     if (!activeEditor) {
         vscode.window.showErrorMessage('No active CalcpadCE document found');
         return;
@@ -1121,7 +1132,10 @@ async function saveDocx() {
                     content: documentContent,
                     settings,
                     sourceFilePath: activeEditor.document.uri.fsPath,
-                    forPrint: true,
+                    forPrint: render.forPrint,
+                    uiOverrides: render.useOverrides
+                        ? uiOverrides.toRecord(activeEditor.document.uri.toString())
+                        : undefined,
                 }),
                 signal: AbortSignal.timeout(60000),
             });
@@ -1165,12 +1179,13 @@ function navigateEditorToLine(sourceEditor: vscode.TextEditor, line: number) {
 }
 
 // Editor -> preview sync: tell any open preview panel(s) to scroll to a 1-based
-// source line. Both views match on data-source-line / line-num anchors, so the
-// same source line works for the wrapped and unwrapped panels.
+// source line. Every view matches on data-source-line / line-num anchors, so the
+// same source line works for the preview, unwrapped and report panels.
 function postPreviewSourceLine(line: number) {
     const msg = { type: 'scrollToSourceLine', line };
     wrappedPanel?.webview.postMessage(msg);
     unwrappedPanel?.webview.postMessage(msg);
+    uiReportPanel?.webview.postMessage(msg);
 }
 
 function handlePreviewMessage(message: any, kind: PreviewKind) {
@@ -1288,13 +1303,16 @@ async function showPreview(kind: PreviewKind, scrollToLine?: number) {
             wrappedPanel = undefined;
         } else if (kind === 'ui') {
             uiPanel = undefined;
-            // The report only exists to accompany the form.
-            uiReportPanel?.dispose();
             // Closing the panel directly leaves input mode too; the toggle command
-            // has already dealt with the values when it comes through there.
+            // has already dealt with the values when it comes through there. The report
+            // stays open — it is a view of the document in its own right — but the values
+            // it was showing are gone now, so re-render it from the document.
             const docKey = uiPanelDocKey;
             uiPanelDocKey = undefined;
-            void discardUiValues(docKey);
+            void discardUiValues(docKey).then(() => {
+                const editor = previewSourceEditor;
+                if (uiReportPanel && editor) void refreshPreviewPanels(editor.document);
+            });
         } else if (kind === 'uiReport') {
             uiReportPanel = undefined;
         } else {
@@ -1721,15 +1739,13 @@ export async function activate(context: vscode.ExtensionContext) {
         form?.reveal(form.viewColumn, false);
     });
 
-    // Shows or hides the report beside the input form, mirroring the desktop's
-    // toggle. Closing the panel directly does the same thing.
+    // Shows or hides the report preview. It accompanies the input form when that is open —
+    // opened to its right, with focus handed back so the form stays in front — but it also
+    // stands alone beside the editor, which is how you read the print layout without
+    // filling in a form. Closing the panel directly does the same thing.
     const toggleUiReportCommand = vscode.commands.registerCommand('vscode-calcpad.toggleUiReport', async () => {
         if (uiReportPanel) {
             uiReportPanel.dispose();
-            return;
-        }
-        if (!uiPanel) {
-            vscode.window.showInformationMessage('The report accompanies the #UI input form — enable input mode first.');
             return;
         }
         await showPreview('uiReport');
@@ -1828,16 +1844,19 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
 
-    const printToPdfCommand = vscode.commands.registerCommand('vscode-calcpad.printToPdf', () => {
-        runPdfExportCommand();
+    // All three take an optional variant, so the sidebar's Export tab can ask for the
+    // preview / input-form / unwrapped rendering through the same commands. Invoked from
+    // a menu or the palette there is no argument, and the report is what you get.
+    const printToPdfCommand = vscode.commands.registerCommand('vscode-calcpad.printToPdf', (variant?: ExportVariant) => {
+        runPdfExportCommand(variant ?? 'report');
     });
 
-    const saveSourceHtmlCommand = vscode.commands.registerCommand('vscode-calcpad.saveSourceHtml', () => {
-        saveSourceHtml();
+    const saveSourceHtmlCommand = vscode.commands.registerCommand('vscode-calcpad.saveSourceHtml', (variant?: ExportVariant) => {
+        saveSourceHtml(variant ?? 'report');
     });
 
-    const saveDocxCommand = vscode.commands.registerCommand('vscode-calcpad.saveDocx', () => {
-        saveDocx();
+    const saveDocxCommand = vscode.commands.registerCommand('vscode-calcpad.saveDocx', (variant?: ExportVariant) => {
+        saveDocx(variant ?? 'report');
     });
 
     // Readonly virtual document provider for viewing webview source HTML
@@ -2008,8 +2027,8 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    const exportToPdfCommand = vscode.commands.registerCommand('vscode-calcpad.exportToPdf', () => {
-        runPdfExportCommand();
+    const exportToPdfCommand = vscode.commands.registerCommand('vscode-calcpad.exportToPdf', (variant?: ExportVariant) => {
+        runPdfExportCommand(variant ?? 'report');
     });
 
 

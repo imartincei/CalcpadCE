@@ -77,17 +77,19 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets all snippets as an array for serialization.
+        /// Gets all snippets as an array for serialization. Excludes InternalOnly
+        /// snippets, which exist for the linter's built-in sets only.
         /// </summary>
-        public static SnippetItem[] GetAllSnippetsArray() => [.. AllSnippets];
+        public static SnippetItem[] GetAllSnippetsArray() =>
+            AllSnippets.Where(s => !s.InternalOnly).ToArray();
 
         /// <summary>
-        /// Gets snippets filtered by category prefix.
+        /// Gets snippets filtered by category prefix. Excludes InternalOnly snippets.
         /// </summary>
         public static SnippetItem[] GetSnippetsByCategory(string categoryPrefix)
         {
             return AllSnippets
-                .Where(s => s.Category.StartsWith(categoryPrefix, StringComparison.OrdinalIgnoreCase))
+                .Where(s => !s.InternalOnly && s.Category.StartsWith(categoryPrefix, StringComparison.OrdinalIgnoreCase))
                 .ToArray();
         }
 

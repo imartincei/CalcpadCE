@@ -41,7 +41,8 @@ namespace Calcpad.Server.Controllers
                 var forceUnwrapped = unwrap || request.ForceUnwrappedCode;
                 var (htmlResult, _, errors) = _calcpadService.Convert(
                     request.Content, request.Settings, forceUnwrapped, request.Theme, request.SourceFilePath,
-                    request.ForPrint, captureOpenXml: false, request.EnableUi, request.UiOverrides);
+                    request.ForPrint, captureOpenXml: false, request.EnableUi, request.UiOverrides,
+                    request.IncludeLineAnchors);
                 if (unwrap)
                 {
                     htmlResult = ProcessDataTextLinks(htmlResult);
@@ -246,12 +247,15 @@ namespace Calcpad.Server.Controllers
                 if (string.IsNullOrWhiteSpace(request.Content))
                     return BadRequest(new { error = "Content is required" });
 
-                // forPrint=true so the HTML is the printable / unwrapped form,
-                // matching what the OpenXmlWriter expects. captureOpenXml=true tells
-                // the parser to emit OMML so equations render as native Word math
-                // instead of empty <m:oMath/>.
+                // captureOpenXml=true tells the parser to emit OMML so equations render as
+                // native Word math instead of empty <m:oMath/>. A Word document is a file,
+                // never a navigable preview, so line anchors are always off - but ForPrint
+                // and UiOverrides come from the request, so the caller chooses between a
+                // report (#pre hidden, entered #UI values applied) and the preview layout.
                 var (html, openXmlExpressions, _) = _calcpadService.Convert(
-                    request.Content, request.Settings, request.ForceUnwrappedCode, request.Theme, request.SourceFilePath, forPrint: true, captureOpenXml: true);
+                    request.Content, request.Settings, request.ForceUnwrappedCode, request.Theme, request.SourceFilePath,
+                    forPrint: request.ForPrint, captureOpenXml: true, enableUi: false, uiOverrides: request.UiOverrides,
+                    debug: false);
 
                 using var ms = new MemoryStream();
                 var writer = new OpenXmlWriter(openXmlExpressions.ToList());
@@ -731,6 +735,14 @@ namespace Calcpad.Server.Controllers
         /// modes, so a report shows the values that were actually entered.
         /// </summary>
         public Dictionary<string, string>? UiOverrides { get; set; }
+
+        /// <summary>
+        /// Emits per-line anchors and the error-summary boxes the preview uses for line
+        /// links. Defaults to the opposite of <see cref="ForPrint"/>. Set it explicitly to
+        /// break that pairing: the on-screen report wants the print layout <em>with</em>
+        /// links, and every export wants a rendering <em>without</em> them.
+        /// </summary>
+        public bool? IncludeLineAnchors { get; set; }
     }
 
     public class CpdzDecodeRequest

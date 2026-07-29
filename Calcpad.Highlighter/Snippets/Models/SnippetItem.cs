@@ -59,6 +59,14 @@ namespace Calcpad.Highlighter.Snippets.Models
         public required string Category { get; init; }
 
         /// <summary>
+        /// When true, the snippet is withheld from the frontend (insert menu and
+        /// completion) but still contributes to the linter's built-in name sets.
+        /// Use for engine-internal identifiers that must lint as defined without
+        /// being offered to the user.
+        /// </summary>
+        public bool InternalOnly { get; init; }
+
+        /// <summary>
         /// Quick typing shortcut (without the ~ prefix).
         /// For example, "a" means typing ~a followed by space will insert this symbol.
         /// Null for snippets without quick typing support.

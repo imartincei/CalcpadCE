@@ -160,7 +160,7 @@ async function showServerBlockedDialog(details: string): Promise<void> {
     }
 }
 
-type PreviewMode = 'wrapped' | 'unwrapped' | 'ui';
+type ResultMode = 'preview' | 'unwrapped' | 'ui' | 'report';
 
 async function bootstrap(): Promise<void> {
     let serverUrl: string;
@@ -356,9 +356,9 @@ async function bootstrap(): Promise<void> {
         const path = activeId ? group.tabs.getFilePath(activeId) : null;
         const compiled = !!path && isCompiledPath(path);
         group.editor.updateOptions({ readOnly: compiled });
-        if (compiled && appInstance.getPreviewMode() !== 'ui') {
+        if (compiled && appInstance.getResultMode() !== 'ui') {
             if (!appInstance.isPreviewVisible()) appInstance.togglePreview();
-            appInstance.setPreviewMode('ui');
+            appInstance.setResultMode('ui');
         }
     }
 
@@ -381,6 +381,10 @@ async function bootstrap(): Promise<void> {
         appInstance.setUiOverridesDirty(uiOverridesDirty.has(activeUiDocKey()));
     }
 
+    // The store is keyed per document and owned here, so the bridge is handed a lookup
+    // rather than the store: report and input-form exports render the entered values.
+    activeBridge.setUiOverridesProvider(() => uiOverrides.toRecord(activeUiDocKey()));
+
     /**
      * Seeds a document's overrides from a saved uiOverrides comment the first time
      * it is rendered in UI mode, so entered values survive reopening the file.
@@ -395,12 +399,12 @@ async function bootstrap(): Promise<void> {
 
     async function refreshPreviewFor(group: EditorGroup): Promise<void> {
         if (!appInstance.isPreviewVisible()) return;
-        if (appInstance.getPreviewMode() === 'ui' && group !== activeGroup) return;
+        if (appInstance.getResultMode() === 'ui' && group !== activeGroup) return;
 
         const content = group.editor.getValue();
         const settings = activeBridge.getSettings();
         const apiSettings = buildApiSettings(settings);
-        const mode = appInstance.getPreviewMode() as PreviewMode;
+        const mode = appInstance.getResultMode() as ResultMode;
         const theme = resolvePreviewTheme();
 
         if (!content.trim()) {
@@ -418,15 +422,21 @@ async function bootstrap(): Promise<void> {
         );
         let result;
         try {
-            if (mode === 'ui') seedUiOverrides(group, content);
-            // The preview shows the document as written. Entered values belong to
-            // the input form and the report beside it, not to a view of the source.
-            const ui = mode === 'ui'
-                ? { enableUi: true, uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }
+            // The report applies entered values just as the input form does, so both need
+            // the document's saved ones seeded first.
+            if (mode === 'ui' || mode === 'report') seedUiOverrides(group, content);
+            // Preview and unwrapped show the document as written. Entered values belong to
+            // the input form and to the report, which is what those values produce.
+            const ui = mode === 'ui' || mode === 'report'
+                ? { enableUi: mode === 'ui', uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }
                 : undefined;
             result = mode === 'unwrapped'
                 ? await activeBridge.api.convertUnwrapped(content, apiSettings, fileContext.sourceFilePath, theme)
-                : await activeBridge.api.convert(content, apiSettings, 'html', false, fileContext.sourceFilePath, theme, ui);
+                // The report is a print layout, but on screen, so it keeps the line
+                // anchors that forPrint would otherwise suppress.
+                : await activeBridge.api.convert(
+                    content, apiSettings, 'html', mode === 'report', fileContext.sourceFilePath, theme, ui,
+                    mode === 'report' ? true : undefined);
         } finally {
             window.clearTimeout(loadingTimer);
             appInstance.setPreviewLoading(group.id, false);
@@ -470,7 +480,7 @@ async function bootstrap(): Promise<void> {
     ): Promise<void> {
         const result = await activeBridge.api.convert(
             content, apiSettings, 'html', true, sourceFilePath, theme,
-            { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) });
+            { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }, true);
         if (!result || result instanceof ArrayBuffer) return;
 
         const html = tauriBridge ? await tauriBridge.inlineDocumentImages(result.html) : result.html;
@@ -479,7 +489,7 @@ async function bootstrap(): Promise<void> {
 
     function refreshAllPreviews(): void {
         // UI mode renders the active group only — the other has no iframe.
-        if (appInstance.getPreviewMode() === 'ui') {
+        if (appInstance.getResultMode() === 'ui') {
             void refreshPreviewFor(activeGroup);
             return;
         }
@@ -749,7 +759,7 @@ async function bootstrap(): Promise<void> {
         }
         // The input form owns the window and shows one document; a second group
         // would have nowhere to render and would share this one's entered values.
-        if (appInstance.getPreviewMode() === 'ui' && appInstance.isPreviewVisible()) {
+        if (appInstance.getResultMode() === 'ui' && appInstance.isPreviewVisible()) {
             appInstance.appendOutput('info', 'Exit input mode to split the editor.');
             return;
         }
@@ -1001,11 +1011,11 @@ async function bootstrap(): Promise<void> {
             return;
         }
 
-        // Preview -> editor navigation. An 'output' line comes from the true
-        // wrapped view; when the document has macros/includes that line only
-        // makes sense in the unwrapped view, so flip the pane to unwrapped
-        // scrolled there (the two-step). A 'source' line navigates Monaco
-        // directly. The message's groupId selects which group to act on.
+        // Results -> editor navigation. An 'output' line comes from a rendered
+        // view; when the document has macros/includes that line only makes
+        // sense in the unwrapped view, so flip the pane to unwrapped scrolled
+        // there (the two-step). A 'source' line navigates Monaco directly. The
+        // message's groupId selects which group to act on.
         if (data.type === 'navigateToLine') {
             const line = Number(data.line);
             if (!Number.isFinite(line) || line < 1) return;
@@ -1013,12 +1023,13 @@ async function bootstrap(): Promise<void> {
             if (group !== activeGroup) setActiveGroup(group);
             const isOutputLine = data.lineType === 'output';
             const hasMacros = /^\s*#(def|include)\b/im.test(group.editor.getValue());
-            if (isOutputLine && appInstance.getPreviewMode() === 'wrapped' && hasMacros) {
+            const mode = appInstance.getResultMode() as ResultMode;
+            if (isOutputLine && (mode === 'preview' || mode === 'report') && hasMacros) {
                 // Bake the target into the unwrapped refresh (avoids an
-                // iframe-reload postMessage race); setPreviewMode triggers
-                // onPreviewModeChanged -> refresh all previews.
+                // iframe-reload postMessage race); setResultMode triggers
+                // onResultModeChanged -> refresh all previews.
                 pendingPreviewScrollLine.set(group.id, line);
-                appInstance.setPreviewMode('unwrapped');
+                appInstance.setResultMode('unwrapped');
             } else {
                 group.editor.revealLineInCenter(line);
                 group.editor.setPosition({ lineNumber: line, column: 1 });
@@ -1130,10 +1141,15 @@ async function bootstrap(): Promise<void> {
         switchView?: (id: string) => void;
     };
 
-    // Initialize preview mode from saved extra setting (Tauri) or default (web).
-    const savedMode = (editorBridge.getExtraSetting('previewMode') as PreviewMode | undefined);
-    if (savedMode === 'wrapped' || savedMode === 'unwrapped' || savedMode === 'ui') {
-        appInstance.setPreviewMode(savedMode);
+    // Initialize the result mode from the saved extra setting (Tauri) or default (web).
+    // The key was `previewMode` and the rendered view was `wrapped`, so fall back to the
+    // old key and translate the old value — otherwise an existing install loses its mode.
+    const savedMode = editorBridge.getExtraSetting('resultMode')
+        ?? editorBridge.getExtraSetting('previewMode');
+    const restoredMode = savedMode === 'wrapped' ? 'preview' : savedMode;
+    if (restoredMode === 'preview' || restoredMode === 'unwrapped'
+        || restoredMode === 'ui' || restoredMode === 'report') {
+        appInstance.setResultMode(restoredMode);
     }
 
     // Manual refresh: re-lint with current settings, refresh definitions/
@@ -1153,10 +1169,16 @@ async function bootstrap(): Promise<void> {
         window.dispatchEvent(new MessageEvent('message', { data: { type: 'getPlots' } }));
     }
 
-    appInstance.onPreviewModeChanged = (mode: PreviewMode) => {
-        editorBridge.setExtraSetting('previewMode', mode);
+    appInstance.onResultModeChanged = (mode: ResultMode) => {
+        editorBridge.setExtraSetting('resultMode', mode);
         refreshUiDirtyIndicator();
         refreshAllPreviews();
+    };
+
+    // "Print PDF" on the report/input toolbar. The report is the default export variant,
+    // so this is the same render the Export tab's Report group produces.
+    appInstance.onPrintReportRequest = () => {
+        activeBridge.handleMessage({ type: 'generatePdf' });
     };
 
     // The report pane renders on demand; showing it needs a fresh convert.
@@ -1228,7 +1250,7 @@ async function bootstrap(): Promise<void> {
      * document it is. Returns false when the user cancels the switch.
      */
     async function confirmLeaveUiDoc(): Promise<boolean> {
-        if (!appInstance.isPreviewVisible() || appInstance.getPreviewMode() !== 'ui') return true;
+        if (!appInstance.isPreviewVisible() || appInstance.getResultMode() !== 'ui') return true;
         return await leaveUiDoc();
     }
 
@@ -1820,11 +1842,25 @@ async function bootstrap(): Promise<void> {
         await tauriListen<{ id: string }>('menu-click', async (evt) => {
             const id: string = evt.payload.id;
 
-            // Preview mode picker (View → Preview Mode: Wrapped/Unwrapped)
-            if (id.startsWith('preview-mode:')) {
-                const mode = id.split(':')[1] as PreviewMode;
-                appInstance.setPreviewMode(mode);
+            // Result mode picker (View → Result Mode: Preview/Unwrapped/Input/Report)
+            if (id.startsWith('result-mode:')) {
+                const mode = id.split(':')[1] as ResultMode;
+                appInstance.setResultMode(mode);
                 return;
+            }
+
+            // File → Export. A bare `export-pdf` is the report (the default variant);
+            // `export-pdf:preview` and friends name one explicitly.
+            if (id.startsWith('export-')) {
+                const [format, variant] = id.slice('export-'.length).split(':');
+                const type = format === 'pdf' ? 'generatePdf'
+                    : format === 'html' ? 'saveSourceHtml'
+                    : format === 'docx' ? 'saveDocx'
+                    : null;
+                if (type) {
+                    tauriBridge.handleMessage({ type, variant: variant ?? 'report' });
+                    return;
+                }
             }
 
             switch (id) {
@@ -1850,18 +1886,6 @@ async function bootstrap(): Promise<void> {
 
                 case 'save-as':
                     await saveAsActive();
-                    break;
-
-                case 'export-pdf':
-                    tauriBridge.handleMessage({ type: 'generatePdf' });
-                    break;
-
-                case 'export-html':
-                    tauriBridge.handleMessage({ type: 'saveSourceHtml' });
-                    break;
-
-                case 'export-docx':
-                    tauriBridge.handleMessage({ type: 'saveDocx' });
                     break;
 
                 case 'toggle-sidebar':

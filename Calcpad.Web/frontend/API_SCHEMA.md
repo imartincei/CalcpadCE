@@ -319,8 +319,19 @@ interface CalcpadRequest {
   forceUnwrappedCode?: boolean;
   theme?: string;               // "light" or "dark"
   sourceFilePath?: string;      // Used to resolve relative #include against the parent file's directory
+
+  // Render mode. #pre is hidden when forPrint is true; #post is hidden when enableUi is true.
+  forPrint?: boolean;           // Report layout (default: false)
+  enableUi?: boolean;           // Render #UI lines as controls (default: false). Ignored when forPrint.
+  uiOverrides?: Record<string, string>;
+                                // Entered #UI values, keyed by the identity in data-ui-var ("L:1").
+  includeLineAnchors?: boolean; // Line anchors + error boxes. Defaults to !forPrint; set true for an
+                                //   on-screen report, false for anything written to a file.
 }
 ```
+
+See [../backend/API_SCHEMA.md](../backend/API_SCHEMA.md#post-convert) for how the four
+renderings (preview, report, input form, unwrapped) map onto these fields.
 
 **Response:** HTML content (`text/html`).
 
@@ -336,7 +347,7 @@ Same request shape as `/convert`. Returns the raw code rendered as HTML (no calc
 
 Generate a Word `.docx` from Calcpad source.
 
-**Request:** Same as `/convert` (uses `CalcpadRequest`)
+**Request:** Same as `/convert` (uses `CalcpadRequest`). `forPrint` and `uiOverrides` apply; `enableUi` and `includeLineAnchors` are ignored.
 
 **Response:** `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
 

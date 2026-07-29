@@ -128,6 +128,9 @@ export class CalcpadApiClient {
      * @param ui Interactive `#UI` mode. `enableUi` renders `#UI` lines as controls and
      *   hides `#post` content; `uiOverrides` replaces the right hand side of annotated
      *   assignments and applies in both modes, so a report reflects entered values.
+     * @param includeLineAnchors Per-line anchors and error boxes for in-preview line links.
+     *   Defaults server-side to `!forPrint`; pass it to break that pairing — `true` for the
+     *   on-screen report, `false` for anything being written to a file.
      */
     public async convert(
         content: string,
@@ -136,7 +139,8 @@ export class CalcpadApiClient {
         forPrint: boolean = false,
         sourceFilePath?: string,
         theme?: 'light' | 'dark',
-        ui?: UiConvertOptions
+        ui?: UiConvertOptions,
+        includeLineAnchors?: boolean
     ): Promise<ArrayBuffer | ConvertResult | null> {
         return this.serialize(async () => {
             const url = this.baseUrl + '/api/calcpad/convert';
@@ -148,6 +152,7 @@ export class CalcpadApiClient {
                         content, settings, outputFormat, forPrint, sourceFilePath, theme,
                         enableUi: ui?.enableUi ?? false,
                         uiOverrides: ui?.uiOverrides,
+                        includeLineAnchors,
                     }),
                     signal: AbortSignal.timeout(60000),
                 });
@@ -169,11 +174,15 @@ export class CalcpadApiClient {
      * Convert calcpad → DOCX (Word). Backend renders to HTML internally,
      * then runs the Calcpad.OpenXml writer over it. Returns the .docx
      * bytes, or null on failure.
+     *
+     * @param opts `forPrint` defaults to true — a Word export is a report unless the caller
+     *   asks for the preview layout. `uiOverrides` makes the report show entered `#UI` values.
      */
     public async convertDocx(
         content: string,
         settings: unknown,
         sourceFilePath?: string,
+        opts?: { forPrint?: boolean; uiOverrides?: Record<string, string> },
     ): Promise<ArrayBuffer | null> {
         return this.serialize(async () => {
             const url = this.baseUrl + '/api/calcpad/docx';
@@ -185,7 +194,8 @@ export class CalcpadApiClient {
                         content,
                         settings,
                         sourceFilePath,
-                        forPrint: true,
+                        forPrint: opts?.forPrint ?? true,
+                        uiOverrides: opts?.uiOverrides,
                     }),
                     signal: AbortSignal.timeout(60000),
                 });

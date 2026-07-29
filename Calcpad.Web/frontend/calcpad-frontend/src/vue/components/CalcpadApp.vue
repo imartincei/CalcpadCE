@@ -133,6 +133,7 @@
         v-else-if="pane.activeTab === 'export'"
         :plots="plots"
         :loading="plotsLoading"
+        @save-pdf="handleSavePdf"
         @save-html="handleSaveSourceHtml"
         @save-docx="handleSaveDocx"
         @refresh-plots="handleRefreshPlots"
@@ -172,7 +173,7 @@ import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '
 import type { UiDirectiveData } from '../../text/ui-directive'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
-import type { CalcpadError } from '../../types/api'
+import type { CalcpadError, ExportVariant } from '../../types/api'
 import { DEFAULT_PDF_SETTINGS } from '../types'
 
 // Props
@@ -375,12 +376,16 @@ const switchTab = (tabId: string) => {
   activateTab(panes.value[0], tabId)
 }
 
-const handleSaveSourceHtml = () => {
-  postMessage({ type: 'saveSourceHtml' })
+const handleSavePdf = (variant: ExportVariant) => {
+  postMessage({ type: 'generatePdf', variant })
 }
 
-const handleSaveDocx = () => {
-  postMessage({ type: 'saveDocx' })
+const handleSaveSourceHtml = (variant: ExportVariant) => {
+  postMessage({ type: 'saveSourceHtml', variant })
+}
+
+const handleSaveDocx = (variant: ExportVariant) => {
+  postMessage({ type: 'saveDocx', variant })
 }
 
 const handleRefreshPlots = () => {

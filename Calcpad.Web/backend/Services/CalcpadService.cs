@@ -45,7 +45,8 @@ namespace Calcpad.Server.Services
             bool forPrint = false,
             bool captureOpenXml = false,
             bool enableUi = false,
-            Dictionary<string, string>? uiOverrides = null)
+            Dictionary<string, string>? uiOverrides = null,
+            bool? debug = null)
         {
             if (string.IsNullOrWhiteSpace(calcpadContent))
             {
@@ -108,12 +109,14 @@ namespace Calcpad.Server.Services
                     {
                         // Debug mode makes Calcpad.Core emit per-line anchors (id="line-N" class="line")
                         // and the error-summary boxes that the interactive preview uses for line links.
-                        // Keep it off for print/PDF so exported output has no navigation anchors.
+                        // It defaults to the opposite of forPrint but is independently settable: the
+                        // on-screen report is a print layout that still wants line links, while an
+                        // exported preview wants none.
                         var parser = new ExpressionParser
                         {
                             Settings = coreSettings,
                             SourceFilePath = sourceFilePath,
-                            Debug = !forPrint,
+                            Debug = debug ?? !forPrint,
                             ForPrint = forPrint,
                             EnableUi = enableUi,
                             UiOverrides = uiOverrides

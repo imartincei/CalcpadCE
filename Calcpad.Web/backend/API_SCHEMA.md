@@ -44,8 +44,31 @@ interface CalcpadRequest {
   forceUnwrappedCode?: boolean; // If true, return code without calculation (default: false)
   theme?: string;               // "light" or "dark" (default: "light")
   sourceFilePath?: string;      // Full path of source file on client (used to resolve relative #include against the parent file's directory)
+
+  // Render mode. #pre is hidden when forPrint is true; #post is hidden when enableUi is true.
+  forPrint?: boolean;           // Report layout (default: false)
+  enableUi?: boolean;           // Render #UI lines as interactive controls (default: false).
+                                //   Ignored when forPrint is true — print output carries no controls.
+  uiOverrides?: Record<string, string>;
+                                // Values entered into #UI controls, keyed by the control identity
+                                //   the preview reports in data-ui-var ("L:1", or "L:1:2" for the
+                                //   second pass of a loop; a bare "L" covers every declaration).
+                                //   Replaces the right-hand side of the annotated assignment, so a
+                                //   report reflects what was entered.
+  includeLineAnchors?: boolean; // Per-line anchors + error-summary boxes for in-preview line links.
+                                //   Defaults to !forPrint. Set true for an on-screen report, false
+                                //   for anything written to a file.
 }
 ```
+
+The four renderings the front ends expose map onto these as:
+
+| Variant | `forPrint` | `enableUi` | `uiOverrides` | `includeLineAnchors` |
+|---------|-----------|-----------|---------------|----------------------|
+| Preview | `false` | `false` | — | on screen: default; export: `false` |
+| Report | `true` | `false` | yes | on screen: `true`; export: `false` |
+| Input form | `false` | `true` | yes | export: `false` |
+| Unwrapped | — | — | — | n/a (`?unwrap=true`) |
 
 **Response:** HTML content (`text/html`)
 
@@ -152,9 +175,9 @@ Health check for the PDF generation service.
 
 ## POST /docx
 
-Generate a Word `.docx` from the source. Runs the calcpad → HTML pipeline (`forPrint: true`) and feeds it through `Calcpad.OpenXml.OpenXmlWriter`.
+Generate a Word `.docx` from the source. Runs the calcpad → HTML pipeline and feeds the result through `Calcpad.OpenXml.OpenXmlWriter`.
 
-**Request:** Same as `/convert` (uses `CalcpadRequest`)
+**Request:** Same as `/convert` (uses `CalcpadRequest`). `forPrint` and `uiOverrides` are honored, so the caller chooses between a report and the preview layout. `enableUi` and `includeLineAnchors` are ignored — a Word document has neither controls nor navigation anchors.
 
 **Response:** Word binary (`application/vnd.openxmlformats-officedocument.wordprocessingml.document`)
 

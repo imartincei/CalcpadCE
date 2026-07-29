@@ -91,14 +91,18 @@ It has a **Files** view and a **CalcpadCE** view; the CalcpadCE view is split in
 
 The sidebar is the same across every CalcpadCE front end — see **[The CalcpadCE Panel & Settings](new-calcpad-panel.md)** for a full walkthrough of each tab, including Prettify options and the Export buttons.
 
-## Live preview
+## Live results
 
-The preview pane renders your report live and re-renders as you type.
-From **View** you can:
+The **Results** pane renders your document live and re-renders as you type.
+Its toolbar (and **View → Result Mode**) offers four modes:
 
-- **Toggle Preview** — show/hide the pane.
-- **Preview Mode: Wrapped** — the normal report view.
-- **Preview Mode: Unwrapped** — the fully expanded source, with macros and includes resolved. Useful for debugging what the engine computes.
+- **Preview** — the document as written: both `#pre` and `#post` shown, using the values in the source. The mode to write in.
+- **Unwrapped** — the fully expanded source, with macros and includes resolved. Useful for debugging what the engine computes.
+- **Input** — the `#UI` fill-in form. Takes over the window and hides the editor.
+- **Report** — the print layout: `#pre` hidden, and the values entered into the form applied. In **Report** and **Input** a **Print PDF** button on the toolbar exports it.
+
+**View → Toggle Preview** shows and hides the pane.
+See **[UI Mode](new-ui-mode.md)** for `#pre`/`#post` and the input form.
 
 ### Running on demand (Auto-Run off)
 
@@ -129,13 +133,22 @@ See **[Linter and Diagnostics](new-linter.md)** for the full list of codes.
 
 ## Exporting
 
-Every export uses the app's built-in engine, so the output matches the preview exactly.
+Every export uses the app's built-in engine, so the output matches what you see on screen.
 
-| Output | How | Notes |
-|--------|-----|-------|
-| **PDF** | **File → Export PDF…** | Full-fidelity export via a native save dialog. Requires a Chromium browser — see [PDF Export](new-pdf-export.md). |
-| **HTML** | **Save HTML…** on the sidebar's **Export** tab | Native save dialog writes a standalone `.html` report. |
-| **Word (.docx)** | **Save Word…** on the sidebar's **Export** tab | Native save dialog writes a `.docx` document. |
+Exports come in one variant per result mode, and **the report is the default** — that is what a
+plain **File → Export → Report PDF…** gives you:
+
+| Variant | Contents | Formats |
+|---------|----------|---------|
+| **Report** (default) | `#pre` hidden, `#post` shown, entered `#UI` values applied | PDF, HTML, Word |
+| **Preview** | `#pre` and `#post` both shown, the document's own values | PDF, HTML, Word |
+| **Input form** | The `#UI` form itself | PDF, HTML |
+| **Unwrapped** | The expanded source listing | PDF, HTML |
+
+Every one is in **File → Export** and in the **Export** tab of the sidebar, which groups its
+buttons the same way. Each opens a native save dialog. PDF requires a Chromium browser — see
+[PDF Export](new-pdf-export.md). No exported file carries the line numbers or error boxes the
+on-screen views use for navigation.
 
 Set the document title, timestamp format, page size, and header/footer in the sidebar's **PDF** tab before exporting.
 The **Export** tab also has a **Plots** section that lists every plot the document produces, so you can save each one individually or all at once as a ZIP — see [The CalcpadCE Panel & Settings → Export](new-calcpad-panel.md#export).
@@ -144,9 +157,9 @@ The **Export** tab also has a **Plots** section that lists every plot the docume
 
 The menu bar drives the whole app:
 
-- **File** — New Tab · Open… · Save · Save As… · Close Tab · Export PDF… · Quit
+- **File** — New Tab · Open… · Save · Save As… · Close Tab · Export ▸ · Quit
 - **Edit** — Undo · Redo · Cut · Copy · Paste · Select All · Find · Replace
-- **View** — Toggle Sidebar · Toggle Preview · Split Editor · Preview Mode: Wrapped / Unwrapped
+- **View** — Toggle Sidebar · Toggle Preview · Toggle Word Wrap · Split Editor · Result Mode: Preview / Unwrapped / Input / Report
 - **Server** — Refresh (**Ctrl+Alt+X**) · Show Server Log · Stop Server · Restart Server
 - **Help** — Documentation (opens the docs site in your default browser)
 

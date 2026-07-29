@@ -312,28 +312,32 @@ namespace Calcpad.Highlighter.Snippets.Data
             new SnippetItem
             {
                 Insert = "#show",
-                Description = "Show the output contents (default). Optionally takes a condition, e.g. '#show x == 5'.",
+                Description = "Show the output contents (default). Optionally takes a condition, e.g. '#show x == 5'. Applies to the rest of the document, or up to a matching #end show.",
+                Example = "x = 5\n'Conditional - shows everything below if x > 3\n#show x > 3\ny = 2*x\n\n'Bounded - #end show restores the previous visibility\n#show x > 3\nz = 3*x\n#end show\n'Previous visibility restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#hide",
-                Description = "Hide the output contents. Optionally takes a condition, e.g. '#hide x == 5'.",
+                Description = "Hide the output contents. Optionally takes a condition, e.g. '#hide x == 5'. Applies to the rest of the document, or up to a matching #end hide.",
+                Example = "x = 5\n'Conditional - hides everything below if x > 3\n#hide x > 3\ny = 2*x\n\n'Bounded - #end hide restores the previous visibility\n#hide x > 3\nz = 3*x\n#end hide\n'Previous visibility restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#pre",
-                Description = "Show contents only on screen, not when printing/exporting to PDF. Optionally takes a condition.",
+                Description = "Show contents on screen only - hidden when printing/exporting to PDF. Optionally takes a condition. Applies to the rest of the document, or up to a matching #end pre.",
+                Example = "x = 5\n'Conditional - screen only from here on if x > 3\n#pre x > 3\ny = 2*x\n\n'Bounded - #end pre restores the previous visibility\n#pre x > 3\nz = 3*x\n#end pre\n'Previous visibility restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#post",
-                Description = "Show contents (in the preview and when printing/exporting to PDF). Optionally takes a condition.",
+                Description = "Show contents in the preview and when printing/exporting to PDF - hidden in UI mode. Optionally takes a condition. Applies to the rest of the document, or up to a matching #end post.",
+                Example = "x = 5\n'Conditional - hidden in UI mode from here on if x > 3\n#post x > 3\ny = 2*x\n\n'Bounded - #end post restores the previous visibility\n#post x > 3\nz = 3*x\n#end post\n'Previous visibility restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
@@ -410,21 +414,24 @@ namespace Calcpad.Highlighter.Snippets.Data
             new SnippetItem
             {
                 Insert = "#val",
-                Description = "Show only the result, without the equation. Optionally takes a condition.",
+                Description = "Show only the result, without the equation. Optionally takes a condition. Applies to the rest of the document, or up to a matching #end val.",
+                Example = "x = 5\n'Conditional - results only from here on if x > 3\n#val x > 3\ny = 2*x\n\n'Bounded - #end val restores the previous output mode\n#val x > 3\nz = 3*x\n#end val\n'Previous output mode restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#equ",
-                Description = "Show complete equations and results (default). Optionally takes a condition.",
+                Description = "Show complete equations and results (default). Optionally takes a condition. Applies to the rest of the document, or up to a matching #end equ.",
+                Example = "x = 5\n'Conditional - full equations from here on if x > 3\n#equ x > 3\ny = 2*x\n\n'Bounded - #end equ restores the previous output mode\n#equ x > 3\nz = 3*x\n#end equ\n'Previous output mode restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#noc",
-                Description = "Show equations without results (no calculations). Optionally takes a condition.",
+                Description = "Show equations without results (no calculations). Optionally takes a condition. Applies to the rest of the document, or up to a matching #end noc.",
+                Example = "x = 5\n'Conditional - equations without results from here on if x > 3\n#noc x > 3\ny = 2*x\n\n'Bounded - #end noc restores the previous output mode\n#noc x > 3\nz = 3*x\n#end noc\n'Previous output mode restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
@@ -452,35 +459,35 @@ namespace Calcpad.Highlighter.Snippets.Data
             new SnippetItem
             {
                 Insert = "#varsub",
-                Description = "Show equations with variables and substituted values (default)",
+                Description = "Show equations with both variable names and their substituted values (default). Applies to the rest of the document; takes no condition and has no #end form - switch back with #nosub or #novar.",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#nosub",
-                Description = "Do not substitute variables (no substitution)",
+                Description = "Show equations with variable names only, without substituted values. Applies to the rest of the document; takes no condition and has no #end form - switch back with #varsub.",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#novar",
-                Description = "Show equations only with substituted values (no variables)",
+                Description = "Show equations with substituted values only, without variable names. Applies to the rest of the document; takes no condition and has no #end form - switch back with #varsub.",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#split",
-                Description = "Split long equations after the \"=\" symbol onto a new indented line",
+                Description = "Split long equations after the \"=\" symbol onto a new indented line. Applies to the rest of the document; takes no condition and has no #end form - switch back with #wrap.",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#wrap",
-                Description = "Wrap long equations at the end of the line (default)",
+                Description = "Wrap long equations at the end of the line (default). Applies to the rest of the document; takes no condition and has no #end form - switch back with #split.",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
@@ -488,14 +495,14 @@ namespace Calcpad.Highlighter.Snippets.Data
             {
                 Insert = "#round digits",
                 Description = "Round output to n digits after decimal point",
-                Category = "Output Control",
+                Category = "Settings/Rounding",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#round default",
                 Description = "Restore rounding to default settings",
-                Category = "Output Control",
+                Category = "Settings/Rounding",
                 KeywordType = "Keyword"
             },
             new SnippetItem
@@ -515,8 +522,8 @@ namespace Calcpad.Highlighter.Snippets.Data
             new SnippetItem
             {
                 Insert = "#settings {\"decimals\": 4, \"units\": \"cm\"}",
-                Description = "Override engine settings for subsequent lines via JSON",
-                Category = "Output Control",
+                Description = "Override engine settings for subsequent lines via JSON. Use the Properties panel to see the available settings and edit them.",
+                Category = "Settings/Overrides",
                 KeywordType = "Keyword"
             },
             new SnippetItem
@@ -547,27 +554,9 @@ namespace Calcpad.Highlighter.Snippets.Data
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
-            new SnippetItem
-            {
-                Insert = "#cpd",
-                Description = "Switch parsing mode to Calcpad (default)",
-                Category = "Output Control",
-                KeywordType = "Keyword"
-            },
-            new SnippetItem
-            {
-                Insert = "#html",
-                Description = "Switch parsing mode to raw HTML (no Calcpad evaluation)",
-                Category = "Output Control",
-                KeywordType = "Keyword"
-            },
-            new SnippetItem
-            {
-                Insert = "#markdown",
-                Description = "Switch parsing mode to Markdown (no Calcpad evaluation)",
-                Category = "Output Control",
-                KeywordType = "Keyword"
-            },
+            // The parsing-mode switches #cpd, #html and #markdown are deliberately
+            // absent: Calcpad.Core has no Keyword entry for them, so they must lint
+            // as invalid keywords until Core implements them.
 
             // ============================================
             // BREAKPOINTS
@@ -575,40 +564,40 @@ namespace Calcpad.Highlighter.Snippets.Data
             new SnippetItem
             {
                 Insert = "#pause",
-                Description = "Pause calculation and wait for user to resume",
+                Description = "Pause calculation and wait for user to resume. Not supported in Calcpad.Web.",
                 Category = "Breakpoints",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#input",
-                Description = "Render input form and wait for user input",
+                Description = "Render input form and wait for user input. Not supported in Calcpad.Web.",
                 Category = "Breakpoints",
                 KeywordType = "Keyword"
             },
 
             // ============================================
-            // ANGLE UNITS
+            // SETTINGS / ANGLE UNITS
             // ============================================
             new SnippetItem
             {
                 Insert = "#deg",
                 Description = "Set angle units to degrees",
-                Category = "Angle Units",
+                Category = "Settings/Angle Units",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#rad",
                 Description = "Set angle units to radians",
-                Category = "Angle Units",
+                Category = "Settings/Angle Units",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#gra",
                 Description = "Set angle units to gradians",
-                Category = "Angle Units",
+                Category = "Settings/Angle Units",
                 KeywordType = "Keyword"
             },
         ];
