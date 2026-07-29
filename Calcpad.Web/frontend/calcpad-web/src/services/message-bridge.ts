@@ -134,7 +134,7 @@ export class MessageBridge extends BaseMessageBridge {
         const response = await fetch(`${this.apiClient.getBaseUrl()}/api/calcpad/pdf`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ html, options: this.getStoredPdfOptions() }),
+            body: JSON.stringify({ html, options: this.getEffectivePdfOptions(content) }),
             signal: AbortSignal.timeout(60000),
         });
         if (!response.ok) throw new Error(`PDF endpoint returned ${response.status}`);

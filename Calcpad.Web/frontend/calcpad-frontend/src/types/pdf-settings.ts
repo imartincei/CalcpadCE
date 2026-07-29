@@ -6,16 +6,10 @@ export interface PdfSettings {
   marginLeft: string;
   marginRight: string;
   documentTitle: string;
-  documentSubtitle: string;
   headerCenter: string;
   footerCenter: string;
-  author: string;
-  company: string;
-  project: string;
-  enableHeader: boolean;
-  enableFooter: boolean;
   showPageNumbers: boolean;
-  printBackground: boolean;
+  showDate: boolean;
   scale: number;
   dateTimeFormat: string;
 }
@@ -28,16 +22,10 @@ export const DEFAULT_PDF_SETTINGS: Readonly<PdfSettings> = {
   marginLeft: '0.5in',
   marginRight: '0.5in',
   documentTitle: '',
-  documentSubtitle: '',
   headerCenter: '',
   footerCenter: '',
-  author: '',
-  company: '',
-  project: '',
-  enableHeader: true,
-  enableFooter: true,
   showPageNumbers: true,
-  printBackground: true,
+  showDate: true,
   scale: 1.0,
   dateTimeFormat: 'M/d/yyyy h:mm tt',
 };

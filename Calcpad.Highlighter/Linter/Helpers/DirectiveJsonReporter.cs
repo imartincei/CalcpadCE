@@ -30,6 +30,14 @@ namespace Calcpad.Highlighter.Linter.Helpers
             _directive = directive;
         }
 
+        /// <summary>
+        /// The same span, reporting under a different code and label. Used for a payload
+        /// nested inside another - the <c>pdf</c> object of a metadata comment - so its
+        /// messages name it rather than borrowing the enclosing directive's wording.
+        /// </summary>
+        public DirectiveJsonReporter For(string code, string directive) =>
+            new(_result, _lineIndex, _from, _to, code, directive);
+
         public void Warn(string message) =>
             _result.AddWarning(_lineIndex, _from, _to, _code, message);
 

@@ -56,32 +56,68 @@
           <label>Settings (#settings directive)</label>
           <div v-for="(row, i) in model.settings" :key="'s' + i" class="setting-row">
             <div class="list-row">
-              <select v-model="row.key" @change="onSettingKeyChange(row)">
+              <select v-model="row.key" @change="setting.seedDefault(row)">
                 <option value="">(select)</option>
                 <option v-for="s in settingKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.label }}</option>
               </select>
-              <select v-if="settingType(row.key) === 'boolean'" v-model="row.value">
+              <select v-if="setting.type(row.key) === 'boolean'" v-model="row.value">
                 <option value="true">true</option>
                 <option value="false">false</option>
               </select>
-              <select v-else-if="settingType(row.key) === 'enum'" v-model="row.value">
-                <option v-for="opt in settingOptions(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              <select v-else-if="setting.type(row.key) === 'enum'" v-model="row.value">
+                <option v-for="opt in setting.options(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
               </select>
               <input
                 v-else
-                :type="settingType(row.key) === 'number' ? 'number' : 'text'"
-                :class="{ 'input-invalid': !!settingError(row) }"
-                :min="settingMin(row.key)"
-                :max="settingMax(row.key)"
-                :step="settingStep(row.key)"
+                :type="setting.type(row.key) === 'number' ? 'number' : 'text'"
+                :class="{ 'input-invalid': !!setting.error(row) }"
+                :min="setting.min(row.key)"
+                :max="setting.max(row.key)"
+                :step="setting.step(row.key)"
                 v-model="row.value"
               />
-              <span v-if="row.key" class="setting-info" :title="settingDetail(row.key)">ⓘ</span>
+              <span v-if="row.key" class="setting-info" :title="setting.detail(row.key)">ⓘ</span>
               <button class="icon-button" title="Remove" @click="model.settings.splice(i, 1)">✕</button>
             </div>
-            <div v-if="settingError(row)" class="setting-error">{{ settingError(row) }}</div>
+            <div v-if="setting.error(row)" class="setting-error">{{ setting.error(row) }}</div>
           </div>
           <button class="add-button" @click="model.settings.push({ key: '', value: '' })">+ Add setting</button>
+        </div>
+
+        <div v-if="showPdf" class="field">
+          <label>PDF export</label>
+          <p class="section-desc">
+            Applies to the whole document when it is exported to PDF, overriding the
+            defaults on the Settings tab key by key.
+          </p>
+          <div v-for="(row, i) in model.pdf" :key="'p' + i" class="setting-row">
+            <div class="list-row">
+              <select v-model="row.key" @change="pdf.seedDefault(row)">
+                <option value="">(select)</option>
+                <option v-for="s in pdfKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.label }}</option>
+              </select>
+              <select v-if="pdf.type(row.key) === 'boolean'" v-model="row.value">
+                <option value="true">true</option>
+                <option value="false">false</option>
+              </select>
+              <select v-else-if="pdf.type(row.key) === 'enum'" v-model="row.value">
+                <option v-for="opt in pdf.options(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              </select>
+              <input
+                v-else
+                :type="pdf.type(row.key) === 'number' ? 'number' : 'text'"
+                :class="{ 'input-invalid': !!pdf.error(row) }"
+                :min="pdf.min(row.key)"
+                :max="pdf.max(row.key)"
+                :step="pdf.step(row.key)"
+                v-model="row.value"
+              />
+              <span v-if="row.key" class="setting-info" :title="pdf.detail(row.key)">ⓘ</span>
+              <button class="icon-button" title="Remove" @click="model.pdf.splice(i, 1)">✕</button>
+            </div>
+            <div v-if="pdf.error(row)" class="setting-error">{{ pdf.error(row) }}</div>
+          </div>
+          <button class="add-button" @click="model.pdf.push({ key: '', value: '' })">+ Add PDF setting</button>
         </div>
 
         <div v-if="showUi" class="field">
@@ -208,7 +244,7 @@
         </div>
 
         <div class="actions">
-          <button class="primary-button" :disabled="hasSettingErrors || hasUiErrors" :title="(hasSettingErrors || hasUiErrors) ? 'Fix the highlighted fields before applying' : undefined" @click="onApply">Apply</button>
+          <button class="primary-button" :disabled="hasErrors" :title="hasErrors ? 'Fix the highlighted fields before applying' : undefined" @click="onApply">Apply</button>
           <button class="secondary-button" @click="populate">Reset</button>
         </div>
       </template>
@@ -222,12 +258,12 @@ import {
   FUNCTION_PARAM_TYPES,
   MACRO_PARAM_TYPES,
   METADATA_SETTINGS_KEYS,
-  settingSpec,
+  PDF_SETTING_KEYS,
   specForKey,
-  validateSettingValue,
+  validateCatalogValue,
   LINT_CODES,
 } from '../../text/metadata-comment'
-import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind, SettingsValues, SettingOption } from '../../text/metadata-comment'
+import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind, MetadataSettingKey, PdfCommentValues, SettingsValues } from '../../text/metadata-comment'
 import { UI_PROPERTY_KEYS } from '../../text/ui-directive'
 import type { UiDirectiveData } from '../../text/ui-directive'
 
@@ -243,11 +279,12 @@ const emit = defineEmits<{
 const functionTypes = FUNCTION_PARAM_TYPES
 const macroTypes = MACRO_PARAM_TYPES
 const settingKeys = METADATA_SETTINGS_KEYS
+const pdfKeys = PDF_SETTING_KEYS
 const lintCodes = LINT_CODES
 
 type LintMode = 'off' | 'all' | 'specific'
 
-const KNOWN_KEYS = new Set(['desc', 'paramTypes', 'paramDesc', 'returnType', 'LintIgnore', 'EndLintIgnore'])
+const KNOWN_KEYS = new Set(['desc', 'paramTypes', 'paramDesc', 'returnType', 'LintIgnore', 'EndLintIgnore', 'pdf'])
 
 interface SettingRow { key: string; value: string }
 
@@ -257,6 +294,7 @@ const model = reactive({
   paramDesc: [] as string[],
   returnType: '',
   settings: [] as SettingRow[],
+  pdf: [] as SettingRow[],
   startLintMode: 'off' as LintMode,
   startLintCodes: [] as string[],
   endLintMode: 'off' as LintMode,
@@ -359,6 +397,15 @@ const showLint = computed(() =>
   || !!props.block?.context?.insideOpenLintRegion
   || added.has('lint'))
 
+// PDF settings configure the whole export, not the definition below the comment,
+// so they're offered on generic lines (where a document-level comment naturally
+// lives) and stay hidden on definition comments unless already present or added.
+const showPdf = computed(() =>
+  noContext.value
+  || !isDefinition.value
+  || model.pdf.length > 0
+  || added.has('pdf'))
+
 // On a definition line the panel already shows exactly the fields that apply, so
 // "Add field" is only offered for the null case (a comment not attached to a
 // variable/function/macro), where the definition-oriented fields are hidden.
@@ -369,6 +416,7 @@ const addableFields = computed(() => {
   if (!showParams.value) out.push({ id: 'params', label: 'Parameter types & descriptions' })
   if (!showReturnType.value) out.push({ id: 'returnType', label: 'Return type' })
   if (!showLint.value) out.push({ id: 'lint', label: 'Lint ignore' })
+  if (!showPdf.value) out.push({ id: 'pdf', label: 'PDF export' })
   return out
 })
 
@@ -380,42 +428,61 @@ function addField(id: string) {
   }
 }
 
-function settingType(key: string): MetadataSettingKind {
-  return METADATA_SETTINGS_KEYS.find(s => s.key === key)?.type ?? 'string'
-}
 type MetadataSettingKind = 'number' | 'boolean' | 'string' | 'enum'
 
-function settingOptions(key: string): SettingOption[] {
-  return METADATA_SETTINGS_KEYS.find(s => s.key === key)?.options ?? []
+/**
+ * The per-key lookups a key/value row section needs, bound to one catalog. The
+ * `#settings` and `pdf` sections render the same row UI over different catalogs,
+ * so binding once here keeps a single copy of the logic behind two names.
+ */
+function catalogHelpers(catalog: MetadataSettingKey[]) {
+  const type = (key: string): MetadataSettingKind => specForKey(catalog, key)?.type ?? 'string'
+
+  // Vue casts `<input type="number">` v-model to a number, so `value` may arrive
+  // as a number (or boolean) rather than the string the row nominally holds.
+  const coerce = (key: string, value: string | number | boolean): string | number | boolean => {
+    const str = String(value)
+    if (type(key) === 'boolean') return str === 'true'
+    if (type(key) === 'number' || type(key) === 'enum') {
+      const n = Number(str)
+      return Number.isFinite(n) && str.trim() !== '' ? n : str
+    }
+    return str
+  }
+
+  return {
+    type,
+    coerce,
+    options: (key: string) => specForKey(catalog, key)?.options ?? [],
+    detail: (key: string) => specForKey(catalog, key)?.detail ?? '',
+    min: (key: string) => specForKey(catalog, key)?.min,
+    max: (key: string) => specForKey(catalog, key)?.max,
+    step: (key: string): string | undefined => {
+      if (type(key) !== 'number') return undefined
+      return key === 'precision' || key === 'tol' ? 'any' : '1'
+    },
+    error: (row: SettingRow) => row.key ? validateCatalogValue(catalog, row.key, row.value) : null,
+    /** Seed a freshly picked key with its default, so the row is never left blank. */
+    seedDefault: (row: SettingRow) => {
+      const def = specForKey(catalog, row.key)?.def
+      row.value = def === undefined ? '' : String(def)
+    },
+    /** Collapse the rows into the JSON object the comment/directive carries. */
+    collect: (rows: SettingRow[]): Record<string, string | number | boolean> => {
+      const out: Record<string, string | number | boolean> = {}
+      for (const row of rows)
+        if (row.key) out[row.key] = coerce(row.key, row.value)
+      return out
+    },
+  }
 }
 
-function settingDetail(key: string): string {
-  return settingSpec(key)?.detail ?? ''
-}
+const setting = catalogHelpers(METADATA_SETTINGS_KEYS)
+const pdf = catalogHelpers(PDF_SETTING_KEYS)
 
-function settingMin(key: string): number | undefined {
-  return settingSpec(key)?.min
-}
-
-function settingMax(key: string): number | undefined {
-  return settingSpec(key)?.max
-}
-
-function settingStep(key: string): string | undefined {
-  if (settingType(key) !== 'number') return undefined
-  return key === 'precision' || key === 'tol' ? 'any' : '1'
-}
-
-function settingError(row: SettingRow): string | null {
-  return row.key ? validateSettingValue(row.key, row.value) : null
-}
-
-const hasSettingErrors = computed(() => model.settings.some(r => !!settingError(r)))
-
-function onSettingKeyChange(row: SettingRow) {
-  const def = METADATA_SETTINGS_KEYS.find(s => s.key === row.key)?.def
-  row.value = def === undefined ? '' : String(def)
-}
+const hasSettingErrors = computed(() => model.settings.some(r => !!setting.error(r)))
+const hasPdfErrors = computed(() => model.pdf.some(r => !!pdf.error(r)))
+const hasErrors = computed(() => hasSettingErrors.value || hasPdfErrors.value || hasUiErrors.value)
 
 function populate() {
   added.clear()
@@ -427,6 +494,9 @@ function populate() {
   const settings = props.block?.settings
   model.settings = settings && typeof settings === 'object'
     ? Object.entries(settings).map(([key, value]) => ({ key, value: String(value) }))
+    : []
+  model.pdf = data.pdf && typeof data.pdf === 'object' && !Array.isArray(data.pdf)
+    ? Object.entries(data.pdf).map(([key, value]) => ({ key, value: String(value) }))
     : []
   ;[model.startLintMode, model.startLintCodes] = readLintField(data.LintIgnore)
   ;[model.endLintMode, model.endLintCodes] = readLintField(data.EndLintIgnore)
@@ -469,21 +539,8 @@ function lintFieldValue(mode: LintMode, codes: string[]): string[] | undefined {
   return codes.slice()
 }
 
-// Vue casts `<input type="number">` v-model to a number, so `value` may arrive
-// as a number (or boolean) rather than the string the row nominally holds.
-function coerceSetting(key: string, value: string | number | boolean): string | number | boolean {
-  const type = settingType(key)
-  const str = String(value)
-  if (type === 'boolean') return str === 'true'
-  if (type === 'number' || type === 'enum') {
-    const n = Number(str)
-    return Number.isFinite(n) && str.trim() !== '' ? n : str
-  }
-  return str
-}
-
 function onApply() {
-  if (hasSettingErrors.value || hasUiErrors.value) return
+  if (hasSettingErrors.value || hasPdfErrors.value || hasUiErrors.value) return
   const data: MetadataCommentData = { ...model.extra }
 
   if (model.desc.trim()) data.desc = model.desc.trim()
@@ -496,10 +553,11 @@ function onApply() {
 
   if (model.returnType) data.returnType = model.returnType
 
-  const settings: SettingsValues = {}
-  for (const row of model.settings) {
-    if (row.key) settings[row.key] = coerceSetting(row.key, row.value)
-  }
+  const settings: SettingsValues = setting.collect(model.settings)
+
+  const pdfValues = pdf.collect(model.pdf)
+  // cleanMetadata drops an empty object, so clearing every row removes the key.
+  if (Object.keys(pdfValues).length) data.pdf = pdfValues as PdfCommentValues
 
   const lintIgnore = lintFieldValue(model.startLintMode, model.startLintCodes)
   if (lintIgnore !== undefined) data.LintIgnore = lintIgnore

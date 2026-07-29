@@ -1,0 +1,7 @@
+'<!--{"uiOverrides":{"x:1":"25"}}-->
+'Simple Test'
+#pre
+#UI x = 5
+#post
+x
+y = x*5

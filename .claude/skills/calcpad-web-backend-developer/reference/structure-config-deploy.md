@@ -13,7 +13,7 @@ Calcpad.Web/backend/
 │   ├── CalcpadService.cs           # Core conversion/calculation logic (HTML generation, caching)
 │   ├── PdfGeneratorService.cs      # PDF generation (PuppeteerSharp browser pool + PDFsharp)
 │   ├── FileSettingsExtractor.cs    # Extracts settings from source files
-│   ├── NoPrintRegionStripper.cs    # Strips #noprint regions from output
+│   ├── PdfGeneratorService.cs      # Puppeteer render + PDFsharp header/footer overlay
 │   └── BundledFonts.cs             # Inlines bundled fonts for PDF rendering
 ├── Models/
 │   └── Pdf/

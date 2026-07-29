@@ -2,7 +2,7 @@
 
 > Part of Calcpad.Web. The **Properties** tab described here currently appears in the [VS Code extension](new-vscode-extension.md). The comments it writes are understood everywhere — the [linter](new-linter.md), the preview, and [PDF export](new-pdf-export.md) — no matter which editor created them.
 
-Sometimes you want to tell Calcpad something about your document without that note showing up in the printed report — what a function's inputs mean, that a section is a work-in-progress the linter should leave alone, or that a block of scratch work shouldn't appear in the PDF.
+Sometimes you want to tell Calcpad something about your document without that note showing up in the printed report — what a function's inputs mean, that a section is a work-in-progress the linter should leave alone, or which page size this particular report has to print at.
 
 A **metadata comment** does exactly that. It looks like an ordinary comment, so it never clutters your output, but Calcpad reads the extra information inside it. You don't have to write these by hand: the **Properties** tab in the CalcPad panel fills them in for you.
 
@@ -12,7 +12,7 @@ Open the [CalcPad panel](new-calcpad-panel-and-settings.md) and switch to the **
 
 - **On a definition** (a variable, function, macro, or custom unit) you can add a **description**, and for functions and macros, a **type and description for each parameter** and the **return type**. The parameter rows are filled in to match the definition automatically.
 - **Document settings** are always available. Editing them writes a [`#settings` directive](#document-settings) at the top of the file — not a metadata comment — so they take effect during calculation.
-- **On any other line** you also get the **lint-ignore** regions and **no-print** regions.
+- **On any other line** you also get the **lint-ignore** regions and the [**PDF export** settings](#pdf-export-settings).
 
 Fill in what you want and click **Apply**.
 If the line doesn't have a metadata comment yet, one is created for you; if it does, it's updated in place.
@@ -73,6 +73,7 @@ Unlike the other properties on this tab, `#settings` is a real Calcpad directive
 | `substitute` | `true` / `false` — substitute variable values into the output |
 | `formatEquations` | `true` / `false` — stacked math form |
 | `zeroSmallMatrixElements` | `true` / `false` — show tiny values as `0` |
+| `showHiddenOutput` | `true` / `false` — ignore `#hide` and render hidden content (debugging) |
 | `maxOutputCount` | 5–100 rows shown for big matrices/vectors |
 | `units` | unit system, e.g. `m`, `cm`, `mm` |
 | `vectorGraphics` | `true` / `false` — SVG plots instead of images |
@@ -83,6 +84,32 @@ Unlike the other properties on this tab, `#settings` is a real Calcpad directive
 
 `colorScale` can be `None`, `Gray`, `Rainbow`, `Terrain`, `VioletToYellow`, `GreenToYellow`, `Blues`, `BlueToYellow`, `BlueToRed`, or `PurpleToYellow`.
 Anything the app doesn't recognize is ignored.
+
+## PDF export settings
+
+A document can pin its own PDF page setup, so it prints the same way wherever it's opened.
+Put a `pdf` object in a metadata comment — near the top is the natural place, though it applies to the whole export no matter where it sits:
+
+```text
+'<!--{"pdf": {"format": "A4", "orientation": "landscape", "marginTop": "2cm"}}-->
+```
+
+Each key you set overrides the matching option on the [Settings tab](new-settings.md); everything you leave out keeps whatever the app is configured with.
+So a document that only cares about its margins can say just that, and still follow your usual paper size.
+
+| Key | Values |
+|-----|--------|
+| `format` | `Letter`, `Legal`, `Tabloid`, `Ledger`, or `A0`–`A6` |
+| `orientation` | `portrait` / `landscape` |
+| `marginTop` · `marginRight` · `marginBottom` · `marginLeft` | A length with a unit, e.g. `2cm`, `0.5in`, `12mm` |
+| `showPageNumbers` | `true` / `false` — "Page *n* of *m*" in the footer |
+| `showDate` | `true` / `false` — the timestamp in the header |
+| `documentTitle` | Header title (defaults to the file name) |
+| `dateTimeFormat` | .NET date/time format string, e.g. `M/d/yyyy h:mm tt` |
+
+The **Properties** tab has a picker for these, so you don't have to remember the names, and the linter flags an unknown key or a margin without a unit.
+If more than one comment sets the same key, the last one wins.
+See [PDF Export](new-pdf-export.md) for the rest of the export story.
 
 ## Quieting the linter
 
@@ -99,20 +126,20 @@ The **Properties** tab has a picker for the codes, so you don't have to memorize
 
 ## Leaving sections out of the PDF
 
-To keep something on screen but off the printed page — debug numbers, notes to yourself — wrap it between `NoPrintStart` and `NoPrintEnd` markers:
+This is no longer a metadata comment. Wrap the section in `#pre` … `#end pre` instead:
 
 ```text
-'<!--{"NoPrintStart": true}-->
+#pre
 debug_x = 5
-'<!--{"NoPrintEnd": true}-->
+#end pre
 ```
 
 The section still shows in the preview but is dropped from the PDF.
-See [Excluding sections from the PDF](new-pdf-export.md) for more detail.
+The old `NoPrintStart` / `NoPrintEnd` markers are gone — see [Excluding sections from the PDF](new-pdf-export.md).
 
 ## See also
 
 - [The CalcpadCE Panel & Settings](new-calcpad-panel.md)
 - [Linter and Diagnostics](new-linter.md) — the lint-ignore markers
-- [PDF Export](new-pdf-export.md) — the no-print markers
+- [PDF Export](new-pdf-export.md) — page setup and print visibility
 - [Using the VS Code Extension](new-vscode-extension.md)

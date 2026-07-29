@@ -85,7 +85,10 @@
         :initial-editor-font-family="editorFontFamily"
         :initial-available-fonts="availableFonts"
         :app-version="appVersion"
+        :pdf-settings="pdfSettings"
         @update-settings="handleUpdateSettings"
+        @update-pdf-settings="handleUpdatePdfSettings"
+        @reset-pdf-settings="handleResetPdfSettings"
         @update-preview-theme="handleUpdatePreviewTheme"
         @update-color-theme="handleUpdateColorTheme"
         @update-quick-typing="handleUpdateQuickTyping"
@@ -112,13 +115,6 @@
         :loading="variablesLoading"
         @insert-text="handleInsertText"
       />
-      <CalcpadPdfTab
-        v-else-if="pane.activeTab === 'pdf'"
-        :pdf-settings="pdfSettings"
-        @update-pdf-settings="handleUpdatePdfSettings"
-        @reset-pdf-settings="handleResetPdfSettings"
-        @generate-pdf="handleGeneratePdf"
-      />
       <CalcpadFormattingTab
         v-else-if="pane.activeTab === 'formatting'"
         :indent-style="prettifyIndentStyle"
@@ -136,6 +132,7 @@
         @save-pdf="handleSavePdf"
         @save-html="handleSaveSourceHtml"
         @save-docx="handleSaveDocx"
+        @save-compiled="handleSaveCompiled"
         @refresh-plots="handleRefreshPlots"
         @save-plot="handleSavePlot"
         @save-plots-zip="handleSavePlotsZip"
@@ -162,7 +159,6 @@ import CalcpadInsertTab from './CalcpadInsertTab.vue'
 import CalcpadTocTab from './CalcpadTocTab.vue'
 import CalcpadSettingsTab from './CalcpadSettingsTab.vue'
 import CalcpadVariablesTab from './CalcpadVariablesTab.vue'
-import CalcpadPdfTab from './CalcpadPdfTab.vue'
 import CalcpadFormattingTab from './CalcpadFormattingTab.vue'
 import CalcpadExportTab from './CalcpadExportTab.vue'
 import CalcpadFilesTab from './CalcpadFilesTab.vue'
@@ -255,7 +251,6 @@ const tabs = computed<Tab[]>(() => {
     { id: 'toc', label: 'TOC' },
     { id: 'settings', label: 'Settings' },
     { id: 'variables', label: 'Variables' },
-    { id: 'pdf', label: 'PDF' },
     { id: 'formatting', label: 'Formatting' },
     { id: 'export', label: 'Export' },
     { id: 'errors', label: 'Errors' }
@@ -386,6 +381,10 @@ const handleSaveSourceHtml = (variant: ExportVariant) => {
 
 const handleSaveDocx = (variant: ExportVariant) => {
   postMessage({ type: 'saveDocx', variant })
+}
+
+const handleSaveCompiled = () => {
+  postMessage({ type: 'saveCompiled' })
 }
 
 const handleRefreshPlots = () => {

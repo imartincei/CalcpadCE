@@ -96,6 +96,18 @@
             </label>
           </div>
 
+          <div v-show="rowVisible('math', 'showHiddenOutput')" class="setting-group">
+            <label>
+              <input
+                v-model="localSettings.math.showHiddenOutput"
+                type="checkbox"
+                @change="updateSettings"
+              />
+              Show Hidden Output
+              <span class="setting-info" title="Ignore #hide so suppressed content is rendered anyway. For debugging.">ⓘ</span>
+            </label>
+          </div>
+
           <div v-show="rowVisible('math', 'maxOutput')" class="setting-group">
             <label for="maxOutputCount">
               Max Output Count:
@@ -335,6 +347,59 @@
               <option :value="false">UK (Imperial)</option>
               <option :value="true">US Customary</option>
             </select>
+          </div>
+        </div>
+      </section>
+
+      <section v-show="sectionVisible('pdf')" class="settings-section">
+        <h3 class="section-header" @click="toggle('pdf')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('pdf') }">&#x25BC;</span>
+          PDF Export
+        </h3>
+        <div v-show="bodyVisible('pdf')" class="section-body">
+          <div
+            v-for="spec in pdfKeys"
+            :key="spec.key"
+            v-show="rowVisible('pdf', spec.key)"
+            class="setting-group"
+          >
+            <label :for="'pdf-' + spec.key">
+              {{ spec.label }}:
+              <span class="setting-info" :title="spec.detail">ⓘ</span>
+            </label>
+            <select
+              v-if="spec.type === 'boolean'"
+              :id="'pdf-' + spec.key"
+              v-model="localPdfSettings[spec.key]"
+              @change="updatePdfSettings"
+            >
+              <option :value="true">Yes</option>
+              <option :value="false">No</option>
+            </select>
+            <select
+              v-else-if="spec.type === 'enum'"
+              :id="'pdf-' + spec.key"
+              v-model="localPdfSettings[spec.key]"
+              @change="updatePdfSettings"
+            >
+              <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+            <input
+              v-else
+              :id="'pdf-' + spec.key"
+              type="text"
+              v-model="localPdfSettings[spec.key]"
+              :class="{ 'input-invalid': pdfErrors[spec.key] }"
+              :title="pdfErrors[spec.key] || undefined"
+              @input="updatePdfSettings"
+            />
+            <span v-if="pdfErrors[spec.key]" class="setting-error">{{ pdfErrors[spec.key] }}</span>
+          </div>
+
+          <div v-show="rowVisible('pdf', 'reset')" class="settings-actions">
+            <button @click="resetPdfSettings" class="reset-button">
+              Reset PDF Settings
+            </button>
           </div>
         </div>
       </section>
@@ -652,10 +717,10 @@
 
 <script setup lang="ts">
 import { ref, watch, computed, reactive } from 'vue'
-import type { Settings, ThemeInfo, VersionConfig } from '../types'
-import { DEFAULT_VERSION_CONFIG } from '../types'
+import type { PdfSettings, Settings, ThemeInfo, VersionConfig } from '../types'
+import { DEFAULT_PDF_SETTINGS, DEFAULT_VERSION_CONFIG } from '../types'
 import { getDefaultSettings } from '../../types/settings'
-import { validateSettingValue } from '../../text/metadata-comment'
+import { PDF_SETTING_KEYS, validatePdfValue, validateSettingValue } from '../../text/metadata-comment'
 
 // Props
 interface Props {
@@ -678,6 +743,7 @@ interface Props {
   initialEditorFontFamily?: string
   initialAvailableFonts?: string[]
   appVersion?: string
+  pdfSettings?: PdfSettings
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -699,7 +765,8 @@ const props = withDefaults(defineProps<Props>(), {
   initialAvailableConfigs: () => ['default'],
   initialEditorFontFamily: 'JuliaMono',
   initialAvailableFonts: () => [],
-  appVersion: ''
+  appVersion: '',
+  pdfSettings: () => ({ ...DEFAULT_PDF_SETTINGS })
 })
 
 // Emits
@@ -724,10 +791,17 @@ const emit = defineEmits<{
   openFontsFolder: []
   refreshFonts: []
   updateEditorFontFamily: [family: string]
+  updatePdfSettings: [settings: PdfSettings]
+  resetPdfSettings: []
 }>()
 
 // State
 const localSettings = ref<Settings>({ ...props.settings })
+// Defaults first, so a settings blob written before a key existed still renders a
+// real value rather than validating `undefined` against the key's allowed set.
+const localPdfSettings = reactive<Record<string, string | number | boolean>>(
+  { ...DEFAULT_PDF_SETTINGS, ...props.pdfSettings }
+)
 const previewTheme = ref(props.initialPreviewTheme)
 const colorTheme = ref(props.initialColorTheme)
 const availableThemes = ref<ThemeInfo[]>(props.initialAvailableThemes)
@@ -776,6 +850,7 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       substitute: 'substitute variables',
       formatEquations: 'format equations professional inline',
       zeroSmall: 'zero small matrix elements scientific notation',
+      showHiddenOutput: 'show hidden output hide debug debugging suppressed',
       maxOutput: 'max output count rows columns matrices vectors',
       precision: 'numerical precision integration root finding tolerance',
       tol: 'solver tolerance pcg eigensolver iterative'
@@ -801,6 +876,22 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
     rows: {
       units: 'default input length unit meters centimeters millimeters',
       isUs: 'non-metric units us uk imperial customary'
+    }
+  },
+  pdf: {
+    title: 'PDF Export',
+    rows: {
+      format: 'pdf paper size page format letter legal tabloid ledger a4 a3',
+      orientation: 'pdf page orientation portrait landscape',
+      marginTop: 'pdf top margin page',
+      marginBottom: 'pdf bottom margin page',
+      marginLeft: 'pdf left margin page',
+      marginRight: 'pdf right margin page',
+      showPageNumbers: 'pdf page numbers footer',
+      showDate: 'pdf date timestamp header',
+      documentTitle: 'pdf document title header',
+      dateTimeFormat: 'pdf timestamp date time format',
+      reset: 'reset pdf settings default'
     }
   },
   editor: {
@@ -907,6 +998,26 @@ const hasSettingErrors = computed(() => Object.values(settingErrors.value).some(
 const updateSettings = () => {
   if (hasSettingErrors.value) return
   emit('updateSettings', localSettings.value)
+}
+
+// These are the host-level defaults. A document can override any of them for its
+// own export via the `pdf` key of a metadata comment (see the Properties tab).
+const pdfKeys = PDF_SETTING_KEYS
+
+const pdfErrors = computed<Record<string, string | null>>(() => {
+  const out: Record<string, string | null> = {}
+  for (const spec of PDF_SETTING_KEYS)
+    out[spec.key] = validatePdfValue(spec.key, localPdfSettings[spec.key])
+  return out
+})
+
+const updatePdfSettings = () => {
+  if (Object.values(pdfErrors.value).some(Boolean)) return
+  emit('updatePdfSettings', { ...localPdfSettings } as unknown as PdfSettings)
+}
+
+const resetPdfSettings = () => {
+  emit('resetPdfSettings')
 }
 
 const updatePreviewTheme = () => {
@@ -1122,6 +1233,14 @@ watch(
   (newValue) => {
     availableFonts.value = newValue
   }
+)
+
+watch(
+  () => props.pdfSettings,
+  (newSettings) => {
+    if (newSettings) Object.assign(localPdfSettings, DEFAULT_PDF_SETTINGS, newSettings)
+  },
+  { deep: true }
 )
 
 </script>

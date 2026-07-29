@@ -70,6 +70,7 @@ namespace Calcpad.Highlighter.Linter.Constants
             ["CPD-3411"] = "Invalid paramType value in a metadata comment",
             ["CPD-3412"] = "Invalid metadata-comment JSON",
             ["CPD-3413"] = "Invalid #settings JSON",
+            ["CPD-3414"] = "Invalid PDF settings in a metadata comment",
             ["CPD-3415"] = "Invalid #UI format",
 
             // Stage 3: Format (CPD-36xx)

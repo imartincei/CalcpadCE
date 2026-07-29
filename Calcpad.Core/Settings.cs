@@ -11,6 +11,7 @@ namespace Calcpad.Core
         Substitute,
         FormatEquations,
         ZeroSmallMatrixElements,
+        ShowHiddenOutput,
         MaxOutputCount,
         Units,
         IsUs,
@@ -37,6 +38,7 @@ namespace Calcpad.Core
         public bool? Substitute { get; set; }
         public bool? FormatEquations { get; set; }
         public bool? ZeroSmallMatrixElements { get; set; }
+        public bool? ShowHiddenOutput { get; set; }
         public int? MaxOutputCount { get; set; }
         public string Units { get; set; }
         public bool? IsUs { get; set; }
@@ -104,6 +106,7 @@ namespace Calcpad.Core
         public bool Substitute { get; set; }
         public bool FormatEquations { get; set; }
         public bool ZeroSmallMatrixElements { get; set; }
+        public bool ShowHiddenOutput { get; set; }
         public int MaxOutputCount
         {
             get => _maxOutputCount;
@@ -129,6 +132,7 @@ namespace Calcpad.Core
             Substitute = true;
             FormatEquations = true;
             ZeroSmallMatrixElements = true;
+            ShowHiddenOutput = false;
             MaxOutputCount = 20;
             Precision = 1e-14;
             Tol = 1e-6;

@@ -38,3 +38,16 @@ Otherwise, it will be rewritten at the current location.
 If you need to save the current file with a different name, select the "**File/Save As…**" menu command.
 A file selection dialog will be displayed.
 Select file path and name and click "**Save**"
+
+## Save As Compiled Worksheet…
+
+Compiling produces a "**\*.cpdz**" from the document you are working on.
+It is a separate output rather than a rename: the file you have open keeps its own name and stays editable, so you can keep working on the "**\*.cpd**" and re-compile whenever you need a new copy to hand out.
+
+Any images the document references by a relative path are embedded into the compiled file, so it can be distributed on its own without the surrounding folder.
+
+* In **calcpad-desktop**, use "**File/Save As Compiled Worksheet…**", or the "**Save Compiled…**" button on the "**Export**" tab.
+* In **VS Code**, run "**CalcpadCE: Save As Compiled Worksheet…**" from the command palette, or use the same "**Save Compiled…**" button on the "**Export**" tab.
+
+Opening a compiled worksheet gives you the input form with the source locked — that is what the format is for.
+Values you enter can still be saved back into it: in **calcpad-desktop** it saves like any other file, and in **VS Code** a compiled worksheet opens in its own editor where "**Save**" writes the entered values back.

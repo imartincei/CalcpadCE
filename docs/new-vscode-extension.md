@@ -26,7 +26,7 @@ Alternatively, from a terminal: `code --install-extension vscode-calcpad-<versio
 
 ## Your first document
 
-1. Create a new file and save it with a **`.cpd`** extension (for example `beam.cpd`). VS Code detects the `calcpad` language automatically. The `.cpdz` binary format is also recognized.
+1. Create a new file and save it with a **`.cpd`** extension (for example `beam.cpd`). VS Code detects the `calcpad` language automatically. Compiled **`.cpdz`** worksheets are binary, so they are not edited as text — opening one gives you its input form in a dedicated editor, and **Save** writes the values you entered back into the file. To produce one from a document you are editing, run **CalcpadCE: Save As Compiled Worksheet…**.
 2. Type a calculation, for example:
 
    ```calcpad
@@ -195,7 +195,7 @@ The sidebar's **Export** tab also offers the other renderings, grouped by varian
 (PDF, HTML, Word), **Input form** (PDF, HTML) and **Unwrapped** (PDF, HTML). No exported file
 carries the line numbers or error boxes the preview panels use for navigation.
 
-Use the **PDF** tab in the panel to set the document title, timestamp format, page size, and header/footer before exporting.
+Set the document title, timestamp format, page size, and header/footer in the **PDF Export** section of the panel's **Settings** tab, or pin them to one document from the **Properties** tab — see [PDF Export](new-pdf-export.md).
 The **Export** tab also has a **Plots** section — a thumbnail list of every plot the document emits, each with an individual **Save…** button and a **Download all (ZIP)** button.
 See [The CalcpadCE Panel & Settings → Export](new-calcpad-panel.md#export).
 

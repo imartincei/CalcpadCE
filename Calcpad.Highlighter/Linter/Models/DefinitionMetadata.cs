@@ -27,9 +27,6 @@ namespace Calcpad.Highlighter.Linter.Models
         public static readonly HashSet<string> ValidMacroParamTypes =
             new(Enum.GetNames(typeof(TokenType)), StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>All known JSON property names for metadata comments</summary>
-        public static readonly string[] KnownProperties = { "desc", "paramTypes", "paramDesc", "returnType" };
-
         /// <summary>
         /// Maps a metadata returnType string to a <see cref="CalcpadType"/>, or null when
         /// the value isn't a recognized function return type. "any" maps to Various.

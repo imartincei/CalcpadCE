@@ -98,7 +98,15 @@ export type { ExtractedPlot } from './services/plot-extract';
 export { buildZip } from './services/zip-writer';
 export type { ZipEntry } from './services/zip-writer';
 export { UiOverrideStore, readUiOverrides, writeUiOverrides } from './services/ui-overrides';
-export { isCompiledPath, COMPILED_EXTENSION } from './services/cpdz';
+export { isCompiledPath, inlineImageSources, COMPILED_EXTENSION, COMPILED_MIME } from './services/cpdz';
+export {
+    pathDirname,
+    pathBasename,
+    pathRelative,
+    pathIsAbsolute,
+    pathResolve,
+    pathExtension,
+} from './services/paths';
 export type { UiOverrides, UiValueChange } from './services/ui-overrides';
 
 // --- Message Bridge (base class) --------------------------------------------
@@ -178,14 +186,18 @@ export type {
     LintCode,
     SettingsValues,
     SettingsDirective,
+    PdfCommentValues,
 } from './text/metadata-comment';
 export {
     FUNCTION_PARAM_TYPES,
     MACRO_PARAM_TYPES,
     METADATA_SETTINGS_KEYS,
+    PDF_SETTING_KEYS,
     settingSpec,
+    pdfSpec,
     specForKey,
     validateSettingValue,
+    validatePdfValue,
     validateCatalogValue,
     LINT_CODES,
     findMetadataCommentBlock,
@@ -193,6 +205,7 @@ export {
     serializeMetadataComment,
     settingsDirectiveOnLine,
     serializeSettingsDirective,
+    pdfSettingsFromDocument,
     buildDefinitionResolver,
     analyzeMetadataLine,
 } from './text/metadata-comment';

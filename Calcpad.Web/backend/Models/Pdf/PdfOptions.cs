@@ -5,7 +5,6 @@ namespace Calcpad.Server.Models.Pdf
         // Page settings
         public string Format { get; set; } = "A4";
         public string Orientation { get; set; } = "portrait";
-        public bool PrintBackground { get; set; } = true;
         public float Scale { get; set; } = 1.0f;
 
         // Margins
@@ -15,15 +14,11 @@ namespace Calcpad.Server.Models.Pdf
         public string MarginLeft { get; set; } = "1.5cm";
 
         // Headers and footers
-        public bool EnableHeader { get; set; }
-        public bool EnableFooter { get; set; }
+        public bool ShowPageNumbers { get; set; } = true;
+        public bool ShowDate { get; set; } = true;
 
         // Document metadata
         public string? DocumentTitle { get; set; }
-        public string? DocumentSubtitle { get; set; }
-        public string? Author { get; set; }
-        public string? Company { get; set; }
-        public string? Project { get; set; }
 
         // Custom content
         public string? HeaderCenter { get; set; }
@@ -31,9 +26,6 @@ namespace Calcpad.Server.Models.Pdf
 
         // Timestamp format (null/empty uses system default)
         public string? DateTimeFormat { get; set; }
-
-        // Background PDF
-        public string? BackgroundPdf { get; set; }
     }
 
     public class PdfGenerateRequest

@@ -1,6 +1,7 @@
 import { getIndentLength } from './comment-formatting';
 import { findUiDirectiveBlock } from './ui-directive';
 import type { UiDirectiveBlock } from './ui-directive';
+import type { PdfSettings } from '../types/pdf-settings';
 
 /**
  * Parsed shape of a Calcpad definition-metadata comment
@@ -14,8 +15,16 @@ export interface MetadataCommentData {
     returnType?: string;
     LintIgnore?: string[];
     EndLintIgnore?: string[];
+    pdf?: PdfCommentValues;
     [key: string]: unknown;
 }
+
+/**
+ * PDF export settings a document pins for itself, via the `pdf` key of a
+ * metadata comment. Every field is optional: whatever the document doesn't state
+ * falls back to the host's stored defaults, key by key.
+ */
+export type PdfCommentValues = Partial<PdfSettings>;
 
 /** Recognized value shape of the `#settings` directive JSON payload. */
 export type SettingsValues = Record<string, string | number | boolean>;
@@ -158,6 +167,10 @@ export interface MetadataSettingKey {
     min?: number;
     /** Inclusive upper bound for `number` values; omit for open-ended. */
     max?: number;
+    /** Shape a `string` value must match, e.g. a CSS length. */
+    pattern?: RegExp;
+    /** Completes "must be ...", e.g. "a CSS length such as 2cm, 0.5in, or 12mm". */
+    patternHint?: string;
 }
 
 const COLOR_SCALE_OPTIONS: SettingOption[] = [
@@ -188,6 +201,7 @@ export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
     { key: 'substitute', label: 'Substitute variables', detail: 'Substitute variable values into expressions', type: 'boolean', def: true },
     { key: 'formatEquations', label: 'Format equations', detail: 'Format equations in output', type: 'boolean', def: true },
     { key: 'zeroSmallMatrixElements', label: 'Zero small matrix elements', detail: 'Zero out near-zero matrix elements', type: 'boolean', def: true },
+    { key: 'showHiddenOutput', label: 'Show hidden output', detail: 'Ignore #hide and render hidden content (debugging)', type: 'boolean', def: false },
     { key: 'maxOutputCount', label: 'Max output count', detail: 'Maximum output rows (5 to 100)', type: 'number', def: 20, min: 5, max: 100 },
     { key: 'units', label: 'Default length unit', detail: 'Unit system string', type: 'string', def: 'm' },
     { key: 'vectorGraphics', label: 'Vector graphics', detail: 'Render plots as SVG', type: 'boolean', def: false },
@@ -202,6 +216,52 @@ export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
     { key: 'tol', label: 'Solver tolerance', detail: 'Target tolerance for the iterative PCG/eigensolver (1e-15 to 1e-2)', type: 'number', def: 1e-6, min: 1e-15, max: 1e-2 },
 ];
 
+const PAPER_FORMAT_OPTIONS: SettingOption[] = [
+    { value: 'Letter', label: 'Letter (8.5 × 11 in)' },
+    { value: 'Legal', label: 'Legal (8.5 × 14 in)' },
+    { value: 'Tabloid', label: 'Tabloid (11 × 17 in)' },
+    { value: 'Ledger', label: 'Ledger (17 × 11 in)' },
+    { value: 'A0', label: 'A0' },
+    { value: 'A1', label: 'A1' },
+    { value: 'A2', label: 'A2' },
+    { value: 'A3', label: 'A3' },
+    { value: 'A4', label: 'A4' },
+    { value: 'A5', label: 'A5' },
+    { value: 'A6', label: 'A6' },
+];
+
+/**
+ * A CSS length as the headless browser accepts it for a page margin: a number
+ * with a unit, e.g. `2cm`, `0.5in`, `12mm`, `36pt`, `96px`. A bare number is
+ * rejected because Puppeteer treats it as pixels, which is never what someone
+ * setting a print margin means.
+ */
+const CSS_LENGTH = /^\d*\.?\d+(cm|mm|in|pt|pc|px)$/i;
+const CSS_LENGTH_HINT = 'a length with a unit, e.g. 2cm, 0.5in, or 12mm';
+
+/**
+ * Recognized keys for the `pdf` object of a metadata comment — the PDF export
+ * settings a document can pin for itself. Curated rather than exhaustive: only
+ * options that demonstrably affect the output are offered. Keep in sync with
+ * `Calcpad.Highlighter`'s `PdfSettingsDto` (which validates the same payload) and
+ * with the backend's `PdfOptions`.
+ */
+export const PDF_SETTING_KEYS: MetadataSettingKey[] = [
+    { key: 'format', label: 'Paper size', detail: 'Page size', type: 'enum', def: 'Letter', options: PAPER_FORMAT_OPTIONS },
+    {
+        key: 'orientation', label: 'Orientation', detail: 'Page orientation', type: 'enum', def: 'portrait',
+        options: [{ value: 'portrait', label: 'Portrait' }, { value: 'landscape', label: 'Landscape' }],
+    },
+    { key: 'marginTop', label: 'Top margin', detail: `Top page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.75in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
+    { key: 'marginBottom', label: 'Bottom margin', detail: `Bottom page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.75in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
+    { key: 'marginLeft', label: 'Left margin', detail: `Left page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.5in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
+    { key: 'marginRight', label: 'Right margin', detail: `Right page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.5in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
+    { key: 'showPageNumbers', label: 'Page numbers', detail: 'Show "Page n of m" in the footer', type: 'boolean', def: true },
+    { key: 'showDate', label: 'Date', detail: 'Show the timestamp in the header', type: 'boolean', def: true },
+    { key: 'documentTitle', label: 'Document title', detail: 'Header title (defaults to the file name)', type: 'string', def: '' },
+    { key: 'dateTimeFormat', label: 'Timestamp format', detail: '.NET date/time format string, e.g. M/d/yyyy h:mm tt', type: 'string', def: 'M/d/yyyy h:mm tt' },
+];
+
 /** A catalog entry generic enough to cover both `MetadataSettingKey` and `UiPropertyKey`. */
 interface CatalogKeySpec {
     key: string;
@@ -210,6 +270,8 @@ interface CatalogKeySpec {
     options?: SettingOption[];
     min?: number;
     max?: number;
+    pattern?: RegExp;
+    patternHint?: string;
 }
 
 /** Looks up a key's spec in an arbitrary catalog (`METADATA_SETTINGS_KEYS`, `UI_PROPERTY_KEYS`, ...). */
@@ -251,6 +313,8 @@ export function validateCatalogValue<T extends CatalogKeySpec>(
         if (String(value).trim() === '' || !Number.isFinite(n)) return `${spec.label} must be a number`;
         if (spec.min !== undefined && n < spec.min || spec.max !== undefined && n > spec.max) return rangeMessage(spec);
     }
+    if (spec.pattern && !spec.pattern.test(String(value)))
+        return `${spec.label} must be ${spec.patternHint}`;
     return null;
 }
 
@@ -260,6 +324,19 @@ export function validateCatalogValue<T extends CatalogKeySpec>(
  */
 export function validateSettingValue(key: string, value: string | number | boolean): string | null {
     return validateCatalogValue(METADATA_SETTINGS_KEYS, key, value);
+}
+
+/** Looks up a `pdf` key's spec. */
+export function pdfSpec(key: string): MetadataSettingKey | undefined {
+    return specForKey(PDF_SETTING_KEYS, key);
+}
+
+/**
+ * Returns an error message when `value` is not valid for a `pdf` key, else `null`.
+ * Mirrors the checks in `Calcpad.Highlighter`'s `PdfSettingsDto.Validate`.
+ */
+export function validatePdfValue(key: string, value: string | number | boolean): string | null {
+    return validateCatalogValue(PDF_SETTING_KEYS, key, value);
 }
 
 export interface LintCode {
@@ -324,6 +401,9 @@ export const LINT_CODES: LintCode[] = [
     { code: 'CPD-3410', description: 'Outer-scope assignment (←) to an undefined variable' },
     { code: 'CPD-3411', description: 'Invalid paramType value in a metadata comment' },
     { code: 'CPD-3412', description: 'Invalid metadata-comment JSON' },
+    { code: 'CPD-3413', description: 'Invalid #settings JSON' },
+    { code: 'CPD-3414', description: 'Invalid PDF settings in a metadata comment' },
+    { code: 'CPD-3415', description: 'Invalid #UI format' },
     { code: 'CPD-3601', description: 'Invalid format specifier' },
 ];
 
@@ -632,6 +712,26 @@ export function serializeSettingsDirective(settings: SettingsValues, layout?: Me
     const singleLine = `#settings ${JSON.stringify(settings)}`;
     if (!layout || layout.segments.length === 0) return singleLine;
     return serializeWithLayout(settings, layout, '#settings ', '') ?? singleLine;
+}
+
+/**
+ * Collect the PDF settings the document pins for itself: the `pdf` object of every
+ * metadata comment, shallow-merged in document order so a later comment overrides
+ * an earlier one key by key. Unlike `#settings` — which applies only to the lines
+ * below it — PDF settings configure one export, so position carries no meaning
+ * beyond that last-wins ordering. Returns an empty object when the document pins
+ * nothing, letting the caller fall back to the host's stored defaults.
+ */
+export function pdfSettingsFromDocument(lines: string[]): PdfCommentValues {
+    const merged: Record<string, unknown> = {};
+    for (let i = 0; i < lines.length; i++) {
+        const block = findMetadataCommentBlock(lines, i);
+        // Only the opening line contributes, so a multi-line comment isn't merged once per line.
+        if (!block?.valid || block.line !== i) continue;
+        const pdf = block.data?.pdf;
+        if (pdf && typeof pdf === 'object' && !Array.isArray(pdf)) Object.assign(merged, pdf);
+    }
+    return merged as PdfCommentValues;
 }
 
 /** A recognized definition line and how many parameters it declares. */

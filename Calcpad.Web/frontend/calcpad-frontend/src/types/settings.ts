@@ -8,6 +8,7 @@ export interface CalcpadSettings {
         substitute: boolean;
         formatEquations: boolean;
         zeroSmallMatrixElements: boolean;
+        showHiddenOutput: boolean;
         maxOutputCount: number;
         formatString: string;
         precision: number;

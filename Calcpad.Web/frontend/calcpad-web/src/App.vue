@@ -21,10 +21,17 @@
       :aria-orientation="'vertical'"
       :aria-expanded="sidebarVisible"
     ></div>
-    <!-- UI mode is a data-entry view, so the preview takes the whole window and
-         the editor steps aside until the user exits it. -->
-    <div v-show="!uiModeFullscreen" class="editor-pane">
-      <div class="editor-toolbar" @contextmenu.prevent>
+    <!-- UI mode is a data-entry view, so the preview takes the whole window and the
+         editor steps aside until the user exits it. The tab strip stays, though —
+         filling in one worksheet and moving to the next is the point of the mode, and
+         without tabs there is no way to switch. `.work-area` turns into a column so
+         that strip spans the window above the form; outside UI mode it is
+         `display: contents` and the panes lay out as direct siblings.
+         The wrapper and the panes share an indent level so adding it left the rest of
+         the template untouched. -->
+    <div class="work-area" :class="{ 'ui-mode': uiModeFullscreen }">
+    <div class="editor-pane">
+      <div v-show="!uiModeFullscreen" class="editor-toolbar" @contextmenu.prevent>
         <span class="spacer"></span>
         <button
           class="toolbar-btn"
@@ -47,10 +54,10 @@
 
       <!-- Editor groups, stacked top/bottom. One group normally; two when split. -->
       <div class="editor-groups">
-        <template v-for="(group, gi) in groups" :key="group.id">
+        <template v-for="(group, gi) in visibleGroups" :key="group.id">
           <div
             class="editor-group"
-            :class="{ 'active-group': group.id === activeGroupId && isSplit }"
+            :class="{ 'active-group': group.id === activeGroupId && isSplit && !uiModeFullscreen }"
             :style="editorGroupStyle(gi)"
             @mousedown="onGroupFocus(group.id)"
           >
@@ -88,11 +95,11 @@
                 @click="onCloseGroup(group.id)"
               >✕</button>
             </div>
-            <div class="editor-container" :ref="el => setEditorRef(group.id, el)"></div>
+            <div v-show="!uiModeFullscreen" class="editor-container" :ref="el => setEditorRef(group.id, el)"></div>
           </div>
           <!-- Horizontal divider between the two stacked groups. -->
           <div
-            v-if="gi === 0 && isSplit"
+            v-if="gi === 0 && isSplit && !uiModeFullscreen"
             class="group-divider"
             :class="{ dragging: draggingEditorDivider }"
             @mousedown="onEditorDividerMouseDown"
@@ -175,7 +182,7 @@
       </div>
 
       <!-- Bottom panel (Problems / Output) — reflects the ACTIVE group. -->
-      <div v-if="bottomPanelOpen" class="bottom-panel">
+      <div v-if="bottomPanelOpen && !uiModeFullscreen" class="bottom-panel">
         <div class="bottom-panel-header">
           <button
             class="panel-tab"
@@ -254,7 +261,7 @@
         </div>
       </div>
       <!-- Status bar -->
-      <div class="status-bar" @contextmenu.prevent>
+      <div v-show="!uiModeFullscreen" class="status-bar" @contextmenu.prevent>
         <span class="status-problems" @click="openBottomTab('problems')">
           <svg class="status-icon lintError" viewBox="0 0 16 16" aria-hidden="true">
             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
@@ -278,6 +285,9 @@
       </div>
     </div>
 
+    <!-- Holds the input form and the report beside it, so UI mode can lay them out as a
+         row underneath the tab strip. Dissolved by `display: contents` otherwise. -->
+    <div class="preview-area">
     <div v-if="previewVisible" class="preview-pane" :class="{ fullscreen: uiModeFullscreen }">
       <div class="preview-toolbar" @contextmenu.prevent>
         <span>Results</span>
@@ -285,14 +295,20 @@
           <button
             class="toolbar-btn"
             :class="{ active: resultMode === 'preview' }"
+            :disabled="!resultModeAvailable('preview')"
             @click="setResultMode('preview')"
-            title="The document as written — #pre and #post both shown, entered #UI values ignored"
+            :title="activeTabIsCompiled
+              ? 'Unavailable for a compiled worksheet — it has no source to show'
+              : 'The document as written — #pre and #post both shown, entered #UI values ignored'"
           >Preview</button>
           <button
             class="toolbar-btn"
             :class="{ active: resultMode === 'unwrapped' }"
+            :disabled="!resultModeAvailable('unwrapped')"
             @click="setResultMode('unwrapped')"
-            title="The source listing, with macros and includes resolved"
+            :title="activeTabIsCompiled
+              ? 'Unavailable for a compiled worksheet — it has no source to show'
+              : 'The source listing, with macros and includes resolved'"
           >Unwrapped</button>
           <button
             class="toolbar-btn"
@@ -361,7 +377,7 @@
       </div>
 
       <div class="preview-frames">
-        <template v-for="(group, gi) in previewGroups" :key="'pv-' + group.id">
+        <template v-for="(group, gi) in visibleGroups" :key="'pv-' + group.id">
           <iframe
             class="preview-frame"
             :class="{ 'active-group': group.id === activeGroupId && isSplit && !uiModeFullscreen }"
@@ -404,6 +420,8 @@
         ></iframe>
       </div>
     </div>
+    </div><!-- /.preview-area -->
+    </div><!-- /.work-area -->
 
     <!-- Preview context menu. Layered over the iframe in place of the broken
          native WebView menu (see injectLineLinks). Positioned in viewport
@@ -476,7 +494,7 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
-import { extractBodyHtml } from 'calcpad-frontend'
+import { extractBodyHtml, isCompiledPath } from 'calcpad-frontend'
 
 export interface ProblemItem {
   severity: number
@@ -518,7 +536,7 @@ const onExitUiModeRequest = ref<(() => Promise<boolean>) | null>(null)
 // "Print PDF" on the report/input toolbar; the host runs the report PDF export.
 const onPrintReportRequest = ref<(() => void) | null>(null)
 
-/** UI mode hands the whole window to the input form; the editor is hidden. */
+/** UI mode hands the whole window to the input form; only the tab strip stays. */
 const uiModeFullscreen = computed(() => previewVisible.value && resultMode.value === 'ui')
 
 // The report pane beside the input form, toggled like the preview pane itself.
@@ -553,6 +571,21 @@ const activeGroupId = ref<string>('g0')
 
 const isSplit = computed(() => groups.value.length > 1)
 const activeGroup = computed(() => groups.value.find(g => g.id === activeGroupId.value) ?? groups.value[0])
+
+/**
+ * A compiled worksheet has no readable source: it is distributed to be filled in, and
+ * the editor holding it is locked. So the two modes that exist to show source — the
+ * as-written preview and the resolved listing — are not offered for one. Input and
+ * report are, since both are views of the filled-in form.
+ */
+const COMPILED_RESULT_MODES: ResultMode[] = ['ui', 'report']
+const activeTabIsCompiled = computed(() => {
+  const filePath = activeGroup.value?.tabs.find(t => t.isActive)?.filePath
+  return !!filePath && isCompiledPath(filePath)
+})
+function resultModeAvailable(mode: ResultMode): boolean {
+  return !activeTabIsCompiled.value || COMPILED_RESULT_MODES.includes(mode)
+}
 const problems = computed(() => activeGroup.value?.problems ?? [])
 const errorCount = computed(() => activeGroup.value?.errorCount ?? 0)
 const warningCount = computed(() => activeGroup.value?.warningCount ?? 0)
@@ -592,11 +625,12 @@ const editorSplitRatio = ref<number>(0.5)
 const draggingEditorDivider = ref(false)
 
 /**
- * The input form is a single-document view: a split would stack two forms, and
- * with the same file open in both they would share one set of entered values and
- * fight over it. So UI mode renders only the active group, full height.
+ * The groups the editor side and the preview side each render. The input form is a
+ * single-document view: a split would stack two forms, and with the same file open in
+ * both they would share one set of entered values and fight over it. So UI mode renders
+ * only the active group — one form, and one tab strip above it.
  */
-const previewGroups = computed(() =>
+const visibleGroups = computed(() =>
   uiModeFullscreen.value ? [activeGroup.value].filter(Boolean) : groups.value)
 
 function previewGroupStyle(index: number): Record<string, string> {
@@ -605,6 +639,8 @@ function previewGroupStyle(index: number): Record<string, string> {
 }
 
 function editorGroupStyle(index: number): Record<string, string> {
+  // Only the tab strip is left in UI mode, so the group hugs it instead of filling.
+  if (uiModeFullscreen.value) return { flex: '0 0 auto', minHeight: '0' }
   if (!isSplit.value) return { flex: '1 1 0', minHeight: '0' }
   if (index === 0) return { flex: `0 0 ${editorSplitRatio.value * 100}%`, minHeight: '0' }
   return { flex: '1 1 0', minHeight: '0' }
@@ -1369,6 +1405,9 @@ function isPreviewVisible(): boolean {
 
 async function setResultMode(mode: ResultMode): Promise<void> {
   if (resultMode.value === mode) return
+  // Guarded here rather than only on the buttons, so the native View menu, the
+  // restored-on-startup mode, and the auto-switch to unwrapped are all covered.
+  if (!resultModeAvailable(mode)) return
   if (resultMode.value === 'ui' && !await confirmExitUiMode()) return
   resultMode.value = mode
   onResultModeChanged.value?.(mode)
@@ -1813,6 +1852,7 @@ defineExpose({
   onResultModeChanged,
   setResultMode,
   getResultMode,
+  resultModeAvailable,
   setUiOverridesDirty,
   onSaveUiOverridesRequest,
   onExitUiModeRequest,

@@ -24,10 +24,9 @@ The **CalcpadCE** view is organized into tabs:
 |-----|--------------|
 | **Insert** | Searchable palette of symbols, built-in functions, and snippets. Click an item to insert it at the cursor. Includes an **Insert Image** button and a Symbol Palette. |
 | **TOC** | Live table of contents built from your document headings. Click a heading to jump to that line. |
-| **Settings** | All calculation, plot, unit, theme, editor, and linter settings, plus named configurations. See [Settings](new-settings.md). |
+| **Settings** | All calculation, plot, unit, PDF export, theme, editor, and linter settings, plus named configurations. See [Settings](new-settings.md). |
 | **Variables** | Everything defined in the document — macros, variables, functions, and custom units — with types and signatures. Click an entry to insert it; each is searchable. |
-| **Metadata** | Form-based editor for the [metadata comment](new-metadata-comments.md) at the cursor — descriptions, parameter/return types, per-file settings, lint-ignore, and no-print markers. |
-| **PDF** | Header/footer, page size, and layout options applied when you export to PDF. |
+| **Properties** | Form-based editor for the [metadata comment](new-metadata-comments.md) at the cursor — descriptions, parameter/return types, per-file settings, lint-ignore, and per-document PDF export settings. |
 | **Formatting** | Prettify options and the **Prettify Document** button. See [Formatting](#formatting-prettify). |
 | **Export** | PDF / HTML / Word save actions, grouped by which rendering they capture, plus per-plot and ZIP-all image export from any plots produced by the document. See [Export](#export). |
 | **Errors** | Full list of calculation errors from the engine, each linking to its source line. |
@@ -52,10 +51,10 @@ Lists everything the current document defines, grouped and counted:
 Entries are scoped to the active document (and its `#include` files).
 Click any entry to insert its name at the cursor.
 
-### Metadata
+### Properties
 
 A form-based editor for the [metadata comment](new-metadata-comments.md) on the line at the cursor — no hand-editing of JSON required.
-Put the cursor on a definition (or an existing metadata comment) and the tab shows exactly the fields that apply: a description for any definition, parameter/return types for functions and macros, and per-file settings, lint-ignore, and no-print markers on generic lines.
+Put the cursor on a definition (or an existing metadata comment) and the tab shows exactly the fields that apply: a description for any definition, parameter/return types for functions and macros, and per-file settings, lint-ignore, and [PDF export settings](new-metadata-comments.md#pdf-export-settings) on generic lines.
 **Apply** writes the comment (creating one above the definition if none exists); **Reset** re-reads the current one.
 See [Metadata Comments](new-metadata-comments.md) for the full format.
 
@@ -75,17 +74,6 @@ Controls the **Prettify Document** command, which reformats the active file:
 
 Set your options, then click **Prettify Document**.
 
-### PDF
-
-Configures the PDF export before you run it:
-
-- **Header** — document title (defaults to the file name) and a timestamp format (e.g. `M/d/yyyy h:mm tt`)
-- **Page Layout** — page size (Letter, …) and orientation
-
-Use **Generate PDF** to export, or **Reset** to restore the defaults.
-
-See [PDF Export](new-pdf-export.md) for more information about the options.
-
 ### Export
 
 Renders the current document through the backend and saves the result. The buttons are grouped
@@ -100,7 +88,8 @@ by *which* rendering gets saved — **Report** first, since that is the default 
 
 Word is offered for the report and the preview only — a fill-in form and a code listing have no
 meaningful Word rendering. See **[UI Mode → Exporting](new-ui-mode.md)** for what each variant
-is for. PDF uses the page setup from the **PDF** tab.
+is for. PDF uses the page setup from the **Settings** tab's **PDF Export** section, overridden by the
+document's own `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings) where it sets one.
 
 Below those, the **Plots** section lists every plot the document emits, each with a thumbnail, filename, and size:
 

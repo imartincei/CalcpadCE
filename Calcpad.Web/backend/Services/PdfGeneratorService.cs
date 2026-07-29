@@ -63,12 +63,7 @@ namespace Calcpad.Server.Services
             var basicPdf = await GenerateBasicPdfAsync(html, options, browserPath).ConfigureAwait(false);
 
             // Step 2: Enhance with PDFsharp (headers, footers, backgrounds)
-            if (options.EnableHeader || options.EnableFooter || !string.IsNullOrEmpty(options.BackgroundPdf))
-            {
-                return EnhancePdf(basicPdf, options);
-            }
-
-            return basicPdf;
+            return EnhancePdf(basicPdf, options);
         }
 
         private async Task<byte[]> GenerateBasicPdfAsync(string html, CalcpadPdfOptions options, string? browserPath)
@@ -161,7 +156,7 @@ namespace Calcpad.Server.Services
                 {
                     Format = ParsePaperFormat(options.Format),
                     Landscape = options.Orientation == "landscape",
-                    PrintBackground = options.PrintBackground,
+                    PrintBackground = true,
                     Scale = (decimal)options.Scale,
                     MarginOptions = new MarginOptions
                     {
@@ -423,13 +418,6 @@ namespace Calcpad.Server.Services
             using var inputStream = new MemoryStream(pdfBytes);
             var document = PdfReader.Open(inputStream, PdfDocumentOpenMode.Modify);
 
-            // Add background first (drawn behind content)
-            if (!string.IsNullOrEmpty(options.BackgroundPdf) && File.Exists(options.BackgroundPdf))
-            {
-                AddBackground(document, options.BackgroundPdf);
-            }
-
-            // Add headers and footers on top
             for (int i = 0; i < document.PageCount; i++)
             {
                 var page = document.Pages[i];
@@ -438,11 +426,8 @@ namespace Calcpad.Server.Services
                 double width = page.Width.Point;
                 double height = page.Height.Point;
 
-                if (options.EnableHeader)
-                    DrawHeader(gfx, width, height, options);
-
-                if (options.EnableFooter)
-                    DrawFooter(gfx, width, height, i + 1, document.PageCount, options);
+                DrawHeader(gfx, width, height, options);
+                DrawFooter(gfx, width, height, i + 1, document.PageCount, options);
             }
 
             using var outputStream = new MemoryStream();
@@ -478,13 +463,6 @@ namespace Calcpad.Server.Services
             {
                 gfx.DrawString(options.DocumentTitle, boldFont, darkBrush,
                     new XPoint(margin, headerY + 12));
-
-                // Subtitle
-                if (!string.IsNullOrEmpty(options.DocumentSubtitle))
-                {
-                    gfx.DrawString(options.DocumentSubtitle, font, ctx.GrayBrush,
-                        new XPoint(margin, headerY + 23));
-                }
             }
 
             // Header center text
@@ -496,11 +474,14 @@ namespace Calcpad.Server.Services
             }
 
             // Timestamp (top-right)
-            var timestampFormat = string.IsNullOrEmpty(options.DateTimeFormat) ? "g" : options.DateTimeFormat;
-            var timestamp = DateTime.Now.ToString(timestampFormat);
-            var timestampSize = gfx.MeasureString(timestamp, smallFont);
-            gfx.DrawString(timestamp, smallFont, lightGrayBrush,
-                new XPoint(width - margin - timestampSize.Width, headerY + 12));
+            if (options.ShowDate)
+            {
+                var timestampFormat = string.IsNullOrEmpty(options.DateTimeFormat) ? "g" : options.DateTimeFormat;
+                var timestamp = DateTime.Now.ToString(timestampFormat);
+                var timestampSize = gfx.MeasureString(timestamp, smallFont);
+                gfx.DrawString(timestamp, smallFont, lightGrayBrush,
+                    new XPoint(width - margin - timestampSize.Width, headerY + 12));
+            }
         }
 
         private void DrawFooter(XGraphics gfx, double width, double height,
@@ -517,20 +498,6 @@ namespace Calcpad.Server.Services
             double lineY = footerY - 5;
             gfx.DrawLine(ctx.LinePen, margin, lineY, width - margin, lineY);
 
-            // Left side: Author / Company
-            double leftY = footerY + 8;
-            if (!string.IsNullOrEmpty(options.Author))
-            {
-                gfx.DrawString($"Author: {options.Author}", font, ctx.GrayBrush,
-                    new XPoint(margin, leftY));
-                leftY += 10;
-            }
-            if (!string.IsNullOrEmpty(options.Company))
-            {
-                gfx.DrawString(options.Company, font, ctx.GrayBrush,
-                    new XPoint(margin, leftY));
-            }
-
             // Center: Custom footer text
             if (!string.IsNullOrEmpty(options.FooterCenter))
             {
@@ -540,38 +507,12 @@ namespace Calcpad.Server.Services
             }
 
             // Right side: Page numbers
-            var pageText = $"Page {pageNumber} of {totalPages}";
-            var pageSize = gfx.MeasureString(pageText, font);
-            double rightY = footerY + 8;
-            gfx.DrawString(pageText, font, ctx.GrayBrush,
-                new XPoint(width - margin - pageSize.Width, rightY));
-
-            if (!string.IsNullOrEmpty(options.Project))
+            if (options.ShowPageNumbers)
             {
-                rightY += 10;
-                var projectText = $"Project: {options.Project}";
-                var projectSize = gfx.MeasureString(projectText, font);
-                gfx.DrawString(projectText, font, ctx.GrayBrush,
-                    new XPoint(width - margin - projectSize.Width, rightY));
-            }
-        }
-
-        private void AddBackground(PdfDocument document, string backgroundPdfPath)
-        {
-            try
-            {
-                var bgForm = XPdfForm.FromFile(backgroundPdfPath);
-
-                for (int i = 0; i < document.PageCount; i++)
-                {
-                    var page = document.Pages[i];
-                    using var gfx = XGraphics.FromPdfPage(page, XGraphicsPdfPageOptions.Prepend);
-                    gfx.DrawImage(bgForm, 0, 0, page.Width.Point, page.Height.Point);
-                }
-            }
-            catch (Exception ex)
-            {
-                FileLogger.LogWarning("Failed to add background PDF", ex.Message);
+                var pageText = $"Page {pageNumber} of {totalPages}";
+                var pageSize = gfx.MeasureString(pageText, font);
+                gfx.DrawString(pageText, font, ctx.GrayBrush,
+                    new XPoint(width - margin - pageSize.Width, footerY + 8));
             }
         }
 

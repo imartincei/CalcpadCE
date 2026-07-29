@@ -150,7 +150,7 @@ buttons the same way. Each opens a native save dialog. PDF requires a Chromium b
 [PDF Export](new-pdf-export.md). No exported file carries the line numbers or error boxes the
 on-screen views use for navigation.
 
-Set the document title, timestamp format, page size, and header/footer in the sidebar's **PDF** tab before exporting.
+Set the document title, timestamp format, page size, and header/footer in the **PDF Export** section of the sidebar's **Settings** tab, or pin them to one document from the **Properties** tab — see [PDF Export](new-pdf-export.md).
 The **Export** tab also has a **Plots** section that lists every plot the document produces, so you can save each one individually or all at once as a ZIP — see [The CalcpadCE Panel & Settings → Export](new-calcpad-panel.md#export).
 
 ## The native menu

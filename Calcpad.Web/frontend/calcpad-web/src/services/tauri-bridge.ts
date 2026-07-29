@@ -31,9 +31,13 @@ import type { ExportVariant } from 'calcpad-frontend/types/api';
 import {
     IMAGE_EXTENSIONS,
     bytesToBase64,
-    isImageExtension,
     isCompiledPath,
-    mimeFromExtension,
+    inlineImageSources,
+    pathBasename,
+    pathDirname,
+    pathExtension,
+    pathRelative,
+    pathResolve,
     type PickedImage,
 } from 'calcpad-frontend';
 import { setAppTheme, coerceAppTheme } from '../editor/app-theme';
@@ -55,46 +59,19 @@ const RECENT_FILES_KEY = 'calcpad-recent-files';
 const OPENED_FOLDER_KEY = 'calcpad-opened-folder';
 const MAX_RECENT_FILES = 10;
 
-function pathDirname(p: string): string {
-    const idx = Math.max(p.lastIndexOf('/'), p.lastIndexOf('\\'));
-    return idx > 0 ? p.slice(0, idx) : '';
-}
+/** The `IFileSystem` reader `inlineImageSources` needs, over the Tauri fs plugin. */
+const tauriReader = { readFile: (path: string) => fsReadFile(path) };
 
-function pathBasename(p: string): string {
-    const idx = Math.max(p.lastIndexOf('/'), p.lastIndexOf('\\'));
-    return idx >= 0 ? p.slice(idx + 1) : p;
-}
-
-/** POSIX-style relative path from `from` to `to`, using forward slashes. */
-function pathRelative(from: string, to: string): string {
-    const norm = (p: string) => p.replace(/\\/g, '/').replace(/\/+$/, '');
-    const fromParts = norm(from).split('/').filter(Boolean);
-    const toParts = norm(to).split('/').filter(Boolean);
-    let i = 0;
-    while (i < fromParts.length && i < toParts.length && fromParts[i] === toParts[i]) i++;
-    const up = fromParts.slice(i).map(() => '..');
-    const down = toParts.slice(i);
-    const rel = [...up, ...down].join('/');
-    return rel || '.';
-}
-
-function pathIsAbsolute(p: string): boolean {
-    return p.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(p);
-}
-
-function pathResolve(dir: string, file: string): string {
-    if (pathIsAbsolute(file)) return file;
-    if (!dir) return file;
-    const sep = dir.includes('\\') ? '\\' : '/';
-    const raw = `${dir}${sep}${file}`.replace(/\\/g, '/');
-    const parts = raw.split('/');
-    const result: string[] = [];
-    for (const part of parts) {
-        if (part === '..') result.pop();
-        else if (part !== '.') result.push(part);
-    }
-    const joined = result.join('/');
-    return sep === '\\' ? joined.replace(/\//g, '\\') : joined;
+/**
+ * Applies `accepted[0]` when the chosen path carries none of them. Tauri's save
+ * dialog returns the typed name verbatim and never reports which filter was
+ * selected, so on GTK a name typed without an extension comes back bare — which
+ * for `.cpdz` would silently produce a plain text file.
+ */
+function withExtension(filePath: string, accepted: string[]): string {
+    if (accepted.length === 0 || accepted.includes('*')) return filePath;
+    const ext = pathExtension(filePath);
+    return accepted.some(a => a.toLowerCase() === ext) ? filePath : `${filePath}.${accepted[0]}`;
 }
 
 /**
@@ -102,37 +79,8 @@ function pathResolve(dir: string, file: string): string {
  * so PuppeteerSharp's headless Chromium — which has no local-filesystem
  * access — can render user-supplied images inside exported PDFs.
  */
-async function inlineLocalImages(html: string, documentDir: string): Promise<string> {
-    const cache: Record<string, string> = {};
-    const imgRegex = /<img\s[^>]*?src\s*=\s*["']([^"']+)["'][^>]*>/gi;
-    const seen = new Set<string>();
-    let m: RegExpExecArray | null;
-    while ((m = imgRegex.exec(html)) !== null) {
-        const src = m[1];
-        if (seen.has(src)) continue;
-        seen.add(src);
-        if (src.startsWith('data:') || /^https?:\/\//i.test(src)) continue;
-
-        const ext = (src.split('.').pop() ?? '').toLowerCase();
-        if (!isImageExtension(ext)) continue;
-        const mime = mimeFromExtension(ext);
-
-        const absolute = pathResolve(documentDir, src);
-
-        try {
-            const bytes = await fsReadFile(absolute);
-            cache[src] = `data:${mime};base64,${bytesToBase64(bytes)}`;
-        } catch {
-            // missing file or permission error → leave src untouched
-        }
-    }
-
-    if (Object.keys(cache).length === 0) return html;
-    return html.replace(
-        /<img\s([^>]*?)src\s*=\s*["']([^"']+)["']([^>]*?)>/gi,
-        (full, before, src, after) =>
-            cache[src] ? `<img ${before}src="${cache[src]}"${after}>` : full,
-    );
+function inlineLocalImages(html: string, documentDir: string): Promise<string> {
+    return inlineImageSources(html, documentDir, tauriReader);
 }
 
 /**
@@ -278,6 +226,10 @@ export class TauriMessageBridge extends BaseMessageBridge {
         return inlineLocalImages(html, this.activeTabDirectory());
     }
 
+    protected async buildCompiledSource(content: string): Promise<string> {
+        return inlineLocalImages(content, this.activeTabDirectory());
+    }
+
     protected async saveImageToImagesFolder(img: PickedImage): Promise<string | null> {
         const docPath = this.activeTabFilePath();
         if (!docPath) return null;
@@ -323,12 +275,13 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     protected async saveExportedFile(req: ExportRequest): Promise<string | null> {
-        const filePath = await dialogSave({
+        const chosen = await dialogSave({
             title: req.dialogTitle,
             defaultPath: this.getExportDefaultPath(req),
             filters: [{ name: `${req.dialogTitle} Files`, extensions: req.extensions }],
         });
-        if (!filePath) return null;
+        if (!chosen) return null;
+        const filePath = withExtension(chosen, req.extensions);
         this.rememberDialogDir(filePath);
         if (typeof req.data === 'string') {
             await writeTextFile(filePath, req.data);
@@ -397,7 +350,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
         const pdfResp = await fetch(`${this.apiClient.getBaseUrl()}/api/calcpad/pdf`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ html, options: this.getStoredPdfOptions() }),
+            body: JSON.stringify({ html, options: this.getEffectivePdfOptions(content) }),
             signal: AbortSignal.timeout(60000),
         });
         if (!pdfResp.ok) throw new Error(`PDF endpoint returned ${pdfResp.status}`);

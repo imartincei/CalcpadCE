@@ -130,7 +130,7 @@ namespace Calcpad.Core
 
             switch (keyword)
             {
-                case Keyword.Hide: SetVisibility(s, 5, false); break;
+                case Keyword.Hide: SetVisibility(s, 5, Settings.Math.ShowHiddenOutput && _isVisible); break;
                 case Keyword.Show: SetVisibility(s, 5, true); break;
                 case Keyword.Pre: SetVisibility(s, 4, !ForPrint); break;
                 case Keyword.Post: SetVisibility(s, 5, !EnableUi); break;
@@ -728,6 +728,10 @@ namespace Calcpad.Core
                 case SettingKey.ZeroSmallMatrixElements:
                     if (dto.ZeroSmallMatrixElements.HasValue)
                         Settings.Math.ZeroSmallMatrixElements = dto.ZeroSmallMatrixElements.Value;
+                    break;
+                case SettingKey.ShowHiddenOutput:
+                    if (dto.ShowHiddenOutput.HasValue)
+                        Settings.Math.ShowHiddenOutput = dto.ShowHiddenOutput.Value;
                     break;
                 case SettingKey.MaxOutputCount:
                     if (dto.MaxOutputCount.HasValue)

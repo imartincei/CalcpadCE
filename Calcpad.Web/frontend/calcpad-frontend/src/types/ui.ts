@@ -32,6 +32,7 @@ export interface UiSettings {
     substitute: boolean;
     formatEquations: boolean;
     zeroSmallMatrixElements: boolean;
+    showHiddenOutput: boolean;
     maxOutputCount: number;
     formatString: string;
   };

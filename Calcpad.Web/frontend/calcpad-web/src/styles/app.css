@@ -49,6 +49,36 @@ select option {
     font-family: var(--vscode-font-family);
 }
 
+/* Wrappers around the editor and preview panes. Normally they contribute nothing:
+   `display: contents` dissolves them so their children are direct flex items of
+   `.app-layout` and sit side by side. In #UI input mode `.work-area` becomes a column
+   instead, which stacks the surviving tab strip above the form. */
+.work-area,
+.preview-area {
+    display: contents;
+}
+
+.work-area.ui-mode {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Just the tab strip is left, so the editor side hugs its content and the panes
+   below it take the rest of the height. */
+.work-area.ui-mode .editor-pane,
+.work-area.ui-mode .editor-groups {
+    flex: 0 0 auto;
+}
+
+.work-area.ui-mode .preview-area {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+}
+
 .editor-pane {
     flex: 1;
     min-width: 0;
@@ -447,7 +477,8 @@ select option {
     position: relative;
 }
 
-/* #UI input mode hides the editor, so the form gets the whole window. */
+/* #UI input mode hides the editor body, so the form gets the whole window below
+   the tab strip. */
 .preview-pane.fullscreen {
     width: auto;
     flex: 1;

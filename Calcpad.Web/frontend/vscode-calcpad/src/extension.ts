@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, variantRender } from 'calcpad-frontend';
+import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, variantRender, inlineImageSources, COMPILED_EXTENSION } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -19,6 +19,7 @@ import { CalcpadIncludeLinkProvider } from './calcpadIncludeLinkProvider';
 import { CalcpadReferenceProvider } from './calcpadReferenceProvider';
 import { CalcpadRenameProvider } from './calcpadRenameProvider';
 import { CalcpadHoverProvider } from './calcpadHoverProvider';
+import { CalcpadCompiledEditorProvider } from './calcpadCompiledEditorProvider';
 import { CommentFormatter } from './commentFormatter';
 import { CalcpadServerManager } from './calcpadServerManager';
 import { DotnetRuntimeManager } from './dotnetRuntimeManager';
@@ -133,6 +134,8 @@ let calcpadOutputHtmlChannel: vscode.OutputChannel;
 let calcpadWebviewConsoleChannel: vscode.OutputChannel;
 let extensionContext: vscode.ExtensionContext;
 let vueUiProvider: CalcpadVueUIProvider | undefined;
+// Set in activate(); the module-level export commands need it outside that scope.
+let sharedApiClient: CalcpadApiClient | undefined;
 
 const PREVIEW_BUSY_DELAY_MS = 400;
 
@@ -213,29 +216,17 @@ function showPreviewLoading(panel: vscode.WebviewPanel): () => void {
     };
 }
 
-// Extends the shared PdfSettings with additional server-side fields
-interface FullPdfSettings extends FrontendPdfSettings {
-    enableHeader: boolean;
-    documentSubtitle: string;
-    headerCenter: string;
-    author: string;
-    enableFooter: boolean;
-    footerCenter: string;
-    company: string;
-    project: string;
-    showPageNumbers: boolean;
-    orientation: string;
-    printBackground: boolean;
-    scale: number;
-    headerTemplate: string;
-    footerTemplate: string;
-    backgroundSvgPath: string;
-}
-
-
-function getPdfSettings(): FullPdfSettings {
+/**
+ * The PDF options for an export: the stored host defaults, overridden per key by
+ * the document's own `pdf` metadata comment. `documentContent` is optional so
+ * callers with no document in hand still get the host defaults.
+ */
+function getPdfSettings(documentContent?: string): FrontendPdfSettings {
     const settingsManager = CalcpadSettingsManager.getInstance();
-    const stored = settingsManager.getExtraObject('pdfSettings', {} as Partial<FullPdfSettings>);
+    const stored = settingsManager.getExtraObject('pdfSettings', {} as Partial<FrontendPdfSettings>);
+    const fromDocument = documentContent
+        ? pdfSettingsFromDocument(documentContent.split('\n'))
+        : {};
     const activeEditor = vscode.window.activeTextEditor;
 
     const fileName = activeEditor
@@ -243,31 +234,12 @@ function getPdfSettings(): FullPdfSettings {
         : 'CalcpadCE Document';
 
     return {
-        // User-configurable settings (defaults from shared module)
-        format: stored.format ?? DEFAULT_PDF_SETTINGS.format,
-        marginTop: stored.marginTop ?? DEFAULT_PDF_SETTINGS.marginTop,
-        marginBottom: stored.marginBottom ?? DEFAULT_PDF_SETTINGS.marginBottom,
-        marginLeft: stored.marginLeft ?? DEFAULT_PDF_SETTINGS.marginLeft,
-        marginRight: stored.marginRight ?? DEFAULT_PDF_SETTINGS.marginRight,
-        documentTitle: stored.documentTitle || fileName,
-        dateTimeFormat: stored.dateTimeFormat ?? DEFAULT_PDF_SETTINGS.dateTimeFormat,
-
-        // Hardcoded defaults (to be re-exposed in UI later)
-        enableHeader: true,
-        documentSubtitle: '',
-        headerCenter: '',
-        author: '',
-        enableFooter: true,
-        footerCenter: '',
-        company: '',
-        project: '',
-        showPageNumbers: true,
-        orientation: 'portrait',
-        printBackground: true,
-        scale: 1.0,
-        headerTemplate: 'default',
-        footerTemplate: 'default',
-        backgroundSvgPath: ''
+        ...DEFAULT_PDF_SETTINGS,
+        ...stored,
+        ...fromDocument,
+        // The file name is the last resort, so an explicit title from either
+        // source wins over it.
+        documentTitle: fromDocument.documentTitle || stored.documentTitle || fileName,
     };
 }
 
@@ -698,18 +670,25 @@ function getLineLinkScript(scrollToLine?: number): string {
     `;
 }
 
-async function updatePreviewContent(panel: vscode.WebviewPanel, content: string, sourceFileUri: vscode.Uri, unwrapped: boolean = false, scrollToLine?: number, enableUi: boolean = false, forPrint: boolean = false) {
+/**
+ * `standalone` marks a panel that *is* the document rather than a preview of an open
+ * text editor — the compiled-worksheet editor. Such a panel owns its own tab title,
+ * must not claim the shared input-form slot that the toggle commands manage, and has
+ * no `activeTextEditor` whose folder local images could be resolved against (a
+ * compiled worksheet carries its images inline anyway).
+ */
+async function updatePreviewContent(panel: vscode.WebviewPanel, content: string, sourceFileUri: vscode.Uri, unwrapped: boolean = false, scrollToLine?: number, enableUi: boolean = false, forPrint: boolean = false, standalone: boolean = false) {
     const docKey = sourceFileUri.toString();
     if ((enableUi || forPrint) && !uiOverrides.has(docKey) && !uiOverridesDirty.has(docKey))
         uiOverrides.readFromSource(docKey, content);
-    if (enableUi) uiPanelDocKey = docKey;
+    if (enableUi && !standalone) uiPanelDocKey = docKey;
 
     const mode = enableUi ? 'ui' : forPrint ? 'report' : unwrapped ? 'unwrapped' : 'wrapped';
     outputChannel.appendLine(`Starting updatePreviewContent (${mode})...`);
     outputChannel.appendLine(`Content length: ${content.length} characters`);
 
     // Update panel title with current file name
-    const activeEditor = vscode.window.activeTextEditor ?? previewSourceEditor;
+    const activeEditor = standalone ? undefined : (vscode.window.activeTextEditor ?? previewSourceEditor);
     if (activeEditor) {
         const fileName = activeEditor.document.fileName.split('/').pop() || 'CalcpadCE';
         panel.title = enableUi ? `CalcpadCE Input - ${fileName}`
@@ -970,7 +949,7 @@ async function generatePdfToFile(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             html: html,
-            options: getPdfSettings()
+            options: getPdfSettings(documentContent)
         }),
         signal: AbortSignal.timeout(60000)
     });
@@ -1157,6 +1136,46 @@ async function saveDocx(variant: ExportVariant = 'report') {
         const msg = error instanceof Error ? error.message : 'Unknown error';
         outputChannel.appendLine(`ERROR in saveDocx: ${msg}`);
         vscode.window.showErrorMessage(`Failed to save Word document: ${msg}`);
+    }
+}
+
+/**
+ * Compile the active document to a `.cpdz` and save it. This is an export: the open
+ * document keeps its own path and stays editable. Referenced local images are embedded
+ * first, so the compiled file travels on its own.
+ */
+async function saveAsCompiled() {
+    const activeEditor = vscode.window.activeTextEditor ?? previewSourceEditor;
+    if (!activeEditor) {
+        vscode.window.showErrorMessage('No active CalcpadCE document found');
+        return;
+    }
+    try {
+        const document = activeEditor.document;
+        const baseFilename = document.isUntitled
+            ? 'worksheet'
+            : path.basename(document.fileName, path.extname(document.fileName));
+        const defaultDir = document.isUntitled
+            ? (vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '')
+            : path.dirname(document.fileName);
+        const saveUri = await vscode.window.showSaveDialog({
+            defaultUri: vscode.Uri.file(path.join(defaultDir, baseFilename + COMPILED_EXTENSION)),
+            filters: { 'CalcpadCE Compiled': ['cpdz'] },
+        });
+        if (!saveUri) return;
+
+        // An untitled document has no folder for relative image paths to resolve against.
+        const documentDir = document.isUntitled ? '' : path.dirname(document.uri.fsPath);
+        const compiled = await inlineImageSources(document.getText(), documentDir, new VSCodeFileSystem());
+        const bytes = await sharedApiClient?.encodeCpdz(compiled);
+        if (!bytes) throw new Error('The server could not encode the worksheet');
+        await vscode.workspace.fs.writeFile(saveUri, bytes);
+
+        vscode.window.showInformationMessage(`Compiled worksheet saved to ${saveUri.fsPath}`);
+    } catch (error) {
+        const msg = error instanceof Error ? error.message : 'Unknown error';
+        outputChannel.appendLine(`ERROR in saveAsCompiled: ${msg}`);
+        vscode.window.showErrorMessage(`Failed to save compiled worksheet: ${msg}`);
     }
 }
 
@@ -1377,6 +1396,7 @@ export async function activate(context: vscode.ExtensionContext) {
             settingsManager.getServerUrl(),
             new VSCodeLogger(serverDebugChannel)
         );
+        sharedApiClient = apiClient;
 
         // Start bundled server if available
         const serverMode = settingsManager.getSettings().server.mode || 'auto';
@@ -1569,6 +1589,16 @@ export async function activate(context: vscode.ExtensionContext) {
         // Initialize hover provider (Hover Tooltips)
         outputChannel.appendLine('Initializing hover provider...');
         const hoverProviderDisposable = CalcpadHoverProvider.register(definitionsService, insertManager, outputChannel);
+
+        // Initialize the compiled worksheet editor (.cpdz opens as an input form)
+        outputChannel.appendLine('Initializing compiled worksheet editor...');
+        const compiledEditorDisposable = CalcpadCompiledEditorProvider.register(
+            apiClient,
+            uiOverrides,
+            (panel, text, uri) =>
+                updatePreviewContent(panel, text, uri, false, undefined, true, false, true),
+            outputChannel,
+        );
 
     // Unified document processing function
     let isProcessingDocument = false;
@@ -1859,6 +1889,15 @@ export async function activate(context: vscode.ExtensionContext) {
         saveDocx(variant ?? 'report');
     });
 
+    const saveAsCompiledCommand = vscode.commands.registerCommand('vscode-calcpad.saveAsCompiled', () => {
+        saveAsCompiled();
+    });
+
+    // The compiled-worksheet editor is a custom editor, so the workbench's own Save
+    // drives it. This gives the Vue panel and the palette a way in as well.
+    const saveCompiledUiValuesCommand = vscode.commands.registerCommand('vscode-calcpad.saveCompiledUiValues', () =>
+        vscode.commands.executeCommand('workbench.action.files.save'));
+
     // Readonly virtual document provider for viewing webview source HTML
     let webviewSourceHtml = '';
     const webviewSourceProvider = new class implements vscode.TextDocumentContentProvider {
@@ -2136,6 +2175,9 @@ export async function activate(context: vscode.ExtensionContext) {
             printToPdfCommand,
             saveSourceHtmlCommand,
             saveDocxCommand,
+            saveAsCompiledCommand,
+            saveCompiledUiValuesCommand,
+            compiledEditorDisposable,
             refreshVariablesCommand,
             refreshDocumentCommand,
             stopServerCommand,

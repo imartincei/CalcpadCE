@@ -216,6 +216,10 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     vscode.commands.executeCommand('vscode-calcpad.saveDocx', data.variant);
                     break;
 
+                case 'saveCompiled':
+                    vscode.commands.executeCommand('vscode-calcpad.saveAsCompiled');
+                    break;
+
                 case 'getPlots':
                     await this._handleGetPlots();
                     break;

@@ -26,8 +26,8 @@ const SIDECAR_EXE_UNIX: &str = "Calcpad.Server";
 const SIDECAR_EXE_WINDOWS: &str = "Calcpad.Server.exe";
 const PORT_READY_TIMEOUT_MS: u64 = 30_000;
 
-/// Files handed to us by the OS at launch (double-click on .cpd via the
-/// installed file association). Populated in setup() from argv; drained by
+/// Files handed to us by the OS at launch (double-click on .cpd or .cpdz via the
+/// installed file associations). Populated in setup() from argv; drained by
 /// the frontend once it has registered its open-file listener, avoiding the
 /// race between Rust emitting and JS being ready to listen.
 #[derive(Default)]
@@ -96,9 +96,10 @@ struct DraftContent {
     content: String,
 }
 
-/// Pull out any file paths (with .cpd extension) from a launch argv so we can
-/// open them once the frontend is ready. argv[0] is the executable path — skip
-/// it. macOS may pass an `-psn_...` process serial arg for double-click launches.
+/// Pull out any worksheet paths (.cpd or compiled .cpdz — both are registered file
+/// associations) from a launch argv so we can open them once the frontend is ready.
+/// argv[0] is the executable path — skip it. macOS may pass an `-psn_...` process
+/// serial arg for double-click launches.
 fn extract_launch_files<I: IntoIterator<Item = String>>(args: I) -> Vec<PathBuf> {
     args.into_iter()
         .skip(1)
@@ -107,7 +108,7 @@ fn extract_launch_files<I: IntoIterator<Item = String>>(args: I) -> Vec<PathBuf>
         .filter(|p| {
             p.extension()
                 .and_then(|e| e.to_str())
-                .map(|e| e.eq_ignore_ascii_case("cpd"))
+                .map(|e| e.eq_ignore_ascii_case("cpd") || e.eq_ignore_ascii_case("cpdz"))
                 .unwrap_or(false)
         })
         .filter(|p| p.exists())
@@ -350,6 +351,19 @@ async fn stop_server(app: AppHandle) -> Result<(), String> {
 #[tauri::command]
 fn get_env(name: String) -> Option<String> {
     std::env::var(name).ok()
+}
+
+/// Greys out menu items whose command doesn't apply to the active document — the
+/// source-showing result modes while a compiled worksheet is open. The frontend
+/// guards these actions anyway; this keeps the menu from offering them.
+#[tauri::command]
+fn set_menu_items_enabled(app: AppHandle, ids: Vec<String>, enabled: bool) {
+    let Some(menu) = app.menu() else { return };
+    for id in ids {
+        if let Some(item) = menu.get(id.as_str()).and_then(|kind| kind.as_menuitem().cloned()) {
+            let _ = item.set_enabled(enabled);
+        }
+    }
 }
 
 // Inside a linuxdeploy-generated AppImage, AppRun exports LD_LIBRARY_PATH so
@@ -946,6 +960,15 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
                 true,
                 Some("CmdOrCtrl+Shift+S"),
             )?,
+            // Compiling is an export: it writes a .cpdz alongside, leaving the open
+            // document on its own path, so it sits apart from the Save entries.
+            &MenuItem::with_id(
+                app,
+                "save-as-compiled",
+                "Save As Compiled Worksheet...",
+                true,
+                None::<&str>,
+            )?,
             &sep()?,
             &MenuItem::with_id(app, "close-tab", "Close Tab", true, Some("CmdOrCtrl+W"))?,
             &sep()?,
@@ -1129,6 +1152,7 @@ pub fn run() {
             open_path_native,
             log_dir,
             take_pending_launch_files,
+            set_menu_items_enabled,
         ])
         .setup(|app| {
             // Pin the on-disk locations the panic hook + draft commands need.

@@ -45,7 +45,7 @@ Most POST endpoints accept a request with these fields:
 - `settings` — math / plot / unit configuration
 - `theme` — `"light"` or `"dark"`
 - `sourceFilePath` — the document's file path, used to resolve relative `#include` paths against the file's folder
-- `forPrint` — when `true`, `NoPrint` regions are stripped before conversion (used by PDF export)
+- `forPrint` — when `true`, `#pre` regions are hidden during conversion (used by PDF export)
 
 ## Response shapes
 

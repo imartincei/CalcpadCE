@@ -2,8 +2,7 @@
   <div class="export-tab">
     <div class="export-container p-3">
       <div v-for="group in EXPORT_GROUPS" :key="group.variant" class="export-group">
-        <h3 class="export-group-title">{{ group.label }}</h3>
-        <p class="export-group-detail">{{ group.detail }}</p>
+        <h3 class="export-group-title" :title="group.detail">{{ group.label }}</h3>
         <div class="header-actions">
           <button class="btn" @click="$emit('savePdf', group.variant)" :title="`Save this document's ${group.label.toLowerCase()} as a PDF`">
             Save PDF…
@@ -18,6 +17,19 @@
           </button>
           <button class="btn" @click="$emit('saveHtml', group.variant)" :title="`Save this document's ${group.label.toLowerCase()} as standalone HTML`">
             Save HTML…
+          </button>
+        </div>
+      </div>
+
+      <div class="export-group">
+        <h3 class="export-group-title" :title="COMPILED_DETAIL">Compiled worksheet</h3>
+        <div class="header-actions">
+          <button
+            class="btn"
+            @click="$emit('saveCompiled')"
+            title="Save this document as a compiled .cpdz worksheet"
+          >
+            Save Compiled…
           </button>
         </div>
       </div>
@@ -80,6 +92,12 @@ export interface PlotSummary {
   sizeBytes: number
 }
 
+// Each group's `detail` is the title's tooltip rather than body text: the tab is a column
+// of buttons, and spelling every variant out inline buried them.
+const COMPILED_DETAIL =
+  'A .cpdz for handing out: it opens as an input form with the source locked, '
+  + 'and referenced images are embedded so it travels as one file.'
+
 // Report first: it is the default rendering everywhere else, so it reads as the one to
 // reach for. A form and a code listing have no meaningful Word form, hence `word: false`.
 const EXPORT_GROUPS: { variant: ExportVariant; label: string; detail: string; word: boolean }[] = [
@@ -118,6 +136,7 @@ defineEmits<{
   savePdf: [variant: ExportVariant]
   saveHtml: [variant: ExportVariant]
   saveDocx: [variant: ExportVariant]
+  saveCompiled: []
   refreshPlots: []
   savePlot: [index: number]
   savePlotsZip: []
@@ -152,18 +171,16 @@ function formatSize(bytes: number): string {
   margin-top: 14px;
 }
 
+/* inline-block so the tooltip's hover target hugs the label instead of spanning
+   the full row, and `help` to advertise that there is one. */
 .export-group-title {
-  margin: 0;
+  display: inline-block;
+  margin: 0 0 6px;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   opacity: 0.8;
-}
-
-.export-group-detail {
-  margin: 2px 0 6px;
-  font-size: 11px;
-  opacity: 0.7;
+  cursor: help;
 }
 
 .plots-section {

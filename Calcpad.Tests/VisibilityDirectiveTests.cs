@@ -2,9 +2,11 @@ namespace Calcpad.Tests
 {
     public class VisibilityDirectiveTests
     {
-        private static string Render(string source, bool forPrint = false, bool enableUi = false)
+        private static string Render(string source, bool forPrint = false, bool enableUi = false, bool showHiddenOutput = false)
         {
-            var parser = new ExpressionParser { Settings = new Settings(), ForPrint = forPrint, EnableUi = enableUi };
+            var settings = new Settings();
+            settings.Math.ShowHiddenOutput = showHiddenOutput;
+            var parser = new ExpressionParser { Settings = settings, ForPrint = forPrint, EnableUi = enableUi };
             parser.Parse(source, true, false);
             return parser.HtmlResult;
         }
@@ -96,6 +98,37 @@ namespace Calcpad.Tests
         {
             var html = Render("#if 0\n#hide\n#end if\naaa1 = 1");
             Assert.Contains("aaa1", html);
+        }
+
+        [Fact]
+        public void ShowHiddenOutput_IgnoresHide()
+        {
+            var html = Render("aaa1 = 1\n#hide\nbbb2 = 2\n#end hide\nccc3 = 3", showHiddenOutput: true);
+            Assert.Contains("aaa1", html);
+            Assert.Contains("bbb2", html);
+            Assert.Contains("ccc3", html);
+        }
+
+        [Fact]
+        public void ShowHiddenOutput_DoesNotOverrideEnclosingPre()
+        {
+            // #hide is ignored, but it must not un-hide content the surrounding
+            // #pre already hid for print.
+            var html = Render(
+                "#pre\naaa1 = 1\n#hide\nbbb2 = 2\n#end hide\n#end pre\nccc3 = 3",
+                forPrint: true, showHiddenOutput: true);
+
+            Assert.DoesNotContain("aaa1", html);
+            Assert.DoesNotContain("bbb2", html);
+            Assert.Contains("ccc3", html);
+        }
+
+        [Fact]
+        public void ShowHiddenOutput_SetByDirective()
+        {
+            var html = Render("#settings {\"showHiddenOutput\": true}\n#hide\naaa1 = 1\n#end hide\nbbb2 = 2");
+            Assert.Contains("aaa1", html);
+            Assert.Contains("bbb2", html);
         }
 
         [Fact]

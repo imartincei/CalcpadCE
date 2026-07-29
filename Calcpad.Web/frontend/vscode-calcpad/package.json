@@ -23,10 +23,21 @@
           "calcpad"
         ],
         "extensions": [
-          ".cpd",
-          ".cpdz"
+          ".cpd"
         ],
         "configuration": "./language-configuration.json"
+      }
+    ],
+    "customEditors": [
+      {
+        "viewType": "calcpad.compiledWorksheet",
+        "displayName": "CalcpadCE Compiled Worksheet",
+        "selector": [
+          {
+            "filenamePattern": "*.cpdz"
+          }
+        ],
+        "priority": "default"
       }
     ],
     "grammars": [
@@ -281,6 +292,15 @@
         "command": "vscode-calcpad.saveDocx",
         "title": "CalcpadCE: Save as Word Document…",
         "icon": "$(file)"
+      },
+      {
+        "command": "vscode-calcpad.saveAsCompiled",
+        "title": "CalcpadCE: Save As Compiled Worksheet…",
+        "icon": "$(file-binary)"
+      },
+      {
+        "command": "vscode-calcpad.saveCompiledUiValues",
+        "title": "CalcpadCE: Save Values to Compiled Worksheet"
       },
       {
         "command": "vscode-calcpad.insertImage",

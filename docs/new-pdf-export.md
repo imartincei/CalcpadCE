@@ -2,13 +2,20 @@
 
 > Calcpad.Web only (web editor, desktop app, and VS Code extension). Not available in the standalone WPF desktop application for Windows.
 
-Calcpad.Web can export your report to a print-ready PDF that matches the on-screen preview, with configurable page size, margins, and optional headers, footers, and a letterhead background.
+Calcpad.Web can export your report to a print-ready PDF that matches the on-screen preview, with configurable page size, margins, and header/footer content.
 
-Set the options below in the sidebar's **PDF** tab, then export:
+Options come from two places, and the document wins:
+
+- **Your defaults** live in the **PDF Export** section of the sidebar's [**Settings** tab](new-settings.md). They apply to every document you export.
+- **A document can override any of them for itself** with a `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings), written for you by the **Properties** tab. This is how a report that has to print A4 landscape says so, once, and prints that way on every machine.
+
+The two are merged key by key: a document that sets only `marginTop` keeps your usual paper size and title.
+
+Then export:
 
 - **Desktop app** — **File → Export PDF…**
 - **VS Code** — *CalcpadCE: Export to PDF*
-- **Web editor** — the PDF button on the sidebar's **PDF** tab
+- **Web editor** — **Report → Save PDF…** on the sidebar's **Export** tab
 
 ## Browser requirement
 
@@ -29,49 +36,45 @@ On Linux, if no browser is found the app shows you the exact package to install 
 
 ## Page setup
 
-- **Paper size** — Letter, Legal, Tabloid, Ledger, or A0–A6. Default is A4.
-- **Orientation** — portrait (default) or landscape.
-- **Margins** — set each edge independently, using values like `2cm`, `1.5cm`, or `0.5in`.
-- **Scale** — a zoom factor from 0.1 to 2.0 for shrinking or enlarging the content.
-- **Background** — colors and background images are printed by default.
+- **Paper size** — Letter, Legal, Tabloid, Ledger, or A0–A6.
+- **Orientation** — portrait or landscape.
+- **Margins** — set each edge independently. A unit is required: `2cm`, `1.5cm`, `0.5in`, `12mm`.
+- **Header and footer** — always drawn. What goes in them is up to you: the title, the timestamp, and the page number can each be set or hidden, and anything you leave blank simply doesn't appear.
 
-## Excluding sections from the PDF (NoPrint)
+Background colors and images are always printed.
 
-Wrap sections you want visible on screen but omitted from the PDF in `NoPrintStart` / `NoPrintEnd` markers:
+## Excluding sections from the PDF
+
+Wrap sections you want visible on screen but omitted from the PDF in `#pre` … `#end pre`:
 
 ```text
-'<!--{"NoPrintStart": true}-->
-'These lines are visible in the preview but stripped from the PDF.
+#pre
+'These lines are visible in the preview but excluded from the PDF.
 debug_x = 5
 debug_y = debug_x + 1
-'<!--{"NoPrintEnd": true}-->
+#end pre
 'This prints!'
 ```
 
-Good to know:
-
-- The marker lines themselves are removed too.
-- Regions can be nested; the outermost pair wins.
-- A `NoPrintStart` without a matching `NoPrintEnd` strips everything through the end of the file.
-- Property names are matched case-insensitively, and the marker's value doesn't matter — only that the property is present.
-- These sections stay visible in the live preview; they're only removed from PDF (and other print) output.
-- These markers are one kind of [metadata comment](new-metadata-comments.md); the **Properties** panel tab can insert them for you.
-
-This uses the same comment-marker syntax as [`LintIgnore`](new-linter.md#suppressing-diagnostics-lint-ignore) and per-file settings.
+This is part of Calcpad's [visibility directive system](new-syntax.md), so it also takes an optional condition and nests properly.
+The older `NoPrintStart` / `NoPrintEnd` comment markers no longer exist.
 
 ## Options reference
 
-Every option you can set for a PDF export:
+Every option you can set for a PDF export, on the **Settings** tab or in a document's `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings):
 
 | Option | Default | Purpose |
 |--------|---------|---------|
-| `format` | `Letter` | Paper size |
-| `marginTop` | `2cm` | Top margin |
-| `marginRight` | `1.5cm` | Right margin |
-| `marginBottom` | `2cm` | Bottom margin |
-| `marginLeft` | `1.5cm` | Left margin |
-| `documentTitle` | — | Title (header, bold) |
-| `dateTimeFormat` | — | .NET date/time format string for the timestamp |
+| `format` | `Letter` | Paper size — Letter, Legal, Tabloid, Ledger, A0–A6 |
+| `orientation` | `portrait` | `portrait` or `landscape` |
+| `marginTop` | `0.75in` | Top margin |
+| `marginRight` | `0.5in` | Right margin |
+| `marginBottom` | `0.75in` | Bottom margin |
+| `marginLeft` | `0.5in` | Left margin |
+| `showPageNumbers` | `true` | "Page *n* of *m*" in the footer |
+| `showDate` | `true` | The timestamp in the header |
+| `documentTitle` | file name | Title (header, bold) |
+| `dateTimeFormat` | `M/d/yyyy h:mm tt` | .NET date/time format string for the timestamp |
 
 ## Troubleshooting
 
@@ -79,9 +82,11 @@ Every option you can set for a PDF export:
 |---------|-----|
 | Export fails or times out | Install a Chromium browser (see the table above). In the desktop app, **Server → Show Server Log** shows the underlying error. |
 | Images missing in the PDF | Use paths the app can read; local images are embedded automatically before export. |
-| A debug section appears in the PDF | Wrap it in `NoPrintStart` / `NoPrintEnd` markers. |
+| A debug section appears in the PDF | Wrap it in `#pre` … `#end pre`. |
+| A page setting is ignored | Check for a `pdf` metadata comment in the document — it overrides the Settings tab. The linter flags an unrecognized key or a margin written without a unit. |
 
 ## See also
 
 - [Using the Desktop App](new-desktop-app.md) · [Using the VS Code Extension](new-vscode-extension.md)
 - [The CalcpadCE Panel & Settings](new-calcpad-panel.md)
+- [Metadata Comments](new-metadata-comments.md#pdf-export-settings) — per-document page setup

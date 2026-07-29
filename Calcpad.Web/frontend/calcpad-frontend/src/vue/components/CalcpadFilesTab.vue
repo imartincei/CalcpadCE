@@ -83,12 +83,14 @@ const emit = defineEmits<{
 const expandedPaths = ref<string[]>([])
 const showAll = ref(false)
 
-// Extension filter: only .cpd files are surfaced by default. Folders are
-// always kept so the user can drill in.
+// Extension filter: only worksheets — editable .cpd and compiled .cpdz — are
+// surfaced by default. Folders are always kept so the user can drill in.
+const WORKSHEET_EXTENSIONS = ['cpd', 'cpdz']
+
 const isCalcpadFile = (name: string): boolean => {
   const dot = name.lastIndexOf('.')
   if (dot < 0) return false
-  return name.substring(dot + 1).toLowerCase() === 'cpd'
+  return WORKSHEET_EXTENSIONS.includes(name.substring(dot + 1).toLowerCase())
 }
 
 // Structural sharing: return the original array when no children were

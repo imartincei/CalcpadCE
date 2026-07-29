@@ -41,11 +41,11 @@ public class PdfOptions
     public float Scale { get; set; }
     public string MarginTop { get; set; }
     // ... MarginRight, MarginBottom, MarginLeft
-    public bool PrintBackground { get; set; }
-    public bool EnableHeader { get; set; }
-    public bool EnableFooter { get; set; }
+    public bool ShowPageNumbers { get; set; }
+    public bool ShowDate { get; set; }
     public string? DocumentTitle { get; set; }
-    public string? Author { get; set; }
+    public string? HeaderCenter { get; set; }
+    public string? FooterCenter { get; set; }
     public string? DateTimeFormat { get; set; }
 }
 ```

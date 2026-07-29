@@ -2,7 +2,7 @@ import { CalcpadApiClient } from '../../api/client';
 import { CalcpadSnippetService } from '../snippets';
 import { CalcpadDefinitionsService } from '../definitions';
 import { parseHeadings } from '../headings';
-import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from '../../text/metadata-comment';
+import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver, pdfSettingsFromDocument } from '../../text/metadata-comment';
 import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
 import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
 import type { UiDirectiveData } from '../../text/ui-directive';
@@ -13,6 +13,7 @@ import { DEFAULT_PDF_SETTINGS } from '../../types/pdf-settings';
 import { buildImageCommentLine, bytesToBase64 } from '../image-utils';
 import type { ImageStorageMode, PickedImage } from '../image-utils';
 import { extractPlotsFromHtml, type ExtractedPlot } from '../plot-extract';
+import { COMPILED_MIME } from '../cpdz';
 import { buildZip } from '../zip-writer';
 import type { ILogger } from '../../types/interfaces';
 
@@ -250,6 +251,9 @@ export abstract class BaseMessageBridge {
             case 'saveDocx':
                 this.handleSaveDocx(message.variant);
                 break;
+            case 'saveCompiled':
+                this.saveCompiled();
+                break;
             case 'getPlots':
                 this.handleGetPlots();
                 break;
@@ -305,6 +309,12 @@ export abstract class BaseMessageBridge {
     protected async saveImageToImagesFolder(_img: PickedImage): Promise<string | null> { return null; }
     /** Prompt for a save location; return the src (relative to the document) to reference it by. */
     protected async saveImageToCustomPath(_img: PickedImage): Promise<string | null> { return null; }
+    /**
+     * Embeds locally-referenced images so a compiled worksheet travels as one file.
+     * Hosts with no filesystem hand the source back untouched — a browser has no
+     * relative paths to resolve in the first place.
+     */
+    protected async buildCompiledSource(content: string): Promise<string> { return content; }
     /** Persist an export; returns the saved path when the platform has one, else null. */
     protected abstract saveExportedFile(req: ExportRequest): Promise<string | null>;
     protected abstract buildFileContext(content: string): Promise<{ sourceFilePath?: string }>;
@@ -480,6 +490,16 @@ export abstract class BaseMessageBridge {
         }
     }
 
+    /**
+     * The PDF options an export should actually use: the stored defaults with the
+     * document's own `pdf` metadata comment layered over them, key by key. The
+     * Settings tab keeps editing the stored set alone — this merge is only for the
+     * request that generates a PDF.
+     */
+    protected getEffectivePdfOptions(content: string): Record<string, unknown> {
+        return { ...this.getStoredPdfOptions(), ...pdfSettingsFromDocument(content.split('\n')) };
+    }
+
     private async handleInsertImage(): Promise<void> {
         // File picker: the image already exists on disk, so reference it in
         // place. The storage-mode prompt is only for pasted in-memory images.
@@ -598,6 +618,25 @@ export abstract class BaseMessageBridge {
             mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             extensions: ['docx'],
             dialogTitle: exportDialogTitle('Save', 'Word Document', variant),
+        });
+    }
+
+    /**
+     * Compiles the active document to a `.cpdz` and prompts for a location. This is an
+     * export, not a Save As: the open document keeps its own path and stays editable.
+     * Returns the saved path where the platform has one.
+     */
+    async saveCompiled(): Promise<string | null> {
+        const content = this.getActiveEditorContent();
+        const compiled = await this.buildCompiledSource(content);
+        const bytes = await this.apiClient.encodeCpdz(compiled);
+        if (!bytes) return null;
+        return this.saveExportedFile({
+            defaultName: 'calcpad-worksheet.cpdz',
+            data: bytes,
+            mime: COMPILED_MIME,
+            extensions: ['cpdz'],
+            dialogTitle: 'Save Compiled Worksheet',
         });
     }
 

@@ -345,6 +345,10 @@ async function bootstrap(): Promise<void> {
     // Documents whose in-memory values have not been written back yet.
     const uiOverridesDirty = new Set<string>();
 
+    // Tauri's `invoke`, once the desktop-only block below has imported it. Null in the
+    // web build, where there is no native menu to keep in step.
+    let invokeTauri: (<T>(cmd: string, args?: Record<string, unknown>) => Promise<T>) | null = null;
+
     /**
      * A .cpdz is a compiled worksheet: it is distributed to be filled in, not read
      * or edited, so it opens straight into the input form with the editor locked.
@@ -356,10 +360,28 @@ async function bootstrap(): Promise<void> {
         const path = activeId ? group.tabs.getFilePath(activeId) : null;
         const compiled = !!path && isCompiledPath(path);
         group.editor.updateOptions({ readOnly: compiled });
+        if (group === activeGroup) syncSourceModeMenuItems(!compiled);
         if (compiled && appInstance.getResultMode() !== 'ui') {
             if (!appInstance.isPreviewVisible()) appInstance.togglePreview();
             appInstance.setResultMode('ui');
         }
+    }
+
+    /**
+     * The two result modes that render source. App.vue disables their toolbar buttons
+     * and refuses the mode outright; this greys out the native View menu entries to
+     * match, so the menu doesn't offer a command that would do nothing. Only the
+     * desktop build has a menu — elsewhere `invokeTauri` stays null and the App.vue
+     * guard is the whole story.
+     */
+    let sourceModeMenuEnabled = true;
+    function syncSourceModeMenuItems(enabled: boolean): void {
+        if (enabled === sourceModeMenuEnabled) return;
+        sourceModeMenuEnabled = enabled;
+        void invokeTauri?.('set_menu_items_enabled', {
+            ids: ['result-mode:preview', 'result-mode:unwrapped'],
+            enabled,
+        });
     }
 
     /**
@@ -1024,7 +1046,10 @@ async function bootstrap(): Promise<void> {
             const isOutputLine = data.lineType === 'output';
             const hasMacros = /^\s*#(def|include)\b/im.test(group.editor.getValue());
             const mode = appInstance.getResultMode() as ResultMode;
-            if (isOutputLine && (mode === 'preview' || mode === 'report') && hasMacros) {
+            // A compiled worksheet has no unwrapped view to route through, so the
+            // click falls through to revealing the line in the editor instead.
+            if (isOutputLine && (mode === 'preview' || mode === 'report') && hasMacros
+                && appInstance.resultModeAvailable('unwrapped')) {
                 // Bake the target into the unwrapped refresh (avoids an
                 // iframe-reload postMessage race); setResultMode triggers
                 // onResultModeChanged -> refresh all previews.
@@ -1279,6 +1304,10 @@ async function bootstrap(): Promise<void> {
             import('@tauri-apps/plugin-clipboard-manager'),
             import('@tauri-apps/api/core'),
         ]);
+        invokeTauri = tauriInvoke;
+        // The seeded tab decided the menu state before `invoke` existed; re-apply it.
+        sourceModeMenuEnabled = true;
+        syncSourceModeMenuItems(appInstance.resultModeAvailable('unwrapped'));
 
         // ---- Autosave drafts (10s debounce per tab) ----
         // Rust owns the on-disk drafts dir (<app_data>/drafts). Each tab is
@@ -1886,6 +1915,12 @@ async function bootstrap(): Promise<void> {
 
                 case 'save-as':
                     await saveAsActive();
+                    break;
+
+                // An export, so the tab keeps its own path and stays editable —
+                // unlike Save As, which would turn it into a locked worksheet.
+                case 'save-as-compiled':
+                    await tauriBridge.saveCompiled();
                     break;
 
                 case 'toggle-sidebar':
