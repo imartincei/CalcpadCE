@@ -360,7 +360,10 @@ async function bootstrap(): Promise<void> {
         const path = activeId ? group.tabs.getFilePath(activeId) : null;
         const compiled = !!path && isCompiledPath(path);
         group.editor.updateOptions({ readOnly: compiled });
-        if (group === activeGroup) syncSourceModeMenuItems(!compiled);
+        if (group === activeGroup) {
+            syncSourceModeMenuItems(!compiled);
+            syncInputMode();
+        }
         if (compiled && appInstance.getResultMode() !== 'ui') {
             if (!appInstance.isPreviewVisible()) appInstance.togglePreview();
             appInstance.setResultMode('ui');
@@ -368,20 +371,33 @@ async function bootstrap(): Promise<void> {
     }
 
     /**
-     * The two result modes that render source. App.vue disables their toolbar buttons
-     * and refuses the mode outright; this greys out the native View menu entries to
-     * match, so the menu doesn't offer a command that would do nothing. Only the
-     * desktop build has a menu — elsewhere `invokeTauri` stays null and the App.vue
-     * guard is the whole story.
+     * The result modes a compiled worksheet has nothing to render for. App.vue leaves
+     * their toolbar buttons out entirely, so the native View menu drops the matching
+     * entries rather than greying them: a menu that offers a mode the toolbar doesn't
+     * have reads as a bug. Only the desktop build has a menu — elsewhere `invokeTauri`
+     * stays null and the App.vue guard is the whole story.
      */
-    let sourceModeMenuEnabled = true;
-    function syncSourceModeMenuItems(enabled: boolean): void {
-        if (enabled === sourceModeMenuEnabled) return;
-        sourceModeMenuEnabled = enabled;
-        void invokeTauri?.('set_menu_items_enabled', {
-            ids: ['result-mode:preview', 'result-mode:unwrapped'],
-            enabled,
-        });
+    let sourceModeMenuShown = true;
+    function syncSourceModeMenuItems(shown: boolean): void {
+        if (shown === sourceModeMenuShown) return;
+        sourceModeMenuShown = shown;
+        void invokeTauri?.('set_source_result_modes_visible', { visible: shown });
+    }
+
+    /**
+     * Tells the sidebar whether the active document is being filled in rather than
+     * edited, so the tabs that act on source can grey themselves out. Input mode hides
+     * the editor; a compiled worksheet has no source to act on at all, however the
+     * results pane happens to be set.
+     */
+    function syncInputMode(): void {
+        const activeId = activeGroup.tabs.activeId;
+        const path = activeId ? activeGroup.tabs.getFilePath(activeId) : null;
+        const active = (!!path && isCompiledPath(path))
+            || (appInstance.isPreviewVisible() && appInstance.getResultMode() === 'ui');
+        window.dispatchEvent(new MessageEvent('message', {
+            data: { type: 'inputModeChanged', active },
+        }));
     }
 
     /**
@@ -553,6 +569,7 @@ async function bootstrap(): Promise<void> {
         refreshProblemsFor(group);
         activeBridge.refreshHeadings();
         refreshUiDirtyIndicator();
+        syncInputMode();
         if (appInstance.isPreviewVisible()) void refreshPreviewFor(group);
     }
 
@@ -932,6 +949,9 @@ async function bootstrap(): Promise<void> {
             const n = Number(e.data.value);
             if (Number.isFinite(n)) appInstance.setMaxOutputLines(n);
         }
+        if (e.data?.type === 'exportError') {
+            appInstance.appendOutput('error', String(e.data.message ?? 'Export failed'));
+        }
     });
 
     // Apply persisted cap at startup — the sidebar's settingsResponse will
@@ -1176,6 +1196,9 @@ async function bootstrap(): Promise<void> {
         || restoredMode === 'ui' || restoredMode === 'report') {
         appInstance.setResultMode(restoredMode);
     }
+    // The restore above predates onResultModeChanged, and the sidebar has only just
+    // mounted, so seed it with the mode the session came up in.
+    syncInputMode();
 
     // Manual refresh: re-lint with current settings, refresh definitions/
     // headings, redraw previews, and re-extract Export-tab plots. Called from
@@ -1197,6 +1220,7 @@ async function bootstrap(): Promise<void> {
     appInstance.onResultModeChanged = (mode: ResultMode) => {
         editorBridge.setExtraSetting('resultMode', mode);
         refreshUiDirtyIndicator();
+        syncInputMode();
         refreshAllPreviews();
     };
 
@@ -1281,6 +1305,7 @@ async function bootstrap(): Promise<void> {
 
     // Refresh all previews when the preview pane is first opened.
     appInstance.onPreviewToggled = (visible: boolean) => {
+        syncInputMode();
         if (visible) {
             setTimeout(refreshAllPreviews, 50);
         }

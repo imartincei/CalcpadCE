@@ -372,6 +372,15 @@ export class TauriMessageBridge extends BaseMessageBridge {
         }
     }
 
+    protected async onExportError(message: string): Promise<void> {
+        await super.onExportError(message);
+        try {
+            await dialogMessage(message, { title: 'Export failed', kind: 'error', okLabel: 'OK' });
+        } catch {
+            /* output panel already carries the message */
+        }
+    }
+
     protected onOpenLogsFolder(): void {
         void this.handleOpenLogsFolder();
     }

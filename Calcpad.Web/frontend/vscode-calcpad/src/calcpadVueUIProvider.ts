@@ -13,6 +13,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     private _outputChannel: vscode.OutputChannel;
     private _cachedPlots: ExtractedPlot[] = [];
     private _cachedHtml: string = '';
+    private _inputMode = false;
     /**
      * Extension supplies a getter that combines `activeTextEditor` with the
      * remembered preview-source editor so plot fetching still works when the
@@ -324,6 +325,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 
         // Send initial data
         this._sendInitialData();
+        this._postInputMode();
 
         // Refresh headings when the user switches editor tabs
         vscode.window.onDidChangeActiveTextEditor(() => {
@@ -528,6 +530,22 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     /** Ask the panel to switch to a given tab id. */
     public focusTab(tab: string) {
         this._view?.webview.postMessage({ type: 'focusTab', tab });
+    }
+
+    /**
+     * Tells the panel whether the user is filling a worksheet in rather than editing it —
+     * the input form is open, or a compiled worksheet is the active editor. The tabs that
+     * act on source grey themselves out for it. Remembered so a view that is resolved
+     * again (the sidebar reloads its webview when re-expanded) comes back in step.
+     */
+    public setInputMode(active: boolean) {
+        if (active === this._inputMode) return;
+        this._inputMode = active;
+        this._postInputMode();
+    }
+
+    private _postInputMode() {
+        this._view?.webview.postMessage({ type: 'inputModeChanged', active: this._inputMode });
     }
 
     /**

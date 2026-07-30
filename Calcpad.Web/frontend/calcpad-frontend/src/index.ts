@@ -29,6 +29,7 @@ export type {
     ExportVariant,
     CpdzDecodeResponse,
     CpdzEncodeResponse,
+    PortableBundleResult,
 } from './types/api';
 export { CalcpadTokenType, CalcpadTypeId } from './types/api';
 

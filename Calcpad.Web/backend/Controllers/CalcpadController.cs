@@ -104,6 +104,31 @@ namespace Calcpad.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Rewrites a worksheet into the self-contained form a compiled <c>.cpdz</c> needs:
+        /// macros and includes expanded, <c>#read</c> data inlined, an included file's image
+        /// paths made absolute. The caller embeds the images and encodes the result. Reading
+        /// a data file that isn't there is an error, not a warning — the worksheet would
+        /// otherwise be handed out broken.
+        /// </summary>
+        [HttpPost("portable/bundle")]
+        public IActionResult BundlePortable([FromBody] PortableBundleRequest request)
+        {
+            try
+            {
+                var result = PortableWorksheet.Build(request.Content, request.SourceFilePath);
+                if (result.Errors.Count > 0)
+                    return BadRequest(new { error = "The worksheet is not self-contained", messages = result.Errors });
+
+                return Ok(new PortableBundleResponse { Content = result.Content });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("portable bundle failed", ex);
+                return StatusCode(500, new { error = "Failed to bundle the worksheet", message = ex.Message });
+            }
+        }
+
         private static HighlightResponse MapTokensToResponse(IEnumerable<Token> tokens, bool includeText)
         {
             return new HighlightResponse
@@ -779,6 +804,27 @@ namespace Calcpad.Server.Controllers
     {
         /// <summary>Base64 of the encoded file's bytes.</summary>
         public string Data { get; set; } = string.Empty;
+    }
+
+    public class PortableBundleRequest
+    {
+        /// <summary>The Calcpad source to bundle.</summary>
+        public string Content { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Full path of the source file on disk. Relative <c>#include</c> and <c>#read</c>
+        /// paths resolve against its folder, as they do when the worksheet runs.
+        /// </summary>
+        public string? SourceFilePath { get; set; }
+    }
+
+    public class PortableBundleResponse
+    {
+        /// <summary>
+        /// The bundled source: no includes, no data files, and images left as absolute paths
+        /// for the caller to embed.
+        /// </summary>
+        public string Content { get; set; } = string.Empty;
     }
 
     public class HighlightRequest

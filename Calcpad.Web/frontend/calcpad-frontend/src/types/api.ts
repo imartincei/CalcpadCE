@@ -318,6 +318,15 @@ export interface CpdzEncodeResponse {
 }
 
 /**
+ * The outcome of bundling a worksheet for compiling. `content` is the self-contained
+ * source; when it is missing, `errors` says what the worksheet still depends on.
+ */
+export interface PortableBundleResult {
+    content?: string;
+    errors: string[];
+}
+
+/**
  * Which rendering an export captures.
  *
  * - `report` — hides `#pre` and applies the entered `#UI` values. The default everywhere.

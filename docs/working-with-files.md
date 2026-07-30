@@ -44,10 +44,22 @@ Select file path and name and click "**Save**"
 Compiling produces a "**\*.cpdz**" from the document you are working on.
 It is a separate output rather than a rename: the file you have open keeps its own name and stays editable, so you can keep working on the "**\*.cpd**" and re-compile whenever you need a new copy to hand out.
 
-Any images the document references by a relative path are embedded into the compiled file, so it can be distributed on its own without the surrounding folder.
+A compiled worksheet is fully portable: everything the document depends on is written into it, so it runs with nothing beside it.
+
+* "**#include**"d files are expanded in place, and macros defined with "**#def**" are applied — the compiled file has neither.
+* Every "**#read**" is replaced by the data it imports. `#read M from table.csv` becomes the assignment `M = [1; 3|2; 4]`, hidden so it does not appear in the report, and the matrix keeps the shape the directive asked for (`type=C`, `type=S` and the rest). A read declared as high performance ("**type=R_hp**") becomes an ordinary matrix.
+* Images referenced by a relative path are embedded as data, including those referenced by an included file.
+
+If a referenced file cannot be read — a missing "**\*.csv**", an "**#include**" that does not resolve — compiling stops and reports it, rather than writing a worksheet that fails for whoever receives it. An unsaved document has no folder for relative paths to resolve against, so save it before compiling.
+
+"**#write**" and "**#append**" are left as they are: they are outputs, not dependencies, and still write next to the compiled file when it runs.
 
 * In **calcpad-desktop**, use "**File/Save As Compiled Worksheet…**", or the "**Save Compiled…**" button on the "**Export**" tab.
 * In **VS Code**, run "**CalcpadCE: Save As Compiled Worksheet…**" from the command palette, or use the same "**Save Compiled…**" button on the "**Export**" tab.
 
 Opening a compiled worksheet gives you the input form with the source locked — that is what the format is for.
 Values you enter can still be saved back into it: in **calcpad-desktop** it saves like any other file, and in **VS Code** a compiled worksheet opens in its own editor where "**Save**" writes the entered values back.
+
+A filled-in worksheet is still read and handed on, so the report and the exports work from a compiled file as they do from a "**\*.cpd**".
+In **VS Code**, "**CalcpadCE: Toggle Report Preview**" opens the report beside the form, and the "**Export**" tab's PDF, HTML and Word buttons render the values you have entered.
+The source stays hidden throughout — the report is a rendering, not the code.

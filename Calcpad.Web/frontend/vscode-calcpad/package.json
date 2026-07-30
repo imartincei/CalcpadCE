@@ -423,12 +423,12 @@
         },
         {
           "command": "vscode-calcpad.toggleUiReport",
-          "when": "resourceLangId == plaintext || resourceLangId == calcpad || activeWebviewPanelId == htmlPreviewUi",
+          "when": "resourceLangId == plaintext || resourceLangId == calcpad || activeWebviewPanelId == htmlPreviewUi || activeCustomEditorId == calcpad.compiledWorksheet",
           "group": "navigation"
         },
         {
           "command": "vscode-calcpad.printToPdf",
-          "when": "activeWebviewPanelId == htmlPreviewUi || activeWebviewPanelId == htmlPreviewUiReport",
+          "when": "activeWebviewPanelId == htmlPreviewUi || activeWebviewPanelId == htmlPreviewUiReport || activeWebviewPanelId == calcpadCompiledReport || activeCustomEditorId == calcpad.compiledWorksheet",
           "group": "navigation"
         },
         {
@@ -450,7 +450,7 @@
         },
         {
           "command": "vscode-calcpad.printToPdf",
-          "when": "webviewId == htmlPreviewUi || webviewId == htmlPreviewUiReport",
+          "when": "webviewId == htmlPreviewUi || webviewId == htmlPreviewUiReport || webviewId == calcpadCompiledReport",
           "group": "navigation"
         },
         {

@@ -293,22 +293,18 @@
         <span>Results</span>
         <div class="preview-mode-group">
           <button
+            v-if="resultModeAvailable('preview')"
             class="toolbar-btn"
             :class="{ active: resultMode === 'preview' }"
-            :disabled="!resultModeAvailable('preview')"
             @click="setResultMode('preview')"
-            :title="activeTabIsCompiled
-              ? 'Unavailable for a compiled worksheet — it has no source to show'
-              : 'The document as written — #pre and #post both shown, entered #UI values ignored'"
+            title="The document as written — #pre and #post both shown, entered #UI values ignored"
           >Preview</button>
           <button
+            v-if="resultModeAvailable('unwrapped')"
             class="toolbar-btn"
             :class="{ active: resultMode === 'unwrapped' }"
-            :disabled="!resultModeAvailable('unwrapped')"
             @click="setResultMode('unwrapped')"
-            :title="activeTabIsCompiled
-              ? 'Unavailable for a compiled worksheet — it has no source to show'
-              : 'The source listing, with macros and includes resolved'"
+            title="The source listing, with macros and includes resolved"
           >Unwrapped</button>
           <button
             class="toolbar-btn"
@@ -317,6 +313,7 @@
             title="#UI input form — #post content is hidden"
           >Input</button>
           <button
+            v-if="resultModeAvailable('report')"
             class="toolbar-btn"
             :class="{ active: resultMode === 'report' }"
             @click="setResultMode('report')"
@@ -574,11 +571,13 @@ const activeGroup = computed(() => groups.value.find(g => g.id === activeGroupId
 
 /**
  * A compiled worksheet has no readable source: it is distributed to be filled in, and
- * the editor holding it is locked. So the two modes that exist to show source — the
- * as-written preview and the resolved listing — are not offered for one. Input and
- * report are, since both are views of the filled-in form.
+ * the editor holding it is locked. Filling in the form is the only thing to do with
+ * one, so input is the only mode offered — the buttons for the others are left out
+ * rather than shown disabled. The report is still reachable: it renders beside the
+ * form (see `uiPrintVisible`), which is where it belongs for a worksheet being
+ * filled in.
  */
-const COMPILED_RESULT_MODES: ResultMode[] = ['ui', 'report']
+const COMPILED_RESULT_MODES: ResultMode[] = ['ui']
 const activeTabIsCompiled = computed(() => {
   const filePath = activeGroup.value?.tabs.find(t => t.isActive)?.filePath
   return !!filePath && isCompiledPath(filePath)
@@ -1466,15 +1465,16 @@ function setPreviewHtml(groupId: string, html: string, scrollToLine?: number): v
 /**
  * Writes the report that accompanies the input form. It carries no controls, so it needs
  * no #UI event script, and nothing in it logs, so it needs no console interception. It does
- * get the clipboard bridge — copying a result out of it is otherwise dead — and the line
- * links, so a result traces back to the line that produced it.
+ * get the clipboard bridge — copying a result out of it is otherwise dead — but not the
+ * hover line links: input mode hides the editor they would navigate to. The report shown
+ * in report mode, where the editor is on screen, keeps them.
  */
 function setUiPrintHtml(groupId: string, html: string): void {
   const doc = uiPrintEls.get(groupId)?.contentDocument
   if (!doc) return
   const frameId = UI_PRINT_FRAME + groupId
   doc.open()
-  doc.write(injectPreviewClipboard(injectLineLinks(html, undefined, groupId, frameId), frameId))
+  doc.write(injectPreviewClipboard(injectLineLinks(html, undefined, groupId, frameId, false), frameId))
   doc.close()
 }
 
@@ -1513,11 +1513,16 @@ function scrollPreviewToSourceLine(groupId: string, line: number): void {
 // `frameId` addresses the iframe itself and only differs for the report pane beside
 // the input form, which shares its group's id: navigation still targets the group's
 // editor, while the menu and find widget belong to whichever frame was clicked.
+//
+// `lineLinks` turns just the hover arrows off; the context menu, find, error chips and
+// editor->preview sync stay. The report beside the input form drops them — the editor
+// they navigate to isn't on screen there.
 function injectLineLinks(
   html: string,
   scrollToLine: number | undefined,
   groupId: string,
   frameId: string = groupId,
+  lineLinks: boolean = true,
 ): string {
   const scrollTarget = typeof scrollToLine === 'number' ? String(scrollToLine) : 'null'
   const gid = JSON.stringify(groupId)
@@ -1559,6 +1564,7 @@ function injectLineLinks(
     "      post(parseInt(n, 10), lineType);",
     "    });",
     "  });",
+    ...(lineLinks ? [
     "  function hideAllLineLinks() {",
     "    document.querySelectorAll('.lineLink').forEach(function(l) { l.style.display = 'none'; });",
     "  }",
@@ -1585,6 +1591,7 @@ function injectLineLinks(
     "    });",
     "  });",
     "  window.addEventListener('scroll', hideAllLineLinks);",
+    ] : []),
     "  document.querySelectorAll('.roundBox').forEach(function(box) {",
     "    box.addEventListener('click', function() {",
     "      var errId = box.getAttribute('data-error');",

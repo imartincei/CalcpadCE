@@ -27,6 +27,7 @@ Default port is `9420` (override with `CALCPAD_PORT`).
 - [POST /definitions](#post-definitions)
 - [POST /find-references](#post-find-references)
 - [POST /prettify](#post-prettify)
+- [POST /portable/bundle](#post-portablebundle)
 - [GET /snippets](#get-snippets)
 - [Usage Notes](#usage-notes)
 
@@ -648,6 +649,29 @@ interface PrettifyRequest {
 ```
 
 **Response:** Plain text (`text/plain`) — the prettified source code.
+
+---
+
+## POST /portable/bundle
+
+Rewrite a worksheet into the self-contained form a compiled `.cpdz` needs: macros and `#include`d files expanded in place, every `#read` replaced by the data it imports (hidden, so it stays out of the report), and an included file's relative image paths made absolute. Images themselves are left for the caller to embed — the host owns the filesystem the editor sees — so the order is bundle, embed images, then `POST /cpdz/encode`.
+
+**Request:**
+```typescript
+interface PortableBundleRequest {
+  content: string;
+  sourceFilePath?: string;   // relative #include and #read paths resolve against its folder
+}
+```
+
+**Response:**
+```typescript
+interface PortableBundleResponse {
+  content: string;           // no includes, no data files, images by absolute path
+}
+```
+
+**400** when the worksheet still depends on something that cannot be read (missing `.csv`, unresolved `#include`, or a relative path with no `sourceFilePath` to resolve against): `{ error, messages: string[] }`. Nothing is skipped — a worksheet that would fail for whoever receives it is not written.
 
 ---
 

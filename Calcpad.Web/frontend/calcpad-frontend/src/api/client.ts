@@ -16,6 +16,7 @@ import type {
     UiConvertOptions,
     CpdzDecodeResponse,
     CpdzEncodeResponse,
+    PortableBundleResult,
 } from '../types/api';
 import type { SnippetsResponse } from '../types/snippets';
 
@@ -109,6 +110,39 @@ export class CalcpadApiClient {
         const result = await this.post<CpdzEncodeResponse>('/api/calcpad/cpdz/encode',
             { content, original: original ? toBase64(original) : undefined }, 'EncodeCpdz');
         return result ? fromBase64(result.data) : null;
+    }
+
+    /**
+     * Rewrites a worksheet into the self-contained form a compiled `.cpdz` needs: macros and
+     * `#include`d files expanded, `#read` data inlined, an included file's image paths made
+     * absolute so the host can embed them. Reports what stands in the way instead of
+     * returning a worksheet that would still read files beside it — which is why this has
+     * its own request rather than going through {@link post}, whose errors are only logged.
+     */
+    public bundlePortable(content: string, sourceFilePath?: string): Promise<PortableBundleResult> {
+        return this.serialize(async () => {
+            try {
+                const response = await fetch(`${this.baseUrl}/api/calcpad/portable/bundle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content, sourceFilePath }),
+                    signal: AbortSignal.timeout(30000),
+                });
+                const body = await response.json().catch(() => null);
+                if (response.ok && typeof body?.content === 'string') return { content: body.content, errors: [] };
+
+                this.logger?.appendLine(`[BundlePortable] Server returned ${response.status}`);
+                const messages: unknown = body?.messages;
+                return {
+                    errors: Array.isArray(messages) && messages.length
+                        ? messages.map(String)
+                        : [body?.message ?? body?.error ?? `The server returned ${response.status}`],
+                };
+            } catch (error) {
+                this.logError('BundlePortable', error);
+                return { errors: [error instanceof Error ? error.message : String(error)] };
+            }
+        });
     }
 
     public async snippets(): Promise<SnippetsResponse | null> {

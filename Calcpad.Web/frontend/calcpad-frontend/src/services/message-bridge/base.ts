@@ -344,6 +344,13 @@ export abstract class BaseMessageBridge {
     protected async onPdfError(_err: unknown): Promise<void> { /* default no-op */ }
     /** Called after a PDF is successfully written, with the saved path (platforms that have one). */
     protected async onPdfSaved(_filePath: string): Promise<void> { /* default no-op */ }
+    /**
+     * Report an export that could not be produced. The message reaches the Output panel
+     * everywhere; platforms with a native dialog put one up on top of that.
+     */
+    protected async onExportError(message: string): Promise<void> {
+        this.postToVue({ type: 'exportError', message });
+    }
     protected handlePlatformMessage(_message: any): boolean { return false; }
     protected onOpenLogsFolder(): void {
         console.warn('Open Logs Folder is only available in the desktop build — server logs live on the host running CalcPad.');
@@ -625,10 +632,20 @@ export abstract class BaseMessageBridge {
      * Compiles the active document to a `.cpdz` and prompts for a location. This is an
      * export, not a Save As: the open document keeps its own path and stays editable.
      * Returns the saved path where the platform has one.
+     *
+     * The worksheet is bundled first — includes expanded, `#read` data inlined — then its
+     * images are embedded, in that order: an included file's images only resolve once the
+     * server has rewritten their paths.
      */
     async saveCompiled(): Promise<string | null> {
         const content = this.getActiveEditorContent();
-        const compiled = await this.buildCompiledSource(content);
+        const { sourceFilePath } = await this.buildFileContext(content);
+        const bundled = await this.apiClient.bundlePortable(content, sourceFilePath);
+        if (bundled.content == null) {
+            await this.onExportError(`This worksheet cannot be compiled:\n${bundled.errors.join('\n')}`);
+            return null;
+        }
+        const compiled = await this.buildCompiledSource(bundled.content);
         const bytes = await this.apiClient.encodeCpdz(compiled);
         if (!bytes) return null;
         return this.saveExportedFile({

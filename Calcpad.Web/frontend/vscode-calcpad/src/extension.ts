@@ -48,6 +48,13 @@ const uiOverridesDirty = new Set<string>();
 // about and dropped when the form closes.
 let uiPanelDocKey: string | undefined = undefined;
 
+// The compiled-worksheet editor, which holds the decoded source of every open `.cpdz`:
+// they never become text documents, so it is the only way to the content.
+let compiledEditor: CalcpadCompiledEditorProvider | undefined = undefined;
+// The compiled worksheet last worked in, for the same reason previewSourceEditor exists:
+// a report or side panel holding focus leaves no active editor of any kind.
+let compiledSourceUri: vscode.Uri | undefined = undefined;
+
 type PreviewKind = 'regular' | 'unwrapped' | 'ui' | 'uiReport';
 
 function previewPanelFor(kind: PreviewKind): vscode.WebviewPanel | undefined {
@@ -57,6 +64,55 @@ function previewPanelFor(kind: PreviewKind): vscode.WebviewPanel | undefined {
         case 'ui': return uiPanel;
         default: return uiReportPanel;
     }
+}
+
+/** The compiled worksheet whose editor is the active tab, if that is what it is. */
+function activeCompiledUri(): vscode.Uri | undefined {
+    const input = vscode.window.tabGroups.activeTabGroup.activeTab?.input;
+    return input instanceof vscode.TabInputCustom
+        && input.viewType === CalcpadCompiledEditorProvider.viewType ? input.uri : undefined;
+}
+
+/**
+ * Tells the side panel when the user is filling a worksheet in rather than editing it:
+ * the input form is open, or the active editor is a compiled worksheet — which has no
+ * text document behind it at all. The panel's source-editing tabs grey out for it.
+ */
+function syncInputMode(): void {
+    const compiled = activeCompiledUri();
+    if (compiled) compiledSourceUri = compiled;
+    // The report beside the form is the other half of what a compiled worksheet shows, so
+    // it is input mode too. A webview tab reports its view type behind a
+    // `mainThreadWebview-` prefix, hence the suffix match.
+    const input = vscode.window.tabGroups.activeTabGroup.activeTab?.input;
+    const compiledReport = input instanceof vscode.TabInputWebview
+        && input.viewType.endsWith(CalcpadCompiledEditorProvider.reportViewType);
+    vueUiProvider?.setInputMode(!!uiPanel || !!compiled || compiledReport);
+}
+
+/** The content and identity of a document the preview and export paths work from. */
+interface CalcpadSource {
+    readonly text: string;
+    readonly uri: vscode.Uri;
+}
+
+/**
+ * The document the preview and export commands act on. A compiled worksheet has no text
+ * document, so it can only be reached through its editor; the remembered editor and
+ * worksheet cover the case where a preview, the report or the side panel holds focus and
+ * there is no active editor of any kind.
+ */
+function activeCalcpadSource(): CalcpadSource | undefined {
+    const editor = vscode.window.activeTextEditor;
+    if (editor) return { text: editor.document.getText(), uri: editor.document.uri };
+
+    const compiled = activeCompiledUri() ?? compiledSourceUri;
+    const compiledText = compiled && compiledEditor?.sourceFor(compiled);
+    if (compiled && compiledText !== undefined) return { text: compiledText, uri: compiled };
+
+    return previewSourceEditor
+        ? { text: previewSourceEditor.document.getText(), uri: previewSourceEditor.document.uri }
+        : undefined;
 }
 
 /**
@@ -579,12 +635,14 @@ function getScrollbarStyleScript(): string {
  *    the webview reload.
  * The arrows are created after DOMContentLoaded (so after getErrorNavigationScript
  * binds), hence they get their own click handler here.
+ *
+ * `includeLinks` turns just the arrows off; the chips, the scroll target and the
+ * editor->preview sync stay. The report drops them while it accompanies the input
+ * form, where the form — not the source — is what you are working in.
  */
-function getLineLinkScript(scrollToLine?: number): string {
+function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true): string {
     const scrollTarget = typeof scrollToLine === 'number' ? String(scrollToLine) : 'null';
-    return `
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
+    const arrows = !includeLinks ? '' : `
                 function hideAllLineLinks() {
                     document.querySelectorAll('.lineLink').forEach(function(l) { l.style.display = 'none'; });
                 }
@@ -616,6 +674,11 @@ function getLineLinkScript(scrollToLine?: number): string {
                     });
                 });
                 window.addEventListener('scroll', hideAllLineLinks);
+    `;
+    return `
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                ${arrows}
 
                 // Error-summary chips: scroll the preview to the referenced output line.
                 document.querySelectorAll('.roundBox').forEach(function(box) {
@@ -822,8 +885,13 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // Visible, styled vertical scrollbar for the preview
         const scrollbarStyleScript = getScrollbarStyleScript();
 
-        // Hover line links + roundBox scroll + optional scroll-to-line target
-        const lineLinkScript = getLineLinkScript(scrollToLine);
+        // Hover line links + roundBox scroll + optional scroll-to-line target. The arrows
+        // need a source editor to navigate to: a compiled worksheet has none, and the
+        // report gives them up while the input form is in front of it. The report gets
+        // them back when it stands alone beside the editor (the 'ui' panel's disposal
+        // re-renders it, so closing input mode restores them).
+        const lineLinkScript = getLineLinkScript(
+            scrollToLine, !standalone && !(forPrint && uiPanel !== undefined));
 
         // Override VS Code's injected theme to match the selected preview theme
         const themeOverrideScript = getThemeOverrideScript(theme);
@@ -966,27 +1034,30 @@ async function generatePdfToFile(
 }
 
 /**
+ * Default save target for an export: the document's own folder and base name, or the
+ * workspace folder for a document that has never been saved.
+ */
+function defaultSavePath(uri: vscode.Uri, extension: string): string {
+    const directory = uri.scheme === 'untitled'
+        ? (vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '')
+        : path.dirname(uri.fsPath);
+    return path.join(directory, path.basename(uri.fsPath, path.extname(uri.fsPath)) + extension);
+}
+
+/**
  * Editor → save dialog → generate → "Open PDF" prompt. Shared entry point for
  * <c>vscode-calcpad.exportToPdf</c> and <c>vscode-calcpad.printToPdf</c>, which
  * both produce the report; the Export tab passes other variants through.
  */
 async function runPdfExportCommand(variant: ExportVariant = 'report'): Promise<void> {
-    // The Print Report button lives on the report and input panels' title bars, so the
-    // webview holds focus and there is no active *text* editor — fall back to the editor
-    // the previews were opened from.
-    const activeEditor = vscode.window.activeTextEditor ?? previewSourceEditor;
-    if (!activeEditor) {
+    const source = activeCalcpadSource();
+    if (!source) {
         vscode.window.showErrorMessage('No active CalcpadCE document found');
         return;
     }
 
-    // Default save location: same dir as the .cpd, with .pdf extension.
-    const currentDir = path.dirname(activeEditor.document.fileName);
-    const baseFilename = path.basename(activeEditor.document.fileName, path.extname(activeEditor.document.fileName));
-    const defaultPath = path.join(currentDir, baseFilename + '.pdf');
-
     const saveUri = await vscode.window.showSaveDialog({
-        defaultUri: vscode.Uri.file(defaultPath),
+        defaultUri: vscode.Uri.file(defaultSavePath(source.uri, '.pdf')),
         filters: { 'PDF Files': ['pdf'] }
     });
     if (!saveUri) return;
@@ -999,8 +1070,8 @@ async function runPdfExportCommand(variant: ExportVariant = 'report'): Promise<v
         }, async progress => {
             progress.report({ increment: 0, message: 'Starting PDF generation...' });
             await generatePdfToFile(
-                activeEditor.document.getText(),
-                activeEditor.document.uri,
+                source.text,
+                source.uri,
                 saveUri,
                 variant,
                 progress
@@ -1027,17 +1098,14 @@ async function runPdfExportCommand(variant: ExportVariant = 'report'): Promise<v
  * "Save HTML…" buttons, which pick the variant.
  */
 async function saveSourceHtml(variant: ExportVariant = 'report') {
-    const activeEditor = vscode.window.activeTextEditor ?? previewSourceEditor;
-    if (!activeEditor) {
+    const source = activeCalcpadSource();
+    if (!source) {
         vscode.window.showErrorMessage('No active CalcpadCE document found');
         return;
     }
     try {
-        const currentDir = path.dirname(activeEditor.document.fileName);
-        const baseFilename = path.basename(activeEditor.document.fileName, path.extname(activeEditor.document.fileName));
-        const defaultPath = path.join(currentDir, baseFilename + '.html');
         const saveUri = await vscode.window.showSaveDialog({
-            defaultUri: vscode.Uri.file(defaultPath),
+            defaultUri: vscode.Uri.file(defaultSavePath(source.uri, '.html')),
             filters: { 'HTML Files': ['html', 'htm'] },
         });
         if (!saveUri) return;
@@ -1047,8 +1115,7 @@ async function saveSourceHtml(variant: ExportVariant = 'report') {
             title: 'Generating HTML…',
             cancellable: false,
         }, async () => {
-            const html = await renderForExport(
-                activeEditor.document.getText(), activeEditor.document.uri, variant);
+            const html = await renderForExport(source.text, source.uri, variant);
             await vscode.workspace.fs.writeFile(saveUri, new TextEncoder().encode(html));
         });
 
@@ -1074,8 +1141,8 @@ async function saveSourceHtml(variant: ExportVariant = 'report') {
 async function saveDocx(variant: ExportVariant = 'report') {
     const render = variantRender(variant);
     if (render.enableUi || render.unwrap) return;
-    const activeEditor = vscode.window.activeTextEditor ?? previewSourceEditor;
-    if (!activeEditor) {
+    const source = activeCalcpadSource();
+    if (!source) {
         vscode.window.showErrorMessage('No active CalcpadCE document found');
         return;
     }
@@ -1087,11 +1154,8 @@ async function saveDocx(variant: ExportVariant = 'report') {
             return;
         }
 
-        const currentDir = path.dirname(activeEditor.document.fileName);
-        const baseFilename = path.basename(activeEditor.document.fileName, path.extname(activeEditor.document.fileName));
-        const defaultPath = path.join(currentDir, baseFilename + '.docx');
         const saveUri = await vscode.window.showSaveDialog({
-            defaultUri: vscode.Uri.file(defaultPath),
+            defaultUri: vscode.Uri.file(defaultSavePath(source.uri, '.docx')),
             filters: { 'Word Documents': ['docx'] },
         });
         if (!saveUri) return;
@@ -1102,18 +1166,17 @@ async function saveDocx(variant: ExportVariant = 'report') {
             cancellable: false,
         }, async () => {
             const settings = await settingsManager.getApiSettings();
-            const documentContent = activeEditor.document.getText();
 
             const response = await fetch(`${apiBaseUrl}/api/calcpad/docx`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    content: documentContent,
+                    content: source.text,
                     settings,
-                    sourceFilePath: activeEditor.document.uri.fsPath,
+                    sourceFilePath: source.uri.fsPath,
                     forPrint: render.forPrint,
                     uiOverrides: render.useOverrides
-                        ? uiOverrides.toRecord(activeEditor.document.uri.toString())
+                        ? uiOverrides.toRecord(source.uri.toString())
                         : undefined,
                 }),
                 signal: AbortSignal.timeout(60000),
@@ -1141,32 +1204,39 @@ async function saveDocx(variant: ExportVariant = 'report') {
 
 /**
  * Compile the active document to a `.cpdz` and save it. This is an export: the open
- * document keeps its own path and stays editable. Referenced local images are embedded
- * first, so the compiled file travels on its own.
+ * document keeps its own path and stays editable. The worksheet is bundled first —
+ * includes expanded, `#read` data inlined — and its images embedded after, in that order:
+ * an included file's images only resolve once the server has rewritten their paths.
  */
 async function saveAsCompiled() {
-    const activeEditor = vscode.window.activeTextEditor ?? previewSourceEditor;
-    if (!activeEditor) {
+    const source = activeCalcpadSource();
+    if (!source) {
         vscode.window.showErrorMessage('No active CalcpadCE document found');
         return;
     }
     try {
-        const document = activeEditor.document;
-        const baseFilename = document.isUntitled
-            ? 'worksheet'
-            : path.basename(document.fileName, path.extname(document.fileName));
-        const defaultDir = document.isUntitled
-            ? (vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '')
-            : path.dirname(document.fileName);
+        const untitled = source.uri.scheme === 'untitled';
+        const defaultPath = untitled
+            ? path.join(
+                vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '',
+                'worksheet' + COMPILED_EXTENSION)
+            : defaultSavePath(source.uri, COMPILED_EXTENSION);
         const saveUri = await vscode.window.showSaveDialog({
-            defaultUri: vscode.Uri.file(path.join(defaultDir, baseFilename + COMPILED_EXTENSION)),
+            defaultUri: vscode.Uri.file(defaultPath),
             filters: { 'CalcpadCE Compiled': ['cpdz'] },
         });
         if (!saveUri) return;
 
+        const bundled = await sharedApiClient?.bundlePortable(
+            source.text, untitled ? undefined : source.uri.fsPath);
+        if (bundled?.content == null) {
+            const reasons = bundled?.errors.join('\n') ?? 'The server is not running';
+            throw new Error(`the worksheet is not self-contained:\n${reasons}`);
+        }
+
         // An untitled document has no folder for relative image paths to resolve against.
-        const documentDir = document.isUntitled ? '' : path.dirname(document.uri.fsPath);
-        const compiled = await inlineImageSources(document.getText(), documentDir, new VSCodeFileSystem());
+        const documentDir = untitled ? '' : path.dirname(source.uri.fsPath);
+        const compiled = await inlineImageSources(bundled.content, documentDir, new VSCodeFileSystem());
         const bytes = await sharedApiClient?.encodeCpdz(compiled);
         if (!bytes) throw new Error('The server could not encode the worksheet');
         await vscode.workspace.fs.writeFile(saveUri, bytes);
@@ -1307,6 +1377,7 @@ async function showPreview(kind: PreviewKind, scrollToLine?: number) {
         wrappedPanel = panel;
     } else if (kind === 'ui') {
         uiPanel = panel;
+        syncInputMode();
     } else if (kind === 'uiReport') {
         uiReportPanel = panel;
     } else {
@@ -1322,6 +1393,7 @@ async function showPreview(kind: PreviewKind, scrollToLine?: number) {
             wrappedPanel = undefined;
         } else if (kind === 'ui') {
             uiPanel = undefined;
+            syncInputMode();
             // Closing the panel directly leaves input mode too; the toggle command
             // has already dealt with the values when it comes through there. The report
             // stays open — it is a view of the document in its own right — but the values
@@ -1590,13 +1662,15 @@ export async function activate(context: vscode.ExtensionContext) {
         outputChannel.appendLine('Initializing hover provider...');
         const hoverProviderDisposable = CalcpadHoverProvider.register(definitionsService, insertManager, outputChannel);
 
-        // Initialize the compiled worksheet editor (.cpdz opens as an input form)
+        // Initialize the compiled worksheet editor (.cpdz opens as an input form, with
+        // the report available beside it). Both of its panels are standalone: there is no
+        // text editor behind a .cpdz for a preview to be *of*.
         outputChannel.appendLine('Initializing compiled worksheet editor...');
-        const compiledEditorDisposable = CalcpadCompiledEditorProvider.register(
+        compiledEditor = CalcpadCompiledEditorProvider.register(
             apiClient,
             uiOverrides,
-            (panel, text, uri) =>
-                updatePreviewContent(panel, text, uri, false, undefined, true, false, true),
+            (panel, text, uri, kind) => updatePreviewContent(
+                panel, text, uri, false, undefined, kind === 'form', kind === 'report', true),
             outputChannel,
         );
 
@@ -1735,6 +1809,8 @@ export async function activate(context: vscode.ExtensionContext) {
         CalcpadVueUIProvider.viewType,
         vueUiProvider
     );
+    // A restored session can come up with a compiled worksheet already in front.
+    syncInputMode();
 
     const disposable = vscode.commands.registerCommand('vscode-calcpad.activate', () => {
         vscode.window.showInformationMessage('CalcpadCE activated!');
@@ -1774,6 +1850,13 @@ export async function activate(context: vscode.ExtensionContext) {
     // stands alone beside the editor, which is how you read the print layout without
     // filling in a form. Closing the panel directly does the same thing.
     const toggleUiReportCommand = vscode.commands.registerCommand('vscode-calcpad.toggleUiReport', async () => {
+        // A compiled worksheet is its own form, so its report belongs to that editor
+        // rather than to the shared input-form slot.
+        const compiled = activeCompiledUri();
+        if (compiled) {
+            await compiledEditor?.toggleReport(compiled);
+            return;
+        }
         if (uiReportPanel) {
             uiReportPanel.dispose();
             return;
@@ -2100,9 +2183,19 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
+    // A compiled worksheet is a custom editor, not a text one, so activating or closing
+    // its tab never reaches onDidChangeActiveTextEditor — the tab events are what tell
+    // the side panel a form has taken over.
+    const onDidChangeTabs = vscode.window.tabGroups.onDidChangeTabs(() => syncInputMode());
+    const onDidChangeTabGroups = vscode.window.tabGroups.onDidChangeTabGroups(() => syncInputMode());
+
     // Update preview and variables when active editor changes
     const onDidChangeActiveTextEditor = vscode.window.onDidChangeActiveTextEditor(async editor => {
         updateMetadataContext(editor);
+        // A text editor taking over is what ends a compiled worksheet's claim on the
+        // export commands; a webview taking focus is not, which is the point of both
+        // this and previewSourceEditor.
+        if (editor) compiledSourceUri = undefined;
         if (editor && (editor.document.languageId === 'calcpad' || editor.document.languageId === 'plaintext')) {
             // The input form follows the active editor, so switching documents takes
             // the form's values with it. Prompt as if the form were closing, since
@@ -2177,7 +2270,7 @@ export async function activate(context: vscode.ExtensionContext) {
             saveDocxCommand,
             saveAsCompiledCommand,
             saveCompiledUiValuesCommand,
-            compiledEditorDisposable,
+            compiledEditor,
             refreshVariablesCommand,
             refreshDocumentCommand,
             stopServerCommand,
@@ -2193,6 +2286,8 @@ export async function activate(context: vscode.ExtensionContext) {
             onDidOpenTextDocument,
             onDidSaveTextDocument,
             onDidChangeActiveTextEditor,
+            onDidChangeTabs,
+            onDidChangeTabGroups,
             onDidChangeConfiguration,
             operatorReplacerDisposable,
             quickTyperDisposable,

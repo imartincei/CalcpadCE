@@ -37,7 +37,8 @@
       <button
         v-for="tab in tabs"
         :key="tab.id"
-        :class="['tab', { active: pane.activeTab === tab.id }]"
+        :class="['tab', { active: pane.activeTab === tab.id, unavailable: tabUnavailable(tab.id) }]"
+        :title="tabUnavailable(tab.id) ? INPUT_MODE_NOTE : undefined"
         @click="activateTab(pane, tab.id)"
       >
         {{ tab.label }}
@@ -51,7 +52,11 @@
       ></button>
     </div>
 
-    <div class="tab-content">
+    <p v-if="tabUnavailable(pane.activeTab)" class="unavailable-note">{{ INPUT_MODE_NOTE }}</p>
+
+    <!-- `inert` rather than a per-control disabled flag: it takes the whole tab out of
+         both pointer and keyboard reach in one attribute, whatever it holds. -->
+    <div class="tab-content" :class="{ unavailable: tabUnavailable(pane.activeTab) }" :inert="tabUnavailable(pane.activeTab)">
       <CalcpadInsertTab
         v-if="pane.activeTab === 'insert'"
         :insert-items="insertItems"
@@ -263,6 +268,17 @@ const tabs = computed<Tab[]>(() => {
   return base
 })
 
+/**
+ * Input mode fills a worksheet in rather than editing it — the host hides the editor,
+ * and for a compiled worksheet there is no source behind it at all. The tabs that act
+ * on source have nothing to act on there, so their content is shown inert: TOC, Export
+ * and Settings still work, since a filled-in worksheet is still navigated and exported.
+ */
+const SOURCE_TABS = ['insert', 'variables', 'formatting', 'errors', 'metadata']
+const INPUT_MODE_NOTE = 'Unavailable in input mode — this acts on the document source, which the input form does not edit.'
+const inputMode = ref(false)
+const tabUnavailable = (tabId: string) => inputMode.value && SOURCE_TABS.includes(tabId)
+
 const convertErrors = ref<CalcpadError[]>([])
 
 interface PlotSummary { index: number; ext: 'png' | 'svg'; dataUri: string; sizeBytes: number }
@@ -334,6 +350,8 @@ const closePane = (index: number) => {
 
 const activateTab = (pane: Pane, tabId: string) => {
   pane.activeTab = tabId
+  // Nothing below is worth asking the host for while the tab is inert.
+  if (tabUnavailable(tabId)) return
 
   // Request fresh data when switching to variables tab
   if (tabId === 'variables') {
@@ -665,6 +683,9 @@ const handleMessage = (event: MessageEvent) => {
     case 'metadataContext':
       metadataBlock.value = message.block ?? null
       break
+    case 'inputModeChanged':
+      inputMode.value = !!message.active
+      break
     case 'focusTab':
       if (typeof message.tab === 'string') switchTab(message.tab)
       break
@@ -828,6 +849,12 @@ onUnmounted(() => {
   border-bottom: 2px solid var(--vscode-tab-activeBorder);
 }
 
+/* Still clickable while unavailable: opening the tab is how the note explaining
+ * why its content is inert gets read. */
+.tab.unavailable {
+  opacity: 0.5;
+}
+
 /* Split / close button pinned to the right end of the tab strip. */
 .pane-action {
   margin-left: auto;
@@ -857,6 +884,20 @@ onUnmounted(() => {
   /* Natural-flow content area — grows with its content. The parent
    * (#vue-sidebar) handles overflow scrolling for the whole panel. */
   padding: 0;
+}
+
+.tab-content.unavailable {
+  opacity: 0.45;
+}
+
+/* Sits outside .tab-content so it stays legible while the tab itself is dimmed. */
+.unavailable-note {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--vscode-descriptionForeground);
+  border-bottom: 1px solid var(--vscode-widget-border);
 }
 
 .tab-placeholder {

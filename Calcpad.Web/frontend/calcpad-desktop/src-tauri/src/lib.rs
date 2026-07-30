@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
-use tauri::menu::{Menu, MenuBuilder, MenuItem, PredefinedMenuItem, Submenu};
+use tauri::menu::{IsMenuItem, Menu, MenuBuilder, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Emitter, Manager, RunEvent, State, WindowEvent};
 use tokio::io::{AsyncBufReadExt, BufReader};
@@ -353,17 +353,14 @@ fn get_env(name: String) -> Option<String> {
     std::env::var(name).ok()
 }
 
-/// Greys out menu items whose command doesn't apply to the active document — the
-/// source-showing result modes while a compiled worksheet is open. The frontend
-/// guards these actions anyway; this keeps the menu from offering them.
+/// Shows or hides the result-mode entries that need a document with readable source —
+/// dropped while a compiled worksheet is open, since the results toolbar drops their
+/// buttons too. A menu item has no visibility of its own, so the menu is rebuilt.
 #[tauri::command]
-fn set_menu_items_enabled(app: AppHandle, ids: Vec<String>, enabled: bool) {
-    let Some(menu) = app.menu() else { return };
-    for id in ids {
-        if let Some(item) = menu.get(id.as_str()).and_then(|kind| kind.as_menuitem().cloned()) {
-            let _ = item.set_enabled(enabled);
-        }
-    }
+fn set_source_result_modes_visible(app: AppHandle, visible: bool) -> Result<(), String> {
+    let menu = build_menu(&app, visible).map_err(|e| e.to_string())?;
+    app.set_menu(menu).map_err(|e| e.to_string())?;
+    Ok(())
 }
 
 // Inside a linuxdeploy-generated AppImage, AppRun exports LD_LIBRARY_PATH so
@@ -880,7 +877,9 @@ fn assign_to_job_object(pid: u32) {
     }
 }
 
-fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
+/// Builds the app menu. `source_result_modes` drops the View entries that only make
+/// sense for a document with readable source (see the View submenu below).
+fn build_menu(app: &AppHandle, source_result_modes: bool) -> tauri::Result<Menu<tauri::Wry>> {
     let sep = || PredefinedMenuItem::separator(app);
 
     // Grouped by what gets rendered. The unsuffixed ids are the report — the default
@@ -996,80 +995,85 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         ],
     )?;
 
-    let view = Submenu::with_items(
+    let toggle_sidebar = MenuItem::with_id(
         app,
-        "View",
+        "toggle-sidebar",
+        "Toggle Sidebar",
         true,
-        &[
-            &MenuItem::with_id(
-                app,
-                "toggle-sidebar",
-                "Toggle Sidebar",
-                true,
-                Some("CmdOrCtrl+Shift+B"),
-            )?,
-            &MenuItem::with_id(
-                app,
-                "toggle-preview",
-                "Toggle Preview",
-                true,
-                Some("CmdOrCtrl+P"),
-            )?,
-            &MenuItem::with_id(
-                app,
-                "toggle-word-wrap",
-                "Toggle Word Wrap",
-                true,
-                Some("Alt+Z"),
-            )?,
-            &sep()?,
-            &MenuItem::with_id(
-                app,
-                "split-editor",
-                "Split Editor Down",
-                true,
-                Some("CmdOrCtrl+\\"),
-            )?,
-            &MenuItem::with_id(
-                app,
-                "unsplit-editor",
-                "Merge Editor Groups",
-                true,
-                None::<&str>,
-            )?,
-            &sep()?,
-            // Same order as the results toolbar. "Preview" shows #pre and #post with the
-            // document's own values; "Report" hides #pre and applies entered #UI values.
-            &MenuItem::with_id(
-                app,
-                "result-mode:preview",
-                "Result Mode: Preview",
-                true,
-                None::<&str>,
-            )?,
-            &MenuItem::with_id(
-                app,
-                "result-mode:unwrapped",
-                "Result Mode: Unwrapped",
-                true,
-                None::<&str>,
-            )?,
-            &MenuItem::with_id(
-                app,
-                "result-mode:ui",
-                "Result Mode: Input",
-                true,
-                None::<&str>,
-            )?,
-            &MenuItem::with_id(
-                app,
-                "result-mode:report",
-                "Result Mode: Report",
-                true,
-                None::<&str>,
-            )?,
-        ],
+        Some("CmdOrCtrl+Shift+B"),
     )?;
+    let toggle_preview = MenuItem::with_id(
+        app,
+        "toggle-preview",
+        "Toggle Preview",
+        true,
+        Some("CmdOrCtrl+P"),
+    )?;
+    let toggle_word_wrap =
+        MenuItem::with_id(app, "toggle-word-wrap", "Toggle Word Wrap", true, Some("Alt+Z"))?;
+    let split_editor = MenuItem::with_id(
+        app,
+        "split-editor",
+        "Split Editor Down",
+        true,
+        Some("CmdOrCtrl+\\"),
+    )?;
+    let unsplit_editor = MenuItem::with_id(
+        app,
+        "unsplit-editor",
+        "Merge Editor Groups",
+        true,
+        None::<&str>,
+    )?;
+    // Same order as the results toolbar. "Preview" shows #pre and #post with the
+    // document's own values; "Report" hides #pre and applies entered #UI values.
+    let mode_preview = MenuItem::with_id(
+        app,
+        "result-mode:preview",
+        "Result Mode: Preview",
+        true,
+        None::<&str>,
+    )?;
+    let mode_unwrapped = MenuItem::with_id(
+        app,
+        "result-mode:unwrapped",
+        "Result Mode: Unwrapped",
+        true,
+        None::<&str>,
+    )?;
+    let mode_input =
+        MenuItem::with_id(app, "result-mode:ui", "Result Mode: Input", true, None::<&str>)?;
+    let mode_report = MenuItem::with_id(
+        app,
+        "result-mode:report",
+        "Result Mode: Report",
+        true,
+        None::<&str>,
+    )?;
+    let view_sep_1 = sep()?;
+    let view_sep_2 = sep()?;
+    let mut view_items: Vec<&dyn IsMenuItem<tauri::Wry>> = vec![
+        &toggle_sidebar,
+        &toggle_preview,
+        &toggle_word_wrap,
+        &view_sep_1,
+        &split_editor,
+        &unsplit_editor,
+        &view_sep_2,
+    ];
+    // A compiled worksheet is only ever filled in: it has no source for preview or
+    // unwrapped to render, and its report is read beside the form rather than in place
+    // of it. Input is all that is left, so the rest are omitted from the menu the way
+    // the results toolbar omits their buttons.
+    if source_result_modes {
+        view_items.push(&mode_preview);
+        view_items.push(&mode_unwrapped);
+    }
+    view_items.push(&mode_input);
+    if source_result_modes {
+        view_items.push(&mode_report);
+    }
+    let view = Submenu::with_items(app, "View", true, &view_items)?;
 
     let server = Submenu::with_items(
         app,
@@ -1152,7 +1156,7 @@ pub fn run() {
             open_path_native,
             log_dir,
             take_pending_launch_files,
-            set_menu_items_enabled,
+            set_source_result_modes_visible,
         ])
         .setup(|app| {
             // Pin the on-disk locations the panic hook + draft commands need.
@@ -1169,7 +1173,7 @@ pub fn run() {
                 let _ = DRAFTS_DIR.set(drafts);
             }
 
-            let menu = build_menu(app.handle())?;
+            let menu = build_menu(app.handle(), true)?;
             app.set_menu(menu)?;
             let handle_for_menu = app.handle().clone();
             app.on_menu_event(move |_app, event| {

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { writeUiOverrides } from 'calcpad-frontend';
 import type { CalcpadApiClient, UiOverrideStore } from 'calcpad-frontend';
 
@@ -17,8 +18,16 @@ class CompiledWorksheetDocument implements vscode.CustomDocument {
     dispose(): void { /* nothing held beyond the fields above */ }
 }
 
-/** Renders the `#UI` input form for `text` into `panel`. Supplied by the extension. */
-type RenderForm = (panel: vscode.WebviewPanel, text: string, uri: vscode.Uri) => Promise<void>;
+/**
+ * Renders `text` into `panel` — as the `#UI` input form, or as the print report of the
+ * values entered into it. Supplied by the extension, which owns the conversion.
+ */
+type RenderPanel = (
+    panel: vscode.WebviewPanel,
+    text: string,
+    uri: vscode.Uri,
+    kind: 'form' | 'report',
+) => Promise<void>;
 
 /**
  * Opens compiled worksheets as an editor in their own right. A `.cpdz` is binary and
@@ -33,34 +42,91 @@ type RenderForm = (panel: vscode.WebviewPanel, text: string, uri: vscode.Uri) =>
  * workbench undo stack.
  */
 export class CalcpadCompiledEditorProvider
-    implements vscode.CustomEditorProvider<CompiledWorksheetDocument> {
+    implements vscode.CustomEditorProvider<CompiledWorksheetDocument>, vscode.Disposable {
 
     public static readonly viewType = 'calcpad.compiledWorksheet';
+    /** The report panel's view type, which package.json's menus key their buttons off. */
+    public static readonly reportViewType = 'calcpadCompiledReport';
 
     private readonly _onDidChange =
         new vscode.EventEmitter<vscode.CustomDocumentContentChangeEvent<CompiledWorksheetDocument>>();
     public readonly onDidChangeCustomDocument = this._onDidChange.event;
 
     private readonly _panels = new Map<string, Set<vscode.WebviewPanel>>();
+    // Open documents by uri, so the extension's preview and export commands can reach a
+    // compiled worksheet's source: it is held here and nowhere else.
+    private readonly _docs = new Map<string, CompiledWorksheetDocument>();
+    private readonly _reports = new Map<string, vscode.WebviewPanel>();
+    private _registration: vscode.Disposable | undefined;
 
     constructor(
         private readonly _apiClient: CalcpadApiClient,
         private readonly _uiOverrides: UiOverrideStore,
-        private readonly _renderForm: RenderForm,
+        private readonly _renderPanel: RenderPanel,
         private readonly _log: vscode.OutputChannel,
     ) {}
 
     public static register(
         apiClient: CalcpadApiClient,
         uiOverrides: UiOverrideStore,
-        renderForm: RenderForm,
+        renderPanel: RenderPanel,
         log: vscode.OutputChannel,
-    ): vscode.Disposable {
-        return vscode.window.registerCustomEditorProvider(
+    ): CalcpadCompiledEditorProvider {
+        const provider = new CalcpadCompiledEditorProvider(apiClient, uiOverrides, renderPanel, log);
+        provider._registration = vscode.window.registerCustomEditorProvider(
             CalcpadCompiledEditorProvider.viewType,
-            new CalcpadCompiledEditorProvider(apiClient, uiOverrides, renderForm, log),
+            provider,
             { supportsMultipleEditorsPerDocument: true, webviewOptions: { retainContextWhenHidden: true } },
         );
+        return provider;
+    }
+
+    dispose(): void {
+        this._registration?.dispose();
+        for (const report of this._reports.values()) report.dispose();
+    }
+
+    /**
+     * The decoded source of an open compiled worksheet, or undefined when that file has
+     * no editor open on it. Entered values are not applied here — they live in the shared
+     * override store under the same uri, which the render and export paths pass along.
+     */
+    public sourceFor(uri: vscode.Uri): string | undefined {
+        return this._docs.get(uri.toString())?.text;
+    }
+
+    /**
+     * Opens the report for a compiled worksheet beside its form, or closes it if it is
+     * already open. Together with the form it is the whole of what a `.cpdz` shows — the
+     * source stays hidden — and it re-renders as values are entered.
+     */
+    public async toggleReport(uri: vscode.Uri): Promise<void> {
+        const key = uri.toString();
+        const open = this._reports.get(key);
+        if (open) {
+            open.dispose();
+            return;
+        }
+        const document = this._docs.get(key);
+        if (!document) return;
+
+        const forms = [...(this._panels.get(key) ?? [])];
+        const form = forms.find(p => p.active) ?? forms[0];
+        const panel = vscode.window.createWebviewPanel(
+            CalcpadCompiledEditorProvider.reportViewType,
+            `CalcpadCE Report - ${path.basename(uri.fsPath)}`,
+            vscode.ViewColumn.Beside,
+            { enableScripts: true, enableFindWidget: true, retainContextWhenHidden: true },
+        );
+        this._reports.set(key, panel);
+        panel.onDidDispose(() => {
+            if (this._reports.get(key) === panel) this._reports.delete(key);
+        });
+        this._log.appendLine(`[cpdz] report opened for ${uri.fsPath}`);
+        await this._renderPanel(panel, document.text, document.uri, 'report');
+        // The report is there to be watched while the form is filled in, so the form
+        // takes the focus back off it.
+        form?.reveal(form.viewColumn, false);
     }
 
     async openCustomDocument(uri: vscode.Uri): Promise<CompiledWorksheetDocument> {
@@ -89,7 +155,7 @@ export class CalcpadCompiledEditorProvider
             void this._refresh(document);
         });
 
-        await this._renderForm(panel, document.text, document.uri);
+        await this._renderPanel(panel, document.text, document.uri, 'form');
     }
 
     async saveCustomDocument(document: CompiledWorksheetDocument): Promise<void> {
@@ -155,10 +221,15 @@ export class CalcpadCompiledEditorProvider
         const panels = this._panels.get(key) ?? new Set<vscode.WebviewPanel>();
         panels.add(panel);
         this._panels.set(key, panels);
+        this._docs.set(key, document);
         panel.onDidDispose(() => {
             panels.delete(panel);
             if (panels.size > 0) return;
             this._panels.delete(key);
+            this._docs.delete(key);
+            // The report is a view of the form's values; with the form gone it has
+            // nothing left to show.
+            this._reports.get(key)?.dispose();
             // Entered values only live in memory; with no view left on the document
             // there is nothing to keep them for.
             this._uiOverrides.clear(key);
@@ -166,9 +237,10 @@ export class CalcpadCompiledEditorProvider
     }
 
     private async _refresh(document: CompiledWorksheetDocument): Promise<void> {
-        const panels = this._panels.get(document.uri.toString());
-        if (!panels) return;
-        for (const panel of panels)
-            await this._renderForm(panel, document.text, document.uri);
+        const key = document.uri.toString();
+        for (const panel of this._panels.get(key) ?? [])
+            await this._renderPanel(panel, document.text, document.uri, 'form');
+        const report = this._reports.get(key);
+        if (report) await this._renderPanel(report, document.text, document.uri, 'report');
     }
 }
