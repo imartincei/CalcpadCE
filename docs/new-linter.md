@@ -95,6 +95,7 @@ The tables below group them by the kind of problem.
 | CPD-3410 | Error | Outer-scope assignment (`←`) to an undefined variable |
 | CPD-3411 | Warning | Invalid `paramType` value in a metadata comment |
 | CPD-3412 | Warning | Invalid metadata-comment JSON |
+| CPD-3413 | Error| Invalid #settings JSON |
 
 ### Formatting
 
@@ -114,7 +115,7 @@ prototype_var = 5
 
 Leave the list empty (`"LintIgnore": []`) to suppress *all* diagnostics inside the region.
 
-These markers are one kind of [metadata comment](new-metadata-comments.md); the **Metadata** panel tab can write them for you with a code picker.
+These markers are one kind of [metadata comment](new-metadata-comments.md); the **Properties** panel tab can write them for you with a code picker.
 
 ## Choosing how much to show (VS Code)
 

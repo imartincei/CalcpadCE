@@ -709,6 +709,15 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
+        // /   Looks up a localized string similar to Invalid settings JSON: {0}..
+        // / </summary>
+        public static string Invalid_settings_0 {
+            get {
+                return ResourceManager.GetString("Invalid_settings_0", resourceCulture);
+            }
+        }
+
+        // / <summary>
         // /   Looks up a localized string similar to Invalid macro identifier: &quot;{0}$&quot;..
         // / </summary>
         public static string Invalid_macro_identifier_0 {

@@ -21,6 +21,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Calcpad.Core\Calcpad.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Exclude sample files that have external dependencies -->
     <Compile Remove="Samples\**" />
     <!-- Exclude test files from compilation -->

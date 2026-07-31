@@ -55,7 +55,7 @@ Good to know:
 - A `NoPrintStart` without a matching `NoPrintEnd` strips everything through the end of the file.
 - Property names are matched case-insensitively, and the marker's value doesn't matter — only that the property is present.
 - These sections stay visible in the live preview; they're only removed from PDF (and other print) output.
-- These markers are one kind of [metadata comment](new-metadata-comments.md); the **Metadata** panel tab can insert them for you.
+- These markers are one kind of [metadata comment](new-metadata-comments.md); the **Properties** panel tab can insert them for you.
 
 This uses the same comment-marker syntax as [`LintIgnore`](new-linter.md#suppressing-diagnostics-lint-ignore) and per-file settings.
 

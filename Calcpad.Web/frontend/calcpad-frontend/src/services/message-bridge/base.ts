@@ -2,8 +2,8 @@ import { CalcpadApiClient } from '../../api/client';
 import { CalcpadSnippetService } from '../snippets';
 import { CalcpadDefinitionsService } from '../definitions';
 import { parseHeadings } from '../headings';
-import { findMetadataCommentBlock, analyzeMetadataLine, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver } from '../../text/metadata-comment';
-import type { MetadataCommentData, MetadataCommentBlock, DefinitionResolver } from '../../text/metadata-comment';
+import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from '../../text/metadata-comment';
+import type { MetadataCommentData, MetadataCommentBlock, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
 import type { DefinitionsResponse } from '../../types/api';
 import { getDefaultSettings, buildApiSettings } from '../../types/settings';
 import type { CalcpadSettings } from '../../types/settings';
@@ -639,30 +639,79 @@ export abstract class BaseMessageBridge {
         trailingQuote?: string;
         data: MetadataCommentData;
         isNew?: boolean;
+        settings?: SettingsValues;
+        settingsLine?: number | null;
     }): void {
         const editor = this.getActiveMonacoEditor();
         const model = editor?.getModel();
         if (!editor || !model || typeof msg.line !== 'number') return;
-        const lineNumber = msg.line + 1;
-        if (lineNumber < 1 || lineNumber > model.getLineCount()) return;
-        const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '');
-        const range = msg.isNew
-            ? { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }
-            : {
-                startLineNumber: lineNumber, startColumn: 1,
-                endLineNumber: lineNumber, endColumn: model.getLineMaxColumn(lineNumber),
-            };
-        editor.executeEdits('calcpad-metadata', [{
-            range,
-            text: msg.isNew ? newText + '\n' : newText,
-        }]);
 
-        // Re-emit context for the persisted comment so a repeated Apply edits it
-        // in place instead of inserting a duplicate.
+        const edits: { range: MonacoRangeLike; text: string }[] = [];
+
+        // Metadata comment (desc/params/lint/no-print) — only when it has content.
+        const lineNumber = msg.line + 1;
+        if (Object.keys(msg.data).length > 0 && lineNumber >= 1 && lineNumber <= model.getLineCount()) {
+            const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '');
+            edits.push(msg.isNew
+                ? { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }, text: newText + '\n' }
+                : { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: model.getLineMaxColumn(lineNumber) }, text: newText });
+        }
+
+        // #settings directive under the cursor. `settingsLine` (0-based) points at
+        // the existing directive to rewrite, or null to create a new one at the
+        // cursor — so multiple directives can coexist, each edited where it lives.
+        const settingsText = msg.settings ? serializeSettingsDirective(msg.settings) : '';
+        let insertedSettings = false;
+        if (msg.settings) {
+            const dirLine = msg.settingsLine ?? null;
+            const hasExisting = dirLine !== null && dirLine >= 0 && dirLine < model.getLineCount();
+            const hasSettings = Object.keys(msg.settings).length > 0;
+            if (hasSettings) {
+                edits.push(hasExisting
+                    ? { range: { startLineNumber: dirLine! + 1, startColumn: 1, endLineNumber: dirLine! + 1, endColumn: model.getLineMaxColumn(dirLine! + 1) }, text: settingsText }
+                    : { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }, text: settingsText + '\n' });
+                insertedSettings = !hasExisting;
+            } else if (hasExisting) {
+                edits.push(this.deleteLineEdit(model, dirLine! + 1));
+            }
+        }
+
+        if (edits.length === 0) return;
+        editor.executeEdits('calcpad-metadata', edits);
+
+        // A freshly created directive: park the cursor on it so the re-emitted
+        // context binds to it and a repeated Apply edits in place, not duplicates.
+        if (insertedSettings) {
+            const target = this.nearestLineMatching(model.getValue().split(/\r?\n/), settingsText, msg.line);
+            if (target !== null)
+                editor.setPosition({ lineNumber: target + 1, column: model.getLineMaxColumn(target + 1) });
+        }
+
+        // Re-emit context (comment + refreshed settings) at the current cursor so a
+        // repeated Apply edits in place instead of inserting a duplicate.
+        const pos = editor.getPosition();
         const lines = model.getValue().split(/\r?\n/);
-        const block = findMetadataCommentBlock(lines, msg.line);
-        if (block) block.context = analyzeMetadataLine(lines, msg.line, this.definitionResolver());
+        const block = pos ? computeMetadataBlock(lines, pos.lineNumber - 1, this.definitionResolver()) : null;
         this.postToVue({ type: 'metadataContext', block });
+    }
+
+    /** 0-based index of the line equal to `text`, closest to `near`; null if none. */
+    private nearestLineMatching(lines: string[], text: string, near: number): number | null {
+        let best: number | null = null;
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i] !== text) continue;
+            if (best === null || Math.abs(i - near) < Math.abs(best - near)) best = i;
+        }
+        return best;
+    }
+
+    /** Range edit that removes a whole 1-based line, handling the last-line case. */
+    private deleteLineEdit(model: MonacoModelLike, ln: number): { range: MonacoRangeLike; text: string } {
+        if (ln < model.getLineCount())
+            return { range: { startLineNumber: ln, startColumn: 1, endLineNumber: ln + 1, endColumn: 1 }, text: '' };
+        if (ln > 1)
+            return { range: { startLineNumber: ln - 1, startColumn: model.getLineMaxColumn(ln - 1), endLineNumber: ln, endColumn: model.getLineMaxColumn(ln) }, text: '' };
+        return { range: { startLineNumber: 1, startColumn: 1, endLineNumber: 1, endColumn: model.getLineMaxColumn(1) }, text: '' };
     }
 }
 

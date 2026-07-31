@@ -1,7 +1,7 @@
 <template>
   <div class="metadata-tab">
     <div class="metadata-container p-3">
-      <h3 class="section-title">Metadata Comment</h3>
+      <h3 class="section-title">Properties</h3>
 
       <template v-if="block">
         <p v-if="!block.valid" class="warning">
@@ -53,25 +53,33 @@
         </div>
 
         <div v-if="showSettings" class="field">
-          <label>Settings overrides</label>
-          <div v-for="(row, i) in model.settings" :key="'s' + i" class="list-row">
-            <select v-model="row.key" @change="onSettingKeyChange(row)">
-              <option value="">(select)</option>
-              <option v-for="s in settingKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.key }}</option>
-            </select>
-            <select v-if="settingType(row.key) === 'boolean'" v-model="row.value">
-              <option value="true">true</option>
-              <option value="false">false</option>
-            </select>
-            <select v-else-if="settingType(row.key) === 'enum'" v-model="row.value">
-              <option v-for="opt in settingOptions(row.key)" :key="opt" :value="opt">{{ opt }}</option>
-            </select>
-            <input
-              v-else
-              :type="settingType(row.key) === 'number' ? 'number' : 'text'"
-              v-model="row.value"
-            />
-            <button class="icon-button" title="Remove" @click="model.settings.splice(i, 1)">✕</button>
+          <label>Settings (#settings directive)</label>
+          <div v-for="(row, i) in model.settings" :key="'s' + i" class="setting-row">
+            <div class="list-row">
+              <select v-model="row.key" @change="onSettingKeyChange(row)">
+                <option value="">(select)</option>
+                <option v-for="s in settingKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.label }}</option>
+              </select>
+              <select v-if="settingType(row.key) === 'boolean'" v-model="row.value">
+                <option value="true">true</option>
+                <option value="false">false</option>
+              </select>
+              <select v-else-if="settingType(row.key) === 'enum'" v-model="row.value">
+                <option v-for="opt in settingOptions(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              </select>
+              <input
+                v-else
+                :type="settingType(row.key) === 'number' ? 'number' : 'text'"
+                :class="{ 'input-invalid': !!settingError(row) }"
+                :min="settingMin(row.key)"
+                :max="settingMax(row.key)"
+                :step="settingStep(row.key)"
+                v-model="row.value"
+              />
+              <span v-if="row.key" class="setting-info" :title="settingDetail(row.key)">ⓘ</span>
+              <button class="icon-button" title="Remove" @click="model.settings.splice(i, 1)">✕</button>
+            </div>
+            <div v-if="settingError(row)" class="setting-error">{{ settingError(row) }}</div>
           </div>
           <button class="add-button" @click="model.settings.push({ key: '', value: '' })">+ Add setting</button>
         </div>
@@ -148,7 +156,7 @@
         </div>
 
         <div class="actions">
-          <button class="primary-button" @click="onApply">Apply</button>
+          <button class="primary-button" :disabled="hasSettingErrors" :title="hasSettingErrors ? 'Fix the highlighted settings before applying' : undefined" @click="onApply">Apply</button>
           <button class="secondary-button" @click="populate">Reset</button>
         </div>
       </template>
@@ -162,9 +170,11 @@ import {
   FUNCTION_PARAM_TYPES,
   MACRO_PARAM_TYPES,
   METADATA_SETTINGS_KEYS,
+  settingSpec,
+  validateSettingValue,
   LINT_CODES,
 } from '../../text/metadata-comment'
-import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind } from '../../text/metadata-comment'
+import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind, SettingsValues, SettingOption } from '../../text/metadata-comment'
 
 interface Props {
   block?: MetadataCommentBlock | null
@@ -172,7 +182,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), { block: null })
 
 const emit = defineEmits<{
-  'apply': [data: MetadataCommentData]
+  'apply': [payload: { data: MetadataCommentData; settings: SettingsValues }]
 }>()
 
 const functionTypes = FUNCTION_PARAM_TYPES
@@ -182,7 +192,7 @@ const lintCodes = LINT_CODES
 
 type LintMode = 'off' | 'all' | 'specific'
 
-const KNOWN_KEYS = new Set(['desc', 'paramTypes', 'paramDesc', 'returnType', 'settings', 'LintIgnore', 'EndLintIgnore', 'NoPrintStart', 'NoPrintEnd'])
+const KNOWN_KEYS = new Set(['desc', 'paramTypes', 'paramDesc', 'returnType', 'LintIgnore', 'EndLintIgnore', 'NoPrintStart', 'NoPrintEnd'])
 
 interface SettingRow { key: string; value: string }
 
@@ -249,11 +259,9 @@ const showEndLint = computed(() =>
 // only offered on generic lines — or explicitly, via "Add field".
 const isDefinition = computed(() => defKind.value !== null)
 
-const showSettings = computed(() =>
-  noContext.value
-  || !isDefinition.value
-  || model.settings.length > 0
-  || added.has('settings'))
+// Settings drive the document-level #settings directive, not the cursor's
+// metadata comment, so the section is always available regardless of context.
+const showSettings = computed(() => true)
 
 const showLint = computed(() =>
   noContext.value
@@ -287,7 +295,6 @@ const addableFields = computed(() => {
   if (!showDesc.value) out.push({ id: 'desc', label: 'Description' })
   if (!showParams.value) out.push({ id: 'params', label: 'Parameter types & descriptions' })
   if (!showReturnType.value) out.push({ id: 'returnType', label: 'Return type' })
-  if (!showSettings.value) out.push({ id: 'settings', label: 'Settings overrides' })
   if (!showLint.value) out.push({ id: 'lint', label: 'Lint ignore' })
   if (!showNoPrint.value) out.push({ id: 'noprint', label: 'No-print region' })
   return out
@@ -299,9 +306,6 @@ function addField(id: string) {
     if (model.paramTypes.length === 0) model.paramTypes.push('')
     if (model.paramDesc.length === 0) model.paramDesc.push('')
   }
-  if (id === 'settings' && model.settings.length === 0) {
-    model.settings.push({ key: '', value: '' })
-  }
 }
 
 function settingType(key: string): MetadataSettingKind {
@@ -309,9 +313,32 @@ function settingType(key: string): MetadataSettingKind {
 }
 type MetadataSettingKind = 'number' | 'boolean' | 'string' | 'enum'
 
-function settingOptions(key: string): string[] {
+function settingOptions(key: string): SettingOption[] {
   return METADATA_SETTINGS_KEYS.find(s => s.key === key)?.options ?? []
 }
+
+function settingDetail(key: string): string {
+  return settingSpec(key)?.detail ?? ''
+}
+
+function settingMin(key: string): number | undefined {
+  return settingSpec(key)?.min
+}
+
+function settingMax(key: string): number | undefined {
+  return settingSpec(key)?.max
+}
+
+function settingStep(key: string): string | undefined {
+  if (settingType(key) !== 'number') return undefined
+  return key === 'precision' || key === 'tol' ? 'any' : '1'
+}
+
+function settingError(row: SettingRow): string | null {
+  return row.key ? validateSettingValue(row.key, row.value) : null
+}
+
+const hasSettingErrors = computed(() => model.settings.some(r => !!settingError(r)))
 
 function onSettingKeyChange(row: SettingRow) {
   const def = METADATA_SETTINGS_KEYS.find(s => s.key === row.key)?.def
@@ -325,8 +352,9 @@ function populate() {
   model.paramTypes = Array.isArray(data.paramTypes) ? data.paramTypes.map(String) : []
   model.paramDesc = Array.isArray(data.paramDesc) ? data.paramDesc.map(String) : []
   model.returnType = typeof data.returnType === 'string' ? data.returnType : ''
-  model.settings = data.settings && typeof data.settings === 'object'
-    ? Object.entries(data.settings).map(([key, value]) => ({ key, value: String(value) }))
+  const settings = props.block?.settings
+  model.settings = settings && typeof settings === 'object'
+    ? Object.entries(settings).map(([key, value]) => ({ key, value: String(value) }))
     : []
   ;[model.startLintMode, model.startLintCodes] = readLintField(data.LintIgnore)
   ;[model.endLintMode, model.endLintCodes] = readLintField(data.EndLintIgnore)
@@ -359,17 +387,21 @@ function lintFieldValue(mode: LintMode, codes: string[]): string[] | undefined {
   return codes.slice()
 }
 
-function coerceSetting(key: string, value: string): string | number | boolean {
+// Vue casts `<input type="number">` v-model to a number, so `value` may arrive
+// as a number (or boolean) rather than the string the row nominally holds.
+function coerceSetting(key: string, value: string | number | boolean): string | number | boolean {
   const type = settingType(key)
-  if (type === 'boolean') return value === 'true'
+  const str = String(value)
+  if (type === 'boolean') return str === 'true'
   if (type === 'number' || type === 'enum') {
-    const n = Number(value)
-    return Number.isFinite(n) && value.trim() !== '' ? n : value
+    const n = Number(str)
+    return Number.isFinite(n) && str.trim() !== '' ? n : str
   }
-  return value
+  return str
 }
 
 function onApply() {
+  if (hasSettingErrors.value) return
   const data: MetadataCommentData = { ...model.extra }
 
   if (model.desc.trim()) data.desc = model.desc.trim()
@@ -382,11 +414,10 @@ function onApply() {
 
   if (model.returnType) data.returnType = model.returnType
 
-  const settings: Record<string, string | number | boolean> = {}
+  const settings: SettingsValues = {}
   for (const row of model.settings) {
     if (row.key) settings[row.key] = coerceSetting(row.key, row.value)
   }
-  if (Object.keys(settings).length) data.settings = settings
 
   const lintIgnore = lintFieldValue(model.startLintMode, model.startLintCodes)
   if (lintIgnore !== undefined) data.LintIgnore = lintIgnore
@@ -399,7 +430,7 @@ function onApply() {
   if (model.noPrintStart) data.NoPrintStart = true
   if (model.noPrintEnd) data.NoPrintEnd = true
 
-  emit('apply', data)
+  emit('apply', { data, settings })
 }
 
 // Identity of the target the form is bound to. Cursor jitter within the same
@@ -407,7 +438,7 @@ function onApply() {
 // user's unsaved edits, so only repopulate when the target actually changes.
 function blockSignature(b: MetadataCommentBlock | null | undefined): string {
   if (!b) return ''
-  return [b.line, b.isNew ? 1 : 0, b.rawJson, b.context?.defKind ?? '', b.context?.paramCount ?? ''].join('|')
+  return [b.line, b.isNew ? 1 : 0, b.rawJson, JSON.stringify(b.settings ?? {}), b.context?.defKind ?? '', b.context?.paramCount ?? ''].join('|')
 }
 
 let lastSignature = ''
@@ -481,6 +512,32 @@ watch(
   align-items: center;
   gap: 6px;
   margin-bottom: 6px;
+}
+
+.setting-row {
+  margin-bottom: 6px;
+}
+
+.setting-row .list-row {
+  margin-bottom: 0;
+}
+
+.setting-info {
+  cursor: help;
+  color: var(--vscode-descriptionForeground);
+  font-size: 11px;
+}
+
+.setting-error {
+  color: var(--vscode-errorForeground, #f14c4c);
+  font-size: 11px;
+  margin-top: 2px;
+  margin-left: 2px;
+}
+
+.input-invalid {
+  border-color: var(--vscode-inputValidation-errorBorder, #f14c4c) !important;
+  outline: 1px solid var(--vscode-inputValidation-errorBorder, #f14c4c);
 }
 
 .sub-row {
@@ -607,8 +664,13 @@ watch(
   border-radius: 2px;
 }
 
-.primary-button:hover {
+.primary-button:hover:not(:disabled) {
   background: var(--vscode-button-hoverBackground);
+}
+
+.primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .secondary-button {

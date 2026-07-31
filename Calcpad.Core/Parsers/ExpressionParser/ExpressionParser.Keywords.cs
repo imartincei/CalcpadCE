@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.Json;
 
 namespace Calcpad.Core
 {
@@ -49,6 +50,7 @@ namespace Calcpad.Core
             Append,
             Phasor,
             Complex,
+            Settings,
             SkipLine
         }
         private enum KeywordResult
@@ -212,6 +214,9 @@ namespace Calcpad.Core
                     break;
                 case Keyword.Complex:
                     _parser.Phasor = false;
+                    break;
+                case Keyword.Settings:
+                    ParseKeywordSettings(s);
                     break;
                 default:
                     if (keyword != Keyword.Global && keyword != Keyword.Local)
@@ -610,6 +615,161 @@ namespace Calcpad.Core
             }
             else
                 Settings.Math.FormatString = null;
+        }
+        private const string SettingsKeyword = "#settings";
+
+        private void ParseKeywordSettings(ReadOnlySpan<char> s)
+        {
+            var json = s[SettingsKeyword.Length..].Trim();
+            if (json.IsEmpty)
+            {
+                AppendError(s.ToString(), string.Format(Messages.Invalid_settings_0, json.ToString()), _currentLine);
+                return;
+            }
+            try
+            {
+                var dto = SettingsDto.Parse(json.ToString());
+                if (dto is null)
+                    return;
+
+                HashSet<SettingKey> invalid = null;
+                foreach (var error in dto.Validate())
+                {
+                    (invalid ??= []).Add(error.Key);
+                    AppendError(s.ToString(), error.Message, _currentLine);
+                }
+
+                foreach (SettingKey key in Enum.GetValues<SettingKey>())
+                    if (invalid is null || !invalid.Contains(key))
+                        ApplySetting(key, dto);
+            }
+            catch (JsonException)
+            {
+                AppendError(s.ToString(), string.Format(Messages.Invalid_settings_0, json.ToString()), _currentLine);
+            }
+        }
+
+        private void ApplySetting(SettingKey key, SettingsDto dto)
+        {
+            switch (key)
+            {
+                case SettingKey.Decimals:
+                    if (dto.Decimals.HasValue)
+                        Settings.Math.Decimals = dto.Decimals.Value;
+                    break;
+                case SettingKey.Degrees:
+                    if (dto.Degrees.HasValue)
+                    {
+                        Settings.Math.Degrees = dto.Degrees.Value;
+                        _parser.Degrees = dto.Degrees.Value;
+                    }
+                    break;
+                case SettingKey.Complex:
+                    if (dto.Complex.HasValue)
+                        _parser.SetComplex(dto.Complex.Value);
+                    break;
+                case SettingKey.Substitute:
+                    if (dto.Substitute.HasValue)
+                        Settings.Math.Substitute = dto.Substitute.Value;
+                    break;
+                case SettingKey.FormatEquations:
+                    if (dto.FormatEquations.HasValue)
+                        Settings.Math.FormatEquations = dto.FormatEquations.Value;
+                    break;
+                case SettingKey.ZeroSmallMatrixElements:
+                    if (dto.ZeroSmallMatrixElements.HasValue)
+                        Settings.Math.ZeroSmallMatrixElements = dto.ZeroSmallMatrixElements.Value;
+                    break;
+                case SettingKey.MaxOutputCount:
+                    if (dto.MaxOutputCount.HasValue)
+                        Settings.Math.MaxOutputCount = dto.MaxOutputCount.Value;
+                    break;
+                case SettingKey.Units:
+                    if (dto.Units is not null)
+                    {
+                        Settings.Units = dto.Units;
+                        _parser.SetVariable("Units", new RealValue(UnitsFactor()));
+                    }
+                    break;
+                case SettingKey.IsUs:
+                    if (dto.IsUs.HasValue)
+                    {
+                        Settings.IsUs = dto.IsUs.Value;
+                        Unit.IsUs = dto.IsUs.Value;
+                    }
+                    break;
+                case SettingKey.VectorGraphics:
+                    if (dto.VectorGraphics.HasValue)
+                    {
+                        Settings.Plot.VectorGraphics = dto.VectorGraphics.Value;
+                        _parser.SetVariable("PlotSVG", dto.VectorGraphics.Value ? 1d : 0d);
+                    }
+                    break;
+                case SettingKey.ColorScale:
+                    if (dto.ColorScale is not null &&
+                        Enum.TryParse<PlotSettings.ColorScales>(dto.ColorScale, true, out var cs))
+                    {
+                        Settings.Plot.ColorScale = cs;
+                        _parser.SetVariable("PlotPalette", (int)cs);
+                    }
+                    break;
+                case SettingKey.SmoothScale:
+                    if (dto.SmoothScale.HasValue)
+                    {
+                        Settings.Plot.SmoothScale = dto.SmoothScale.Value;
+                        _parser.SetVariable("PlotSmooth", dto.SmoothScale.Value ? 1d : 0d);
+                    }
+                    break;
+                case SettingKey.Shadows:
+                    if (dto.Shadows.HasValue)
+                    {
+                        Settings.Plot.Shadows = dto.Shadows.Value;
+                        _parser.SetVariable("PlotShadows", dto.Shadows.Value ? 1d : 0d);
+                    }
+                    break;
+                case SettingKey.AdaptivePlot:
+                    if (dto.AdaptivePlot.HasValue)
+                    {
+                        Settings.Plot.IsAdaptive = dto.AdaptivePlot.Value;
+                        _parser.SetVariable("PlotAdaptive", dto.AdaptivePlot.Value ? 1d : 0d);
+                    }
+                    break;
+                case SettingKey.PlotWidth:
+                    if (dto.PlotWidth.HasValue)
+                    {
+                        Settings.Plot.Width = dto.PlotWidth.Value;
+                        _parser.SetVariable("PlotWidth", dto.PlotWidth.Value);
+                    }
+                    break;
+                case SettingKey.PlotHeight:
+                    if (dto.PlotHeight.HasValue)
+                    {
+                        Settings.Plot.Height = dto.PlotHeight.Value;
+                        _parser.SetVariable("PlotHeight", dto.PlotHeight.Value);
+                    }
+                    break;
+                case SettingKey.PlotStep:
+                    if (dto.PlotStep.HasValue)
+                    {
+                        Settings.Plot.Step = dto.PlotStep.Value;
+                        _parser.SetVariable("PlotStep", dto.PlotStep.Value);
+                    }
+                    break;
+                case SettingKey.Precision:
+                    if (dto.Precision.HasValue)
+                    {
+                        Settings.Math.Precision = dto.Precision.Value;
+                        _parser.SetVariable("Precision", dto.Precision.Value);
+                    }
+                    break;
+                case SettingKey.Tol:
+                    if (dto.Tol.HasValue)
+                    {
+                        Settings.Math.Tol = dto.Tol.Value;
+                        _parser.SetVariable("Tol", dto.Tol.Value);
+                    }
+                    break;
+            }
         }
 
         private void ParseKeywordMd(ReadOnlySpan<char> s)

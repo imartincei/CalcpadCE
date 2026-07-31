@@ -10,12 +10,23 @@ export interface MetadataCommentData {
     paramTypes?: string[];
     paramDesc?: string[];
     returnType?: string;
-    settings?: Record<string, string | number | boolean>;
     LintIgnore?: string[];
     EndLintIgnore?: string[];
     NoPrintStart?: boolean;
     NoPrintEnd?: boolean;
     [key: string]: unknown;
+}
+
+/** Recognized value shape of the `#settings` directive JSON payload. */
+export type SettingsValues = Record<string, string | number | boolean>;
+
+/**
+ * Location and parsed values of a `#settings` directive. `line` is its 0-based
+ * line, or null when the queried position holds no directive.
+ */
+export interface SettingsDirective {
+    line: number | null;
+    settings: SettingsValues;
 }
 
 /** A metadata comment located on a single document line. */
@@ -33,6 +44,14 @@ export interface MetadataCommentBlock {
     valid: boolean;
     /** Which properties actually apply to this line; set by the host. */
     context?: MetadataLineContext;
+    /**
+     * Parsed values of the `#settings` directive under the cursor, and its
+     * 0-based line (null when the cursor isn't on a directive). Empty off a
+     * directive line, so Apply creates a new one at the cursor instead of
+     * editing a distant directive.
+     */
+    settings?: SettingsValues;
+    settingsLine?: number | null;
     /**
      * True when no comment exists yet and this block is a synthetic template for
      * the definition under the cursor. Applying it inserts a new line rather than
@@ -84,33 +103,102 @@ export const MACRO_PARAM_TYPES = [
     'Input', 'Format',
 ] as const;
 
-export interface MetadataSettingKey {
-    key: string;
-    detail: string;
-    type: 'number' | 'boolean' | 'string' | 'enum';
-    options?: string[];
-    def: string | number | boolean;
+/**
+ * A selectable value for an `enum` setting: `value` is written verbatim into the
+ * `#settings` JSON (must match what Calcpad.Core parses), `label` is the friendly
+ * text shown in the dropdown.
+ */
+export interface SettingOption {
+    value: string;
+    label: string;
 }
 
-/** Recognized keys for the `settings` overrides object. */
-export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
-    { key: 'decimals', detail: 'Decimal places in output (0-15)', type: 'number', def: 4 },
-    { key: 'degrees', detail: 'Angle unit: 0=radians, 1=degrees, 2=gradians', type: 'enum', options: ['0', '1', '2'], def: 0 },
-    { key: 'complex', detail: 'Enable complex number mode', type: 'boolean', def: false },
-    { key: 'substitute', detail: 'Substitute variable values into expressions', type: 'boolean', def: true },
-    { key: 'formatEquations', detail: 'Format equations in output', type: 'boolean', def: true },
-    { key: 'zeroSmallMatrixElements', detail: 'Zero out near-zero matrix elements', type: 'boolean', def: true },
-    { key: 'maxOutputCount', detail: 'Maximum output rows (5-100)', type: 'number', def: 20 },
-    { key: 'units', detail: 'Unit system string', type: 'string', def: 'm' },
-    { key: 'vectorGraphics', detail: 'Render plots as SVG', type: 'boolean', def: false },
-    {
-        key: 'colorScale', detail: 'Plot color scale', type: 'enum', def: 'Rainbow',
-        options: ['None', 'Gray', 'Rainbow', 'Terrain', 'VioletToYellow', 'GreenToYellow', 'Blues', 'BlueToYellow', 'BlueToRed', 'PurpleToYellow'],
-    },
-    { key: 'smoothScale', detail: 'Smooth color scale transitions', type: 'boolean', def: false },
-    { key: 'shadows', detail: 'Enable 3-D plot shadows', type: 'boolean', def: true },
-    { key: 'adaptivePlot', detail: 'Use adaptive sampling for plots', type: 'boolean', def: true },
+export interface MetadataSettingKey {
+    key: string;
+    /** Friendly name shown in the key dropdown; `key` is what's written to JSON. */
+    label: string;
+    detail: string;
+    type: 'number' | 'boolean' | 'string' | 'enum';
+    options?: SettingOption[];
+    def: string | number | boolean;
+    /** Inclusive lower bound for `number` values. Mirrors Calcpad.Core's SettingsDto. */
+    min?: number;
+    /** Inclusive upper bound for `number` values; omit for open-ended. */
+    max?: number;
+}
+
+const COLOR_SCALE_OPTIONS: SettingOption[] = [
+    { value: 'None', label: 'None' },
+    { value: 'Gray', label: 'Grayscale' },
+    { value: 'Rainbow', label: 'Rainbow' },
+    { value: 'Terrain', label: 'Terrain' },
+    { value: 'VioletToYellow', label: 'Violet → Yellow' },
+    { value: 'GreenToYellow', label: 'Green → Yellow' },
+    { value: 'Blues', label: 'Blues' },
+    { value: 'BlueToYellow', label: 'Blue → Yellow' },
+    { value: 'BlueToRed', label: 'Blue → Red' },
+    { value: 'PurpleToYellow', label: 'Purple → Yellow' },
 ];
+
+/**
+ * Recognized keys for the `settings` overrides object (the `#settings` directive).
+ * Types and ranges mirror `Calcpad.Core`'s `SettingsDto` so the panel rejects the
+ * same values the engine would reject. Keep in sync with `Settings.cs`.
+ */
+export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
+    { key: 'decimals', label: 'Decimals', detail: 'Decimal places in output (0 to 15)', type: 'number', def: 4, min: 0, max: 15 },
+    {
+        key: 'degrees', label: 'Angle units', detail: 'Angle unit: 0=radians, 1=degrees, 2=gradians', type: 'enum', def: 0,
+        options: [{ value: '0', label: 'Radians' }, { value: '1', label: 'Degrees' }, { value: '2', label: 'Gradians' }],
+    },
+    { key: 'complex', label: 'Complex numbers', detail: 'Enable complex number mode', type: 'boolean', def: false },
+    { key: 'substitute', label: 'Substitute variables', detail: 'Substitute variable values into expressions', type: 'boolean', def: true },
+    { key: 'formatEquations', label: 'Format equations', detail: 'Format equations in output', type: 'boolean', def: true },
+    { key: 'zeroSmallMatrixElements', label: 'Zero small matrix elements', detail: 'Zero out near-zero matrix elements', type: 'boolean', def: true },
+    { key: 'maxOutputCount', label: 'Max output count', detail: 'Maximum output rows (5 to 100)', type: 'number', def: 20, min: 5, max: 100 },
+    { key: 'units', label: 'Default length unit', detail: 'Unit system string', type: 'string', def: 'm' },
+    { key: 'vectorGraphics', label: 'Vector graphics', detail: 'Render plots as SVG', type: 'boolean', def: false },
+    { key: 'colorScale', label: 'Plot color scale', detail: 'Plot color scale', type: 'enum', def: 'Rainbow', options: COLOR_SCALE_OPTIONS },
+    { key: 'smoothScale', label: 'Smooth color scale', detail: 'Smooth color scale transitions', type: 'boolean', def: false },
+    { key: 'shadows', label: 'Plot shadows', detail: 'Enable 3-D plot shadows', type: 'boolean', def: true },
+    { key: 'adaptivePlot', label: 'Adaptive plotting', detail: 'Use adaptive sampling for plots', type: 'boolean', def: true },
+    { key: 'plotWidth', label: 'Plot width', detail: 'Width of the plot area in pixels (at least 1)', type: 'number', def: 500, min: 1 },
+    { key: 'plotHeight', label: 'Plot height', detail: 'Height of the plot area in pixels (at least 1)', type: 'number', def: 300, min: 1 },
+    { key: 'plotStep', label: 'Plot mesh step', detail: 'Mesh size for map plotting in pixels (at least 0; 0 = auto)', type: 'number', def: 0, min: 0 },
+    { key: 'precision', label: 'Numerical precision', detail: 'Relative precision for numerical methods (1e-15 to 1e-2)', type: 'number', def: 1e-14, min: 1e-15, max: 1e-2 },
+    { key: 'tol', label: 'Solver tolerance', detail: 'Target tolerance for the iterative PCG/eigensolver (1e-15 to 1e-2)', type: 'number', def: 1e-6, min: 1e-15, max: 1e-2 },
+];
+
+/** Looks up the definition for a `#settings` key. */
+export function settingSpec(key: string): MetadataSettingKey | undefined {
+    return METADATA_SETTINGS_KEYS.find(s => s.key === key);
+}
+
+function rangeMessage(spec: MetadataSettingKey): string {
+    if (spec.min !== undefined && spec.max !== undefined) return `${spec.label} must be between ${spec.min} and ${spec.max}`;
+    if (spec.min !== undefined) return `${spec.label} must be at least ${spec.min}`;
+    if (spec.max !== undefined) return `${spec.label} must be at most ${spec.max}`;
+    return '';
+}
+
+/**
+ * Returns an error message when `value` is not valid for `key`, else `null`.
+ * Mirrors the type/range checks in `Calcpad.Core`'s `SettingsDto.Validate`.
+ */
+export function validateSettingValue(key: string, value: string | number | boolean): string | null {
+    const spec = settingSpec(key);
+    if (!spec) return null;
+    if (spec.type === 'enum')
+        return spec.options?.some(o => o.value === String(value))
+            ? null
+            : `${spec.label} must be one of: ${spec.options?.map(o => o.label).join(', ')}`;
+    if (spec.type === 'number') {
+        const n = Number(value);
+        if (String(value).trim() === '' || !Number.isFinite(n)) return `${spec.label} must be a number`;
+        if (spec.min !== undefined && n < spec.min || spec.max !== undefined && n > spec.max) return rangeMessage(spec);
+    }
+    return null;
+}
 
 export interface LintCode {
     code: string;
@@ -240,6 +328,35 @@ export function serializeMetadataComment(data: MetadataCommentData, indent = '',
     return `${indent}'<!--${JSON.stringify(clean)}-->${trailingQuote}`;
 }
 
+const SETTINGS_DIRECTIVE_RE = /^\s*#settings\b\s*(\{.*\})\s*$/i;
+
+/**
+ * Parse the `#settings` directive on a single 0-based line, or null when that
+ * line isn't a directive. `#settings` directives are cursor-local: the panel
+ * edits the one the cursor sits on and can create new ones elsewhere, so a
+ * document may hold several (each applies to the lines below it). A
+ * present-but-malformed directive returns its line with empty settings so Apply
+ * overwrites it in place.
+ */
+export function settingsDirectiveOnLine(lines: string[], line: number): SettingsDirective | null {
+    if (line < 0 || line >= lines.length) return null;
+    const match = SETTINGS_DIRECTIVE_RE.exec(lines[line]);
+    if (!match) return null;
+    try {
+        const parsed = JSON.parse(match[1]);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed))
+            return { line, settings: parsed as SettingsValues };
+    } catch {
+        // Malformed JSON — surface the line so Apply replaces it.
+    }
+    return { line, settings: {} };
+}
+
+/** Build a `#settings` directive line from a settings object. */
+export function serializeSettingsDirective(settings: SettingsValues): string {
+    return `#settings ${JSON.stringify(settings)}`;
+}
+
 /** A recognized definition line and how many parameters it declares. */
 export interface MetadataDefinition {
     kind: Exclude<MetadataDefKind, null>;
@@ -330,6 +447,23 @@ export function analyzeMetadataLine(
  * metadata comment nor a definition.
  */
 export function computeMetadataBlock(
+    lines: string[],
+    cursorLine: number,
+    resolveDefinition: DefinitionResolver,
+): MetadataCommentBlock | null {
+    const block = computeCommentBlock(lines, cursorLine, resolveDefinition);
+    if (block) {
+        // Bind the settings section to the directive under the cursor (if any).
+        // Off a `#settings` line it's empty, so the panel returns to its basic
+        // state and Apply creates a new directive rather than editing a distant one.
+        const directive = settingsDirectiveOnLine(lines, cursorLine);
+        block.settings = directive?.settings ?? {};
+        block.settingsLine = directive?.line ?? null;
+    }
+    return block;
+}
+
+function computeCommentBlock(
     lines: string[],
     cursorLine: number,
     resolveDefinition: DefinitionResolver,

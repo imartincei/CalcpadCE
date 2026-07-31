@@ -1,4 +1,4 @@
-'<!--{"settings": {"complex": true}}-->'
+#settings {"complex": true}
 ' Complex numbers: literals, arithmetic, functions, phasor
 z1 = 3 + 2i
 z2 = 5 - 4i

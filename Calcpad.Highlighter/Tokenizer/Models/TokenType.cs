@@ -128,9 +128,11 @@ namespace Calcpad.Highlighter.Tokenizer.Models
         /// <summary>Format specifiers (e.g., :f2, :e3)</summary>
         Format = 27,
 
-        // [Future Reserved] 28-30 previously held StringVariable, StringFunction, StringTable.
+        /// <summary>JSON payload following the #settings directive (`#settings {...}`).</summary>
+        SettingsJson = 28,
+
+        // [Future Reserved] 29-30 previously held StringFunction, StringTable.
         // Kept as reserved ordinals to avoid renumbering serialized values.
-        FutureReserved28 = 28,
         FutureReserved29 = 29,
         FutureReserved30 = 30
     }

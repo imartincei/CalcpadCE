@@ -10,10 +10,13 @@ export interface CalcpadSettings {
         zeroSmallMatrixElements: boolean;
         maxOutputCount: number;
         formatString: string;
+        precision: number;
+        tol: number;
     };
     plot: {
         isAdaptive: boolean;
         screenScaleFactor: number;
+        /** @deprecated WPF-only, to be removed later. */
         imagePath: string;
         imageUri: string;
         vectorGraphics: boolean;
@@ -21,6 +24,9 @@ export interface CalcpadSettings {
         smoothScale: boolean;
         shadows: boolean;
         lightDirection: string;
+        width: number;
+        height: number;
+        step: number;
     };
     server: {
         url: string;

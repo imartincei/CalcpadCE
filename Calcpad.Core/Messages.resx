@@ -526,6 +526,9 @@
   <data name="Invalid_keyword_0" xml:space="preserve">
     <value>Invalid keyword: {0}.</value>
   </data>
+  <data name="Invalid_settings_0" xml:space="preserve">
+    <value>Invalid settings JSON: {0}.</value>
+  </data>
   <data name="_must_be_matrix" xml:space="preserve">
     <value> must be matrix.</value>
   </data>

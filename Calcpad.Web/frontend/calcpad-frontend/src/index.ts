@@ -167,15 +167,21 @@ export type {
     DefinitionResolver,
     MetadataSettingKey,
     LintCode,
+    SettingsValues,
+    SettingsDirective,
 } from './text/metadata-comment';
 export {
     FUNCTION_PARAM_TYPES,
     MACRO_PARAM_TYPES,
     METADATA_SETTINGS_KEYS,
+    settingSpec,
+    validateSettingValue,
     LINT_CODES,
     findMetadataCommentBlock,
     computeMetadataBlock,
     serializeMetadataComment,
+    settingsDirectiveOnLine,
+    serializeSettingsDirective,
     buildDefinitionResolver,
     analyzeMetadataLine,
 } from './text/metadata-comment';

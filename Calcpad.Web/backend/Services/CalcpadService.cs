@@ -7,7 +7,6 @@ namespace Calcpad.Server.Services
     {
         private readonly string _tempDirectory;
         private readonly string _htmlTemplate;
-        private static readonly FileSettingsExtractor _fileSettingsExtractor = new();
         private static readonly NoPrintRegionStripper _noPrintRegionStripper = new();
 
         public CalcpadService()
@@ -64,11 +63,9 @@ namespace Calcpad.Server.Services
                 if (forPrint)
                     calcpadContent = _noPrintRegionStripper.Strip(calcpadContent);
 
-                // 1. Use Calcpad.Core settings directly (defaults are set in constructors)
+                // 1. Use Calcpad.Core settings directly (defaults are set in constructors).
+                //    Per-file overrides now come from the #settings directive, handled in Core.
                 Settings coreSettings = settings ?? new Settings();
-
-                // Apply any per-file settings overrides embedded in HTML comments
-                coreSettings = _fileSettingsExtractor.ApplyFileSettings(calcpadContent, coreSettings);
 
                 // 2. Parse macros and includes (server reads referenced files from disk).
                 var macroParser = new MacroParser

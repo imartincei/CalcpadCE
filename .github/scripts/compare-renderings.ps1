@@ -6,11 +6,13 @@ $ErrorActionPreference = 'Stop'
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $ScriptDir)
 $VenvDir = Join-Path $ScriptDir '.venv'
+$CliBuildDir = Join-Path $RepoRoot 'cli-build'
 
 $exitCode = 0
 try {
     Write-Host "Building Calcpad CLI..." -ForegroundColor Blue
-    dotnet build (Join-Path $RepoRoot 'Calcpad.Cli\Calcpad.Cli.csproj') -c Release
+    Remove-Item -Recurse -Force $CliBuildDir -ErrorAction SilentlyContinue
+    dotnet publish (Join-Path $RepoRoot 'Calcpad.Cli\Calcpad.Cli.csproj') -c Release -o $CliBuildDir
 
     Write-Host "Setting up Python venv..." -ForegroundColor Blue
     python -m venv $VenvDir
@@ -21,6 +23,7 @@ try {
     $exitCode = $LASTEXITCODE
 } finally {
     Remove-Item -Recurse -Force $VenvDir -ErrorAction SilentlyContinue
+    Remove-Item -Recurse -Force $CliBuildDir -ErrorAction SilentlyContinue
 }
 
 exit $exitCode
