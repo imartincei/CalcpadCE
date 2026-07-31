@@ -1442,10 +1442,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-metadata-tab" class="md-nav__link">
+  <a href="#the-properties-tab" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Metadata tab
+        The Properties tab
       
     </span>
   </a>
@@ -1475,10 +1475,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#per-file-settings" class="md-nav__link">
+  <a href="#document-settings" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Per-file settings
+        Document settings
       
     </span>
   </a>
@@ -2858,10 +2858,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-metadata-tab" class="md-nav__link">
+  <a href="#the-properties-tab" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Metadata tab
+        The Properties tab
       
     </span>
   </a>
@@ -2891,10 +2891,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#per-file-settings" class="md-nav__link">
+  <a href="#document-settings" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Per-file settings
+        Document settings
       
     </span>
   </a>
@@ -2952,16 +2952,17 @@
 
 
 <h1 id="metadata-comments">Metadata Comments<a class="headerlink" href="#metadata-comments" title="Permanent link">&para;</a></h1>
-<p>Sometimes you want to tell CalcpadCE something about your document without that note showing up in the printed report — what a function's inputs mean, that a section is a work-in-progress the linter should leave alone, or that a block of scratch work shouldn't appear in the PDF.</p>
-<p>A <strong>metadata comment</strong> does exactly that.
-It looks like an ordinary comment, so it never clutters your output, but CalcpadCE reads the extra information inside it.
-You don't have to write these by hand: the <strong>Metadata</strong> tab in the CalcpadCE panel fills them in for you.</p>
-<h2 id="the-metadata-tab">The Metadata tab<a class="headerlink" href="#the-metadata-tab" title="Permanent link">&para;</a></h2>
-<p>Open the <a href="new-calcpad-panel.html">CalcpadCE panel</a> and switch to the <strong>Metadata</strong> tab.
-Then click a line in your document, and the tab shows a small form for that line:</p>
+<blockquote>
+<p>Part of Calcpad.Web. The <strong>Properties</strong> tab described here currently appears in the <a href="new-vscode-extension.html">VS Code extension</a>. The comments it writes are understood everywhere — the <a href="new-linter.html">linter</a>, the preview, and <a href="new-pdf-export.html">PDF export</a> — no matter which editor created them.</p>
+</blockquote>
+<p>Sometimes you want to tell Calcpad something about your document without that note showing up in the printed report — what a function's inputs mean, that a section is a work-in-progress the linter should leave alone, or that a block of scratch work shouldn't appear in the PDF.</p>
+<p>A <strong>metadata comment</strong> does exactly that. It looks like an ordinary comment, so it never clutters your output, but Calcpad reads the extra information inside it. You don't have to write these by hand: the <strong>Properties</strong> tab in the CalcPad panel fills them in for you.</p>
+<h2 id="the-properties-tab">The Properties tab<a class="headerlink" href="#the-properties-tab" title="Permanent link">&para;</a></h2>
+<p>Open the <a href="new-calcpad-panel-and-settings.md">CalcPad panel</a> and switch to the <strong>Properties</strong> tab. Then click a line in your document, and the tab shows a small form for that line:</p>
 <ul>
 <li><strong>On a definition</strong> (a variable, function, macro, or custom unit) you can add a <strong>description</strong>, and for functions and macros, a <strong>type and description for each parameter</strong> and the <strong>return type</strong>. The parameter rows are filled in to match the definition automatically.</li>
-<li><strong>On any other line</strong> you get the document-wide options: <strong>settings overrides</strong>, <strong>lint-ignore</strong> regions, and <strong>no-print</strong> regions.</li>
+<li><strong>Document settings</strong> are always available. Editing them writes a <a href="#document-settings"><code>#settings</code> directive</a> at the top of the file — not a metadata comment — so they take effect during calculation.</li>
+<li><strong>On any other line</strong> you also get the <strong>lint-ignore</strong> regions and <strong>no-print</strong> regions.</li>
 </ul>
 <p>Fill in what you want and click <strong>Apply</strong>.
 If the line doesn't have a metadata comment yet, one is created for you; if it does, it's updated in place.
@@ -3012,13 +3013,11 @@ A(b; h) = b·h
 I(b; h) = b·h³/12
 </code></pre></div>
 <p>Filling in parameter and return types also helps the <a href="new-linter.html">linter</a> catch places where the function is called with the wrong kind of value.</p>
-<h2 id="per-file-settings">Per-file settings<a class="headerlink" href="#per-file-settings" title="Permanent link">&para;</a></h2>
-<p>You can pin settings — decimals, angle units, and so on — to a document so it always renders the same way, no matter how the app is configured.
-Put a <code>settings</code> comment near the top of the file:</p>
-<div class="language-text highlight"><pre><span></span><code>&#39;&lt;!--{&quot;settings&quot;: {&quot;decimals&quot;: 2, &quot;degrees&quot;: 1, &quot;units&quot;: &quot;cm&quot;}}--&gt;
+<h2 id="document-settings">Document settings<a class="headerlink" href="#document-settings" title="Permanent link">&para;</a></h2>
+<p>You can pin settings — decimals, angle units, and so on — to a document so it always renders the same way, no matter how the app is configured. Use the <code>#settings</code> directive with a JSON object:</p>
+<div class="language-text highlight"><pre><span></span><code>#settings {&quot;decimals&quot;: 2, &quot;degrees&quot;: 1, &quot;units&quot;: &quot;cm&quot;}
 </code></pre></div>
-<p>If more than one appears, the first one wins, so keep it at the top.
-The settings you can set here are the same ones on the <a href="new-calcpad-panel.html#settings">Settings tab</a>:</p>
+<p>Unlike the other properties on this tab, <code>#settings</code> is a real Calcpad directive, not a metadata comment — the engine reads it while calculating. It applies to <strong>every line after it</strong>, so you can change settings partway through a document by adding another <code>#settings</code> directive. If you keep one near the top, it configures the whole file; the <strong>Properties</strong> tab writes it there for you. The settings you can set are the same ones on the <a href="new-calcpad-panel-and-settings.md#settings">Settings tab</a>:</p>
 <table>
 <thead>
 <tr>
@@ -3090,8 +3089,7 @@ Wrap those lines between a <code>LintIgnore</code> and an <code>EndLintIgnore</c
 prototype_var = 5
 &#39;&lt;!--{&quot;EndLintIgnore&quot;: []}--&gt;
 </code></pre></div>
-<p>The <strong>Metadata</strong> tab has a picker for the codes, so you don't have to memorize them.
-See <a href="new-linter.html">Suppressing diagnostics</a> for the details.</p>
+<p>The <strong>Properties</strong> tab has a picker for the codes, so you don't have to memorize them. See <a href="new-linter.html">Suppressing diagnostics</a> for the details.</p>
 <h2 id="leaving-sections-out-of-the-pdf">Leaving sections out of the PDF<a class="headerlink" href="#leaving-sections-out-of-the-pdf" title="Permanent link">&para;</a></h2>
 <p>To keep something on screen but off the printed page — debug numbers, notes to yourself — wrap it between <code>NoPrintStart</code> and <code>NoPrintEnd</code> markers:</p>
 <div class="language-text highlight"><pre><span></span><code>&#39;&lt;!--{&quot;NoPrintStart&quot;: true}--&gt;
