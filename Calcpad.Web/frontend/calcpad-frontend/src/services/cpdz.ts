@@ -9,7 +9,6 @@
  * values instead of writing plain text.
  */
 import { bytesToBase64, isImageExtension, mimeFromExtension } from './image-utils';
-import { pathResolve } from './paths';
 import type { IFileSystem } from '../types/interfaces';
 
 export const COMPILED_EXTENSION = '.cpdz';
@@ -23,9 +22,12 @@ export function isCompiledPath(filePath: string): boolean {
 
 /**
  * Replaces `<img src="local/path">` references with base64 data URIs, resolving
- * relative paths against `documentDir`. Remote and `data:` sources are left
- * alone, so this is idempotent, and a source that cannot be read keeps its
- * original `src` rather than failing the whole document.
+ * each `src` through `resolve` — which handles a `<project>`/`<library>` token
+ * and environment variables the same way the rest of the document's references
+ * do, then returns an absolute path. Remote and `data:` sources are left alone,
+ * so this is idempotent, and a source that cannot be read (or whose token root
+ * isn't declared) keeps its original `src` rather than failing the whole
+ * document.
  *
  * Used two ways: to make a compiled worksheet self-contained before it is
  * deflated, and to feed exported HTML to headless Chromium, which has no
@@ -34,8 +36,8 @@ export function isCompiledPath(filePath: string): boolean {
  */
 export async function inlineImageSources(
     text: string,
-    documentDir: string,
     fs: Pick<IFileSystem, 'readFile'>,
+    resolve: (src: string) => string | Promise<string>,
 ): Promise<string> {
     const cache: Record<string, string> = {};
     const seen = new Set<string>();
@@ -52,10 +54,10 @@ export async function inlineImageSources(
         if (!isImageExtension(ext)) continue;
 
         try {
-            const bytes = await fs.readFile(pathResolve(documentDir, src));
+            const bytes = await fs.readFile(await resolve(src));
             cache[src] = `data:${mimeFromExtension(ext)};base64,${bytesToBase64(bytes)}`;
         } catch {
-            // missing file or permission error → leave src untouched
+            // missing file, permission error, or undeclared token root → leave src untouched
         }
     }
 

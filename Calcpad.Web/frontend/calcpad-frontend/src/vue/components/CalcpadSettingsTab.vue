@@ -594,20 +594,6 @@
             </select>
           </div>
 
-          <div v-show="rowVisible('editor', 'libraryPath')" class="setting-group">
-            <label for="libraryPath">
-              Library Path:
-              <span class="setting-info" title="Shared .cpd/.txt files for #include autocomplete. Supports %ENV% variables.">ⓘ</span>
-            </label>
-            <input
-              id="libraryPath"
-              v-model="libraryPath"
-              type="text"
-              placeholder="%USERPROFILE%\Documents\CalcpadLibrary"
-              @input="updateLibraryPath"
-            />
-          </div>
-
           <div v-show="rowVisible('editor', 'linterMinSeverity')" class="setting-group">
             <label for="linterMinSeverity">Linter Minimum Severity:</label>
             <select
@@ -763,7 +749,6 @@ interface Props {
   initialLinterMinSeverity?: string
   initialMaxOutputLines?: number
   versionConfig?: VersionConfig
-  initialLibraryPath?: string
   initialActiveConfig?: string
   initialAvailableConfigs?: string[]
   initialEditorFontFamily?: string
@@ -788,7 +773,6 @@ const props = withDefaults(defineProps<Props>(), {
   initialLinterMinSeverity: 'information',
   initialMaxOutputLines: 1000,
   versionConfig: () => ({ ...DEFAULT_VERSION_CONFIG }),
-  initialLibraryPath: '',
   initialActiveConfig: 'default',
   initialAvailableConfigs: () => ['default'],
   initialEditorFontFamily: 'JuliaMono',
@@ -812,7 +796,6 @@ const emit = defineEmits<{
   updateDarkBackground: [color: string]
   updateLinterMinSeverity: [severity: string]
   updateMaxOutputLines: [value: number]
-  updateLibraryPath: [path: string]
   resetSettings: []
   saveNamedConfig: [name: string]
   switchConfig: [name: string]
@@ -858,7 +841,6 @@ const enablePreviewUiOverrides = ref(props.initialEnablePreviewUiOverrides)
 const darkBackground = ref(props.initialDarkBackground)
 const linterMinSeverity = ref(props.initialLinterMinSeverity)
 const maxOutputLines = ref(props.initialMaxOutputLines)
-const libraryPath = ref(props.initialLibraryPath)
 const activeConfig = ref(props.initialActiveConfig)
 const availableConfigs = ref<string[]>(props.initialAvailableConfigs)
 const editorFontFamily = ref(props.initialEditorFontFamily)
@@ -941,7 +923,6 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       previewTheme: 'preview theme system light dark',
       darkBackground: 'dark mode background color',
       colorTheme: 'color theme syntax',
-      libraryPath: 'library path include autocomplete',
       linterMinSeverity: 'linter minimum severity error warning information'
     }
   },
@@ -1109,10 +1090,6 @@ const updateMaxOutputLines = () => {
   emit('updateMaxOutputLines', Math.floor(n))
 }
 
-const updateLibraryPath = () => {
-  emit('updateLibraryPath', libraryPath.value)
-}
-
 const resetSettings = () => {
   emit('resetSettings')
 }
@@ -1253,13 +1230,6 @@ watch(
   () => props.initialMaxOutputLines,
   (newValue) => {
     maxOutputLines.value = newValue
-  }
-)
-
-watch(
-  () => props.initialLibraryPath,
-  (newValue) => {
-    libraryPath.value = newValue
   }
 )
 

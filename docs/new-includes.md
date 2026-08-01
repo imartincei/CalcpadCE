@@ -27,6 +27,50 @@ Both bring in outside content, but they do different jobs:
 | When it happens | At parse time — the source is inlined | At run time — the data is loaded into a variable |
 | Result | The included code becomes part of your document | You get a matrix or vector variable to compute with |
 
+## Path root tokens: `<project>` and `<library>`
+
+`<project>` and `<library>` are symbolic roots you can use as a prefix in `#include`, `#read`, `#write`/`#append`, and `<img src="...">`, instead of a path specific to your machine:
+
+```text
+#ProjectPath = C:/Jobs/1042
+#LibraryPath = %APPDATA%/Calcpad/lib
+#include <library>/steel/aisc.cpd
+#read L from <project>/data/loads.csv
+#write R to <project>/out/results.csv
+'<img src="<library>/logo.png">
+```
+
+Each root is declared once, with a directive naming the folder it points at:
+
+- `#ProjectPath = ...` — the job- or document-specific folder, typically outside version control and different for every recipient.
+- `#LibraryPath = ...` — a shared folder of reusable `.cpd`/`.txt` files, e.g. a firm-wide function or materials library.
+
+Both directives render nothing, the same as `#include`. A relative value resolves against the folder of the file that declares it; environment variables (`%VAR%` on Windows, `$VAR` on macOS/Linux) are expanded in the value.
+
+**Rules, kept deliberately simple:**
+
+- **One `#ProjectPath` and one `#LibraryPath` per document.** A second declaration of the same root is an error.
+- **Declare before first use.** A directive must appear above the first line that uses its token, or that line is an error — this also means the document's declared paths can be read once, up front, without worrying about them changing mid-file.
+- A token whose root was never declared is an error, not a silent fallback to something else.
+
+**Reusable modules should use `#local`.** A file meant to be `#include`d elsewhere — a shared library module, say — should wrap its own `#ProjectPath`/`#LibraryPath` in `#local`/`#global`:
+
+```text
+' lib/steel.cpd
+#local
+#LibraryPath = ./data
+#global
+#read Fy from <library>/grades.csv
+```
+
+`#local` content is stripped when the file is `#include`d into another document (the same way it always is), so the module's own declaration never reaches — and never clashes with — the including document's. Opened by itself, the module still runs: `#local` sections are only stripped when a file is reached through `#include`.
+
+### Path root tokens and portable export
+
+An [exported portable package](working-with-files.md#export-portable-package) leaves a token reference exactly as written by default — the recipient's own `#ProjectPath`/`#LibraryPath` resolves it, so a shared library file isn't duplicated into every package. Two checkboxes on the **Export** tab, both off by default, bundle `<project>` and `<library>` references independently instead — each resolves the token to your own local path and bundles it like any other absolute reference, for a one-off recipient who has no roots declared of their own. The Export tab also shows the document's declared `<project>`/`<library>` paths, read-only.
+
+A [compiled `.cpdz` worksheet](working-with-files.md#save-as-compiled-worksheet), by contrast, always resolves both roots — its source is locked, so there is no way for a recipient to add a declaration afterwards.
+
 ## Errors point to the right place
 
 > Calcpad.Web only (web editor, desktop app, and VS Code extension). Not available in the standalone WPF desktop application for Windows.

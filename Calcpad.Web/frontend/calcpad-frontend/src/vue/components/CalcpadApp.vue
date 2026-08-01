@@ -86,7 +86,6 @@
         :initial-linter-min-severity="linterMinSeverity"
         :initial-max-output-lines="maxOutputLines"
         :version-config="versionConfig"
-        :initial-library-path="libraryPath"
         :initial-active-config="activeConfig"
         :initial-available-configs="availableConfigs"
         :initial-editor-font-family="editorFontFamily"
@@ -108,7 +107,6 @@
         @update-dark-background="handleUpdateDarkBackground"
         @update-linter-min-severity="handleUpdateLinterMinSeverity"
         @update-max-output-lines="handleUpdateMaxOutputLines"
-        @update-library-path="handleUpdateLibraryPath"
         @reset-settings="handleResetSettings"
         @save-named-config="handleSaveNamedConfig"
         @switch-config="handleSwitchConfig"
@@ -140,12 +138,17 @@
         :loading="plotsLoading"
         :version-config="versionConfig"
         :write-next-to-worksheet="portableWriteNextToWorksheet"
+        :bundle-project-references="portableBundleProjectRefs"
+        :bundle-library-references="portableBundleLibraryRefs"
+        :declared-path-roots="declaredPathRoots"
         @save-pdf="handleSavePdf"
         @save-html="handleSaveSourceHtml"
         @save-docx="handleSaveDocx"
         @save-compiled="handleSaveCompiled"
         @save-portable="handleSavePortable"
         @update-write-next-to-worksheet="handleUpdateWriteNextToWorksheet"
+        @update-bundle-project-references="handleUpdateBundleProjectReferences"
+        @update-bundle-library-references="handleUpdateBundleLibraryReferences"
         @refresh-plots="handleRefreshPlots"
         @save-plot="handleSavePlot"
         @save-plots-zip="handleSavePlotsZip"
@@ -183,6 +186,7 @@ import CalcpadMetadataTab from './CalcpadMetadataTab.vue'
 import { postMessage } from '../services/messaging'
 import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '../../text/metadata-comment'
 import type { UiDirectiveData } from '../../text/ui-directive'
+import type { DeclaredPathRoots } from '../../text/path-roots'
 import type { UiControl } from '../../services/ui-overrides'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
@@ -241,10 +245,12 @@ const enableAutoRun = ref(true)
 const enableAutoInputMode = ref(true)
 const enablePreviewUiOverrides = ref(false)
 const portableWriteNextToWorksheet = ref(true)
+const portableBundleProjectRefs = ref(false)
+const portableBundleLibraryRefs = ref(false)
+const declaredPathRoots = ref<DeclaredPathRoots>({ project: null, library: null })
 const darkBackground = ref('#1e1e1e')
 const linterMinSeverity = ref('information')
 const maxOutputLines = ref(1000)
-const libraryPath = ref('')
 const activeConfig = ref('default')
 const availableConfigs = ref<string[]>(['default'])
 const editorFontFamily = ref('JuliaMono')
@@ -431,6 +437,16 @@ const handleUpdateWriteNextToWorksheet = (enabled: boolean) => {
   postMessage({ type: 'updatePortableWriteNextToWorksheet', enabled })
 }
 
+const handleUpdateBundleProjectReferences = (enabled: boolean) => {
+  portableBundleProjectRefs.value = enabled
+  postMessage({ type: 'updatePortableBundleProjectRefs', enabled })
+}
+
+const handleUpdateBundleLibraryReferences = (enabled: boolean) => {
+  portableBundleLibraryRefs.value = enabled
+  postMessage({ type: 'updatePortableBundleLibraryRefs', enabled })
+}
+
 const handleRefreshPlots = () => {
   plotsLoading.value = true
   postMessage({ type: 'getPlots' })
@@ -521,11 +537,6 @@ const handleUpdateLinterMinSeverity = (severity: string) => {
 const handleUpdateMaxOutputLines = (value: number) => {
   maxOutputLines.value = value
   postMessage({ type: 'updateMaxOutputLines', value })
-}
-
-const handleUpdateLibraryPath = (path: string) => {
-  libraryPath.value = path
-  postMessage({ type: 'updateLibraryPath', path })
 }
 
 const handleResetSettings = () => {
@@ -671,12 +682,13 @@ const handleMessage = (event: MessageEvent) => {
       if (typeof message.enableAutoInputMode === 'boolean') enableAutoInputMode.value = message.enableAutoInputMode
       if (typeof message.enablePreviewUiOverrides === 'boolean') enablePreviewUiOverrides.value = message.enablePreviewUiOverrides
       if (typeof message.portableWriteNextToWorksheet === 'boolean') portableWriteNextToWorksheet.value = message.portableWriteNextToWorksheet
+      if (typeof message.portableBundleProjectRefs === 'boolean') portableBundleProjectRefs.value = message.portableBundleProjectRefs
+      if (typeof message.portableBundleLibraryRefs === 'boolean') portableBundleLibraryRefs.value = message.portableBundleLibraryRefs
       darkBackground.value = message.darkBackground || '#1e1e1e'
       linterMinSeverity.value = message.linterMinSeverity || 'information'
       if (typeof message.maxOutputLines === 'number' && message.maxOutputLines >= 10) {
         maxOutputLines.value = message.maxOutputLines
       }
-      libraryPath.value = message.libraryPath || ''
       if (message.activeConfig) activeConfig.value = message.activeConfig
       if (Array.isArray(message.availableConfigs)) availableConfigs.value = message.availableConfigs
       if (typeof message.editorFontFamily === 'string') editorFontFamily.value = message.editorFontFamily
@@ -726,6 +738,7 @@ const handleMessage = (event: MessageEvent) => {
     case 'plotsResponse':
       plots.value = Array.isArray(message.plots) ? message.plots : []
       plotsLoading.value = false
+      if (message.declaredPathRoots) declaredPathRoots.value = message.declaredPathRoots
       break
     case 'metadataContext':
       metadataBlock.value = message.block ?? null

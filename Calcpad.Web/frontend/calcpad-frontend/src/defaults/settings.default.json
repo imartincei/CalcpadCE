@@ -46,7 +46,6 @@
         "previewUiOverrides": false,
         "linterMinSeverity": "information",
         "maxOutputLines": 1000,
-        "libraryPath": "",
         "prettifyIndentStyle": "tab",
         "prettifyIndentSize": 4,
         "prettifyTrimTrailingWhitespace": true,

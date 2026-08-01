@@ -134,6 +134,9 @@ namespace Calcpad.Highlighter.Tokenizer.Models
         // [Future Reserved] 29-30 previously held StringFunction, StringTable.
         // Kept as reserved ordinals to avoid renumbering serialized values.
         FutureReserved29 = 29,
-        FutureReserved30 = 30
+        FutureReserved30 = 30,
+
+        /// <summary>Path value following #ProjectPath/#LibraryPath (e.g. `#ProjectPath = C:/Jobs/1042`).</summary>
+        PathRoot = 31
     }
 }

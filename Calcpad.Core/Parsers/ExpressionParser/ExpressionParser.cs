@@ -36,6 +36,7 @@ namespace Calcpad.Core
 
         public Settings Settings { get; set; } = new();
         public string SourceFilePath { get; set; }
+        private PathRoots _pathRoots = new();
         public string HtmlResult { get; private set; }
         public IReadOnlyList<CalcpadError> Errors => _errorList;
         public static bool IsUs
@@ -495,6 +496,7 @@ namespace Calcpad.Core
                 _uiVarCounts.Clear();
                 _uiDeclarationIndex.Clear();
                 OpenXmlExpressions.Clear();
+                _pathRoots = new PathRoots();
             }
             else
             {

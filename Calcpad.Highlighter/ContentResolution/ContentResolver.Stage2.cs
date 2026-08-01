@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Calcpad.Core;
 using Calcpad.Highlighter.Linter.Helpers;
 using Calcpad.Highlighter.Parsing;
 using Calcpad.Highlighter.Tokenizer;
@@ -27,19 +28,33 @@ namespace Calcpad.Highlighter.ContentResolution
             var sourceMap = new Dictionary<int, int>();  // expanded line -> stage1 line
             var includeMap = new Dictionary<int, SourceInfo>();
             var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var rootDir = !string.IsNullOrEmpty(sourceFilePath)
+                ? Path.GetDirectoryName(sourceFilePath) : null;
+            // Shared across the root and every included file, exactly like MacroParser's own
+            // instance field — a <project>/<library> reference resolves against whichever
+            // declaration came first in document order, wherever it was written.
+            var pathRoots = new PathRoots();
 
             for (int i = 0; i < stage1.Lines.Count; i++)
             {
                 var line = stage1.Lines[i];
                 var trimmedSpan = line.AsSpan().Trim();
 
-                if (IsIncludeDirective(trimmedSpan))
+                if (PathRoots.IsDeclaration(trimmedSpan, out var isProject, out var declStart, out var declLength))
+                {
+                    if (declLength > 0)
+                        pathRoots.TryDeclare(isProject, trimmedSpan.Slice(declStart, declLength).ToString(),
+                            rootDir, out _);
+                    // A malformed or duplicate declaration is reported when the document is
+                    // actually parsed/converted (Calcpad.Core.MacroParser/ExpressionParser) — the
+                    // editor's lint pass only needs the roots it can resolve, not to re-validate.
+                }
+                else if (IsIncludeDirective(trimmedSpan))
                 {
                     var rawFileName = ExtractIncludeFilename(trimmedSpan);
-                    var sourceDir = !string.IsNullOrEmpty(sourceFilePath)
-                        ? Path.GetDirectoryName(sourceFilePath) : null;
+                    pathRoots.TryExpand(rawFileName, out rawFileName, out _);
                     ExpandInclude(rawFileName, i, includeFiles, clientFileCache,
-                        expandedLines, sourceMap, includeMap, visited, 0, sourceDir);
+                        expandedLines, sourceMap, includeMap, visited, 0, rootDir, pathRoots);
                     continue;
                 }
 
@@ -328,8 +343,10 @@ namespace Calcpad.Highlighter.ContentResolution
             Dictionary<int, SourceInfo> includeMap,
             HashSet<string> visited,
             int depth,
-            string sourceDir = null)
+            string sourceDir = null,
+            PathRoots pathRoots = null)
         {
+            pathRoots ??= new PathRoots();
             if (depth > 20 || string.IsNullOrEmpty(rawFileName) || !visited.Add(rawFileName))
             {
                 expandedLines.Add("' Error: Include file not provided: " + rawFileName);
@@ -371,12 +388,25 @@ namespace Calcpad.Highlighter.ContentResolution
                 if (directives.Scope == ScopeMode.Local)
                     continue;
 
-                if (IsIncludeDirective(trimmedSpan))
+                var nestedSourceDir = resolvedPath != null ? Path.GetDirectoryName(resolvedPath) : sourceDir;
+                if (PathRoots.IsDeclaration(trimmedSpan, out var isProject, out var declStart, out var declLength))
+                {
+                    // A #local-scoped declaration never reaches here — the scope check above
+                    // already excluded it, the same way the real include delegate
+                    // (CalcpadService.ProcessIncludedContent) strips it before Core ever parses
+                    // the includer's flattened text. One that does reach here is added to
+                    // expandedLines below like any other line — it is genuinely part of the
+                    // flattened document, same as the root's own declaration.
+                    if (declLength > 0)
+                        pathRoots.TryDeclare(isProject, trimmedSpan.Slice(declStart, declLength).ToString(),
+                            nestedSourceDir, out _);
+                }
+                else if (IsIncludeDirective(trimmedSpan))
                 {
                     var nestedFileName = ExtractIncludeFilename(trimmedSpan);
-                    var nestedSourceDir = resolvedPath != null ? Path.GetDirectoryName(resolvedPath) : sourceDir;
+                    pathRoots.TryExpand(nestedFileName, out nestedFileName, out _);
                     ExpandInclude(nestedFileName, stage1Line, includeFiles, clientFileCache,
-                        expandedLines, sourceMap, includeMap, visited, depth + 1, nestedSourceDir);
+                        expandedLines, sourceMap, includeMap, visited, depth + 1, nestedSourceDir, pathRoots);
                     continue;
                 }
 

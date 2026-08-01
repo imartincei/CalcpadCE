@@ -106,7 +106,7 @@ This is the reliable place to see errors that occur inside `#hide` blocks, which
 
 ## Settings
 
-The **Settings** tab is the single place to control the calculation engine and the editor — Math, Plot, Units, Server, themes, Editor features, Library, Linter, Diagnostics, and named configurations.
+The **Settings** tab is the single place to control the calculation engine and the editor — Math, Plot, Units, Server, themes, Editor features, Linter, Diagnostics, and named configurations.
 See [Settings](new-settings.md) for the full reference.
 
 ## See also

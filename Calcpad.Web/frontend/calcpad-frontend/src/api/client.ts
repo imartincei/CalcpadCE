@@ -160,13 +160,18 @@ export class CalcpadApiClient {
         content: string,
         sourceFilePath?: string,
         writeNextToWorksheet?: boolean,
+        bundleProjectReferences?: boolean,
+        bundleLibraryReferences?: boolean,
     ): Promise<PortablePackageResult> {
         return this.serialize(async () => {
             try {
                 const response = await fetch(`${this.baseUrl}/api/calcpad/portable/package`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, sourceFilePath, writeNextToWorksheet }),
+                    body: JSON.stringify({
+                        content, sourceFilePath, writeNextToWorksheet,
+                        bundleProjectReferences, bundleLibraryReferences,
+                    }),
                     signal: AbortSignal.timeout(60000),
                 });
                 const body = await response.json().catch(() => null);

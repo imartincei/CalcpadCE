@@ -85,11 +85,6 @@ Pick the Monaco editor's font family from:
 - **Open #UI Documents in Input Mode** *(default on)* — a document declaring `#UI` controls opens as its input form the first time you open it. The mode you switch to afterwards sticks; a later tab switch never brings the form back. Desktop app and VS Code only. See [UI Mode](new-ui-mode.md).
 - **Apply #UI Values in Preview** *(default off)* — Preview normally renders the document's own values; turn this on and it renders the values entered into the input form instead, while still showing `#pre` and `#post` together. For tracking down an error that only appears once a form is filled in. Exports of the Preview variant are unaffected — they always use the document's own values. See [UI Mode](new-ui-mode.md).
 
-## Library
-
-**Library Path** — a directory of shared `.cpd`/`.txt` files that appear in `#include` / `#read` path completion, so a team can share a common library.
-Supports `%ENV%` variables.
-
 ## Linter
 
 **Minimum Severity** — Error / Warning / Information (all).

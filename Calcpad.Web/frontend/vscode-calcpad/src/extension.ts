@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION } from 'calcpad-frontend';
+import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -24,6 +24,7 @@ import { CommentFormatter } from './commentFormatter';
 import { CalcpadServerManager } from './calcpadServerManager';
 import { DotnetRuntimeManager } from './dotnetRuntimeManager';
 import { VSCodeLogger, VSCodeFileSystem } from './adapters';
+import { expandEnvVars } from './calcpadLocationResolver';
 import { installJuliaMonoCommand, maybePromptInstall } from './installFont';
 
 // The wrapped ("regular") and unwrapped previews are independent panels that can
@@ -364,10 +365,14 @@ const IMAGE_MIME_MAP: Record<string, string> = {
 
 /**
  * Scan HTML for <img src="..."> tags with local file paths, read the files from disk,
- * and return a cache mapping original src values to base64 data URIs.
+ * and return a cache mapping original src values to base64 data URIs. `sourceText` is
+ * the raw `.cpd` source the HTML was rendered from — it is what a `<project>`/
+ * `<library>` reference is declared and resolved against, and env vars (`%VAR%`/`$VAR`)
+ * are expanded the same way any other reference's are.
  */
-async function buildImageCache(html: string, documentDir: string): Promise<Record<string, string>> {
+async function buildImageCache(html: string, documentDir: string, sourceText: string): Promise<Record<string, string>> {
     const cache: Record<string, string> = {};
+    const resolve = createReferenceResolver(sourceText, documentDir, expandEnvVars, path.resolve);
     const imgSrcRegex = /<img\s[^>]*?src\s*=\s*["']([^"']+)["'][^>]*>/gi;
     let match;
 
@@ -385,7 +390,7 @@ async function buildImageCache(html: string, documentDir: string): Promise<Recor
         }
 
         try {
-            const absolutePath = path.resolve(documentDir, src);
+            const absolutePath = await resolve(src);
             const ext = path.extname(absolutePath).toLowerCase().replace('.', '');
             const mimeType = IMAGE_MIME_MAP[ext];
 
@@ -924,7 +929,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         let imageCacheScript = '';
         if (activeEditor && !activeEditor.document.isUntitled) {
             const documentDir = path.dirname(activeEditor.document.uri.fsPath);
-            const imageCache = await buildImageCache(apiResponse, documentDir);
+            const imageCache = await buildImageCache(apiResponse, documentDir, activeEditor.document.getText());
             imageCacheScript = getImageCacheScript(imageCache);
         }
 
@@ -1055,7 +1060,7 @@ async function generatePdfToFile(
 
     // Inline local images as base64 data URIs so the headless browser can
     // render them (it has no access to the local filesystem).
-    const imageCache = await buildImageCache(html, sourceDir);
+    const imageCache = await buildImageCache(html, sourceDir, documentContent);
     html = applyImageCache(html, imageCache);
 
     progress?.report({ increment: 50, message: 'Generating PDF...' });
@@ -1287,7 +1292,11 @@ async function saveAsCompiled() {
 
         // An untitled document has no folder for relative image paths to resolve against.
         const documentDir = untitled ? '' : path.dirname(source.uri.fsPath);
-        const compiled = await inlineImageSources(bundled.content, documentDir, new VSCodeFileSystem());
+        // bundled.content is already self-contained — the server resolved any <project>/
+        // <library> reference to an absolute path — so this resolver only needs to expand
+        // env vars in whatever plain relative/absolute src the author wrote directly.
+        const resolve = createReferenceResolver(bundled.content, documentDir, expandEnvVars, path.resolve);
+        const compiled = await inlineImageSources(bundled.content, new VSCodeFileSystem(), resolve);
         const bytes = await sharedApiClient?.encodeCpdz(compiled);
         if (!bytes) throw new Error('The server could not encode the worksheet');
         await vscode.workspace.fs.writeFile(saveUri, bytes);
@@ -1332,10 +1341,13 @@ async function exportPortable() {
         });
         if (!saveUri) return;
 
-        const writeNextToWorksheet = CalcpadSettingsManager.getInstance()
-            .getExtraBool('portableWriteNextToWorksheet', true);
+        const settingsManager = CalcpadSettingsManager.getInstance();
+        const writeNextToWorksheet = settingsManager.getExtraBool('portableWriteNextToWorksheet', true);
+        const bundleProjectReferences = settingsManager.getExtraBool('portableBundleProjectRefs', false);
+        const bundleLibraryReferences = settingsManager.getExtraBool('portableBundleLibraryRefs', false);
         const packaged = await sharedApiClient?.packagePortable(
-            source.text, source.uri.fsPath, writeNextToWorksheet);
+            source.text, source.uri.fsPath, writeNextToWorksheet,
+            bundleProjectReferences, bundleLibraryReferences);
         if (!packaged?.zip) {
             const reasons = packaged?.errors ?? ['The server is not running'];
             // A collision or a list of unreadable references runs to several lines, which a

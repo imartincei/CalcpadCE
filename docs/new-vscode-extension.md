@@ -116,14 +116,14 @@ Hovering over a built-in function shows its signature, description, return type,
 
 ## Path completion for includes and data files
 
-When you type a path after `#include`, `#read`, `#write`, or `#append`, the extension completes filenames from the workspace and from your configured library path:
+When you type a path after `#include`, `#read`, `#write`, or `#append`, the extension completes filenames from the workspace and, once the document declares them, from its `#ProjectPath`/`#LibraryPath` roots:
 
 - `#include`: `.cpd`, `.txt`
 - `#read` / `#write` / `#append`: `.cpd`, `.txt`, `.csv`, `.tsv`, `.xlsx`, `.xlsm`, `.xls`
 - Both `/` and `\` separators work, and it drills into subdirectories.
 - Environment variables expand: `%VAR%` on Windows, `$VAR` on macOS/Linux.
 
-Point the library path (in the Settings tab) at a folder of reusable `.cpd` / `.txt` files and they show up in completion alongside workspace files — an easy way for a team to share a common library without copying it into every project.
+Declare `#ProjectPath = ...` and/or `#LibraryPath = ...` at the top of a document and both roots show up in completion at the root level, alongside workspace files, drilling into `<project>/…`/`<library>/…` as you type — an easy way for a team to share a common library without copying it into every project. See [Includes and File Reads](new-includes.md#path-root-tokens-project-and-library) for the directive itself.
 
 ## The CalcpadCE panel
 
@@ -201,7 +201,7 @@ See [The CalcpadCE Panel & Settings → Export](new-calcpad-panel.md#export).
 
 ## Settings
 
-All CalcpadCE settings — math, plot, units, preview and color themes, editor features, linter severity, library path, and named configurations — live in the **Settings** tab of the CalcpadCE panel, **not** in VS Code's normal settings editor.
+All CalcpadCE settings — math, plot, units, preview and color themes, editor features, linter severity, and named configurations — live in the **Settings** tab of the CalcpadCE panel, **not** in VS Code's normal settings editor.
 Editing them there keeps them in sync with the extension and the server.
 
 See **[The CalcpadCE Panel & Settings → Settings](new-calcpad-panel.md#settings)** for the full list.

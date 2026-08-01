@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { VSCodeFileSystem } from './adapters';
-import { resolveIncludeDirectiveLocation } from './calcpadLocationResolver';
+import { resolveIncludeDirectiveLocation, resolveDocumentPathRoots } from './calcpadLocationResolver';
 import { parseDirectiveLine } from './calcpadIncludeCompletionProvider';
 
 /**
@@ -17,6 +17,7 @@ export class CalcpadIncludeLinkProvider implements vscode.DocumentLinkProvider {
 
     async provideDocumentLinks(document: vscode.TextDocument): Promise<vscode.DocumentLink[]> {
         const links: vscode.DocumentLink[] = [];
+        const roots = resolveDocumentPathRoots(document);
         for (let i = 0; i < document.lineCount; i++) {
             const line = document.lineAt(i).text;
             const parsed = parseDirectiveLine(line);
@@ -25,7 +26,7 @@ export class CalcpadIncludeLinkProvider implements vscode.DocumentLinkProvider {
             if (!rawPath) continue;
 
             const location = await resolveIncludeDirectiveLocation(
-                document, rawPath, this.fileSystem, this.outputChannel, '[IncludeLink]',
+                document, rawPath, this.fileSystem, this.outputChannel, '[IncludeLink]', roots,
             );
             if (!location) continue;
 

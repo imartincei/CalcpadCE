@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CalcpadSettingsManager } from './calcpadSettings';
+import { scanDeclaredPathRoots, getPathRootTokenKind, type PathRootKind } from 'calcpad-frontend';
+import { expandEnvVars } from './calcpadLocationResolver';
 
 const DIRECTIVES = ['include', 'read', 'write', 'append'] as const;
 type Directive = typeof DIRECTIVES[number];
@@ -79,6 +80,9 @@ export function parseDirectiveLine(lineText: string): DirectiveParse | undefined
     return { directive: keyword, pathStartCol: i, partialPath: lineText.substring(i) };
 }
 
+const PATH_ROOT_LABEL: Record<PathRootKind, string> = { project: 'Project', library: 'Library' };
+const PATH_ROOT_TOKEN: Record<PathRootKind, string> = { project: '<project>', library: '<library>' };
+
 export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemProvider {
     private outputChannel: vscode.OutputChannel;
 
@@ -127,32 +131,40 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
             position.line, position.character
         );
 
-        // Get library configuration
-        const libraryPath = CalcpadSettingsManager.getInstance().getExtra('libraryPath', '');
-        const libraryPrefix = libraryPath
-            ? (libraryPath.endsWith('/') || libraryPath.endsWith('\\') ? libraryPath : libraryPath + '\\')
-            : '';
-        const resolvedLibraryPath = libraryPath ? this.resolveLibraryPath(libraryPath) : undefined;
-
-        this.outputChannel.appendLine(`[INCLUDE COMPLETION] Library: raw="${libraryPath}" prefix="${libraryPrefix}" resolved="${resolvedLibraryPath || '(none)'}"`);
+        // The document's own #ProjectPath/#LibraryPath declarations, resolved to absolute
+        // directories — there is no host-level default any more, only what the document itself
+        // declares above this line.
+        const declaredRoots = scanDeclaredPathRoots(document.getText(), position.line);
+        const resolvedRoots: Record<PathRootKind, string | undefined> = { project: undefined, library: undefined };
+        for (const kind of ['project', 'library'] as const) {
+            const declared = declaredRoots[kind];
+            if (declared) {
+                resolvedRoots[kind] = path.resolve(documentDir, expandEnvVars(declared));
+            }
+        }
+        this.outputChannel.appendLine(
+            `[INCLUDE COMPLETION] Declared roots: project="${resolvedRoots.project || '(none)'}" library="${resolvedRoots.library || '(none)'}"`
+        );
 
         try {
-            // Determine if the user is navigating inside a library path
-            // (i.e. they already selected a library folder and are drilling deeper)
-            const isInLibrary = libraryPrefix && partialPath.startsWith(libraryPrefix);
-
-            if (isInLibrary && resolvedLibraryPath) {
-                // User is inside a library path - strip the prefix and search the library subdirectory
-                const libraryRelativePath = partialPath.substring(libraryPrefix.length);
-                this.outputChannel.appendLine(`[INCLUDE COMPLETION] Inside library, relative path: "${libraryRelativePath}"`);
-
-                await this.addEntriesFromDirectory(
-                    resolvedLibraryPath, libraryRelativePath, extensions, replaceRange,
-                    document.uri.fsPath, completionItems, addedEntries, token,
-                    'Library', '', libraryPrefix
-                );
+            const tokenKind = getPathRootTokenKind(partialPath);
+            if (tokenKind !== null) {
+                // Drilling into a <project>/<library> reference: search the resolved root, but
+                // reinsert completions in token form so the reference stays portable.
+                const root = resolvedRoots[tokenKind];
+                if (root) {
+                    const tokenText = partialPath.slice(0, PATH_ROOT_TOKEN[tokenKind].length);
+                    let rest = partialPath.slice(tokenText.length);
+                    if (rest.startsWith('/') || rest.startsWith('\\')) rest = rest.slice(1);
+                    this.outputChannel.appendLine(`[INCLUDE COMPLETION] Inside ${tokenKind} root, relative path: "${rest}"`);
+                    await this.addEntriesFromDirectory(
+                        root, rest, extensions, replaceRange,
+                        document.uri.fsPath, completionItems, addedEntries, token,
+                        PATH_ROOT_LABEL[tokenKind], '', `${tokenText}/`
+                    );
+                }
             } else if (partialPath.includes('/') || partialPath.includes('\\')) {
-                // User is navigating local subdirectories (path has separators but isn't library)
+                // User is navigating local subdirectories (path has separators but isn't a token)
                 this.outputChannel.appendLine(`[INCLUDE COMPLETION] Navigating local subdirectory`);
 
                 await this.addEntriesFromDirectory(
@@ -161,8 +173,8 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
                     undefined, ''
                 );
             } else {
-                // Root level - show local files/folders + library + workspace folders
-                this.outputChannel.appendLine(`[INCLUDE COMPLETION] Root level - searching local + library + workspace`);
+                // Root level - show local files/folders + declared roots + workspace folders
+                this.outputChannel.appendLine(`[INCLUDE COMPLETION] Root level - searching local + declared roots + workspace`);
 
                 await this.addEntriesFromDirectory(
                     documentDir, partialPath, extensions, replaceRange,
@@ -170,27 +182,32 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
                     undefined, ''
                 );
 
-                // Also search library root if configured and different from document dir
-                if (resolvedLibraryPath && path.normalize(resolvedLibraryPath) !== path.normalize(documentDir)) {
-                    this.outputChannel.appendLine(`[INCLUDE COMPLETION] Also searching library root: ${resolvedLibraryPath}`);
-                    await this.addEntriesFromDirectory(
-                        resolvedLibraryPath, '', extensions, replaceRange,
-                        document.uri.fsPath, completionItems, addedEntries, token,
-                        'Library', '', libraryPrefix
-                    );
+                const docDirNorm = path.normalize(documentDir);
+                for (const kind of ['project', 'library'] as const) {
+                    const root = resolvedRoots[kind];
+                    if (root && path.normalize(root) !== docDirNorm) {
+                        this.outputChannel.appendLine(`[INCLUDE COMPLETION] Also searching ${kind} root: ${root}`);
+                        await this.addEntriesFromDirectory(
+                            root, '', extensions, replaceRange,
+                            document.uri.fsPath, completionItems, addedEntries, token,
+                            PATH_ROOT_LABEL[kind], '', `${PATH_ROOT_TOKEN[kind]}/`
+                        );
+                    }
                 }
 
-                // Also search each open workspace folder. Skip any folder that
-                // is the doc dir or the library — those are already covered.
-                // Workspace-folder entries get absolute-path insert text so
-                // #include resolves regardless of the current file's location.
+                // Also search each open workspace folder. Skip any folder that coincides with
+                // the doc dir or a declared root — those are already covered. Workspace-folder
+                // entries get absolute-path insert text so #include resolves regardless of the
+                // current file's location.
                 const workspaceFolders = vscode.workspace.workspaceFolders ?? [];
-                const docDirNorm = path.normalize(documentDir);
-                const libNorm = resolvedLibraryPath ? path.normalize(resolvedLibraryPath) : '';
+                const rootNorms = (['project', 'library'] as const)
+                    .map(k => resolvedRoots[k])
+                    .filter((p): p is string => !!p)
+                    .map(p => path.normalize(p));
                 for (const folder of workspaceFolders) {
                     const folderPath = folder.uri.fsPath;
                     const folderNorm = path.normalize(folderPath);
-                    if (folderNorm === docDirNorm || (libNorm && folderNorm === libNorm)) {
+                    if (folderNorm === docDirNorm || rootNorms.includes(folderNorm)) {
                         continue;
                     }
                     this.outputChannel.appendLine(`[INCLUDE COMPLETION] Also searching workspace folder: ${folderPath}`);
@@ -332,38 +349,6 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
             item.sortText = '1_' + name;
             completionItems.push(item);
         }
-    }
-
-    private resolveLibraryPath(libraryPath: string): string | undefined {
-        this.outputChannel.appendLine(`[INCLUDE COMPLETION] Resolving library path: "${libraryPath}"`);
-
-        // Expand environment variables (%VAR% on Windows, $VAR on Unix)
-        let resolved = libraryPath.replace(/%([^%]+)%/g, (_, varName) => {
-            const value = process.env[varName];
-            this.outputChannel.appendLine(`[INCLUDE COMPLETION]   ENV %${varName}% = "${value || '(not set)'}"`);
-            return value || '';
-        });
-        resolved = resolved.replace(/\$([A-Za-z_][A-Za-z0-9_]*)/g, (_, varName) => {
-            const value = process.env[varName];
-            this.outputChannel.appendLine(`[INCLUDE COMPLETION]   ENV $${varName} = "${value || '(not set)'}"`);
-            return value || '';
-        });
-
-        this.outputChannel.appendLine(`[INCLUDE COMPLETION]   After expansion: "${resolved}"`);
-
-        if (!path.isAbsolute(resolved)) {
-            // Resolve relative to the first workspace folder
-            const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-            if (workspaceFolder) {
-                resolved = path.resolve(workspaceFolder.uri.fsPath, resolved);
-                this.outputChannel.appendLine(`[INCLUDE COMPLETION]   Resolved relative to workspace: "${resolved}"`);
-            } else {
-                this.outputChannel.appendLine(`[INCLUDE COMPLETION]   Cannot resolve relative path - no workspace folder`);
-                return undefined;
-            }
-        }
-
-        return resolved;
     }
 
     public static register(outputChannel: vscode.OutputChannel): vscode.Disposable {

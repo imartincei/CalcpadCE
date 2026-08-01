@@ -34,6 +34,7 @@ namespace Calcpad.Highlighter.Tokenizer
                     var isInclude = false;
                     var isFormat = false;
                     var isSettings = false;
+                    var isPathRoot = false;
                     if (_state.CurrentType == TokenType.Keyword)
                     {
                         isInclude = len == 8 &&
@@ -48,6 +49,12 @@ namespace Calcpad.Highlighter.Tokenizer
                             _builder[1] == 's' &&
                             _builder[2] == 'e' &&
                             _builder[3] == 't';
+                        // Case-insensitive, unlike the checks above: #ProjectPath/#LibraryPath are
+                        // suggested to authors in PascalCase, so a case-sensitive check here would
+                        // silently miss the exact spelling this feature itself recommends.
+                        isPathRoot = len == 12 &&
+                            (_builder.ToString().Equals("#projectpath", StringComparison.OrdinalIgnoreCase) ||
+                             _builder.ToString().Equals("#librarypath", StringComparison.OrdinalIgnoreCase));
                     }
 
                     Append(_state.CurrentType);
@@ -77,6 +84,12 @@ namespace Calcpad.Highlighter.Tokenizer
                         // Set start column to AFTER this space for the JSON payload token
                         _state.TokenStartColumn = position + 1;
                     }
+                    else if (isPathRoot)
+                    {
+                        _state.CurrentType = TokenType.PathRoot;
+                        // Set start column to AFTER this space for the path value token
+                        _state.TokenStartColumn = position + 1;
+                    }
                     else
                     {
                         _state.CurrentType = TokenType.None;
@@ -84,12 +97,13 @@ namespace Calcpad.Highlighter.Tokenizer
                 }
 
                 // Emit whitespace as None type to preserve column positions
-                // But preserve FilePath, Include, Format, and SettingsJson modes
+                // But preserve FilePath, Include, Format, SettingsJson, and PathRoot modes
                 var inFilePath = _state.CurrentType == TokenType.FilePath;
                 var inIncludeMode = _state.CurrentType == TokenType.Include;
                 var inFormatMode = _state.CurrentType == TokenType.Format;
                 var inSettingsMode = _state.CurrentType == TokenType.SettingsJson;
-                if (inFilePath || inIncludeMode || inSettingsMode)
+                var inPathRootMode = _state.CurrentType == TokenType.PathRoot;
+                if (inFilePath || inIncludeMode || inSettingsMode || inPathRootMode)
                 {
                     // For filepath/include, spaces within are part of the token
                     // But if this is the FIRST char (builder is empty), skip leading space

@@ -140,7 +140,8 @@ namespace Calcpad.Server.Controllers
         {
             try
             {
-                var result = PortablePackage.Build(request.Content, request.SourceFilePath, request.WriteNextToWorksheet);
+                var result = PortablePackage.Build(request.Content, request.SourceFilePath, request.WriteNextToWorksheet,
+                    request.BundleProjectReferences, request.BundleLibraryReferences);
                 if (result.Zip is null)
                     return BadRequest(new { error = "The worksheet cannot be packaged", messages = result.Errors });
 
@@ -854,6 +855,17 @@ namespace Calcpad.Server.Controllers
         /// Defaults to false so a client that predates this option keeps today's behavior.
         /// </summary>
         public bool WriteNextToWorksheet { get; set; }
+
+        /// <summary>
+        /// Resolves a <c>&lt;project&gt;</c> reference to its local path and bundles it like any
+        /// other absolute reference, instead of leaving the token for the recipient's own
+        /// <c>#ProjectPath</c> to resolve. Read only by <c>portable/package</c> — a compiled
+        /// worksheet always resolves both roots, since its locked source has no way to add one.
+        /// </summary>
+        public bool BundleProjectReferences { get; set; }
+
+        /// <summary>The same choice as <see cref="BundleProjectReferences"/>, for <c>&lt;library&gt;</c>.</summary>
+        public bool BundleLibraryReferences { get; set; }
     }
 
     public class PortableBundleResponse

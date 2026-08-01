@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using System.Text;
+using Calcpad.Core;
 using static Calcpad.Server.Services.WorksheetReferences;
 
 namespace Calcpad.Server.Services
@@ -57,13 +58,24 @@ namespace Calcpad.Server.Services
         /// output lands beside wherever the package is unpacked instead of a folder that may not
         /// exist there. A relative target already does that and is untouched either way.
         /// </param>
+        /// <param name="bundleProject">
+        /// Resolves a <c>&lt;project&gt;</c> reference to the author's local path and bundles it
+        /// like any other absolute reference, instead of leaving the token exactly as written for
+        /// the recipient's own <c>#ProjectPath</c> to resolve.
+        /// </param>
+        /// <param name="bundleLibrary">The same choice, for <c>&lt;library&gt;</c>.</param>
         /// <returns>
         /// The archive, or <see cref="Result.Errors"/> saying why there is none. A reference that
         /// cannot be read, two that share a name, and two outputs that would collapse onto the
         /// same file are all refusals: a package that fails, or overwrites one output with
         /// another, for whoever receives it is the one thing this exists to prevent.
         /// </returns>
-        public static Result Build(string content, string? sourceFilePath, bool nextToWorksheet = false)
+        public static Result Build(
+            string content,
+            string? sourceFilePath,
+            bool nextToWorksheet = false,
+            bool bundleProject = false,
+            bool bundleLibrary = false)
         {
             if (string.IsNullOrWhiteSpace(sourceFilePath))
                 return Unpackable("A portable package resolves references against the folder of the "
@@ -89,7 +101,9 @@ namespace Calcpad.Server.Services
             // reference on the first line, and put back on the way out. Included files are read
             // as text, which drops theirs.
             var bom = content.StartsWith('﻿');
-            var documents = Walk(rootPath, bom ? content[1..] : content, errors);
+            var pathRoots = new PathRoots();
+            var documents = Walk(rootPath, bom ? content[1..] : content, errors, pathRoots,
+                bundleProject, bundleLibrary);
             var dataFiles = documents.DataFiles;
             if (errors.Count > 0)
                 return Failed(errors);
@@ -101,10 +115,11 @@ namespace Calcpad.Server.Services
 
             var entries = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
             var rewritten = new Dictionary<string, string>(PathComparer);
-            var outputs = new OutputTargets(nextToWorksheet, rootDirectory, errors);
+            var outputs = new OutputTargets(nextToWorksheet, rootDirectory, errors, pathRoots,
+                bundleProject, bundleLibrary);
             foreach (var path in documents.Texts.Keys.OrderBy(p => p, StringComparer.Ordinal))
                 rewritten[path] = RewriteDocument(documents.Texts[path], path, rootPath, innerName,
-                    refsFolder, outputs);
+                    refsFolder, outputs, pathRoots, bundleProject, bundleLibrary, errors);
             if (errors.Count > 0)
                 return Failed(errors);
 
@@ -152,11 +167,29 @@ namespace Calcpad.Server.Services
 
         /// <summary>
         /// Follows every reference from the root outwards, collecting the text of each document
-        /// and the path of each data file and image. Reading an included file is what makes it a
-        /// document, so a file only referenced by <c>#read</c> is never parsed for references of
-        /// its own.
+        /// and the path of each data file and image, and records every <c>#ProjectPath</c>/
+        /// <c>#LibraryPath</c> declaration into <paramref name="pathRoots"/> along the way — the
+        /// same instance <see cref="RewriteDocument"/> later reads from, once every declaration
+        /// in the tree has been seen. Reading an included file is what makes it a document, so a
+        /// file only referenced by <c>#read</c> is never parsed for references of its own.
         /// </summary>
-        private static Walked Walk(string rootPath, string rootText, List<string> errors)
+        /// <remarks>
+        /// A declaration inside a <c>#local</c>...<c>#global</c> section of a file reached by
+        /// <c>#include</c> is skipped, mirroring <c>CalcpadService.ProcessIncludedContent</c> —
+        /// the include delegate the real pipeline reads through — which drops that section
+        /// entirely before the includer ever sees it. Without this, a module that follows the
+        /// documented pattern of scoping its own roots to <c>#local</c> would still collide with
+        /// the including document's here, even though it never actually would at render time.
+        /// The root's own <c>#local</c> is not gated: opening it directly never goes through the
+        /// include delegate, so its declarations are live exactly as written.
+        /// </remarks>
+        private static Walked Walk(
+            string rootPath,
+            string rootText,
+            List<string> errors,
+            PathRoots pathRoots,
+            bool bundleProject,
+            bool bundleLibrary)
         {
             var texts = new Dictionary<string, string>(PathComparer) { [rootPath] = rootText };
             var dataFiles = new HashSet<string>(PathComparer);
@@ -169,10 +202,37 @@ namespace Calcpad.Server.Services
                 var (path, depth) = queue.Dequeue();
                 var directory = Path.GetDirectoryName(path) ?? string.Empty;
                 var owner = Path.GetFileName(path);
+                var isRootFile = PathComparer.Equals(path, rootPath);
+                var isLocal = false;
                 var lineNumber = 0;
                 foreach (var (line, _) in Lines(texts[path]))
                 {
                     ++lineNumber;
+                    var trimmedLine = line.TrimStart();
+                    if (PathRoots.IsDeclaration(trimmedLine.AsSpan(), out var isProject, out var declStart, out var declLength))
+                    {
+                        if (isRootFile || !isLocal)
+                        {
+                            if (declLength == 0)
+                                errors.Add($"{owner}, line {lineNumber}: "
+                                    + $"{(isProject ? "#ProjectPath" : "#LibraryPath")} requires a path.");
+                            else if (!pathRoots.TryDeclare(isProject, trimmedLine.Substring(declStart, declLength),
+                                directory, out var declError))
+                                errors.Add($"{owner}, line {lineNumber}: {declError}");
+                        }
+                        continue;
+                    }
+                    if (Validator.IsKeyword(line, "#local"))
+                    {
+                        isLocal = true;
+                        continue;
+                    }
+                    if (Validator.IsKeyword(line, "#global"))
+                    {
+                        isLocal = false;
+                        continue;
+                    }
+
                     foreach (var reference in Scan(line))
                     {
                         if (reference.IsOutput)
@@ -180,7 +240,21 @@ namespace Calcpad.Server.Services
                         if (reference.Kind == ReferenceKind.Image && IsExternalSource(reference.Raw))
                             continue;
 
-                        if (!TryResolve(reference.Raw, ResolveDirectory(reference, directory), out var resolved))
+                        var raw = reference.Raw;
+                        if (PathRoots.TryGetTokenKind(raw.AsSpan(), out var isProjectToken))
+                        {
+                            if (isProjectToken ? !bundleProject : !bundleLibrary)
+                                continue;
+
+                            if (!pathRoots.TryExpand(raw, out raw, out var tokenError))
+                            {
+                                errors.Add($"{owner}, line {lineNumber}: {reference.Directive} "
+                                    + $"{reference.Raw} — {tokenError}");
+                                continue;
+                            }
+                        }
+
+                        if (!TryResolve(raw, ResolveDirectory(reference, directory), out var resolved))
                         {
                             errors.Add(Unreadable(owner, lineNumber, reference, reference.Raw));
                             continue;
@@ -278,7 +352,11 @@ namespace Calcpad.Server.Services
             string rootPath,
             string innerName,
             string refsFolder,
-            OutputTargets outputs)
+            OutputTargets outputs,
+            PathRoots pathRoots,
+            bool bundleProject,
+            bool bundleLibrary,
+            List<string> errors)
         {
             var isRoot = PathComparer.Equals(path, rootPath);
             var directory = Path.GetDirectoryName(path) ?? string.Empty;
@@ -301,8 +379,26 @@ namespace Calcpad.Server.Services
                 if (reference.Kind == ReferenceKind.Image && IsExternalSource(reference.Raw))
                     return null;
 
+                var raw = reference.Raw;
+                if (PathRoots.TryGetTokenKind(raw.AsSpan(), out var isProjectToken))
+                {
+                    if (isProjectToken ? !bundleProject : !bundleLibrary)
+                        return null;
+
+                    // Walk already validated every token reference in the tree, so a failure
+                    // here would mean Build reached this rewrite pass despite Walk reporting an
+                    // error — which Build's own error check does not allow. Reported defensively
+                    // rather than silently leaving the token in place.
+                    if (!pathRoots.TryExpand(raw, out raw, out var tokenError))
+                    {
+                        errors.Add($"{owner}, line {lineNumber}: {reference.Directive} "
+                            + $"{reference.Raw} — {tokenError}");
+                        return null;
+                    }
+                }
+
                 var isInclude = reference.Kind == ReferenceKind.Include;
-                if (!TryResolve(reference.Raw, isInclude ? directory : rootDirectory, out var resolved))
+                if (!TryResolve(raw, isInclude ? directory : rootDirectory, out var resolved))
                     return null;
 
                 if (PathComparer.Equals(resolved, rootPath))

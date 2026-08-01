@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import type { SymbolLocation } from 'calcpad-frontend';
+import { scanDeclaredPathRoots, resolveDeclaredPathRoots, expandPathRootToken, type ResolvedPathRoots } from 'calcpad-frontend';
 import { VSCodeFileSystem } from './adapters';
 
 /** Expands %VAR% (Windows) and $VAR / ${VAR} (POSIX) references against process.env. */
@@ -11,11 +12,19 @@ export function expandEnvVars(input: string): string {
         .replace(/\$([A-Za-z_][A-Za-z0-9_]*)/g, (_, n) => process.env[n] ?? '');
 }
 
+/** The document's declared `<project>`/`<library>` roots, resolved to absolute directories. */
+export function resolveDocumentPathRoots(document: vscode.TextDocument): ResolvedPathRoots {
+    const documentDir = path.dirname(document.uri.fsPath);
+    const declared = scanDeclaredPathRoots(document.getText());
+    return resolveDeclaredPathRoots(declared, documentDir, expandEnvVars, path.resolve);
+}
+
 /**
- * Resolve a raw `#include FILEPATH` path (as typed, possibly with %VAR%/$VAR
- * env references) to a concrete `vscode.Location` pointing at the start of
- * that file. Same lookup order as resolveSymbolLocation: document dir first,
- * then a workspace-wide search; null if neither finds it.
+ * Resolve a raw `#include FILEPATH` path (as typed, possibly with a
+ * `<project>`/`<library>` token and/or %VAR%/$VAR env references) to a
+ * concrete `vscode.Location` pointing at the start of that file. Same lookup
+ * order as resolveSymbolLocation: document dir first, then a workspace-wide
+ * search; null if neither finds it (including an undeclared token root).
  */
 export async function resolveIncludeDirectiveLocation(
     document: vscode.TextDocument,
@@ -23,8 +32,14 @@ export async function resolveIncludeDirectiveLocation(
     fileSystem: VSCodeFileSystem,
     outputChannel: vscode.OutputChannel,
     logPrefix: string,
+    roots: ResolvedPathRoots = resolveDocumentPathRoots(document),
 ): Promise<vscode.Location | null> {
-    const expanded = expandEnvVars(rawPath.trim());
+    const { expanded: tokenExpanded, ok } = expandPathRootToken(rawPath.trim(), roots);
+    if (!ok) {
+        outputChannel.appendLine(`${logPrefix} Include target's path root is not declared: ${rawPath}`);
+        return null;
+    }
+    const expanded = expandEnvVars(tokenExpanded);
     if (!expanded) return null;
     const start = new vscode.Position(0, 0);
 

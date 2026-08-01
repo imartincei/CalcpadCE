@@ -223,3 +223,19 @@ export {
     serializeUiDirective,
     documentHasUiDirectives,
 } from './text/ui-directive';
+export type {
+    PathRootKind,
+    PathRootDeclaration,
+    DeclaredPathRoots,
+    ResolvedPathRoots,
+} from './text/path-roots';
+export {
+    hasPathRootToken,
+    getPathRootTokenKind,
+    parsePathRootDeclaration,
+    scanDeclaredPathRoots,
+    resolvePathRoot,
+    resolveDeclaredPathRoots,
+    expandPathRootToken,
+    createReferenceResolver,
+} from './text/path-roots';

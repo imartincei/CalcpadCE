@@ -568,7 +568,7 @@ async function bootstrap(): Promise<void> {
             // the images-folder / custom-path insert options) render in the
             // sandboxed preview iframe, matching PDF export.
             const finalHtml = tauriBridge
-                ? await tauriBridge.inlineDocumentImages(result.html)
+                ? await tauriBridge.inlineDocumentImages(result.html, content)
                 : result.html;
             appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine);
             if (mode === 'ui') uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
@@ -598,7 +598,7 @@ async function bootstrap(): Promise<void> {
             { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }, true);
         if (!result || result instanceof ArrayBuffer) return;
 
-        const html = tauriBridge ? await tauriBridge.inlineDocumentImages(result.html) : result.html;
+        const html = tauriBridge ? await tauriBridge.inlineDocumentImages(result.html, content) : result.html;
         appInstance.setUiPrintHtml(group.id, html);
     }
 
@@ -1012,7 +1012,7 @@ async function bootstrap(): Promise<void> {
             listDirectory: (p) => tauriBridge.listDirectory(p),
             getCurrentFilePath: () => tabs.activeTab?.filePath ?? null,
             getOpenedFolder: () => tauriBridge.getOpenedFolder(),
-            getLibraryPath: () => tauriBridge.getLibraryPath(),
+            expandEnvVars: (raw) => tauriBridge.expandEnvVars(raw),
         });
     }
     registerHoverProvider(editorBridge);

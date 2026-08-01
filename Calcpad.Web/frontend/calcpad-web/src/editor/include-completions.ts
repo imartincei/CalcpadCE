@@ -1,4 +1,6 @@
 import * as monaco from 'monaco-editor';
+import { scanDeclaredPathRoots, getPathRootTokenKind, type PathRootKind } from 'calcpad-frontend';
+import { pathResolve } from 'calcpad-frontend/services/paths';
 
 const DIRECTIVES = ['include', 'read', 'write', 'append'] as const;
 type Directive = typeof DIRECTIVES[number];
@@ -79,20 +81,22 @@ export interface IncludeCompletionsContext {
     getCurrentFilePath(): string | null;
     /** Currently-opened workspace folder root, or null. */
     getOpenedFolder(): Promise<string | null>;
-    /**
-     * Configured library folder, or null. Searched at the root level in
-     * addition to the current file's directory and any opened workspace
-     * folder, so shared includes remain reachable regardless of what the
-     * user has open in the Files panel.
-     */
-    getLibraryPath?(): Promise<string | null>;
+    /** Expands %VAR%/$VAR references against the host's environment. */
+    expandEnvVars(raw: string): Promise<string>;
 }
+
+const PATH_ROOT_LABEL: Record<PathRootKind, string> = { project: 'Project', library: 'Library' };
+const PATH_ROOT_TOKEN: Record<PathRootKind, string> = { project: '<project>', library: '<library>' };
 
 /**
  * Register a Monaco completion provider for #include / #read / #write / #append
  * directives. Search roots (in priority order):
  *   1. The current file's parent directory.
  *   2. The opened workspace folder (if any and different).
+ *   3. The document's own `#ProjectPath`/`#LibraryPath` declarations, if any —
+ *      offered (and drilled into) as `<project>/…`/`<library>/…` so completions
+ *      naturally lead an author to write the portable, token-prefixed form
+ *      rather than an absolute path that a portable package would bundle.
  * Duplicates (same file reachable via multiple roots) are filtered by absolute
  * path so the same file only appears once in the completion list.
  */
@@ -122,7 +126,15 @@ export function registerIncludeCompletionProvider(
             const currentFilePath = ctx.getCurrentFilePath();
             const currentDir = currentFilePath ? pathDirname(currentFilePath) : '';
             const openedFolder = await ctx.getOpenedFolder();
-            const libraryFolder = ctx.getLibraryPath ? await ctx.getLibraryPath() : null;
+
+            const declaredRoots = scanDeclaredPathRoots(model.getValue(), position.lineNumber - 1);
+            const resolvedRoots: Record<PathRootKind, string | null> = { project: null, library: null };
+            for (const kind of ['project', 'library'] as const) {
+                const declared = declaredRoots[kind];
+                if (declared && currentDir) {
+                    resolvedRoots[kind] = pathResolve(currentDir, await ctx.expandEnvVars(declared));
+                }
+            }
 
             const range: monaco.IRange = {
                 startLineNumber: position.lineNumber,
@@ -134,9 +146,23 @@ export function registerIncludeCompletionProvider(
             const suggestions: monaco.languages.CompletionItem[] = [];
             const seenAbsolute = new Set<string>();
 
+            const tokenKind = getPathRootTokenKind(partialPath);
             const hasSeparator = partialPath.includes('/') || partialPath.includes('\\');
 
-            if (hasSeparator && !pathIsAbsolute(partialPath)) {
+            if (tokenKind !== null) {
+                // Drilling into a <project>/<library> reference: search the resolved root,
+                // but reinsert completions in token form so the reference stays portable.
+                const root = resolvedRoots[tokenKind];
+                if (root === null) return { suggestions: [], incomplete: true };
+
+                const tokenText = partialPath.slice(0, PATH_ROOT_TOKEN[tokenKind].length);
+                let rest = partialPath.slice(tokenText.length);
+                if (rest.startsWith('/') || rest.startsWith('\\')) rest = rest.slice(1);
+                await addEntries(
+                    ctx, root, rest, extensions, range,
+                    currentFilePath, suggestions, seenAbsolute, '', false, `${tokenText}/`
+                );
+            } else if (hasSeparator && !pathIsAbsolute(partialPath)) {
                 // Drill down: resolve the typed prefix relative to the doc dir only.
                 await addEntries(
                     ctx, currentDir, partialPath, extensions, range,
@@ -151,7 +177,7 @@ export function registerIncludeCompletionProvider(
                     currentFilePath, suggestions, seenAbsolute, ''
                 );
             } else {
-                // Root level: current file dir + opened workspace folder (dedup).
+                // Root level: current file dir + opened workspace folder + declared roots (dedup).
                 if (currentDir) {
                     await addEntries(
                         ctx, currentDir, partialPath, extensions, range,
@@ -161,16 +187,20 @@ export function registerIncludeCompletionProvider(
                 if (openedFolder && normalize(openedFolder) !== normalize(currentDir)) {
                     await addEntries(
                         ctx, openedFolder, partialPath, extensions, range,
-                        currentFilePath, suggestions, seenAbsolute, 'Workspace'
+                        currentFilePath, suggestions, seenAbsolute, 'Workspace', true
                     );
                 }
-                if (libraryFolder
-                    && normalize(libraryFolder) !== normalize(currentDir)
-                    && (!openedFolder || normalize(libraryFolder) !== normalize(openedFolder))) {
-                    await addEntries(
-                        ctx, libraryFolder, partialPath, extensions, range,
-                        currentFilePath, suggestions, seenAbsolute, 'Library'
-                    );
+                for (const kind of ['project', 'library'] as const) {
+                    const root = resolvedRoots[kind];
+                    if (root
+                        && normalize(root) !== normalize(currentDir)
+                        && (!openedFolder || normalize(root) !== normalize(openedFolder))) {
+                        await addEntries(
+                            ctx, root, partialPath, extensions, range,
+                            currentFilePath, suggestions, seenAbsolute, PATH_ROOT_LABEL[kind], false,
+                            `${PATH_ROOT_TOKEN[kind]}/`
+                        );
+                    }
                 }
             }
 
@@ -188,7 +218,9 @@ async function addEntries(
     currentFilePath: string | null,
     suggestions: monaco.languages.CompletionItem[],
     seenAbsolute: Set<string>,
-    sourceLabel: string
+    sourceLabel: string,
+    useAbsolute: boolean = false,
+    insertPrefix: string = ''
 ): Promise<void> {
     let searchDir: string;
     let pathPrefix: string;
@@ -205,12 +237,6 @@ async function addEntries(
     const entries = await ctx.listDirectory(searchDir);
     if (!entries.length) return;
 
-    // For the opened-folder ("Workspace") and library ("Library") sources,
-    // inserted paths are absolute so #include resolves regardless of the
-    // current file's location. For the doc-dir root we insert relative paths
-    // (using the same prefix the user has typed so far).
-    const useAbsolute = sourceLabel === 'Workspace' || sourceLabel === 'Library';
-
     // Folders
     for (const entry of entries) {
         if (!entry.isDirectory || entry.name.startsWith('.')) continue;
@@ -223,7 +249,7 @@ async function addEntries(
         const sep = absPath.includes('\\') ? '\\' : '/';
         const insertText = useAbsolute
             ? absPath + sep
-            : pathPrefix + entry.name + sep;
+            : insertPrefix + pathPrefix + entry.name + sep;
 
         suggestions.push({
             label: entry.name,
@@ -255,7 +281,7 @@ async function addEntries(
         if (seenAbsolute.has(dedupKey)) continue;
         seenAbsolute.add(dedupKey);
 
-        const insertText = useAbsolute ? absPath : pathPrefix + entry.name;
+        const insertText = useAbsolute ? absPath : insertPrefix + pathPrefix + entry.name;
 
         suggestions.push({
             label: entry.name,

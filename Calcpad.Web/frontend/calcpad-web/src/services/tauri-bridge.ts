@@ -33,6 +33,7 @@ import {
     bytesToBase64,
     isCompiledPath,
     inlineImageSources,
+    createReferenceResolver,
     pathBasename,
     pathDirname,
     pathExtension,
@@ -75,15 +76,6 @@ function withExtension(filePath: string, accepted: string[]): string {
 }
 
 /**
- * Replace `<img src="local/path">` references in `html` with base64 data URIs
- * so PuppeteerSharp's headless Chromium — which has no local-filesystem
- * access — can render user-supplied images inside exported PDFs.
- */
-function inlineLocalImages(html: string, documentDir: string): Promise<string> {
-    return inlineImageSources(html, documentDir, tauriReader);
-}
-
-/**
  * Message bridge for the Tauri desktop platform. Settings JSON files live
  * under `$APPDATA/settings/`; recent files and the opened folder live in a
  * plugin-store JSON. Native dialogs, filesystem, and clipboard flow through
@@ -96,7 +88,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
     // Original bytes of each open .cpdz, kept only for the composite archives that
     // bundle images — re-encoding needs them to preserve the non-code entries.
     private readonly _compiledOriginals = new Map<string, Uint8Array | undefined>();
-    private _resolvedLibraryPath: string | null | undefined = undefined;
     private _activePresetName: string = DEFAULT_PRESET_NAME;
     private _appDataDir: string = '';
     private _settingsDir: string = '';
@@ -141,7 +132,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     setExtraSetting(key: string, value: string): void {
         this.persistSetting(key, value);
-        if (key === 'libraryPath') this._resolvedLibraryPath = undefined;
     }
 
     private persistSetting(key: string, value: string): void {
@@ -159,7 +149,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
         await this.readPresetInto(DEFAULT_PRESET_NAME);
         await this.setActivePresetName(DEFAULT_PRESET_NAME);
         await this.saveActiveSettings();
-        this._resolvedLibraryPath = undefined;
     }
 
     protected async afterResetSettings(): Promise<void> {
@@ -220,14 +209,23 @@ export class TauriMessageBridge extends BaseMessageBridge {
      * URIs so the sandboxed preview iframe can render them (the VS Code
      * extension does the same via its image cache). Absolute paths resolve
      * even for untitled documents; relative paths need the active tab's folder.
-     * Remote/data URIs are left untouched.
+     * Remote/data URIs are left untouched. `sourceText` is the raw `.cpd`
+     * source (not `html`) — it is what a `<project>`/`<library>` reference
+     * is declared and resolved against.
      */
-    async inlineDocumentImages(html: string): Promise<string> {
-        return inlineLocalImages(html, this.activeTabDirectory());
+    async inlineDocumentImages(html: string, sourceText: string): Promise<string> {
+        return this.inlineLocalImages(html, this.activeTabDirectory(), sourceText);
     }
 
     protected async buildCompiledSource(content: string): Promise<string> {
-        return inlineLocalImages(content, this.activeTabDirectory());
+        return this.inlineLocalImages(content, this.activeTabDirectory(), content);
+    }
+
+    /** Builds the `<img src>` → absolute-path resolver from `sourceText`'s own declared roots. */
+    private inlineLocalImages(html: string, documentDir: string, sourceText: string): Promise<string> {
+        const resolve = createReferenceResolver(
+            sourceText, documentDir, (raw) => this.expandEnvVars(raw), pathResolve);
+        return inlineImageSources(html, tauriReader, resolve);
     }
 
     protected async saveImageToImagesFolder(img: PickedImage): Promise<string | null> {
@@ -319,7 +317,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     protected async buildSettingsResponseExtras(): Promise<Record<string, unknown>> {
         return {
-            libraryPath: this._extraSettings.libraryPath || '',
             activeConfig: this._activePresetName,
             availableConfigs: await this.listPresets(),
             availableFonts: [...this._availableFonts],
@@ -345,7 +342,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
         // The headless browser has no filesystem access, so on-disk images have to travel
         // as data URIs.
-        const html = await inlineLocalImages(rendered, this.activeTabDirectory());
+        const html = await this.inlineLocalImages(rendered, this.activeTabDirectory(), content);
 
         const pdfResp = await fetch(`${this.apiClient.getBaseUrl()}/api/calcpad/pdf`, {
             method: 'POST',
@@ -409,9 +406,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
                 return true;
             case 'openSettingsFolder':
                 this.handleOpenSettingsFolder();
-                return true;
-            case 'updateLibraryPath':
-                this.setExtraSetting('libraryPath', message.path ?? '');
                 return true;
             case 'getPrettifySettings':
                 this.handleGetPrettifySettings();
@@ -640,8 +634,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     private async handleGetOpenedFolder(): Promise<void> {
-        const explicit = await this.getOpenedFolder();
-        const folder = explicit ?? (await this.getLibraryPath());
+        const folder = await this.getOpenedFolder();
         if (!folder) {
             this.postToVue({ type: 'folderOpened', path: null, entries: [] });
             return;
@@ -689,25 +682,10 @@ export class TauriMessageBridge extends BaseMessageBridge {
         await openPath(target);
     }
 
-    // ---- Library path resolution ----
+    // ---- Environment variable expansion ----
 
-    getLibraryPathRaw(): string {
-        return this._extraSettings.libraryPath || '';
-    }
-
-    async getLibraryPath(): Promise<string | null> {
-        if (this._resolvedLibraryPath !== undefined) return this._resolvedLibraryPath;
-        const raw = this.getLibraryPathRaw().trim();
-        if (!raw) {
-            this._resolvedLibraryPath = null;
-            return null;
-        }
-        const expanded = await this.expandEnvVars(raw);
-        this._resolvedLibraryPath = expanded ? expanded : null;
-        return this._resolvedLibraryPath;
-    }
-
-    private async expandEnvVars(input: string): Promise<string> {
+    /** Expands `%VAR%`/`$VAR` references against the Tauri host's environment. */
+    async expandEnvVars(input: string): Promise<string> {
         const names = new Set<string>();
         for (const m of input.matchAll(/%([^%]+)%/g)) names.add(m[1]);
         for (const m of input.matchAll(/\$([A-Za-z_][A-Za-z0-9_]*)/g)) names.add(m[1]);
@@ -1102,7 +1080,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
         await this.readPresetInto(name);
         await this.setActivePresetName(name);
         await this.saveActiveSettings();
-        this._resolvedLibraryPath = undefined;
         if (this.settings.server?.url) {
             this.apiClient.setBaseUrl(this.settings.server.url);
         }

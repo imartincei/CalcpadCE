@@ -379,6 +379,144 @@ public class PortablePackageTests
         Assert.Equal(["root.cpd"], Names(zip));
     }
 
+    [Fact]
+    public void ATokenReference_IsLeftAsWrittenWithBothBundleFlagsOff()
+    {
+        using var tree = new Tree();
+        tree.Write("lib/steel.cpd", "a = 1\n");
+        var source = $"""
+            #LibraryPath = {tree.At("lib")}
+            #include <library>/steel.cpd
+            """;
+        var zip = tree.Pack(source);
+
+        Assert.Equal(source, Text(zip, "root.cpd"));
+        Assert.Equal(["root.cpd"], Names(zip));
+    }
+
+    [Fact]
+    public void ATokenReadAndWriteAndImage_AreAllLeftAsWrittenWithBothBundleFlagsOff()
+    {
+        using var tree = new Tree();
+        var source = """
+            #ProjectPath = /project
+            #read L from <project>/data/loads.csv
+            #write R to <project>/out/results.csv
+            '<img src="<project>/media/logo.png">
+            """;
+        var zip = tree.Pack(source);
+
+        Assert.Equal(source, Text(zip, "root.cpd"));
+        Assert.Equal(["root.cpd"], Names(zip));
+    }
+
+    [Fact]
+    public void ATokenInclude_IsBundledWhenItsFlagIsOn()
+    {
+        using var tree = new Tree();
+        tree.Write("lib/steel.cpd", "a = 1\n");
+        var zip = tree.Pack($"""
+            #LibraryPath = {tree.At("lib")}
+            #include <library>/steel.cpd
+            """, bundleLibrary: true);
+
+        Assert.Equal(["root.cpd", "root.cpd.refs/steel.cpd"], Names(zip));
+        Assert.Contains("#include root.cpd.refs/steel.cpd", Text(zip, "root.cpd"));
+    }
+
+    [Fact]
+    public void AProjectTokenInclude_StaysAsWritten_WhenOnlyLibraryIsBundled()
+    {
+        using var tree = new Tree();
+        tree.Write("job/data.cpd", "a = 1\n");
+        var source = $"""
+            #ProjectPath = {tree.At("job")}
+            #include <project>/data.cpd
+            """;
+        var zip = tree.Pack(source, bundleLibrary: true);
+
+        Assert.Equal(source, Text(zip, "root.cpd"));
+        Assert.Equal(["root.cpd"], Names(zip));
+    }
+
+    /// <summary>
+    /// With its bundle flag off, a token reference is never resolved by the exporter at all — it
+    /// is left exactly as written whether or not its root was ever declared. An undeclared root
+    /// is the document's own error, caught the way any other one is: when it is actually rendered.
+    /// </summary>
+    [Fact]
+    public void AnUndeclaredTokenInclude_IsLeftAsWrittenWithItsFlagOff()
+    {
+        using var tree = new Tree();
+        var source = "#include <library>/steel.cpd\n";
+        var zip = tree.Pack(source);
+
+        Assert.Equal(source, Text(zip, "root.cpd"));
+        Assert.Equal(["root.cpd"], Names(zip));
+    }
+
+    [Fact]
+    public void AnUndeclaredTokenInclude_IsRefusedNamingTheDirective_WhenItsFlagIsOn()
+    {
+        using var tree = new Tree();
+        var result = tree.Build("#include <library>/steel.cpd\n", bundleLibrary: true);
+
+        Assert.Null(result.Zip);
+        var message = Assert.Single(result.Errors);
+        Assert.Contains("LibraryPath", message);
+    }
+
+    [Fact]
+    public void ATokenUsedBeforeItsDeclaration_IsRefusedWhenBundled()
+    {
+        using var tree = new Tree();
+        tree.Write("lib/steel.cpd", "a = 1\n");
+        var result = tree.Build($"""
+            #include <library>/steel.cpd
+            #LibraryPath = {tree.At("lib")}
+            """, bundleLibrary: true);
+
+        Assert.Null(result.Zip);
+        var message = Assert.Single(result.Errors);
+        Assert.Contains("LibraryPath", message);
+    }
+
+    [Fact]
+    public void ASecondConflictingLibraryPath_IsRefused()
+    {
+        using var tree = new Tree();
+        var result = tree.Build("""
+            #LibraryPath = ./a
+            #LibraryPath = ./b
+            """);
+
+        Assert.Null(result.Zip);
+        Assert.Contains("LibraryPath", Assert.Single(result.Errors));
+    }
+
+    /// <summary>
+    /// A module meant to be <c>#include</c>d elsewhere is documented to scope its own root
+    /// declarations to <c>#local</c>, so they never reach the including document and cannot
+    /// clash with one it declares for itself.
+    /// </summary>
+    [Fact]
+    public void ALocalLibraryPathInsideAnInclude_DoesNotClashWithTheIncludingDocuments()
+    {
+        using var tree = new Tree();
+        tree.Write("inc/lib.cpd", $"""
+            #local
+            #LibraryPath = {tree.At("inc/otherlib")}
+            #global
+            a = 1
+            """);
+        var zip = tree.Pack($"""
+            #LibraryPath = {tree.At("lib")}
+            #include ./inc/lib.cpd
+            """);
+
+        Assert.Equal(["root.cpd", "root.cpd.refs/lib.cpd"], Names(zip));
+    }
+
     private static List<string> Names(byte[] zip)
     {
         using var archive = new ZipArchive(new MemoryStream(zip), ZipArchiveMode.Read);
@@ -416,15 +554,17 @@ public class PortablePackageTests
         /// Packs <paramref name="content"/> as the worksheet <c>root.cpd</c> of this folder,
         /// which is written to disk as well so a reference back to it resolves.
         /// </summary>
-        public PortablePackage.Result Build(string content, bool nextToWorksheet = false)
+        public PortablePackage.Result Build(
+            string content, bool nextToWorksheet = false, bool bundleProject = false, bool bundleLibrary = false)
         {
             Write("root.cpd", content);
-            return PortablePackage.Build(content, At("root.cpd"), nextToWorksheet);
+            return PortablePackage.Build(content, At("root.cpd"), nextToWorksheet, bundleProject, bundleLibrary);
         }
 
-        public byte[] Pack(string content, bool nextToWorksheet = false)
+        public byte[] Pack(
+            string content, bool nextToWorksheet = false, bool bundleProject = false, bool bundleLibrary = false)
         {
-            var result = Build(content, nextToWorksheet);
+            var result = Build(content, nextToWorksheet, bundleProject, bundleLibrary);
             Assert.Empty(result.Errors);
             Assert.NotNull(result.Zip);
             Assert.Equal("root.zip", result.Name);

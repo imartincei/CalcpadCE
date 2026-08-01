@@ -49,6 +49,7 @@ A compiled worksheet is fully portable: everything the document depends on is wr
 * "**#include**"d files are expanded in place, and macros defined with "**#def**" are applied — the compiled file has neither.
 * Every "**#read**" is replaced by the data it imports. `#read M from table.csv` becomes the assignment `M = [1; 3|2; 4]`, hidden so it does not appear in the report, and the matrix keeps the shape the directive asked for (`type=C`, `type=S` and the rest). A read declared as high performance ("**type=R_hp**") becomes an ordinary matrix.
 * Images referenced by a relative path are embedded as data, including those referenced by an included file.
+* A `<project>`/`<library>` reference (see [Path root tokens](new-includes.md#path-root-tokens-project-and-library)) is always resolved to your own local path, for every reference kind — a compiled worksheet's source is locked, so there is no way for whoever opens it to add a `#ProjectPath`/`#LibraryPath` of their own.
 
 If a referenced file cannot be read — a missing "**\*.csv**", an "**#include**" that does not resolve — compiling stops and reports it, rather than writing a worksheet that fails for whoever receives it. An unsaved document has no folder for relative paths to resolve against, so save it before compiling.
 
@@ -86,6 +87,7 @@ Unzip it anywhere and open the "**\*.cpd**": it renders as it did for its author
 * An "**#include**"d file is packed with its own references, which are rewritten as well.
 * Images given as a web address or as inline data are left alone: they already resolve anywhere.
 * "**#write**" and "**#append**" are outputs, not dependencies, so a relative target is left alone for the same reason as when compiling. An absolute target is rewritten to its bare filename when "**Write outputs next to the worksheet**" on the "**Export**" tab is checked (the default), so the output lands beside wherever the package is unpacked; clear it to keep the target exactly as written.
+* A `<project>`/`<library>` reference (see [Path root tokens](new-includes.md#path-root-tokens-project-and-library)) is left exactly as written by default, for the recipient's own `#ProjectPath`/`#LibraryPath` to resolve — useful for a shared library file that shouldn't be duplicated into every package. The **Export** tab has a checkbox for each root, off by default, to bundle it instead: resolved to your own local path and packed like any other absolute reference. The tab also shows the document's declared paths, read-only.
 
 The folder is flat, so **no two referenced files may share a name**, however different their folders are, and however deep in the "**#include**"s they sit.
 Two that do stops the export and names both paths, so you can rename one; nothing is written in the meantime.

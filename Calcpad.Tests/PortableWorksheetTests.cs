@@ -103,6 +103,59 @@ public class PortableWorksheetTests
         Assert.Equal("#write R to results.csv\n", Rewritten(result));
     }
 
+    [Fact]
+    public void ATokenWriteTarget_AlwaysResolves_RegardlessOfNextToWorksheet()
+    {
+        using var dir = new WorksheetDir();
+        var source = $"""
+            #ProjectPath = {dir.At("out")}
+            #write R to <project>/results.csv
+            """ + "\n";
+        var result = dir.Build(source, nextToWorksheet: false);
+
+        Assert.Empty(result.Errors);
+        Assert.Equal($"#write R to {dir.At("out/results.csv")}\n", Rewritten(result));
+    }
+
+    [Fact]
+    public void ATokenWriteTarget_CollapsesToItsFilename_WithNextToWorksheetOn()
+    {
+        using var dir = new WorksheetDir();
+        var source = $"""
+            #ProjectPath = {dir.At("out")}
+            #write R to <project>/results.csv
+            """ + "\n";
+        var result = dir.Build(source, nextToWorksheet: true);
+
+        Assert.Empty(result.Errors);
+        Assert.Equal("#write R to results.csv\n", Rewritten(result));
+    }
+
+    [Fact]
+    public void ATokenImageSource_ResolvesToTheAuthorsLocalPath()
+    {
+        using var dir = new WorksheetDir();
+        var source = $"""
+            #LibraryPath = {dir.At("lib")}
+            '<img src="<library>/logo.png">
+            """ + "\n";
+        var result = dir.Build(source, nextToWorksheet: false);
+
+        Assert.Empty(result.Errors);
+        var expectedSrc = "src=\"" + dir.At("lib/logo.png").Replace('\\', '/') + "\"";
+        Assert.Contains(expectedSrc, Rewritten(result));
+    }
+
+    [Fact]
+    public void AnUndeclaredTokenWriteTarget_Errors()
+    {
+        using var dir = new WorksheetDir();
+        var result = dir.Build("#write R to <project>/results.csv\n", nextToWorksheet: false);
+
+        var message = Assert.Single(result.Errors);
+        Assert.Contains("ProjectPath", message);
+    }
+
     // PortableWorksheet.Build always adds one trailing blank line when the source ends with a
     // newline — a pre-existing quirk of its line splitting, unrelated to what these tests check.
     private static string Rewritten(PortableWorksheet.Result result) => result.Content.TrimEnd('\n') + "\n";

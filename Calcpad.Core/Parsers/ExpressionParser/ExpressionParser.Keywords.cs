@@ -59,6 +59,8 @@ namespace Calcpad.Core
             Complex,
             Settings,
             Ui,
+            ProjectPath,
+            LibraryPath,
             SkipLine
         }
         private enum KeywordResult
@@ -225,6 +227,10 @@ namespace Calcpad.Core
                     break;
                 case Keyword.Ui:
                     return ParseKeywordUi(s);
+                case Keyword.ProjectPath:
+                case Keyword.LibraryPath:
+                    ParseKeywordPathRoot(s);
+                    break;
                 default:
                     if (keyword != Keyword.Global && keyword != Keyword.Local)
                         return KeywordResult.None;
@@ -665,6 +671,23 @@ namespace Calcpad.Core
             else
                 Settings.Math.FormatString = null;
         }
+        private void ParseKeywordPathRoot(ReadOnlySpan<char> s)
+        {
+            PathRoots.IsDeclaration(s, out var isProject, out var start, out var length);
+            if (length == 0)
+            {
+                AppendError(s.ToString(), string.Format(Messages.Missing_path_value_0,
+                    isProject ? "#ProjectPath" : "#LibraryPath"), _currentLine);
+                return;
+            }
+
+            var rawValue = s.Slice(start, length).ToString();
+            var declaringDir = !string.IsNullOrEmpty(SourceFilePath)
+                ? System.IO.Path.GetDirectoryName(SourceFilePath) : null;
+            if (!_pathRoots.TryDeclare(isProject, rawValue, declaringDir, out var error))
+                AppendError(s.ToString(), error, _currentLine);
+        }
+
         private const string SettingsKeyword = "#settings";
 
         private void ParseKeywordSettings(ReadOnlySpan<char> s)
@@ -849,7 +872,7 @@ namespace Calcpad.Core
                 {
                     var sourceDir = !string.IsNullOrEmpty(SourceFilePath)
                         ? System.IO.Path.GetDirectoryName(SourceFilePath) : null;
-                    var options = new ReadWriteOptions(s, 0, sourceDir);
+                    var options = new ReadWriteOptions(s, 0, sourceDir, _pathRoots);
                     if (options.Name.IsEmpty)
                         return;
 
@@ -875,7 +898,7 @@ namespace Calcpad.Core
                 {
                     var sourceDir = !string.IsNullOrEmpty(SourceFilePath)
                         ? System.IO.Path.GetDirectoryName(SourceFilePath) : null;
-                    var options = new ReadWriteOptions(s, keyword - Keyword.Read, sourceDir);
+                    var options = new ReadWriteOptions(s, keyword - Keyword.Read, sourceDir, _pathRoots);
                     if (options.Name.IsEmpty)
                         return;
 

@@ -80,6 +80,8 @@ namespace Calcpad.Core
             Def,
             EndDef,
             Include,
+            ProjectPath,
+            LibraryPath,
         }
         private readonly List<int> _lineNumbers = [];
         // Filesystem path comparison must match the host OS to avoid false-positive circular
@@ -87,6 +89,10 @@ namespace Calcpad.Core
         private static readonly StringComparer PathComparer =
             OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
         private readonly HashSet<string> _includeStack = new(PathComparer);
+        // Not reset between an #include and the file it pulls in — a document and everything it
+        // includes share one set of <project>/<library> roots, which is what makes a clash
+        // between an included module's own declaration and the parent's an error worth having.
+        private PathRoots _pathRoots = new();
         private static readonly Dictionary<string, Macro> Macros = new(StringComparer.Ordinal);
         public Func<string, Queue<string>, string> Include;
         public string SourceFilePath { get; set; }
@@ -103,6 +109,10 @@ namespace Calcpad.Core
                 return Keywords.EndDef;
             if (s.StartsWith("#include", StringComparison.OrdinalIgnoreCase))
                 return Keywords.Include;
+            if (s.StartsWith("#projectpath", StringComparison.OrdinalIgnoreCase))
+                return Keywords.ProjectPath;
+            if (s.StartsWith("#librarypath", StringComparison.OrdinalIgnoreCase))
+                return Keywords.LibraryPath;
 
             return Keywords.None;
         }
@@ -148,6 +158,7 @@ namespace Calcpad.Core
                 _includeStack.Clear();
                 _parsedLineNumber = 0;
                 _errorList.Clear();
+                _pathRoots = new PathRoots();
             }
             var macroBuilder = new StringBuilder(1000);
             var macroName = string.Empty;
@@ -172,7 +183,7 @@ namespace Calcpad.Core
                         AppendLine(sourceLine);
                         continue;
                     }
-                    if (lineContent[0] == '#' && ParseKeyword(lineContent))
+                    if (lineContent[0] == '#' && ParseKeyword(lineContent, sourceLine))
                         continue;
 
                     if (macroDefCount == 1)
@@ -217,7 +228,7 @@ namespace Calcpad.Core
             }
             return hasErrors;
 
-            bool ParseKeyword(ReadOnlySpan<char> lineContent)
+            bool ParseKeyword(ReadOnlySpan<char> lineContent, ReadOnlySpan<char> sourceLine)
             {
                 var keyword = GetKeyword(lineContent);
                 switch (keyword)
@@ -231,9 +242,36 @@ namespace Calcpad.Core
                     case Keywords.EndDef:
                         ParseEndDef(lineContent);
                         return true;
+                    case Keywords.ProjectPath:
+                    case Keywords.LibraryPath:
+                        ParsePathRoot(lineContent, sourceLine);
+                        return true;
                     default:
                         return false;
                 }
+            }
+
+            // The line is declared here, for #include resolution during this very pass, but is
+            // otherwise left standing rather than consumed the way #include is — ExpressionParser
+            // runs over this same flattened text next and independently declares its own root
+            // from it, which is what lets #read/#write resolve a token later in the document.
+            void ParsePathRoot(ReadOnlySpan<char> lineContent, ReadOnlySpan<char> sourceLine)
+            {
+                PathRoots.IsDeclaration(lineContent, out var isProject, out var start, out var length);
+                if (length == 0)
+                {
+                    AppendError(lineContent, string.Format(Messages.Missing_path_value_0,
+                        isProject ? "#ProjectPath" : "#LibraryPath"));
+                    return;
+                }
+
+                var rawValue = lineContent.Slice(start, length).ToString();
+                var declaringDir = !string.IsNullOrEmpty(SourceFilePath)
+                    ? Path.GetDirectoryName(SourceFilePath) : null;
+                if (!_pathRoots.TryDeclare(isProject, rawValue, declaringDir, out var error))
+                    AppendError(lineContent, error);
+                else
+                    AppendLine(sourceLine);
             }
 
             void ParseInclude(ReadOnlySpan<char> lineContent)
@@ -261,7 +299,12 @@ namespace Calcpad.Core
 
                 var sourceDir = !string.IsNullOrEmpty(SourceFilePath)
                     ? Path.GetDirectoryName(SourceFilePath) : null;
-                var expanded = Environment.ExpandEnvironmentVariables(rawFileName);
+                if (!_pathRoots.TryExpand(rawFileName, out var tokenExpanded, out var tokenError))
+                {
+                    AppendError(lineContent, tokenError);
+                    return;
+                }
+                var expanded = Environment.ExpandEnvironmentVariables(tokenExpanded);
                 var resolvedPath = sourceDir != null
                     ? Path.GetFullPath(expanded, sourceDir)
                     : Path.GetFullPath(expanded);

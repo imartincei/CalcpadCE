@@ -17,16 +17,20 @@ namespace Calcpad.Core
         /// The worksheet holding the directive. A relative data path resolves against its
         /// folder, exactly as it does when the directive runs.
         /// </param>
+        /// <param name="pathRoots">
+        /// The <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> roots declared so far in the
+        /// document, or <c>null</c> to leave a token in the path unresolved.
+        /// </param>
         /// <returns>
         /// The assignment, or <c>null</c> when the directive names no variable or the file
         /// holds no data — both assign nothing when the directive runs.
         /// </returns>
-        public static string InlineReadDirective(ReadOnlySpan<char> line, string sourceFilePath)
+        public static string InlineReadDirective(ReadOnlySpan<char> line, string sourceFilePath, PathRoots pathRoots = null)
         {
             var sourceDir = string.IsNullOrEmpty(sourceFilePath)
                 ? null
                 : System.IO.Path.GetDirectoryName(sourceFilePath);
-            var options = new ReadWriteOptions(line.Trim(), 0, sourceDir);
+            var options = new ReadWriteOptions(line.Trim(), 0, sourceDir, pathRoots);
             if (options.Name.IsEmpty)
                 return null;
 

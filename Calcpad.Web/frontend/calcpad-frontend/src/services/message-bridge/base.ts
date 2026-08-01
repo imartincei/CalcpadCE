@@ -6,6 +6,8 @@ import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBl
 import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
 import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
 import type { UiDirectiveData } from '../../text/ui-directive';
+import { scanDeclaredPathRoots } from '../../text/path-roots';
+import type { DeclaredPathRoots } from '../../text/path-roots';
 import type { DefinitionsResponse, ExportVariant } from '../../types/api';
 import { getDefaultSettings, buildApiSettings } from '../../types/settings';
 import type { CalcpadSettings } from '../../types/settings';
@@ -317,6 +319,12 @@ export abstract class BaseMessageBridge {
             case 'updatePortableWriteNextToWorksheet':
                 this.setExtraSetting('portableWriteNextToWorksheet', String(message.enabled));
                 break;
+            case 'updatePortableBundleProjectRefs':
+                this.setExtraSetting('portableBundleProjectRefs', String(message.enabled));
+                break;
+            case 'updatePortableBundleLibraryRefs':
+                this.setExtraSetting('portableBundleLibraryRefs', String(message.enabled));
+                break;
             case 'getPlots':
                 this.handleGetPlots();
                 break;
@@ -473,6 +481,8 @@ export abstract class BaseMessageBridge {
             enableAutoInputMode: this.getExtraSetting('autoInputMode') !== 'false',
             enablePreviewUiOverrides: this.getExtraSetting('previewUiOverrides') === 'true',
             portableWriteNextToWorksheet: this.getExtraSetting('portableWriteNextToWorksheet') !== 'false',
+            portableBundleProjectRefs: this.getExtraSetting('portableBundleProjectRefs') === 'true',
+            portableBundleLibraryRefs: this.getExtraSetting('portableBundleLibraryRefs') === 'true',
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
             editorFontFamily: this.getExtraSetting('editorFontFamily') ?? 'JuliaMono',
@@ -739,7 +749,10 @@ export abstract class BaseMessageBridge {
         const content = this.getActiveEditorContent();
         const { sourceFilePath } = await this.buildFileContext(content);
         const writeNextToWorksheet = this.getExtraSetting('portableWriteNextToWorksheet') !== 'false';
-        const packaged = await this.apiClient.packagePortable(content, sourceFilePath, writeNextToWorksheet);
+        const bundleProjectReferences = this.getExtraSetting('portableBundleProjectRefs') === 'true';
+        const bundleLibraryReferences = this.getExtraSetting('portableBundleLibraryRefs') === 'true';
+        const packaged = await this.apiClient.packagePortable(
+            content, sourceFilePath, writeNextToWorksheet, bundleProjectReferences, bundleLibraryReferences);
         if (!packaged.zip) {
             await this.onExportError(
                 `This worksheet cannot be packaged:\n${packaged.errors.join('\n')}`);
@@ -776,9 +789,13 @@ export abstract class BaseMessageBridge {
 
     private async handleGetPlots(): Promise<void> {
         const content = this.getActiveEditorContent();
+        // Read alongside plots — both are Export-tab-only, refreshed together, and neither
+        // is worth a separate round-trip: the document's declared roots are shown read-only
+        // there, next to the checkboxes that decide whether a package resolves them.
+        const declaredPathRoots: DeclaredPathRoots = scanDeclaredPathRoots(content);
         if (!content.trim()) {
             this._cachedPlots = [];
-            this.postToVue({ type: 'plotsResponse', plots: [] });
+            this.postToVue({ type: 'plotsResponse', plots: [], declaredPathRoots });
             return;
         }
         const apiSettings = buildApiSettings(this.settings);
@@ -794,6 +811,7 @@ export abstract class BaseMessageBridge {
                 dataUri: p.dataUri,
                 sizeBytes: p.bytes.length,
             })),
+            declaredPathRoots,
         });
     }
 

@@ -47,6 +47,34 @@
             Export Portable…
           </button>
         </div>
+
+        <div class="path-roots">
+          <div class="path-root-row">
+            <span class="path-root-label">&lt;project&gt;:</span>
+            <span class="path-root-value">{{ declaredPathRoots.project ?? 'not declared' }}</span>
+          </div>
+          <div class="path-root-row">
+            <span class="path-root-label">&lt;library&gt;:</span>
+            <span class="path-root-value">{{ declaredPathRoots.library ?? 'not declared' }}</span>
+          </div>
+        </div>
+
+        <label class="bundle-option" :title="BUNDLE_PROJECT_DETAIL">
+          <input
+            type="checkbox"
+            :checked="bundleProjectReferences"
+            @change="$emit('updateBundleProjectReferences', ($event.target as HTMLInputElement).checked)"
+          />
+          Bundle &lt;project&gt; references
+        </label>
+        <label class="bundle-option" :title="BUNDLE_LIBRARY_DETAIL">
+          <input
+            type="checkbox"
+            :checked="bundleLibraryReferences"
+            @change="$emit('updateBundleLibraryReferences', ($event.target as HTMLInputElement).checked)"
+          />
+          Bundle &lt;library&gt; references
+        </label>
       </div>
 
       <!-- Governs both exports above: an absolute #write/#append target only ever matters once
@@ -112,6 +140,7 @@
 import type { ExportVariant } from '../../types/api'
 import type { VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
+import type { DeclaredPathRoots } from '../../text/path-roots'
 
 export interface PlotSummary {
   index: number
@@ -135,6 +164,16 @@ const WRITE_NEXT_TO_WORKSHEET_DETAIL =
   'When a #write or #append target is an absolute path, rewrite it to a bare filename so '
   + 'the output lands beside the exported worksheet instead of a folder that may not exist '
   + 'on the recipient\'s machine. A relative target already does that and is never touched.'
+
+const BUNDLE_PROJECT_DETAIL =
+  'Off (default): a <project> reference is left exactly as written, for the recipient\'s own '
+  + '#ProjectPath to resolve. On: resolved to your local path and bundled into the package '
+  + 'like any other absolute reference — for a one-off recipient who has no #ProjectPath of '
+  + 'their own.'
+
+const BUNDLE_LIBRARY_DETAIL =
+  'The same choice as "Bundle <project> references", for <library> — leave off when the '
+  + 'recipient already has the shared library and only needs its own #LibraryPath to find it.'
 
 // Report first: it is the default rendering everywhere else, so it reads as the one to
 // reach for. A form and a code listing have no meaningful Word form, hence `word: false`.
@@ -170,9 +209,15 @@ withDefaults(defineProps<{
   loading: boolean
   versionConfig?: VersionConfig
   writeNextToWorksheet?: boolean
+  bundleProjectReferences?: boolean
+  bundleLibraryReferences?: boolean
+  declaredPathRoots?: DeclaredPathRoots
 }>(), {
   versionConfig: () => ({ ...DEFAULT_VERSION_CONFIG }),
   writeNextToWorksheet: true,
+  bundleProjectReferences: false,
+  bundleLibraryReferences: false,
+  declaredPathRoots: () => ({ project: null, library: null }),
 })
 
 defineEmits<{
@@ -182,6 +227,8 @@ defineEmits<{
   saveCompiled: []
   savePortable: []
   updateWriteNextToWorksheet: [enabled: boolean]
+  updateBundleProjectReferences: [enabled: boolean]
+  updateBundleLibraryReferences: [enabled: boolean]
   refreshPlots: []
   savePlot: [index: number]
   savePlotsZip: []
@@ -233,6 +280,34 @@ function formatSize(bytes: number): string {
   align-items: center;
   gap: 6px;
   margin-top: 10px;
+  font-size: 12px;
+  cursor: help;
+}
+
+.path-roots {
+  margin-top: 10px;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.path-root-row {
+  display: flex;
+  gap: 6px;
+}
+
+.path-root-label {
+  font-family: var(--vscode-editor-font-family, monospace);
+}
+
+.path-root-value {
+  overflow-wrap: anywhere;
+}
+
+.bundle-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
   font-size: 12px;
   cursor: help;
 }
