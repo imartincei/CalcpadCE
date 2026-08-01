@@ -17,6 +17,7 @@ import type {
     CpdzDecodeResponse,
     CpdzEncodeResponse,
     PortableBundleResult,
+    PortablePackageResult,
 } from '../types/api';
 import type { SnippetsResponse } from '../types/snippets';
 
@@ -119,13 +120,17 @@ export class CalcpadApiClient {
      * returning a worksheet that would still read files beside it — which is why this has
      * its own request rather than going through {@link post}, whose errors are only logged.
      */
-    public bundlePortable(content: string, sourceFilePath?: string): Promise<PortableBundleResult> {
+    public bundlePortable(
+        content: string,
+        sourceFilePath?: string,
+        writeNextToWorksheet?: boolean,
+    ): Promise<PortableBundleResult> {
         return this.serialize(async () => {
             try {
                 const response = await fetch(`${this.baseUrl}/api/calcpad/portable/bundle`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, sourceFilePath }),
+                    body: JSON.stringify({ content, sourceFilePath, writeNextToWorksheet }),
                     signal: AbortSignal.timeout(30000),
                 });
                 const body = await response.json().catch(() => null);
@@ -141,6 +146,49 @@ export class CalcpadApiClient {
             } catch (error) {
                 this.logError('BundlePortable', error);
                 return { errors: [error instanceof Error ? error.message : String(error)] };
+            }
+        });
+    }
+
+    /**
+     * Packs a worksheet and the files it references into a ZIP that stays text — the document
+     * with its directives intact, and a folder beside it holding what they name. Reports what
+     * stands in the way instead of writing a package that is missing a file, so like
+     * {@link bundlePortable} it has its own request rather than going through {@link post}.
+     */
+    public packagePortable(
+        content: string,
+        sourceFilePath?: string,
+        writeNextToWorksheet?: boolean,
+    ): Promise<PortablePackageResult> {
+        return this.serialize(async () => {
+            try {
+                const response = await fetch(`${this.baseUrl}/api/calcpad/portable/package`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content, sourceFilePath, writeNextToWorksheet }),
+                    signal: AbortSignal.timeout(60000),
+                });
+                const body = await response.json().catch(() => null);
+                if (response.ok && typeof body?.data === 'string') return {
+                    zip: fromBase64(body.data),
+                    name: String(body.name ?? 'worksheet.zip'),
+                    refsFolder: String(body.refsFolder ?? ''),
+                    bundled: Array.isArray(body.bundled) ? body.bundled.map(String) : [],
+                    errors: [],
+                };
+
+                this.logger?.appendLine(`[PackagePortable] Server returned ${response.status}`);
+                const messages: unknown = body?.messages;
+                return {
+                    bundled: [],
+                    errors: Array.isArray(messages) && messages.length
+                        ? messages.map(String)
+                        : [body?.message ?? body?.error ?? `The server returned ${response.status}`],
+                };
+            } catch (error) {
+                this.logError('PackagePortable', error);
+                return { bundled: [], errors: [error instanceof Error ? error.message : String(error)] };
             }
         });
     }

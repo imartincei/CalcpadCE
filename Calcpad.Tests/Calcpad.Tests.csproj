@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Calcpad.Core\Calcpad.Core.csproj" />
     <ProjectReference Include="..\Calcpad.Highlighter\Calcpad.Highlighter.csproj" />
+    <ProjectReference Include="..\Calcpad.Web\backend\Calcpad.Server.csproj" />
   </ItemGroup>
 
   <ItemGroup>

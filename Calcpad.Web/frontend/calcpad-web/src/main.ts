@@ -12,7 +12,9 @@ import {
     buildDefinitionResolver,
     UiOverrideStore,
     writeUiOverrides,
+    extractUiControls,
     isCompiledPath,
+    documentHasUiDirectives,
 } from 'calcpad-frontend';
 import { registerCalcpadLanguage, registerCalcpadTheme, remeasureEditorFontsWhenReady, resolveEditorFontFamily } from './editor/setup';
 import { setAppTheme, coerceAppTheme } from './editor/app-theme';
@@ -37,6 +39,7 @@ import { registerFormatDocumentProvider } from './editor/format-document';
 import { setActiveDocumentKeyResolver, type EditorBridge } from './editor/bridge';
 import { EditorGroup } from './editor/editor-group';
 import type { TabManager } from './tabs/tab-manager';
+import type { UiControl } from 'calcpad-frontend';
 import './editor/vscode-variables.css';
 import 'calcpad-frontend/vue/styles/base.css';
 import './styles/app.css';
@@ -344,6 +347,9 @@ async function bootstrap(): Promise<void> {
     const uiOverrides = new UiOverrideStore();
     // Documents whose in-memory values have not been written back yet.
     const uiOverridesDirty = new Set<string>();
+    // Controls each document's last input-form render produced, which is what tells the
+    // Properties tab whether a saved value still applies to anything.
+    const uiControls = new Map<string, UiControl[]>();
 
     // Tauri's `invoke`, once the desktop-only block below has imported it. Null in the
     // web build, where there is no native menu to keep in step.
@@ -368,6 +374,53 @@ async function bootstrap(): Promise<void> {
             if (!appInstance.isPreviewVisible()) appInstance.togglePreview();
             appInstance.setResultMode('ui');
         }
+    }
+
+    // Files already judged for input mode. Held per path for the session: the point of the
+    // whole thing is that a tab switch, or a #UI line added while editing, never drags the
+    // user back into a form they deliberately left.
+    const autoUiSeenPaths = new Set<string>();
+    // Set while the auto-switch drives setResultMode, so the mode it picks is not persisted
+    // as the session's own — one #UI document would otherwise pin every later launch to it.
+    let autoUiSwitchInFlight = false;
+
+    /**
+     * Whether opening this tab should go straight to the input form: a document declaring
+     * `#UI` controls is one to fill in. Decided once per file, and recorded as decided even
+     * when the answer is no, so the answer cannot change under the user later.
+     *
+     * Split from {@link autoEnterUiMode} so the caller can skip its own preview refresh —
+     * switching the result mode triggers one of its own.
+     */
+    function shouldAutoEnterUiMode(group: EditorGroup): boolean {
+        if (!isTauri) return false;
+        const activeId = group.tabs.activeId;
+        if (!activeId) return false;
+
+        const path = group.tabs.getFilePath(activeId);
+        // Untitled documents are left alone: there is no file yet, so nothing to remember
+        // the decision against, and a #UI line typed into a scratch buffer is being written
+        // rather than filled in. A compiled worksheet is already forced to the form above.
+        if (!path || isCompiledPath(path)) return false;
+        if (autoUiSeenPaths.has(path)) return false;
+        autoUiSeenPaths.add(path);
+
+        // A recovered draft comes back dirty, and hiding it behind a form right after the
+        // recovery prompt is the last thing the user wants to see.
+        if (group.tabs.isDirty(activeId)) return false;
+        if (editorBridge.getExtraSetting('autoInputMode') === 'false') return false;
+        // Toggling the preview off leaves the mode at 'ui', so the pane's visibility is part
+        // of "already there" — otherwise this would do nothing and show nothing.
+        if (appInstance.getResultMode() === 'ui' && appInstance.isPreviewVisible()) return false;
+
+        return documentHasUiDirectives(group.editor.getValue());
+    }
+
+    function autoEnterUiMode(): void {
+        autoUiSwitchInFlight = true;
+        if (!appInstance.isPreviewVisible()) appInstance.togglePreview();
+        void appInstance.setResultMode('ui');
+        autoUiSwitchInFlight = false;
     }
 
     /**
@@ -422,6 +475,26 @@ async function bootstrap(): Promise<void> {
     // The store is keyed per document and owned here, so the bridge is handed a lookup
     // rather than the store: report and input-form exports render the entered values.
     activeBridge.setUiOverridesProvider(() => uiOverrides.toRecord(activeUiDocKey()));
+    activeBridge.setUiControlsProvider(() => uiControls.get(activeUiDocKey()) ?? null);
+    activeBridge.setUiControlsSink((controls) => uiControls.set(activeUiDocKey(), controls));
+    // An edit made in the Properties tab is an edit to the entered values, so the store
+    // follows it - otherwise the next "Save values" would write the old ones back.
+    activeBridge.setUiOverridesSink((overrides) => {
+        const docKey = activeUiDocKey();
+        uiOverrides.replace(docKey, overrides);
+        uiOverridesDirty.delete(docKey);
+        refreshUiDirtyIndicator();
+        void refreshPreviewFor(activeGroup);
+    });
+
+    /**
+     * Whether the plain preview renders with the entered #UI values applied. Off by
+     * default: preview is where the document itself is read, and seeing its own values
+     * is the point. Turned on it becomes a debugging view of the filled-in form.
+     */
+    function previewAppliesUiOverrides(): boolean {
+        return editorBridge.getExtraSetting('previewUiOverrides') === 'true';
+    }
 
     /**
      * Seeds a document's overrides from a saved uiOverrides comment the first time
@@ -461,11 +534,14 @@ async function bootstrap(): Promise<void> {
         let result;
         try {
             // The report applies entered values just as the input form does, so both need
-            // the document's saved ones seeded first.
-            if (mode === 'ui' || mode === 'report') seedUiOverrides(group, content);
-            // Preview and unwrapped show the document as written. Entered values belong to
-            // the input form and to the report, which is what those values produce.
-            const ui = mode === 'ui' || mode === 'report'
+            // the document's saved ones seeded first. Preview joins them when the setting
+            // asks it to, which is how an error that only shows up once the form is filled
+            // in gets looked at against the source.
+            const overrideMode = mode === 'ui' || mode === 'report'
+                || (mode === 'preview' && previewAppliesUiOverrides());
+            if (overrideMode) seedUiOverrides(group, content);
+            // Unwrapped always shows the document as written.
+            const ui = overrideMode
                 ? { enableUi: mode === 'ui', uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }
                 : undefined;
             result = mode === 'unwrapped'
@@ -495,6 +571,7 @@ async function bootstrap(): Promise<void> {
                 ? await tauriBridge.inlineDocumentImages(result.html)
                 : result.html;
             appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine);
+            if (mode === 'ui') uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
             window.dispatchEvent(new MessageEvent('message', {
                 data: { type: 'updateConvertErrors', errors: result.errors },
             }));
@@ -734,13 +811,17 @@ async function bootstrap(): Promise<void> {
         // On tab switch within this group, re-emit markers + re-lint + repaint.
         group.tabs.onActiveModelChanged(() => {
             applyCompiledWorksheetMode(group);
+            const enteringUi = shouldAutoEnterUiMode(group);
             refreshProblemsFor(group);
             // Re-lint: content-change events don't fire on tab switch, so the
             // debounced lint in setupDiagnostics never re-runs for the new model.
             void group.diagnostics?.refresh();
-            if (appInstance.isPreviewVisible()) void refreshPreviewFor(group);
+            // The mode switch below renders the form itself, so rendering here first would
+            // just be a preview nobody sees.
+            if (!enteringUi && appInstance.isPreviewVisible()) void refreshPreviewFor(group);
             if (group === activeGroup) activeBridge.refreshHeadings();
             void refreshDefinitionsFor(group);
+            if (enteringUi) autoEnterUiMode();
         });
 
         // Initial definitions population for the seeded tab.
@@ -1036,7 +1117,8 @@ async function bootstrap(): Promise<void> {
             return;
         }
 
-        if (data.type === 'previewThemeChanged' || data.type === 'settingsChanged') {
+        if (data.type === 'previewThemeChanged' || data.type === 'settingsChanged'
+            || data.type === 'previewUiOverridesChanged') {
             refreshAllPreviews();
             return;
         }
@@ -1218,7 +1300,9 @@ async function bootstrap(): Promise<void> {
     }
 
     appInstance.onResultModeChanged = (mode: ResultMode) => {
-        editorBridge.setExtraSetting('resultMode', mode);
+        // Not persisted when a #UI document chose it rather than the user: the session would
+        // otherwise come back up in a form, whatever document is opened next.
+        if (!autoUiSwitchInFlight) editorBridge.setExtraSetting('resultMode', mode);
         refreshUiDirtyIndicator();
         syncInputMode();
         refreshAllPreviews();
@@ -1330,9 +1414,11 @@ async function bootstrap(): Promise<void> {
             import('@tauri-apps/api/core'),
         ]);
         invokeTauri = tauriInvoke;
-        // The seeded tab decided the menu state before `invoke` existed; re-apply it.
-        sourceModeMenuEnabled = true;
-        syncSourceModeMenuItems(appInstance.resultModeAvailable('unwrapped'));
+        // The seeded tab decided the menu state before `invoke` existed, so the cached flag
+        // is inverted here to defeat the no-op guard and let the real state through.
+        const sourceModesShown = appInstance.resultModeAvailable('unwrapped');
+        sourceModeMenuShown = !sourceModesShown;
+        syncSourceModeMenuItems(sourceModesShown);
 
         // ---- Autosave drafts (10s debounce per tab) ----
         // Rust owns the on-disk drafts dir (<app_data>/drafts). Each tab is
@@ -1492,6 +1578,11 @@ async function bootstrap(): Promise<void> {
             try {
                 const content = await tauriBridge!.readFile(path);
                 tabs.openFile(path, content);
+                // Opening into the seeded empty tab replaces it in place, which is not an
+                // active-model change, so the listener that normally settles the mode for a
+                // newly opened file never runs — and that is the first file of every session.
+                applyCompiledWorksheetMode(activeGroup);
+                if (shouldAutoEnterUiMode(activeGroup)) autoEnterUiMode();
                 await tauriBridge!.addRecentFile(path);
             } catch (err) {
                 appInstance.appendOutput('error', 'Failed to open file: ' + (err instanceof Error ? err.message : String(err)));
@@ -1946,6 +2037,10 @@ async function bootstrap(): Promise<void> {
                 // unlike Save As, which would turn it into a locked worksheet.
                 case 'save-as-compiled':
                     await tauriBridge.saveCompiled();
+                    break;
+
+                case 'save-as-portable':
+                    await tauriBridge.savePortable();
                     break;
 
                 case 'toggle-sidebar':

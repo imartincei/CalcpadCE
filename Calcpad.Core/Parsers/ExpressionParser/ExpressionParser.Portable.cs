@@ -35,6 +35,63 @@ namespace Calcpad.Core
         }
 
         /// <summary>
+        /// Locates the <c>Path.Ext</c> token of a <c>#read</c>, <c>#write</c> or <c>#append</c>
+        /// directive within <paramref name="line"/>, which must start at the <c>#</c>. The span is
+        /// the one the directive itself reads: from just after the <c>from</c>/<c>to</c> connector
+        /// to the end of the extension, which the last <c>.</c> of the line opens and a <c>@</c>,
+        /// <c>!</c>, <c>:</c> or space closes. A sheet, a range, <c>type=</c> and <c>sep=</c> all
+        /// fall outside it, so replacing the span rewrites the file and nothing else.
+        /// </summary>
+        /// <returns>
+        /// False when the line is not one of those directives, or names a file the directive could
+        /// not read either — no connector, or no extension to resolve.
+        /// </returns>
+        public static bool TryGetDataPath(ReadOnlySpan<char> line, out int start, out int length)
+        {
+            start = 0;
+            length = 0;
+            var connector = line.StartsWith("#read", StringComparison.OrdinalIgnoreCase) ? "from"
+                : line.StartsWith("#write", StringComparison.OrdinalIgnoreCase)
+                    || line.StartsWith("#append", StringComparison.OrdinalIgnoreCase) ? "to"
+                : null;
+            if (connector is null)
+                return false;
+
+            // The keyword, the variable name and the connector: one space-delimited token each,
+            // consumed exactly as ReadWriteOptions consumes them.
+            var len = line.Length;
+            var i = 0;
+            for (var token = 0; token < 3; ++token)
+            {
+                var from = i;
+                while (i < len) { if (line[i++] == ' ') break; }
+                if (i == len)
+                    return false;
+
+                if (token == 2 && !line[from..(i - 1)].Equals(connector, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            var dot = line.LastIndexOf('.');
+            if (dot < i)
+                return false;
+
+            var end = len;
+            for (var j = dot + 1; j < len; ++j)
+            {
+                var c = line[j];
+                if (c is '@' or '!' or ':' or ' ')
+                {
+                    end = j;
+                    break;
+                }
+            }
+            start = i;
+            length = end - i;
+            return length > 0;
+        }
+
+        /// <summary>
         /// The literal that recreates <paramref name="data"/> the way <paramref name="type"/>
         /// asks for, mirroring <see cref="MathParser"/>'s <c>SetMatrix</c>/<c>SetVector</c>.
         /// Structured types are built by copying a rectangle into an empty matrix of that

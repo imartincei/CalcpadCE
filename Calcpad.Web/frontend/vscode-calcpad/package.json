@@ -299,6 +299,11 @@
         "icon": "$(file-binary)"
       },
       {
+        "command": "vscode-calcpad.exportPortable",
+        "title": "CalcpadCE: Export Portable Package…",
+        "icon": "$(file-zip)"
+      },
+      {
         "command": "vscode-calcpad.saveCompiledUiValues",
         "title": "CalcpadCE: Save Values to Compiled Worksheet"
       },
@@ -501,6 +506,11 @@
           "command": "vscode-calcpad.editMetadataProperties",
           "when": "resourceLangId == calcpad || resourceLangId == plaintext",
           "group": "calcpad@4"
+        },
+        {
+          "command": "vscode-calcpad.exportPortable",
+          "when": "resourceLangId == calcpad || resourceLangId == plaintext",
+          "group": "calcpad@5"
         }
       ]
     },

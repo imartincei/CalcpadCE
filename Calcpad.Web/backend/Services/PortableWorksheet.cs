@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.RegularExpressions;
 using Calcpad.Core;
 
 namespace Calcpad.Server.Services
@@ -24,7 +23,12 @@ namespace Calcpad.Server.Services
         /// reported rather than skipped: a worksheet that still reads a file beside it is not
         /// portable, so it is better not to write one at all.
         /// </summary>
-        public static Result Build(string content, string? sourceFilePath)
+        /// <param name="nextToWorksheet">
+        /// Collapses an absolute <c>#write</c>/<c>#append</c> target to its bare filename, so the
+        /// output lands beside wherever the compiled worksheet runs instead of a folder that may
+        /// not exist there. A relative target already does that and is untouched either way.
+        /// </param>
+        public static Result Build(string content, string? sourceFilePath, bool nextToWorksheet = false)
         {
             var errors = new List<string>();
             var macroParser = new MacroParser
@@ -36,18 +40,25 @@ namespace Calcpad.Server.Services
             foreach (var error in macroParser.Errors)
                 errors.Add($"Line {error.SourceLine}: {error.Message}");
 
-            return errors.Count > 0
-                ? new Result(content, errors)
-                : new Result(InlineReadDirectives(expanded, sourceFilePath, errors), errors);
+            if (errors.Count > 0)
+                return new Result(content, errors);
+
+            var rootDirectory = string.IsNullOrEmpty(sourceFilePath)
+                ? string.Empty : Path.GetDirectoryName(sourceFilePath) ?? string.Empty;
+            var outputs = new OutputTargets(nextToWorksheet, rootDirectory, errors);
+            var rewritten = RewriteDirectives(expanded, sourceFilePath, outputs, errors);
+            return new Result(rewritten, errors);
         }
 
         /// <summary>
-        /// Replaces every <c>#read</c> with the data it imports. The assignment goes between
-        /// <c>#hide</c> and <c>#end hide</c>, which leaves the surrounding visibility as it
-        /// was and keeps a bundled data set out of the report — where the directive itself
-        /// only ever printed a line naming the file.
+        /// Replaces every <c>#read</c> with the data it imports, and rewrites every
+        /// <c>#write</c>/<c>#append</c> target <paramref name="outputs"/> asks for. The read
+        /// assignment goes between <c>#hide</c> and <c>#end hide</c>, which leaves the
+        /// surrounding visibility as it was and keeps a bundled data set out of the report —
+        /// where the directive itself only ever printed a line naming the file.
         /// </summary>
-        private static string InlineReadDirectives(string text, string? sourceFilePath, List<string> errors)
+        private static string RewriteDirectives(
+            string text, string? sourceFilePath, OutputTargets outputs, List<string> errors)
         {
             var sb = new StringBuilder(text.Length);
             var lineNumber = 0;
@@ -56,26 +67,32 @@ namespace Calcpad.Server.Services
                 ++lineNumber;
                 var line = rawLine.TrimEnd('\r');
                 var code = line.TrimStart();
-                if (!code.StartsWith("#read", StringComparison.OrdinalIgnoreCase))
+                if (code.StartsWith("#read", StringComparison.OrdinalIgnoreCase))
                 {
-                    sb.Append(line).Append('\n');
+                    try
+                    {
+                        var assignment = ExpressionParser.InlineReadDirective(code, sourceFilePath);
+                        if (assignment is null)
+                            continue;
+
+                        var indent = line[..(line.Length - code.Length)];
+                        sb.Append(indent).Append("#hide").Append('\n')
+                          .Append(indent).Append(assignment).Append('\n')
+                          .Append(indent).Append("#end hide").Append('\n');
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add($"Line {lineNumber}: {ex.Message}");
+                    }
                     continue;
                 }
-                try
-                {
-                    var assignment = ExpressionParser.InlineReadDirective(code, sourceFilePath);
-                    if (assignment is null)
-                        continue;
 
-                    var indent = line[..(line.Length - code.Length)];
-                    sb.Append(indent).Append("#hide").Append('\n')
-                      .Append(indent).Append(assignment).Append('\n')
-                      .Append(indent).Append("#end hide").Append('\n');
-                }
-                catch (Exception ex)
-                {
-                    errors.Add($"Line {lineNumber}: {ex.Message}");
-                }
+                var references = WorksheetReferences.Scan(line);
+                sb.Append(references.Exists(r => r.IsOutput)
+                    ? WorksheetReferences.Rewrite(line, references,
+                        r => outputs.Rewrite(r, "the worksheet", lineNumber))
+                    : line)
+                  .Append('\n');
             }
             return sb.ToString();
         }
@@ -86,18 +103,11 @@ namespace Calcpad.Server.Services
         private static string ReadIncludeWithAbsoluteImages(string fileName, Queue<string> fields) =>
             AbsoluteImagePaths(ReadInclude(fileName, fields), Path.GetDirectoryName(fileName)!);
 
-        private static readonly Regex ImageSource =
-            new(@"(<img\s[^>]*?src\s*=\s*[""'])([^""']+)([""'])",
-                RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
         private static string AbsoluteImagePaths(string content, string directory) =>
-            ImageSource.Replace(content, match =>
+            WorksheetReferences.ImageSource.Replace(content, match =>
             {
                 var src = match.Groups[2].Value;
-                if (Path.IsPathRooted(src)
-                    || src.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
-                    || src.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-                    || src.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                if (WorksheetReferences.IsExternalSource(src))
                     return match.Value;
 
                 var full = Path.GetFullPath(src, directory).Replace('\\', '/');

@@ -88,6 +88,25 @@ export function findUiDirectiveBlock(lines: string[], cursorLine: number): UiDir
     return { line: cursorLine, indent, keyword, rawJson, data, valid, tail };
 }
 
+/**
+ * A `#UI` line: the keyword as the line's first token, followed by something for it to
+ * describe. The anchoring matches {@link findUiDirectiveBlock} and, through it,
+ * `ExpressionParser.ParseKeywordUi` — a `'`- or `"`-commented line therefore never counts,
+ * and `#UIx` counts exactly as the engine counts it, since keywords are matched by prefix.
+ * A bare `#UI` produces no control, so it does not count either.
+ */
+const UI_DIRECTIVE_LINE = /^[﻿ \t]*#ui[ \t]*\S/im;
+
+/**
+ * True when the source declares at least one `#UI` control, which is what makes a document
+ * one to fill in rather than to read. Scans this source alone: following `#include` would
+ * mean reading files on every open, so a document whose only `#UI` lines are in an included
+ * file is not recognized as one.
+ */
+export function documentHasUiDirectives(source: string): boolean {
+    return UI_DIRECTIVE_LINE.test(source);
+}
+
 /** Drop keys that shouldn't be serialized: undefined/null, empty strings, empty arrays. */
 function cleanUiData(data: UiDirectiveData): Record<string, unknown> {
     const clean: Record<string, unknown> = {};

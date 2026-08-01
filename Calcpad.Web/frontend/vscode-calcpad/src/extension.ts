@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, variantRender, inlineImageSources, COMPILED_EXTENSION } from 'calcpad-frontend';
-import type { PdfSettings as FrontendPdfSettings, ExportVariant } from 'calcpad-frontend';
+import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION } from 'calcpad-frontend';
+import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
 import { CalcpadVueUIProvider } from './calcpadVueUIProvider';
@@ -44,6 +44,8 @@ let uiPanel: vscode.WebviewPanel | undefined = undefined;
 let uiReportPanel: vscode.WebviewPanel | undefined = undefined;
 const uiOverrides = new UiOverrideStore();
 const uiOverridesDirty = new Set<string>();
+// Controls each document's last input-form render produced, keyed like the store above.
+const uiControls = new Map<string, UiControl[]>();
 // Document the input form is currently showing, so its values can be prompted
 // about and dropped when the form closes.
 let uiPanelDocKey: string | undefined = undefined;
@@ -174,6 +176,40 @@ async function discardUiValues(docKey: string | undefined, allowCancel = false):
     return true;
 }
 
+// Documents whose first activation has already been judged for input mode.
+const autoUiConsidered = new Set<string>();
+
+/**
+ * A document declaring `#UI` controls is one to fill in, so the first time one is looked at
+ * its input form opens. Judged once per document per session: a tab switch back, or a `#UI`
+ * line added while editing, must not re-open a form the user closed.
+ *
+ * The form is opened without taking the focus, so the caret stays where the user left it.
+ */
+async function maybeAutoEnterInputMode(document: vscode.TextDocument): Promise<void> {
+    // Deliberately stricter than processDocument, which also lints plaintext: a .txt file
+    // with a line starting '#ui' is not a worksheet to fill in.
+    if (document.languageId !== 'calcpad') return;
+    // Keeps git diffs, output views and other virtual documents out of it.
+    if (document.uri.scheme !== 'file') return;
+
+    const docKey = document.uri.toString();
+    if (autoUiConsidered.has(docKey)) return;
+    // Marked before the rest, so a document judged while the form was open or the setting off
+    // is never judged again — turning the setting on affects what is opened after it.
+    autoUiConsidered.add(docKey);
+
+    // With the form already open, the active-editor handler retargets it at this document;
+    // anything done here would fight it and prompt twice.
+    if (uiPanel) return;
+    if (document.isUntitled || document.isDirty) return;
+    if (!CalcpadSettingsManager.getInstance(extensionContext).getExtraBool('autoInputMode', true)) return;
+    if (!documentHasUiDirectives(document.getText())) return;
+
+    outputChannel.appendLine(`[UI] Input mode opened for ${document.uri.fsPath} (#UI document)`);
+    await showPreview('ui', undefined, true);
+}
+
 /** Re-renders every open preview panel from the given document. */
 async function refreshPreviewPanels(document: vscode.TextDocument): Promise<void> {
     const text = document.getText();
@@ -213,6 +249,9 @@ function updateMetadataContext(editor: vscode.TextEditor | undefined): void {
     }
     vscode.commands.executeCommand('setContext', 'calcpad.inMetadataComment', block !== null && !block.isNew);
     vueUiProvider?.updateMetadataContext(block);
+    // Sent with the block so the panel's saved-values list follows the document the
+    // cursor is actually in, rather than keeping the last one it asked about.
+    vueUiProvider?.updateUiControls(editor ? uiControls.get(editor.document.uri.toString()) ?? null : null);
 }
 
 /**
@@ -742,7 +781,12 @@ function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true):
  */
 async function updatePreviewContent(panel: vscode.WebviewPanel, content: string, sourceFileUri: vscode.Uri, unwrapped: boolean = false, scrollToLine?: number, enableUi: boolean = false, forPrint: boolean = false, standalone: boolean = false) {
     const docKey = sourceFileUri.toString();
-    if ((enableUi || forPrint) && !uiOverrides.has(docKey) && !uiOverridesDirty.has(docKey))
+    // The plain preview shows the document as written, unless the setting asks it to
+    // render the entered values too — a debugging view of the filled-in form.
+    const applyOverrides = enableUi || forPrint
+        || (!unwrapped && CalcpadSettingsManager.getInstance(extensionContext)
+            .getExtraBool('previewUiOverrides', false));
+    if (applyOverrides && !uiOverrides.has(docKey) && !uiOverridesDirty.has(docKey))
         uiOverrides.readFromSource(docKey, content);
     if (enableUi && !standalone) uiPanelDocKey = docKey;
 
@@ -842,9 +886,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
                 sourceFilePath: sourceFileUri.fsPath,
                 enableUi: enableUi,
                 forPrint: forPrint,
-                // The plain preview shows the document as written; entered values
-                // belong to the input form and the report that accompanies it.
-                uiOverrides: enableUi || forPrint ? uiOverrides.toRecord(docKey) : undefined,
+                uiOverrides: applyOverrides ? uiOverrides.toRecord(docKey) : undefined,
                 // The report is a print layout, but on screen beside the editor, so it
                 // keeps the line links that forPrint would otherwise suppress.
                 includeLineAnchors: forPrint ? true : undefined
@@ -864,6 +906,13 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // Share the freshly-converted HTML with the Vue side panel so the
         // Export tab can extract plot bytes without another server round-trip.
         vueUiProvider?.setCachedHtml(apiResponse);
+
+        // The controls this document really has, which is what tells the Properties tab
+        // whether a saved #UI value still applies to anything.
+        if (enableUi) {
+            uiControls.set(docKey, extractUiControls(apiResponse));
+            vueUiProvider?.updateUiControls(uiControls.get(docKey) ?? null);
+        }
 
         // Log to dedicated HTML output channel (without stealing focus)
         calcpadOutputHtmlChannel.clear();
@@ -1227,8 +1276,10 @@ async function saveAsCompiled() {
         });
         if (!saveUri) return;
 
+        const writeNextToWorksheet = CalcpadSettingsManager.getInstance()
+            .getExtraBool('portableWriteNextToWorksheet', true);
         const bundled = await sharedApiClient?.bundlePortable(
-            source.text, untitled ? undefined : source.uri.fsPath);
+            source.text, untitled ? undefined : source.uri.fsPath, writeNextToWorksheet);
         if (bundled?.content == null) {
             const reasons = bundled?.errors.join('\n') ?? 'The server is not running';
             throw new Error(`the worksheet is not self-contained:\n${reasons}`);
@@ -1246,6 +1297,64 @@ async function saveAsCompiled() {
         const msg = error instanceof Error ? error.message : 'Unknown error';
         outputChannel.appendLine(`ERROR in saveAsCompiled: ${msg}`);
         vscode.window.showErrorMessage(`Failed to save compiled worksheet: ${msg}`);
+    }
+}
+
+/**
+ * Packs the active document and everything it references into a portable archive. Unlike a
+ * compiled worksheet this stays text: what comes out is the document as written, with only its
+ * paths changed — each one pointing into the folder of references packed beside it. For a
+ * recipient who has to read or edit the calculation rather than just fill it in.
+ *
+ * The server does the packing, since resolving the references means reading them; refusing is
+ * part of the job, so what came back is reported rather than worked around.
+ */
+async function exportPortable() {
+    const source = activeCalcpadSource();
+    if (!source) {
+        vscode.window.showErrorMessage('No active CalcpadCE document found');
+        return;
+    }
+    if (source.uri.scheme === 'untitled') {
+        vscode.window.showErrorMessage('A portable package resolves references against the '
+            + "document's own folder, so save the document first.");
+        return;
+    }
+    if (isCompiledPath(source.uri.fsPath)) {
+        vscode.window.showErrorMessage('A compiled worksheet already carries everything it needs, '
+            + 'and its source is not handed out — there is nothing to package.');
+        return;
+    }
+    try {
+        const saveUri = await vscode.window.showSaveDialog({
+            defaultUri: vscode.Uri.file(defaultSavePath(source.uri, '.zip')),
+            filters: { 'ZIP Archives': ['zip'] },
+        });
+        if (!saveUri) return;
+
+        const writeNextToWorksheet = CalcpadSettingsManager.getInstance()
+            .getExtraBool('portableWriteNextToWorksheet', true);
+        const packaged = await sharedApiClient?.packagePortable(
+            source.text, source.uri.fsPath, writeNextToWorksheet);
+        if (!packaged?.zip) {
+            const reasons = packaged?.errors ?? ['The server is not running'];
+            // A collision or a list of unreadable references runs to several lines, which a
+            // notification swallows: the first goes in the toast, the rest to the log.
+            outputChannel.appendLine(`ERROR in exportPortable:\n${reasons.join('\n')}`);
+            const choice = await vscode.window.showErrorMessage(
+                `Cannot package this worksheet: ${reasons[0]}`,
+                'Show Details');
+            if (choice === 'Show Details') outputChannel.show(true);
+            return;
+        }
+
+        await vscode.workspace.fs.writeFile(saveUri, packaged.zip);
+        vscode.window.showInformationMessage(
+            `Portable package saved to ${saveUri.fsPath} — ${packaged.bundled.length} reference(s) bundled`);
+    } catch (error) {
+        const msg = error instanceof Error ? error.message : 'Unknown error';
+        outputChannel.appendLine(`ERROR in exportPortable: ${msg}`);
+        vscode.window.showErrorMessage(`Failed to export the portable package: ${msg}`);
     }
 }
 
@@ -1323,7 +1432,7 @@ function handlePreviewMessage(message: any, kind: PreviewKind) {
 // stacked directly below the wrapped one so the two-step navigation reads top→bottom.
 // `scrollToLine` (an output line) is baked into the rendered HTML so the unwrapped
 // view scrolls to it on load without a postMessage race.
-async function showPreview(kind: PreviewKind, scrollToLine?: number) {
+async function showPreview(kind: PreviewKind, scrollToLine?: number, preserveFocus = false) {
     // When invoked from a preview line-link click the webview is focused, so there is
     // no active *text* editor — fall back to the editor that spawned the preview.
     const activeEditor = vscode.window.activeTextEditor ?? previewSourceEditor;
@@ -1366,7 +1475,12 @@ async function showPreview(kind: PreviewKind, scrollToLine?: number) {
     const panel = vscode.window.createWebviewPanel(
         viewType,
         title,
-        unwrapped && wrappedPanel ? vscode.ViewColumn.Active : vscode.ViewColumn.Beside,
+        {
+            viewColumn: unwrapped && wrappedPanel ? vscode.ViewColumn.Active : vscode.ViewColumn.Beside,
+            // A panel the user asked for should have the focus; one that opened on its own
+            // (a #UI document's form) must leave the caret where it was.
+            preserveFocus,
+        },
         {
             enableScripts: true,
             enableFindWidget: true
@@ -1805,6 +1919,26 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!activeEditor) return;
         await refreshPreviewPanels(activeEditor.document);
     };
+    // Rendered on demand rather than served from the cache: this is what the Properties
+    // tab asks when it has no answer or wants a fresh one, and the cache is only as new
+    // as the last time the input form itself was shown.
+    vueUiProvider.resolveUiControls = async () => {
+        const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
+        if (!editor) return null;
+        try {
+            const html = await renderForExport(editor.document.getText(), editor.document.uri, 'input');
+            const controls = extractUiControls(html);
+            uiControls.set(editor.document.uri.toString(), controls);
+            return controls;
+        } catch (e) {
+            outputChannel.appendLine('[UI controls] Render failed: ' + e);
+            return null;
+        }
+    };
+    vueUiProvider.onUiOverridesEdited = (documentUri, overrides) => {
+        uiOverrides.replace(documentUri, overrides);
+        uiOverridesDirty.delete(documentUri);
+    };
     const vueUiProviderDisposable = vscode.window.registerWebviewViewProvider(
         CalcpadVueUIProvider.viewType,
         vueUiProvider
@@ -1974,6 +2108,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const saveAsCompiledCommand = vscode.commands.registerCommand('vscode-calcpad.saveAsCompiled', () => {
         saveAsCompiled();
+    });
+
+    const exportPortableCommand = vscode.commands.registerCommand('vscode-calcpad.exportPortable', () => {
+        exportPortable();
     });
 
     // The compiled-worksheet editor is a custom editor, so the workbench's own Save
@@ -2220,6 +2358,9 @@ export async function activate(context: vscode.ExtensionContext) {
             }
             // Update Variables tab
             processDocument(editor.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e));
+            // Last, and after the cancel path above returns: a switch the user backed out of
+            // must not open anything.
+            await maybeAutoEnterInputMode(editor.document);
         }
     });
 
@@ -2250,8 +2391,19 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    // Process all open calcpad documents on activation
-    vscode.workspace.textDocuments.forEach(document => processDocument(document));
+    // Process all open calcpad documents on activation. Activation happens after the
+    // document that triggered it is already active, so no active-editor event follows for it:
+    // the one in front is judged for input mode here instead. The rest are marked as judged
+    // without opening anything, so a restored session with eight worksheets does not come up
+    // with eight forms.
+    {
+        const activeDocument = vscode.window.activeTextEditor?.document;
+        for (const document of vscode.workspace.textDocuments) {
+            if (document !== activeDocument) autoUiConsidered.add(document.uri.toString());
+            processDocument(document);
+        }
+        if (activeDocument) void maybeAutoEnterInputMode(activeDocument);
+    }
 
         outputChannel.appendLine('Registering subscriptions...');
         context.subscriptions.push(
@@ -2269,6 +2421,7 @@ export async function activate(context: vscode.ExtensionContext) {
             saveSourceHtmlCommand,
             saveDocxCommand,
             saveAsCompiledCommand,
+            exportPortableCommand,
             saveCompiledUiValuesCommand,
             compiledEditor,
             refreshVariablesCommand,

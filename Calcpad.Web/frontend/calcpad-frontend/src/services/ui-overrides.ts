@@ -16,6 +16,23 @@ export interface UiValueChange {
     sourceLine: number;
 }
 
+/** A `#UI` control the engine actually created, harvested from a rendered form. */
+export interface UiControl {
+    /** Control identity, as emitted in `data-ui-var`. */
+    key: string;
+    /** 1-based source line the control was declared on, from `data-ui-line`. */
+    line: number;
+}
+
+/** A saved override paired with the control it resolves to, if any. */
+export interface UiOverrideRow {
+    key: string;
+    value: string;
+    /** Source line of the control this override applies to, null when it applies to none. */
+    line: number | null;
+    used: boolean;
+}
+
 /** Metadata-comment key the saved overrides live under. */
 const OVERRIDES_KEY = 'uiOverrides';
 
@@ -149,4 +166,49 @@ export function writeUiOverrides(source: string, overrides: UiOverrides): string
 
     const comment = serializeMetadataComment({ [OVERRIDES_KEY]: overrides });
     return [comment, ...lines].join(eol);
+}
+
+/** Opening tag of an element the engine tagged as a `#UI` control. */
+const UI_CONTROL_TAG = /<[^>]+\sdata-ui-var="[^"]*"[^>]*>/g;
+
+/**
+ * The controls a rendered input form actually created, in document order. Reading them
+ * back out of the markup rather than scanning the source is what makes them exact:
+ * `#include`d files, macro expansions, taken `#if` branches and loop passes are all
+ * already resolved by the time the engine emits the attributes.
+ */
+export function extractUiControls(html: string): UiControl[] {
+    const controls: UiControl[] = [];
+    const seen = new Set<string>();
+    for (const [tag] of html.matchAll(UI_CONTROL_TAG)) {
+        const key = /\sdata-ui-var="([^"]*)"/.exec(tag)?.[1];
+        const line = /\sdata-ui-line="(\d+)"/.exec(tag)?.[1];
+        if (!key || !line || seen.has(key)) continue;
+        seen.add(key);
+        controls.push({ key, line: Number(line) });
+    }
+    return controls;
+}
+
+/**
+ * Resolves each saved override against the live controls, mirroring the narrowest-first
+ * match `ExpressionParser.ApplyUiOverride` makes: this exact control, then every pass of
+ * its declaration, then every declaration of the name. An override matching none of them
+ * applies to nothing and is what "unused" means. Key order is the saved one.
+ */
+export function classifyUiOverrides(overrides: UiOverrides, controls: UiControl[]): UiOverrideRow[] {
+    const byKey = new Map<string, number>();
+    const byDeclaration = new Map<string, number>();
+    const byName = new Map<string, number>();
+    for (const { key, line } of controls) {
+        const [name, ordinal] = key.split(':');
+        if (!byKey.has(key)) byKey.set(key, line);
+        if (!byDeclaration.has(`${name}:${ordinal}`)) byDeclaration.set(`${name}:${ordinal}`, line);
+        if (!byName.has(name)) byName.set(name, line);
+    }
+
+    return Object.entries(overrides).map(([key, value]) => {
+        const line = byKey.get(key) ?? byDeclaration.get(key) ?? byName.get(key) ?? null;
+        return { key, value, line, used: line !== null };
+    });
 }

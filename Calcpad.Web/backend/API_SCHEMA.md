@@ -28,6 +28,7 @@ Default port is `9420` (override with `CALCPAD_PORT`).
 - [POST /find-references](#post-find-references)
 - [POST /prettify](#post-prettify)
 - [POST /portable/bundle](#post-portablebundle)
+- [POST /portable/package](#post-portablepackage)
 - [GET /snippets](#get-snippets)
 - [Usage Notes](#usage-notes)
 
@@ -660,7 +661,8 @@ Rewrite a worksheet into the self-contained form a compiled `.cpdz` needs: macro
 ```typescript
 interface PortableBundleRequest {
   content: string;
-  sourceFilePath?: string;   // relative #include and #read paths resolve against its folder
+  sourceFilePath?: string;      // relative #include and #read paths resolve against its folder
+  writeNextToWorksheet?: boolean; // collapse absolute #write/#append targets to a bare filename; default false
 }
 ```
 
@@ -671,7 +673,37 @@ interface PortableBundleResponse {
 }
 ```
 
-**400** when the worksheet still depends on something that cannot be read (missing `.csv`, unresolved `#include`, or a relative path with no `sourceFilePath` to resolve against): `{ error, messages: string[] }`. Nothing is skipped — a worksheet that would fail for whoever receives it is not written.
+**400** when the worksheet still depends on something that cannot be read (missing `.csv`, unresolved `#include`, or a relative path with no `sourceFilePath` to resolve against), or when `writeNextToWorksheet` would make two `#write`/`#append` targets collapse onto the same file: `{ error, messages: string[] }`. Nothing is skipped — a worksheet that would fail, or overwrite one output with another, for whoever receives it is not written.
+
+---
+
+## POST /portable/package
+
+Pack a worksheet and the files it references into a ZIP that stays text — the middle ground between a `.cpd`, which only runs where it was written, and a `.cpdz`, which runs anywhere but cannot be read. The document keeps its directives; only their paths change, each rewritten to reach the copy bundled beside it:
+
+```
+calc.zip
+  calc.cpd
+  calc.cpd.refs/  logo.png  library.cpd  loads.csv
+```
+
+`#include`, `#read` and local `<img src>` paths are rewritten and their files bundled, recursively through included files. Images given as `http(s):`/`data:` are left as written. Note the asymmetry the engine imposes: an `#include` resolves against the file holding it, while everything else resolves against the *root* document, because includes are expanded before anything else runs — so a path inside a bundled include is rewritten relative to the document, not to the include.
+
+`#write`/`#append` targets are left as written unless `writeNextToWorksheet` is set, in which case an absolute one is collapsed to its bare filename so the output lands beside wherever the package is unpacked; a relative target is untouched either way.
+
+**Request:** `PortableBundleRequest` (as above).
+
+**Response:**
+```typescript
+interface PortablePackageResponse {
+  data: string;              // base64 of the .zip
+  name: string;              // suggested file name, from the document's own
+  refsFolder: string;        // "<document>.refs"
+  bundled: string[];         // the entries packed beside the document
+}
+```
+
+**400** when the package cannot be built: `{ error, messages: string[] }`. Three refusals, all naming what to fix — a reference that cannot be read, two references sharing a file name (which the flat refs folder cannot hold), and, with `writeNextToWorksheet` set, two `#write`/`#append` targets that would collapse onto the same file. Nothing partial is ever returned.
 
 ---
 

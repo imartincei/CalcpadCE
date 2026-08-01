@@ -80,6 +80,8 @@
         :initial-enable-formatting-hotkeys="enableFormattingHotkeys"
         :initial-enable-preview-cursor-sync="enablePreviewCursorSync"
         :initial-enable-auto-run="enableAutoRun"
+        :initial-enable-auto-input-mode="enableAutoInputMode"
+        :initial-enable-preview-ui-overrides="enablePreviewUiOverrides"
         :initial-dark-background="darkBackground"
         :initial-linter-min-severity="linterMinSeverity"
         :initial-max-output-lines="maxOutputLines"
@@ -101,6 +103,8 @@
         @update-formatting-hotkeys="handleUpdateFormattingHotkeys"
         @update-preview-cursor-sync="handleUpdatePreviewCursorSync"
         @update-auto-run="handleUpdateAutoRun"
+        @update-auto-input-mode="handleUpdateAutoInputMode"
+        @update-preview-ui-overrides="handleUpdatePreviewUiOverrides"
         @update-dark-background="handleUpdateDarkBackground"
         @update-linter-min-severity="handleUpdateLinterMinSeverity"
         @update-max-output-lines="handleUpdateMaxOutputLines"
@@ -134,10 +138,14 @@
         v-else-if="pane.activeTab === 'export'"
         :plots="plots"
         :loading="plotsLoading"
+        :version-config="versionConfig"
+        :write-next-to-worksheet="portableWriteNextToWorksheet"
         @save-pdf="handleSavePdf"
         @save-html="handleSaveSourceHtml"
         @save-docx="handleSaveDocx"
         @save-compiled="handleSaveCompiled"
+        @save-portable="handleSavePortable"
+        @update-write-next-to-worksheet="handleUpdateWriteNextToWorksheet"
         @refresh-plots="handleRefreshPlots"
         @save-plot="handleSavePlot"
         @save-plots-zip="handleSavePlotsZip"
@@ -150,7 +158,10 @@
       <CalcpadMetadataTab
         v-else-if="pane.activeTab === 'metadata'"
         :block="metadataBlock"
+        :ui-controls="uiControls"
         @apply="handleApplyMetadata"
+        @go-to-line="handleGoToLine"
+        @refresh-ui-controls="handleRefreshUiControls"
       />
     </div>
     </div>
@@ -172,6 +183,7 @@ import CalcpadMetadataTab from './CalcpadMetadataTab.vue'
 import { postMessage } from '../services/messaging'
 import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '../../text/metadata-comment'
 import type { UiDirectiveData } from '../../text/ui-directive'
+import type { UiControl } from '../../services/ui-overrides'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
 import type { CalcpadError, ExportVariant } from '../../types/api'
@@ -226,6 +238,9 @@ const commentFormat = ref('auto')
 const enableFormattingHotkeys = ref(true)
 const enablePreviewCursorSync = ref(false)
 const enableAutoRun = ref(true)
+const enableAutoInputMode = ref(true)
+const enablePreviewUiOverrides = ref(false)
+const portableWriteNextToWorksheet = ref(true)
 const darkBackground = ref('#1e1e1e')
 const linterMinSeverity = ref('information')
 const maxOutputLines = ref(1000)
@@ -249,6 +264,8 @@ const prettifyIndentSize = ref(4)
 const prettifyTrimTrailing = ref(true)
 
 const metadataBlock = ref<MetadataCommentBlock | null>(null)
+// #UI controls of the last input-form render, null until the host resolves them.
+const uiControls = ref<UiControl[] | null>(null)
 
 const tabs = computed<Tab[]>(() => {
   const base: Tab[] = [
@@ -405,6 +422,15 @@ const handleSaveCompiled = () => {
   postMessage({ type: 'saveCompiled' })
 }
 
+const handleSavePortable = () => {
+  postMessage({ type: 'savePortable' })
+}
+
+const handleUpdateWriteNextToWorksheet = (enabled: boolean) => {
+  portableWriteNextToWorksheet.value = enabled
+  postMessage({ type: 'updatePortableWriteNextToWorksheet', enabled })
+}
+
 const handleRefreshPlots = () => {
   plotsLoading.value = true
   postMessage({ type: 'getPlots' })
@@ -465,6 +491,16 @@ const handleUpdateFormattingHotkeys = (enabled: boolean) => {
 const handleUpdatePreviewCursorSync = (enabled: boolean) => {
   enablePreviewCursorSync.value = enabled
   postMessage({ type: 'updatePreviewCursorSync', enabled })
+}
+
+const handleUpdateAutoInputMode = (enabled: boolean) => {
+  enableAutoInputMode.value = enabled
+  postMessage({ type: 'updateAutoInputMode', enabled })
+}
+
+const handleUpdatePreviewUiOverrides = (enabled: boolean) => {
+  enablePreviewUiOverrides.value = enabled
+  postMessage({ type: 'updatePreviewUiOverrides', enabled })
 }
 
 const handleUpdateAutoRun = (enabled: boolean) => {
@@ -583,6 +619,14 @@ const handleUpdatePrettifyTrim = (enabled: boolean) => {
   postMessage({ type: 'updatePrettifyTrim', value: enabled })
 }
 
+// Re-resolving renders the document, so the stale result is dropped first: the panel
+// withholds its used/unused verdicts while nothing is resolved rather than showing an
+// answer from before the edit that prompted the refresh.
+const handleRefreshUiControls = () => {
+  uiControls.value = null
+  postMessage({ type: 'getUiControls' })
+}
+
 const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: SettingsValues; ui?: UiDirectiveData }) => {
   if (!metadataBlock.value) return
   // One message → one atomic edit covering the metadata comment, the
@@ -624,6 +668,9 @@ const handleMessage = (event: MessageEvent) => {
       if (typeof message.enableQuickTyping === 'boolean') enableQuickTyping.value = message.enableQuickTyping
       if (typeof message.enablePreviewCursorSync === 'boolean') enablePreviewCursorSync.value = message.enablePreviewCursorSync
       if (typeof message.enableAutoRun === 'boolean') enableAutoRun.value = message.enableAutoRun
+      if (typeof message.enableAutoInputMode === 'boolean') enableAutoInputMode.value = message.enableAutoInputMode
+      if (typeof message.enablePreviewUiOverrides === 'boolean') enablePreviewUiOverrides.value = message.enablePreviewUiOverrides
+      if (typeof message.portableWriteNextToWorksheet === 'boolean') portableWriteNextToWorksheet.value = message.portableWriteNextToWorksheet
       darkBackground.value = message.darkBackground || '#1e1e1e'
       linterMinSeverity.value = message.linterMinSeverity || 'information'
       if (typeof message.maxOutputLines === 'number' && message.maxOutputLines >= 10) {
@@ -682,6 +729,9 @@ const handleMessage = (event: MessageEvent) => {
       break
     case 'metadataContext':
       metadataBlock.value = message.block ?? null
+      break
+    case 'uiControls':
+      uiControls.value = Array.isArray(message.controls) ? message.controls : null
       break
     case 'inputModeChanged':
       inputMode.value = !!message.active

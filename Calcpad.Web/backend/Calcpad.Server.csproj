@@ -39,6 +39,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The services are internal: they are the server's own, not an API. The test project
+         reaches them directly rather than through HTTP, which would need a host per test. -->
+    <InternalsVisibleTo Include="Calcpad.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="template.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

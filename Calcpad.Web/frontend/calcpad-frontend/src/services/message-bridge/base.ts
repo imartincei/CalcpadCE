@@ -2,7 +2,7 @@ import { CalcpadApiClient } from '../../api/client';
 import { CalcpadSnippetService } from '../snippets';
 import { CalcpadDefinitionsService } from '../definitions';
 import { parseHeadings } from '../headings';
-import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver, pdfSettingsFromDocument } from '../../text/metadata-comment';
+import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver, pdfSettingsFromDocument, hasMetadataContent } from '../../text/metadata-comment';
 import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
 import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
 import type { UiDirectiveData } from '../../text/ui-directive';
@@ -13,6 +13,8 @@ import { DEFAULT_PDF_SETTINGS } from '../../types/pdf-settings';
 import { buildImageCommentLine, bytesToBase64 } from '../image-utils';
 import type { ImageStorageMode, PickedImage } from '../image-utils';
 import { extractPlotsFromHtml, type ExtractedPlot } from '../plot-extract';
+import { extractUiControls } from '../ui-overrides';
+import type { UiControl } from '../ui-overrides';
 import { COMPILED_MIME } from '../cpdz';
 import { buildZip } from '../zip-writer';
 import type { ILogger } from '../../types/interfaces';
@@ -110,6 +112,9 @@ export abstract class BaseMessageBridge {
     protected _onInsertText: ((text: string) => void) | null = null;
     protected quickPick: QuickPickFn | null = null;
     private _uiOverridesProvider: (() => Record<string, string> | undefined) | null = null;
+    private _uiControlsProvider: (() => UiControl[] | null) | null = null;
+    private _uiControlsSink: ((controls: UiControl[]) => void) | null = null;
+    private _uiOverridesSink: ((overrides: Record<string, string>) => void) | null = null;
     private _cachedPlots: ExtractedPlot[] = [];
 
     constructor(serverUrl: string, logger?: ILogger) {
@@ -152,6 +157,49 @@ export abstract class BaseMessageBridge {
 
     protected activeUiOverrides(): Record<string, string> | undefined {
         return this._uiOverridesProvider?.() ?? undefined;
+    }
+
+    /**
+     * Host injects the controls of the active document's last input-form render, and a way
+     * to record a fresh set. Null means the document has not been rendered as a form yet,
+     * which is what makes the Properties tab withhold its used/unused verdicts rather than
+     * declare every saved value orphaned.
+     */
+    setUiControlsProvider(fn: () => UiControl[] | null): void {
+        this._uiControlsProvider = fn;
+    }
+
+    /** Host injects where a render made here records its controls, keyed by its own document. */
+    setUiControlsSink(fn: (controls: UiControl[]) => void): void {
+        this._uiControlsSink = fn;
+    }
+
+    /** Host injects a sink for the entered `#UI` values, so an edit made in the panel sticks. */
+    setUiOverridesSink(fn: (overrides: Record<string, string>) => void): void {
+        this._uiOverridesSink = fn;
+    }
+
+    /** Pushes the cached controls, so the panel follows document and cursor changes. */
+    protected refreshUiControls(): void {
+        this.postToVue({ type: 'uiControls', controls: this._uiControlsProvider?.() ?? null });
+    }
+
+    /**
+     * Answers the panel's request for the live controls by rendering the document as a
+     * form. Deliberately not served from the cache: this is what the panel asks when it
+     * has no answer or wants a fresh one, and the cache is only as new as the last time
+     * the form itself was shown.
+     */
+    private async handleGetUiControls(): Promise<void> {
+        const content = this.getActiveEditorContent();
+        const { sourceFilePath } = await this.buildFileContext(content);
+        const html = await this.renderForExport(content, buildApiSettings(this.settings), sourceFilePath, 'input');
+        // A failed render leaves the panel unresolved rather than empty - "no controls"
+        // and "could not tell" must not read the same to a purge button.
+        if (html == null) return;
+        const controls = extractUiControls(html);
+        this._uiControlsSink?.(controls);
+        this.postToVue({ type: 'uiControls', controls });
     }
 
     /** The `#UI` options an export of `variant` should render with. */
@@ -224,6 +272,14 @@ export abstract class BaseMessageBridge {
                 this.setExtraSetting('autoRun', String(message.enabled));
                 this.postToVue({ type: 'autoRunChanged', enabled: !!message.enabled });
                 break;
+            // Read per open rather than cached, so there is nothing to broadcast.
+            case 'updateAutoInputMode':
+                this.setExtraSetting('autoInputMode', String(message.enabled));
+                break;
+            case 'updatePreviewUiOverrides':
+                this.setExtraSetting('previewUiOverrides', String(message.enabled));
+                this.postToVue({ type: 'previewUiOverridesChanged', enabled: !!message.enabled });
+                break;
             case 'updateLinterMinSeverity':
                 this.setExtraSetting('linterMinSeverity', message.severity);
                 this.postToVue({ type: 'linterMinSeverityChanged', severity: message.severity });
@@ -254,6 +310,13 @@ export abstract class BaseMessageBridge {
             case 'saveCompiled':
                 this.saveCompiled();
                 break;
+            case 'savePortable':
+                this.savePortable();
+                break;
+            // Read per export rather than cached, so there is nothing to broadcast.
+            case 'updatePortableWriteNextToWorksheet':
+                this.setExtraSetting('portableWriteNextToWorksheet', String(message.enabled));
+                break;
             case 'getPlots':
                 this.handleGetPlots();
                 break;
@@ -271,6 +334,9 @@ export abstract class BaseMessageBridge {
                 break;
             case 'updateMetadata':
                 this.handleUpdateMetadata(message);
+                break;
+            case 'getUiControls':
+                this.handleGetUiControls();
                 break;
             case 'goToLine':
                 this.handleGoToLine(message.line);
@@ -404,6 +470,9 @@ export abstract class BaseMessageBridge {
             enableFormattingHotkeys: this.getExtraSetting('formattingHotkeys') !== 'false',
             enablePreviewCursorSync: this.getExtraSetting('previewCursorSync') === 'true',
             enableAutoRun: this.getExtraSetting('autoRun') !== 'false',
+            enableAutoInputMode: this.getExtraSetting('autoInputMode') !== 'false',
+            enablePreviewUiOverrides: this.getExtraSetting('previewUiOverrides') === 'true',
+            portableWriteNextToWorksheet: this.getExtraSetting('portableWriteNextToWorksheet') !== 'false',
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
             editorFontFamily: this.getExtraSetting('editorFontFamily') ?? 'JuliaMono',
@@ -640,7 +709,8 @@ export abstract class BaseMessageBridge {
     async saveCompiled(): Promise<string | null> {
         const content = this.getActiveEditorContent();
         const { sourceFilePath } = await this.buildFileContext(content);
-        const bundled = await this.apiClient.bundlePortable(content, sourceFilePath);
+        const writeNextToWorksheet = this.getExtraSetting('portableWriteNextToWorksheet') !== 'false';
+        const bundled = await this.apiClient.bundlePortable(content, sourceFilePath, writeNextToWorksheet);
         if (bundled.content == null) {
             await this.onExportError(`This worksheet cannot be compiled:\n${bundled.errors.join('\n')}`);
             return null;
@@ -654,6 +724,33 @@ export abstract class BaseMessageBridge {
             mime: COMPILED_MIME,
             extensions: ['cpdz'],
             dialogTitle: 'Save Compiled Worksheet',
+        });
+    }
+
+    /**
+     * Packs the active document and everything it references into a portable archive, then
+     * prompts for a location. Unlike a compiled worksheet this stays text: what comes out is
+     * the document as written, with only its paths pointing somewhere else — at the folder of
+     * references packed beside it. The recipient can read and edit it.
+     *
+     * The server does the packing, since resolving the references means reading them.
+     */
+    async savePortable(): Promise<string | null> {
+        const content = this.getActiveEditorContent();
+        const { sourceFilePath } = await this.buildFileContext(content);
+        const writeNextToWorksheet = this.getExtraSetting('portableWriteNextToWorksheet') !== 'false';
+        const packaged = await this.apiClient.packagePortable(content, sourceFilePath, writeNextToWorksheet);
+        if (!packaged.zip) {
+            await this.onExportError(
+                `This worksheet cannot be packaged:\n${packaged.errors.join('\n')}`);
+            return null;
+        }
+        return this.saveExportedFile({
+            defaultName: packaged.name ?? 'calcpad-worksheet.zip',
+            data: packaged.zip,
+            mime: 'application/zip',
+            extensions: ['zip'],
+            dialogTitle: 'Export Portable Package',
         });
     }
 
@@ -788,6 +885,9 @@ export abstract class BaseMessageBridge {
             block = computeMetadataBlock(lines, pos.lineNumber - 1, this.definitionResolver());
         }
         this.postToVue({ type: 'metadataContext', block });
+        // Sent with the block so the panel's saved-values list follows the document the
+        // cursor is actually in, rather than keeping the last one it asked about.
+        this.refreshUiControls();
     }
 
     /**
@@ -819,12 +919,19 @@ export abstract class BaseMessageBridge {
         // Metadata comment (desc/params/lint/no-print) — only when it has content.
         // A multi-line comment spans line..endLine; layout preserves its shape.
         const lineNumber = msg.line + 1;
-        if (Object.keys(msg.data).length > 0 && lineNumber >= 1 && lineNumber <= model.getLineCount()) {
+        if (lineNumber >= 1 && lineNumber <= model.getLineCount()) {
             const endLineNumber = (msg.endLine ?? msg.line) + 1;
-            const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '', msg.layout);
-            edits.push(msg.isNew
-                ? { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }, text: newText + '\n' }
-                : { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: endLineNumber, endColumn: model.getLineMaxColumn(endLineNumber) }, text: newText });
+            if (hasMetadataContent(msg.data)) {
+                const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '', msg.layout);
+                edits.push(msg.isNew
+                    ? { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }, text: newText + '\n' }
+                    : { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: endLineNumber, endColumn: model.getLineMaxColumn(endLineNumber) }, text: newText });
+            } else if (!msg.isNew) {
+                // Every key removed - clearing the last field, or purging the last saved
+                // value - leaves an empty comment, so the comment goes with them.
+                for (let ln = endLineNumber; ln >= lineNumber; ln--)
+                    edits.push(this.deleteLineEdit(model, ln));
+            }
         }
 
         // #settings directive under the cursor. `settingsLine` (0-based) points at
@@ -865,6 +972,13 @@ export abstract class BaseMessageBridge {
 
         if (edits.length === 0) return;
         editor.executeEdits('calcpad-metadata', edits);
+
+        // Entered values are held in memory and written out on demand, so an edit to the
+        // saved ones has to reach the store too - otherwise the next "Save values" puts
+        // the purged keys straight back.
+        const overrides = msg.data.uiOverrides;
+        if (this._uiOverridesSink && overrides && typeof overrides === 'object' && !Array.isArray(overrides))
+            this._uiOverridesSink(overrides as Record<string, string>);
 
         // A freshly created directive: park the cursor on it so the re-emitted
         // context binds to it and a repeated Apply edits in place, not duplicates.

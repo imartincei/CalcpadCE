@@ -23,6 +23,14 @@ Preview and Report show three ordinary lines. In Input mode `L` and `q` become t
 
 ## Turning it on
 
+A document that declares `#UI` controls exists to be filled in, so the first time you open one
+it comes up as its input form — in the desktop app the results pane switches to **Input**, and in
+**VS Code** the form panel opens beside the editor without taking the caret out of it. That
+happens once per document per session: switch to **Preview** or **Report** and the mode you chose
+sticks, however often you come back to the tab. `#UI` lines reached only through an `#include`
+are not detected, since finding them would mean reading files on every open. Turn the whole
+behaviour off with **Open #UI Documents in Input Mode** on the panel's **Settings** tab.
+
 **VS Code**
 
 | Command | What it does |
@@ -60,7 +68,7 @@ back. `#pre` is hidden in a report; `#post` is hidden while the form is on scree
 
 | | `#pre` shown | `#post` shown | Entered `#UI` values applied |
 |---|---|---|---|
-| **Preview** | yes | yes | no |
+| **Preview** | yes | yes | no, unless the setting below says so |
 | **Input** | yes | no | yes |
 | **Report** | no | yes | yes |
 
@@ -80,6 +88,14 @@ whoever fills the form in inside `#pre`, and they stay out of the report.
 
 **Preview** is the mode to write in: it shows everything at once, and it deliberately ignores
 entered values so you always see what the document itself says.
+
+The exception is **Apply #UI Values in Preview** on the panel's **Settings** tab, off by
+default. Turn it on and Preview renders with the entered values applied, exactly as the form
+and the report do, while still showing `#pre` and `#post` together. That combination is what
+makes it a debugging view: when a document calculates cleanly as written but errors once the
+form is filled in, Preview with this on shows the failing values against the whole document —
+the `#pre` instructions, the `#post` results and the source lines the form leaves out. Turn it
+back off to see the document's own values again.
 
 ## Writing a `#UI` line
 
@@ -106,6 +122,10 @@ inputs on a following, unannotated line instead.
 
 Exponent notation is not a value here either: `2.5e6` reads as `2.5` with a unit `e6`. Write
 `2500000` or `2.5*10^6` on a separate line.
+
+Saved values are matched to controls by variable name, so give each input a name of its own
+rather than re-assigning one — see [Editing a document that has saved
+values](#editing-a-document-that-has-saved-values).
 
 ### Labels
 
@@ -301,6 +321,38 @@ See [Metadata Comments](new-metadata-comments.md) for the comment format itself.
 
 Values do not have to be saved to be exported: an export made while the form is filled in uses
 what is currently entered. Saving is what makes them survive closing the document.
+
+### Editing a document that has saved values
+
+Because a saved value is tied to a variable name and to which declaration of that name it is,
+**editing the source of a document can move or orphan the values already saved in it**. The
+document still calculates correctly — the risk is that a filled-in form comes back with a value
+on the wrong control, or with a control reset to what the document itself says.
+
+The ordinal counts the `#UI` declarations of that name in the order the document runs them, so
+what matters is not where a line sits in the file but how many declarations of the same name
+come before it:
+
+- **Renaming a variable** orphans its value. `L:1` no longer matches anything, the control comes
+  up with the document's own value, and the stale entry stays in the metadata comment until it
+  is overwritten by the next save.
+- **Deleting one of several `#UI` lines that declare the same name** renumbers the ones after it.
+  Delete the first of three `L` controls and the old `L:2` and `L:3` values land on what are now
+  `L:1` and `L:2` — the values survive, attached to the wrong controls.
+- **Inserting a new `#UI` declaration of a name that already exists** shifts every later
+  declaration of that name the same way.
+- **Moving, editing or deleting lines that declare *other* names** is safe. So is reordering, as
+  long as the declarations of one name keep their relative order.
+
+The stable arrangement is therefore **one `#UI` declaration per variable name**. Give each input
+its own name instead of re-assigning one, and every key is `name:1`: it cannot be renumbered by
+anything you do elsewhere in the document, and only renaming or removing that input affects it.
+Where a name genuinely must be declared more than once — the two branches of an `#if`, a control
+inside a `#repeat` — the numbering is already stable against branch flips and loop passes, but
+adding or removing one of those declarations later will still shift the rest.
+
+If a document's values do end up scrambled, the metadata comment is plain text: fix the keys by
+hand, or clear the `uiOverrides` entry to start the form from the document's own values again.
 
 ## Exporting
 

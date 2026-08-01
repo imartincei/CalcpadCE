@@ -30,6 +30,7 @@ export type {
     CpdzDecodeResponse,
     CpdzEncodeResponse,
     PortableBundleResult,
+    PortablePackageResult,
 } from './types/api';
 export { CalcpadTokenType, CalcpadTypeId } from './types/api';
 
@@ -98,7 +99,7 @@ export { extractPlotsFromHtml } from './services/plot-extract';
 export type { ExtractedPlot } from './services/plot-extract';
 export { buildZip } from './services/zip-writer';
 export type { ZipEntry } from './services/zip-writer';
-export { UiOverrideStore, readUiOverrides, writeUiOverrides } from './services/ui-overrides';
+export { UiOverrideStore, readUiOverrides, writeUiOverrides, extractUiControls, classifyUiOverrides } from './services/ui-overrides';
 export { isCompiledPath, inlineImageSources, COMPILED_EXTENSION, COMPILED_MIME } from './services/cpdz';
 export {
     pathDirname,
@@ -108,7 +109,7 @@ export {
     pathResolve,
     pathExtension,
 } from './services/paths';
-export type { UiOverrides, UiValueChange } from './services/ui-overrides';
+export type { UiOverrides, UiValueChange, UiControl, UiOverrideRow } from './services/ui-overrides';
 
 // --- Message Bridge (base class) --------------------------------------------
 export { BaseMessageBridge, variantRender } from './services/message-bridge/base';
@@ -204,6 +205,7 @@ export {
     findMetadataCommentBlock,
     computeMetadataBlock,
     serializeMetadataComment,
+    hasMetadataContent,
     settingsDirectiveOnLine,
     serializeSettingsDirective,
     pdfSettingsFromDocument,
@@ -219,4 +221,5 @@ export {
     UI_PROPERTY_KEYS,
     findUiDirectiveBlock,
     serializeUiDirective,
+    documentHasUiDirectives,
 } from './text/ui-directive';

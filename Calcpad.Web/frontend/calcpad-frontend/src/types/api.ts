@@ -327,6 +327,21 @@ export interface PortableBundleResult {
 }
 
 /**
+ * The outcome of packing a worksheet into a portable archive. `zip` is the file to save and
+ * `bundled` names what travelled with the document; when they are missing, `errors` says what
+ * stopped the package — a reference that could not be read, or two that share a name.
+ */
+export interface PortablePackageResult {
+    zip?: Uint8Array;
+    /** Suggested file name, taken from the document's own. */
+    name?: string;
+    /** The folder inside the archive holding every referenced file. */
+    refsFolder?: string;
+    bundled: string[];
+    errors: string[];
+}
+
+/**
  * Which rendering an export captures.
  *
  * - `report` — hides `#pre` and applies the entered `#UI` values. The default everywhere.

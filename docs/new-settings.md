@@ -82,6 +82,8 @@ Pick the Monaco editor's font family from:
 - **Enable Formatting Hotkeys** — the Ctrl+B / Ctrl+I / Ctrl+1–6 … bindings.
 - **Sync Preview to Cursor Line** — scroll the preview to follow the line the cursor is on.
 - **Auto-Run Preview** *(default on)* — when off, the preview only re-renders when the preview panel is first opened or a manual **Run Preview** is triggered (**Ctrl+Alt+X**, the ▶ Run button, the editor context menu, or the Server → Refresh menu in the desktop app). Turn this off for large documents where every keystroke re-render is too costly.
+- **Open #UI Documents in Input Mode** *(default on)* — a document declaring `#UI` controls opens as its input form the first time you open it. The mode you switch to afterwards sticks; a later tab switch never brings the form back. Desktop app and VS Code only. See [UI Mode](new-ui-mode.md).
+- **Apply #UI Values in Preview** *(default off)* — Preview normally renders the document's own values; turn this on and it renders the values entered into the input form instead, while still showing `#pre` and `#post` together. For tracking down an error that only appears once a form is filled in. Exports of the Preview variant are unaffected — they always use the document's own values. See [UI Mode](new-ui-mode.md).
 
 ## Library
 

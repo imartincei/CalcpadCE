@@ -52,7 +52,7 @@ A compiled worksheet is fully portable: everything the document depends on is wr
 
 If a referenced file cannot be read — a missing "**\*.csv**", an "**#include**" that does not resolve — compiling stops and reports it, rather than writing a worksheet that fails for whoever receives it. An unsaved document has no folder for relative paths to resolve against, so save it before compiling.
 
-"**#write**" and "**#append**" are left as they are: they are outputs, not dependencies, and still write next to the compiled file when it runs.
+"**#write**" and "**#append**" are outputs, not dependencies, so a relative target is left as it is and still writes next to the compiled file when it runs. An absolute target, however, points at a folder that may not exist on whoever runs the compiled file — so with the "**Write outputs next to the worksheet**" checkbox on the "**Export**" tab checked (the default), it is rewritten to its bare filename instead, landing beside the compiled file the same way a relative one does. Clear the checkbox to keep it exactly as written.
 
 * In **calcpad-desktop**, use "**File/Save As Compiled Worksheet…**", or the "**Save Compiled…**" button on the "**Export**" tab.
 * In **VS Code**, run "**CalcpadCE: Save As Compiled Worksheet…**" from the command palette, or use the same "**Save Compiled…**" button on the "**Export**" tab.
@@ -63,3 +63,38 @@ Values you enter can still be saved back into it: in **calcpad-desktop** it save
 A filled-in worksheet is still read and handed on, so the report and the exports work from a compiled file as they do from a "**\*.cpd**".
 In **VS Code**, "**CalcpadCE: Toggle Report Preview**" opens the report beside the form, and the "**Export**" tab's PDF, HTML and Word buttons render the values you have entered.
 The source stays hidden throughout — the report is a rendering, not the code.
+
+If the recipient has to read or edit the calculation rather than just fill it in, export a portable package instead.
+
+## Export Portable Package…
+
+A portable package is the middle ground between a "**\*.cpd**", which only runs on the machine it was written on, and a "**\*.cpdz**", which runs anywhere but cannot be read.
+It is a "**\*.zip**" holding the document as text beside a folder of everything it references, with each path rewritten to reach it there:
+
+```
+calc.zip
+    calc.cpd
+    calc.cpd.refs/
+        logo.png
+        library.cpd
+        loads.csv
+```
+
+Unzip it anywhere and open the "**\*.cpd**": it renders as it did for its author, and it is still a document — readable, editable, and re-exportable.
+
+* "**#include**" stays an "**#include**", "**#read**" stays a "**#read**" and images stay images. Only their paths change.
+* An "**#include**"d file is packed with its own references, which are rewritten as well.
+* Images given as a web address or as inline data are left alone: they already resolve anywhere.
+* "**#write**" and "**#append**" are outputs, not dependencies, so a relative target is left alone for the same reason as when compiling. An absolute target is rewritten to its bare filename when "**Write outputs next to the worksheet**" on the "**Export**" tab is checked (the default), so the output lands beside wherever the package is unpacked; clear it to keep the target exactly as written.
+
+The folder is flat, so **no two referenced files may share a name**, however different their folders are, and however deep in the "**#include**"s they sit.
+Two that do stops the export and names both paths, so you can rename one; nothing is written in the meantime.
+A reference that cannot be read stops it the same way, and lists every one.
+Two "**#write**"/"**#append**" targets that would collapse onto the same filename once rewritten next to the worksheet stop it too, naming both — rename one, or clear the checkbox.
+An unsaved document has no folder for relative paths to resolve against, so save it first.
+
+* In **calcpad-desktop**, use "**File/Export Portable Package…**", or the "**Export Portable…**" button on the "**Export**" tab.
+* In **VS Code**, run "**CalcpadCE: Export Portable Package…**" from the command palette or the editor's right-click menu, or use the same "**Export Portable…**" button on the "**Export**" tab.
+
+One thing to know when reading the packaged files: a path inside an "**#include**"d file is written relative to the *document*, not to the included file, because "**#include**"s are expanded into the document before anything resolves.
+That is where the original resolved it from too.

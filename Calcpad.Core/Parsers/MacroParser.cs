@@ -107,6 +107,35 @@ namespace Calcpad.Core
             return Keywords.None;
         }
 
+        /// <summary>
+        /// Locates the file name of an <c>#include</c> directive within <paramref name="line"/>,
+        /// which must start at the <c>#</c> — the parser trims each line before it gets here, so
+        /// a caller working on raw source adds its own indent to <paramref name="start"/>.
+        /// The name runs to the first <c>'</c> or <c>"</c> (a trailing comment) or to the last
+        /// <c>#</c> (an input-field block), whichever comes first, and so may contain spaces.
+        /// </summary>
+        /// <returns>False when the line is not an <c>#include</c> or names nothing.</returns>
+        public static bool TryGetIncludePath(ReadOnlySpan<char> line, out int start, out int length)
+        {
+            start = 0;
+            length = 0;
+            if (!line.StartsWith("#include", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            var n = line.IndexOfAny('\'', '"');
+            var nf1 = line.LastIndexOf('#');
+            if (n < 9 || nf1 > 0 && nf1 < n)
+                n = nf1;
+
+            if (n < 9)
+                n = line.Length;
+
+            var name = line[8..n];
+            start = 8 + name.Length - name.TrimStart().Length;
+            length = name.Trim().Length;
+            return length > 0;
+        }
+
         private int _parsedLineNumber;
         public bool Parse(string sourceCode, out string outCode, StringBuilder sb, int includeLine, bool addLineNumbers)
         {
@@ -209,18 +238,12 @@ namespace Calcpad.Core
 
             void ParseInclude(ReadOnlySpan<char> lineContent)
             {
-                int n = lineContent.Length;
-                if (n < 9)
+                if (lineContent.Length < 9)
                     AppendError(lineContent, Messages.Missing_source_file_for_include);
-                n = lineContent.IndexOfAny('\'', '"');
+
+                TryGetIncludePath(lineContent, out var start, out var length);
+                var rawFileName = lineContent.Slice(start, length).ToString();
                 var nf1 = lineContent.LastIndexOf('#');
-                if (n < 9 || nf1 > 0 && nf1 < n)
-                    n = nf1;
-
-                if (n < 9)
-                    n = lineContent.Length;
-
-                var rawFileName = lineContent[8..n].Trim().ToString();
 
                 Queue<string> fields = new();
                 if (nf1 > 0)

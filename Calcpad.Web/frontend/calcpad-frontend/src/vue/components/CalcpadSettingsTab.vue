@@ -471,6 +471,30 @@
             </label>
           </div>
 
+          <div v-if="!versionConfig.isWeb" v-show="rowVisible('editor', 'autoInputMode')" class="setting-group">
+            <label>
+              <input
+                v-model="enableAutoInputMode"
+                type="checkbox"
+                @change="updateAutoInputMode"
+              />
+              Open #UI Documents in Input Mode
+              <span class="setting-info" title="A document declaring #UI controls opens as its input form the first time you open it. The mode you switch to afterwards sticks — a later tab switch never brings the form back.">ⓘ</span>
+            </label>
+          </div>
+
+          <div v-show="rowVisible('editor', 'previewUiOverrides')" class="setting-group">
+            <label>
+              <input
+                v-model="enablePreviewUiOverrides"
+                type="checkbox"
+                @change="updatePreviewUiOverrides"
+              />
+              Apply #UI Values in Preview
+              <span class="setting-info" title="Preview normally shows the document's own values. Turn this on to render it with the values entered into the input form instead, for tracking down an error that only appears once a form is filled in.">ⓘ</span>
+            </label>
+          </div>
+
           <div v-if="versionConfig.isDesktop" v-show="rowVisible('editor', 'fontFamily')" class="setting-group">
             <label for="editorFontFamily">
               Font Family:
@@ -733,6 +757,8 @@ interface Props {
   initialEnableFormattingHotkeys?: boolean
   initialEnablePreviewCursorSync?: boolean
   initialEnableAutoRun?: boolean
+  initialEnableAutoInputMode?: boolean
+  initialEnablePreviewUiOverrides?: boolean
   initialDarkBackground?: string
   initialLinterMinSeverity?: string
   initialMaxOutputLines?: number
@@ -756,6 +782,8 @@ const props = withDefaults(defineProps<Props>(), {
   initialEnableFormattingHotkeys: true,
   initialEnablePreviewCursorSync: false,
   initialEnableAutoRun: true,
+  initialEnableAutoInputMode: true,
+  initialEnablePreviewUiOverrides: false,
   initialDarkBackground: '#1a1a2e',
   initialLinterMinSeverity: 'information',
   initialMaxOutputLines: 1000,
@@ -779,6 +807,8 @@ const emit = defineEmits<{
   updateFormattingHotkeys: [enabled: boolean]
   updatePreviewCursorSync: [enabled: boolean]
   updateAutoRun: [enabled: boolean]
+  updateAutoInputMode: [enabled: boolean]
+  updatePreviewUiOverrides: [enabled: boolean]
   updateDarkBackground: [color: string]
   updateLinterMinSeverity: [severity: string]
   updateMaxOutputLines: [value: number]
@@ -823,6 +853,8 @@ const commentFormat = ref(props.initialCommentFormat)
 const enableFormattingHotkeys = ref(props.initialEnableFormattingHotkeys)
 const enablePreviewCursorSync = ref(props.initialEnablePreviewCursorSync)
 const enableAutoRun = ref(props.initialEnableAutoRun)
+const enableAutoInputMode = ref(props.initialEnableAutoInputMode)
+const enablePreviewUiOverrides = ref(props.initialEnablePreviewUiOverrides)
 const darkBackground = ref(props.initialDarkBackground)
 const linterMinSeverity = ref(props.initialLinterMinSeverity)
 const maxOutputLines = ref(props.initialMaxOutputLines)
@@ -902,6 +934,8 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       formattingHotkeys: 'formatting hotkeys bold italic',
       previewCursorSync: 'sync preview cursor line scroll',
       autoRun: 'auto-run preview render',
+      autoInputMode: 'auto input mode ui form first open',
+      previewUiOverrides: 'apply ui values preview entered overrides debug troubleshoot',
       fontFamily: 'editor font family juliamono system',
       fontsFolder: 'open fonts folder custom',
       previewTheme: 'preview theme system light dark',
@@ -1048,6 +1082,14 @@ const updateAutoRun = () => {
   emit('updateAutoRun', enableAutoRun.value)
 }
 
+const updateAutoInputMode = () => {
+  emit('updateAutoInputMode', enableAutoInputMode.value)
+}
+
+const updatePreviewUiOverrides = () => {
+  emit('updatePreviewUiOverrides', enablePreviewUiOverrides.value)
+}
+
 const updateDarkBackground = () => {
   emit('updateDarkBackground', darkBackground.value)
 }
@@ -1169,6 +1211,20 @@ watch(
   () => props.initialEnablePreviewCursorSync,
   (newValue) => {
     enablePreviewCursorSync.value = newValue
+  }
+)
+
+watch(
+  () => props.initialEnableAutoInputMode,
+  (newValue) => {
+    enableAutoInputMode.value = newValue
+  }
+)
+
+watch(
+  () => props.initialEnablePreviewUiOverrides,
+  (newValue) => {
+    enablePreviewUiOverrides.value = newValue
   }
 )
 

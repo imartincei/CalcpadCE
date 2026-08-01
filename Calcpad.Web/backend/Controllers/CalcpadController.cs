@@ -116,7 +116,7 @@ namespace Calcpad.Server.Controllers
         {
             try
             {
-                var result = PortableWorksheet.Build(request.Content, request.SourceFilePath);
+                var result = PortableWorksheet.Build(request.Content, request.SourceFilePath, request.WriteNextToWorksheet);
                 if (result.Errors.Count > 0)
                     return BadRequest(new { error = "The worksheet is not self-contained", messages = result.Errors });
 
@@ -126,6 +126,36 @@ namespace Calcpad.Server.Controllers
             {
                 FileLogger.LogError("portable bundle failed", ex);
                 return StatusCode(500, new { error = "Failed to bundle the worksheet", message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Packs a worksheet and the files it references into a ZIP that stays text: the document
+        /// keeps its directives and only their paths change, each rewritten to point into a folder
+        /// beside it holding the file it named. The middle ground between a worksheet that only
+        /// runs where it was written and a compiled one that cannot be read.
+        /// </summary>
+        [HttpPost("portable/package")]
+        public IActionResult PackagePortable([FromBody] PortableBundleRequest request)
+        {
+            try
+            {
+                var result = PortablePackage.Build(request.Content, request.SourceFilePath, request.WriteNextToWorksheet);
+                if (result.Zip is null)
+                    return BadRequest(new { error = "The worksheet cannot be packaged", messages = result.Errors });
+
+                return Ok(new PortablePackageResponse
+                {
+                    Data = Convert.ToBase64String(result.Zip),
+                    Name = result.Name,
+                    RefsFolder = result.RefsFolder,
+                    Bundled = result.Bundled,
+                });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("portable package failed", ex);
+                return StatusCode(500, new { error = "Failed to package the worksheet", message = ex.Message });
             }
         }
 
@@ -816,6 +846,14 @@ namespace Calcpad.Server.Controllers
         /// paths resolve against its folder, as they do when the worksheet runs.
         /// </summary>
         public string? SourceFilePath { get; set; }
+
+        /// <summary>
+        /// Collapses an absolute <c>#write</c>/<c>#append</c> target to its bare filename, so
+        /// the output lands beside wherever the export ends up instead of a folder that may not
+        /// exist there. A relative target already does that and is untouched either way.
+        /// Defaults to false so a client that predates this option keeps today's behavior.
+        /// </summary>
+        public bool WriteNextToWorksheet { get; set; }
     }
 
     public class PortableBundleResponse
@@ -825,6 +863,21 @@ namespace Calcpad.Server.Controllers
         /// for the caller to embed.
         /// </summary>
         public string Content { get; set; } = string.Empty;
+    }
+
+    public class PortablePackageResponse
+    {
+        /// <summary>Base64 of the archive's bytes.</summary>
+        public string Data { get; set; } = string.Empty;
+
+        /// <summary>Suggested file name, taken from the document's own.</summary>
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>The folder inside the archive holding every referenced file.</summary>
+        public string RefsFolder { get; set; } = string.Empty;
+
+        /// <summary>The bundled entries, for reporting what was packed.</summary>
+        public IReadOnlyList<string> Bundled { get; set; } = [];
     }
 
     public class HighlightRequest

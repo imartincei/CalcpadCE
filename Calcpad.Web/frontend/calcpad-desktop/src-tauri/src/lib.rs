@@ -960,11 +960,19 @@ fn build_menu(app: &AppHandle, source_result_modes: bool) -> tauri::Result<Menu<
                 Some("CmdOrCtrl+Shift+S"),
             )?,
             // Compiling is an export: it writes a .cpdz alongside, leaving the open
-            // document on its own path, so it sits apart from the Save entries.
+            // document on its own path, so it sits apart from the Save entries. Packaging
+            // is the same kind of thing, for a recipient who has to read the source.
             &MenuItem::with_id(
                 app,
                 "save-as-compiled",
                 "Save As Compiled Worksheet...",
+                true,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                "save-as-portable",
+                "Export Portable Package...",
                 true,
                 None::<&str>,
             )?,

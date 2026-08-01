@@ -42,6 +42,8 @@
         "formattingHotkeys": true,
         "quickTyping": true,
         "previewCursorSync": false,
+        "autoInputMode": true,
+        "previewUiOverrides": false,
         "linterMinSeverity": "information",
         "maxOutputLines": 1000,
         "libraryPath": "",
@@ -49,6 +51,7 @@
         "prettifyIndentSize": 4,
         "prettifyTrimTrailingWhitespace": true,
         "writeMode": "localFile",
+        "portableWriteNextToWorksheet": true,
         "dotnetPath": "dotnet",
         "editorFontFamily": "JuliaMono",
         "pdfSettings": {

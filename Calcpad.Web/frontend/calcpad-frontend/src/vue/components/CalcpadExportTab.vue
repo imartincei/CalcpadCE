@@ -34,6 +34,32 @@
         </div>
       </div>
 
+      <!-- Not in the browser: the references are read from the folder the document is saved
+           in, and there is neither in a browser tab. -->
+      <div v-if="!versionConfig.isWeb" class="export-group">
+        <h3 class="export-group-title" :title="PORTABLE_DETAIL">Portable package</h3>
+        <div class="header-actions">
+          <button
+            class="btn"
+            @click="$emit('savePortable')"
+            title="Save this document and everything it references as a ZIP that runs anywhere"
+          >
+            Export Portable…
+          </button>
+        </div>
+      </div>
+
+      <!-- Governs both exports above: an absolute #write/#append target only ever matters once
+           the worksheet leaves the folder it was written in. -->
+      <label class="write-next-to-worksheet" :title="WRITE_NEXT_TO_WORKSHEET_DETAIL">
+        <input
+          type="checkbox"
+          :checked="writeNextToWorksheet"
+          @change="$emit('updateWriteNextToWorksheet', ($event.target as HTMLInputElement).checked)"
+        />
+        Write outputs next to the worksheet
+      </label>
+
       <div class="plots-section">
         <div class="plots-header">
           <h3>Plots</h3>
@@ -84,6 +110,8 @@
 
 <script setup lang="ts">
 import type { ExportVariant } from '../../types/api'
+import type { VersionConfig } from '../types'
+import { DEFAULT_VERSION_CONFIG } from '../types'
 
 export interface PlotSummary {
   index: number
@@ -97,6 +125,16 @@ export interface PlotSummary {
 const COMPILED_DETAIL =
   'A .cpdz for handing out: it opens as an input form with the source locked, '
   + 'and referenced images are embedded so it travels as one file.'
+
+const PORTABLE_DETAIL =
+  'A ZIP holding this document as text beside a folder of everything it references, '
+  + 'with the paths rewritten to reach them there. For a recipient who has to read or '
+  + 'edit the calculation, not just fill it in.'
+
+const WRITE_NEXT_TO_WORKSHEET_DETAIL =
+  'When a #write or #append target is an absolute path, rewrite it to a bare filename so '
+  + 'the output lands beside the exported worksheet instead of a folder that may not exist '
+  + 'on the recipient\'s machine. A relative target already does that and is never touched.'
 
 // Report first: it is the default rendering everywhere else, so it reads as the one to
 // reach for. A form and a code listing have no meaningful Word form, hence `word: false`.
@@ -127,16 +165,23 @@ const EXPORT_GROUPS: { variant: ExportVariant; label: string; detail: string; wo
   },
 ]
 
-defineProps<{
+withDefaults(defineProps<{
   plots: PlotSummary[]
   loading: boolean
-}>()
+  versionConfig?: VersionConfig
+  writeNextToWorksheet?: boolean
+}>(), {
+  versionConfig: () => ({ ...DEFAULT_VERSION_CONFIG }),
+  writeNextToWorksheet: true,
+})
 
 defineEmits<{
   savePdf: [variant: ExportVariant]
   saveHtml: [variant: ExportVariant]
   saveDocx: [variant: ExportVariant]
   saveCompiled: []
+  savePortable: []
+  updateWriteNextToWorksheet: [enabled: boolean]
   refreshPlots: []
   savePlot: [index: number]
   savePlotsZip: []
@@ -180,6 +225,15 @@ function formatSize(bytes: number): string {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   opacity: 0.8;
+  cursor: help;
+}
+
+.write-next-to-worksheet {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 12px;
   cursor: help;
 }
 

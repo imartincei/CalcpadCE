@@ -605,6 +605,15 @@ function cleanMetadata(data: MetadataCommentData): Record<string, unknown> {
 }
 
 /**
+ * True when {@link data} still serializes to something. Keys that clean away — an
+ * emptied object among them — leave a comment with nothing in it, which callers
+ * remove rather than write out as `'<!--{}-->'`.
+ */
+export function hasMetadataContent(data: MetadataCommentData): boolean {
+    return Object.keys(cleanMetadata(data)).length > 0;
+}
+
+/**
  * Serialize a cleaned key/value object across the physical lines described by
  * {@link layout}, wrapped by {@link opener}`{` … `}`{@link closer}. Existing keys
  * stay on their line, keys not on any line append to the last line, and a line

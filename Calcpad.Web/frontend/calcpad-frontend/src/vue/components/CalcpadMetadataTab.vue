@@ -184,6 +184,43 @@
           </template>
         </div>
 
+        <div v-if="showUiOverrides" class="field">
+          <label>Saved #UI values</label>
+          <p class="section-desc">
+            Values entered into the input form. Click a name to go to the #UI line that
+            declares it.
+          </p>
+          <p v-if="!uiControlsResolved" class="section-desc">
+            Checking which controls still exist…
+          </p>
+          <p v-else-if="unusedOverrides.length" class="warning">
+            {{ unusedOverrides.length }} value{{ unusedOverrides.length === 1 ? '' : 's' }}
+            no longer match a #UI control.
+          </p>
+
+          <div v-for="(row, i) in overrideRows" :key="'uo' + row.key" class="list-row">
+            <button
+              class="key-button"
+              :disabled="row.line === null"
+              :title="row.line === null ? 'No #UI control uses this value' : `Go to line ${row.line}`"
+              @click="goToOverride(row)"
+            >{{ row.key }}</button>
+            <input type="text" v-model="model.uiOverrides[i].value" />
+            <span v-if="uiControlsResolved && !row.used" class="unused-badge">unused</span>
+            <button class="icon-button" title="Remove" @click="model.uiOverrides.splice(i, 1)">✕</button>
+          </div>
+
+          <div class="sub-row">
+            <button
+              class="add-button"
+              :disabled="!unusedOverrides.length"
+              :title="uiControlsResolved ? undefined : 'Waiting for the document to be rendered'"
+              @click="purgeUnused"
+            >Purge unused</button>
+            <button class="add-button" @click="emit('refresh-ui-controls')">Refresh</button>
+          </div>
+        </div>
+
         <div v-if="showLint" class="field">
           <label>Lint ignore</label>
 
@@ -253,7 +290,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, watch } from 'vue'
+import { reactive, ref, computed, watch } from 'vue'
 import {
   FUNCTION_PARAM_TYPES,
   MACRO_PARAM_TYPES,
@@ -266,14 +303,20 @@ import {
 import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind, MetadataSettingKey, PdfCommentValues, SettingsValues } from '../../text/metadata-comment'
 import { UI_PROPERTY_KEYS } from '../../text/ui-directive'
 import type { UiDirectiveData } from '../../text/ui-directive'
+import { classifyUiOverrides } from '../../services/ui-overrides'
+import type { UiControl, UiOverrideRow } from '../../services/ui-overrides'
 
 interface Props {
   block?: MetadataCommentBlock | null
+  /** Controls of the last input-form render, or null until the host resolves them. */
+  uiControls?: UiControl[] | null
 }
-const props = withDefaults(defineProps<Props>(), { block: null })
+const props = withDefaults(defineProps<Props>(), { block: null, uiControls: null })
 
 const emit = defineEmits<{
   'apply': [payload: { data: MetadataCommentData; settings: SettingsValues; ui?: UiDirectiveData }]
+  'go-to-line': [line: number]
+  'refresh-ui-controls': []
 }>()
 
 const functionTypes = FUNCTION_PARAM_TYPES
@@ -284,7 +327,7 @@ const lintCodes = LINT_CODES
 
 type LintMode = 'off' | 'all' | 'specific'
 
-const KNOWN_KEYS = new Set(['desc', 'paramTypes', 'paramDesc', 'returnType', 'LintIgnore', 'EndLintIgnore', 'pdf'])
+const KNOWN_KEYS = new Set(['desc', 'paramTypes', 'paramDesc', 'returnType', 'LintIgnore', 'EndLintIgnore', 'pdf', 'uiOverrides'])
 
 interface SettingRow { key: string; value: string }
 
@@ -299,6 +342,7 @@ const model = reactive({
   startLintCodes: [] as string[],
   endLintMode: 'off' as LintMode,
   endLintCodes: [] as string[],
+  uiOverrides: [] as SettingRow[],
   extra: {} as Record<string, unknown>,
   ui: {
     type: '',
@@ -387,6 +431,31 @@ const hasUiErrors = computed(() => !!uiKeysValuesError.value)
 function removeUiOption(i: number) {
   model.ui.keys.splice(i, 1)
   model.ui.values.splice(i, 1)
+}
+
+// Entered #UI values live in a document-level comment, so the section shows up exactly
+// where that comment does: the cursor is on the object being edited. It stays up once
+// shown, so emptying the list leaves somewhere to press Apply from.
+const showUiOverrides = ref(false)
+
+// Until the host reports what the document actually renders, nothing can be called
+// stale — an unrendered document would otherwise look like every value is orphaned.
+const uiControlsResolved = computed(() => props.uiControls !== null)
+
+const overrideRows = computed(() => classifyUiOverrides(
+  Object.fromEntries(model.uiOverrides.map(r => [r.key, r.value])),
+  props.uiControls ?? []))
+
+const unusedOverrides = computed(() =>
+  uiControlsResolved.value ? overrideRows.value.filter(r => !r.used) : [])
+
+function purgeUnused() {
+  const stale = new Set(unusedOverrides.value.map(r => r.key))
+  model.uiOverrides = model.uiOverrides.filter(r => !stale.has(r.key))
+}
+
+function goToOverride(row: UiOverrideRow) {
+  if (row.line !== null) emit('go-to-line', row.line)
 }
 
 const showLint = computed(() =>
@@ -498,6 +567,10 @@ function populate() {
   model.pdf = data.pdf && typeof data.pdf === 'object' && !Array.isArray(data.pdf)
     ? Object.entries(data.pdf).map(([key, value]) => ({ key, value: String(value) }))
     : []
+  model.uiOverrides = data.uiOverrides && typeof data.uiOverrides === 'object' && !Array.isArray(data.uiOverrides)
+    ? Object.entries(data.uiOverrides).map(([key, value]) => ({ key, value: String(value) }))
+    : []
+  showUiOverrides.value = model.uiOverrides.length > 0
   ;[model.startLintMode, model.startLintCodes] = readLintField(data.LintIgnore)
   ;[model.endLintMode, model.endLintCodes] = readLintField(data.EndLintIgnore)
   const extra: Record<string, unknown> = {}
@@ -559,6 +632,11 @@ function onApply() {
   // cleanMetadata drops an empty object, so clearing every row removes the key.
   if (Object.keys(pdfValues).length) data.pdf = pdfValues as PdfCommentValues
 
+  // Sent even when emptied: cleanMetadata drops the empty object from the comment, but
+  // the host still needs to hear that the values are gone so its in-memory ones follow.
+  if (showUiOverrides.value)
+    data.uiOverrides = Object.fromEntries(model.uiOverrides.map(r => [r.key, r.value]))
+
   const lintIgnore = lintFieldValue(model.startLintMode, model.startLintCodes)
   if (lintIgnore !== undefined) data.LintIgnore = lintIgnore
 
@@ -610,6 +688,12 @@ watch(
   },
   { immediate: true },
 )
+
+// Resolving the controls means rendering the document, so it waits until a comment
+// carrying values is actually under the cursor.
+watch(showUiOverrides, (shown) => {
+  if (shown && !uiControlsResolved.value) emit('refresh-ui-controls')
+}, { immediate: true })
 </script>
 
 <style scoped>
@@ -787,8 +871,49 @@ watch(
   border-radius: 2px;
 }
 
-.add-button:hover {
+.add-button:hover:not(:disabled) {
   background: var(--vscode-toolbar-hoverBackground);
+}
+
+.add-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.key-button {
+  flex: 0 0 auto;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  color: var(--vscode-textLink-foreground);
+  cursor: pointer;
+}
+
+.key-button:hover:not(:disabled) {
+  background: var(--vscode-toolbar-hoverBackground);
+  text-decoration: underline;
+}
+
+.key-button:disabled {
+  cursor: default;
+  color: var(--vscode-descriptionForeground);
+}
+
+.unused-badge {
+  flex: 0 0 auto;
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  color: var(--vscode-editorWarning-foreground, #cca700);
+  border: 1px solid var(--vscode-editorWarning-foreground, #cca700);
 }
 
 .checkbox-label {
