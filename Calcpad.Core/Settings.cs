@@ -80,7 +80,7 @@ namespace Calcpad.Core
         public MathSettings Math { get; set; } = new();
         public PlotSettings Plot { get; set; } = new();
         public string Units { get; set; } = "m";
-        public bool IsUs { get; set; }
+        public bool IsUs { get; set; } = true;
     }
 
     [Serializable()]

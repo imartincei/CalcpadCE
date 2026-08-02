@@ -160,6 +160,45 @@ public class PathRootsTests
             ExpressionParser.InlineReadDirective("#read M from <project>/loads.csv", temp.At("main.cpd"), new PathRoots()));
     }
 
+    [Fact]
+    public void TryExpand_UserToken_JoinsTheHomeDirectory()
+    {
+        var roots = new PathRoots();
+        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        Assert.True(roots.TryExpand("<user>/lib/steel.cpd", out var expanded, out var error));
+        Assert.Null(error);
+        Assert.Equal(System.IO.Path.Combine(home, "lib", "steel.cpd"), expanded);
+    }
+
+    [Fact]
+    public void TryExpand_UserTokenAlone_ResolvesToTheHomeDirectory()
+    {
+        var roots = new PathRoots();
+        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        Assert.True(roots.TryExpand("<user>", out var expanded, out _));
+        Assert.Equal(home, expanded);
+    }
+
+    [Fact]
+    public void TryExpand_UserToken_NeedsNoDeclaration()
+    {
+        // Unlike <project>/<library>, a fresh PathRoots instance with nothing declared still
+        // resolves <user> — it is never "undeclared".
+        var roots = new PathRoots();
+        Assert.True(roots.TryExpand("<user>/a.cpd", out _, out var error));
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void TryDeclare_WithAUserTokenValue_ExpandsItFirst()
+    {
+        var roots = new PathRoots();
+        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        Assert.True(roots.TryDeclare(true, "<user>/Jobs/1042", "/project", out _));
+        Assert.Equal(System.IO.Path.Combine(home, "Jobs", "1042"), roots.Project);
+    }
+
+
     private sealed class TempDir : IDisposable
     {
         public string Path { get; } = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetRandomFileName());

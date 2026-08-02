@@ -24,7 +24,7 @@ public class PortablePackageTests
             """);
 
         Assert.Equal(
-            ["root.cpd", "root.cpd.refs/loads.csv", "root.cpd.refs/logo.png"],
+            ["root.cpd", "root.cpd.refs/data/loads.csv", "root.cpd.refs/media/logo.png"],
             Names(zip));
     }
 
@@ -42,9 +42,9 @@ public class PortablePackageTests
             """);
 
         Assert.Equal("""
-            #include root.cpd.refs/lib.cpd
-            #read L from root.cpd.refs/loads.csv type=R sep=';'
-            '<img src="root.cpd.refs/logo.png">
+            #include root.cpd.refs/inc/lib.cpd
+            #read L from root.cpd.refs/data/loads.csv type=R sep=';'
+            '<img src="root.cpd.refs/media/logo.png">
             """, Text(zip, "root.cpd"));
     }
 
@@ -61,8 +61,8 @@ public class PortablePackageTests
         var zip = tree.Pack("#include ./inc/lib.cpd\n");
 
         Assert.Equal(
-            ["root.cpd", "root.cpd.refs/deep.cpd", "root.cpd.refs/lib.cpd"], Names(zip));
-        Assert.Equal("#include deep.cpd\n", Text(zip, "root.cpd.refs/lib.cpd"));
+            ["root.cpd", "root.cpd.refs/inc/deep.cpd", "root.cpd.refs/inc/lib.cpd"], Names(zip));
+        Assert.Equal("#include deep.cpd\n", Text(zip, "root.cpd.refs/inc/lib.cpd"));
     }
 
     /// <summary>
@@ -83,12 +83,13 @@ public class PortablePackageTests
         var zip = tree.Pack("#include ./inc/lib.cpd\n");
 
         Assert.Equal(
-            ["root.cpd", "root.cpd.refs/detail.png", "root.cpd.refs/fy.csv", "root.cpd.refs/lib.cpd"],
+            ["root.cpd", "root.cpd.refs/inc/lib.cpd", "root.cpd.refs/media/detail.png",
+                "root.cpd.refs/tables/fy.csv"],
             Names(zip));
         Assert.Equal("""
-            '<img src="root.cpd.refs/detail.png">
-            #read T from root.cpd.refs/fy.csv
-            """, Text(zip, "root.cpd.refs/lib.cpd"));
+            '<img src="root.cpd.refs/media/detail.png">
+            #read T from root.cpd.refs/tables/fy.csv
+            """, Text(zip, "root.cpd.refs/inc/lib.cpd"));
     }
 
     [Fact]
@@ -98,7 +99,7 @@ public class PortablePackageTests
         tree.Write("inc/lib.cpd", "#include ../root.cpd\n");
         var zip = tree.Pack("#include ./inc/lib.cpd\n");
 
-        Assert.Equal("#include ../root.cpd\n", Text(zip, "root.cpd.refs/lib.cpd"));
+        Assert.Equal("#include ../../root.cpd\n", Text(zip, "root.cpd.refs/inc/lib.cpd"));
     }
 
     [Fact]
@@ -180,37 +181,46 @@ public class PortablePackageTests
         Assert.Equal("#append R to results.csv\n", Text(zip, "root.cpd"));
     }
 
+    /// <summary>
+    /// Both are absolute and neither can keep the bare name over the other, so both are renamed
+    /// — the same <c>name-1.ext</c>/<c>name-2.ext</c> scheme <c>FlatMembers</c> uses for two
+    /// bundled dependency files sharing a basename.
+    /// </summary>
     [Fact]
-    public void TwoAbsoluteWriteTargetsSharingAFilename_AreRefused()
+    public void TwoAbsoluteWriteTargetsSharingAFilename_AreBothRenamed()
     {
         using var tree = new Tree();
         var a = tree.At("a/results.csv");
         var b = tree.At("b/results.csv");
-        var result = tree.Build($"""
+        var zip = tree.Pack($"""
             #write A to {a}
             #write B to {b}
             """, nextToWorksheet: true);
 
-        Assert.Null(result.Zip);
-        var message = Assert.Single(result.Errors);
-        Assert.Contains("results.csv", message);
-        Assert.Contains(a, message);
-        Assert.Contains(b, message);
+        Assert.Equal("""
+            #write A to results-1.csv
+            #write B to results-2.csv
+            """, Text(zip, "root.cpd"));
     }
 
+    /// <summary>
+    /// A relative target is never renamed — it stays exactly as written — so the colliding
+    /// absolute one is the one renamed away from it instead.
+    /// </summary>
     [Fact]
-    public void AnAbsoluteWriteTargetCollidingWithARelativeOne_IsRefused()
+    public void AnAbsoluteWriteTargetCollidingWithARelativeOne_IsRenamedAwayFromIt()
     {
         using var tree = new Tree();
         var absolute = tree.At("out/results.csv");
-        var result = tree.Build($"""
+        var zip = tree.Pack($"""
             #write A to {absolute}
             #write B to results.csv
             """, nextToWorksheet: true);
 
-        Assert.Null(result.Zip);
-        var message = Assert.Single(result.Errors);
-        Assert.Contains("results.csv", message);
+        Assert.Equal("""
+            #write A to results-1.csv
+            #write B to results.csv
+            """, Text(zip, "root.cpd"));
     }
 
     [Fact]
@@ -237,7 +247,7 @@ public class PortablePackageTests
         tree.Write("inc/lib.cpd", $"#write R to {absolute}\n");
         var zip = tree.Pack("#include ./inc/lib.cpd\n", nextToWorksheet: true);
 
-        Assert.Equal("#write R to results.csv\n", Text(zip, "root.cpd.refs/lib.cpd"));
+        Assert.Equal("#write R to results.csv\n", Text(zip, "root.cpd.refs/inc/lib.cpd"));
     }
 
     [Fact]
@@ -270,25 +280,115 @@ public class PortablePackageTests
         tree.Write("inc/lib.cpd", "a = 1\n");
         var zip = tree.Pack("#include ./inc/lib.cpd #{1;2} 'the library\n");
 
-        Assert.Equal("#include root.cpd.refs/lib.cpd #{1;2} 'the library\n", Text(zip, "root.cpd"));
+        Assert.Equal("#include root.cpd.refs/inc/lib.cpd #{1;2} 'the library\n", Text(zip, "root.cpd"));
     }
 
+    /// <summary>
+    /// Both sit under the document's own folder, so each keeps its own path in the refs folder
+    /// instead of colliding on the bare name they share.
+    /// </summary>
     [Fact]
-    public void TwoReferencesWithOneName_AreRefusedNamingBoth()
+    public void TwoNestedReferencesWithTheSameBasename_KeepTheirOwnPaths()
     {
         using var tree = new Tree();
         tree.Write("data/loads.csv", "1\n");
         tree.Write("archive/loads.csv", "2\n");
-        var result = tree.Build("""
+        var zip = tree.Pack("""
             #read A from ./data/loads.csv
             #read B from ./archive/loads.csv
             """);
 
-        Assert.Null(result.Zip);
-        var message = Assert.Single(result.Errors);
-        Assert.Contains("loads.csv", message);
-        Assert.Contains(tree.At("data/loads.csv"), message);
-        Assert.Contains(tree.At("archive/loads.csv"), message);
+        Assert.Equal(
+            ["root.cpd", "root.cpd.refs/archive/loads.csv", "root.cpd.refs/data/loads.csv"], Names(zip));
+        Assert.Equal("""
+            #read A from root.cpd.refs/data/loads.csv
+            #read B from root.cpd.refs/archive/loads.csv
+            """, Text(zip, "root.cpd"));
+    }
+
+    [Fact]
+    public void TwoEscapingReferencesWithOneName_AreRenamedAndTheirReferencesRewritten()
+    {
+        using var tree = new Tree();
+        using var external = new Tree();
+        external.Write("aaa/loads.csv", "1\n");
+        external.Write("zzz/loads.csv", "2\n");
+        var zip = tree.Pack($"""
+            #read A from {external.At("aaa/loads.csv")}
+            #read B from {external.At("zzz/loads.csv")}
+            """);
+
+        Assert.Equal(
+            ["root.cpd", "root.cpd.refs/loads-1.csv", "root.cpd.refs/loads-2.csv"], Names(zip));
+        Assert.Equal("""
+            #read A from root.cpd.refs/loads-1.csv
+            #read B from root.cpd.refs/loads-2.csv
+            """, Text(zip, "root.cpd"));
+        Assert.Equal("1\n", Text(zip, "root.cpd.refs/loads-1.csv"));
+        Assert.Equal("2\n", Text(zip, "root.cpd.refs/loads-2.csv"));
+    }
+
+    [Fact]
+    public void ThreeEscapingReferencesWithOneName_AreAllRenamed()
+    {
+        using var tree = new Tree();
+        using var external = new Tree();
+        external.Write("aaa/data.csv", "1\n");
+        external.Write("bbb/data.csv", "2\n");
+        external.Write("ccc/data.csv", "3\n");
+        var zip = tree.Pack($"""
+            #read A from {external.At("aaa/data.csv")}
+            #read B from {external.At("bbb/data.csv")}
+            #read C from {external.At("ccc/data.csv")}
+            """);
+
+        Assert.Equal(
+            ["root.cpd", "root.cpd.refs/data-1.csv", "root.cpd.refs/data-2.csv", "root.cpd.refs/data-3.csv"],
+            Names(zip));
+    }
+
+    [Fact]
+    public void TwoEscapingIncludesWithOneName_AreBothRenamedAndTheirIncludeLinesRewritten()
+    {
+        using var tree = new Tree();
+        using var external = new Tree();
+        external.Write("aaa/helper.cpd", "x = 1\n");
+        external.Write("bbb/helper.cpd", "y = 2\n");
+        var zip = tree.Pack($"""
+            #include {external.At("aaa/helper.cpd")}
+            #include {external.At("bbb/helper.cpd")}
+            """);
+
+        Assert.Equal(
+            ["root.cpd", "root.cpd.refs/helper-1.cpd", "root.cpd.refs/helper-2.cpd"], Names(zip));
+        Assert.Equal("""
+            #include root.cpd.refs/helper-1.cpd
+            #include root.cpd.refs/helper-2.cpd
+            """, Text(zip, "root.cpd"));
+    }
+
+    /// <summary>
+    /// The escaping file cannot keep the bare name the nested one already sits under, so it is
+    /// the one renamed even though nothing else claiming that exact name was escaping too.
+    /// </summary>
+    [Fact]
+    public void AnEscapingReferenceCollidingWithANestedSiblingsName_IsRenamed()
+    {
+        using var tree = new Tree();
+        using var external = new Tree();
+        tree.Write("loads.csv", "1\n");
+        external.Write("loads.csv", "2\n");
+        var zip = tree.Pack($"""
+            #read A from ./loads.csv
+            #read B from {external.At("loads.csv")}
+            """);
+
+        Assert.Equal(
+            ["root.cpd", "root.cpd.refs/loads-1.csv", "root.cpd.refs/loads.csv"], Names(zip));
+        Assert.Equal("""
+            #read A from root.cpd.refs/loads.csv
+            #read B from root.cpd.refs/loads-1.csv
+            """, Text(zip, "root.cpd"));
     }
 
     [Fact]
@@ -335,9 +435,9 @@ public class PortablePackageTests
         tree.Write("inc/b.cpd", "#include ./a.cpd\n");
         var zip = tree.Pack("#include ./inc/a.cpd\n");
 
-        Assert.Equal(["root.cpd", "root.cpd.refs/a.cpd", "root.cpd.refs/b.cpd"], Names(zip));
-        Assert.Equal("#include b.cpd\n", Text(zip, "root.cpd.refs/a.cpd"));
-        Assert.Equal("#include a.cpd\n", Text(zip, "root.cpd.refs/b.cpd"));
+        Assert.Equal(["root.cpd", "root.cpd.refs/inc/a.cpd", "root.cpd.refs/inc/b.cpd"], Names(zip));
+        Assert.Equal("#include b.cpd\n", Text(zip, "root.cpd.refs/inc/a.cpd"));
+        Assert.Equal("#include a.cpd\n", Text(zip, "root.cpd.refs/inc/b.cpd"));
     }
 
     [Fact]
@@ -347,7 +447,7 @@ public class PortablePackageTests
         tree.Write("inc/lib.cpd", "a = 1\n");
         var zip = tree.Pack("'first\r\n#include ./inc/lib.cpd\r\n'last");
 
-        Assert.Equal("'first\r\n#include root.cpd.refs/lib.cpd\r\n'last", Text(zip, "root.cpd"));
+        Assert.Equal("'first\r\n#include root.cpd.refs/inc/lib.cpd\r\n'last", Text(zip, "root.cpd"));
     }
 
     [Fact]
@@ -357,7 +457,7 @@ public class PortablePackageTests
         tree.Write("inc/lib.cpd", "a = 1\n");
         var zip = tree.Pack("﻿#include ./inc/lib.cpd\n");
 
-        Assert.Equal("﻿#include root.cpd.refs/lib.cpd\n", Text(zip, "root.cpd"));
+        Assert.Equal("﻿#include root.cpd.refs/inc/lib.cpd\n", Text(zip, "root.cpd"));
     }
 
     [Fact]
@@ -367,7 +467,7 @@ public class PortablePackageTests
         tree.Write("inc/lib.cpd", "a = 1\n");
         var zip = tree.Pack("#include ./inc/lib.cpd\n#include inc/lib.cpd\n");
 
-        Assert.Equal(["root.cpd", "root.cpd.refs/lib.cpd"], Names(zip));
+        Assert.Equal(["root.cpd", "root.cpd.refs/inc/lib.cpd"], Names(zip));
     }
 
     [Fact]
@@ -420,8 +520,8 @@ public class PortablePackageTests
             #include <library>/steel.cpd
             """, bundleLibrary: true);
 
-        Assert.Equal(["root.cpd", "root.cpd.refs/steel.cpd"], Names(zip));
-        Assert.Contains("#include root.cpd.refs/steel.cpd", Text(zip, "root.cpd"));
+        Assert.Equal(["root.cpd", "root.cpd.refs/lib/steel.cpd"], Names(zip));
+        Assert.Contains("#include root.cpd.refs/lib/steel.cpd", Text(zip, "root.cpd"));
     }
 
     [Fact]
@@ -481,6 +581,36 @@ public class PortablePackageTests
         Assert.Contains("LibraryPath", message);
     }
 
+    /// <summary>
+    /// A <c>&lt;user&gt;</c> reference needs no declaration and always resolves — but to this
+    /// exporting machine's own home directory, which there is no reason to expect the recipient's
+    /// home directory mirrors. So, unlike <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c>, it is
+    /// always bundled: there is no flag to leave it as written.
+    /// </summary>
+    [Fact]
+    public void AUserTokenInclude_IsAlwaysBundled()
+    {
+        using var tree = new Tree();
+        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        // A random name under the real home directory rather than a fixed one or a fake HOME:
+        // <user> resolves via Environment.GetFolderPath, which several tests read concurrently,
+        // so nothing here can safely repoint HOME itself for the duration of the test.
+        var fileName = Path.GetRandomFileName() + ".cpd";
+        var homeFile = Path.Combine(home, fileName);
+        File.WriteAllText(homeFile, "a = 1\n");
+        try
+        {
+            var zip = tree.Pack($"#include <user>/{fileName}\n");
+
+            Assert.Equal(["root.cpd", $"root.cpd.refs/{fileName}"], Names(zip));
+            Assert.Contains($"#include root.cpd.refs/{fileName}", Text(zip, "root.cpd"));
+        }
+        finally
+        {
+            File.Delete(homeFile);
+        }
+    }
+
     [Fact]
     public void ASecondConflictingLibraryPath_IsRefused()
     {
@@ -514,7 +644,7 @@ public class PortablePackageTests
             #include ./inc/lib.cpd
             """);
 
-        Assert.Equal(["root.cpd", "root.cpd.refs/lib.cpd"], Names(zip));
+        Assert.Equal(["root.cpd", "root.cpd.refs/inc/lib.cpd"], Names(zip));
     }
 
     private static List<string> Names(byte[] zip)

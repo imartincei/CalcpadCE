@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CalcpadApiClient, DEFAULT_PDF_SETTINGS, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION } from 'calcpad-frontend';
+import * as os from 'os';
+import { CalcpadApiClient, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -329,14 +330,7 @@ function getPdfSettings(documentContent?: string): FrontendPdfSettings {
         ? path.basename(activeEditor.document.fileName, path.extname(activeEditor.document.fileName))
         : 'CalcpadCE Document';
 
-    return {
-        ...DEFAULT_PDF_SETTINGS,
-        ...stored,
-        ...fromDocument,
-        // The file name is the last resort, so an explicit title from either
-        // source wins over it.
-        documentTitle: fromDocument.documentTitle || stored.documentTitle || fileName,
-    };
+    return resolveEffectivePdfSettings(stored, fromDocument, fileName);
 }
 
 function getEffectivePreviewTheme(): 'light' | 'dark' {
@@ -372,7 +366,7 @@ const IMAGE_MIME_MAP: Record<string, string> = {
  */
 async function buildImageCache(html: string, documentDir: string, sourceText: string): Promise<Record<string, string>> {
     const cache: Record<string, string> = {};
-    const resolve = createReferenceResolver(sourceText, documentDir, expandEnvVars, path.resolve);
+    const resolve = createReferenceResolver(sourceText, documentDir, expandEnvVars, path.resolve, os.homedir);
     const imgSrcRegex = /<img\s[^>]*?src\s*=\s*["']([^"']+)["'][^>]*>/gi;
     let match;
 
@@ -1295,7 +1289,7 @@ async function saveAsCompiled() {
         // bundled.content is already self-contained — the server resolved any <project>/
         // <library> reference to an absolute path — so this resolver only needs to expand
         // env vars in whatever plain relative/absolute src the author wrote directly.
-        const resolve = createReferenceResolver(bundled.content, documentDir, expandEnvVars, path.resolve);
+        const resolve = createReferenceResolver(bundled.content, documentDir, expandEnvVars, path.resolve, os.homedir);
         const compiled = await inlineImageSources(bundled.content, new VSCodeFileSystem(), resolve);
         const bytes = await sharedApiClient?.encodeCpdz(compiled);
         if (!bytes) throw new Error('The server could not encode the worksheet');

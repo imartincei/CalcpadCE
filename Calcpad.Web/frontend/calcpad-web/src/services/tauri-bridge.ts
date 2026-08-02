@@ -224,8 +224,21 @@ export class TauriMessageBridge extends BaseMessageBridge {
     /** Builds the `<img src>` → absolute-path resolver from `sourceText`'s own declared roots. */
     private inlineLocalImages(html: string, documentDir: string, sourceText: string): Promise<string> {
         const resolve = createReferenceResolver(
-            sourceText, documentDir, (raw) => this.expandEnvVars(raw), pathResolve);
+            sourceText, documentDir, (raw) => this.expandEnvVars(raw), pathResolve, () => this.getHomeDir());
         return inlineImageSources(html, tauriReader, resolve);
+    }
+
+    /**
+     * The current user's home directory, for the `<user>` path-root token. There is no single
+     * env var name that holds it on every platform the way `expandEnvVars` can otherwise treat
+     * uniformly, so this asks the Tauri host for whichever one applies.
+     */
+    private async getHomeDir(): Promise<string | null> {
+        try {
+            return (await invoke<string | null>('get_env', { name: this._platform === 'windows' ? 'USERPROFILE' : 'HOME' })) ?? null;
+        } catch {
+            return null;
+        }
     }
 
     protected async saveImageToImagesFolder(img: PickedImage): Promise<string | null> {

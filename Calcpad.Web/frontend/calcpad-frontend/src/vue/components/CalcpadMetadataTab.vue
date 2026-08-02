@@ -294,13 +294,13 @@ import { reactive, ref, computed, watch } from 'vue'
 import {
   FUNCTION_PARAM_TYPES,
   MACRO_PARAM_TYPES,
-  METADATA_SETTINGS_KEYS,
-  PDF_SETTING_KEYS,
-  specForKey,
-  validateCatalogValue,
   LINT_CODES,
 } from '../../text/metadata-comment'
-import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind, MetadataSettingKey, PdfCommentValues, SettingsValues } from '../../text/metadata-comment'
+import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind, PdfCommentValues, SettingsValues } from '../../text/metadata-comment'
+import { METADATA_SETTINGS_KEYS } from '../../types/settings'
+import { PDF_SETTING_KEYS } from '../../types/pdf-settings'
+import { specForKey, validateCatalogValue } from '../../types/catalog'
+import type { MetadataSettingKey } from '../../types/catalog'
 import { UI_PROPERTY_KEYS } from '../../text/ui-directive'
 import type { UiDirectiveData } from '../../text/ui-directive'
 import { classifyUiOverrides } from '../../services/ui-overrides'

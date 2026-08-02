@@ -1,6 +1,7 @@
 {
     "core": {
         "math": {
+            "formatString": "",
             "decimals": 2,
             "degrees": 0,
             "isComplex": false,
@@ -9,20 +10,19 @@
             "zeroSmallMatrixElements": true,
             "showHiddenOutput": false,
             "maxOutputCount": 20,
-            "formatString": "",
             "precision": 1e-14,
-            "tol": 1e-6
+            "tol": 0.000001
         },
         "plot": {
-            "isAdaptive": true,
-            "screenScaleFactor": 2,
             "imagePath": "",
             "imageUri": "",
+            "screenScaleFactor": 2,
+            "lightDirection": "NorthWest",
             "vectorGraphics": false,
             "colorScale": "Rainbow",
             "smoothScale": false,
             "shadows": true,
-            "lightDirection": "NorthWest",
+            "isAdaptive": true,
             "width": 500,
             "height": 300,
             "step": 0
@@ -32,7 +32,7 @@
             "mode": "auto"
         },
         "units": "m",
-        "isUs": false
+        "isUs": true
     },
     "extras": {
         "previewTheme": "system",
@@ -60,12 +60,9 @@
             "marginBottom": "0.75in",
             "marginLeft": "0.5in",
             "marginRight": "0.5in",
-            "documentTitle": "",
-            "headerCenter": "",
-            "footerCenter": "",
             "showPageNumbers": true,
             "showDate": true,
-            "scale": 1.0,
+            "documentTitle": "",
             "dateTimeFormat": "M/d/yyyy h:mm tt"
         }
     }

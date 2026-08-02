@@ -1795,6 +1795,18 @@
 
         [Fact]
         [Trait("Category", "Mechanical Formulas")]
+        public void Test_ton_ft_s2_UK()
+        {
+            // TestCalc/MathParser never reads Settings.IsUs (only ExpressionParser.Parse
+            // does, at the top of every document parse), so "ton" here is always the bare
+            // Unit._isUs default. #settings can only override IsUs through ExpressionParser.
+            var parser = new ExpressionParser { Settings = new Settings() };
+            parser.Parse("#settings {\"isUs\": false}\nr = 100ton*32.17404855643045ft/s^2", true, false);
+            Assert.Contains("224", parser.HtmlResult);
+        }
+
+        [Fact]
+        [Trait("Category", "Mechanical Formulas")]
         public void Test_MPa_cm2() => Test("10MPa*1cm^2", "1kN");
 
         [Fact]

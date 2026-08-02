@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as os from 'os';
 import type { SymbolLocation } from 'calcpad-frontend';
 import { scanDeclaredPathRoots, resolveDeclaredPathRoots, expandPathRootToken, type ResolvedPathRoots } from 'calcpad-frontend';
 import { VSCodeFileSystem } from './adapters';
@@ -16,7 +17,7 @@ export function expandEnvVars(input: string): string {
 export function resolveDocumentPathRoots(document: vscode.TextDocument): ResolvedPathRoots {
     const documentDir = path.dirname(document.uri.fsPath);
     const declared = scanDeclaredPathRoots(document.getText());
-    return resolveDeclaredPathRoots(declared, documentDir, expandEnvVars, path.resolve);
+    return resolveDeclaredPathRoots(declared, documentDir, expandEnvVars, path.resolve, os.homedir());
 }
 
 /**
@@ -34,7 +35,7 @@ export async function resolveIncludeDirectiveLocation(
     logPrefix: string,
     roots: ResolvedPathRoots = resolveDocumentPathRoots(document),
 ): Promise<vscode.Location | null> {
-    const { expanded: tokenExpanded, ok } = expandPathRootToken(rawPath.trim(), roots);
+    const { expanded: tokenExpanded, ok } = expandPathRootToken(rawPath.trim(), roots, os.homedir());
     if (!ok) {
         outputChannel.appendLine(`${logPrefix} Include target's path root is not declared: ${rawPath}`);
         return null;

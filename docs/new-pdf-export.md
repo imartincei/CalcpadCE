@@ -74,7 +74,7 @@ Every option you can set for a PDF export, on the **Settings** tab or in a docum
 | `showPageNumbers` | `true` | "Page *n* of *m*" in the footer |
 | `showDate` | `true` | The timestamp in the header |
 | `documentTitle` | file name | Title (header, bold) |
-| `dateTimeFormat` | `M/d/yyyy h:mm tt` | .NET date/time format string for the timestamp |
+| `dateTimeFormat` | `M/d/yyyy h:mm tt` | [.NET date/time format string](https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings) for the timestamp |
 
 ## Troubleshooting
 

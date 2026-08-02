@@ -52,5 +52,23 @@ namespace Calcpad.Tests.HighlighterTests
 
             Assert.Contains("Error: Include file not provided", joined);
         }
+
+        [Fact]
+        public void Include_WithUserToken_ResolvesWithNoDeclaration()
+        {
+            var home = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
+            var resolvedFile = System.IO.Path.GetFullPath("lib/steel.cpd", home);
+            var content = "#include <user>/lib/steel.cpd\nx = 1";
+            var includeFiles = new Dictionary<string, string>
+            {
+                [resolvedFile] = "y = 2"
+            };
+
+            var staged = new ContentResolver().GetStagedContent(content, includeFiles, sourceFilePath: "/project/main.cpd");
+            var joined = string.Join('\n', staged.Stage2.Lines);
+
+            Assert.DoesNotContain("Error: Include file not provided", joined);
+            Assert.Contains("y = 2", joined);
+        }
     }
 }

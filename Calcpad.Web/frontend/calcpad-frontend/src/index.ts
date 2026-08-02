@@ -36,8 +36,18 @@ export { CalcpadTokenType, CalcpadTypeId } from './types/api';
 
 export type { ILogger, IFileSystem } from './types/interfaces';
 
+export type { SettingOption, MetadataSettingKey } from './types/catalog';
+export { specForKey, validateCatalogValue } from './types/catalog';
+
 export type { PdfSettings } from './types/pdf-settings';
-export { DEFAULT_PDF_SETTINGS } from './types/pdf-settings';
+export {
+    DEFAULT_PDF_SETTINGS,
+    resolveStoredPdfSettings,
+    resolveEffectivePdfSettings,
+    PDF_SETTING_KEYS,
+    pdfSpec,
+    validatePdfValue,
+} from './types/pdf-settings';
 
 export type { CalcpadSettings, CalcpadExtras, CalcpadSettingsBlob } from './types/settings';
 export {
@@ -53,6 +63,11 @@ export {
     colorScaleToEnum,
     lightDirectionToEnum,
     buildApiSettings,
+    METADATA_SETTINGS_KEYS,
+    settingSpec,
+    validateSettingValue,
+    SETTINGS_PATH,
+    DEFAULT_CALCPAD_SETTINGS,
 } from './types/settings';
 
 export type {
@@ -184,7 +199,6 @@ export type {
     MetadataDefKind,
     MetadataDefinition,
     DefinitionResolver,
-    MetadataSettingKey,
     LintCode,
     SettingsValues,
     SettingsDirective,
@@ -193,14 +207,6 @@ export type {
 export {
     FUNCTION_PARAM_TYPES,
     MACRO_PARAM_TYPES,
-    METADATA_SETTINGS_KEYS,
-    PDF_SETTING_KEYS,
-    settingSpec,
-    pdfSpec,
-    specForKey,
-    validateSettingValue,
-    validatePdfValue,
-    validateCatalogValue,
     LINT_CODES,
     findMetadataCommentBlock,
     computeMetadataBlock,

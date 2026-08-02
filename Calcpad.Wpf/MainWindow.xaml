@@ -1932,7 +1932,7 @@
                    TextAlignment="Center" Width="105" Foreground="#DA000000"
                    Text="{x:Static wpf:MainWindowResources.NonMetricUnits}" />
         <RadioButton Grid.Row="0" Checked="UnitsRadioButton_Checked" x:Name="UK" Content="UK"
-                     GroupName="Units" TabIndex="7" IsChecked="True" Margin="0,27,458,0"
+                     GroupName="Units" TabIndex="7" Margin="0,27,458,0"
                      Width="30" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top"
                      FontSize="14"
                      Style="{StaticResource Toggle}">
@@ -1944,7 +1944,7 @@
             </RadioButton.Background>
         </RadioButton>
         <RadioButton Grid.Row="0" Checked="UnitsRadioButton_Checked" x:Name="US" Content="US"
-                     GroupName="Units" TabIndex="8" Margin="0,27,423,0"
+                     GroupName="Units" TabIndex="8" IsChecked="True" Margin="0,27,423,0"
                      Width="30" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top"
                      FontSize="14"
                      Style="{StaticResource Toggle}"/>

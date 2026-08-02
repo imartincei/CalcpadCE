@@ -38,14 +38,11 @@ public class PdfOptions
 {
     public string Format { get; set; }
     public string Orientation { get; set; }
-    public float Scale { get; set; }
     public string MarginTop { get; set; }
     // ... MarginRight, MarginBottom, MarginLeft
     public bool ShowPageNumbers { get; set; }
     public bool ShowDate { get; set; }
     public string? DocumentTitle { get; set; }
-    public string? HeaderCenter { get; set; }
-    public string? FooterCenter { get; set; }
     public string? DateTimeFormat { get; set; }
 }
 ```

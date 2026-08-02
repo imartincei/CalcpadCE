@@ -11,7 +11,8 @@ import type { DeclaredPathRoots } from '../../text/path-roots';
 import type { DefinitionsResponse, ExportVariant } from '../../types/api';
 import { getDefaultSettings, buildApiSettings } from '../../types/settings';
 import type { CalcpadSettings } from '../../types/settings';
-import { DEFAULT_PDF_SETTINGS } from '../../types/pdf-settings';
+import { resolveStoredPdfSettings, resolveEffectivePdfSettings } from '../../types/pdf-settings';
+import type { PdfSettings } from '../../types/pdf-settings';
 import { buildImageCommentLine, bytesToBase64 } from '../image-utils';
 import type { ImageStorageMode, PickedImage } from '../image-utils';
 import { extractPlotsFromHtml, type ExtractedPlot } from '../plot-extract';
@@ -562,17 +563,17 @@ export abstract class BaseMessageBridge {
     }
 
     private handleGetPdfSettings(): void {
-        this.postToVue({ type: 'pdfSettingsResponse', settings: this.getStoredPdfOptions() });
+        this.postToVue({ type: 'pdfSettingsResponse', settings: resolveStoredPdfSettings(this.getStoredPdfOptions()) });
     }
 
-    /** The persisted PDF options (page size, header/footer, title), for the `/pdf` endpoint. */
-    protected getStoredPdfOptions(): Record<string, unknown> {
+    /** The raw persisted PDF options, however much of `PdfSettings` was actually stored. */
+    protected getStoredPdfOptions(): Partial<PdfSettings> {
         const stored = this.getExtraSetting('pdfSettings');
-        if (!stored) return { ...DEFAULT_PDF_SETTINGS };
+        if (!stored) return {};
         try {
             return JSON.parse(stored);
         } catch {
-            return { ...DEFAULT_PDF_SETTINGS };
+            return {};
         }
     }
 
@@ -582,8 +583,8 @@ export abstract class BaseMessageBridge {
      * Settings tab keeps editing the stored set alone — this merge is only for the
      * request that generates a PDF.
      */
-    protected getEffectivePdfOptions(content: string): Record<string, unknown> {
-        return { ...this.getStoredPdfOptions(), ...pdfSettingsFromDocument(content.split('\n')) };
+    protected getEffectivePdfOptions(content: string): PdfSettings {
+        return resolveEffectivePdfSettings(this.getStoredPdfOptions(), pdfSettingsFromDocument(content.split('\n')));
     }
 
     private async handleInsertImage(): Promise<void> {

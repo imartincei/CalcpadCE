@@ -105,7 +105,7 @@ So a document that only cares about its margins can say just that, and still fol
 | `showPageNumbers` | `true` / `false` — "Page *n* of *m*" in the footer |
 | `showDate` | `true` / `false` — the timestamp in the header |
 | `documentTitle` | Header title (defaults to the file name) |
-| `dateTimeFormat` | .NET date/time format string, e.g. `M/d/yyyy h:mm tt` |
+| `dateTimeFormat` | [.NET date/time format string](https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings), e.g. `M/d/yyyy h:mm tt` |
 
 The **Properties** tab has a picker for these, so you don't have to remember the names, and the linter flags an unknown key or a margin without a unit.
 If more than one comment sets the same key, the last one wins.

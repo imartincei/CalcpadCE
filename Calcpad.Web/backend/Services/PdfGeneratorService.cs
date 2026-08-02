@@ -1,11 +1,11 @@
 using System.Reflection;
+using Calcpad.Highlighter.HtmlComment;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
 using PdfSharp.Drawing;
 using PdfSharp.Fonts;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
-using CalcpadPdfOptions = Calcpad.Server.Models.Pdf.PdfOptions;
 
 namespace Calcpad.Server.Services
 {
@@ -55,9 +55,9 @@ namespace Calcpad.Server.Services
             _config = config;
         }
 
-        public async Task<byte[]> GeneratePdfAsync(string html, CalcpadPdfOptions? options = null, string? browserPath = null)
+        public async Task<byte[]> GeneratePdfAsync(string html, PdfSettingsDto? options = null, string? browserPath = null)
         {
-            options ??= new CalcpadPdfOptions();
+            options ??= new PdfSettingsDto();
 
             // Step 1: Generate basic PDF with PuppeteerSharp
             var basicPdf = await GenerateBasicPdfAsync(html, options, browserPath).ConfigureAwait(false);
@@ -66,7 +66,7 @@ namespace Calcpad.Server.Services
             return EnhancePdf(basicPdf, options);
         }
 
-        private async Task<byte[]> GenerateBasicPdfAsync(string html, CalcpadPdfOptions options, string? browserPath)
+        private async Task<byte[]> GenerateBasicPdfAsync(string html, PdfSettingsDto options, string? browserPath)
         {
             var browser = await GetOrCreateBrowserAsync(browserPath).ConfigureAwait(false);
             var page = await browser.NewPageAsync().ConfigureAwait(false);
@@ -157,13 +157,12 @@ namespace Calcpad.Server.Services
                     Format = ParsePaperFormat(options.Format),
                     Landscape = options.Orientation == "landscape",
                     PrintBackground = true,
-                    Scale = (decimal)options.Scale,
                     MarginOptions = new MarginOptions
                     {
-                        Top = options.MarginTop,
-                        Right = options.MarginRight,
-                        Bottom = options.MarginBottom,
-                        Left = options.MarginLeft
+                        Top = options.MarginTop ?? PdfSettingsDefaults.MarginTop,
+                        Right = options.MarginRight ?? PdfSettingsDefaults.MarginRight,
+                        Bottom = options.MarginBottom ?? PdfSettingsDefaults.MarginBottom,
+                        Left = options.MarginLeft ?? PdfSettingsDefaults.MarginLeft
                     },
                     DisplayHeaderFooter = false
                 };
@@ -395,25 +394,32 @@ namespace Calcpad.Server.Services
         private static string? NullIfEmpty(string? value) =>
             string.IsNullOrEmpty(value) ? null : value;
 
-        private static PaperFormat ParsePaperFormat(string? format) => format?.ToUpperInvariant() switch
+        /// <summary>Recognized names mirror <see cref="PdfPaperFormat"/> in Calcpad.Highlighter,
+        /// which is what validates a document's <c>pdf</c> metadata comment.</summary>
+        private static PaperFormat ParsePaperFormat(string? format) =>
+            Enum.TryParse<PdfPaperFormat>(format, true, out var parsed)
+                ? MapPaperFormat(parsed)
+                : MapPaperFormat(Enum.Parse<PdfPaperFormat>(PdfSettingsDefaults.Format, true));
+
+        private static PaperFormat MapPaperFormat(PdfPaperFormat format) => format switch
         {
-            "LETTER" => PaperFormat.Letter,
-            "LEGAL" => PaperFormat.Legal,
-            "TABLOID" => PaperFormat.Tabloid,
-            "LEDGER" => PaperFormat.Ledger,
-            "A0" => PaperFormat.A0,
-            "A1" => PaperFormat.A1,
-            "A2" => PaperFormat.A2,
-            "A3" => PaperFormat.A3,
-            "A4" => PaperFormat.A4,
-            "A5" => PaperFormat.A5,
-            "A6" => PaperFormat.A6,
-            _ => PaperFormat.A4
+            PdfPaperFormat.Letter => PaperFormat.Letter,
+            PdfPaperFormat.Legal => PaperFormat.Legal,
+            PdfPaperFormat.Tabloid => PaperFormat.Tabloid,
+            PdfPaperFormat.Ledger => PaperFormat.Ledger,
+            PdfPaperFormat.A0 => PaperFormat.A0,
+            PdfPaperFormat.A1 => PaperFormat.A1,
+            PdfPaperFormat.A2 => PaperFormat.A2,
+            PdfPaperFormat.A3 => PaperFormat.A3,
+            PdfPaperFormat.A4 => PaperFormat.A4,
+            PdfPaperFormat.A5 => PaperFormat.A5,
+            PdfPaperFormat.A6 => PaperFormat.A6,
+            _ => PaperFormat.Letter,
         };
 
         #region PDFsharp Enhancement
 
-        private byte[] EnhancePdf(byte[] pdfBytes, CalcpadPdfOptions options)
+        private byte[] EnhancePdf(byte[] pdfBytes, PdfSettingsDto options)
         {
             using var inputStream = new MemoryStream(pdfBytes);
             var document = PdfReader.Open(inputStream, PdfDocumentOpenMode.Modify);
@@ -442,7 +448,7 @@ namespace Calcpad.Server.Services
             LinePen: new XPen(XColor.FromArgb(179, 179, 179), 0.5),
             GrayBrush: new XSolidBrush(XColor.FromArgb(77, 77, 77)));
 
-        private void DrawHeader(XGraphics gfx, double width, double height, CalcpadPdfOptions options)
+        private void DrawHeader(XGraphics gfx, double width, double height, PdfSettingsDto options)
         {
             var ctx = SetupHeaderFooterContext();
             var font = new XFont("Helvetica", 10);
@@ -465,16 +471,8 @@ namespace Calcpad.Server.Services
                     new XPoint(margin, headerY + 12));
             }
 
-            // Header center text
-            if (!string.IsNullOrEmpty(options.HeaderCenter))
-            {
-                var size = gfx.MeasureString(options.HeaderCenter, font);
-                gfx.DrawString(options.HeaderCenter, font, ctx.GrayBrush,
-                    new XPoint((width - size.Width) / 2, headerY + 12));
-            }
-
             // Timestamp (top-right)
-            if (options.ShowDate)
+            if (options.ShowDate ?? PdfSettingsDefaults.ShowDate)
             {
                 var timestampFormat = string.IsNullOrEmpty(options.DateTimeFormat) ? "g" : options.DateTimeFormat;
                 var timestamp = DateTime.Now.ToString(timestampFormat);
@@ -485,7 +483,7 @@ namespace Calcpad.Server.Services
         }
 
         private void DrawFooter(XGraphics gfx, double width, double height,
-            int pageNumber, int totalPages, CalcpadPdfOptions options)
+            int pageNumber, int totalPages, PdfSettingsDto options)
         {
             var ctx = SetupHeaderFooterContext();
             var font = new XFont("Helvetica", 8);
@@ -498,16 +496,8 @@ namespace Calcpad.Server.Services
             double lineY = footerY - 5;
             gfx.DrawLine(ctx.LinePen, margin, lineY, width - margin, lineY);
 
-            // Center: Custom footer text
-            if (!string.IsNullOrEmpty(options.FooterCenter))
-            {
-                var size = gfx.MeasureString(options.FooterCenter, centerFont);
-                gfx.DrawString(options.FooterCenter, centerFont, ctx.GrayBrush,
-                    new XPoint((width - size.Width) / 2, footerY + 8));
-            }
-
             // Right side: Page numbers
-            if (options.ShowPageNumbers)
+            if (options.ShowPageNumbers ?? PdfSettingsDefaults.ShowPageNumbers)
             {
                 var pageText = $"Page {pageNumber} of {totalPages}";
                 var pageSize = gfx.MeasureString(pageText, font);

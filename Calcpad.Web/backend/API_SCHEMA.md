@@ -122,21 +122,18 @@ interface PdfGenerateRequest {
 
 interface PdfOptions {
   // Page settings
-  format?: string;           // Letter | Legal | Tabloid | Ledger | A0-A6 (default: "A4")
+  format?: string;           // Letter | Legal | Tabloid | Ledger | A0-A6 (default: "Letter")
   orientation?: string;      // "portrait" or "landscape" (default: "portrait")
-  scale?: number;            // Scale factor (default: 1.0)
 
   // Margins — a length with a unit, e.g. "2cm", "0.5in", "12mm"
-  marginTop?: string;        // Top margin (default: "2cm")
-  marginRight?: string;      // Right margin (default: "1.5cm")
-  marginBottom?: string;     // Bottom margin (default: "2cm")
-  marginLeft?: string;       // Left margin (default: "1.5cm")
+  marginTop?: string;        // Top margin (default: "0.75in")
+  marginRight?: string;      // Right margin (default: "0.5in")
+  marginBottom?: string;     // Bottom margin (default: "0.75in")
+  marginLeft?: string;       // Left margin (default: "0.5in")
 
   // Header and footer content. The bands are always drawn; these control what
   // goes in them, and an empty/omitted value simply leaves that slot blank.
   documentTitle?: string;    // Header, left, bold
-  headerCenter?: string;
-  footerCenter?: string;
   showPageNumbers?: boolean; // "Page n of m", footer right (default: true)
   showDate?: boolean;        // Timestamp, header right (default: true)
   dateTimeFormat?: string;   // .NET format string for the timestamp (empty uses "g")

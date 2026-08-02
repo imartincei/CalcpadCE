@@ -48,17 +48,6 @@
           </button>
         </div>
 
-        <div class="path-roots">
-          <div class="path-root-row">
-            <span class="path-root-label">&lt;project&gt;:</span>
-            <span class="path-root-value">{{ declaredPathRoots.project ?? 'not declared' }}</span>
-          </div>
-          <div class="path-root-row">
-            <span class="path-root-label">&lt;library&gt;:</span>
-            <span class="path-root-value">{{ declaredPathRoots.library ?? 'not declared' }}</span>
-          </div>
-        </div>
-
         <label class="bundle-option" :title="BUNDLE_PROJECT_DETAIL">
           <input
             type="checkbox"
@@ -166,14 +155,13 @@ const WRITE_NEXT_TO_WORKSHEET_DETAIL =
   + 'on the recipient\'s machine. A relative target already does that and is never touched.'
 
 const BUNDLE_PROJECT_DETAIL =
-  'Off (default): a <project> reference is left exactly as written, for the recipient\'s own '
-  + '#ProjectPath to resolve. On: resolved to your local path and bundled into the package '
-  + 'like any other absolute reference — for a one-off recipient who has no #ProjectPath of '
-  + 'their own.'
-
+  'Off (default): a <project>  reference is left exactly as written for #ProjectPath to resolve.\n'
+  + 'On: <projects> references are removed and bundled into the package '
+  + 'using a relative path.'
 const BUNDLE_LIBRARY_DETAIL =
-  'The same choice as "Bundle <project> references", for <library> — leave off when the '
-  + 'recipient already has the shared library and only needs its own #LibraryPath to find it.'
+  'Off (default): a <library> reference is left exactly as written for #LibraryPath to resolve.\n'
+  + 'On: <library> references are removed and bundled into the package '
+  + 'using a relative path.'
 
 // Report first: it is the default rendering everywhere else, so it reads as the one to
 // reach for. A form and a code listing have no meaningful Word form, hence `word: false`.
@@ -282,25 +270,6 @@ function formatSize(bytes: number): string {
   margin-top: 10px;
   font-size: 12px;
   cursor: help;
-}
-
-.path-roots {
-  margin-top: 10px;
-  font-size: 11px;
-  opacity: 0.8;
-}
-
-.path-root-row {
-  display: flex;
-  gap: 6px;
-}
-
-.path-root-label {
-  font-family: var(--vscode-editor-font-family, monospace);
-}
-
-.path-root-value {
-  overflow-wrap: anywhere;
 }
 
 .bundle-option {

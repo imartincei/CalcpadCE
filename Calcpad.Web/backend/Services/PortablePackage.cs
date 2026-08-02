@@ -14,17 +14,25 @@ namespace Calcpad.Server.Services
     /// <code>
     /// calc.zip
     ///   calc.cpd
-    ///   calc.cpd.refs/  image.png  include.cpd  loads.csv
+    ///   calc.cpd.refs/  image.png  data/loads.csv  lib.cpd
     /// </code>
     ///
     /// This is the middle ground between a worksheet that only runs on the machine it was
     /// written on and a compiled <c>.cpdz</c>, which travels anywhere but cannot be read
     /// (see <see cref="PortableWorksheet"/>). The recipient can open, read and edit it.
     ///
-    /// The folder is flat, so no two referenced files may share a name — including through
-    /// nested includes, whose own references land in the same folder. That is refused rather
-    /// than worked around: any scheme for renaming the duplicates would leave the recipient
-    /// with a worksheet whose paths no longer match the ones its author wrote.
+    /// A reference that sits under the document's own folder keeps that structure inside the
+    /// refs folder — <c>./data/loads.csv</c> lands at <c>calc.cpd.refs/data/loads.csv</c> — since
+    /// nothing else could collide with it there. One that reaches outside that folder, whether
+    /// written as an absolute path or via a leading <c>..</c>, is flattened to its bare name
+    /// instead, because there is no tree left to mirror; if two of those bare names collide, the
+    /// second and any further one are renamed <c>name-1.ext</c>, <c>name-2.ext</c> and so on, and
+    /// every path that pointed at the original is rewritten to match.
+    ///
+    /// A <c>&lt;user&gt;</c> reference is always bundled, unlike an unbundled <c>&lt;project&gt;</c>/
+    /// <c>&lt;library&gt;</c> one left for the recipient's own declaration to resolve: it needs no
+    /// declaration and always resolves, but to this exporting machine's own home directory, which
+    /// there is no reason to expect the recipient's home directory mirrors.
     /// </summary>
     internal static class PortablePackage
     {
@@ -66,9 +74,10 @@ namespace Calcpad.Server.Services
         /// <param name="bundleLibrary">The same choice, for <c>&lt;library&gt;</c>.</param>
         /// <returns>
         /// The archive, or <see cref="Result.Errors"/> saying why there is none. A reference that
-        /// cannot be read, two that share a name, and two outputs that would collapse onto the
-        /// same file are all refusals: a package that fails, or overwrites one output with
-        /// another, for whoever receives it is the one thing this exists to prevent.
+        /// cannot be read, and two outputs that would collapse onto the same file, are both
+        /// refusals: a package that fails, or overwrites one output with another, for whoever
+        /// receives it is the one thing this exists to prevent. Two references sharing a name is
+        /// not — the later one is renamed instead.
         /// </returns>
         public static Result Build(
             string content,
@@ -109,24 +118,29 @@ namespace Calcpad.Server.Services
                 return Failed(errors);
 
             var members = FlatMembers(documents.Texts.Keys.Where(p => !PathComparer.Equals(p, rootPath)),
-                dataFiles, refsFolder, errors);
-            if (errors.Count > 0)
-                return Failed(errors);
+                dataFiles, rootDirectory);
+            var zipPaths = new Dictionary<string, string>(PathComparer) { [rootPath] = innerName };
+            foreach (var (path, name) in members)
+                zipPaths[path] = $"{refsFolder}/{name}";
 
             var entries = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
             var rewritten = new Dictionary<string, string>(PathComparer);
             var outputs = new OutputTargets(nextToWorksheet, rootDirectory, errors, pathRoots,
                 bundleProject, bundleLibrary);
+            // pathRoots is already fully declared — Walk, above, has already read every
+            // #ProjectPath/#LibraryPath in the tree — so Prepare sees exactly what Rewrite,
+            // below, will.
+            outputs.Prepare(EnumerateOutputReferences(documents.Texts), pathRoots);
             foreach (var path in documents.Texts.Keys.OrderBy(p => p, StringComparer.Ordinal))
-                rewritten[path] = RewriteDocument(documents.Texts[path], path, rootPath, innerName,
-                    refsFolder, outputs, pathRoots, bundleProject, bundleLibrary, errors);
+                rewritten[path] = RewriteDocument(documents.Texts[path], path, rootDirectory, zipPaths,
+                    outputs, pathRoots, bundleProject, bundleLibrary, errors);
             if (errors.Count > 0)
                 return Failed(errors);
 
             entries[innerName] = Utf8.GetBytes(bom ? '﻿' + rewritten[rootPath] : rewritten[rootPath]);
             foreach (var (path, name) in members)
             {
-                var entryName = $"{refsFolder}/{name}";
+                var entryName = zipPaths[path];
                 if (rewritten.TryGetValue(path, out var text))
                 {
                     // Reached as an #include as well as a #read: the rewrite would hand the reader
@@ -241,7 +255,20 @@ namespace Calcpad.Server.Services
                             continue;
 
                         var raw = reference.Raw;
-                        if (PathRoots.TryGetTokenKind(raw.AsSpan(), out var isProjectToken))
+                        // Unlike <project>/<library>, <user> is always bundled rather than left
+                        // for the recipient to resolve themselves: it needs no declaration and
+                        // always resolves, but to *this* exporting machine's home directory, which
+                        // there is no reason to expect the recipient's own home directory mirrors.
+                        if (PathRoots.IsUserToken(raw.AsSpan()))
+                        {
+                            if (!pathRoots.TryExpand(raw, out raw, out var tokenError))
+                            {
+                                errors.Add($"{owner}, line {lineNumber}: {reference.Directive} "
+                                    + $"{reference.Raw} — {tokenError}");
+                                continue;
+                            }
+                        }
+                        else if (PathRoots.TryGetTokenKind(raw.AsSpan(), out var isProjectToken))
                         {
                             if (isProjectToken ? !bundleProject : !bundleLibrary)
                                 continue;
@@ -310,57 +337,127 @@ namespace Calcpad.Server.Services
             $"{owner}, line {line}: {reference.Directive} {reference.Raw} — {resolved} could not be read.";
 
         /// <summary>
-        /// The name each bundled file takes in the refs folder: its own, since the folder is flat.
-        /// Two files wanting the same one is the format's single limitation, and is reported with
-        /// both paths — the author is the only one who can decide which to rename.
+        /// The path each bundled file takes inside the refs folder, relative to it: the same path
+        /// it has under <paramref name="rootDirectory"/> when it sits there, since nothing else can
+        /// collide with a mirrored tree; otherwise its bare name, renamed <c>name-1.ext</c>,
+        /// <c>name-2.ext</c> and so on when another bare name — mirrored or not — already claims
+        /// it, in path order.
         /// </summary>
         private static SortedDictionary<string, string> FlatMembers(
-            IEnumerable<string> includes,
-            IEnumerable<string> dataFiles,
-            string refsFolder,
-            List<string> errors)
+            IEnumerable<string> includes, IEnumerable<string> dataFiles, string rootDirectory)
         {
             var members = new SortedDictionary<string, string>(PathComparer);
-            var byName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var seen = new HashSet<string>(PathComparer);
+            var byName = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
             foreach (var path in includes.Concat(dataFiles).OrderBy(p => p, StringComparer.Ordinal))
             {
-                var name = Path.GetFileName(path);
-                if (!members.TryAdd(path, name))
+                if (!seen.Add(path))
                     continue;
 
-                if (byName.TryGetValue(name, out var taken))
-                    errors.Add($"Two of the referenced files are both named \"{name}\": {taken} and "
-                        + $"{path}. They are bundled together into {refsFolder}, so one of them has "
-                        + "to be renamed or the reference dropped.");
+                if (TryNestedPath(path, rootDirectory, out var nested))
+                {
+                    members[path] = nested;
+                    continue;
+                }
+
+                var name = Path.GetFileName(path);
+                if (!byName.TryGetValue(name, out var group))
+                    byName[name] = group = new();
+                group.Add(path);
+            }
+
+            // A bare name only goes to a single claimant once nothing already sitting in the
+            // mirrored tree wants it too — otherwise it joins the multi-claimant files below,
+            // if it hadn't already, and is renamed like them.
+            var taken = new HashSet<string>(members.Values, StringComparer.OrdinalIgnoreCase);
+            var renaming = new List<List<string>>();
+            foreach (var (name, group) in byName)
+            {
+                if (group.Count == 1 && taken.Add(name))
+                    members[group[0]] = name;
                 else
-                    byName[name] = path;
+                    renaming.Add(group);
+            }
+
+            foreach (var group in renaming)
+            {
+                var name = Path.GetFileName(group[0]);
+                var stem = Path.GetFileNameWithoutExtension(name);
+                var extension = Path.GetExtension(name);
+                var index = 0;
+                foreach (var path in group)
+                {
+                    string candidate;
+                    do
+                        candidate = $"{stem}-{++index}{extension}";
+                    while (!taken.Add(candidate));
+                    members[path] = candidate;
+                }
             }
             return members;
         }
 
         /// <summary>
+        /// Whether <paramref name="path"/> sits under <paramref name="rootDirectory"/> — as
+        /// opposed to reaching it only through a leading <c>..</c>, or an absolute path elsewhere
+        /// entirely — and if so, its path relative to it, with forward slashes for the zip entry.
+        /// </summary>
+        private static bool TryNestedPath(string path, string rootDirectory, out string nested)
+        {
+            var relative = Path.GetRelativePath(rootDirectory, path);
+            if (Path.IsPathRooted(relative) || relative == ".."
+                || relative.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            {
+                nested = string.Empty;
+                return false;
+            }
+            nested = relative.Replace(Path.DirectorySeparatorChar, '/');
+            return true;
+        }
+
+        /// <summary>
+        /// Every <c>#write</c>/<c>#append</c> reference across the whole tree, with the owner
+        /// name and line number <see cref="RewriteDocument"/> will later look each one up by —
+        /// same file-name-then-line-order walk, so <see cref="OutputTargets.Prepare"/> sees
+        /// occurrences in exactly the order <see cref="OutputTargets.Rewrite"/> will reach them.
+        /// </summary>
+        private static IEnumerable<(WorksheetReferences.Reference Reference, string Owner, int Line)>
+            EnumerateOutputReferences(Dictionary<string, string> texts)
+        {
+            foreach (var path in texts.Keys.OrderBy(p => p, StringComparer.Ordinal))
+            {
+                var owner = Path.GetFileName(path);
+                var lineNumber = 0;
+                foreach (var (line, _) in Lines(texts[path]))
+                {
+                    ++lineNumber;
+                    foreach (var reference in Scan(line))
+                        if (reference.IsOutput)
+                            yield return (reference, owner, lineNumber);
+                }
+            }
+        }
+
+        /// <summary>
         /// Points every reference in <paramref name="text"/> at its bundled copy. An
-        /// <c>#include</c> is reached from the file holding it — through the refs folder from the
-        /// root, as a sibling from inside it, and back out of the folder for the root itself.
-        /// Everything else is reached from the root document wherever its line sits, because that
-        /// is where it is resolved from once the includes have been expanded: a bundled include
-        /// therefore names the refs folder too, which reads oddly but is what resolves.
+        /// <c>#include</c> is reached from wherever <paramref name="path"/> itself landed in the
+        /// zip. Everything else is reached from the root document's own location regardless of
+        /// where <paramref name="path"/> landed, because that is where it is resolved from once
+        /// the includes have been expanded — so a bundled include several folders deep can still
+        /// name a reference several folders back up, which reads oddly but is what resolves.
         /// </summary>
         private static string RewriteDocument(
             string text,
             string path,
-            string rootPath,
-            string innerName,
-            string refsFolder,
+            string rootDirectory,
+            IReadOnlyDictionary<string, string> zipPaths,
             OutputTargets outputs,
             PathRoots pathRoots,
             bool bundleProject,
             bool bundleLibrary,
             List<string> errors)
         {
-            var isRoot = PathComparer.Equals(path, rootPath);
             var directory = Path.GetDirectoryName(path) ?? string.Empty;
-            var rootDirectory = Path.GetDirectoryName(rootPath) ?? string.Empty;
             var owner = Path.GetFileName(path);
             var sb = new StringBuilder(text.Length);
             var lineNumber = 0;
@@ -380,7 +477,19 @@ namespace Calcpad.Server.Services
                     return null;
 
                 var raw = reference.Raw;
-                if (PathRoots.TryGetTokenKind(raw.AsSpan(), out var isProjectToken))
+                if (PathRoots.IsUserToken(raw.AsSpan()))
+                {
+                    // Walk already validated every <user> reference in the tree (see the comment
+                    // there for why it is always bundled), so a failure here would mean this
+                    // rewrite pass was reached despite Walk reporting an error.
+                    if (!pathRoots.TryExpand(raw, out raw, out var tokenError))
+                    {
+                        errors.Add($"{owner}, line {lineNumber}: {reference.Directive} "
+                            + $"{reference.Raw} — {tokenError}");
+                        return null;
+                    }
+                }
+                else if (PathRoots.TryGetTokenKind(raw.AsSpan(), out var isProjectToken))
                 {
                     if (isProjectToken ? !bundleProject : !bundleLibrary)
                         return null;
@@ -401,12 +510,31 @@ namespace Calcpad.Server.Services
                 if (!TryResolve(raw, isInclude ? directory : rootDirectory, out var resolved))
                     return null;
 
-                if (PathComparer.Equals(resolved, rootPath))
-                    return isRoot || !isInclude ? innerName : $"../{innerName}";
-
-                var name = Path.GetFileName(resolved);
-                return isRoot || !isInclude ? $"{refsFolder}/{name}" : name;
+                var fromDirectory = isInclude ? ZipDirectory(zipPaths[path]) : string.Empty;
+                return ZipRelative(fromDirectory, zipPaths[resolved]);
             }
+        }
+
+        private static string ZipDirectory(string zipPath)
+        {
+            var slash = zipPath.LastIndexOf('/');
+            return slash < 0 ? string.Empty : zipPath[..slash];
+        }
+
+        /// <summary>
+        /// The path from <paramref name="fromDirectory"/> to <paramref name="toPath"/> within the
+        /// zip, forward-slashed regardless of host: these are archive entry names, not filesystem
+        /// paths, so they never go through <see cref="Path"/>.
+        /// </summary>
+        private static string ZipRelative(string fromDirectory, string toPath)
+        {
+            var from = fromDirectory.Length == 0 ? [] : fromDirectory.Split('/');
+            var to = toPath.Split('/');
+            var common = 0;
+            while (common < from.Length && common < to.Length - 1 && from[common] == to[common])
+                ++common;
+
+            return string.Join('/', Enumerable.Repeat("..", from.Length - common).Concat(to.Skip(common)));
         }
 
         /// <summary>

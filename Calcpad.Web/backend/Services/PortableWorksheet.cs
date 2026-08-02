@@ -13,6 +13,14 @@ namespace Calcpad.Server.Services
     /// exception to "expanded in place" — they stay as <c>src</c> paths for the host to embed,
     /// which is why an included file's relative paths are made absolute on the way through: once
     /// its text sits in the parent worksheet, the folder they were relative to is gone.
+    ///
+    /// A <c>&lt;user&gt;</c> image reference is resolved here too, on this same author's machine,
+    /// purely to read its bytes for embedding — the embedded data itself carries no path, so
+    /// unlike <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> there is nothing recipient-specific
+    /// baked in. A <c>&lt;user&gt;</c> <c>#write</c>/<c>#append</c> target resolves the same way a
+    /// bundled <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> one does (see
+    /// <see cref="OutputTargets"/>) — there being no recipient-side declaration for it to wait
+    /// for either way — and then follows <c>nextToWorksheet</c> like any other resolved target.
     /// </summary>
     internal static class PortableWorksheet
     {
@@ -47,13 +55,55 @@ namespace Calcpad.Server.Services
 
             var rootDirectory = string.IsNullOrEmpty(sourceFilePath)
                 ? string.Empty : Path.GetDirectoryName(sourceFilePath) ?? string.Empty;
+            var declaringDirectory = string.IsNullOrEmpty(sourceFilePath)
+                ? null : Path.GetDirectoryName(sourceFilePath);
             // A compiled worksheet's source is locked, so there is no "leave the token" option
             // here the way a portable package offers: both roots always resolve.
             var pathRoots = new PathRoots();
             var outputs = new OutputTargets(nextToWorksheet, rootDirectory, errors, pathRoots,
                 bundleProject: true, bundleLibrary: true);
+            // A throwaway PathRoots of its own, declared progressively by the same dry run that
+            // feeds Prepare — not pathRoots above, which RewriteDirectives populates for real,
+            // below. Sharing that one here would make every declaration in the document visible
+            // to Prepare before RewriteDirectives had even started, silently curing a genuine
+            // "used before declared" document (still an error the real pass has to catch) instead
+            // of a batch of names to compute.
+            var dryRunRoots = new PathRoots();
+            outputs.Prepare(EnumerateOutputReferences(expanded, dryRunRoots, declaringDirectory), dryRunRoots);
             var rewritten = RewriteDirectives(expanded, sourceFilePath, outputs, pathRoots, errors);
             return new Result(rewritten, errors);
+        }
+
+        /// <summary>
+        /// Every <c>#write</c>/<c>#append</c> reference in <paramref name="text"/>, with the line
+        /// number <see cref="RewriteDirectives"/>'s own <c>Target</c> will later look each one up
+        /// by. Declares into <paramref name="dryRunRoots"/> as it goes, exactly the way
+        /// <see cref="RewriteDirectives"/> declares into its own <c>pathRoots</c> — so a reference
+        /// enumerated here sees precisely the declarations that came before it in the text, same
+        /// as the real pass will, and <see cref="OutputTargets.Prepare"/> can tell a genuinely
+        /// undeclared or out-of-order token from a merely unrenamed one the same way
+        /// <see cref="OutputTargets.Rewrite"/> does.
+        /// </summary>
+        private static IEnumerable<(WorksheetReferences.Reference Reference, string Owner, int Line)>
+            EnumerateOutputReferences(string text, PathRoots dryRunRoots, string? declaringDirectory)
+        {
+            var lineNumber = 0;
+            foreach (var rawLine in text.Split('\n'))
+            {
+                ++lineNumber;
+                var code = rawLine.TrimEnd('\r').TrimStart();
+                if (PathRoots.IsDeclaration(code.AsSpan(), out var isProject, out var declStart, out var declLength))
+                {
+                    if (declLength > 0)
+                        dryRunRoots.TryDeclare(isProject, code.Substring(declStart, declLength),
+                            declaringDirectory, out _);
+                    continue;
+                }
+
+                foreach (var reference in WorksheetReferences.Scan(code))
+                    if (reference.IsOutput)
+                        yield return (reference, "the worksheet", lineNumber);
+            }
         }
 
         /// <summary>
@@ -121,7 +171,8 @@ namespace Calcpad.Server.Services
 
                 var references = WorksheetReferences.Scan(line);
                 var needsRewrite = references.Exists(r => r.IsOutput
-                    || r.Kind == WorksheetReferences.ReferenceKind.Image && PathRoots.HasToken(r.Raw));
+                    || r.Kind == WorksheetReferences.ReferenceKind.Image
+                        && (PathRoots.HasToken(r.Raw) || PathRoots.IsUserToken(r.Raw)));
                 sb.Append(needsRewrite ? WorksheetReferences.Rewrite(line, references, Target) : line)
                   .Append('\n');
             }
@@ -131,7 +182,8 @@ namespace Calcpad.Server.Services
             {
                 if (r.IsOutput)
                     return outputs.Rewrite(r, "the worksheet", lineNumber);
-                if (r.Kind != WorksheetReferences.ReferenceKind.Image || !PathRoots.HasToken(r.Raw))
+                if (r.Kind != WorksheetReferences.ReferenceKind.Image
+                    || !(PathRoots.HasToken(r.Raw) || PathRoots.IsUserToken(r.Raw)))
                     return null;
 
                 if (!pathRoots.TryExpand(r.Raw, out var expandedSrc, out var tokenError))
@@ -169,7 +221,7 @@ namespace Calcpad.Server.Services
             WorksheetReferences.ImageSource.Replace(content, match =>
             {
                 var src = match.Groups[2].Value;
-                if (WorksheetReferences.IsExternalSource(src) || PathRoots.HasToken(src))
+                if (WorksheetReferences.IsExternalSource(src) || PathRoots.HasToken(src) || PathRoots.IsUserToken(src))
                     return match.Value;
 
                 try

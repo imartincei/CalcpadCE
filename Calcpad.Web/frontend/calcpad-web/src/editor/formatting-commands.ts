@@ -175,9 +175,14 @@ function insertHeading(
     const selections = editor.getSelections() ?? [];
 
     const edits: monaco.editor.IIdentifiedSingleEditOperation[] = [];
+    const contentWasEmpty: boolean[] = [];
     for (const sel of selections) {
         const lineNumber = sel.positionLineNumber;
         const lineText = model.getLineContent(lineNumber);
+        const strippedContent = lineText
+            .replace(/^<h[1-6]>(.*)<\/h[1-6]>$/, '$1')
+            .replace(/^#{1,6}\s+(.*)$/, '$1');
+        contentWasEmpty.push(strippedContent.trim().length === 0);
         edits.push({
             range: new monaco.Range(lineNumber, 1, lineNumber, lineText.length + 1),
             text: buildHeadingLine(lineText, level, format),
@@ -185,6 +190,23 @@ function insertHeading(
         });
     }
     editor.executeEdits('calcpad-format-heading', edits);
+
+    // Place cursor between tags when the line's content was empty, same as the VS Code extension.
+    if (format === 'html') {
+        const closingTag = `</h${level}>`;
+        const newSelections: monaco.Selection[] = [];
+        for (let i = 0; i < selections.length; i++) {
+            if (contentWasEmpty[i]) {
+                const lineNumber = selections[i].positionLineNumber;
+                const lineLength = model.getLineLength(lineNumber);
+                const col = lineLength + 1 - closingTag.length;
+                newSelections.push(new monaco.Selection(lineNumber, col, lineNumber, col));
+            } else {
+                newSelections.push(selections[i]);
+            }
+        }
+        editor.setSelections(newSelections);
+    }
 }
 
 function insertParagraph(editor: monaco.editor.IStandaloneCodeEditor): void {

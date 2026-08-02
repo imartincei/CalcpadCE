@@ -1,0 +1,3 @@
+'<h4>Portable Export Test</h4>
+#include ./Nested/reference.cpd
+#include <user>/repos/CalcpadCE/Examples/Engineering/Areas/Circle.cpd

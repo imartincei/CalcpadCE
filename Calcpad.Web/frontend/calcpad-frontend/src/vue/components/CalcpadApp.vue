@@ -29,6 +29,7 @@
       @expand-folder="handleExpandFolder"
       @open-containing-folder="handleOpenContainingFolder"
       @close-folder="handleCloseFolder"
+      @refresh-folder="handleRefreshFolder"
     />
 
     <div v-show="!versionConfig.isDesktop || activeView === 'calcpad'" class="calcpad-view" :class="{ split: isSplit }">
@@ -138,17 +139,12 @@
         :loading="plotsLoading"
         :version-config="versionConfig"
         :write-next-to-worksheet="portableWriteNextToWorksheet"
-        :bundle-project-references="portableBundleProjectRefs"
-        :bundle-library-references="portableBundleLibraryRefs"
-        :declared-path-roots="declaredPathRoots"
         @save-pdf="handleSavePdf"
         @save-html="handleSaveSourceHtml"
         @save-docx="handleSaveDocx"
         @save-compiled="handleSaveCompiled"
         @save-portable="handleSavePortable"
         @update-write-next-to-worksheet="handleUpdateWriteNextToWorksheet"
-        @update-bundle-project-references="handleUpdateBundleProjectReferences"
-        @update-bundle-library-references="handleUpdateBundleLibraryReferences"
         @refresh-plots="handleRefreshPlots"
         @save-plot="handleSavePlot"
         @save-plots-zip="handleSavePlotsZip"
@@ -339,6 +335,10 @@ const handleCloseFolder = () => {
   postMessage({ type: 'closeFolder' })
 }
 
+const handleRefreshFolder = () => {
+  postMessage({ type: 'getOpenedFolder' })
+}
+
 // Insert children into the tree at the given directory path.
 const setDirectoryChildren = (parentPath: string, children: FileNode[]) => {
   const norm = (p: string) => p.replace(/\\/g, '/').replace(/\/+$/, '')
@@ -435,16 +435,6 @@ const handleSavePortable = () => {
 const handleUpdateWriteNextToWorksheet = (enabled: boolean) => {
   portableWriteNextToWorksheet.value = enabled
   postMessage({ type: 'updatePortableWriteNextToWorksheet', enabled })
-}
-
-const handleUpdateBundleProjectReferences = (enabled: boolean) => {
-  portableBundleProjectRefs.value = enabled
-  postMessage({ type: 'updatePortableBundleProjectRefs', enabled })
-}
-
-const handleUpdateBundleLibraryReferences = (enabled: boolean) => {
-  portableBundleLibraryRefs.value = enabled
-  postMessage({ type: 'updatePortableBundleLibraryRefs', enabled })
 }
 
 const handleRefreshPlots = () => {

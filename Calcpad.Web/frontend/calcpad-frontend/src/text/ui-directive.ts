@@ -1,4 +1,4 @@
-import type { SettingOption } from './metadata-comment';
+import type { SettingOption } from '../types/catalog';
 
 /** Parsed JSON attributes of a `#UI {...} name = value` directive. */
 export interface UiDirectiveData {

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Calcpad</title>
+    <title>CalcpadCE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
@@ -12,10 +12,6 @@
             margin: 0;
         }
 
-        /* On screen: indent from the left and cap at ~one printed page width
-           so the webview preview stays readable on wide monitors. In print/PDF
-           we drop both the indent and the cap so the body fills the Puppeteer-
-           defined print area edge-to-edge. */
         @media screen {
             body {
                 margin-left: 1.5em;
@@ -105,7 +101,7 @@
                 border-radius: 0.35em;
                 text-align: right;
                 box-shadow: 0.06em 0.06em 0.5em #ddd;
-                min-width: 3em; 
+                min-width: 3em;
             }
 
             input[type="text"]:focus {
@@ -309,7 +305,7 @@
             position: relative;
             bottom: 1pt;
         }
-		
+
         .eq small.nth{
             font-size: 70%;
         }
@@ -957,12 +953,10 @@
             color: #569cd6; /* Light blue on hover in dark mode */
         }
 
-        /* Give the preview iframe a clearly visible vertical scrollbar. The
-           default scrollbar is nearly invisible; reserving the gutter with
-           overflow-y: scroll keeps the layout from shifting. Plain rgba values
-           are used since the iframe has no VS Code theme variables. */
-        html { overflow-y: scroll; }
-        body { min-height: 100vh; }
+        @media screen {
+            html { overflow-y: scroll; }
+            body { min-height: 100vh; }
+        }
         .code { overflow-y: auto; }
         ::-webkit-scrollbar { width: 12px; height: 12px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -970,13 +964,9 @@
         ::-webkit-scrollbar-thumb:hover { background: rgba(100,100,100,0.7); }
         ::-webkit-scrollbar-thumb:active { background: rgba(85,85,85,0.9); }
         ::-webkit-scrollbar-corner { background: transparent; }
-        /* Pin the arrow to its own line (position: relative on .line) and extend
-           it across the body's left margin so the whole gutter is a hover+click
-           target. */
         .line { position: relative; }
         /* Brief flash when the preview is focused to the editor's cursor line. */
         .cpd-line-focus { background-color: rgba(120,170,255,0.28) !important; transition: background-color 0.3s ease !important; }
-        /* Find-in-preview highlights, driven from the parent (App.vue find widget). */
         mark.cpd-find { background: rgba(234,179,8,0.45); color: inherit; border-radius: 2px; }
         mark.cpd-find.cpd-find-current { background: rgba(249,115,22,0.95); color: #000; }
         .lineLink { left: -3em !important; top: 0 !important; bottom: 0 !important; width: 3em !important; height: auto !important; font-size: 16pt !important; padding-right: 4pt !important; box-sizing: border-box !important; display: flex !important; align-items: center !important; justify-content: flex-end !important; opacity: 0 !important; transition: opacity 0.15s !important; }

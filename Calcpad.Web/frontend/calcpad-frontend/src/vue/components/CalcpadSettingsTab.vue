@@ -23,142 +23,54 @@
           Math Settings
         </h3>
         <div v-show="bodyVisible('math')" class="section-body">
-          <div v-show="rowVisible('math', 'decimals')" class="setting-group">
-            <label for="decimals">Decimals:</label>
-            <input
-              id="decimals"
-              v-model.number="localSettings.math.decimals"
-              type="number"
-              min="0"
-              max="15"
-              :class="{ 'input-invalid': settingErrors.decimals }"
-              :title="settingErrors.decimals || undefined"
-              @input="updateSettings"
-            />
-          </div>
-
-          <div v-show="rowVisible('math', 'degrees')" class="setting-group">
-            <label for="degrees">Angle Units:</label>
-            <select
-              id="degrees"
-              v-model.number="localSettings.math.degrees"
-              @change="updateSettings"
-            >
-              <option :value="0">Radians</option>
-              <option :value="1">Degrees</option>
-              <option :value="2">Gradians</option>
-            </select>
-          </div>
-
-          <div v-show="rowVisible('math', 'isComplex')" class="setting-group">
-            <label>
+          <div
+            v-for="spec in MATH_KEYS"
+            :key="spec.key"
+            v-show="rowVisible('math', spec.key)"
+            class="setting-group"
+          >
+            <label v-if="spec.type === 'boolean'">
               <input
-                v-model="localSettings.math.isComplex"
                 type="checkbox"
+                v-model="settingModel(spec.key).value"
                 @change="updateSettings"
               />
-              Complex Numbers
+              {{ spec.label }}
+              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
             </label>
-          </div>
-
-          <div v-show="rowVisible('math', 'substitute')" class="setting-group">
-            <label>
-              <input
-                v-model="localSettings.math.substitute"
-                type="checkbox"
+            <template v-else>
+              <label :for="spec.key">
+                {{ spec.label }}:
+                <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+              </label>
+              <select
+                v-if="spec.type === 'enum'"
+                :id="spec.key"
+                v-model="settingModel(spec.key).value"
                 @change="updateSettings"
-              />
-              Substitute Variables
-            </label>
-          </div>
-
-          <div v-show="rowVisible('math', 'formatEquations')" class="setting-group">
-            <label>
+              >
+                <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              </select>
               <input
-                v-model="localSettings.math.formatEquations"
-                type="checkbox"
-                @change="updateSettings"
+                v-else-if="spec.type === 'number'"
+                :id="spec.key"
+                type="number"
+                v-model="settingModel(spec.key).value"
+                :min="spec.min"
+                :max="spec.max"
+                :step="numberStep(spec.key)"
+                :class="{ 'input-invalid': settingErrors[spec.key] }"
+                :title="settingErrors[spec.key] || undefined"
+                @input="updateSettings"
               />
-              Format Equations
-              <span class="setting-info" title="Professional (checked) renders equations in stacked math form; Inline (unchecked) renders them on a single line.">ⓘ</span>
-            </label>
-          </div>
-
-          <div v-show="rowVisible('math', 'zeroSmall')" class="setting-group">
-            <label>
               <input
-                v-model="localSettings.math.zeroSmallMatrixElements"
-                type="checkbox"
-                @change="updateSettings"
+                v-else
+                :id="spec.key"
+                type="text"
+                v-model="settingModel(spec.key).value"
+                @input="updateSettings"
               />
-              Zero Small Matrix Elements
-              <span class="setting-info" title="Display very small matrix/vector values as 0 instead of using scientific notation.">ⓘ</span>
-            </label>
-          </div>
-
-          <div v-show="rowVisible('math', 'showHiddenOutput')" class="setting-group">
-            <label>
-              <input
-                v-model="localSettings.math.showHiddenOutput"
-                type="checkbox"
-                @change="updateSettings"
-              />
-              Show Hidden Output
-              <span class="setting-info" title="Ignore #hide so suppressed content is rendered anyway. For debugging.">ⓘ</span>
-            </label>
-          </div>
-
-          <div v-show="rowVisible('math', 'maxOutput')" class="setting-group">
-            <label for="maxOutputCount">
-              Max Output Count:
-              <span class="setting-info" title="Maximum number of rows/columns shown for large matrices and vectors (5–100).">ⓘ</span>
-            </label>
-            <input
-              id="maxOutputCount"
-              v-model.number="localSettings.math.maxOutputCount"
-              type="number"
-              min="5"
-              max="100"
-              :class="{ 'input-invalid': settingErrors.maxOutputCount }"
-              :title="settingErrors.maxOutputCount || undefined"
-              @input="updateSettings"
-            />
-          </div>
-
-          <div v-show="rowVisible('math', 'precision')" class="setting-group">
-            <label for="precision">
-              Numerical Precision:
-              <span class="setting-info" title="Relative precision for numerical methods such as integration and root finding (1e-2 to 1e-15). Can be overridden per-document with a Precision = … line.">ⓘ</span>
-            </label>
-            <input
-              id="precision"
-              v-model.number="localSettings.math.precision"
-              type="number"
-              step="any"
-              min="1e-15"
-              max="1e-2"
-              :class="{ 'input-invalid': settingErrors.precision }"
-              :title="settingErrors.precision || undefined"
-              @input="updateSettings"
-            />
-          </div>
-
-          <div v-show="rowVisible('math', 'tol')" class="setting-group">
-            <label for="tol">
-              Solver Tolerance:
-              <span class="setting-info" title="Target tolerance for the iterative PCG solver and eigensolver. Can be overridden per-document with a Tol = … line.">ⓘ</span>
-            </label>
-            <input
-              id="tol"
-              v-model.number="localSettings.math.tol"
-              type="number"
-              step="any"
-              min="1e-15"
-              max="1e-2"
-              :class="{ 'input-invalid': settingErrors.tol }"
-              :title="settingErrors.tol || undefined"
-              @input="updateSettings"
-            />
+            </template>
           </div>
         </div>
       </section>
@@ -169,15 +81,16 @@
           Plot Settings
         </h3>
         <div v-show="bodyVisible('plot')" class="section-body">
-          <div v-show="rowVisible('plot', 'isAdaptive')" class="setting-group">
+          <div
+            v-for="spec in PLOT_KEYS_A"
+            :key="spec.key"
+            v-show="rowVisible('plot', spec.key)"
+            class="setting-group"
+          >
             <label>
-              <input
-                v-model="localSettings.plot.isAdaptive"
-                type="checkbox"
-                @change="updateSettings"
-              />
-              Adaptive Plotting
-              <span class="setting-info" title="Concentrates sample points where the curve bends sharply instead of spacing them evenly. Produces smoother plots of curved functions at a lower point count; disable for a fixed dense sampling.">ⓘ</span>
+              <input type="checkbox" v-model="settingModel(spec.key).value" @change="updateSettings" />
+              {{ spec.label }}
+              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
             </label>
           </div>
 
@@ -194,54 +107,38 @@
             />
           </div>
 
-          <div v-show="rowVisible('plot', 'vectorGraphics')" class="setting-group">
-            <label>
-              <input
-                v-model="localSettings.plot.vectorGraphics"
-                type="checkbox"
-                @change="updateSettings"
-              />
-              Vector Graphics
-              <span class="setting-info" title="Renders plots as SVG (scalable, sharp at any zoom) instead of raster PNG images.">ⓘ</span>
+          <div
+            v-for="spec in PLOT_KEYS_B"
+            :key="spec.key"
+            v-show="rowVisible('plot', spec.key)"
+            class="setting-group"
+          >
+            <label v-if="spec.type === 'boolean'">
+              <input type="checkbox" v-model="settingModel(spec.key).value" @change="updateSettings" />
+              {{ spec.label }}
+              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
             </label>
-          </div>
-
-          <div v-show="rowVisible('plot', 'colorScale')" class="setting-group">
-            <label for="colorScale">Color Scale:</label>
-            <select
-              id="colorScale"
-              v-model="localSettings.plot.colorScale"
-              @change="updateSettings"
-            >
-              <option value="Rainbow">Rainbow</option>
-              <option value="Grayscale">Grayscale</option>
-              <option value="Hot">Hot</option>
-              <option value="Cool">Cool</option>
-              <option value="Jet">Jet</option>
-              <option value="Parula">Parula</option>
-            </select>
-          </div>
-
-          <div v-show="rowVisible('plot', 'smoothScale')" class="setting-group">
-            <label>
-              <input
-                v-model="localSettings.plot.smoothScale"
-                type="checkbox"
+            <template v-else>
+              <label :for="spec.key">
+                {{ spec.label }}:
+                <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+              </label>
+              <select
+                v-if="spec.type === 'enum'"
+                :id="spec.key"
+                v-model="settingModel(spec.key).value"
                 @change="updateSettings"
-              />
-              Smooth Scale
-            </label>
-          </div>
-
-          <div v-show="rowVisible('plot', 'shadows')" class="setting-group">
-            <label>
+              >
+                <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              </select>
               <input
-                v-model="localSettings.plot.shadows"
-                type="checkbox"
-                @change="updateSettings"
+                v-else
+                :id="spec.key"
+                type="text"
+                v-model="settingModel(spec.key).value"
+                @input="updateSettings"
               />
-              Shadows
-            </label>
+            </template>
           </div>
 
           <div v-show="rowVisible('plot', 'lightDirection')" class="setting-group">
@@ -262,50 +159,24 @@
             </select>
           </div>
 
-          <div v-show="rowVisible('plot', 'width')" class="setting-group">
-            <label for="plotWidth">
-              Plot Width (px):
-              <span class="setting-info" title="Width of the plot area in pixels. Can be overridden per-document with a PlotWidth = … line.">ⓘ</span>
+          <div
+            v-for="spec in PLOT_KEYS_C"
+            :key="spec.key"
+            v-show="rowVisible('plot', spec.key)"
+            class="setting-group"
+          >
+            <label :for="spec.key">
+              {{ spec.label }}:
+              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
             </label>
             <input
-              id="plotWidth"
-              v-model.number="localSettings.plot.width"
+              :id="spec.key"
               type="number"
-              min="1"
-              :class="{ 'input-invalid': settingErrors.plotWidth }"
-              :title="settingErrors.plotWidth || undefined"
-              @input="updateSettings"
-            />
-          </div>
-
-          <div v-show="rowVisible('plot', 'height')" class="setting-group">
-            <label for="plotHeight">
-              Plot Height (px):
-              <span class="setting-info" title="Height of the plot area in pixels. Can be overridden per-document with a PlotHeight = … line.">ⓘ</span>
-            </label>
-            <input
-              id="plotHeight"
-              v-model.number="localSettings.plot.height"
-              type="number"
-              min="1"
-              :class="{ 'input-invalid': settingErrors.plotHeight }"
-              :title="settingErrors.plotHeight || undefined"
-              @input="updateSettings"
-            />
-          </div>
-
-          <div v-show="rowVisible('plot', 'step')" class="setting-group">
-            <label for="plotStep">
-              Map Mesh Step:
-              <span class="setting-info" title="Mesh size for map (surface) plotting; 0 lets Calcpad choose automatically. Can be overridden per-document with a PlotStep = … line.">ⓘ</span>
-            </label>
-            <input
-              id="plotStep"
-              v-model.number="localSettings.plot.step"
-              type="number"
-              min="0"
-              :class="{ 'input-invalid': settingErrors.plotStep }"
-              :title="settingErrors.plotStep || undefined"
+              v-model="settingModel(spec.key).value"
+              :min="spec.min"
+              :max="spec.max"
+              :class="{ 'input-invalid': settingErrors[spec.key] }"
+              :title="settingErrors[spec.key] || undefined"
               @input="updateSettings"
             />
           </div>
@@ -479,7 +350,7 @@
                 @change="updateAutoInputMode"
               />
               Open #UI Documents in Input Mode
-              <span class="setting-info" title="A document declaring #UI controls opens as its input form the first time you open it. The mode you switch to afterwards sticks — a later tab switch never brings the form back.">ⓘ</span>
+              <span class="setting-info" title="A document declaring #UI controls opens as its input form the first time you open it.">ⓘ</span>
             </label>
           </div>
 
@@ -727,10 +598,12 @@
 
 <script setup lang="ts">
 import { ref, watch, computed, reactive } from 'vue'
+import type { WritableComputedRef } from 'vue'
 import type { PdfSettings, Settings, ThemeInfo, VersionConfig } from '../types'
 import { DEFAULT_PDF_SETTINGS, DEFAULT_VERSION_CONFIG } from '../types'
-import { getDefaultSettings } from '../../types/settings'
-import { PDF_SETTING_KEYS, validatePdfValue, validateSettingValue } from '../../text/metadata-comment'
+import { getDefaultSettings, METADATA_SETTINGS_KEYS, validateSettingValue, SETTINGS_PATH } from '../../types/settings'
+import { PDF_SETTING_KEYS, validatePdfValue } from '../../types/pdf-settings'
+import { specForKey } from '../../types/catalog'
 
 // Props
 interface Props {
@@ -810,6 +683,44 @@ const emit = defineEmits<{
 
 // State
 const localSettings = ref<Settings>({ ...props.settings })
+
+// Ordered per-section key lists — METADATA_SETTINGS_KEYS' array order doesn't
+// group Math/Plot/Units contiguously (units/isUs sit mid-array, precision/tol
+// sit at the end), so the render order is spelled out here instead of sliced.
+// Plot is split around screenScaleFactor/lightDirection, which have no
+// #settings-directive counterpart and so stay hardcoded, to keep the visible
+// field order unchanged.
+const MATH_KEYS = [
+  'decimals', 'degrees', 'complex', 'substitute', 'formatEquations',
+  'zeroSmallMatrixElements', 'showHiddenOutput', 'maxOutputCount', 'precision', 'tol',
+].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
+const PLOT_KEYS_A = ['adaptivePlot'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
+const PLOT_KEYS_B = ['vectorGraphics', 'colorScale', 'smoothScale', 'shadows'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
+const PLOT_KEYS_C = ['plotWidth', 'plotHeight', 'plotStep'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
+
+/** Writable computed bound through SETTINGS_PATH's dot-path, one per key, cached. */
+const settingModelCache = new Map<string, WritableComputedRef<string | number | boolean>>()
+function settingModel(key: string): WritableComputedRef<string | number | boolean> {
+  let model = settingModelCache.get(key)
+  if (!model) {
+    const [a, b] = SETTINGS_PATH[key]!.split('.')
+    model = computed({
+      get: () => (b ? (localSettings.value as any)[a][b] : (localSettings.value as any)[a]),
+      set: (v) => {
+        const current = b ? (localSettings.value as any)[a][b] : (localSettings.value as any)[a]
+        const coerced = typeof current === 'number' ? Number(v) : v
+        if (b) (localSettings.value as any)[a][b] = coerced
+        else (localSettings.value as any)[a] = coerced
+      },
+    })
+    settingModelCache.set(key, model)
+  }
+  return model
+}
+
+/** `step` for a generic number input — precision/tol are continuous, everything else is integral. */
+const numberStep = (key: string) => (key === 'precision' || key === 'tol' ? 'any' : '1')
+
 // Defaults first, so a settings blob written before a key existed still renders a
 // real value rather than validating `undefined` against the key's allowed set.
 const localPdfSettings = reactive<Record<string, string | number | boolean>>(
@@ -860,12 +771,12 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
     rows: {
       decimals: 'decimals precision digits',
       degrees: 'angle units degrees radians gradians',
-      isComplex: 'complex numbers imaginary',
+      complex: 'complex numbers imaginary',
       substitute: 'substitute variables',
       formatEquations: 'format equations professional inline',
-      zeroSmall: 'zero small matrix elements scientific notation',
+      zeroSmallMatrixElements: 'zero small matrix elements scientific notation',
       showHiddenOutput: 'show hidden output hide debug debugging suppressed',
-      maxOutput: 'max output count rows columns matrices vectors',
+      maxOutputCount: 'max output count rows columns matrices vectors',
       precision: 'numerical precision integration root finding tolerance',
       tol: 'solver tolerance pcg eigensolver iterative'
     }
@@ -873,16 +784,16 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
   plot: {
     title: 'Plot Settings',
     rows: {
-      isAdaptive: 'adaptive plotting sample points',
+      adaptivePlot: 'adaptive plotting sample points',
       screenScale: 'screen scale factor resolution',
       vectorGraphics: 'vector graphics svg png raster',
       colorScale: 'color scale rainbow grayscale hot cool jet parula',
       smoothScale: 'smooth scale',
       shadows: 'shadows',
       lightDirection: 'light direction',
-      width: 'plot width pixels size',
-      height: 'plot height pixels size',
-      step: 'map mesh step surface plotting'
+      plotWidth: 'plot width pixels size',
+      plotHeight: 'plot height pixels size',
+      plotStep: 'map mesh step surface plotting'
     }
   },
   units: {
@@ -997,16 +908,10 @@ const anyVisible = computed(() =>
 // Per-field validation against the ranges Calcpad.Core enforces. Invalid fields
 // are highlighted and block the settings from being applied (rather than clamped).
 const settingErrors = computed<Record<string, string | null>>(() => {
-  const { math, plot } = localSettings.value
-  return {
-    decimals: validateSettingValue('decimals', math.decimals),
-    maxOutputCount: validateSettingValue('maxOutputCount', math.maxOutputCount),
-    precision: validateSettingValue('precision', math.precision),
-    tol: validateSettingValue('tol', math.tol),
-    plotWidth: validateSettingValue('plotWidth', plot.width),
-    plotHeight: validateSettingValue('plotHeight', plot.height),
-    plotStep: validateSettingValue('plotStep', plot.step),
-  }
+  const out: Record<string, string | null> = {}
+  for (const spec of [...MATH_KEYS, ...PLOT_KEYS_A, ...PLOT_KEYS_B, ...PLOT_KEYS_C])
+    if (spec.type === 'number') out[spec.key] = validateSettingValue(spec.key, settingModel(spec.key).value)
+  return out
 })
 const hasSettingErrors = computed(() => Object.values(settingErrors.value).some(Boolean))
 

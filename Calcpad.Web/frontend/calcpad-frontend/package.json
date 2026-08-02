@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "postbuild": "tsx scripts/generate-settings-defaults.ts",
     "watch": "tsc --watch"
   },
   "peerDependencies": {
@@ -13,6 +14,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.3.0",
+    "tsx": "^4.23.4",
     "typescript": "^5.9.0",
     "vue": "^3.5.0"
   }

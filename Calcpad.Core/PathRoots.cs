@@ -9,11 +9,14 @@ namespace Calcpad.Core
     /// One instance follows a single consumer's own top-to-bottom walk of the document, so
     /// "declared before first use" falls out of the order lines are fed in rather than needing
     /// a separate check — a token reached before its declaration simply finds the root unset.
+    /// A third token, <c>&lt;user&gt;</c>, needs no declaration at all: it always expands to the
+    /// current OS user's home directory (see <see cref="IsUserToken"/>).
     /// </summary>
     public sealed class PathRoots
     {
         private const string ProjectToken = "<project>";
         private const string LibraryToken = "<library>";
+        private const string UserToken = "<user>";
         private const string ProjectKeyword = "#projectpath";
         private const string LibraryKeyword = "#librarypath";
 
@@ -24,6 +27,30 @@ namespace Calcpad.Core
         public static bool HasToken(ReadOnlySpan<char> path) =>
             path.StartsWith(ProjectToken, StringComparison.OrdinalIgnoreCase)
             || path.StartsWith(LibraryToken, StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Whether <paramref name="path"/> starts with the <c>&lt;user&gt;</c> token — the
+        /// current OS user's home directory. Unlike <see cref="HasToken"/>'s two roots, this one
+        /// needs no <c>#ProjectPath</c>/<c>#LibraryPath</c>-style declaration and always
+        /// resolves, so it is checked and expanded separately from them rather than folded into
+        /// <see cref="TryGetTokenKind"/>/<see cref="TryExpand"/>'s declared-root machinery.
+        /// </summary>
+        public static bool IsUserToken(ReadOnlySpan<char> path) =>
+            path.StartsWith(UserToken, StringComparison.OrdinalIgnoreCase);
+
+        // Expands the <user> token itself. Kept separate from Environment.ExpandEnvironmentVariables
+        // (called on the result afterward by every caller) because that API only recognizes
+        // %VAR%-style references on every platform — it never expands $HOME on Linux/macOS despite
+        // looking like it should.
+        private static string ExpandUserToken(string raw)
+        {
+            var rest = raw[UserToken.Length..];
+            if (rest.Length > 0 && (rest[0] == '/' || rest[0] == '\\'))
+                rest = rest[1..];
+
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            return rest.Length == 0 ? home : Path.Combine(home, rest);
+        }
 
         /// <summary>
         /// Which root <paramref name="path"/> starts with, for a caller that treats the two
@@ -110,7 +137,8 @@ namespace Calcpad.Core
             string resolved;
             try
             {
-                var expanded = Environment.ExpandEnvironmentVariables(rawValue);
+                var expanded = IsUserToken(rawValue.AsSpan()) ? ExpandUserToken(rawValue) : rawValue;
+                expanded = Environment.ExpandEnvironmentVariables(expanded);
                 resolved = string.IsNullOrEmpty(declaringDirectory)
                     ? Path.GetFullPath(expanded)
                     : Path.GetFullPath(expanded, declaringDirectory);
@@ -151,6 +179,12 @@ namespace Calcpad.Core
             expanded = raw;
             if (raw is null)
                 return true;
+
+            if (IsUserToken(raw.AsSpan()))
+            {
+                expanded = ExpandUserToken(raw);
+                return true;
+            }
 
             if (!TryGetTokenKind(raw.AsSpan(), out var isProject))
                 return true;

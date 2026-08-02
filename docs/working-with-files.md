@@ -89,9 +89,8 @@ Unzip it anywhere and open the "**\*.cpd**": it renders as it did for its author
 * "**#write**" and "**#append**" are outputs, not dependencies, so a relative target is left alone for the same reason as when compiling. An absolute target is rewritten to its bare filename when "**Write outputs next to the worksheet**" on the "**Export**" tab is checked (the default), so the output lands beside wherever the package is unpacked; clear it to keep the target exactly as written.
 * A `<project>`/`<library>` reference (see [Path root tokens](new-includes.md#path-root-tokens-project-and-library)) is left exactly as written by default, for the recipient's own `#ProjectPath`/`#LibraryPath` to resolve — useful for a shared library file that shouldn't be duplicated into every package. The **Export** tab has a checkbox for each root, off by default, to bundle it instead: resolved to your own local path and packed like any other absolute reference. The tab also shows the document's declared paths, read-only.
 
-The folder is flat, so **no two referenced files may share a name**, however different their folders are, and however deep in the "**#include**"s they sit.
-Two that do stops the export and names both paths, so you can rename one; nothing is written in the meantime.
-A reference that cannot be read stops it the same way, and lists every one.
+The folder is flat, so if two referenced files share a name — however different their folders are, and however deep in the "**#include**"s they sit — the second and any further one are renamed "**name-1.ext**", "**name-2.ext**" and so on, and every path that pointed at them is rewritten to match.
+A reference that cannot be read stops the export, and lists every one.
 Two "**#write**"/"**#append**" targets that would collapse onto the same filename once rewritten next to the worksheet stop it too, naming both — rename one, or clear the checkbox.
 An unsaved document has no folder for relative paths to resolve against, so save it first.
 

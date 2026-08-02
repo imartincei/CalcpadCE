@@ -20,23 +20,49 @@ namespace Calcpad.Highlighter.HtmlComment
     }
 
     /// <summary>
+    /// Paper names <c>PdfGeneratorService.ParsePaperFormat</c> maps to a
+    /// <c>PuppeteerSharp.Media.PaperFormat</c> instance. A dedicated enum rather than
+    /// <c>PuppeteerSharp.Media.PaperFormat</c> itself, since that type is a class
+    /// (static properties, not enum members) and Calcpad.Highlighter must not
+    /// depend on PuppeteerSharp.
+    /// </summary>
+    public enum PdfPaperFormat { Letter, Legal, Tabloid, Ledger, A0, A1, A2, A3, A4, A5, A6 }
+
+    /// <summary>
+    /// Canonical values <c>PdfGeneratorService</c> resolves a null <see cref="PdfSettingsDto"/>
+    /// field to. Mirrors the frontend's <c>DEFAULT_PDF_SETTINGS</c> (pdf-settings.ts).
+    /// </summary>
+    public static class PdfSettingsDefaults
+    {
+        public const string Format = "Letter";
+        public const string Orientation = "portrait";
+        public const string MarginTop = "0.75in";
+        public const string MarginRight = "0.5in";
+        public const string MarginBottom = "0.75in";
+        public const string MarginLeft = "0.5in";
+        public const bool ShowPageNumbers = true;
+        public const bool ShowDate = true;
+    }
+
+    /// <summary>
     /// JSON payload of the <c>pdf</c> key of a metadata comment
     /// (<c>'&lt;!--{"pdf":{...}}--&gt;</c>) - the PDF export settings a document pins
     /// for itself. Calcpad.Core never sees these: the comment is HTML, so the engine
     /// renders past it and only the export path reads it.
     /// <para>
+    /// This same type is also what <c>PdfGeneratorService</c> deserializes a <c>/pdf</c>
+    /// request's <c>options</c> into - a null field means "use the default," resolved
+    /// at the point each field is used (e.g. <c>options.MarginTop ?? "0.75in"</c>).
+    /// </para>
+    /// <para>
     /// The recognized keys are curated, not the full set the PDF endpoint accepts -
     /// only options that demonstrably affect the output are offered. Keep this in step
     /// with <c>PDF_SETTING_KEYS</c> in <c>metadata-comment.ts</c>, which validates the
-    /// same payload in the editor panel, and with the server's <c>PdfOptions</c>.
+    /// same payload in the editor panel.
     /// </para>
     /// </summary>
     public sealed class PdfSettingsDto : DirectiveDto<PdfSettingsDto, PdfSettingKey>
     {
-        /// <summary>Paper names <c>PdfGeneratorService.ParsePaperFormat</c> accepts.</summary>
-        private static readonly string[] Formats =
-            { "Letter", "Legal", "Tabloid", "Ledger", "A0", "A1", "A2", "A3", "A4", "A5", "A6" };
-
         private static readonly string[] Orientations = { "portrait", "landscape" };
 
         /// <summary>
@@ -60,7 +86,9 @@ namespace Calcpad.Highlighter.HtmlComment
 
         protected override void Validate(List<DirectiveError<PdfSettingKey>> errors)
         {
-            CheckOneOf(errors, PdfSettingKey.Format, "format", Format, Formats);
+            if (Format is not null && !Enum.TryParse<PdfPaperFormat>(Format, true, out _))
+                errors.Add(new(PdfSettingKey.Format,
+                    $"'format' must be one of: {string.Join(", ", Enum.GetNames<PdfPaperFormat>())}"));
             CheckOneOf(errors, PdfSettingKey.Orientation, "orientation", Orientation, Orientations);
             CheckMargin(errors, PdfSettingKey.MarginTop, "marginTop", MarginTop);
             CheckMargin(errors, PdfSettingKey.MarginRight, "marginRight", MarginRight);

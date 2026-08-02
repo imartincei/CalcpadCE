@@ -45,7 +45,11 @@ Each root is declared once, with a directive naming the folder it points at:
 - `#ProjectPath = ...` — the job- or document-specific folder, typically outside version control and different for every recipient.
 - `#LibraryPath = ...` — a shared folder of reusable `.cpd`/`.txt` files, e.g. a firm-wide function or materials library.
 
-Both directives render nothing, the same as `#include`. A relative value resolves against the folder of the file that declares it; environment variables (`%VAR%` on Windows, `$VAR` on macOS/Linux) are expanded in the value.
+Both directives render nothing, the same as `#include`. A relative value resolves against the folder of the file that declares it; environment variables are expanded in the value using `%VAR%` syntax — on every platform, including macOS/Linux:
+
+```text
+#LibraryPath = %HOME%/lib/calcpad
+```
 
 **Rules, kept deliberately simple:**
 
@@ -65,11 +69,29 @@ Both directives render nothing, the same as `#include`. A relative value resolve
 
 `#local` content is stripped when the file is `#include`d into another document (the same way it always is), so the module's own declaration never reaches — and never clashes with — the including document's. Opened by itself, the module still runs: `#local` sections are only stripped when a file is reached through `#include`.
 
+## Path root token: `<user>`
+
+`<user>` is a third root, usable anywhere `<project>`/`<library>` are — but unlike them, it needs no `#ProjectPath`/`#LibraryPath`-style declaration first. It always expands to the current OS user's home directory: `%USERPROFILE%` on Windows, `$HOME` on macOS/Linux.
+
+```text
+#include <user>/calcpad/lib/steel.cpd
+#read L from <user>/data/loads.csv
+'<img src="<user>/logo.png">
+```
+
+It can also appear inside a `#ProjectPath`/`#LibraryPath` value itself:
+
+```text
+#LibraryPath = <user>/calcpad/lib
+```
+
 ### Path root tokens and portable export
 
-An [exported portable package](working-with-files.md#export-portable-package) leaves a token reference exactly as written by default — the recipient's own `#ProjectPath`/`#LibraryPath` resolves it, so a shared library file isn't duplicated into every package. Two checkboxes on the **Export** tab, both off by default, bundle `<project>` and `<library>` references independently instead — each resolves the token to your own local path and bundles it like any other absolute reference, for a one-off recipient who has no roots declared of their own. The Export tab also shows the document's declared `<project>`/`<library>` paths, read-only.
+An [exported portable package](working-with-files.md#export-portable-package) leaves a `<project>`/`<library>` reference exactly as written by default — the recipient's own `#ProjectPath`/`#LibraryPath` resolves it, so a shared library file isn't duplicated into every package. Two checkboxes on the **Export** tab, both off by default, bundle `<project>` and `<library>` references independently instead — each resolves the token to your own local path and bundles it like any other absolute reference, for a one-off recipient who has no roots declared of their own. The Export tab also shows the document's declared `<project>`/`<library>` paths, read-only.
 
-A [compiled `.cpdz` worksheet](working-with-files.md#save-as-compiled-worksheet), by contrast, always resolves both roots — its source is locked, so there is no way for a recipient to add a declaration afterwards.
+`<user>` has no such checkbox: a reference through it is always bundled. It always resolves — there is nothing to declare and nothing that can be left undeclared — but only to *your* home directory, and there is no reason to expect a recipient's own home directory holds the same file in the same place, the way a shared `<library>` folder is expected to.
+
+A [compiled `.cpdz` worksheet](working-with-files.md#save-as-compiled-worksheet), by contrast, always resolves `<project>`/`<library>` (and `<user>`) references — its source is locked, so there is no way for a recipient to add a declaration afterwards.
 
 ## Errors point to the right place
 

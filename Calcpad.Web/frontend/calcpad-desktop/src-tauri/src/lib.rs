@@ -891,7 +891,7 @@ fn build_menu(app: &AppHandle, source_result_modes: bool) -> tauri::Result<Menu<
         "Export",
         true,
         &[
-            &MenuItem::with_id(app, "export-pdf", "Report PDF...", true, None::<&str>)?,
+            &MenuItem::with_id(app, "export-pdf", "Report PDF...", true, Some("CmdOrCtrl+E"))?,
             &MenuItem::with_id(app, "export-html", "Report HTML...", true, None::<&str>)?,
             &MenuItem::with_id(app, "export-docx", "Report Word...", true, None::<&str>)?,
             &sep()?,
