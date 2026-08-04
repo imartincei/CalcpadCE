@@ -6,8 +6,6 @@ import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBl
 import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
 import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
 import type { UiDirectiveData } from '../../text/ui-directive';
-import { scanDeclaredPathRoots } from '../../text/path-roots';
-import type { DeclaredPathRoots } from '../../text/path-roots';
 import type { DefinitionsResponse, ExportVariant } from '../../types/api';
 import { getDefaultSettings, buildApiSettings } from '../../types/settings';
 import type { CalcpadSettings } from '../../types/settings';
@@ -316,16 +314,6 @@ export abstract class BaseMessageBridge {
             case 'savePortable':
                 this.savePortable();
                 break;
-            // Read per export rather than cached, so there is nothing to broadcast.
-            case 'updatePortableWriteNextToWorksheet':
-                this.setExtraSetting('portableWriteNextToWorksheet', String(message.enabled));
-                break;
-            case 'updatePortableBundleProjectRefs':
-                this.setExtraSetting('portableBundleProjectRefs', String(message.enabled));
-                break;
-            case 'updatePortableBundleLibraryRefs':
-                this.setExtraSetting('portableBundleLibraryRefs', String(message.enabled));
-                break;
             case 'getPlots':
                 this.handleGetPlots();
                 break;
@@ -481,9 +469,6 @@ export abstract class BaseMessageBridge {
             enableAutoRun: this.getExtraSetting('autoRun') !== 'false',
             enableAutoInputMode: this.getExtraSetting('autoInputMode') !== 'false',
             enablePreviewUiOverrides: this.getExtraSetting('previewUiOverrides') === 'true',
-            portableWriteNextToWorksheet: this.getExtraSetting('portableWriteNextToWorksheet') !== 'false',
-            portableBundleProjectRefs: this.getExtraSetting('portableBundleProjectRefs') === 'true',
-            portableBundleLibraryRefs: this.getExtraSetting('portableBundleLibraryRefs') === 'true',
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
             editorFontFamily: this.getExtraSetting('editorFontFamily') ?? 'JuliaMono',
@@ -720,8 +705,7 @@ export abstract class BaseMessageBridge {
     async saveCompiled(): Promise<string | null> {
         const content = this.getActiveEditorContent();
         const { sourceFilePath } = await this.buildFileContext(content);
-        const writeNextToWorksheet = this.getExtraSetting('portableWriteNextToWorksheet') !== 'false';
-        const bundled = await this.apiClient.bundlePortable(content, sourceFilePath, writeNextToWorksheet);
+        const bundled = await this.apiClient.bundlePortable(content, sourceFilePath);
         if (bundled.content == null) {
             await this.onExportError(`This worksheet cannot be compiled:\n${bundled.errors.join('\n')}`);
             return null;
@@ -749,11 +733,7 @@ export abstract class BaseMessageBridge {
     async savePortable(): Promise<string | null> {
         const content = this.getActiveEditorContent();
         const { sourceFilePath } = await this.buildFileContext(content);
-        const writeNextToWorksheet = this.getExtraSetting('portableWriteNextToWorksheet') !== 'false';
-        const bundleProjectReferences = this.getExtraSetting('portableBundleProjectRefs') === 'true';
-        const bundleLibraryReferences = this.getExtraSetting('portableBundleLibraryRefs') === 'true';
-        const packaged = await this.apiClient.packagePortable(
-            content, sourceFilePath, writeNextToWorksheet, bundleProjectReferences, bundleLibraryReferences);
+        const packaged = await this.apiClient.packagePortable(content, sourceFilePath);
         if (!packaged.zip) {
             await this.onExportError(
                 `This worksheet cannot be packaged:\n${packaged.errors.join('\n')}`);
@@ -792,13 +772,9 @@ export abstract class BaseMessageBridge {
 
     private async handleGetPlots(): Promise<void> {
         const content = this.getActiveEditorContent();
-        // Read alongside plots — both are Export-tab-only, refreshed together, and neither
-        // is worth a separate round-trip: the document's declared roots are shown read-only
-        // there, next to the checkboxes that decide whether a package resolves them.
-        const declaredPathRoots: DeclaredPathRoots = scanDeclaredPathRoots(content);
         if (!content.trim()) {
             this._cachedPlots = [];
-            this.postToVue({ type: 'plotsResponse', plots: [], declaredPathRoots });
+            this.postToVue({ type: 'plotsResponse', plots: [] });
             return;
         }
         const apiSettings = buildApiSettings(this.settings);
@@ -814,7 +790,6 @@ export abstract class BaseMessageBridge {
                 dataUri: p.dataUri,
                 sizeBytes: p.bytes.length,
             })),
-            declaredPathRoots,
         });
     }
 

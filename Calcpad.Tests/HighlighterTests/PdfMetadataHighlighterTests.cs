@@ -132,6 +132,32 @@ namespace Calcpad.Tests.HighlighterTests
         }
 
         [Fact]
+        public void UiOverrides_SavedValues_ReportNothing()
+        {
+            var result = Lint("'<!--{\"uiOverrides\":{\"L:1\":\"8\",\"v:1\":\"[4; 5; 6]\",\"y:1:2\":\"5\"}}-->\n#UI L = 4");
+
+            Assert.DoesNotContain(result.Diagnostics, d => d.Code == "CPD-3412");
+        }
+
+        [Fact]
+        public void UiOverrides_NotAnObject_WarnsCpd3412()
+        {
+            var result = Lint("'<!--{\"uiOverrides\":[\"L:1\"]}-->\nx = 1");
+
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3412" && d.Message.Contains("uiOverrides"));
+        }
+
+        [Fact]
+        public void UiOverrides_NonStringValue_WarnsCpd3412()
+        {
+            // The host writes every entered value as a string; a bare number here would
+            // come back as a value the form can't round-trip.
+            var result = Lint("'<!--{\"uiOverrides\":{\"L:1\":8}}-->\nx = 1");
+
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3412" && d.Message.Contains("L:1"));
+        }
+
+        [Fact]
         public void PdfSettings_SpanningLines_IsValidatedNotSkipped()
         {
             // A `_`-continued comment used to be invisible to this validator, which read

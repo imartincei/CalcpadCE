@@ -28,7 +28,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
         /// <summary>Recognized top-level keys of a metadata comment.</summary>
         private static readonly HashSet<string> KnownKeys = new(StringComparer.OrdinalIgnoreCase)
-            { "desc", "paramTypes", "paramDesc", "returnType", "LintIgnore", "EndLintIgnore", "pdf" };
+            { "desc", "paramTypes", "paramDesc", "returnType", "LintIgnore", "EndLintIgnore", "pdf", "uiOverrides" };
 
         private readonly HtmlCommentParser _parser = new();
 
@@ -60,6 +60,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 reporter.CheckKnownKeys(root, KnownKeys.Contains, "metadata property");
                 ValidateTypes(block, root, stage3, tokenProvider, reporter);
                 ValidateLintRegions(root, reporter);
+                ValidateUiOverrides(root, reporter);
                 ValidatePdf(root, reporter);
             }
         }
@@ -130,6 +131,30 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     if (!ErrorCodes.Descriptions.ContainsKey(code))
                         reporter.Warn($"'{code}' is not a known diagnostic code");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Checks the shape of the saved <c>#UI</c> values: an object mapping a control
+        /// identity to the expression entered for it, both written as strings. The keys
+        /// themselves are not checked - a key may deliberately be broader than any single
+        /// control, and one left behind by an edit is not an error.
+        /// </summary>
+        private static void ValidateUiOverrides(JsonElement root, DirectiveJsonReporter reporter)
+        {
+            if (!root.TryGetProperty("uiOverrides", out var overrides))
+                return;
+
+            if (overrides.ValueKind != JsonValueKind.Object)
+            {
+                reporter.Warn("'uiOverrides' must be an object of control identities to values, e.g. {\"L:1\": \"8\"}");
+                return;
+            }
+
+            foreach (var prop in overrides.EnumerateObject())
+            {
+                if (prop.Value.ValueKind != JsonValueKind.String)
+                    reporter.Warn($"'uiOverrides' value for '{prop.Name}' must be a string, e.g. \"8\"");
             }
         }
 

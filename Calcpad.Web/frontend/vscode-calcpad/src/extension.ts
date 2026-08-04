@@ -1312,10 +1312,8 @@ async function saveAsCompiled() {
         });
         if (!saveUri) return;
 
-        const writeNextToWorksheet = CalcpadSettingsManager.getInstance()
-            .getExtraBool('portableWriteNextToWorksheet', true);
         const bundled = await sharedApiClient?.bundlePortable(
-            source.text, untitled ? undefined : source.uri.fsPath, writeNextToWorksheet);
+            source.text, untitled ? undefined : source.uri.fsPath);
         if (bundled?.content == null) {
             const reasons = bundled?.errors.join('\n') ?? 'The server is not running';
             throw new Error(`the worksheet is not self-contained:\n${reasons}`);
@@ -1372,13 +1370,7 @@ async function exportPortable() {
         });
         if (!saveUri) return;
 
-        const settingsManager = CalcpadSettingsManager.getInstance();
-        const writeNextToWorksheet = settingsManager.getExtraBool('portableWriteNextToWorksheet', true);
-        const bundleProjectReferences = settingsManager.getExtraBool('portableBundleProjectRefs', false);
-        const bundleLibraryReferences = settingsManager.getExtraBool('portableBundleLibraryRefs', false);
-        const packaged = await sharedApiClient?.packagePortable(
-            source.text, source.uri.fsPath, writeNextToWorksheet,
-            bundleProjectReferences, bundleLibraryReferences);
+        const packaged = await sharedApiClient?.packagePortable(source.text, source.uri.fsPath);
         if (!packaged?.zip) {
             const reasons = packaged?.errors ?? ['The server is not running'];
             // A collision or a list of unreadable references runs to several lines, which a

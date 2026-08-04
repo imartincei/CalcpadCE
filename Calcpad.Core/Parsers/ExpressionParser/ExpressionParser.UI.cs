@@ -372,10 +372,114 @@ namespace Calcpad.Core
         }
 
         /// <summary>
+        /// Fills in the grid shape from a vector(n)/matrix(m; n) call whose counts are
+        /// expressions, by evaluating the arguments. An override replaces the whole call, so
+        /// the shape it asks for has to be known before that happens - otherwise the entered
+        /// values keep whatever shape they were saved with and editing the source no longer
+        /// resizes the grid. Leaves the shape alone when an argument cannot be evaluated,
+        /// which puts <see cref="ResolveDatagridShape"/> back in charge of it.
+        /// </summary>
+        private void ResolveShapeFromSizingCall(UiPropertyMetadata ui, string expression)
+        {
+            if (ui.Rows > 0 && ui.Columns > 0 || !_calculate || _isVal < 0)
+                return;
+
+            var eqIndex = IndexOfAssignment(expression);
+            if (eqIndex < 0)
+                return;
+
+            var rhs = expression.AsSpan(eqIndex + 1).Trim();
+            var isVector = StartsWithFunction(rhs, "vector");
+            if (!isVector && !StartsWithFunction(rhs, "matrix"))
+                return;
+
+            var parenStart = rhs.IndexOf('(');
+            var parenEnd = rhs.LastIndexOf(')');
+            if (parenStart < 0 || parenEnd <= parenStart)
+                return;
+
+            var args = rhs[(parenStart + 1)..parenEnd];
+            if (isVector)
+            {
+                var n = EvaluateCount(args);
+                if (n > 0)
+                {
+                    if (ui.Rows == 0)
+                        ui.Rows = 1;
+
+                    if (ui.Columns == 0)
+                        ui.Columns = n;
+                }
+                return;
+            }
+            var separator = IndexOfArgumentSeparator(args);
+            if (separator < 0)
+                return;
+
+            var m = EvaluateCount(args[..separator]);
+            var k = EvaluateCount(args[(separator + 1)..]);
+            if (m > 0 && k > 0)
+            {
+                if (ui.Rows == 0)
+                    ui.Rows = m;
+
+                if (ui.Columns == 0)
+                    ui.Columns = k;
+            }
+        }
+
+        /// <summary>
+        /// Index of the ';' separating the arguments of a call, ignoring the ones belonging to
+        /// a nested call - matrix(max(a; b); n). Returns -1 when there is only one argument.
+        /// </summary>
+        private static int IndexOfArgumentSeparator(ReadOnlySpan<char> args)
+        {
+            var depth = 0;
+            for (var i = 0; i < args.Length; ++i)
+            {
+                var c = args[i];
+                if (c is '(' or '[' or '{')
+                    ++depth;
+                else if (c is ')' or ']' or '}')
+                    --depth;
+                else if (c == ';' && depth == 0)
+                    return i;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// The whole number a grid sizing argument evaluates to, or 0 when it does not
+        /// evaluate to one. Runs on the live parser, so it reads the same variables the line
+        /// itself will - including ones a #UI control has overridden. The caller parses the
+        /// real expression straight afterwards, which resets what this leaves behind.
+        /// </summary>
+        private int EvaluateCount(ReadOnlySpan<char> expression)
+        {
+            try
+            {
+                _parser.Parse(expression, false);
+                _parser.Calculate(false);
+                var n = Math.Round(_parser.Real);
+                return n > 0 && n < int.MaxValue ? (int)n : 0;
+            }
+            catch (MathParserException)
+            {
+                _parser.ResetStack();
+                return 0;
+            }
+        }
+
+        /// <summary>
         /// Rewrites the assignment before MathParser evaluates it: fits a datagrid literal
         /// to the declared shape, applies any override, then captures the resulting cells
         /// for the grid widget. Only the override runs in report mode - it is the entered
         /// value - while the declared shape describes the grid and so applies to the form.
+        ///
+        /// A datagrid override is fitted to the shape the source asks for, so editing the
+        /// source resizes the grid even once values have been entered: cells outside the new
+        /// shape are trimmed off and new ones come in as zeros. What was saved is left alone,
+        /// so shrinking a grid and growing it back brings the trimmed values with it.
         /// </summary>
         private string PrepareUiExpression(UiPropertyMetadata ui, string expression)
         {
@@ -383,9 +487,18 @@ namespace Calcpad.Core
             if (isDatagrid && EnableUi)
                 expression = ResizeDatagridMatrixToFit(ui, expression);
 
-            var overridden = ApplyUiOverride(ui, expression);
-            if (overridden is not null)
-                expression = overridden;
+            if (TryGetUiOverride(ui, out var value))
+            {
+                if (isDatagrid)
+                {
+                    ResolveShapeFromSizingCall(ui, expression);
+                    if (ui.Rows > 0 && ui.Columns > 0)
+                        value = ReshapeMatrixLiteral(value, ui.Rows, ui.Columns);
+                }
+                var overridden = ApplyUiOverride(ui, expression, value);
+                if (overridden is not null)
+                    expression = overridden;
+            }
 
             if (isDatagrid)
                 CaptureDatagridValues(ui, expression);
@@ -399,24 +512,30 @@ namespace Calcpad.Core
         /// beyond the declared shape are dropped. A right hand side that is not a bracket
         /// literal - vector(n), matrix(m; n) - is left alone, since it sizes itself.
         /// </summary>
-        private static string ResizeDatagridMatrixToFit(UiPropertyMetadata ui, string expression)
+        private static string ResizeDatagridMatrixToFit(UiPropertyMetadata ui, string expression) =>
+            ui.HasDeclaredShape ? ReshapeMatrixLiteral(expression, ui.Rows, ui.Columns) : expression;
+
+        /// <summary>
+        /// Rewrites the bracket literal in <paramref name="s"/> to <paramref name="rows"/> by
+        /// <paramref name="columns"/> cells, keeping the values already written: cells the
+        /// literal does not reach become 0 and cells outside the shape are dropped. Text with
+        /// no literal in it is returned unchanged.
+        /// </summary>
+        private static string ReshapeMatrixLiteral(string s, int rows, int columns)
         {
-            if (!ui.HasDeclaredShape)
-                return expression;
-
-            var bracketStart = expression.IndexOf('[');
-            var bracketEnd = expression.LastIndexOf(']');
+            var bracketStart = s.IndexOf('[');
+            var bracketEnd = s.LastIndexOf(']');
             if (bracketStart < 0 || bracketEnd <= bracketStart)
-                return expression;
+                return s;
 
-            var cells = SplitMatrixLiteral(expression[(bracketStart + 1)..bracketEnd]);
+            var cells = SplitMatrixLiteral(s[(bracketStart + 1)..bracketEnd]);
             var sb = new StringBuilder();
-            for (var r = 0; r < ui.Rows; ++r)
+            for (var r = 0; r < rows; ++r)
             {
                 if (r > 0)
                     sb.Append(" | ");
 
-                for (var c = 0; c < ui.Columns; ++c)
+                for (var c = 0; c < columns; ++c)
                 {
                     if (c > 0)
                         sb.Append("; ");
@@ -425,7 +544,7 @@ namespace Calcpad.Core
                     sb.Append(value.Length == 0 ? "0" : value);
                 }
             }
-            return string.Concat(expression.AsSpan(0, bracketStart + 1), sb.ToString(), expression.AsSpan(bracketEnd));
+            return string.Concat(s.AsSpan(0, bracketStart + 1), sb.ToString(), s.AsSpan(bracketEnd));
         }
 
         /// <summary>
@@ -469,20 +588,27 @@ namespace Calcpad.Core
         }
 
         /// <summary>
-        /// Substitutes the override value into the assignment before MathParser sees it.
-        /// Returns null when no override applies, so the caller keeps the original text.
+        /// The override that applies to a control, if any. Narrowest match wins: this exact
+        /// control, then every pass of this declaration, then every declaration of the name -
+        /// the last being what a hand written override for a variable that appears only once
+        /// looks like.
         /// </summary>
-        private string ApplyUiOverride(UiPropertyMetadata ui, string expression)
+        private bool TryGetUiOverride(UiPropertyMetadata ui, out string value)
         {
-            // Narrowest match wins: this exact control, then every pass of this declaration,
-            // then every declaration of the name - the last being what a hand written
-            // override for a variable that appears only once looks like.
-            if (UiOverrides is null ||
-                !UiOverrides.TryGetValue(ui.Key, out var value) &&
-                !UiOverrides.TryGetValue(ui.DeclarationKey, out value) &&
-                !UiOverrides.TryGetValue(ui.VariableName, out value))
-                return null;
+            value = null;
+            return UiOverrides is not null &&
+                (UiOverrides.TryGetValue(ui.Key, out value) ||
+                UiOverrides.TryGetValue(ui.DeclarationKey, out value) ||
+                UiOverrides.TryGetValue(ui.VariableName, out value));
+        }
 
+        /// <summary>
+        /// Substitutes the override value into the assignment before MathParser sees it.
+        /// Returns null when the assignment has nothing to substitute into, so the caller
+        /// keeps the original text.
+        /// </summary>
+        private static string ApplyUiOverride(UiPropertyMetadata ui, string expression, string value)
+        {
             var eqIndex = IndexOfAssignment(expression);
             if (eqIndex < 0)
                 return null;

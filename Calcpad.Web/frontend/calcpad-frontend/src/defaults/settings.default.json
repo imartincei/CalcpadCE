@@ -50,7 +50,6 @@
         "prettifyIndentSize": 4,
         "prettifyTrimTrailingWhitespace": true,
         "writeMode": "localFile",
-        "portableWriteNextToWorksheet": true,
         "dotnetPath": "dotnet",
         "editorFontFamily": "JuliaMono",
         "pdfSettings": {

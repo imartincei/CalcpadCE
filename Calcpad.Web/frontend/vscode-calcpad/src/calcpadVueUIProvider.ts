@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, scanDeclaredPathRoots } from 'calcpad-frontend';
-import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse, SettingsValues, UiDirectiveData, UiControl, DeclaredPathRoots } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective } from 'calcpad-frontend';
+import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse, SettingsValues, UiDirectiveData, UiControl } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 
@@ -158,18 +158,6 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 
                 case 'updateAutoInputMode':
                     this._settingsManager.setExtra('autoInputMode', data.enabled);
-                    break;
-
-                case 'updatePortableWriteNextToWorksheet':
-                    this._settingsManager.setExtra('portableWriteNextToWorksheet', data.enabled);
-                    break;
-
-                case 'updatePortableBundleProjectRefs':
-                    this._settingsManager.setExtra('portableBundleProjectRefs', data.enabled);
-                    break;
-
-                case 'updatePortableBundleLibraryRefs':
-                    this._settingsManager.setExtra('portableBundleLibraryRefs', data.enabled);
                     break;
 
                 // Changes what an open preview renders, so it is re-run rather than
@@ -441,20 +429,11 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             enableAutoRun: sm.getExtraBool('autoRun', true),
             enableAutoInputMode: sm.getExtraBool('autoInputMode', true),
             enablePreviewUiOverrides: sm.getExtraBool('previewUiOverrides', false),
-            portableWriteNextToWorksheet: sm.getExtraBool('portableWriteNextToWorksheet', true),
-            portableBundleProjectRefs: sm.getExtraBool('portableBundleProjectRefs', false),
-            portableBundleLibraryRefs: sm.getExtraBool('portableBundleLibraryRefs', false),
             darkBackground: sm.getExtra('darkBackground', '#1e1e1e'),
             linterMinSeverity: sm.getExtra('linterMinSeverity', 'information'),
             activeConfig: sm.getActivePresetName(),
             availableConfigs: await sm.listPresets(),
         };
-    }
-
-    /** The document's declared `{project}`/`{library}` roots, for the Export tab's read-only display. */
-    private _declaredPathRoots(): DeclaredPathRoots {
-        const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
-        return editor ? scanDeclaredPathRoots(editor.document.getText()) : { project: null, library: null };
     }
 
     public setCachedHtml(html: string): void {
@@ -469,7 +448,6 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     dataUri: p.dataUri,
                     sizeBytes: p.bytes.length,
                 })),
-                declaredPathRoots: this._declaredPathRoots(),
             });
         }
     }
@@ -489,7 +467,6 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                 dataUri: p.dataUri,
                 sizeBytes: p.bytes.length,
             })),
-            declaredPathRoots: this._declaredPathRoots(),
         });
     }
 

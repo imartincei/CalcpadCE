@@ -138,13 +138,11 @@
         :plots="plots"
         :loading="plotsLoading"
         :version-config="versionConfig"
-        :write-next-to-worksheet="portableWriteNextToWorksheet"
         @save-pdf="handleSavePdf"
         @save-html="handleSaveSourceHtml"
         @save-docx="handleSaveDocx"
         @save-compiled="handleSaveCompiled"
         @save-portable="handleSavePortable"
-        @update-write-next-to-worksheet="handleUpdateWriteNextToWorksheet"
         @refresh-plots="handleRefreshPlots"
         @save-plot="handleSavePlot"
         @save-plots-zip="handleSavePlotsZip"
@@ -182,7 +180,6 @@ import CalcpadMetadataTab from './CalcpadMetadataTab.vue'
 import { postMessage } from '../services/messaging'
 import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '../../text/metadata-comment'
 import type { UiDirectiveData } from '../../text/ui-directive'
-import type { DeclaredPathRoots } from '../../text/path-roots'
 import type { UiControl } from '../../services/ui-overrides'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
@@ -240,10 +237,6 @@ const enablePreviewCursorSync = ref(false)
 const enableAutoRun = ref(true)
 const enableAutoInputMode = ref(true)
 const enablePreviewUiOverrides = ref(false)
-const portableWriteNextToWorksheet = ref(true)
-const portableBundleProjectRefs = ref(false)
-const portableBundleLibraryRefs = ref(false)
-const declaredPathRoots = ref<DeclaredPathRoots>({ project: null, library: null })
 const darkBackground = ref('#1e1e1e')
 const linterMinSeverity = ref('information')
 const maxOutputLines = ref(1000)
@@ -430,11 +423,6 @@ const handleSaveCompiled = () => {
 
 const handleSavePortable = () => {
   postMessage({ type: 'savePortable' })
-}
-
-const handleUpdateWriteNextToWorksheet = (enabled: boolean) => {
-  portableWriteNextToWorksheet.value = enabled
-  postMessage({ type: 'updatePortableWriteNextToWorksheet', enabled })
 }
 
 const handleRefreshPlots = () => {
@@ -671,9 +659,6 @@ const handleMessage = (event: MessageEvent) => {
       if (typeof message.enableAutoRun === 'boolean') enableAutoRun.value = message.enableAutoRun
       if (typeof message.enableAutoInputMode === 'boolean') enableAutoInputMode.value = message.enableAutoInputMode
       if (typeof message.enablePreviewUiOverrides === 'boolean') enablePreviewUiOverrides.value = message.enablePreviewUiOverrides
-      if (typeof message.portableWriteNextToWorksheet === 'boolean') portableWriteNextToWorksheet.value = message.portableWriteNextToWorksheet
-      if (typeof message.portableBundleProjectRefs === 'boolean') portableBundleProjectRefs.value = message.portableBundleProjectRefs
-      if (typeof message.portableBundleLibraryRefs === 'boolean') portableBundleLibraryRefs.value = message.portableBundleLibraryRefs
       darkBackground.value = message.darkBackground || '#1e1e1e'
       linterMinSeverity.value = message.linterMinSeverity || 'information'
       if (typeof message.maxOutputLines === 'number' && message.maxOutputLines >= 10) {
@@ -728,7 +713,6 @@ const handleMessage = (event: MessageEvent) => {
     case 'plotsResponse':
       plots.value = Array.isArray(message.plots) ? message.plots : []
       plotsLoading.value = false
-      if (message.declaredPathRoots) declaredPathRoots.value = message.declaredPathRoots
       break
     case 'metadataContext':
       metadataBlock.value = message.block ?? null

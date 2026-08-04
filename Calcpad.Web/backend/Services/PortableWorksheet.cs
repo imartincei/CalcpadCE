@@ -17,10 +17,9 @@ namespace Calcpad.Server.Services
     /// A <c>&lt;user&gt;</c> image reference is resolved here too, on this same author's machine,
     /// purely to read its bytes for embedding — the embedded data itself carries no path, so
     /// unlike <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> there is nothing recipient-specific
-    /// baked in. A <c>&lt;user&gt;</c> <c>#write</c>/<c>#append</c> target resolves the same way a
-    /// bundled <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> one does (see
-    /// <see cref="OutputTargets"/>) — there being no recipient-side declaration for it to wait
-    /// for either way — and then follows <c>nextToWorksheet</c> like any other resolved target.
+    /// baked in. All three resolve the same way as a <c>#write</c>/<c>#append</c> target, and are
+    /// then collapsed to a bare filename like any other absolute one (see
+    /// <see cref="OutputTargets"/>).
     /// </summary>
     internal static class PortableWorksheet
     {
@@ -33,12 +32,7 @@ namespace Calcpad.Server.Services
         /// reported rather than skipped: a worksheet that still reads a file beside it is not
         /// portable, so it is better not to write one at all.
         /// </summary>
-        /// <param name="nextToWorksheet">
-        /// Collapses an absolute <c>#write</c>/<c>#append</c> target to its bare filename, so the
-        /// output lands beside wherever the compiled worksheet runs instead of a folder that may
-        /// not exist there. A relative target already does that and is untouched either way.
-        /// </param>
-        public static Result Build(string content, string? sourceFilePath, bool nextToWorksheet = false)
+        public static Result Build(string content, string? sourceFilePath)
         {
             var errors = new List<string>();
             var macroParser = new MacroParser
@@ -57,11 +51,8 @@ namespace Calcpad.Server.Services
                 ? string.Empty : Path.GetDirectoryName(sourceFilePath) ?? string.Empty;
             var declaringDirectory = string.IsNullOrEmpty(sourceFilePath)
                 ? null : Path.GetDirectoryName(sourceFilePath);
-            // A compiled worksheet's source is locked, so there is no "leave the token" option
-            // here the way a portable package offers: both roots always resolve.
             var pathRoots = new PathRoots();
-            var outputs = new OutputTargets(nextToWorksheet, rootDirectory, errors, pathRoots,
-                bundleProject: true, bundleLibrary: true);
+            var outputs = new OutputTargets(rootDirectory, errors, pathRoots);
             // A throwaway PathRoots of its own, declared progressively by the same dry run that
             // feeds Prepare — not pathRoots above, which RewriteDirectives populates for real,
             // below. Sharing that one here would make every declaration in the document visible

@@ -29,10 +29,11 @@ namespace Calcpad.Server.Services
     /// second and any further one are renamed <c>name-1.ext</c>, <c>name-2.ext</c> and so on, and
     /// every path that pointed at the original is rewritten to match.
     ///
-    /// A <c>&lt;user&gt;</c> reference is always bundled, unlike an unbundled <c>&lt;project&gt;</c>/
-    /// <c>&lt;library&gt;</c> one left for the recipient's own declaration to resolve: it needs no
-    /// declaration and always resolves, but to this exporting machine's own home directory, which
-    /// there is no reason to expect the recipient's home directory mirrors.
+    /// A <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c>/<c>&lt;user&gt;</c> reference is resolved
+    /// against this exporting machine's own roots and bundled like any other: the token names a
+    /// folder there is no reason to expect the recipient has, and a package that still depended on
+    /// one would not be portable. The recipient who does have their own <c>#ProjectPath</c>/
+    /// <c>#LibraryPath</c> is better served by the document itself than by a package.
     /// </summary>
     internal static class PortablePackage
     {
@@ -61,17 +62,6 @@ namespace Calcpad.Server.Services
         /// <paramref name="content"/> is taken as given rather than read back from disk, so an
         /// unsaved edit is packed as it stands.
         /// </summary>
-        /// <param name="nextToWorksheet">
-        /// Collapses an absolute <c>#write</c>/<c>#append</c> target to its bare filename, so the
-        /// output lands beside wherever the package is unpacked instead of a folder that may not
-        /// exist there. A relative target already does that and is untouched either way.
-        /// </param>
-        /// <param name="bundleProject">
-        /// Resolves a <c>&lt;project&gt;</c> reference to the author's local path and bundles it
-        /// like any other absolute reference, instead of leaving the token exactly as written for
-        /// the recipient's own <c>#ProjectPath</c> to resolve.
-        /// </param>
-        /// <param name="bundleLibrary">The same choice, for <c>&lt;library&gt;</c>.</param>
         /// <returns>
         /// The archive, or <see cref="Result.Errors"/> saying why there is none. A reference that
         /// cannot be read, and two outputs that would collapse onto the same file, are both
@@ -79,12 +69,7 @@ namespace Calcpad.Server.Services
         /// receives it is the one thing this exists to prevent. Two references sharing a name is
         /// not — the later one is renamed instead.
         /// </returns>
-        public static Result Build(
-            string content,
-            string? sourceFilePath,
-            bool nextToWorksheet = false,
-            bool bundleProject = false,
-            bool bundleLibrary = false)
+        public static Result Build(string content, string? sourceFilePath)
         {
             if (string.IsNullOrWhiteSpace(sourceFilePath))
                 return Unpackable("A portable package resolves references against the folder of the "
@@ -111,8 +96,7 @@ namespace Calcpad.Server.Services
             // as text, which drops theirs.
             var bom = content.StartsWith('﻿');
             var pathRoots = new PathRoots();
-            var documents = Walk(rootPath, bom ? content[1..] : content, errors, pathRoots,
-                bundleProject, bundleLibrary);
+            var documents = Walk(rootPath, bom ? content[1..] : content, errors, pathRoots);
             var dataFiles = documents.DataFiles;
             if (errors.Count > 0)
                 return Failed(errors);
@@ -125,15 +109,14 @@ namespace Calcpad.Server.Services
 
             var entries = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
             var rewritten = new Dictionary<string, string>(PathComparer);
-            var outputs = new OutputTargets(nextToWorksheet, rootDirectory, errors, pathRoots,
-                bundleProject, bundleLibrary);
+            var outputs = new OutputTargets(rootDirectory, errors, pathRoots);
             // pathRoots is already fully declared — Walk, above, has already read every
             // #ProjectPath/#LibraryPath in the tree — so Prepare sees exactly what Rewrite,
             // below, will.
             outputs.Prepare(EnumerateOutputReferences(documents.Texts), pathRoots);
             foreach (var path in documents.Texts.Keys.OrderBy(p => p, StringComparer.Ordinal))
                 rewritten[path] = RewriteDocument(documents.Texts[path], path, rootDirectory, zipPaths,
-                    outputs, pathRoots, bundleProject, bundleLibrary, errors);
+                    outputs, pathRoots, errors);
             if (errors.Count > 0)
                 return Failed(errors);
 
@@ -201,9 +184,7 @@ namespace Calcpad.Server.Services
             string rootPath,
             string rootText,
             List<string> errors,
-            PathRoots pathRoots,
-            bool bundleProject,
-            bool bundleLibrary)
+            PathRoots pathRoots)
         {
             var texts = new Dictionary<string, string>(PathComparer) { [rootPath] = rootText };
             var dataFiles = new HashSet<string>(PathComparer);
@@ -254,31 +235,13 @@ namespace Calcpad.Server.Services
                         if (reference.Kind == ReferenceKind.Image && IsExternalSource(reference.Raw))
                             continue;
 
+                        // A no-op on a path that carries no token at all, so it runs unconditionally.
                         var raw = reference.Raw;
-                        // Unlike {project}/{library}, {user} is always bundled rather than left
-                        // for the recipient to resolve themselves: it needs no declaration and
-                        // always resolves, but to *this* exporting machine's home directory, which
-                        // there is no reason to expect the recipient's own home directory mirrors.
-                        if (PathRoots.IsUserToken(raw.AsSpan()))
+                        if (!pathRoots.TryExpand(raw, out raw, out var tokenError))
                         {
-                            if (!pathRoots.TryExpand(raw, out raw, out var tokenError))
-                            {
-                                errors.Add($"{owner}, line {lineNumber}: {reference.Directive} "
-                                    + $"{reference.Raw} — {tokenError}");
-                                continue;
-                            }
-                        }
-                        else if (PathRoots.TryGetTokenKind(raw.AsSpan(), out var isProjectToken))
-                        {
-                            if (isProjectToken ? !bundleProject : !bundleLibrary)
-                                continue;
-
-                            if (!pathRoots.TryExpand(raw, out raw, out var tokenError))
-                            {
-                                errors.Add($"{owner}, line {lineNumber}: {reference.Directive} "
-                                    + $"{reference.Raw} — {tokenError}");
-                                continue;
-                            }
+                            errors.Add($"{owner}, line {lineNumber}: {reference.Directive} "
+                                + $"{reference.Raw} — {tokenError}");
+                            continue;
                         }
 
                         if (!TryResolve(raw, ResolveDirectory(reference, directory), out var resolved))
@@ -453,8 +416,6 @@ namespace Calcpad.Server.Services
             IReadOnlyDictionary<string, string> zipPaths,
             OutputTargets outputs,
             PathRoots pathRoots,
-            bool bundleProject,
-            bool bundleLibrary,
             List<string> errors)
         {
             var directory = Path.GetDirectoryName(path) ?? string.Empty;
@@ -476,34 +437,16 @@ namespace Calcpad.Server.Services
                 if (reference.Kind == ReferenceKind.Image && IsExternalSource(reference.Raw))
                     return null;
 
+                // Walk already validated every token reference in the tree, so a failure here
+                // would mean Build reached this rewrite pass despite Walk reporting an error —
+                // which Build's own error check does not allow. Reported defensively rather than
+                // silently leaving the token in place.
                 var raw = reference.Raw;
-                if (PathRoots.IsUserToken(raw.AsSpan()))
+                if (!pathRoots.TryExpand(raw, out raw, out var tokenError))
                 {
-                    // Walk already validated every {user} reference in the tree (see the comment
-                    // there for why it is always bundled), so a failure here would mean this
-                    // rewrite pass was reached despite Walk reporting an error.
-                    if (!pathRoots.TryExpand(raw, out raw, out var tokenError))
-                    {
-                        errors.Add($"{owner}, line {lineNumber}: {reference.Directive} "
-                            + $"{reference.Raw} — {tokenError}");
-                        return null;
-                    }
-                }
-                else if (PathRoots.TryGetTokenKind(raw.AsSpan(), out var isProjectToken))
-                {
-                    if (isProjectToken ? !bundleProject : !bundleLibrary)
-                        return null;
-
-                    // Walk already validated every token reference in the tree, so a failure
-                    // here would mean Build reached this rewrite pass despite Walk reporting an
-                    // error — which Build's own error check does not allow. Reported defensively
-                    // rather than silently leaving the token in place.
-                    if (!pathRoots.TryExpand(raw, out raw, out var tokenError))
-                    {
-                        errors.Add($"{owner}, line {lineNumber}: {reference.Directive} "
-                            + $"{reference.Raw} — {tokenError}");
-                        return null;
-                    }
+                    errors.Add($"{owner}, line {lineNumber}: {reference.Directive} "
+                        + $"{reference.Raw} — {tokenError}");
+                    return null;
                 }
 
                 var isInclude = reference.Kind == ReferenceKind.Include;

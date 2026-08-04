@@ -326,6 +326,71 @@ namespace Calcpad.Tests
             Assert.Contains("data-ui-values=\"1;2|3;4\"", html);
         }
 
+        /// <summary>
+        /// The source sizes the grid, even once values have been entered - the entered ones are
+        /// fitted to the shape it asks for. Without this the saved literal, which replaces the
+        /// whole constructor call, would go on deciding the shape and editing the source would
+        /// stop resizing the grid.
+        /// </summary>
+        [Theory]
+        // Shrinks: the cells outside the new shape are trimmed off.
+        [InlineData(2, 2, "[1; 2; 3; 4 | 5; 6; 7; 8 | 9; 10; 11; 12]", "1;2|5;6")]
+        [InlineData(1, 2, "[1; 2; 3; 4 | 5; 6; 7; 8 | 9; 10; 11; 12]", "1;2")]
+        // Grows: the written values stay put and the new cells come in as zeros.
+        [InlineData(3, 3, "[1; 2 | 3; 4]", "1;2;0|3;4;0|0;0;0")]
+        public void Datagrid_ComputedSize_FitsTheEnteredValuesToTheSourceShape(int rows, int columns, string saved, string values)
+        {
+            var overrides = new Dictionary<string, string>
+            {
+                ["x:1"] = rows.ToString(),
+                ["y:1"] = columns.ToString(),
+                ["M:1"] = saved
+            };
+            var html = Render("#UI x = 3\n#UI y = 4\n#UI M = matrix(x; y)", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains($"data-ui-rows=\"{rows}\" data-ui-columns=\"{columns}\"", html);
+            Assert.Contains($"data-ui-values=\"{values}\"", html);
+        }
+
+        [Fact]
+        public void Datagrid_LiteralSize_FitsTheEnteredValuesToTheSourceShape()
+        {
+            var overrides = new Dictionary<string, string> { ["M:1"] = "[1; 2; 3 | 4; 5; 6]" };
+            var html = Render("#UI {\"type\": \"datagrid\"} M = matrix(1; 2)", enableUi: true, overrides);
+            Assert.Contains("data-ui-rows=\"1\" data-ui-columns=\"2\"", html);
+            Assert.Contains("data-ui-values=\"1;2\"", html);
+        }
+
+        [Fact]
+        public void Datagrid_ComputedSize_FitsTheEnteredValuesOfAVector()
+        {
+            var overrides = new Dictionary<string, string> { ["n:1"] = "2", ["Z:1"] = "[7; 8; 9]" };
+            var html = Render("#UI n = 3\n#UI Z = vector(n)", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("data-ui-rows=\"1\" data-ui-columns=\"2\"", html);
+            Assert.Contains("data-ui-values=\"7;8\"", html);
+        }
+
+        /// <summary>
+        /// The trimmed values are what the document calculates with, in a report as much as in
+        /// a form - the grid and the results it feeds cannot disagree about the matrix.
+        /// </summary>
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Datagrid_FittedOverride_DrivesTheResults(bool enableUi)
+        {
+            var overrides = new Dictionary<string, string>
+            {
+                ["x:1"] = "2",
+                ["y:1"] = "2",
+                ["M:1"] = "[1; 2; 3; 4 | 5; 6; 7; 8 | 9; 10; 11; 12]"
+            };
+            var html = Render("#UI x = 3\n#UI y = 4\n#UI M = matrix(x; y)\ns = sum(M)", enableUi, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("14", html);
+        }
+
         [Fact]
         public void Datagrid_EmitsTheContainerOutsideTheParagraph()
         {

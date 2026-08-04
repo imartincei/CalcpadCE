@@ -118,21 +118,11 @@ public class PortablePackageTests
     }
 
     [Fact]
-    public void AnAbsoluteWriteTarget_IsLeftAsWrittenWithTheOptionOff()
+    public void AnAbsoluteWriteTarget_CollapsesToItsFilename()
     {
         using var tree = new Tree();
         var source = $"#write R to {tree.At("out/results.csv")}\n";
-        var zip = tree.Pack(source, nextToWorksheet: false);
-
-        Assert.Equal(source, Text(zip, "root.cpd"));
-    }
-
-    [Fact]
-    public void AnAbsoluteWriteTarget_CollapsesToItsFilenameWithTheOptionOn()
-    {
-        using var tree = new Tree();
-        var source = $"#write R to {tree.At("out/results.csv")}\n";
-        var zip = tree.Pack(source, nextToWorksheet: true);
+        var zip = tree.Pack(source);
 
         Assert.Equal("#write R to results.csv\n", Text(zip, "root.cpd"));
     }
@@ -149,7 +139,7 @@ public class PortablePackageTests
         Environment.SetEnvironmentVariable(variable, tree.At("out"));
         try
         {
-            var zip = tree.Pack($"#write R to %{variable}%/results.csv\n", nextToWorksheet: true);
+            var zip = tree.Pack($"#write R to %{variable}%/results.csv\n");
             Assert.Equal("#write R to results.csv\n", Text(zip, "root.cpd"));
         }
         finally
@@ -166,17 +156,17 @@ public class PortablePackageTests
             #write R to ./out/results.csv
             #append S to results.csv
             """;
-        var zip = tree.Pack(source, nextToWorksheet: true);
+        var zip = tree.Pack(source);
 
         Assert.Equal(source, Text(zip, "root.cpd"));
     }
 
     [Fact]
-    public void AppendBehavesAsWrite_ForTheCollapseOption()
+    public void AppendBehavesAsWrite_ForTheCollapse()
     {
         using var tree = new Tree();
         var source = $"#append R to {tree.At("out/results.csv")}\n";
-        var zip = tree.Pack(source, nextToWorksheet: true);
+        var zip = tree.Pack(source);
 
         Assert.Equal("#append R to results.csv\n", Text(zip, "root.cpd"));
     }
@@ -195,7 +185,7 @@ public class PortablePackageTests
         var zip = tree.Pack($"""
             #write A to {a}
             #write B to {b}
-            """, nextToWorksheet: true);
+            """);
 
         Assert.Equal("""
             #write A to results-1.csv
@@ -215,7 +205,7 @@ public class PortablePackageTests
         var zip = tree.Pack($"""
             #write A to {absolute}
             #write B to results.csv
-            """, nextToWorksheet: true);
+            """);
 
         Assert.Equal("""
             #write A to results-1.csv
@@ -231,7 +221,7 @@ public class PortablePackageTests
         var zip = tree.Pack($"""
             #write R to {path}
             #append R to {path}
-            """, nextToWorksheet: true);
+            """);
 
         Assert.Equal("""
             #write R to results.csv
@@ -245,7 +235,7 @@ public class PortablePackageTests
         using var tree = new Tree();
         var absolute = tree.At("out/results.csv");
         tree.Write("inc/lib.cpd", $"#write R to {absolute}\n");
-        var zip = tree.Pack("#include ./inc/lib.cpd\n", nextToWorksheet: true);
+        var zip = tree.Pack("#include ./inc/lib.cpd\n");
 
         Assert.Equal("#write R to results.csv\n", Text(zip, "root.cpd.refs/inc/lib.cpd"));
     }
@@ -256,7 +246,7 @@ public class PortablePackageTests
         using var tree = new Tree();
         var absolute = tree.At("out/results.xlsx");
         var source = $"#write R to {absolute}@Sheet1!A1:B2 type=R sep=';' 'a comment\n";
-        var zip = tree.Pack(source, nextToWorksheet: true);
+        var zip = tree.Pack(source);
 
         Assert.Equal("#write R to results.xlsx@Sheet1!A1:B2 type=R sep=';' 'a comment\n",
             Text(zip, "root.cpd"));
@@ -480,87 +470,54 @@ public class PortablePackageTests
     }
 
     [Fact]
-    public void ATokenReference_IsLeftAsWrittenWithBothBundleFlagsOff()
-    {
-        using var tree = new Tree();
-        tree.Write("lib/steel.cpd", "a = 1\n");
-        var source = $$"""
-            #LibraryPath {{tree.At("lib")}}
-            #include {library}/steel.cpd
-            """;
-        var zip = tree.Pack(source);
-
-        Assert.Equal(source, Text(zip, "root.cpd"));
-        Assert.Equal(["root.cpd"], Names(zip));
-    }
-
-    [Fact]
-    public void ATokenReadAndWriteAndImage_AreAllLeftAsWrittenWithBothBundleFlagsOff()
-    {
-        using var tree = new Tree();
-        tree.Write("project/.keep", "");
-        var source = $$"""
-            #ProjectPath {{tree.At("project")}}
-            #read L from {project}/data/loads.csv
-            #write R to {project}/out/results.csv
-            '<img src="{project}/media/logo.png">
-            """;
-        var zip = tree.Pack(source);
-
-        Assert.Equal(source, Text(zip, "root.cpd"));
-        Assert.Equal(["root.cpd"], Names(zip));
-    }
-
-    [Fact]
-    public void ATokenInclude_IsBundledWhenItsFlagIsOn()
+    public void ATokenInclude_IsBundled()
     {
         using var tree = new Tree();
         tree.Write("lib/steel.cpd", "a = 1\n");
         var zip = tree.Pack($$"""
             #LibraryPath {{tree.At("lib")}}
             #include {library}/steel.cpd
-            """, bundleLibrary: true);
+            """);
 
         Assert.Equal(["root.cpd", "root.cpd.refs/lib/steel.cpd"], Names(zip));
         Assert.Contains("#include root.cpd.refs/lib/steel.cpd", Text(zip, "root.cpd"));
     }
 
-    [Fact]
-    public void AProjectTokenInclude_StaysAsWritten_WhenOnlyLibraryIsBundled()
-    {
-        using var tree = new Tree();
-        tree.Write("job/data.cpd", "a = 1\n");
-        var source = $$"""
-            #ProjectPath {{tree.At("job")}}
-            #include {project}/data.cpd
-            """;
-        var zip = tree.Pack(source, bundleLibrary: true);
-
-        Assert.Equal(source, Text(zip, "root.cpd"));
-        Assert.Equal(["root.cpd"], Names(zip));
-    }
-
     /// <summary>
-    /// With its bundle flag off, a token reference is never resolved by the exporter at all — it
-    /// is left exactly as written whether or not its root was ever declared. An undeclared root
-    /// is the document's own error, caught the way any other one is: when it is actually rendered.
+    /// Every reference kind goes through the same resolution, so a <c>{project}</c> read, write
+    /// target and image src are all rewritten to reach the bundled copy — the write target being
+    /// the one that collapses to a bare name rather than pointing into the refs folder, since it
+    /// is an output rather than something packed.
     /// </summary>
     [Fact]
-    public void AnUndeclaredTokenInclude_IsLeftAsWrittenWithItsFlagOff()
+    public void ATokenReadAndWriteAndImage_AreAllResolved()
     {
         using var tree = new Tree();
-        var source = "#include {library}/steel.cpd\n";
-        var zip = tree.Pack(source);
+        tree.Write("project/data/loads.csv", "1;2\n");
+        tree.Write("project/media/logo.png", "png\n");
+        var zip = tree.Pack($$"""
+            #ProjectPath {{tree.At("project")}}
+            #read L from {project}/data/loads.csv
+            #write R to {project}/out/results.csv
+            '<img src="{project}/media/logo.png">
+            """);
 
-        Assert.Equal(source, Text(zip, "root.cpd"));
-        Assert.Equal(["root.cpd"], Names(zip));
+        // The project folder sits under the document's own, so the refs folder mirrors that tree
+        // rather than flattening it — see TryNestedPath.
+        Assert.Equal(
+            ["root.cpd", "root.cpd.refs/project/data/loads.csv", "root.cpd.refs/project/media/logo.png"],
+            Names(zip));
+        var text = Text(zip, "root.cpd");
+        Assert.Contains("#read L from root.cpd.refs/project/data/loads.csv", text);
+        Assert.Contains("#write R to results.csv", text);
+        Assert.Contains("src=\"root.cpd.refs/project/media/logo.png\"", text);
     }
 
     [Fact]
-    public void AnUndeclaredTokenInclude_IsRefusedNamingTheDirective_WhenItsFlagIsOn()
+    public void AnUndeclaredTokenInclude_IsRefusedNamingTheDirective()
     {
         using var tree = new Tree();
-        var result = tree.Build("#include {library}/steel.cpd\n", bundleLibrary: true);
+        var result = tree.Build("#include {library}/steel.cpd\n");
 
         Assert.Null(result.Zip);
         var message = Assert.Single(result.Errors);
@@ -568,14 +525,14 @@ public class PortablePackageTests
     }
 
     [Fact]
-    public void ATokenUsedBeforeItsDeclaration_IsRefusedWhenBundled()
+    public void ATokenUsedBeforeItsDeclaration_IsRefused()
     {
         using var tree = new Tree();
         tree.Write("lib/steel.cpd", "a = 1\n");
         var result = tree.Build($$"""
             #include {library}/steel.cpd
             #LibraryPath {{tree.At("lib")}}
-            """, bundleLibrary: true);
+            """);
 
         Assert.Null(result.Zip);
         var message = Assert.Single(result.Errors);
@@ -585,8 +542,7 @@ public class PortablePackageTests
     /// <summary>
     /// A <c>&lt;user&gt;</c> reference needs no declaration and always resolves — but to this
     /// exporting machine's own home directory, which there is no reason to expect the recipient's
-    /// home directory mirrors. So, unlike <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c>, it is
-    /// always bundled: there is no flag to leave it as written.
+    /// home directory mirrors, so it is bundled like any other.
     /// </summary>
     [Fact]
     public void AUserTokenInclude_IsAlwaysBundled()
@@ -689,17 +645,15 @@ public class PortablePackageTests
         /// Packs <paramref name="content"/> as the worksheet <c>root.cpd</c> of this folder,
         /// which is written to disk as well so a reference back to it resolves.
         /// </summary>
-        public PortablePackage.Result Build(
-            string content, bool nextToWorksheet = false, bool bundleProject = false, bool bundleLibrary = false)
+        public PortablePackage.Result Build(string content)
         {
             Write("root.cpd", content);
-            return PortablePackage.Build(content, At("root.cpd"), nextToWorksheet, bundleProject, bundleLibrary);
+            return PortablePackage.Build(content, At("root.cpd"));
         }
 
-        public byte[] Pack(
-            string content, bool nextToWorksheet = false, bool bundleProject = false, bool bundleLibrary = false)
+        public byte[] Pack(string content)
         {
-            var result = Build(content, nextToWorksheet, bundleProject, bundleLibrary);
+            var result = Build(content);
             Assert.Empty(result.Errors);
             Assert.NotNull(result.Zip);
             Assert.Equal("root.zip", result.Name);

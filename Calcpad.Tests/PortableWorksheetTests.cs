@@ -4,29 +4,18 @@ namespace Calcpad.Tests;
 
 /// <summary>
 /// <c>PortableWorksheet.Build</c> is what a compiled <c>.cpdz</c> is made from: macros and
-/// includes expanded, <c>#read</c> inlined, and — the option under test here — a <c>#write</c>/
+/// includes expanded, <c>#read</c> inlined, and — what is under test here — a <c>#write</c>/
 /// <c>#append</c> target rewritten when it names an absolute path, so the compiled file's output
 /// lands beside wherever it runs rather than a folder that may not exist there.
 /// </summary>
 public class PortableWorksheetTests
 {
     [Fact]
-    public void AnAbsoluteWriteTarget_IsLeftAsWrittenWithTheOptionOff()
+    public void AnAbsoluteWriteTarget_CollapsesToItsFilename()
     {
         using var dir = new WorksheetDir();
         var source = $"#write R to {dir.At("results.csv")}\n";
-        var result = dir.Build(source, nextToWorksheet: false);
-
-        Assert.Empty(result.Errors);
-        Assert.Equal(source, Rewritten(result));
-    }
-
-    [Fact]
-    public void AnAbsoluteWriteTarget_CollapsesToItsFilenameWithTheOptionOn()
-    {
-        using var dir = new WorksheetDir();
-        var source = $"#write R to {dir.At("results.csv")}\n";
-        var result = dir.Build(source, nextToWorksheet: true);
+        var result = dir.Build(source);
 
         Assert.Empty(result.Errors);
         Assert.Equal("#write R to results.csv\n", Rewritten(result));
@@ -40,18 +29,18 @@ public class PortableWorksheetTests
             #write R to ./out/results.csv
             #append S to results.csv
             """ + "\n";
-        var result = dir.Build(source, nextToWorksheet: true);
+        var result = dir.Build(source);
 
         Assert.Empty(result.Errors);
         Assert.Equal(source, Rewritten(result));
     }
 
     [Fact]
-    public void AppendBehavesAsWrite_ForTheCollapseOption()
+    public void AppendBehavesAsWrite_ForTheCollapse()
     {
         using var dir = new WorksheetDir();
         var source = $"#append R to {dir.At("results.csv")}\n";
-        var result = dir.Build(source, nextToWorksheet: true);
+        var result = dir.Build(source);
 
         Assert.Empty(result.Errors);
         Assert.Equal("#append R to results.csv\n", Rewritten(result));
@@ -71,7 +60,7 @@ public class PortableWorksheetTests
         var result = dir.Build($"""
             #write A to {a}
             #write B to {b}
-            """ + "\n", nextToWorksheet: true);
+            """ + "\n");
 
         Assert.Empty(result.Errors);
         Assert.Equal("""
@@ -92,7 +81,7 @@ public class PortableWorksheetTests
         var result = dir.Build($"""
             #write A to {absolute}
             #write B to results.csv
-            """ + "\n", nextToWorksheet: true);
+            """ + "\n");
 
         Assert.Empty(result.Errors);
         Assert.Equal("""
@@ -109,7 +98,7 @@ public class PortableWorksheetTests
         var result = dir.Build($"""
             #write R to {path}
             #append R to {path}
-            """ + "\n", nextToWorksheet: true);
+            """ + "\n");
 
         Assert.Empty(result.Errors);
         Assert.Equal("""
@@ -124,14 +113,19 @@ public class PortableWorksheetTests
         using var dir = new WorksheetDir();
         var absolute = dir.At("results.csv");
         dir.Write("lib.cpd", $"#write R to {absolute}\n");
-        var result = dir.Build("#include ./lib.cpd\n", nextToWorksheet: true);
+        var result = dir.Build("#include ./lib.cpd\n");
 
         Assert.Empty(result.Errors);
         Assert.Equal("#write R to results.csv\n", Rewritten(result));
     }
 
+    /// <summary>
+    /// A token target resolves against this machine's own root first, then collapses like any
+    /// other absolute target — a compiled worksheet's source is locked, so there is no way for
+    /// whoever opens it to add a <c>#ProjectPath</c>/<c>#LibraryPath</c> of their own.
+    /// </summary>
     [Fact]
-    public void ATokenWriteTarget_AlwaysResolves_RegardlessOfNextToWorksheet()
+    public void ATokenWriteTarget_ResolvesAndCollapsesToItsFilename()
     {
         using var dir = new WorksheetDir();
         Directory.CreateDirectory(dir.At("out"));
@@ -139,22 +133,7 @@ public class PortableWorksheetTests
             #ProjectPath {{dir.At("out")}}
             #write R to {project}/results.csv
             """ + "\n";
-        var result = dir.Build(source, nextToWorksheet: false);
-
-        Assert.Empty(result.Errors);
-        Assert.Equal($"#write R to {dir.At("out/results.csv")}\n", Rewritten(result));
-    }
-
-    [Fact]
-    public void ATokenWriteTarget_CollapsesToItsFilename_WithNextToWorksheetOn()
-    {
-        using var dir = new WorksheetDir();
-        Directory.CreateDirectory(dir.At("out"));
-        var source = $$"""
-            #ProjectPath {{dir.At("out")}}
-            #write R to {project}/results.csv
-            """ + "\n";
-        var result = dir.Build(source, nextToWorksheet: true);
+        var result = dir.Build(source);
 
         Assert.Empty(result.Errors);
         Assert.Equal("#write R to results.csv\n", Rewritten(result));
@@ -169,7 +148,7 @@ public class PortableWorksheetTests
             #LibraryPath {{dir.At("lib")}}
             '<img src="{library}/logo.png">
             """ + "\n";
-        var result = dir.Build(source, nextToWorksheet: false);
+        var result = dir.Build(source);
 
         Assert.Empty(result.Errors);
         var expectedSrc = "src=\"" + dir.At("lib/logo.png").Replace('\\', '/') + "\"";
@@ -181,7 +160,7 @@ public class PortableWorksheetTests
     {
         using var dir = new WorksheetDir();
         var source = "'<img src=\"{user}/logo.png\">\n";
-        var result = dir.Build(source, nextToWorksheet: false);
+        var result = dir.Build(source);
 
         Assert.Empty(result.Errors);
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -190,42 +169,24 @@ public class PortableWorksheetTests
     }
 
     /// <summary>
-    /// Unlike an image (read once, on this machine, to embed its bytes), a <c>&lt;user&gt;</c>
-    /// write target has to resolve fresh on every run — on whoever's machine that is — so it is
-    /// left exactly as written even though a compiled worksheet's source is otherwise locked.
-    /// </summary>
-    /// <summary>
-    /// Unlike an unbundled <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> target, <c>&lt;user&gt;</c>
-    /// always resolves — there is no recipient-side declaration for it to wait for — so it
-    /// follows <c>nextToWorksheet</c> the same way a bundled token does: collapsed to its bare
-    /// filename here, since the option is on.
+    /// <c>&lt;user&gt;</c> needs no declaration and always resolves, so it reaches the collapse
+    /// the same way a declared <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> target does.
     /// </summary>
     [Fact]
-    public void AUserTokenWriteTarget_ResolvesAndCollapses_WithNextToWorksheetOn()
+    public void AUserTokenWriteTarget_ResolvesAndCollapses()
     {
         using var dir = new WorksheetDir();
-        var result = dir.Build("#write R to {user}/results.csv\n", nextToWorksheet: true);
+        var result = dir.Build("#write R to {user}/results.csv\n");
 
         Assert.Empty(result.Errors);
         Assert.Equal("#write R to results.csv\n", Rewritten(result));
     }
 
     [Fact]
-    public void AUserTokenWriteTarget_ResolvesToTheHomeDirectory_WithNextToWorksheetOff()
-    {
-        using var dir = new WorksheetDir();
-        var result = dir.Build("#write R to {user}/results.csv\n", nextToWorksheet: false);
-
-        Assert.Empty(result.Errors);
-        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        Assert.Equal($"#write R to {Path.Combine(home, "results.csv")}\n", Rewritten(result));
-    }
-
-    [Fact]
     public void AnUndeclaredTokenWriteTarget_Errors()
     {
         using var dir = new WorksheetDir();
-        var result = dir.Build("#write R to {project}/results.csv\n", nextToWorksheet: false);
+        var result = dir.Build("#write R to {project}/results.csv\n");
 
         var message = Assert.Single(result.Errors);
         Assert.Contains("ProjectPath", message);
@@ -246,8 +207,8 @@ public class PortableWorksheetTests
 
         public void Write(string relative, string text) => File.WriteAllText(At(relative), text);
 
-        public PortableWorksheet.Result Build(string content, bool nextToWorksheet) =>
-            PortableWorksheet.Build(content, At("worksheet.cpd"), nextToWorksheet);
+        public PortableWorksheet.Result Build(string content) =>
+            PortableWorksheet.Build(content, At("worksheet.cpd"));
 
         public void Dispose() => Directory.Delete(_path, true);
     }

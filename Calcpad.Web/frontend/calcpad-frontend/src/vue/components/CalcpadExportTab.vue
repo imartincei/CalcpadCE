@@ -47,35 +47,7 @@
             Export Portable…
           </button>
         </div>
-
-        <label class="bundle-option" :title="BUNDLE_PROJECT_DETAIL">
-          <input
-            type="checkbox"
-            :checked="bundleProjectReferences"
-            @change="$emit('updateBundleProjectReferences', ($event.target as HTMLInputElement).checked)"
-          />
-          Bundle &lt;project&gt; references
-        </label>
-        <label class="bundle-option" :title="BUNDLE_LIBRARY_DETAIL">
-          <input
-            type="checkbox"
-            :checked="bundleLibraryReferences"
-            @change="$emit('updateBundleLibraryReferences', ($event.target as HTMLInputElement).checked)"
-          />
-          Bundle &lt;library&gt; references
-        </label>
       </div>
-
-      <!-- Governs both exports above: an absolute #write/#append target only ever matters once
-           the worksheet leaves the folder it was written in. -->
-      <label class="write-next-to-worksheet" :title="WRITE_NEXT_TO_WORKSHEET_DETAIL">
-        <input
-          type="checkbox"
-          :checked="writeNextToWorksheet"
-          @change="$emit('updateWriteNextToWorksheet', ($event.target as HTMLInputElement).checked)"
-        />
-        Write outputs next to the worksheet
-      </label>
 
       <div class="plots-section">
         <div class="plots-header">
@@ -129,7 +101,6 @@
 import type { ExportVariant } from '../../types/api'
 import type { VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
-import type { DeclaredPathRoots } from '../../text/path-roots'
 
 export interface PlotSummary {
   index: number
@@ -147,21 +118,9 @@ const COMPILED_DETAIL =
 const PORTABLE_DETAIL =
   'A ZIP holding this document as text beside a folder of everything it references, '
   + 'with the paths rewritten to reach them there. For a recipient who has to read or '
-  + 'edit the calculation, not just fill it in.'
-
-const WRITE_NEXT_TO_WORKSHEET_DETAIL =
-  'When a #write or #append target is an absolute path, rewrite it to a bare filename so '
-  + 'the output lands beside the exported worksheet instead of a folder that may not exist '
-  + 'on the recipient\'s machine. A relative target already does that and is never touched.'
-
-const BUNDLE_PROJECT_DETAIL =
-  'Off (default): a {project}  reference is left exactly as written for #ProjectPath to resolve.\n'
-  + 'On: {project} references are removed and bundled into the package '
-  + 'using a relative path.'
-const BUNDLE_LIBRARY_DETAIL =
-  'Off (default): a {library} reference is left exactly as written for #LibraryPath to resolve.\n'
-  + 'On: {library} references are removed and bundled into the package '
-  + 'using a relative path.'
+  + 'edit the calculation, not just fill it in. Everything travels: a {project}, {library} '
+  + 'or {user} reference is resolved here and packed, and an absolute #write target lands '
+  + 'beside the unpacked document.'
 
 // Report first: it is the default rendering everywhere else, so it reads as the one to
 // reach for. A form and a code listing have no meaningful Word form, hence `word: false`.
@@ -196,16 +155,8 @@ withDefaults(defineProps<{
   plots: PlotSummary[]
   loading: boolean
   versionConfig?: VersionConfig
-  writeNextToWorksheet?: boolean
-  bundleProjectReferences?: boolean
-  bundleLibraryReferences?: boolean
-  declaredPathRoots?: DeclaredPathRoots
 }>(), {
   versionConfig: () => ({ ...DEFAULT_VERSION_CONFIG }),
-  writeNextToWorksheet: true,
-  bundleProjectReferences: false,
-  bundleLibraryReferences: false,
-  declaredPathRoots: () => ({ project: null, library: null }),
 })
 
 defineEmits<{
@@ -214,9 +165,6 @@ defineEmits<{
   saveDocx: [variant: ExportVariant]
   saveCompiled: []
   savePortable: []
-  updateWriteNextToWorksheet: [enabled: boolean]
-  updateBundleProjectReferences: [enabled: boolean]
-  updateBundleLibraryReferences: [enabled: boolean]
   refreshPlots: []
   savePlot: [index: number]
   savePlotsZip: []
@@ -260,24 +208,6 @@ function formatSize(bytes: number): string {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   opacity: 0.8;
-  cursor: help;
-}
-
-.write-next-to-worksheet {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  font-size: 12px;
-  cursor: help;
-}
-
-.bundle-option {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-  font-size: 12px;
   cursor: help;
 }
 

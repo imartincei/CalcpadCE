@@ -658,10 +658,11 @@ Rewrite a worksheet into the self-contained form a compiled `.cpdz` needs: macro
 ```typescript
 interface PortableBundleRequest {
   content: string;
-  sourceFilePath?: string;      // relative #include and #read paths resolve against its folder
-  writeNextToWorksheet?: boolean; // collapse absolute #write/#append targets to a bare filename; default false
+  sourceFilePath?: string;   // relative #include and #read paths resolve against its folder
 }
 ```
+
+An absolute `#write`/`#append` target is always collapsed to its bare filename, so the output lands beside wherever the worksheet ends up rather than a folder that may not exist there; a relative target already does that and is untouched. `{project}`/`{library}`/`{user}` references are always resolved against this machine's own declared roots.
 
 **Response:**
 ```typescript
@@ -670,7 +671,7 @@ interface PortableBundleResponse {
 }
 ```
 
-**400** when the worksheet still depends on something that cannot be read (missing `.csv`, unresolved `#include`, or a relative path with no `sourceFilePath` to resolve against), or when `writeNextToWorksheet` would make two `#write`/`#append` targets collapse onto the same file: `{ error, messages: string[] }`. Nothing is skipped — a worksheet that would fail, or overwrite one output with another, for whoever receives it is not written.
+**400** when the worksheet still depends on something that cannot be read (missing `.csv`, unresolved `#include`, an undeclared `{project}`/`{library}` root, or a relative path with no `sourceFilePath` to resolve against), or when two `#write`/`#append` targets collapse onto the same file: `{ error, messages: string[] }`. Nothing is skipped — a worksheet that would fail, or overwrite one output with another, for whoever receives it is not written.
 
 ---
 
@@ -686,7 +687,7 @@ calc.zip
 
 `#include`, `#read` and local `<img src>` paths are rewritten and their files bundled, recursively through included files. Images given as `http(s):`/`data:` are left as written. Note the asymmetry the engine imposes: an `#include` resolves against the file holding it, while everything else resolves against the *root* document, because includes are expanded before anything else runs — so a path inside a bundled include is rewritten relative to the document, not to the include.
 
-`#write`/`#append` targets are left as written unless `writeNextToWorksheet` is set, in which case an absolute one is collapsed to its bare filename so the output lands beside wherever the package is unpacked; a relative target is untouched either way.
+An absolute `#write`/`#append` target is collapsed to its bare filename so the output lands beside wherever the package is unpacked; a relative target is untouched. A `{project}`/`{library}`/`{user}` reference is resolved against this machine's own declared roots and bundled like any other — a package that still needed a root declared on the recipient's side would not be portable, and its root must therefore be declared here or the export is refused.
 
 **Request:** `PortableBundleRequest` (as above).
 
@@ -700,7 +701,7 @@ interface PortablePackageResponse {
 }
 ```
 
-**400** when the package cannot be built: `{ error, messages: string[] }`. Three refusals, all naming what to fix — a reference that cannot be read, two references sharing a file name (which the flat refs folder cannot hold), and, with `writeNextToWorksheet` set, two `#write`/`#append` targets that would collapse onto the same file. Nothing partial is ever returned.
+**400** when the package cannot be built: `{ error, messages: string[] }`. Three refusals, all naming what to fix — a reference that cannot be read (including one through an undeclared `{project}`/`{library}` root), two references sharing a file name (which the flat refs folder cannot hold), and two `#write`/`#append` targets that would collapse onto the same file. Nothing partial is ever returned.
 
 ---
 

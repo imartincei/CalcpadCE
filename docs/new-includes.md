@@ -88,11 +88,11 @@ It can also appear inside a `#ProjectPath`/`#LibraryPath` value itself:
 
 ### Path root tokens and portable export
 
-An [exported portable package](working-with-files.md#export-portable-package) leaves a `{project}`/`{library}` reference exactly as written by default — the recipient's own `#ProjectPath`/`#LibraryPath` resolves it, so a shared library file isn't duplicated into every package. Two checkboxes on the **Export** tab, both off by default, bundle `{project}` and `{library}` references independently instead — each resolves the token to your own local path and bundles it like any other absolute reference, for a one-off recipient who has no roots declared of their own. The Export tab also shows the document's declared `{project}`/`{library}` paths, read-only.
+Neither export form keeps a token. An [exported portable package](working-with-files.md#export-portable-package) and a [compiled `.cpdz` worksheet](working-with-files.md#save-as-compiled-worksheet) both resolve `{project}`, `{library}` and `{user}` against *your* declared roots — the package bundling what it finds beside the document, the compiled worksheet writing it in.
 
-`{user}` has no such checkbox: a reference through it is always bundled. It always resolves — there is nothing to declare and nothing that can be left undeclared — but only to *your* home directory, and there is no reason to expect a recipient's own home directory holds the same file in the same place, the way a shared `{library}` folder is expected to.
+The reason is the same for all three tokens: each names a folder on the machine that wrote the document, and there is no reason to expect the recipient's machine has the same file in the same place. An export that left the token in would only run where the recipient happened to have declared a matching root, which is the opposite of what either format is for. So the root has to be declared here, and its folder has to exist, or the export is refused naming the directive.
 
-A [compiled `.cpdz` worksheet](working-with-files.md#save-as-compiled-worksheet), by contrast, always resolves `{project}`/`{library}` (and `{user}`) references — its source is locked, so there is no way for a recipient to add a declaration afterwards.
+What a token *is* for is the document itself. If you want a recipient to resolve a shared library from their own folders, give them the `.cpd` and let them point `#ProjectPath`/`#LibraryPath` wherever their copy lives — one line to change, and nothing duplicated.
 
 ## Errors point to the right place
 
