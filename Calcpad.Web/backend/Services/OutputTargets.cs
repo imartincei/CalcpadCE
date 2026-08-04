@@ -176,9 +176,9 @@ namespace Calcpad.Server.Services
             out bool isToken, out bool leaveAsWritten)
         {
             leaveAsWritten = false;
-            // <user> always resolves and is never gated by bundleProject/bundleLibrary — there is
+            // {user} always resolves and is never gated by bundleProject/bundleLibrary — there is
             // no recipient-side declaration it could otherwise wait for — so it takes the same
-            // "resolve now" path a bundled <project>/<library> target does.
+            // "resolve now" path a bundled {project}/{library} target does.
             var isUserToken = PathRoots.IsUserToken(raw.AsSpan());
             var isProject = false;
             var isRootToken = !isUserToken && PathRoots.TryGetTokenKind(raw.AsSpan(), out isProject);

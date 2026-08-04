@@ -53,16 +53,6 @@ export const calcpadDarkTheme: monaco.editor.IStandaloneThemeData = {
         'editor.inactiveSelectionBackground': '#3a3d41',
         'editorBracketMatch.background': '#0064001a',
         'editorBracketMatch.border': '#888888',
-        // Monaco's rainbow bracket palette, pinned to the `bracket` token color. Colorization
-        // is disabled at editor creation, but inheriting vs-dark's gold/orchid/blue means any
-        // path that re-enables it recolors brackets by nesting depth instead of by token.
-        'editorBracketHighlight.foreground1': '#FF69B4',
-        'editorBracketHighlight.foreground2': '#FF69B4',
-        'editorBracketHighlight.foreground3': '#FF69B4',
-        'editorBracketHighlight.foreground4': '#FF69B4',
-        'editorBracketHighlight.foreground5': '#FF69B4',
-        'editorBracketHighlight.foreground6': '#FF69B4',
-        'editorBracketHighlight.unexpectedBracket.foreground': '#FF5555',
     },
 };
 
@@ -116,12 +106,5 @@ export const calcpadLightTheme: monaco.editor.IStandaloneThemeData = {
         'editor.inactiveSelectionBackground': '#e5ebf1',
         'editorBracketMatch.background': '#0064001a',
         'editorBracketMatch.border': '#b9b9b9',
-        'editorBracketHighlight.foreground1': '#C71585',
-        'editorBracketHighlight.foreground2': '#C71585',
-        'editorBracketHighlight.foreground3': '#C71585',
-        'editorBracketHighlight.foreground4': '#C71585',
-        'editorBracketHighlight.foreground5': '#C71585',
-        'editorBracketHighlight.foreground6': '#C71585',
-        'editorBracketHighlight.unexpectedBracket.foreground': '#CD3131',
     },
 };

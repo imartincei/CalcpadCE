@@ -329,7 +329,7 @@ async function bootstrap(): Promise<void> {
     async function refreshDefinitionsFor(group: EditorGroup): Promise<void> {
         const content = group.editor.getValue();
         const ctx = getFileContext ? await getFileContext(content) : {};
-        editorBridge.definitions.refreshDefinitions(content, docKeyFor(group), ctx.sourceFilePath);
+        editorBridge.definitions.refreshDefinitions(content, docKeyFor(group), ctx.sourceFilePath, `defs:${group.id}`);
     }
 
     function resolvePreviewTheme(): 'light' | 'dark' {
@@ -545,12 +545,12 @@ async function bootstrap(): Promise<void> {
                 ? { enableUi: mode === 'ui', uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }
                 : undefined;
             result = mode === 'unwrapped'
-                ? await activeBridge.api.convertUnwrapped(content, apiSettings, fileContext.sourceFilePath, theme)
+                ? await activeBridge.api.convertUnwrapped(content, apiSettings, fileContext.sourceFilePath, theme, { key: `preview:${group.id}` })
                 // The report is a print layout, but on screen, so it keeps the line
                 // anchors that forPrint would otherwise suppress.
                 : await activeBridge.api.convert(
                     content, apiSettings, 'html', mode === 'report', fileContext.sourceFilePath, theme, ui,
-                    mode === 'report' ? true : undefined);
+                    mode === 'report' ? true : undefined, { key: `preview:${group.id}` });
         } finally {
             window.clearTimeout(loadingTimer);
             appInstance.setPreviewLoading(group.id, false);
@@ -568,7 +568,8 @@ async function bootstrap(): Promise<void> {
             // the images-folder / custom-path insert options) render in the
             // sandboxed preview iframe, matching PDF export.
             const finalHtml = tauriBridge
-                ? await tauriBridge.inlineDocumentImages(result.html, content)
+                ? await tauriBridge.inlineDocumentImages(result.html, content,
+                    { projectPath: result.projectPath, libraryPath: result.libraryPath })
                 : result.html;
             appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine);
             if (mode === 'ui') uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
@@ -595,10 +596,13 @@ async function bootstrap(): Promise<void> {
     ): Promise<void> {
         const result = await activeBridge.api.convert(
             content, apiSettings, 'html', true, sourceFilePath, theme,
-            { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }, true);
+            { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }, true, { key: `preview:${group.id}` });
         if (!result || result instanceof ArrayBuffer) return;
 
-        const html = tauriBridge ? await tauriBridge.inlineDocumentImages(result.html, content) : result.html;
+        const html = tauriBridge
+            ? await tauriBridge.inlineDocumentImages(result.html, content,
+                { projectPath: result.projectPath, libraryPath: result.libraryPath })
+            : result.html;
         appInstance.setUiPrintHtml(group.id, html);
     }
 
@@ -677,7 +681,7 @@ async function bootstrap(): Promise<void> {
         group.diagnostics = setupDiagnostics(ed, activeBridge.api, () => {
             const sev = editorBridge.getExtraSetting('linterMinSeverity');
             return (sev === 'error' || sev === 'warning') ? sev : 'information';
-        }, getFileContext);
+        }, getFileContext, `lint:${group.id}`);
 
         // Focus-the-preview-to-line context action (targets this group).
         ed.addAction({
@@ -1013,6 +1017,7 @@ async function bootstrap(): Promise<void> {
             getCurrentFilePath: () => tabs.activeTab?.filePath ?? null,
             getOpenedFolder: () => tauriBridge.getOpenedFolder(),
             expandEnvVars: (raw) => tauriBridge.expandEnvVars(raw),
+            getHomeDir: () => tauriBridge.getHomeDir(),
         });
     }
     registerHoverProvider(editorBridge);

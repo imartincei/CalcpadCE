@@ -196,11 +196,11 @@ export abstract class BaseMessageBridge {
     private async handleGetUiControls(): Promise<void> {
         const content = this.getActiveEditorContent();
         const { sourceFilePath } = await this.buildFileContext(content);
-        const html = await this.renderForExport(content, buildApiSettings(this.settings), sourceFilePath, 'input');
+        const rendered = await this.renderForExport(content, buildApiSettings(this.settings), sourceFilePath, 'input');
         // A failed render leaves the panel unresolved rather than empty - "no controls"
         // and "could not tell" must not read the same to a purge button.
-        if (html == null) return;
-        const controls = extractUiControls(html);
+        if (rendered == null) return;
+        const controls = extractUiControls(rendered.html);
         this._uiControlsSink?.(controls);
         this.postToVue({ type: 'uiControls', controls });
     }
@@ -675,11 +675,11 @@ export abstract class BaseMessageBridge {
         const content = this.getActiveEditorContent();
         const apiSettings = buildApiSettings(this.settings);
         const { sourceFilePath } = await this.buildFileContext(content);
-        const html = await this.renderForExport(content, apiSettings, sourceFilePath, variant);
-        if (html == null) return;
+        const rendered = await this.renderForExport(content, apiSettings, sourceFilePath, variant);
+        if (rendered == null) return;
         await this.saveExportedFile({
             defaultName: 'calcpad-output.html',
-            data: html,
+            data: rendered.html,
             mime: 'text/html;charset=utf-8',
             extensions: ['html', 'htm'],
             dialogTitle: exportDialogTitle('Save', 'HTML', variant),
@@ -778,14 +778,16 @@ export abstract class BaseMessageBridge {
         apiSettings: unknown,
         sourceFilePath: string | undefined,
         variant: ExportVariant,
-    ): Promise<string | null> {
+    ): Promise<{ html: string; projectPath: string | null; libraryPath: string | null } | null> {
         const render = variantRender(variant);
         const result = render.unwrap
             ? await this.apiClient.convertUnwrapped(content, apiSettings, sourceFilePath)
             : await this.apiClient.convert(
                 content, apiSettings, 'html', render.forPrint, sourceFilePath, undefined,
                 this.uiOptionsFor(variant), false);
-        return result && !(result instanceof ArrayBuffer) ? result.html : null;
+        return result && !(result instanceof ArrayBuffer)
+            ? { html: result.html, projectPath: result.projectPath, libraryPath: result.libraryPath }
+            : null;
     }
 
     private async handleGetPlots(): Promise<void> {

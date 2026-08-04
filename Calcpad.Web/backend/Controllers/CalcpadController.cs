@@ -20,16 +20,19 @@ namespace Calcpad.Server.Controllers
     {
         private readonly CalcpadService _calcpadService;
         private readonly PdfGeneratorService _pdfService;
+        private readonly ParserGate _parserGate;
         private static readonly LintIgnoreRegionParser _lintIgnoreRegionParser = new();
 
-        public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService)
+        public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService, ParserGate parserGate)
         {
             _calcpadService = calcpadService;
             _pdfService = pdfService;
+            _parserGate = parserGate;
         }
 
         [HttpPost("convert")]
-        public IActionResult ConvertToHtml([FromBody] CalcpadRequest request, [FromQuery] bool unwrap = false)
+        public async Task<IActionResult> ConvertToHtml(
+            [FromBody] CalcpadRequest request, CancellationToken cancellationToken, [FromQuery] bool unwrap = false)
         {
             try
             {
@@ -38,11 +41,13 @@ namespace Calcpad.Server.Controllers
                     return BadRequest("Content is required");
                 }
 
+                using var _ = await _parserGate.AcquireAsync(cancellationToken);
+
                 var forceUnwrapped = unwrap || request.ForceUnwrappedCode;
-                var (htmlResult, _, errors) = _calcpadService.Convert(
+                var (htmlResult, _, errors, projectPath, libraryPath) = _calcpadService.Convert(
                     request.Content, request.Settings, forceUnwrapped, request.Theme, request.SourceFilePath,
                     request.ForPrint, captureOpenXml: false, request.EnableUi, request.UiOverrides,
-                    request.IncludeLineAnchors);
+                    request.IncludeLineAnchors, cancellationToken);
                 if (unwrap)
                 {
                     htmlResult = ProcessDataTextLinks(htmlResult);
@@ -54,7 +59,17 @@ namespace Calcpad.Server.Controllers
                     Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
                 });
                 Response.Headers["X-Calcpad-Errors"] = Uri.EscapeDataString(errorsJson);
+
+                // Surfaces #ProjectPath/#LibraryPath even when declared inside an #include —
+                // the client would otherwise have to re-scan only its own entry file's text.
+                var pathRootsJson = System.Text.Json.JsonSerializer.Serialize(new { projectPath, libraryPath });
+                Response.Headers["X-Calcpad-PathRoots"] = Uri.EscapeDataString(pathRootsJson);
                 return Content(htmlResult, "text/html");
+            }
+            catch (OperationCanceledException)
+            {
+                // Superseded or the client gave up — expected under rapid tab-switching, not an error.
+                return StatusCode(499);
             }
             catch (Exception ex)
             {
@@ -112,15 +127,21 @@ namespace Calcpad.Server.Controllers
         /// otherwise be handed out broken.
         /// </summary>
         [HttpPost("portable/bundle")]
-        public IActionResult BundlePortable([FromBody] PortableBundleRequest request)
+        public async Task<IActionResult> BundlePortable([FromBody] PortableBundleRequest request, CancellationToken cancellationToken)
         {
             try
             {
+                using var _ = await _parserGate.AcquireAsync(cancellationToken);
+
                 var result = PortableWorksheet.Build(request.Content, request.SourceFilePath, request.WriteNextToWorksheet);
                 if (result.Errors.Count > 0)
                     return BadRequest(new { error = "The worksheet is not self-contained", messages = result.Errors });
 
                 return Ok(new PortableBundleResponse { Content = result.Content });
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(499);
             }
             catch (Exception ex)
             {
@@ -296,7 +317,7 @@ namespace Calcpad.Server.Controllers
         /// Returns the .docx bytes; the frontend handles the download / save dialog.
         /// </summary>
         [HttpPost("docx")]
-        public async Task<IActionResult> GenerateDocx([FromBody] CalcpadRequest request)
+        public async Task<IActionResult> GenerateDocx([FromBody] CalcpadRequest request, CancellationToken cancellationToken)
         {
             try
             {
@@ -308,10 +329,17 @@ namespace Calcpad.Server.Controllers
                 // never a navigable preview, so line anchors are always off - but ForPrint
                 // and UiOverrides come from the request, so the caller chooses between a
                 // report (#pre hidden, entered #UI values applied) and the preview layout.
-                var (html, openXmlExpressions, _) = _calcpadService.Convert(
-                    request.Content, request.Settings, request.ForceUnwrappedCode, request.Theme, request.SourceFilePath,
-                    forPrint: request.ForPrint, captureOpenXml: true, enableUi: false, uiOverrides: request.UiOverrides,
-                    debug: false);
+                // Only the Convert call itself needs the gate — the OpenXML write below is
+                // CPU-bound XML generation, not shared parser state.
+                string html;
+                IReadOnlyList<string> openXmlExpressions;
+                using (await _parserGate.AcquireAsync(cancellationToken))
+                {
+                    (html, openXmlExpressions, _, _, _) = _calcpadService.Convert(
+                        request.Content, request.Settings, request.ForceUnwrappedCode, request.Theme, request.SourceFilePath,
+                        forPrint: request.ForPrint, captureOpenXml: true, enableUi: false, uiOverrides: request.UiOverrides,
+                        debug: false, cancellationToken: cancellationToken);
+                }
 
                 using var ms = new MemoryStream();
                 var writer = new OpenXmlWriter(openXmlExpressions.ToList());
@@ -323,6 +351,10 @@ namespace Calcpad.Server.Controllers
                     bytes,
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     "document.docx");
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(499);
             }
             catch (Exception ex)
             {
@@ -336,12 +368,15 @@ namespace Calcpad.Server.Controllers
         /// Returns tokens with line/column positions and types for frontend colorization.
         /// </summary>
         [HttpPost("highlight")]
-        public IActionResult GetHighlightTokens([FromBody] HighlightRequest request)
+        public IActionResult GetHighlightTokens([FromBody] HighlightRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request.Content))
                     return BadRequest("Content is required");
+
+                // A stale request whose client already gave up shouldn't do this work at all.
+                cancellationToken.ThrowIfCancellationRequested();
 
                 FileLogger.LogInfo("Highlight request received", $"Length: {request.Content.Length}");
 
@@ -361,6 +396,10 @@ namespace Calcpad.Server.Controllers
 
                 var result = tokenizer.Tokenize(request.Content);
                 return Ok(MapTokensToResponse(result.Tokens, request.IncludeText));
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(499);
             }
             catch (Exception ex)
             {
@@ -395,12 +434,14 @@ namespace Calcpad.Server.Controllers
         /// Lint Calcpad source code and return diagnostics (errors and warnings).
         /// </summary>
         [HttpPost("lint")]
-        public IActionResult LintContent([FromBody] LintRequest request)
+        public IActionResult LintContent([FromBody] LintRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request.Content))
                     return BadRequest("Content is required");
+
+                cancellationToken.ThrowIfCancellationRequested();
 
                 FileLogger.LogInfo("Lint request received", "Length: " + request.Content.Length);
 
@@ -433,6 +474,10 @@ namespace Calcpad.Server.Controllers
 
                 return Ok(response);
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(499);
+            }
             catch (Exception ex)
             {
                 FileLogger.LogError("Lint request failed", ex);
@@ -445,12 +490,14 @@ namespace Calcpad.Server.Controllers
         /// Returns type information, parameters, return types, and source locations.
         /// </summary>
         [HttpPost("definitions")]
-        public IActionResult GetDefinitions([FromBody] DefinitionsRequest request)
+        public IActionResult GetDefinitions([FromBody] DefinitionsRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request.Content))
                     return BadRequest("Content is required");
+
+                cancellationToken.ThrowIfCancellationRequested();
 
                 FileLogger.LogInfo("Definitions request received", "Length: " + request.Content.Length);
 
@@ -526,6 +573,10 @@ namespace Calcpad.Server.Controllers
 
                 return Ok(response);
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(499);
+            }
             catch (Exception ex)
             {
                 FileLogger.LogError("Definitions request failed", ex);
@@ -541,12 +592,14 @@ namespace Calcpad.Server.Controllers
         /// the clients don't each re-implement it.
         /// </summary>
         [HttpPost("symbol-at-position")]
-        public IActionResult SymbolAtPosition([FromBody] SymbolAtPositionRequest request)
+        public IActionResult SymbolAtPosition([FromBody] SymbolAtPositionRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request.Content))
                     return BadRequest("Content is required");
+
+                cancellationToken.ThrowIfCancellationRequested();
 
                 var resolver = new ContentResolver();
                 var staged = resolver.GetStagedContent(request.Content, sourceFilePath: request.SourceFilePath);
@@ -570,6 +623,10 @@ namespace Calcpad.Server.Controllers
                     Locations = hit.Locations.Select(ToDto).ToList()
                 };
                 return Ok(response);
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(499);
             }
             catch (Exception ex)
             {

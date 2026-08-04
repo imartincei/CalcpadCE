@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { CalcpadApiClient, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION } from 'calcpad-frontend';
+import { CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPathRootsHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, createReferenceResolverFromRoots, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -360,13 +360,25 @@ const IMAGE_MIME_MAP: Record<string, string> = {
 /**
  * Scan HTML for <img src="..."> tags with local file paths, read the files from disk,
  * and return a cache mapping original src values to base64 data URIs. `sourceText` is
- * the raw `.cpd` source the HTML was rendered from — it is what a `<project>`/
- * `<library>` reference is declared and resolved against, and env vars (`%VAR%`/`$VAR`)
- * are expanded the same way any other reference's are.
+ * the raw `.cpd` source the HTML was rendered from — it is what a `{project}`/
+ * `{library}` reference is declared and resolved against, and env vars (`%VAR%`/`$VAR`)
+ * are expanded the same way any other reference's are. `resolvedRoots` — the server's
+ * `X-Calcpad-PathRoots` render-response roots — takes priority when given: unlike
+ * scanning `sourceText`, it reflects a root declared anywhere in the `#include` chain,
+ * not just the active document's own text.
  */
-async function buildImageCache(html: string, documentDir: string, sourceText: string): Promise<Record<string, string>> {
+async function buildImageCache(
+    html: string,
+    documentDir: string,
+    sourceText: string,
+    resolvedRoots?: { projectPath: string | null; libraryPath: string | null },
+): Promise<Record<string, string>> {
     const cache: Record<string, string> = {};
-    const resolve = createReferenceResolver(sourceText, documentDir, expandEnvVars, path.resolve, os.homedir);
+    const resolve = resolvedRoots
+        ? createReferenceResolverFromRoots(
+            { project: resolvedRoots.projectPath, library: resolvedRoots.libraryPath },
+            documentDir, expandEnvVars, path.resolve, os.homedir)
+        : createReferenceResolver(sourceText, documentDir, expandEnvVars, path.resolve, os.homedir);
     const imgSrcRegex = /<img\s[^>]*?src\s*=\s*["']([^"']+)["'][^>]*>/gi;
     let match;
 
@@ -874,30 +886,52 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         outputChannel.appendLine(`Making API call to ${endpoint}...`);
 
         const theme = getEffectivePreviewTheme();
-        const response = await fetch(`${apiBaseUrl}${endpoint}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                content: content,
-                settings: settings,
-                theme: theme,
-                forceUnwrappedCode: unwrapped,
-                sourceFilePath: sourceFileUri.fsPath,
-                enableUi: enableUi,
-                forPrint: forPrint,
-                uiOverrides: applyOverrides ? uiOverrides.toRecord(docKey) : undefined,
-                // The report is a print layout, but on screen beside the editor, so it
-                // keeps the line links that forPrint would otherwise suppress.
-                includeLineAnchors: forPrint ? true : undefined
-            }),
-            signal: AbortSignal.timeout(10000)
+        const requestBody = JSON.stringify({
+            content: content,
+            settings: settings,
+            theme: theme,
+            forceUnwrappedCode: unwrapped,
+            sourceFilePath: sourceFileUri.fsPath,
+            enableUi: enableUi,
+            forPrint: forPrint,
+            uiOverrides: applyOverrides ? uiOverrides.toRecord(docKey) : undefined,
+            // The report is a print layout, but on screen beside the editor, so it
+            // keeps the line links that forPrint would otherwise suppress.
+            includeLineAnchors: forPrint ? true : undefined
         });
+        // Routed through the shared client's queue (rather than a bare fetch) so this
+        // parser-touching request can't run concurrently with lint/highlight/definitions —
+        // see the invariant documented on CalcpadApiClient.requestQueue. A newer preview
+        // request for the same document aborts this one; that's not a real failure, so it
+        // resolves to null instead of throwing (a genuine fetch error still throws).
+        const runRequest = async (signal: AbortSignal): Promise<Response | null> => {
+            try {
+                return await fetch(`${apiBaseUrl}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: requestBody,
+                    signal: combineSignals(AbortSignal.timeout(10000), signal),
+                });
+            } catch (error) {
+                if (error instanceof DOMException && error.name === 'AbortError' && signal.aborted) return null;
+                throw error;
+            }
+        };
+        const response = sharedApiClient
+            ? await sharedApiClient.runSerialized(runRequest, { key: `preview:${docKey}` })
+            : await runRequest(new AbortController().signal);
+        if (!response) {
+            // Superseded by a newer preview request for this document — that
+            // newer call owns updating the webview, so leave it as is.
+            return;
+        }
         if (!response.ok) {
             throw new Error(`Server returned ${response.status}`);
         }
         outputChannel.appendLine('API call successful');
 
         vueUiProvider?.updateConvertErrors(parseConvertErrorHeader(response));
+        const pathRoots = parseConvertPathRootsHeader(response);
 
         // Use the entire API response as the webview HTML
         const apiResponse = await response.text();
@@ -923,7 +957,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         let imageCacheScript = '';
         if (activeEditor && !activeEditor.document.isUntitled) {
             const documentDir = path.dirname(activeEditor.document.uri.fsPath);
-            const imageCache = await buildImageCache(apiResponse, documentDir, activeEditor.document.getText());
+            const imageCache = await buildImageCache(apiResponse, documentDir, activeEditor.document.getText(), pathRoots);
             imageCacheScript = getImageCacheScript(imageCache);
         }
 
@@ -995,7 +1029,7 @@ async function renderForExport(
     documentContent: string,
     sourceFileUri: vscode.Uri,
     variant: ExportVariant,
-): Promise<string> {
+): Promise<{ html: string; projectPath: string | null; libraryPath: string | null }> {
     const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
     const apiBaseUrl = settingsManager.getServerUrl();
     if (!apiBaseUrl) throw new Error('Server URL not configured');
@@ -1008,7 +1042,11 @@ async function renderForExport(
     const render = variantRender(variant);
     const endpoint = render.unwrap ? '/api/calcpad/convert?unwrap=true' : '/api/calcpad/convert';
 
-    const response = await fetch(`${apiBaseUrl}${endpoint}`, {
+    // Routed through the shared client's queue (rather than a bare fetch) so this
+    // parser-touching request can't run concurrently with lint/highlight/definitions —
+    // see the invariant documented on CalcpadApiClient.requestQueue. Unkeyed: an
+    // export is an explicit one-off action, never superseded by a later one.
+    const runRequest = (signal: AbortSignal) => fetch(`${apiBaseUrl}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1020,12 +1058,17 @@ async function renderForExport(
             uiOverrides: render.useOverrides ? uiOverrides.toRecord(sourceFileUri.toString()) : undefined,
             includeLineAnchors: false,
         }),
-        signal: AbortSignal.timeout(30000)
+        signal: combineSignals(AbortSignal.timeout(30000), signal),
     });
-    if (!response.ok) {
-        throw new Error(`Server returned ${response.status}`);
+    const response = sharedApiClient
+        ? await sharedApiClient.runSerialized(runRequest)
+        : await runRequest(new AbortController().signal);
+    if (!response || !response.ok) {
+        throw new Error(`Server returned ${response?.status ?? 'no response'}`);
     }
-    return await response.text();
+    const html = await response.text();
+    const { projectPath, libraryPath } = parseConvertPathRootsHeader(response);
+    return { html, projectPath, libraryPath };
 }
 
 /**
@@ -1050,11 +1093,13 @@ async function generatePdfToFile(
     const sourceDir = path.dirname(sourceFileUri.fsPath);
 
     // Step 1: Convert calcpad content to HTML
-    let html = await renderForExport(documentContent, sourceFileUri, variant);
+    const rendered = await renderForExport(documentContent, sourceFileUri, variant);
+    let html = rendered.html;
 
     // Inline local images as base64 data URIs so the headless browser can
     // render them (it has no access to the local filesystem).
-    const imageCache = await buildImageCache(html, sourceDir, documentContent);
+    const imageCache = await buildImageCache(html, sourceDir, documentContent,
+        { projectPath: rendered.projectPath, libraryPath: rendered.libraryPath });
     html = applyImageCache(html, imageCache);
 
     progress?.report({ increment: 50, message: 'Generating PDF...' });
@@ -1163,7 +1208,7 @@ async function saveSourceHtml(variant: ExportVariant = 'report') {
             title: 'Generating HTML…',
             cancellable: false,
         }, async () => {
-            const html = await renderForExport(source.text, source.uri, variant);
+            const { html } = await renderForExport(source.text, source.uri, variant);
             await vscode.workspace.fs.writeFile(saveUri, new TextEncoder().encode(html));
         });
 
@@ -1215,24 +1260,16 @@ async function saveDocx(variant: ExportVariant = 'report') {
         }, async () => {
             const settings = await settingsManager.getApiSettings();
 
-            const response = await fetch(`${apiBaseUrl}/api/calcpad/docx`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    content: source.text,
-                    settings,
-                    sourceFilePath: source.uri.fsPath,
-                    forPrint: render.forPrint,
-                    uiOverrides: render.useOverrides
-                        ? uiOverrides.toRecord(source.uri.toString())
-                        : undefined,
-                }),
-                signal: AbortSignal.timeout(60000),
+            // Goes through the shared client (instead of a bare fetch) so it joins the
+            // same queue as lint/highlight/definitions/convert — see the invariant
+            // documented on CalcpadApiClient.requestQueue.
+            const buf = await sharedApiClient?.convertDocx(source.text, settings, source.uri.fsPath, {
+                forPrint: render.forPrint,
+                uiOverrides: render.useOverrides ? uiOverrides.toRecord(source.uri.toString()) : undefined,
             });
-            if (!response.ok) {
-                throw new Error(`Server returned ${response.status}`);
+            if (!buf) {
+                throw new Error('Word document generation failed');
             }
-            const buf = await response.arrayBuffer();
             await vscode.workspace.fs.writeFile(saveUri, new Uint8Array(buf));
         });
 
@@ -1286,8 +1323,8 @@ async function saveAsCompiled() {
 
         // An untitled document has no folder for relative image paths to resolve against.
         const documentDir = untitled ? '' : path.dirname(source.uri.fsPath);
-        // bundled.content is already self-contained — the server resolved any <project>/
-        // <library> reference to an absolute path — so this resolver only needs to expand
+        // bundled.content is already self-contained — the server resolved any {project}/
+        // {library} reference to an absolute path — so this resolver only needs to expand
         // env vars in whatever plain relative/absolute src the author wrote directly.
         const resolve = createReferenceResolver(bundled.content, documentDir, expandEnvVars, path.resolve, os.homedir);
         const compiled = await inlineImageSources(bundled.content, new VSCodeFileSystem(), resolve);
@@ -1932,7 +1969,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
         if (!editor) return null;
         try {
-            const html = await renderForExport(editor.document.getText(), editor.document.uri, 'input');
+            const { html } = await renderForExport(editor.document.getText(), editor.document.uri, 'input');
             const controls = extractUiControls(html);
             uiControls.set(editor.document.uri.toString(), controls);
             return controls;

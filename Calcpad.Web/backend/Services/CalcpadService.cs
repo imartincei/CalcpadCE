@@ -36,7 +36,7 @@ namespace Calcpad.Server.Services
             };
         }
 
-        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors) Convert(
+        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors, string? ProjectPath, string? LibraryPath) Convert(
             string calcpadContent,
             Settings? settings = null,
             bool forceUnwrappedCode = false,
@@ -46,13 +46,18 @@ namespace Calcpad.Server.Services
             bool captureOpenXml = false,
             bool enableUi = false,
             Dictionary<string, string>? uiOverrides = null,
-            bool? debug = null)
+            bool? debug = null,
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(calcpadContent))
             {
                 FileLogger.LogWarning("Convert called with empty content");
                 throw new ArgumentException("Content cannot be null or empty", nameof(calcpadContent));
             }
+
+            // A request that was already superseded/aborted by the time its turn at the
+            // parser gate came up shouldn't spend it running a stale conversion.
+            cancellationToken.ThrowIfCancellationRequested();
 
             try
             {
@@ -77,6 +82,8 @@ namespace Calcpad.Server.Services
 
                 string outputText;
                 var hasMacroErrors = macroParser.Parse(calcpadContent, out outputText, null, 0, true);
+
+                cancellationToken.ThrowIfCancellationRequested();
 
                 string htmlResult;
                 IReadOnlyList<string> openXmlExpressions = Array.Empty<string>();
@@ -138,7 +145,15 @@ namespace Calcpad.Server.Services
                 var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);
                 FileLogger.LogInfo("Conversion completed successfully", $"Output length: {finalHtml.Length}");
 
-                return (finalHtml, openXmlExpressions, errors);
+                // macroParser.PathRoots reflects every #ProjectPath/#LibraryPath declaration
+                // found while flattening #includes, not just ones in calcpadContent itself.
+                return (finalHtml, openXmlExpressions, errors, macroParser.PathRoots.Project, macroParser.PathRoots.Library);
+            }
+            catch (OperationCanceledException)
+            {
+                // Let this propagate as-is rather than the wrapped InvalidOperationException
+                // below — it's an expected supersede/abort, not a conversion failure.
+                throw;
             }
             catch (MathParserException ex)
             {

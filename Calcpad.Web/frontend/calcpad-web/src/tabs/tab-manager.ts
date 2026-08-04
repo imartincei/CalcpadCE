@@ -426,6 +426,14 @@ export class TabManager {
         // across rename and unique even when two tabs hold the same file path.
         const uri = monaco.Uri.parse(`inmemory:///${id}.cpd`);
         const model = monaco.editor.createModel(opts.content, 'calcpad', uri);
+        // Models created this way start with Monaco's global bracket-pair-colorization
+        // default (enabled), independent of the `bracketPairColorization: { enabled: false }`
+        // passed to individual editor instances in setup.ts — that option only takes effect
+        // when an editor creates its own model implicitly. Disable it here instead, so rainbow
+        // bracket colors never clobber the theme's semantic-token colors for this model.
+        model.updateOptions({
+            bracketColorizationOptions: { enabled: false, independentColorPoolPerBracketType: false },
+        });
         const savedVersionId = model.getAlternativeVersionId();
         const doc: DocEntry = {
             filePath: opts.filePath,

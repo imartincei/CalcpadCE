@@ -14,9 +14,9 @@ namespace Calcpad.Core
     /// </summary>
     public sealed class PathRoots
     {
-        private const string ProjectToken = "<project>";
-        private const string LibraryToken = "<library>";
-        private const string UserToken = "<user>";
+        private const string ProjectToken = "{project}";
+        private const string LibraryToken = "{library}";
+        private const string UserToken = "{user}";
         private const string ProjectKeyword = "#projectpath";
         private const string LibraryKeyword = "#librarypath";
 
@@ -38,7 +38,7 @@ namespace Calcpad.Core
         public static bool IsUserToken(ReadOnlySpan<char> path) =>
             path.StartsWith(UserToken, StringComparison.OrdinalIgnoreCase);
 
-        // Expands the <user> token itself. Kept separate from Environment.ExpandEnvironmentVariables
+        // Expands the {user} token itself. Kept separate from Environment.ExpandEnvironmentVariables
         // (called on the result afterward by every caller) because that API only recognizes
         // %VAR%-style references on every platform — it never expands $HOME on Linux/macOS despite
         // looking like it should.
@@ -76,8 +76,9 @@ namespace Calcpad.Core
         /// Whether <paramref name="line"/> is a <c>#ProjectPath</c>/<c>#LibraryPath</c>
         /// declaration. <paramref name="start"/>/<paramref name="length"/> locate the value —
         /// up to a trailing comment, the same convention <see cref="MacroParser.TryGetIncludePath"/>
-        /// uses. A missing <c>=</c> or an empty value still reports <c>true</c>, with
-        /// <paramref name="length"/> zero, so the caller can report the specific error.
+        /// uses, with the value following the keyword directly (<c>#ProjectPath path</c>, no
+        /// <c>=</c>). An empty value still reports <c>true</c>, with <paramref name="length"/>
+        /// zero, so the caller can report the specific error.
         /// </summary>
         public static bool IsDeclaration(ReadOnlySpan<char> line, out bool isProject, out int start, out int length)
         {
@@ -94,19 +95,14 @@ namespace Calcpad.Core
 
             var keywordLength = isProject ? ProjectKeyword.Length : LibraryKeyword.Length;
             var rest = line[keywordLength..];
-            var eq = rest.IndexOf('=');
-            if (eq < 0)
-                return true;
-
-            var afterEq = rest[(eq + 1)..];
-            var trimmedStart = afterEq.Length - afterEq.TrimStart().Length;
-            var value = afterEq[trimmedStart..];
+            var trimmedStart = rest.Length - rest.TrimStart().Length;
+            var value = rest[trimmedStart..];
             var commentIndex = value.IndexOfAny('\'', '"');
             if (commentIndex >= 0)
                 value = value[..commentIndex];
             value = value.TrimEnd();
 
-            start = keywordLength + eq + 1 + trimmedStart;
+            start = keywordLength + trimmedStart;
             length = value.Length;
             return true;
         }
@@ -121,8 +117,9 @@ namespace Calcpad.Core
         /// <summary>
         /// Records a declaration read at <paramref name="declaringDirectory"/> — the folder of
         /// the file the line was written in, so a relative value resolves the way any other
-        /// path in that file does. False and <paramref name="error"/> on an empty value or a
-        /// second declaration of the same root that resolves to a different path.
+        /// path in that file does. False and <paramref name="error"/> on an empty value, a value
+        /// that doesn't resolve to a folder that actually exists, or a second declaration of the
+        /// same root that resolves to a different path.
         /// </summary>
         public bool TryDeclare(bool isProject, string rawValue, string declaringDirectory, out string error)
         {
@@ -146,6 +143,13 @@ namespace Calcpad.Core
             catch (Exception ex)
             {
                 error = ex.Message;
+                return false;
+            }
+
+            if (!Directory.Exists(resolved))
+            {
+                error = string.Format(Messages.Path_root_folder_not_found_0_1,
+                    isProject ? "#ProjectPath" : "#LibraryPath", resolved);
                 return false;
             }
 

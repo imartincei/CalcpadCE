@@ -583,4 +583,7 @@
   <data name="Path_root_not_declared_0_1" xml:space="preserve">
     <value>{0} не е обявен. Добавете {1} преди този ред.</value>
   </data>
+  <data name="Path_root_folder_not_found_0_1" xml:space="preserve">
+    <value>Папката за {0} не е намерена: {1}.</value>
+  </data>
 </root>

@@ -170,7 +170,10 @@ export enum CalcpadTokenType {
     // [Future Reserved] 28-30 used to hold StringVariable, StringFunction, StringTable
     FutureReserved28 = 28,
     FutureReserved29 = 29,
-    FutureReserved30 = 30
+    FutureReserved30 = 30,
+
+    /** #ProjectPath/#LibraryPath declaration values */
+    PathRoot = 31
 }
 
 // ============================================
@@ -300,6 +303,13 @@ export interface CalcpadError {
 export interface ConvertResult {
     html: string;
     errors: CalcpadError[];
+    /**
+     * The document's resolved `#ProjectPath`/`#LibraryPath` roots (via the
+     * `X-Calcpad-PathRoots` header), including any declared inside an `#include`d
+     * file — null when never declared.
+     */
+    projectPath: string | null;
+    libraryPath: string | null;
 }
 
 export interface CpdzDecodeResponse {

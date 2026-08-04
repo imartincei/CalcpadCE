@@ -61,8 +61,18 @@
             :style="editorGroupStyle(gi)"
             @mousedown="onGroupFocus(group.id)"
           >
-            <!-- Tab strip (VS Code-style). Hidden until at least one tab is registered. -->
-            <div v-if="group.tabs.length > 0" class="tab-strip" role="tablist" @contextmenu.prevent>
+            <!-- Tab strip (VS Code-style). Hidden until at least one tab is registered.
+                 Grows a little taller only once its tabs actually overflow (tab-strip-overflowing),
+                 so the horizontal scrollbar that then appears has room and doesn't sit over the
+                 tabs' close buttons. Stays compact the rest of the time. -->
+            <div
+              v-if="group.tabs.length > 0"
+              class="tab-strip"
+              :class="{ 'tab-strip-overflowing': tabStripOverflowIds.has(group.id) }"
+              role="tablist"
+              :ref="el => setTabStripRef(group.id, el)"
+              @contextmenu.prevent
+            >
               <div
                 v-for="tab in group.tabs"
                 :key="tab.id"
@@ -606,6 +616,47 @@ const previewHtmlByGroup = new Map<string, string>()
 function setEditorRef(id: string, el: unknown): void {
   if (el instanceof HTMLElement) editorEls.set(id, el)
   else editorEls.delete(id)
+}
+
+// Tracks which tab strips actually overflow horizontally, so only those grow taller
+// to make room for the scrollbar (see the .tab-strip-overflowing CSS). A ResizeObserver
+// catches both causes of a strip's overflow changing: the window resizing and tabs being
+// added/closed/renamed (each changes scrollWidth/clientWidth without necessarily firing
+// any other event we already listen for).
+const tabStripEls = new Map<string, HTMLElement>()
+const tabStripElIds = new WeakMap<Element, string>()
+const tabStripOverflowIds = ref<Set<string>>(new Set())
+let tabStripResizeObserver: ResizeObserver | null = null
+
+function setTabStripOverflow(id: string, overflowing: boolean): void {
+  if (tabStripOverflowIds.value.has(id) === overflowing) return
+  const next = new Set(tabStripOverflowIds.value)
+  if (overflowing) next.add(id)
+  else next.delete(id)
+  tabStripOverflowIds.value = next
+}
+
+function checkTabStripOverflow(id: string): void {
+  const el = tabStripEls.get(id)
+  if (!el) return
+  setTabStripOverflow(id, el.scrollWidth > el.clientWidth + 1)
+}
+
+function setTabStripRef(id: string, el: unknown): void {
+  const prev = tabStripEls.get(id)
+  if (prev && prev !== el) {
+    tabStripResizeObserver?.unobserve(prev)
+    tabStripElIds.delete(prev)
+  }
+  if (el instanceof HTMLElement) {
+    tabStripEls.set(id, el)
+    tabStripElIds.set(el, id)
+    tabStripResizeObserver?.observe(el)
+    checkTabStripOverflow(id)
+  } else {
+    tabStripEls.delete(id)
+    setTabStripOverflow(id, false)
+  }
 }
 function setPreviewRef(id: string, el: unknown): void {
   if (el instanceof HTMLIFrameElement) previewEls.set(id, el)
@@ -1447,17 +1498,19 @@ function setPreviewLoading(groupId: string, loading: boolean): void {
   else previewLoadingGroups.value.delete(groupId)
 }
 
+// Assigning srcdoc forces a real navigation (a fresh browsing context) rather than
+// rewriting the existing document in place. Reusing the same document via
+// doc.open()/write()/close() on every render left WebKit's per-frame scrolling state
+// prone to desync after certain content swaps (e.g. a resultMode change) -- once that
+// happened, the preview's scrollbar was gone for good until the iframe itself was
+// recreated. A fresh navigation each render sidesteps that entirely.
 function setPreviewHtml(groupId: string, html: string, scrollToLine?: number): void {
   const frame = previewEls.get(groupId)
   if (!frame) return
-  const doc = frame.contentDocument
-  if (!doc) return
-  doc.open()
-  doc.write(injectPreviewConsole(
+  frame.srcdoc = injectPreviewConsole(
     injectPreviewClipboard(injectLineLinks(html, scrollToLine, groupId), groupId),
     groupId,
-  ))
-  doc.close()
+  )
   previewHtmlByGroup.set(groupId, html)
   setPreviewHtmlOutput(groupId, html)
 }
@@ -1470,12 +1523,10 @@ function setPreviewHtml(groupId: string, html: string, scrollToLine?: number): v
  * in report mode, where the editor is on screen, keeps them.
  */
 function setUiPrintHtml(groupId: string, html: string): void {
-  const doc = uiPrintEls.get(groupId)?.contentDocument
-  if (!doc) return
+  const frame = uiPrintEls.get(groupId)
+  if (!frame) return
   const frameId = UI_PRINT_FRAME + groupId
-  doc.open()
-  doc.write(injectPreviewClipboard(injectLineLinks(html, undefined, groupId, frameId, false), frameId))
-  doc.close()
+  frame.srcdoc = injectPreviewClipboard(injectLineLinks(html, undefined, groupId, frameId, false), frameId)
 }
 
 function isUiPrintVisible(): boolean {
@@ -1748,12 +1799,22 @@ onMounted(async () => {
   document.addEventListener('mousedown', onDocumentInteractionForTabMenu)
   document.addEventListener('keydown', onDocumentInteractionForTabMenu)
   window.addEventListener('message', onPreviewWindowMessage)
+
+  tabStripResizeObserver = new ResizeObserver(entries => {
+    for (const entry of entries) {
+      const id = tabStripElIds.get(entry.target)
+      if (id) checkTabStripOverflow(id)
+    }
+  })
+  for (const el of tabStripEls.values()) tabStripResizeObserver.observe(el)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('mousedown', onDocumentInteractionForTabMenu)
   document.removeEventListener('keydown', onDocumentInteractionForTabMenu)
   window.removeEventListener('message', onPreviewWindowMessage)
+  tabStripResizeObserver?.disconnect()
+  tabStripResizeObserver = null
 })
 
 // ---- In-app confirm dialog ----

@@ -134,9 +134,10 @@ public class PortableWorksheetTests
     public void ATokenWriteTarget_AlwaysResolves_RegardlessOfNextToWorksheet()
     {
         using var dir = new WorksheetDir();
-        var source = $"""
-            #ProjectPath = {dir.At("out")}
-            #write R to <project>/results.csv
+        Directory.CreateDirectory(dir.At("out"));
+        var source = $$"""
+            #ProjectPath {{dir.At("out")}}
+            #write R to {project}/results.csv
             """ + "\n";
         var result = dir.Build(source, nextToWorksheet: false);
 
@@ -148,9 +149,10 @@ public class PortableWorksheetTests
     public void ATokenWriteTarget_CollapsesToItsFilename_WithNextToWorksheetOn()
     {
         using var dir = new WorksheetDir();
-        var source = $"""
-            #ProjectPath = {dir.At("out")}
-            #write R to <project>/results.csv
+        Directory.CreateDirectory(dir.At("out"));
+        var source = $$"""
+            #ProjectPath {{dir.At("out")}}
+            #write R to {project}/results.csv
             """ + "\n";
         var result = dir.Build(source, nextToWorksheet: true);
 
@@ -162,9 +164,10 @@ public class PortableWorksheetTests
     public void ATokenImageSource_ResolvesToTheAuthorsLocalPath()
     {
         using var dir = new WorksheetDir();
-        var source = $"""
-            #LibraryPath = {dir.At("lib")}
-            '<img src="<library>/logo.png">
+        Directory.CreateDirectory(dir.At("lib"));
+        var source = $$"""
+            #LibraryPath {{dir.At("lib")}}
+            '<img src="{library}/logo.png">
             """ + "\n";
         var result = dir.Build(source, nextToWorksheet: false);
 
@@ -177,7 +180,7 @@ public class PortableWorksheetTests
     public void AUserTokenImageSource_ResolvesToTheHomeDirectory()
     {
         using var dir = new WorksheetDir();
-        var source = "'<img src=\"<user>/logo.png\">\n";
+        var source = "'<img src=\"{user}/logo.png\">\n";
         var result = dir.Build(source, nextToWorksheet: false);
 
         Assert.Empty(result.Errors);
@@ -201,7 +204,7 @@ public class PortableWorksheetTests
     public void AUserTokenWriteTarget_ResolvesAndCollapses_WithNextToWorksheetOn()
     {
         using var dir = new WorksheetDir();
-        var result = dir.Build("#write R to <user>/results.csv\n", nextToWorksheet: true);
+        var result = dir.Build("#write R to {user}/results.csv\n", nextToWorksheet: true);
 
         Assert.Empty(result.Errors);
         Assert.Equal("#write R to results.csv\n", Rewritten(result));
@@ -211,7 +214,7 @@ public class PortableWorksheetTests
     public void AUserTokenWriteTarget_ResolvesToTheHomeDirectory_WithNextToWorksheetOff()
     {
         using var dir = new WorksheetDir();
-        var result = dir.Build("#write R to <user>/results.csv\n", nextToWorksheet: false);
+        var result = dir.Build("#write R to {user}/results.csv\n", nextToWorksheet: false);
 
         Assert.Empty(result.Errors);
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -222,7 +225,7 @@ public class PortableWorksheetTests
     public void AnUndeclaredTokenWriteTarget_Errors()
     {
         using var dir = new WorksheetDir();
-        var result = dir.Build("#write R to <project>/results.csv\n", nextToWorksheet: false);
+        var result = dir.Build("#write R to {project}/results.csv\n", nextToWorksheet: false);
 
         var message = Assert.Single(result.Errors);
         Assert.Contains("ProjectPath", message);

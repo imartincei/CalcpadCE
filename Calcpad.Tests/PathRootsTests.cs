@@ -21,17 +21,28 @@ public class PathRootsTests
     [Fact]
     public void TryDeclare_TwiceWithTheSameResolvedValue_IsANoOp()
     {
+        using var temp = new TempDir();
         var roots = new PathRoots();
-        Assert.True(roots.TryDeclare(true, "/project/lib", "/project", out _));
-        Assert.True(roots.TryDeclare(true, "/project/lib", "/project", out _));
+        Assert.True(roots.TryDeclare(true, temp.Path, "/project", out _));
+        Assert.True(roots.TryDeclare(true, temp.Path, "/project", out _));
     }
 
     [Fact]
     public void TryDeclare_TwiceWithADifferentValue_Fails()
     {
+        using var temp1 = new TempDir();
+        using var temp2 = new TempDir();
         var roots = new PathRoots();
-        Assert.True(roots.TryDeclare(true, "/project/lib", "/project", out _));
-        Assert.False(roots.TryDeclare(true, "/project/other", "/project", out var error));
+        Assert.True(roots.TryDeclare(true, temp1.Path, "/project", out _));
+        Assert.False(roots.TryDeclare(true, temp2.Path, "/project", out var error));
+        Assert.Contains("ProjectPath", error);
+    }
+
+    [Fact]
+    public void TryDeclare_WithAFolderThatDoesNotExist_Fails()
+    {
+        var roots = new PathRoots();
+        Assert.False(roots.TryDeclare(true, "no/such/folder", "/project", out var error));
         Assert.Contains("ProjectPath", error);
     }
 
@@ -39,18 +50,19 @@ public class PathRootsTests
     public void TryExpand_WithAnUndeclaredRoot_FailsButLeavesTheTokenInPlace()
     {
         var roots = new PathRoots();
-        Assert.False(roots.TryExpand("<library>/steel.cpd", out var expanded, out var error));
-        Assert.Equal("<library>/steel.cpd", expanded);
+        Assert.False(roots.TryExpand("{library}/steel.cpd", out var expanded, out var error));
+        Assert.Equal("{library}/steel.cpd", expanded);
         Assert.Contains("LibraryPath", error);
     }
 
     [Fact]
     public void TryExpand_WithADeclaredRoot_JoinsTheRemainder()
     {
+        using var temp = new TempDir();
         var roots = new PathRoots();
-        roots.TryDeclare(false, "/lib", "/project", out _);
-        Assert.True(roots.TryExpand("<library>/steel.cpd", out var expanded, out _));
-        Assert.Equal(System.IO.Path.Combine("/lib", "steel.cpd"), expanded);
+        roots.TryDeclare(false, temp.Path, "/project", out _);
+        Assert.True(roots.TryExpand("{library}/steel.cpd", out var expanded, out _));
+        Assert.Equal(System.IO.Path.Combine(temp.Path, "steel.cpd"), expanded);
     }
 
     [Fact]
@@ -63,9 +75,9 @@ public class PathRootsTests
     }
 
     [Theory]
-    [InlineData("#ProjectPath = C:/Jobs/1042", true, "C:/Jobs/1042")]
-    [InlineData("#LibraryPath = C:/Lib", false, "C:/Lib")]
-    [InlineData("#projectpath=./rel", true, "./rel")]
+    [InlineData("#ProjectPath C:/Jobs/1042", true, "C:/Jobs/1042")]
+    [InlineData("#LibraryPath C:/Lib", false, "C:/Lib")]
+    [InlineData("#projectpath ./rel", true, "./rel")]
     public void IsDeclaration_LocatesTheValue(string line, bool expectProject, string expectValue)
     {
         Assert.True(PathRoots.IsDeclaration(line.AsSpan(), out var isProject, out var start, out var length));
@@ -74,7 +86,7 @@ public class PathRootsTests
     }
 
     [Fact]
-    public void IsDeclaration_WithNoEqualsSign_ReportsAZeroLengthValue()
+    public void IsDeclaration_WithNoValue_ReportsAZeroLengthValue()
     {
         Assert.True(PathRoots.IsDeclaration("#ProjectPath".AsSpan(), out _, out _, out var length));
         Assert.Equal(0, length);
@@ -83,9 +95,9 @@ public class PathRootsTests
     [Fact]
     public void IsDeclaration_WithATrailingComment_StopsBeforeIt()
     {
-        Assert.True(PathRoots.IsDeclaration("#LibraryPath = /lib 'the shared library".AsSpan(),
+        Assert.True(PathRoots.IsDeclaration("#LibraryPath /lib 'the shared library".AsSpan(),
             out _, out var start, out var length));
-        Assert.Equal("/lib", "#LibraryPath = /lib 'the shared library"[start..(start + length)]);
+        Assert.Equal("/lib", "#LibraryPath /lib 'the shared library"[start..(start + length)]);
     }
 
     [Fact]
@@ -95,7 +107,7 @@ public class PathRootsTests
         temp.Write("lib/steel.cpd", "leaf = 1\n");
 
         var macroParser = new MacroParser { Include = (f, _) => File.ReadAllText(f), SourceFilePath = temp.At("main.cpd") };
-        macroParser.Parse($"#LibraryPath = {temp.Path}/lib\n#include <library>/steel.cpd\n",
+        macroParser.Parse($"#LibraryPath {temp.Path}/lib\n#include {{library}}/steel.cpd\n",
             out var expanded, null, 0, false);
 
         Assert.DoesNotContain("not found", expanded);
@@ -109,7 +121,7 @@ public class PathRootsTests
         temp.Write("lib/steel.cpd", "leaf = 1\n");
 
         var macroParser = new MacroParser { Include = (f, _) => File.ReadAllText(f), SourceFilePath = temp.At("main.cpd") };
-        macroParser.Parse($"#include <library>/steel.cpd\n#LibraryPath = {temp.Path}/lib\n",
+        macroParser.Parse($"#include {{library}}/steel.cpd\n#LibraryPath {temp.Path}/lib\n",
             out var expanded, null, 0, false);
 
         Assert.DoesNotContain("leaf = 1", expanded);
@@ -120,9 +132,11 @@ public class PathRootsTests
     public void Include_WithASecondConflictingDeclaration_Errors()
     {
         using var temp = new TempDir();
+        temp.Write("a/.keep", "");
+        temp.Write("b/.keep", "");
 
         var macroParser = new MacroParser { Include = (f, _) => File.ReadAllText(f), SourceFilePath = temp.At("main.cpd") };
-        macroParser.Parse("#LibraryPath = ./a\n#LibraryPath = ./b\n", out var expanded, null, 0, false);
+        macroParser.Parse("#LibraryPath ./a\n#LibraryPath ./b\n", out var expanded, null, 0, false);
 
         Assert.Contains("LibraryPath", expanded);
     }
@@ -133,7 +147,18 @@ public class PathRootsTests
         using var temp = new TempDir();
 
         var macroParser = new MacroParser { Include = (f, _) => File.ReadAllText(f), SourceFilePath = temp.At("main.cpd") };
-        macroParser.Parse("#LibraryPath =\n", out var expanded, null, 0, false);
+        macroParser.Parse("#LibraryPath\n", out var expanded, null, 0, false);
+
+        Assert.Contains("LibraryPath", expanded);
+    }
+
+    [Fact]
+    public void Declaration_WithAFolderThatDoesNotExist_Errors()
+    {
+        using var temp = new TempDir();
+
+        var macroParser = new MacroParser { Include = (f, _) => File.ReadAllText(f), SourceFilePath = temp.At("main.cpd") };
+        macroParser.Parse("#LibraryPath ./no-such-folder\n", out var expanded, null, 0, false);
 
         Assert.Contains("LibraryPath", expanded);
     }
@@ -147,7 +172,7 @@ public class PathRootsTests
         roots.TryDeclare(true, temp.Path + "/data", temp.Path, out _);
 
         var assignment = ExpressionParser.InlineReadDirective(
-            "#read M from <project>/loads.csv", temp.At("main.cpd"), roots);
+            "#read M from {project}/loads.csv", temp.At("main.cpd"), roots);
 
         Assert.Equal("M = [1; 2]", assignment);
     }
@@ -157,7 +182,7 @@ public class PathRootsTests
     {
         using var temp = new TempDir();
         Assert.Throws<MathParserException>(() =>
-            ExpressionParser.InlineReadDirective("#read M from <project>/loads.csv", temp.At("main.cpd"), new PathRoots()));
+            ExpressionParser.InlineReadDirective("#read M from {project}/loads.csv", temp.At("main.cpd"), new PathRoots()));
     }
 
     [Fact]
@@ -165,7 +190,7 @@ public class PathRootsTests
     {
         var roots = new PathRoots();
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        Assert.True(roots.TryExpand("<user>/lib/steel.cpd", out var expanded, out var error));
+        Assert.True(roots.TryExpand("{user}/lib/steel.cpd", out var expanded, out var error));
         Assert.Null(error);
         Assert.Equal(System.IO.Path.Combine(home, "lib", "steel.cpd"), expanded);
     }
@@ -175,17 +200,17 @@ public class PathRootsTests
     {
         var roots = new PathRoots();
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        Assert.True(roots.TryExpand("<user>", out var expanded, out _));
+        Assert.True(roots.TryExpand("{user}", out var expanded, out _));
         Assert.Equal(home, expanded);
     }
 
     [Fact]
     public void TryExpand_UserToken_NeedsNoDeclaration()
     {
-        // Unlike <project>/<library>, a fresh PathRoots instance with nothing declared still
-        // resolves <user> — it is never "undeclared".
+        // Unlike {project}/{library}, a fresh PathRoots instance with nothing declared still
+        // resolves {user} — it is never "undeclared".
         var roots = new PathRoots();
-        Assert.True(roots.TryExpand("<user>/a.cpd", out _, out var error));
+        Assert.True(roots.TryExpand("{user}/a.cpd", out _, out var error));
         Assert.Null(error);
     }
 
@@ -194,8 +219,8 @@ public class PathRootsTests
     {
         var roots = new PathRoots();
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        Assert.True(roots.TryDeclare(true, "<user>/Jobs/1042", "/project", out _));
-        Assert.Equal(System.IO.Path.Combine(home, "Jobs", "1042"), roots.Project);
+        Assert.True(roots.TryDeclare(true, "{user}", "/project", out _));
+        Assert.Equal(home, roots.Project);
     }
 
 

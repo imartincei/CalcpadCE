@@ -80,7 +80,7 @@ export type {
 } from './types/snippets';
 
 // --- API Client --------------------------------------------------------------
-export { CalcpadApiClient, parseConvertErrorHeader } from './api/client';
+export { CalcpadApiClient, parseConvertErrorHeader, parseConvertPathRootsHeader, combineSignals } from './api/client';
 
 // --- Services ----------------------------------------------------------------
 export { CalcpadLintService } from './services/linter';
@@ -244,4 +244,5 @@ export {
     resolveDeclaredPathRoots,
     expandPathRootToken,
     createReferenceResolver,
+    createReferenceResolverFromRoots,
 } from './text/path-roots';

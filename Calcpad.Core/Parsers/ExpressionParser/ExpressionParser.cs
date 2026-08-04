@@ -37,6 +37,7 @@ namespace Calcpad.Core
         public Settings Settings { get; set; } = new();
         public string SourceFilePath { get; set; }
         private PathRoots _pathRoots = new();
+        public PathRoots PathRoots => _pathRoots;
         public string HtmlResult { get; private set; }
         public IReadOnlyList<CalcpadError> Errors => _errorList;
         public static bool IsUs

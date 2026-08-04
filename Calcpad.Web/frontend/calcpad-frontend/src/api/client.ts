@@ -38,6 +38,16 @@ export class CalcpadApiClient {
     // desktop app can drive two editor groups (two previews + two linters).
     private requestQueue: Promise<unknown> = Promise.resolve();
 
+    // Per-key "latest wins" bookkeeping, layered on top of the queue above. A
+    // caller passes `key` (e.g. an editor group id) to mean "only the newest
+    // request for this key still matters" — an older request sharing the same
+    // key is dropped before it ever runs (if still queued) or aborted (if
+    // already in flight), instead of piling up and running to completion long
+    // after it stopped mattering. Requests with no key keep today's plain FIFO
+    // behavior.
+    private keySeq = new Map<string, number>();
+    private keyAbort = new Map<string, AbortController>();
+
     constructor(baseUrl: string, logger?: ILogger) {
         this.baseUrl = baseUrl;
         this.logger = logger;
@@ -61,20 +71,46 @@ export class CalcpadApiClient {
         return run;
     }
 
-    public async lint(content: string, sourceFilePath?: string): Promise<LintResponse | null> {
-        const request: LintRequest = { content, sourceFilePath };
-        return this.post<LintResponse>('/api/calcpad/lint', request, 'Lint');
+    /**
+     * Like {@link serialize}, but a later call sharing `key` supersedes this
+     * one: still-queued work is skipped without ever reaching the network,
+     * already in-flight work has its `signal` aborted. A superseded call
+     * resolves to `null` — the same outcome callers already handle for a
+     * failed or non-OK response, so no caller needs to special-case it.
+     */
+    private serializeKeyed<T>(key: string | undefined, task: (signal: AbortSignal) => Promise<T>): Promise<T | null> {
+        if (!key) return this.serialize(() => task(new AbortController().signal));
+
+        const mySeq = (this.keySeq.get(key) ?? 0) + 1;
+        this.keySeq.set(key, mySeq);
+        this.keyAbort.get(key)?.abort();
+        const controller = new AbortController();
+        this.keyAbort.set(key, controller);
+
+        return this.serialize(async (): Promise<T | null> => {
+            if (this.keySeq.get(key) !== mySeq) return null;
+            try {
+                return await task(controller.signal);
+            } finally {
+                if (this.keyAbort.get(key) === controller) this.keyAbort.delete(key);
+            }
+        });
     }
 
-    public async highlight(content: string, includeText: boolean = false, sourceFilePath?: string): Promise<HighlightToken[] | null> {
+    public async lint(content: string, sourceFilePath?: string, opts?: { key?: string }): Promise<LintResponse | null> {
+        const request: LintRequest = { content, sourceFilePath };
+        return this.post<LintResponse>('/api/calcpad/lint', request, 'Lint', opts?.key);
+    }
+
+    public async highlight(content: string, includeText: boolean = false, sourceFilePath?: string, opts?: { key?: string }): Promise<HighlightToken[] | null> {
         const request: HighlightRequest = { content, includeText, sourceFilePath };
-        const response = await this.post<HighlightResponse>('/api/calcpad/highlight', request, 'Highlight');
+        const response = await this.post<HighlightResponse>('/api/calcpad/highlight', request, 'Highlight', opts?.key);
         return response?.tokens ?? null;
     }
 
-    public async definitions(content: string, sourceFilePath?: string): Promise<DefinitionsResponse | null> {
+    public async definitions(content: string, sourceFilePath?: string, opts?: { key?: string }): Promise<DefinitionsResponse | null> {
         const request: DefinitionsRequest = { content, sourceFilePath };
-        return this.post<DefinitionsResponse>('/api/calcpad/definitions', request, 'Definitions');
+        return this.post<DefinitionsResponse>('/api/calcpad/definitions', request, 'Definitions', opts?.key);
     }
 
     /**
@@ -88,9 +124,10 @@ export class CalcpadApiClient {
         line: number,
         column: number,
         sourceFilePath?: string,
+        opts?: { key?: string },
     ): Promise<SymbolAtPositionResponse | null> {
         const request: SymbolAtPositionRequest = { content, line, column, sourceFilePath };
-        return this.post<SymbolAtPositionResponse>('/api/calcpad/symbol-at-position', request, 'SymbolAtPosition');
+        return this.post<SymbolAtPositionResponse>('/api/calcpad/symbol-at-position', request, 'SymbolAtPosition', opts?.key);
     }
 
     /**
@@ -227,9 +264,10 @@ export class CalcpadApiClient {
         sourceFilePath?: string,
         theme?: 'light' | 'dark',
         ui?: UiConvertOptions,
-        includeLineAnchors?: boolean
+        includeLineAnchors?: boolean,
+        opts?: { key?: string },
     ): Promise<ArrayBuffer | ConvertResult | null> {
-        return this.serialize(async () => {
+        return this.serializeKeyed(opts?.key, async (signal) => {
             const url = this.baseUrl + '/api/calcpad/convert';
             try {
                 const response = await fetch(url, {
@@ -241,7 +279,7 @@ export class CalcpadApiClient {
                         uiOverrides: ui?.uiOverrides,
                         includeLineAnchors,
                     }),
-                    signal: AbortSignal.timeout(60000),
+                    signal: combineSignals(AbortSignal.timeout(60000), signal),
                 });
                 if (!response.ok) return null;
 
@@ -249,7 +287,7 @@ export class CalcpadApiClient {
                     return response.arrayBuffer();
                 }
                 const html = await response.text();
-                return { html, errors: parseConvertErrorHeader(response) };
+                return { html, errors: parseConvertErrorHeader(response), ...parseConvertPathRootsHeader(response) };
             } catch (error) {
                 this.logError('Convert', error);
                 return null;
@@ -304,24 +342,39 @@ export class CalcpadApiClient {
         settings: unknown,
         sourceFilePath?: string,
         theme?: 'light' | 'dark',
+        opts?: { key?: string },
     ): Promise<ConvertResult | null> {
-        return this.serialize(async () => {
+        return this.serializeKeyed(opts?.key, async (signal) => {
             const url = this.baseUrl + '/api/calcpad/convert?unwrap=true';
             try {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ content, settings, sourceFilePath, theme }),
-                    signal: AbortSignal.timeout(60000),
+                    signal: combineSignals(AbortSignal.timeout(60000), signal),
                 });
                 if (!response.ok) return null;
                 const html = await response.text();
-                return { html, errors: parseConvertErrorHeader(response) };
+                return { html, errors: parseConvertErrorHeader(response), ...parseConvertPathRootsHeader(response) };
             } catch (error) {
                 this.logError('ConvertUnwrapped', error);
                 return null;
             }
         });
+    }
+
+    /**
+     * Runs an arbitrary request through the same global queue and per-key
+     * supersession as the built-in methods above, for a caller whose request
+     * body isn't shaped like any of them (e.g. an endpoint-specific extra
+     * field none of the typed methods carry). `task` gets an `AbortSignal`
+     * that fires when it's superseded — pass it as the `fetch` call's
+     * `signal` (combined with any timeout signal of the caller's own) so a
+     * superseded request actually aborts instead of running to completion
+     * unseen.
+     */
+    public runSerialized<T>(task: (signal: AbortSignal) => Promise<T>, opts?: { key?: string }): Promise<T | null> {
+        return this.serializeKeyed(opts?.key, task);
     }
 
     public async checkHealth(): Promise<boolean> {
@@ -335,10 +388,10 @@ export class CalcpadApiClient {
         }
     }
 
-    private post<T>(endpoint: string, body: unknown, tag: string): Promise<T | null> {
+    private post<T>(endpoint: string, body: unknown, tag: string, key?: string): Promise<T | null> {
         // Serialized: every POST endpoint runs the Calcpad.Core parser, whose
         // static macro state cannot be shared by concurrent requests.
-        return this.serialize(async () => {
+        return this.serializeKeyed(key, async (signal) => {
             const url = this.baseUrl + endpoint;
             try {
                 this.logger?.appendLine(`[${tag}] Sending request to server...`);
@@ -346,7 +399,7 @@ export class CalcpadApiClient {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(body),
-                    signal: AbortSignal.timeout(30000),
+                    signal: combineSignals(AbortSignal.timeout(30000), signal),
                 });
                 if (!response.ok) {
                     this.logger?.appendLine(`[${tag}] Server returned ${response.status}`);
@@ -401,6 +454,35 @@ export function parseConvertErrorHeader(response: Response): CalcpadError[] {
     } catch {
         return [];
     }
+}
+
+/**
+ * Reads the document's resolved `#ProjectPath`/`#LibraryPath` roots from the
+ * `X-Calcpad-PathRoots` header — includes roots declared inside an `#include`d file, unlike
+ * scanning the entry document's own text.
+ */
+export function parseConvertPathRootsHeader(response: Response): { projectPath: string | null; libraryPath: string | null } {
+    const raw = response.headers.get('X-Calcpad-PathRoots');
+    if (!raw) return { projectPath: null, libraryPath: null };
+    try {
+        const parsed = JSON.parse(decodeURIComponent(raw));
+        return { projectPath: parsed.projectPath ?? null, libraryPath: parsed.libraryPath ?? null };
+    } catch {
+        return { projectPath: null, libraryPath: null };
+    }
+}
+
+/**
+ * Aborts when either input does. Hand-rolled instead of `AbortSignal.any()`
+ * since that's Node 20+ only and this client's contract is Node 18+.
+ */
+export function combineSignals(a: AbortSignal, b: AbortSignal): AbortSignal {
+    if (a.aborted) return a;
+    if (b.aborted) return b;
+    const controller = new AbortController();
+    a.addEventListener('abort', () => controller.abort(a.reason), { once: true });
+    b.addEventListener('abort', () => controller.abort(b.reason), { once: true });
+    return controller.signal;
 }
 
 /**

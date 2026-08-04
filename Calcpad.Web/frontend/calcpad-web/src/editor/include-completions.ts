@@ -1,8 +1,9 @@
 import * as monaco from 'monaco-editor';
 import { scanDeclaredPathRoots, getPathRootTokenKind, type PathRootKind } from 'calcpad-frontend';
+import { isUserToken, expandUserToken } from 'calcpad-frontend/text/path-roots';
 import { pathResolve } from 'calcpad-frontend/services/paths';
 
-const DIRECTIVES = ['include', 'read', 'write', 'append'] as const;
+const DIRECTIVES = ['include', 'read', 'write', 'append', 'projectpath', 'librarypath'] as const;
 type Directive = typeof DIRECTIVES[number];
 
 const INCLUDE_EXTENSIONS = ['cpd', 'txt'];
@@ -30,7 +31,7 @@ export function parseDirectiveLine(lineText: string): DirectiveParse | undefined
     while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) i++;
     if (i === afterKeyword) return undefined;
 
-    if (keyword === 'include') {
+    if (keyword === 'include' || keyword === 'projectpath' || keyword === 'librarypath') {
         return { directive: keyword, pathStartCol: i, partialPath: lineText.substring(i) };
     }
 
@@ -83,18 +84,25 @@ export interface IncludeCompletionsContext {
     getOpenedFolder(): Promise<string | null>;
     /** Expands %VAR%/$VAR references against the host's environment. */
     expandEnvVars(raw: string): Promise<string>;
+    /** The current OS user's home directory, for the `{user}` path-root token, or null if unknown. */
+    getHomeDir(): Promise<string | null>;
 }
 
 const PATH_ROOT_LABEL: Record<PathRootKind, string> = { project: 'Project', library: 'Library' };
-const PATH_ROOT_TOKEN: Record<PathRootKind, string> = { project: '<project>', library: '<library>' };
+const PATH_ROOT_TOKEN: Record<PathRootKind, string> = { project: '{project}', library: '{library}' };
+const USER_TOKEN = '{user}';
 
 /**
- * Register a Monaco completion provider for #include / #read / #write / #append
- * directives. Search roots (in priority order):
+ * Register a Monaco completion provider for #include / #read / #write / #append /
+ * #ProjectPath / #LibraryPath directives (the latter two, being directory-only
+ * declarations, only ever offer folders — never files). Search roots (in priority
+ * order):
  *   1. The current file's parent directory.
  *   2. The opened workspace folder (if any and different).
- *   3. The document's own `#ProjectPath`/`#LibraryPath` declarations, if any —
- *      offered (and drilled into) as `<project>/…`/`<library>/…` so completions
+ *   3. The OS user's home directory (if any and different), offered (and drilled
+ *      into) as `{user}/…` — needs no declaration, unlike the two roots below.
+ *   4. The document's own `#ProjectPath`/`#LibraryPath` declarations, if any —
+ *      offered (and drilled into) as `{project}/…`/`{library}/…` so completions
  *      naturally lead an author to write the portable, token-prefixed form
  *      rather than an absolute path that a portable package would bundle.
  * Duplicates (same file reachable via multiple roots) are filtered by absolute
@@ -114,9 +122,12 @@ export function registerIncludeCompletionProvider(
             if (!parsed) return { suggestions: [], incomplete: true };
 
             const isInclude = parsed.directive === 'include';
-            const extensions = isInclude
-                ? INCLUDE_EXTENSIONS
-                : [...INCLUDE_EXTENSIONS, ...DATA_EXTENSIONS];
+            const isPathRoot = parsed.directive === 'projectpath' || parsed.directive === 'librarypath';
+            const extensions = isPathRoot
+                ? []
+                : isInclude
+                    ? INCLUDE_EXTENSIONS
+                    : [...INCLUDE_EXTENSIONS, ...DATA_EXTENSIONS];
 
             // Strip trailing options (@sheet, type=, sep=)
             let partialPath = parsed.partialPath;
@@ -126,13 +137,15 @@ export function registerIncludeCompletionProvider(
             const currentFilePath = ctx.getCurrentFilePath();
             const currentDir = currentFilePath ? pathDirname(currentFilePath) : '';
             const openedFolder = await ctx.getOpenedFolder();
+            const homeDir = await ctx.getHomeDir();
 
             const declaredRoots = scanDeclaredPathRoots(model.getValue(), position.lineNumber - 1);
             const resolvedRoots: Record<PathRootKind, string | null> = { project: null, library: null };
             for (const kind of ['project', 'library'] as const) {
                 const declared = declaredRoots[kind];
                 if (declared && currentDir) {
-                    resolvedRoots[kind] = pathResolve(currentDir, await ctx.expandEnvVars(declared));
+                    const withUser = homeDir !== null && isUserToken(declared) ? expandUserToken(declared, homeDir) : declared;
+                    resolvedRoots[kind] = pathResolve(currentDir, await ctx.expandEnvVars(withUser));
                 }
             }
 
@@ -147,10 +160,23 @@ export function registerIncludeCompletionProvider(
             const seenAbsolute = new Set<string>();
 
             const tokenKind = getPathRootTokenKind(partialPath);
+            const isUser = isUserToken(partialPath);
             const hasSeparator = partialPath.includes('/') || partialPath.includes('\\');
 
-            if (tokenKind !== null) {
-                // Drilling into a <project>/<library> reference: search the resolved root,
+            if (isUser) {
+                // Drilling into a {user} reference: search the OS home directory, but
+                // reinsert completions in token form so the reference stays portable.
+                if (homeDir === null) return { suggestions: [], incomplete: true };
+
+                const tokenText = partialPath.slice(0, USER_TOKEN.length);
+                let rest = partialPath.slice(tokenText.length);
+                if (rest.startsWith('/') || rest.startsWith('\\')) rest = rest.slice(1);
+                await addEntries(
+                    ctx, homeDir, rest, extensions, range,
+                    currentFilePath, suggestions, seenAbsolute, '', false, `${tokenText}/`
+                );
+            } else if (tokenKind !== null) {
+                // Drilling into a {project}/{library} reference: search the resolved root,
                 // but reinsert completions in token form so the reference stays portable.
                 const root = resolvedRoots[tokenKind];
                 if (root === null) return { suggestions: [], incomplete: true };
@@ -188,6 +214,14 @@ export function registerIncludeCompletionProvider(
                     await addEntries(
                         ctx, openedFolder, partialPath, extensions, range,
                         currentFilePath, suggestions, seenAbsolute, 'Workspace', true
+                    );
+                }
+                if (homeDir
+                    && normalize(homeDir) !== normalize(currentDir)
+                    && (!openedFolder || normalize(homeDir) !== normalize(openedFolder))) {
+                    await addEntries(
+                        ctx, homeDir, partialPath, extensions, range,
+                        currentFilePath, suggestions, seenAbsolute, 'User', false, `${USER_TOKEN}/`
                     );
                 }
                 for (const kind of ['project', 'library'] as const) {

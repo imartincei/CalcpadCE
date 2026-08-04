@@ -263,6 +263,23 @@ select option {
     user-select: none;
 }
 
+/* Only once its tabs overflow (see setTabStripRef's ResizeObserver in App.vue) does the
+ * strip grow enough to give the scrollbar room below a full-height tab row, instead of
+ * the scrollbar sitting over the tabs' close buttons. Non-overflowing strips stay compact. */
+.tab-strip.tab-strip-overflowing {
+    height: 48px;
+}
+
+/* Thinner than the app-wide scrollbar so it eats less of the tab strip's height.
+ * Chromium fattens custom scrollbars on hover by default, so pin the hover
+ * state to the same height explicitly. On the Linux desktop app (WebKitGTK) this
+ * doesn't apply -- scrollbars there come from GTK's native overlay-scrolling theme,
+ * not page CSS, and grow on hover regardless of this rule. */
+.tab-strip::-webkit-scrollbar,
+.tab-strip::-webkit-scrollbar:hover {
+    height: 5px;
+}
+
 .tab {
     display: inline-flex;
     align-items: center;

@@ -27,6 +27,9 @@ namespace Calcpad.Server.Services
             // PDF generation service (singleton for browser reuse)
             builder.Services.AddSingleton<PdfGeneratorService>();
 
+            // Serializes the endpoints that touch Calcpad.Core's process-global parser state.
+            builder.Services.AddSingleton<ParserGate>();
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
@@ -34,7 +37,7 @@ namespace Calcpad.Server.Services
                     policy.AllowAnyOrigin()
                           .AllowAnyMethod()
                           .AllowAnyHeader()
-                          .WithExposedHeaders("X-Calcpad-Errors");
+                          .WithExposedHeaders("X-Calcpad-Errors", "X-Calcpad-PathRoots");
                 });
             });
 
@@ -51,6 +54,11 @@ namespace Calcpad.Server.Services
                 try
                 {
                     await next();
+                }
+                catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+                {
+                    // The client disconnected or superseded this request — expected under
+                    // rapid tab-switching, not a server error, so it isn't logged as one.
                 }
                 catch (Exception ex)
                 {

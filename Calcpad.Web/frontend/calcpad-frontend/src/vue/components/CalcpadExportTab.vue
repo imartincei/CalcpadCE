@@ -155,12 +155,12 @@ const WRITE_NEXT_TO_WORKSHEET_DETAIL =
   + 'on the recipient\'s machine. A relative target already does that and is never touched.'
 
 const BUNDLE_PROJECT_DETAIL =
-  'Off (default): a <project>  reference is left exactly as written for #ProjectPath to resolve.\n'
-  + 'On: <projects> references are removed and bundled into the package '
+  'Off (default): a {project}  reference is left exactly as written for #ProjectPath to resolve.\n'
+  + 'On: {project} references are removed and bundled into the package '
   + 'using a relative path.'
 const BUNDLE_LIBRARY_DETAIL =
-  'Off (default): a <library> reference is left exactly as written for #LibraryPath to resolve.\n'
-  + 'On: <library> references are removed and bundled into the package '
+  'Off (default): a {library} reference is left exactly as written for #LibraryPath to resolve.\n'
+  + 'On: {library} references are removed and bundled into the package '
   + 'using a relative path.'
 
 // Report first: it is the default rendering everywhere else, so it reads as the one to

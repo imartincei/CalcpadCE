@@ -41,6 +41,10 @@ namespace Calcpad.Server.Services
     {
         private IBrowser? _browser;
         private readonly SemaphoreSlim _browserLock = new(1, 1);
+        // Caps concurrent Chromium pages against the one shared browser, independent of
+        // _browserLock (which only guards lazy browser creation) — a burst of PDF/DOCX
+        // requests would otherwise open one page per request with no upper bound.
+        private readonly SemaphoreSlim _pageLock = new(4, 4);
         private readonly IConfiguration _config;
         private static string? _cachedChromiumPath;
 
@@ -69,7 +73,18 @@ namespace Calcpad.Server.Services
         private async Task<byte[]> GenerateBasicPdfAsync(string html, PdfSettingsDto options, string? browserPath)
         {
             var browser = await GetOrCreateBrowserAsync(browserPath).ConfigureAwait(false);
-            var page = await browser.NewPageAsync().ConfigureAwait(false);
+
+            await _pageLock.WaitAsync().ConfigureAwait(false);
+            IPage page;
+            try
+            {
+                page = await browser.NewPageAsync().ConfigureAwait(false);
+            }
+            catch
+            {
+                _pageLock.Release();
+                throw;
+            }
 
             try
             {
@@ -185,7 +200,14 @@ namespace Calcpad.Server.Services
             }
             finally
             {
-                await page.CloseAsync().ConfigureAwait(false);
+                try
+                {
+                    await page.CloseAsync().ConfigureAwait(false);
+                }
+                finally
+                {
+                    _pageLock.Release();
+                }
             }
         }
 

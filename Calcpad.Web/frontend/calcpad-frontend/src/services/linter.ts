@@ -23,7 +23,8 @@ export class CalcpadLintService {
      */
     public async lintContent(
         content: string,
-        sourceFilePath?: string
+        sourceFilePath?: string,
+        key?: string,
     ): Promise<LintResponse | null> {
         const reqId = ++this.requestId;
         const startTime = Date.now();
@@ -36,7 +37,7 @@ export class CalcpadLintService {
         }
 
         const truncated = truncateBase64Content(content);
-        const response = await this.apiClient.lint(truncated, sourceFilePath);
+        const response = await this.apiClient.lint(truncated, sourceFilePath, { key });
 
         if (response) {
             this.logger?.appendLine(

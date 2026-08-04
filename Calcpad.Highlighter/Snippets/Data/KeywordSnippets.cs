@@ -141,10 +141,10 @@ namespace Calcpad.Highlighter.Snippets.Data
             },
             new SnippetItem
             {
-                Insert = "#ProjectPath = path",
-                Description = "Declares the folder <project> stands for in #include, #read, #write and image paths below this line.",
+                Insert = "#ProjectPath path",
+                Description = "Declares the folder {project} stands for in #include, #read, #write and image paths below this line.",
                 Documentation = "One `#ProjectPath` is allowed per document, and it has to come before the first "
-                    + "`<project>` reference — a reference reached first reports it as undeclared rather than "
+                    + "`{project}` reference — a reference reached first reports it as undeclared rather than "
                     + "guessing. A module meant to be `#include`d elsewhere should declare its own inside "
                     + "`#local`...`#global`, so it does not clash with the including document's.",
                 Category = "Modules and Macros",
@@ -152,10 +152,10 @@ namespace Calcpad.Highlighter.Snippets.Data
             },
             new SnippetItem
             {
-                Insert = "#LibraryPath = path",
-                Description = "Declares the folder <library> stands for in #include, #read, #write and image paths below this line.",
+                Insert = "#LibraryPath path",
+                Description = "Declares the folder {library} stands for in #include, #read, #write and image paths below this line.",
                 Documentation = "One `#LibraryPath` is allowed per document, and it has to come before the first "
-                    + "`<library>` reference — a reference reached first reports it as undeclared rather than "
+                    + "`{library}` reference — a reference reached first reports it as undeclared rather than "
                     + "guessing. A module meant to be `#include`d elsewhere should declare its own inside "
                     + "`#local`...`#global`, so it does not clash with the including document's.",
                 Category = "Modules and Macros",

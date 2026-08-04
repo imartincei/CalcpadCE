@@ -11,16 +11,16 @@ namespace Calcpad.Tests.HighlighterTests
         [Fact]
         public void Declaration_TokenizesValueAsSingleToken()
         {
-            var result = new CalcpadTokenizer().Tokenize("#ProjectPath = C:/Jobs/1042");
+            var result = new CalcpadTokenizer().Tokenize("#ProjectPath C:/Jobs/1042");
             var pathRootTokens = result.Tokens.Where(t => t.Type == TokenType.PathRoot).ToList();
             var token = Assert.Single(pathRootTokens);
-            Assert.Equal("= C:/Jobs/1042", token.Text);
+            Assert.Equal("C:/Jobs/1042", token.Text);
         }
 
         [Fact]
         public void Declaration_IsRecognizedAsKeyword()
         {
-            var result = new CalcpadTokenizer().Tokenize("#LibraryPath = C:/Lib");
+            var result = new CalcpadTokenizer().Tokenize("#LibraryPath C:/Lib");
             var keywordTokens = result.Tokens.Where(t => t.Type == TokenType.Keyword).ToList();
             var token = Assert.Single(keywordTokens);
             Assert.Equal("#LibraryPath", token.Text);
@@ -29,24 +29,36 @@ namespace Calcpad.Tests.HighlighterTests
         [Fact]
         public void Include_WithLibraryToken_ResolvesAgainstDeclaredRoot()
         {
-            var resolvedLibraryFile = System.IO.Path.GetFullPath("lib/steel.cpd", "/project");
-            var content = "#LibraryPath = /project/lib\n#include <library>/steel.cpd\nx = 1";
-            var includeFiles = new Dictionary<string, string>
+            var temp = new System.IO.DirectoryInfo(System.IO.Path.Combine(
+                System.IO.Path.GetTempPath(), System.IO.Path.GetRandomFileName()));
+            temp.Create();
+            try
             {
-                [resolvedLibraryFile] = "y = 2"
-            };
+                var libDir = System.IO.Directory.CreateDirectory(System.IO.Path.Combine(temp.FullName, "lib"));
+                var resolvedLibraryFile = System.IO.Path.GetFullPath("lib/steel.cpd", temp.FullName);
+                var content = $"#LibraryPath {libDir.FullName}\n#include {{library}}/steel.cpd\nx = 1";
+                var includeFiles = new Dictionary<string, string>
+                {
+                    [resolvedLibraryFile] = "y = 2"
+                };
 
-            var staged = new ContentResolver().GetStagedContent(content, includeFiles, sourceFilePath: "/project/main.cpd");
-            var joined = string.Join('\n', staged.Stage2.Lines);
+                var staged = new ContentResolver().GetStagedContent(content, includeFiles,
+                    sourceFilePath: System.IO.Path.Combine(temp.FullName, "main.cpd"));
+                var joined = string.Join('\n', staged.Stage2.Lines);
 
-            Assert.DoesNotContain("Error: Include file not provided", joined);
-            Assert.Contains("y = 2", joined);
+                Assert.DoesNotContain("Error: Include file not provided", joined);
+                Assert.Contains("y = 2", joined);
+            }
+            finally
+            {
+                temp.Delete(recursive: true);
+            }
         }
 
         [Fact]
         public void Include_WithUndeclaredToken_FallsBackToNotFound()
         {
-            var content = "#include <library>/steel.cpd\nx = 1";
+            var content = "#include {library}/steel.cpd\nx = 1";
             var staged = new ContentResolver().GetStagedContent(content, sourceFilePath: "/project/main.cpd");
             var joined = string.Join('\n', staged.Stage2.Lines);
 
@@ -58,7 +70,7 @@ namespace Calcpad.Tests.HighlighterTests
         {
             var home = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
             var resolvedFile = System.IO.Path.GetFullPath("lib/steel.cpd", home);
-            var content = "#include <user>/lib/steel.cpd\nx = 1";
+            var content = "#include {user}/lib/steel.cpd\nx = 1";
             var includeFiles = new Dictionary<string, string>
             {
                 [resolvedFile] = "y = 2"

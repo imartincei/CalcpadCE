@@ -136,7 +136,7 @@ namespace Calcpad.Highlighter.Tokenizer.Models
         FutureReserved29 = 29,
         FutureReserved30 = 30,
 
-        /// <summary>Path value following #ProjectPath/#LibraryPath (e.g. `#ProjectPath = C:/Jobs/1042`).</summary>
+        /// <summary>Path value following #ProjectPath/#LibraryPath (e.g. `#ProjectPath C:/Jobs/1042`).</summary>
         PathRoot = 31
     }
 }

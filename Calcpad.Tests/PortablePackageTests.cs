@@ -484,9 +484,9 @@ public class PortablePackageTests
     {
         using var tree = new Tree();
         tree.Write("lib/steel.cpd", "a = 1\n");
-        var source = $"""
-            #LibraryPath = {tree.At("lib")}
-            #include <library>/steel.cpd
+        var source = $$"""
+            #LibraryPath {{tree.At("lib")}}
+            #include {library}/steel.cpd
             """;
         var zip = tree.Pack(source);
 
@@ -498,11 +498,12 @@ public class PortablePackageTests
     public void ATokenReadAndWriteAndImage_AreAllLeftAsWrittenWithBothBundleFlagsOff()
     {
         using var tree = new Tree();
-        var source = """
-            #ProjectPath = /project
-            #read L from <project>/data/loads.csv
-            #write R to <project>/out/results.csv
-            '<img src="<project>/media/logo.png">
+        tree.Write("project/.keep", "");
+        var source = $$"""
+            #ProjectPath {{tree.At("project")}}
+            #read L from {project}/data/loads.csv
+            #write R to {project}/out/results.csv
+            '<img src="{project}/media/logo.png">
             """;
         var zip = tree.Pack(source);
 
@@ -515,9 +516,9 @@ public class PortablePackageTests
     {
         using var tree = new Tree();
         tree.Write("lib/steel.cpd", "a = 1\n");
-        var zip = tree.Pack($"""
-            #LibraryPath = {tree.At("lib")}
-            #include <library>/steel.cpd
+        var zip = tree.Pack($$"""
+            #LibraryPath {{tree.At("lib")}}
+            #include {library}/steel.cpd
             """, bundleLibrary: true);
 
         Assert.Equal(["root.cpd", "root.cpd.refs/lib/steel.cpd"], Names(zip));
@@ -529,9 +530,9 @@ public class PortablePackageTests
     {
         using var tree = new Tree();
         tree.Write("job/data.cpd", "a = 1\n");
-        var source = $"""
-            #ProjectPath = {tree.At("job")}
-            #include <project>/data.cpd
+        var source = $$"""
+            #ProjectPath {{tree.At("job")}}
+            #include {project}/data.cpd
             """;
         var zip = tree.Pack(source, bundleLibrary: true);
 
@@ -548,7 +549,7 @@ public class PortablePackageTests
     public void AnUndeclaredTokenInclude_IsLeftAsWrittenWithItsFlagOff()
     {
         using var tree = new Tree();
-        var source = "#include <library>/steel.cpd\n";
+        var source = "#include {library}/steel.cpd\n";
         var zip = tree.Pack(source);
 
         Assert.Equal(source, Text(zip, "root.cpd"));
@@ -559,7 +560,7 @@ public class PortablePackageTests
     public void AnUndeclaredTokenInclude_IsRefusedNamingTheDirective_WhenItsFlagIsOn()
     {
         using var tree = new Tree();
-        var result = tree.Build("#include <library>/steel.cpd\n", bundleLibrary: true);
+        var result = tree.Build("#include {library}/steel.cpd\n", bundleLibrary: true);
 
         Assert.Null(result.Zip);
         var message = Assert.Single(result.Errors);
@@ -571,9 +572,9 @@ public class PortablePackageTests
     {
         using var tree = new Tree();
         tree.Write("lib/steel.cpd", "a = 1\n");
-        var result = tree.Build($"""
-            #include <library>/steel.cpd
-            #LibraryPath = {tree.At("lib")}
+        var result = tree.Build($$"""
+            #include {library}/steel.cpd
+            #LibraryPath {{tree.At("lib")}}
             """, bundleLibrary: true);
 
         Assert.Null(result.Zip);
@@ -593,14 +594,14 @@ public class PortablePackageTests
         using var tree = new Tree();
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         // A random name under the real home directory rather than a fixed one or a fake HOME:
-        // <user> resolves via Environment.GetFolderPath, which several tests read concurrently,
+        // {user} resolves via Environment.GetFolderPath, which several tests read concurrently,
         // so nothing here can safely repoint HOME itself for the duration of the test.
         var fileName = Path.GetRandomFileName() + ".cpd";
         var homeFile = Path.Combine(home, fileName);
         File.WriteAllText(homeFile, "a = 1\n");
         try
         {
-            var zip = tree.Pack($"#include <user>/{fileName}\n");
+            var zip = tree.Pack($"#include {{user}}/{fileName}\n");
 
             Assert.Equal(["root.cpd", $"root.cpd.refs/{fileName}"], Names(zip));
             Assert.Contains($"#include root.cpd.refs/{fileName}", Text(zip, "root.cpd"));
@@ -615,9 +616,11 @@ public class PortablePackageTests
     public void ASecondConflictingLibraryPath_IsRefused()
     {
         using var tree = new Tree();
+        tree.Write("a/.keep", "");
+        tree.Write("b/.keep", "");
         var result = tree.Build("""
-            #LibraryPath = ./a
-            #LibraryPath = ./b
+            #LibraryPath ./a
+            #LibraryPath ./b
             """);
 
         Assert.Null(result.Zip);
@@ -633,14 +636,16 @@ public class PortablePackageTests
     public void ALocalLibraryPathInsideAnInclude_DoesNotClashWithTheIncludingDocuments()
     {
         using var tree = new Tree();
+        tree.Write("inc/otherlib/.keep", "");
+        tree.Write("lib/.keep", "");
         tree.Write("inc/lib.cpd", $"""
             #local
-            #LibraryPath = {tree.At("inc/otherlib")}
+            #LibraryPath {tree.At("inc/otherlib")}
             #global
             a = 1
             """);
         var zip = tree.Pack($"""
-            #LibraryPath = {tree.At("lib")}
+            #LibraryPath {tree.At("lib")}
             #include ./inc/lib.cpd
             """);
 

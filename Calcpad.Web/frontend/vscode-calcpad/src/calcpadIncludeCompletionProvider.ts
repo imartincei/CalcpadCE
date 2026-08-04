@@ -3,7 +3,7 @@ import * as path from 'path';
 import { scanDeclaredPathRoots, getPathRootTokenKind, type PathRootKind } from 'calcpad-frontend';
 import { expandEnvVars } from './calcpadLocationResolver';
 
-const DIRECTIVES = ['include', 'read', 'write', 'append'] as const;
+const DIRECTIVES = ['include', 'read', 'write', 'append', 'projectpath', 'librarypath'] as const;
 type Directive = typeof DIRECTIVES[number];
 
 const INCLUDE_EXTENSIONS = ['cpd', 'txt'];
@@ -23,6 +23,8 @@ export interface DirectiveParse {
  *   #read varName from FILEPATH[@options...]
  *   #write varName to FILEPATH[@options...]
  *   #append varName to FILEPATH[@options...]
+ *   #ProjectPath PATH
+ *   #LibraryPath PATH
  *
  * Returns undefined if the line isn't a recognized directive or
  * the cursor hasn't reached the file path portion yet.
@@ -50,8 +52,8 @@ export function parseDirectiveLine(lineText: string): DirectiveParse | undefined
     // Need at least one space after the directive keyword
     if (i === afterKeyword) { return undefined; }
 
-    if (keyword === 'include') {
-        // #include FILEPATH — path starts here
+    if (keyword === 'include' || keyword === 'projectpath' || keyword === 'librarypath') {
+        // #include FILEPATH / #ProjectPath PATH / #LibraryPath PATH — path starts here
         return { directive: keyword, pathStartCol: i, partialPath: lineText.substring(i) };
     }
 
@@ -81,7 +83,7 @@ export function parseDirectiveLine(lineText: string): DirectiveParse | undefined
 }
 
 const PATH_ROOT_LABEL: Record<PathRootKind, string> = { project: 'Project', library: 'Library' };
-const PATH_ROOT_TOKEN: Record<PathRootKind, string> = { project: '<project>', library: '<library>' };
+const PATH_ROOT_TOKEN: Record<PathRootKind, string> = { project: '{project}', library: '{library}' };
 
 export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemProvider {
     private outputChannel: vscode.OutputChannel;
@@ -105,6 +107,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
 
         const { directive, pathStartCol } = parsed;
         const isInclude = directive === 'include';
+        const isPathRoot = directive === 'projectpath' || directive === 'librarypath';
 
         this.outputChannel.appendLine(`[INCLUDE COMPLETION] Triggered on line: "${lineText}" (directive: #${directive})`);
 
@@ -121,9 +124,11 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
         const completionItems: vscode.CompletionItem[] = [];
         const addedEntries = new Set<string>();
 
-        const extensions = isInclude
-            ? INCLUDE_EXTENSIONS
-            : [...INCLUDE_EXTENSIONS, 'csv', 'tsv', 'xlsx', 'xlsm', 'xls'];
+        const extensions = isPathRoot
+            ? []
+            : isInclude
+                ? INCLUDE_EXTENSIONS
+                : [...INCLUDE_EXTENSIONS, 'csv', 'tsv', 'xlsx', 'xlsm', 'xls'];
 
         // Replace range covers from the start of the file path to the cursor
         const replaceRange = new vscode.Range(
@@ -149,7 +154,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
         try {
             const tokenKind = getPathRootTokenKind(partialPath);
             if (tokenKind !== null) {
-                // Drilling into a <project>/<library> reference: search the resolved root, but
+                // Drilling into a {project}/{library} reference: search the resolved root, but
                 // reinsert completions in token form so the reference stays portable.
                 const root = resolvedRoots[tokenKind];
                 if (root) {

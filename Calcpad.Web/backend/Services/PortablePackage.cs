@@ -255,7 +255,7 @@ namespace Calcpad.Server.Services
                             continue;
 
                         var raw = reference.Raw;
-                        // Unlike <project>/<library>, <user> is always bundled rather than left
+                        // Unlike {project}/{library}, {user} is always bundled rather than left
                         // for the recipient to resolve themselves: it needs no declaration and
                         // always resolves, but to *this* exporting machine's home directory, which
                         // there is no reason to expect the recipient's own home directory mirrors.
@@ -479,7 +479,7 @@ namespace Calcpad.Server.Services
                 var raw = reference.Raw;
                 if (PathRoots.IsUserToken(raw.AsSpan()))
                 {
-                    // Walk already validated every <user> reference in the tree (see the comment
+                    // Walk already validated every {user} reference in the tree (see the comment
                     // there for why it is always bundled), so a failure here would mean this
                     // rewrite pass was reached despite Walk reporting an error.
                     if (!pathRoots.TryExpand(raw, out raw, out var tokenError))

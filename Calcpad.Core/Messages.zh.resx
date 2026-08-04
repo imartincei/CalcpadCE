@@ -589,4 +589,7 @@
   <data name="Path_root_not_declared_0_1" xml:space="preserve">
     <value>{0} 未声明。请在此行之前添加 {1}。</value>
   </data>
+  <data name="Path_root_folder_not_found_0_1" xml:space="preserve">
+    <value>找不到 {0} 文件夹：{1}。</value>
+  </data>
 </root>

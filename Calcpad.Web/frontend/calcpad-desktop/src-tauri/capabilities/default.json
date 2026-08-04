@@ -61,7 +61,8 @@
         { "path": "$APPDATA/**" },
         { "path": "$APPCONFIG/**" },
         { "path": "$APPLOG/**" },
-        { "path": "$HOME/**" }
+        { "path": "$HOME/**" },
+        { "path": "**" }
       ]
     },
     {
@@ -79,7 +80,8 @@
         { "path": "$APPDATA/**" },
         { "path": "$APPCONFIG/**" },
         { "path": "$APPLOG/**" },
-        { "path": "$HOME/**" }
+        { "path": "$HOME/**" },
+        { "path": "**" }
       ]
     },
     {
@@ -97,7 +99,8 @@
         { "path": "$APPDATA/**" },
         { "path": "$APPCONFIG/**" },
         { "path": "$APPLOG/**" },
-        { "path": "$HOME/**" }
+        { "path": "$HOME/**" },
+        { "path": "**" }
       ]
     },
     {

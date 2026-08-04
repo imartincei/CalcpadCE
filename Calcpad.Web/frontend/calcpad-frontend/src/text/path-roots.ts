@@ -1,20 +1,20 @@
 /**
- * The `<project>`/`<library>` path-root tokens, mirrored from `Calcpad.Core.PathRoots` so the
+ * The `{project}`/`{library}` path-root tokens, mirrored from `Calcpad.Core.PathRoots` so the
  * editor resolves `#include`/`#read`/`#write`/`<img src>` references the same way the engine
- * does. A root is declared once, in the document, by a `#ProjectPath = ...` / `#LibraryPath =
- * ...` line — there is no host-level default, so a document with no declaration simply has no
+ * does. A root is declared once, in the document, by a `#ProjectPath path` / `#LibraryPath path`
+ * line — there is no host-level default, so a document with no declaration simply has no
  * root to expand against.
  *
- * A third token, `<user>` (see `isUserToken`/`expandUserToken`), needs no declaration at all: it
+ * A third token, `{user}` (see `isUserToken`/`expandUserToken`), needs no declaration at all: it
  * always expands to the current OS user's home directory, so it is handled separately from the
  * two declared roots rather than folded into `PathRootKind`.
  */
 
 export type PathRootKind = 'project' | 'library';
 
-const PROJECT_TOKEN = '<project>';
-const LIBRARY_TOKEN = '<library>';
-const USER_TOKEN = '<user>';
+const PROJECT_TOKEN = '{project}';
+const LIBRARY_TOKEN = '{library}';
+const USER_TOKEN = '{user}';
 const PROJECT_KEYWORD = '#projectpath';
 const LIBRARY_KEYWORD = '#librarypath';
 
@@ -33,7 +33,7 @@ export function getPathRootTokenKind(raw: string): PathRootKind | null {
 }
 
 /**
- * Whether `raw` starts with the self-resolving `<user>` token, mirroring
+ * Whether `raw` starts with the self-resolving `{user}` token, mirroring
  * `Calcpad.Core.PathRoots.IsUserToken`.
  */
 export function isUserToken(raw: string): boolean {
@@ -63,8 +63,9 @@ export interface PathRootDeclaration {
 /**
  * Parses a `#ProjectPath`/`#LibraryPath` line the same way `PathRoots.IsDeclaration` does in
  * Core: keyword matched case-insensitively at the start of the (already-trimmed) line, value is
- * everything after the first `=` up to a trailing comment. Returns `null` for any other line,
- * including a bare `#ProjectPath` with no `=` at all.
+ * everything after the keyword up to a trailing comment — no `=`, the same convention
+ * `#include` uses. Returns `null` for any other line, and a declaration with an empty `value`
+ * for a bare `#ProjectPath` naming nothing.
  */
 export function parsePathRootDeclaration(trimmedLine: string): PathRootDeclaration | null {
     const lower = trimmedLine.toLowerCase();
@@ -80,11 +81,7 @@ export function parsePathRootDeclaration(trimmedLine: string): PathRootDeclarati
         return null;
     }
 
-    const rest = trimmedLine.slice(keywordLength);
-    const eq = rest.indexOf('=');
-    if (eq < 0) return { kind, value: '' };
-
-    let value = rest.slice(eq + 1).replace(/^[ \t]+/, '');
+    let value = trimmedLine.slice(keywordLength).replace(/^[ \t]+/, '');
     const commentIndex = Math.min(
         ...['\'', '"'].map(q => { const idx = value.indexOf(q); return idx < 0 ? Infinity : idx; }),
     );
@@ -103,7 +100,7 @@ export interface DeclaredPathRoots {
  * first of each counts — a second is a document error Core reports at render time, not
  * something the editor needs to re-validate — and a declaration with no value is skipped the
  * same way. Callers needing the tooling-only "declared before first use" guarantee (e.g.
- * include completions offering `<library>/` only once it is live) can pass a `beforeLine` to
+ * include completions offering `{library}/` only once it is live) can pass a `beforeLine` to
  * stop the scan there.
  */
 export function scanDeclaredPathRoots(source: string, beforeLine?: number): DeclaredPathRoots {
@@ -122,7 +119,7 @@ export function scanDeclaredPathRoots(source: string, beforeLine?: number): Decl
 
 /**
  * Resolves a declared root's raw value to an absolute directory, the same way
- * `PathRoots.TryDeclare` does: a leading `<user>` expanded first (when `homeDir` is known), then
+ * `PathRoots.TryDeclare` does: a leading `{user}` expanded first (when `homeDir` is known), then
  * environment variables, then taken relative to `documentDir` when it isn't already absolute.
  */
 export function resolvePathRoot(
@@ -156,11 +153,11 @@ export function resolveDeclaredPathRoots(
 }
 
 /**
- * Expands a leading root token in `raw` against `roots` (and `<user>` against `homeDir`, when
+ * Expands a leading root token in `raw` against `roots` (and `{user}` against `homeDir`, when
  * known). Returns `raw` unchanged, together with `ok: true`, for anything that isn't a token
  * reference — so a caller can run this unconditionally ahead of its own environment-variable
  * expansion, exactly like the Core `PathRoots.TryExpand` it mirrors. `ok: false` when a
- * `<project>`/`<library>` token's root was never declared, or `<user>` is used but `homeDir`
+ * `{project}`/`{library}` token's root was never declared, or `{user}` is used but `homeDir`
  * isn't available — in which case `expanded` is still `raw` — the token is left in place rather
  * than guessed at.
  */
@@ -190,13 +187,42 @@ export function expandPathRootToken(
 }
 
 /**
+ * Builds a `raw => absolute path` resolver out of roots the caller already resolved
+ * elsewhere — e.g. the server's `X-Calcpad-PathRoots` render-response header, which reflects
+ * `#ProjectPath`/`#LibraryPath` declared anywhere in the document's `#include` chain, not just
+ * its own text the way {@link scanDeclaredPathRoots} is limited to. Otherwise identical to
+ * {@link createReferenceResolver}.
+ */
+export function createReferenceResolverFromRoots(
+    roots: ResolvedPathRoots,
+    documentDir: string,
+    expandEnvVars: (raw: string) => string | Promise<string>,
+    resolve: (dir: string, file: string) => string,
+    getHomeDir?: () => string | null | Promise<string | null>,
+): (raw: string) => Promise<string> {
+    let homeDir: string | null | undefined;
+
+    async function ensureHomeDir(): Promise<string | null> {
+        if (homeDir === undefined) homeDir = getHomeDir ? await getHomeDir() : null;
+        return homeDir;
+    }
+
+    return async (raw: string) => {
+        const home = isUserToken(raw) ? await ensureHomeDir() : null;
+        const { expanded, ok } = expandPathRootToken(raw, roots, home);
+        if (!ok) throw new Error(`Path root not declared for reference: ${raw}`);
+        return resolve(documentDir, await expandEnvVars(expanded));
+    };
+}
+
+/**
  * Builds a `raw => absolute path` resolver out of `sourceText`'s own declared roots, for a
  * caller (e.g. image inlining) that needs to resolve many references the same way: token
  * expanded, then environment variables, then made absolute against `documentDir` — the same
  * order `Environment.ExpandEnvironmentVariables`/`Path.GetFullPath` apply on the Core side. The
  * roots are declared-and-resolved once, on first use, and reused for every later call.
- * Throws for a token that could not be expanded — a `<project>`/`<library>` root never declared,
- * or a `<user>` reference with no `getHomeDir` to ask — so a caller can catch it the same way a
+ * Throws for a token that could not be expanded — a `{project}`/`{library}` root never declared,
+ * or a `{user}` reference with no `getHomeDir` to ask — so a caller can catch it the same way a
  * missing file is caught.
  *
  * `getHomeDir`, when given, is called at most once (like the roots themselves) — there is no

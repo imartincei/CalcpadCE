@@ -66,6 +66,9 @@ export const TOKEN_TYPE_MAP: Record<number, string> = {
     [CalcpadTokenType.Command]: 'command',
     [CalcpadTokenType.Include]: 'include',
     [CalcpadTokenType.FilePath]: 'filePath',
+    // #ProjectPath/#LibraryPath values are file paths too - reuse the filePath scope
+    // rather than adding a distinct token type just for these two directives.
+    [CalcpadTokenType.PathRoot]: 'filePath',
     [CalcpadTokenType.DataExchangeKeyword]: 'dataExchangeKeyword',
     [CalcpadTokenType.Comment]: 'comment',
     [CalcpadTokenType.HtmlComment]: 'htmlComment',

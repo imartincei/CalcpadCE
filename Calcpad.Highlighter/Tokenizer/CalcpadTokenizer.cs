@@ -244,7 +244,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 }
                 else if (_state.CurrentType == TokenType.PathRoot)
                 {
-                    // #ProjectPath/#LibraryPath = value - the value can have spaces and ends at
+                    // #ProjectPath/#LibraryPath value - the value can have spaces and ends at
                     // a trailing comment or newline. Unlike Include, there is no quoted-value or
                     // #{...} fields syntax: PathRoots.IsDeclaration in Core treats any quote as
                     // the start of a comment, full stop, so the tokenizer matches that exactly.

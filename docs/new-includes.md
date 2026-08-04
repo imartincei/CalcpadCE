@@ -27,34 +27,35 @@ Both bring in outside content, but they do different jobs:
 | When it happens | At parse time — the source is inlined | At run time — the data is loaded into a variable |
 | Result | The included code becomes part of your document | You get a matrix or vector variable to compute with |
 
-## Path root tokens: `<project>` and `<library>`
+## Path root tokens: `{project}` and `{library}`
 
-`<project>` and `<library>` are symbolic roots you can use as a prefix in `#include`, `#read`, `#write`/`#append`, and `<img src="...">`, instead of a path specific to your machine:
+`{project}` and `{library}` are symbolic roots you can use as a prefix in `#include`, `#read`, `#write`/`#append`, and `<img src="...">`, instead of a path specific to your machine:
 
 ```text
-#ProjectPath = C:/Jobs/1042
-#LibraryPath = %APPDATA%/Calcpad/lib
-#include <library>/steel/aisc.cpd
-#read L from <project>/data/loads.csv
-#write R to <project>/out/results.csv
-'<img src="<library>/logo.png">
+#ProjectPath C:/Jobs/1042
+#LibraryPath %APPDATA%/Calcpad/lib
+#include {library}/steel/aisc.cpd
+#read L from {project}/data/loads.csv
+#write R to {project}/out/results.csv
+'<img src="{library}/logo.png">
 ```
 
-Each root is declared once, with a directive naming the folder it points at:
+Each root is declared once, with a directive naming the folder it points at — the same bare-value syntax as `#include`, no `=`:
 
-- `#ProjectPath = ...` — the job- or document-specific folder, typically outside version control and different for every recipient.
-- `#LibraryPath = ...` — a shared folder of reusable `.cpd`/`.txt` files, e.g. a firm-wide function or materials library.
+- `#ProjectPath ...` — the job- or document-specific folder, typically outside version control and different for every recipient.
+- `#LibraryPath ...` — a shared folder of reusable `.cpd`/`.txt` files, e.g. a firm-wide function or materials library.
 
 Both directives render nothing, the same as `#include`. A relative value resolves against the folder of the file that declares it; environment variables are expanded in the value using `%VAR%` syntax — on every platform, including macOS/Linux:
 
 ```text
-#LibraryPath = %HOME%/lib/calcpad
+#LibraryPath %HOME%/lib/calcpad
 ```
 
 **Rules, kept deliberately simple:**
 
 - **One `#ProjectPath` and one `#LibraryPath` per document.** A second declaration of the same root is an error.
 - **Declare before first use.** A directive must appear above the first line that uses its token, or that line is an error — this also means the document's declared paths can be read once, up front, without worrying about them changing mid-file.
+- **The folder has to actually exist.** A value that doesn't resolve to a real folder on disk is an error at the declaration, not deferred to whatever `#include`/`#read` reaches it later.
 - A token whose root was never declared is an error, not a silent fallback to something else.
 
 **Reusable modules should use `#local`.** A file meant to be `#include`d elsewhere — a shared library module, say — should wrap its own `#ProjectPath`/`#LibraryPath` in `#local`/`#global`:
@@ -62,36 +63,36 @@ Both directives render nothing, the same as `#include`. A relative value resolve
 ```text
 ' lib/steel.cpd
 #local
-#LibraryPath = ./data
+#LibraryPath ./data
 #global
-#read Fy from <library>/grades.csv
+#read Fy from {library}/grades.csv
 ```
 
 `#local` content is stripped when the file is `#include`d into another document (the same way it always is), so the module's own declaration never reaches — and never clashes with — the including document's. Opened by itself, the module still runs: `#local` sections are only stripped when a file is reached through `#include`.
 
-## Path root token: `<user>`
+## Path root token: `{user}`
 
-`<user>` is a third root, usable anywhere `<project>`/`<library>` are — but unlike them, it needs no `#ProjectPath`/`#LibraryPath`-style declaration first. It always expands to the current OS user's home directory: `%USERPROFILE%` on Windows, `$HOME` on macOS/Linux.
+`{user}` is a third root, usable anywhere `{project}`/`{library}` are — but unlike them, it needs no `#ProjectPath`/`#LibraryPath`-style declaration first. It always expands to the current OS user's home directory: `%USERPROFILE%` on Windows, `$HOME` on macOS/Linux.
 
 ```text
-#include <user>/calcpad/lib/steel.cpd
-#read L from <user>/data/loads.csv
-'<img src="<user>/logo.png">
+#include {user}/calcpad/lib/steel.cpd
+#read L from {user}/data/loads.csv
+'<img src="{user}/logo.png">
 ```
 
 It can also appear inside a `#ProjectPath`/`#LibraryPath` value itself:
 
 ```text
-#LibraryPath = <user>/calcpad/lib
+#LibraryPath {user}/calcpad/lib
 ```
 
 ### Path root tokens and portable export
 
-An [exported portable package](working-with-files.md#export-portable-package) leaves a `<project>`/`<library>` reference exactly as written by default — the recipient's own `#ProjectPath`/`#LibraryPath` resolves it, so a shared library file isn't duplicated into every package. Two checkboxes on the **Export** tab, both off by default, bundle `<project>` and `<library>` references independently instead — each resolves the token to your own local path and bundles it like any other absolute reference, for a one-off recipient who has no roots declared of their own. The Export tab also shows the document's declared `<project>`/`<library>` paths, read-only.
+An [exported portable package](working-with-files.md#export-portable-package) leaves a `{project}`/`{library}` reference exactly as written by default — the recipient's own `#ProjectPath`/`#LibraryPath` resolves it, so a shared library file isn't duplicated into every package. Two checkboxes on the **Export** tab, both off by default, bundle `{project}` and `{library}` references independently instead — each resolves the token to your own local path and bundles it like any other absolute reference, for a one-off recipient who has no roots declared of their own. The Export tab also shows the document's declared `{project}`/`{library}` paths, read-only.
 
-`<user>` has no such checkbox: a reference through it is always bundled. It always resolves — there is nothing to declare and nothing that can be left undeclared — but only to *your* home directory, and there is no reason to expect a recipient's own home directory holds the same file in the same place, the way a shared `<library>` folder is expected to.
+`{user}` has no such checkbox: a reference through it is always bundled. It always resolves — there is nothing to declare and nothing that can be left undeclared — but only to *your* home directory, and there is no reason to expect a recipient's own home directory holds the same file in the same place, the way a shared `{library}` folder is expected to.
 
-A [compiled `.cpdz` worksheet](working-with-files.md#save-as-compiled-worksheet), by contrast, always resolves `<project>`/`<library>` (and `<user>`) references — its source is locked, so there is no way for a recipient to add a declaration afterwards.
+A [compiled `.cpdz` worksheet](working-with-files.md#save-as-compiled-worksheet), by contrast, always resolves `{project}`/`{library}` (and `{user}`) references — its source is locked, so there is no way for a recipient to add a declaration afterwards.
 
 ## Errors point to the right place
 

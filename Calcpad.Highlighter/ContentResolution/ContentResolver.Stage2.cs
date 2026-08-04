@@ -31,7 +31,7 @@ namespace Calcpad.Highlighter.ContentResolution
             var rootDir = !string.IsNullOrEmpty(sourceFilePath)
                 ? Path.GetDirectoryName(sourceFilePath) : null;
             // Shared across the root and every included file, exactly like MacroParser's own
-            // instance field — a <project>/<library> reference resolves against whichever
+            // instance field — a {project}/{library} reference resolves against whichever
             // declaration came first in document order, wherever it was written.
             var pathRoots = new PathRoots();
 

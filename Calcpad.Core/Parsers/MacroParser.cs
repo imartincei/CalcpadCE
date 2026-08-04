@@ -90,9 +90,10 @@ namespace Calcpad.Core
             OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
         private readonly HashSet<string> _includeStack = new(PathComparer);
         // Not reset between an #include and the file it pulls in — a document and everything it
-        // includes share one set of <project>/<library> roots, which is what makes a clash
+        // includes share one set of {project}/{library} roots, which is what makes a clash
         // between an included module's own declaration and the parent's an error worth having.
         private PathRoots _pathRoots = new();
+        public PathRoots PathRoots => _pathRoots;
         private static readonly Dictionary<string, Macro> Macros = new(StringComparer.Ordinal);
         public Func<string, Queue<string>, string> Include;
         public string SourceFilePath { get; set; }

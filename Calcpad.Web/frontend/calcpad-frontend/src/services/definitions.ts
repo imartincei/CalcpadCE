@@ -28,12 +28,17 @@ export class CalcpadDefinitionsService {
 
     /**
      * Fetch definitions from the server and update the cache.
-     * Takes content string directly (not a VS Code TextDocument).
+     * Takes content string directly (not a VS Code TextDocument). `requestKey`
+     * supersedes a same-keyed request still queued or in flight — pass the
+     * owning editor group's id (not `documentKey`) so switching that group's
+     * active tab cancels its previous tab's stale request instead of leaving
+     * it to run to completion alongside the new one.
      */
     public async refreshDefinitions(
         content: string,
         documentKey: string,
-        sourceFilePath?: string
+        sourceFilePath?: string,
+        requestKey?: string,
     ): Promise<DefinitionsResponse | null> {
         const reqId = ++this.requestId;
         const startTime = Date.now();
@@ -46,7 +51,7 @@ export class CalcpadDefinitionsService {
             return null;
         }
 
-        const definitions = await this.apiClient.definitions(content, sourceFilePath);
+        const definitions = await this.apiClient.definitions(content, sourceFilePath, { key: requestKey ?? documentKey });
 
         if (definitions) {
             this.cache.set(documentKey, definitions);

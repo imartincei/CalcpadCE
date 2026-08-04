@@ -13,7 +13,7 @@ export function expandEnvVars(input: string): string {
         .replace(/\$([A-Za-z_][A-Za-z0-9_]*)/g, (_, n) => process.env[n] ?? '');
 }
 
-/** The document's declared `<project>`/`<library>` roots, resolved to absolute directories. */
+/** The document's declared `{project}`/`{library}` roots, resolved to absolute directories. */
 export function resolveDocumentPathRoots(document: vscode.TextDocument): ResolvedPathRoots {
     const documentDir = path.dirname(document.uri.fsPath);
     const declared = scanDeclaredPathRoots(document.getText());
@@ -22,7 +22,7 @@ export function resolveDocumentPathRoots(document: vscode.TextDocument): Resolve
 
 /**
  * Resolve a raw `#include FILEPATH` path (as typed, possibly with a
- * `<project>`/`<library>` token and/or %VAR%/$VAR env references) to a
+ * `{project}`/`{library}` token and/or %VAR%/$VAR env references) to a
  * concrete `vscode.Location` pointing at the start of that file. Same lookup
  * order as resolveSymbolLocation: document dir first, then a workspace-wide
  * search; null if neither finds it (including an undeclared token root).

@@ -123,7 +123,7 @@ When you type a path after `#include`, `#read`, `#write`, or `#append`, the exte
 - Both `/` and `\` separators work, and it drills into subdirectories.
 - Environment variables expand: `%VAR%` on Windows, `$VAR` on macOS/Linux.
 
-Declare `#ProjectPath = ...` and/or `#LibraryPath = ...` at the top of a document and both roots show up in completion at the root level, alongside workspace files, drilling into `<project>/…`/`<library>/…` as you type — an easy way for a team to share a common library without copying it into every project. See [Includes and File Reads](new-includes.md#path-root-tokens-project-and-library) for the directive itself.
+Declare `#ProjectPath ...` and/or `#LibraryPath ...` at the top of a document and both roots show up in completion at the root level, alongside workspace files, drilling into `{project}/…`/`{library}/…` as you type — an easy way for a team to share a common library without copying it into every project. See [Includes and File Reads](new-includes.md#path-root-tokens-project-and-library) for the directive itself.
 
 ## The CalcpadCE panel
 

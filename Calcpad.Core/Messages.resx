@@ -625,4 +625,7 @@
   <data name="Path_root_not_declared_0_1" xml:space="preserve">
     <value>{0} is not declared. Add {1} before this line.</value>
   </data>
+  <data name="Path_root_folder_not_found_0_1" xml:space="preserve">
+    <value>{0} folder not found: {1}.</value>
+  </data>
 </root>

@@ -25,10 +25,11 @@ export function setupDiagnostics(
     apiClient: CalcpadApiClient,
     getMinSeverity: () => LintSeverity = () => 'information',
     getFileContext?: FileContextProvider,
+    key?: string,
 ): DiagnosticsHandle {
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const run = () => lintAndMark(editor, apiClient, getMinSeverity(), getFileContext);
+    const run = () => lintAndMark(editor, apiClient, getMinSeverity(), getFileContext, key);
 
     const listener = editor.onDidChangeModelContent(() => {
         if (debounceTimer) clearTimeout(debounceTimer);
@@ -51,13 +52,14 @@ async function lintAndMark(
     apiClient: CalcpadApiClient,
     minSeverity: LintSeverity,
     getFileContext?: FileContextProvider,
+    key?: string,
 ): Promise<void> {
     const model = editor.getModel();
     if (!model) return;
 
     const content = model.getValue();
     const ctx = getFileContext ? await getFileContext(content) : {};
-    const response = await apiClient.lint(content, ctx.sourceFilePath);
+    const response = await apiClient.lint(content, ctx.sourceFilePath, { key });
 
     if (!response?.diagnostics) {
         monaco.editor.setModelMarkers(model, 'calcpad', []);

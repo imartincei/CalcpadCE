@@ -8,6 +8,7 @@ import {
 } from 'calcpad-frontend/text/completion-format';
 import type { CompletionData, CompletionKind } from 'calcpad-frontend/text/completion-format';
 import { getActiveDocumentKey, type EditorBridge } from './bridge';
+import { parseDirectiveLine } from './include-completions';
 
 /**
  * Register a CompletionItemProvider that surfaces:
@@ -22,6 +23,12 @@ export function registerCompletionProvider(bridge: EditorBridge): monaco.IDispos
         triggerCharacters: ['#', '$', '.'],
 
         provideCompletionItems(model, position) {
+            // Inside a #include/#read/#write/#append/#ProjectPath/#LibraryPath
+            // path, only registerIncludeCompletionProvider's file suggestions
+            // should show.
+            const lineToCursor = model.getLineContent(position.lineNumber).substring(0, position.column - 1);
+            if (parseDirectiveLine(lineToCursor)) return { suggestions: [] };
+
             const word = model.getWordUntilPosition(position);
             const range: monaco.IRange = {
                 startLineNumber: position.lineNumber,

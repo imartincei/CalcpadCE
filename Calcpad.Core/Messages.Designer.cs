@@ -1760,5 +1760,14 @@ namespace Calcpad.Core {
                 return ResourceManager.GetString("Path_root_not_declared_0_1", resourceCulture);
             }
         }
+
+        // / <summary>
+        // /   Looks up a localized string similar to {0} folder not found: {1}..
+        // / </summary>
+        public static string Path_root_folder_not_found_0_1 {
+            get {
+                return ResourceManager.GetString("Path_root_folder_not_found_0_1", resourceCulture);
+            }
+        }
     }
 }

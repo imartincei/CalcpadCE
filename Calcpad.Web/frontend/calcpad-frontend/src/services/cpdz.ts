@@ -22,7 +22,7 @@ export function isCompiledPath(filePath: string): boolean {
 
 /**
  * Replaces `<img src="local/path">` references with base64 data URIs, resolving
- * each `src` through `resolve` — which handles a `<project>`/`<library>` token
+ * each `src` through `resolve` — which handles a `{project}`/`{library}` token
  * and environment variables the same way the rest of the document's references
  * do, then returns an absolute path. Remote and `data:` sources are left alone,
  * so this is idempotent, and a source that cannot be read (or whose token root

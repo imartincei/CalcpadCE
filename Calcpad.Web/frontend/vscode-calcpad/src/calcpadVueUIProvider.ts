@@ -451,7 +451,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         };
     }
 
-    /** The document's declared `<project>`/`<library>` roots, for the Export tab's read-only display. */
+    /** The document's declared `{project}`/`{library}` roots, for the Export tab's read-only display. */
     private _declaredPathRoots(): DeclaredPathRoots {
         const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
         return editor ? scanDeclaredPathRoots(editor.document.getText()) : { project: null, library: null };
