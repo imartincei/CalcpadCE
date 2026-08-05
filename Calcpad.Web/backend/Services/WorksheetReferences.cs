@@ -4,11 +4,10 @@ using Calcpad.Core;
 namespace Calcpad.Server.Services
 {
     /// <summary>
-    /// What a worksheet references, and where in a line each reference sits. The path grammar
-    /// itself belongs to <see cref="MacroParser.TryGetIncludePath"/> and
-    /// <see cref="ExpressionParser.TryGetDataPath"/>; this adds the one convention the parsers
-    /// know nothing about — images carried as <c>&lt;img src&gt;</c> in a comment — so the two
-    /// callers that have to bundle a worksheet agree on what its dependencies are.
+    /// What a worksheet references, and where in a line each reference sits. Every path grammar
+    /// belongs to Core — <see cref="MacroParser.TryGetIncludePath"/>,
+    /// <see cref="ExpressionParser.TryGetDataPath"/> and <see cref="ImageReferences"/> — so that
+    /// the two callers bundling a worksheet agree with the renderer on what it depends on.
     /// </summary>
     internal static class WorksheetReferences
     {
@@ -34,19 +33,9 @@ namespace Calcpad.Server.Services
             };
         }
 
-        internal static readonly Regex ImageSource =
-            new(@"(<img\s[^>]*?src\s*=\s*[""'])([^""']+)([""'])",
-                RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        internal static Regex ImageSource => ImageReferences.Source;
 
-        /// <summary>
-        /// A source that resolves on its own, wherever the worksheet ends up: already absolute,
-        /// inline data, or fetched over the network.
-        /// </summary>
-        internal static bool IsExternalSource(string src) =>
-            Path.IsPathRooted(src)
-            || src.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
-            || src.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-            || src.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+        internal static bool IsExternalSource(string src) => ImageReferences.IsExternal(src);
 
         /// <summary>
         /// Whether a <c>#write</c>/<c>#append</c> target names a fixed location rather than one

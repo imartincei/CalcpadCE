@@ -280,7 +280,7 @@ export class CalcpadApiClient {
                     return response.arrayBuffer();
                 }
                 const html = await response.text();
-                return { html, errors: parseConvertErrorHeader(response), ...parseConvertPathRootsHeader(response) };
+                return { html, errors: parseConvertErrorHeader(response) };
             } catch (error) {
                 this.logError('Convert', error);
                 return null;
@@ -348,7 +348,7 @@ export class CalcpadApiClient {
                 });
                 if (!response.ok) return null;
                 const html = await response.text();
-                return { html, errors: parseConvertErrorHeader(response), ...parseConvertPathRootsHeader(response) };
+                return { html, errors: parseConvertErrorHeader(response) };
             } catch (error) {
                 this.logError('ConvertUnwrapped', error);
                 return null;
@@ -446,22 +446,6 @@ export function parseConvertErrorHeader(response: Response): CalcpadError[] {
         return Array.isArray(parsed) ? parsed : [];
     } catch {
         return [];
-    }
-}
-
-/**
- * Reads the document's resolved `#ProjectPath`/`#LibraryPath` roots from the
- * `X-Calcpad-PathRoots` header — includes roots declared inside an `#include`d file, unlike
- * scanning the entry document's own text.
- */
-export function parseConvertPathRootsHeader(response: Response): { projectPath: string | null; libraryPath: string | null } {
-    const raw = response.headers.get('X-Calcpad-PathRoots');
-    if (!raw) return { projectPath: null, libraryPath: null };
-    try {
-        const parsed = JSON.parse(decodeURIComponent(raw));
-        return { projectPath: parsed.projectPath ?? null, libraryPath: parsed.libraryPath ?? null };
-    } catch {
-        return { projectPath: null, libraryPath: null };
     }
 }
 

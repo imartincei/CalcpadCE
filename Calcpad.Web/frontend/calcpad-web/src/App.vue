@@ -1547,11 +1547,14 @@ function setPreviewHtmlOutput(groupId: string, html: string): void {
   appendOutput('info', extractBodyHtml(html), 'html', groupId)
 }
 
-// Scroll a group's preview to a source line (editor -> preview sync). Posts to
-// the listener injected by injectLineLinks; no-op if that preview isn't shown.
+// Scroll a group's results to a source line (editor/TOC -> preview sync). Posts to
+// the listener injected by injectLineLinks; no-op if that frame isn't shown. The
+// report beside the input form gets it too, so navigating in input mode moves both
+// panes together -- it keeps the sync listener even though it drops the hover arrows.
 function scrollPreviewToSourceLine(groupId: string, line: number): void {
-  const frame = previewEls.get(groupId)
-  frame?.contentWindow?.postMessage({ type: 'scrollPreviewToLine', line }, '*')
+  const msg = { type: 'scrollPreviewToLine', line }
+  previewEls.get(groupId)?.contentWindow?.postMessage(msg, '*')
+  uiPrintEls.get(groupId)?.contentWindow?.postMessage(msg, '*')
 }
 
 // Inject the line-link behaviour ported from vscode-calcpad. Posted messages

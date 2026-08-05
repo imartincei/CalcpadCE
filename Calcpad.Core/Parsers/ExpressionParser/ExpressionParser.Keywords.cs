@@ -673,6 +673,11 @@ namespace Calcpad.Core
         }
         private void ParseKeywordPathRoot(ReadOnlySpan<char> s)
         {
+            // MacroParser already declared and validated this line against the folder of the file
+            // that wrote it — which this flattened text no longer identifies — so its answer wins.
+            if (_hasInheritedPathRoots)
+                return;
+
             PathRoots.IsDeclaration(s, out var isProject, out var start, out var length);
             if (length == 0)
             {

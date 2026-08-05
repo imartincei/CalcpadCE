@@ -44,7 +44,7 @@ namespace Calcpad.Server.Controllers
                 using var _ = await _parserGate.AcquireAsync(cancellationToken);
 
                 var forceUnwrapped = unwrap || request.ForceUnwrappedCode;
-                var (htmlResult, _, errors, projectPath, libraryPath) = _calcpadService.Convert(
+                var (htmlResult, _, errors) = _calcpadService.Convert(
                     request.Content, request.Settings, forceUnwrapped, request.Theme, request.SourceFilePath,
                     request.ForPrint, captureOpenXml: false, request.EnableUi, request.UiOverrides,
                     request.IncludeLineAnchors, cancellationToken);
@@ -59,11 +59,6 @@ namespace Calcpad.Server.Controllers
                     Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
                 });
                 Response.Headers["X-Calcpad-Errors"] = Uri.EscapeDataString(errorsJson);
-
-                // Surfaces #ProjectPath/#LibraryPath even when declared inside an #include —
-                // the client would otherwise have to re-scan only its own entry file's text.
-                var pathRootsJson = System.Text.Json.JsonSerializer.Serialize(new { projectPath, libraryPath });
-                Response.Headers["X-Calcpad-PathRoots"] = Uri.EscapeDataString(pathRootsJson);
                 return Content(htmlResult, "text/html");
             }
             catch (OperationCanceledException)
@@ -334,7 +329,7 @@ namespace Calcpad.Server.Controllers
                 IReadOnlyList<string> openXmlExpressions;
                 using (await _parserGate.AcquireAsync(cancellationToken))
                 {
-                    (html, openXmlExpressions, _, _, _) = _calcpadService.Convert(
+                    (html, openXmlExpressions, _) = _calcpadService.Convert(
                         request.Content, request.Settings, request.ForceUnwrappedCode, request.Theme, request.SourceFilePath,
                         forPrint: request.ForPrint, captureOpenXml: true, enableUi: false, uiOverrides: request.UiOverrides,
                         debug: false, cancellationToken: cancellationToken);

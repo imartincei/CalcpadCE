@@ -8,6 +8,12 @@ namespace Calcpad.Tests.HighlighterTests
 {
     public class PathRootsHighlighterTests
     {
+        // Include resolution runs the source file's folder through Path.GetFullPath, which
+        // rejects a base directory that is not fully qualified — "/project" is rooted on Linux
+        // but drive-less, so it throws on Windows and every lookup falls back to the raw name.
+        private static readonly string SourceFilePath =
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "project", "main.cpd");
+
         [Fact]
         public void Declaration_TokenizesValueAsSingleToken()
         {
@@ -59,7 +65,7 @@ namespace Calcpad.Tests.HighlighterTests
         public void Include_WithUndeclaredToken_FallsBackToNotFound()
         {
             var content = "#include {library}/steel.cpd\nx = 1";
-            var staged = new ContentResolver().GetStagedContent(content, sourceFilePath: "/project/main.cpd");
+            var staged = new ContentResolver().GetStagedContent(content, sourceFilePath: SourceFilePath);
             var joined = string.Join('\n', staged.Stage2.Lines);
 
             Assert.Contains("Error: Include file not provided", joined);
@@ -76,7 +82,7 @@ namespace Calcpad.Tests.HighlighterTests
                 [resolvedFile] = "y = 2"
             };
 
-            var staged = new ContentResolver().GetStagedContent(content, includeFiles, sourceFilePath: "/project/main.cpd");
+            var staged = new ContentResolver().GetStagedContent(content, includeFiles, sourceFilePath: SourceFilePath);
             var joined = string.Join('\n', staged.Stage2.Lines);
 
             Assert.DoesNotContain("Error: Include file not provided", joined);

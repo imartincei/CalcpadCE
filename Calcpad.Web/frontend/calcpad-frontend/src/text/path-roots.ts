@@ -187,37 +187,9 @@ export function expandPathRootToken(
 }
 
 /**
- * Builds a `raw => absolute path` resolver out of roots the caller already resolved
- * elsewhere — e.g. the server's `X-Calcpad-PathRoots` render-response header, which reflects
- * `#ProjectPath`/`#LibraryPath` declared anywhere in the document's `#include` chain, not just
- * its own text the way {@link scanDeclaredPathRoots} is limited to. Otherwise identical to
- * {@link createReferenceResolver}.
- */
-export function createReferenceResolverFromRoots(
-    roots: ResolvedPathRoots,
-    documentDir: string,
-    expandEnvVars: (raw: string) => string | Promise<string>,
-    resolve: (dir: string, file: string) => string,
-    getHomeDir?: () => string | null | Promise<string | null>,
-): (raw: string) => Promise<string> {
-    let homeDir: string | null | undefined;
-
-    async function ensureHomeDir(): Promise<string | null> {
-        if (homeDir === undefined) homeDir = getHomeDir ? await getHomeDir() : null;
-        return homeDir;
-    }
-
-    return async (raw: string) => {
-        const home = isUserToken(raw) ? await ensureHomeDir() : null;
-        const { expanded, ok } = expandPathRootToken(raw, roots, home);
-        if (!ok) throw new Error(`Path root not declared for reference: ${raw}`);
-        return resolve(documentDir, await expandEnvVars(expanded));
-    };
-}
-
-/**
  * Builds a `raw => absolute path` resolver out of `sourceText`'s own declared roots, for a
- * caller (e.g. image inlining) that needs to resolve many references the same way: token
+ * caller (e.g. `.cpdz` compilation, `#include` navigation) that needs to resolve many
+ * references the same way: token
  * expanded, then environment variables, then made absolute against `documentDir` — the same
  * order `Environment.ExpandEnvironmentVariables`/`Path.GetFullPath` apply on the Core side. The
  * roots are declared-and-resolved once, on first use, and reused for every later call.

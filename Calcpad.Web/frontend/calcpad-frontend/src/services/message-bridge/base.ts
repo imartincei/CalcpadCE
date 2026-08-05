@@ -111,6 +111,7 @@ export abstract class BaseMessageBridge {
     protected definitionsService: CalcpadDefinitionsService;
     protected settings: CalcpadSettings;
     protected _onInsertText: ((text: string) => void) | null = null;
+    protected _onGoToLine: ((line: number) => boolean) | null = null;
     protected quickPick: QuickPickFn | null = null;
     private _uiOverridesProvider: (() => Record<string, string> | undefined) | null = null;
     private _uiControlsProvider: (() => UiControl[] | null) | null = null;
@@ -140,6 +141,15 @@ export abstract class BaseMessageBridge {
 
     set onInsertText(handler: (text: string) => void) {
         this._onInsertText = handler;
+    }
+
+    /**
+     * Host hook for sidebar line navigation, returning true when it handled the jump
+     * itself. Only the host knows which results pane is on screen: input mode hides the
+     * editor, so the navigation has to land in the rendered form instead.
+     */
+    set onGoToLine(handler: (line: number) => boolean) {
+        this._onGoToLine = handler;
     }
 
     /** Host injects a modal list picker used by the image-storage prompt. */
@@ -758,16 +768,14 @@ export abstract class BaseMessageBridge {
         apiSettings: unknown,
         sourceFilePath: string | undefined,
         variant: ExportVariant,
-    ): Promise<{ html: string; projectPath: string | null; libraryPath: string | null } | null> {
+    ): Promise<{ html: string } | null> {
         const render = variantRender(variant);
         const result = render.unwrap
             ? await this.apiClient.convertUnwrapped(content, apiSettings, sourceFilePath)
             : await this.apiClient.convert(
                 content, apiSettings, 'html', render.forPrint, sourceFilePath, undefined,
                 this.uiOptionsFor(variant), false);
-        return result && !(result instanceof ArrayBuffer)
-            ? { html: result.html, projectPath: result.projectPath, libraryPath: result.libraryPath }
-            : null;
+        return result && !(result instanceof ArrayBuffer) ? { html: result.html } : null;
     }
 
     private async handleGetPlots(): Promise<void> {
@@ -848,6 +856,7 @@ export abstract class BaseMessageBridge {
 
     private handleGoToLine(line: number): void {
         if (typeof line !== 'number') return;
+        if (this._onGoToLine?.(line)) return;
         const editor = this.getActiveMonacoEditor();
         if (editor) {
             editor.revealLineInCenter(line);

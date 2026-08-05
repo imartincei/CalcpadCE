@@ -34,7 +34,6 @@ import {
     isCompiledPath,
     inlineImageSources,
     createReferenceResolver,
-    createReferenceResolverFromRoots,
     pathBasename,
     pathDirname,
     pathExtension,
@@ -206,47 +205,30 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     /**
-     * Replace on-disk `<img src>` references in preview HTML with base64 data
+     * Replace on-disk `<img src>` references in rendered HTML with base64 data
      * URIs so the sandboxed preview iframe can render them (the VS Code
-     * extension does the same via its image cache). Absolute paths resolve
-     * even for untitled documents; relative paths need the active tab's folder.
-     * Remote/data URIs are left untouched. `sourceText` is the raw `.cpd`
-     * source (not `html`) — it is what a `{project}`/`{library}` reference
-     * is declared and resolved against, when `resolvedRoots` isn't given.
-     * `resolvedRoots` — the server's already-resolved `#ProjectPath`/`#LibraryPath`
-     * (from the render response's `X-Calcpad-PathRoots` header) — takes priority
-     * when present: it reflects a root declared anywhere in the `#include` chain,
-     * not just `sourceText` itself.
+     * extension does the same via its image cache). Remote/data URIs are left
+     * untouched. `Calcpad.Core.ImageReferences` has already expanded any
+     * `{project}`/`{library}`/`{user}` token and environment variable into an
+     * absolute path, so all that is left here is a relative `src`, which needs
+     * the active tab's folder — an untitled document therefore resolves only the
+     * absolute ones.
      */
-    async inlineDocumentImages(
-        html: string,
-        sourceText: string,
-        resolvedRoots?: { projectPath: string | null; libraryPath: string | null },
-    ): Promise<string> {
-        return this.inlineLocalImages(html, this.activeTabDirectory(), sourceText, resolvedRoots);
-    }
-
-    protected async buildCompiledSource(content: string): Promise<string> {
-        return this.inlineLocalImages(content, this.activeTabDirectory(), content);
+    async inlineDocumentImages(html: string): Promise<string> {
+        const documentDir = this.activeTabDirectory();
+        return inlineImageSources(html, tauriReader, (src) => pathResolve(documentDir, src));
     }
 
     /**
-     * Builds the `<img src>` → absolute-path resolver from `resolvedRoots` when given,
-     * otherwise from `sourceText`'s own declared roots.
+     * A compiled worksheet holds `.cpd` source, not rendered HTML, so its image
+     * references are still as authored and need the full token/environment-variable
+     * resolver rather than the plain join {@link inlineDocumentImages} uses.
      */
-    private inlineLocalImages(
-        html: string,
-        documentDir: string,
-        sourceText: string,
-        resolvedRoots?: { projectPath: string | null; libraryPath: string | null },
-    ): Promise<string> {
-        const resolve = resolvedRoots
-            ? createReferenceResolverFromRoots(
-                { project: resolvedRoots.projectPath, library: resolvedRoots.libraryPath },
-                documentDir, (raw) => this.expandEnvVars(raw), pathResolve, () => this.getHomeDir())
-            : createReferenceResolver(
-                sourceText, documentDir, (raw) => this.expandEnvVars(raw), pathResolve, () => this.getHomeDir());
-        return inlineImageSources(html, tauriReader, resolve);
+    protected async buildCompiledSource(content: string): Promise<string> {
+        const documentDir = this.activeTabDirectory();
+        const resolve = createReferenceResolver(
+            content, documentDir, (raw) => this.expandEnvVars(raw), pathResolve, () => this.getHomeDir());
+        return inlineImageSources(content, tauriReader, resolve);
     }
 
     /**
@@ -376,9 +358,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
         // The headless browser has no filesystem access, so on-disk images have to travel
         // as data URIs.
-        const html = await this.inlineLocalImages(rendered.html, this.activeTabDirectory(), content, {
-            projectPath: rendered.projectPath, libraryPath: rendered.libraryPath,
-        });
+        const html = await this.inlineDocumentImages(rendered.html);
 
         const pdfResp = await fetch(`${this.apiClient.getBaseUrl()}/api/calcpad/pdf`, {
             method: 'POST',
@@ -738,7 +718,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
             .replace(/\$([A-Za-z_][A-Za-z0-9_]*)/g, (_, n) => values[n] ?? '');
     }
 
-    /** Resolves `#include`/reference-navigation paths, expanding `{project}`/`{library}`/`{user}` the same way `inlineLocalImages` does. */
+    /** Resolves `#include`/reference-navigation paths, expanding `{project}`/`{library}`/`{user}` the same way `buildCompiledSource` does. */
     public async resolveIncludePath(rawFileName: string): Promise<string> {
         const resolve = createReferenceResolver(
             this.activeTabSourceText(), this.activeTabSourceDir(), (raw) => this.expandEnvVars(raw), pathResolve, () => this.getHomeDir());

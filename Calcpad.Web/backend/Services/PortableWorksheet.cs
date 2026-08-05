@@ -49,18 +49,13 @@ namespace Calcpad.Server.Services
 
             var rootDirectory = string.IsNullOrEmpty(sourceFilePath)
                 ? string.Empty : Path.GetDirectoryName(sourceFilePath) ?? string.Empty;
-            var declaringDirectory = string.IsNullOrEmpty(sourceFilePath)
-                ? null : Path.GetDirectoryName(sourceFilePath);
-            var pathRoots = new PathRoots();
+            // The macro parser's own roots, not a fresh set declared from the flattened text: it
+            // resolved a relative #ProjectPath/#LibraryPath against the folder of the file that
+            // wrote it, which the flattened text no longer identifies. ExpressionParser inherits
+            // them the same way, so a bundle resolves an image token exactly as a render does.
+            var pathRoots = macroParser.PathRoots;
             var outputs = new OutputTargets(rootDirectory, errors, pathRoots);
-            // A throwaway PathRoots of its own, declared progressively by the same dry run that
-            // feeds Prepare — not pathRoots above, which RewriteDirectives populates for real,
-            // below. Sharing that one here would make every declaration in the document visible
-            // to Prepare before RewriteDirectives had even started, silently curing a genuine
-            // "used before declared" document (still an error the real pass has to catch) instead
-            // of a batch of names to compute.
-            var dryRunRoots = new PathRoots();
-            outputs.Prepare(EnumerateOutputReferences(expanded, dryRunRoots, declaringDirectory), dryRunRoots);
+            outputs.Prepare(EnumerateOutputReferences(expanded), pathRoots);
             var rewritten = RewriteDirectives(expanded, sourceFilePath, outputs, pathRoots, errors);
             return new Result(rewritten, errors);
         }
@@ -68,28 +63,18 @@ namespace Calcpad.Server.Services
         /// <summary>
         /// Every <c>#write</c>/<c>#append</c> reference in <paramref name="text"/>, with the line
         /// number <see cref="RewriteDirectives"/>'s own <c>Target</c> will later look each one up
-        /// by. Declares into <paramref name="dryRunRoots"/> as it goes, exactly the way
-        /// <see cref="RewriteDirectives"/> declares into its own <c>pathRoots</c> — so a reference
-        /// enumerated here sees precisely the declarations that came before it in the text, same
-        /// as the real pass will, and <see cref="OutputTargets.Prepare"/> can tell a genuinely
-        /// undeclared or out-of-order token from a merely unrenamed one the same way
-        /// <see cref="OutputTargets.Rewrite"/> does.
+        /// by.
         /// </summary>
         private static IEnumerable<(WorksheetReferences.Reference Reference, string Owner, int Line)>
-            EnumerateOutputReferences(string text, PathRoots dryRunRoots, string? declaringDirectory)
+            EnumerateOutputReferences(string text)
         {
             var lineNumber = 0;
             foreach (var rawLine in text.Split('\n'))
             {
                 ++lineNumber;
                 var code = rawLine.TrimEnd('\r').TrimStart();
-                if (PathRoots.IsDeclaration(code.AsSpan(), out var isProject, out var declStart, out var declLength))
-                {
-                    if (declLength > 0)
-                        dryRunRoots.TryDeclare(isProject, code.Substring(declStart, declLength),
-                            declaringDirectory, out _);
+                if (PathRoots.IsDeclaration(code.AsSpan(), out _, out _, out _))
                     continue;
-                }
 
                 foreach (var reference in WorksheetReferences.Scan(code))
                     if (reference.IsOutput)
@@ -107,20 +92,15 @@ namespace Calcpad.Server.Services
         /// line naming the file.
         /// </summary>
         /// <remarks>
-        /// <paramref name="text"/> is already macro-expanded, so a <c>#ProjectPath</c>/
-        /// <c>#LibraryPath</c> declared inside a <c>#local</c> section of an included file is
-        /// already gone — <see cref="CalcpadService.CreateIncludeDelegate"/> strips it before
-        /// this ever sees the text, the same as it does for the real render path. A relative
-        /// declaration resolves against <paramref name="sourceFilePath"/>'s folder regardless of
-        /// which file wrote it, matching the existing <c>#read</c>/<c>#write</c> asymmetry: once
-        /// everything is flattened into one string, the folder a line was originally written in
-        /// is gone, and the root document's is what is left.
+        /// <paramref name="pathRoots"/> arrives already declared, by the macro parser that
+        /// flattened <paramref name="text"/> — the only pass that still knew which file each
+        /// declaration was written in. The declarations left standing in the text are skipped here
+        /// rather than re-read, and a malformed one never reaches this point: <see cref="Build"/>
+        /// returns on the macro parser's errors first.
         /// </remarks>
         private static string RewriteDirectives(
             string text, string? sourceFilePath, OutputTargets outputs, PathRoots pathRoots, List<string> errors)
         {
-            var declaringDirectory = string.IsNullOrEmpty(sourceFilePath)
-                ? null : Path.GetDirectoryName(sourceFilePath);
             var sb = new StringBuilder(text.Length);
             var lineNumber = 0;
             foreach (var rawLine in text.Split('\n'))
@@ -129,16 +109,8 @@ namespace Calcpad.Server.Services
                 var line = rawLine.TrimEnd('\r');
                 var code = line.TrimStart();
 
-                if (PathRoots.IsDeclaration(code.AsSpan(), out var isProject, out var declStart, out var declLength))
-                {
-                    if (declLength == 0)
-                        errors.Add($"Line {lineNumber}: "
-                            + $"{(isProject ? "#ProjectPath" : "#LibraryPath")} requires a path.");
-                    else if (!pathRoots.TryDeclare(isProject, code.Substring(declStart, declLength),
-                        declaringDirectory, out var declError))
-                        errors.Add($"Line {lineNumber}: {declError}");
+                if (PathRoots.IsDeclaration(code.AsSpan(), out _, out _, out _))
                     continue;
-                }
 
                 if (code.StartsWith("#read", StringComparison.OrdinalIgnoreCase))
                 {

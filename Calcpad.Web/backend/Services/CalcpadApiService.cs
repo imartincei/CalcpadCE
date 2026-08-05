@@ -37,7 +37,7 @@ namespace Calcpad.Server.Services
                     policy.AllowAnyOrigin()
                           .AllowAnyMethod()
                           .AllowAnyHeader()
-                          .WithExposedHeaders("X-Calcpad-Errors", "X-Calcpad-PathRoots");
+                          .WithExposedHeaders("X-Calcpad-Errors");
                 });
             });
 

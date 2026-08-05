@@ -95,6 +95,32 @@ namespace Calcpad.Core
             tokens.Add(token);
         }
 
+        /// <summary>
+        /// Resolves the image paths a line's tokens carry, so the output holds a path that already
+        /// resolves rather than a <c>{project}</c>/<c>{library}</c> token only the host could
+        /// expand. Called on a cache miss, so it runs once per line however many times a loop
+        /// revisits it, and late enough that <c>ParseKeyword</c> has declared any root written
+        /// above — or <see cref="PathRoots"/> was handed the whole document's from outside.
+        /// </summary>
+        private void ExpandImageSources(List<Token> tokens)
+        {
+            var directory = string.IsNullOrEmpty(SourceFilePath)
+                ? null : System.IO.Path.GetDirectoryName(SourceFilePath);
+            foreach (var token in tokens)
+            {
+                // Any token but an expression can carry the tag: a comment starting with '<' is
+                // retyped Html above, but Markdown renders ![alt](path) into whichever token it
+                // came from, which is still Text.
+                if (token.Type == TokenTypes.Expression ||
+                    !token.Value.Contains("<img", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var value = token.Value;
+                token.Value = ImageReferences.ExpandSources(value, _pathRoots, directory,
+                    error => AppendError(value, error, _currentLine));
+            }
+        }
+
         private static TokenTypes GetTokenType(char separator)
         {
             return separator switch

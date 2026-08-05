@@ -266,7 +266,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 
                 case 'getHeadings':
                     {
-                        const headingsEditor = vscode.window.activeTextEditor;
+                        const headingsEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
                         if (headingsEditor && (headingsEditor.document.languageId === 'calcpad' || headingsEditor.document.languageId === 'plaintext')) {
                             const text = headingsEditor.document.getText();
                             const headings = parseHeadings(text);
@@ -283,15 +283,26 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     }
                     break;
 
+                // While a worksheet is being filled in, the panel the user is working in is
+                // the input form, not the source editor -- and a focused webview leaves
+                // `activeTextEditor` undefined, so this used to do nothing at all. Scroll the
+                // rendered views to the line as well, and move the cursor without pulling
+                // focus off the form, so leaving input mode lands on the same place.
                 case 'goToLine':
                     {
-                        const goToEditor = vscode.window.activeTextEditor;
-                        if (goToEditor && typeof data.line === 'number') {
-                            const lineIndex = Math.max(0, data.line - 1);
+                        const goToEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
+                        if (typeof data.line !== 'number') break;
+                        if (goToEditor) {
+                            const lineIndex = Math.min(Math.max(0, data.line - 1), goToEditor.document.lineCount - 1);
                             const lineEnd = goToEditor.document.lineAt(lineIndex).range.end;
                             goToEditor.selection = new vscode.Selection(lineEnd, lineEnd);
                             goToEditor.revealRange(goToEditor.document.lineAt(lineIndex).range, vscode.TextEditorRevealType.InCenter);
-                            vscode.window.showTextDocument(goToEditor.document, goToEditor.viewColumn);
+                            if (!this._inputMode) {
+                                vscode.window.showTextDocument(goToEditor.document, goToEditor.viewColumn);
+                            }
+                        }
+                        if (this._inputMode) {
+                            vscode.commands.executeCommand('vscode-calcpad.focusPreviewToLine', data.line);
                         }
                     }
                     break;

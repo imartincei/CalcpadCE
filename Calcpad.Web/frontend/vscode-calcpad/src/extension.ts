@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPathRootsHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, createReferenceResolverFromRoots, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION } from 'calcpad-frontend';
+import { CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -358,27 +358,18 @@ const IMAGE_MIME_MAP: Record<string, string> = {
 };
 
 /**
- * Scan HTML for <img src="..."> tags with local file paths, read the files from disk,
- * and return a cache mapping original src values to base64 data URIs. `sourceText` is
- * the raw `.cpd` source the HTML was rendered from — it is what a `{project}`/
- * `{library}` reference is declared and resolved against, and env vars (`%VAR%`/`$VAR`)
- * are expanded the same way any other reference's are. `resolvedRoots` — the server's
- * `X-Calcpad-PathRoots` render-response roots — takes priority when given: unlike
- * scanning `sourceText`, it reflects a root declared anywhere in the `#include` chain,
- * not just the active document's own text.
+ * Scan rendered HTML for <img src="..."> tags with local file paths, read the files from
+ * disk, and return a cache mapping original src values to base64 data URIs.
+ * `Calcpad.Core.ImageReferences` has already expanded any `{project}`/`{library}`/`{user}`
+ * token and env var (`%VAR%`/`$VAR`) into an absolute path, so only a relative src is left
+ * to join against `documentDir`.
  */
 async function buildImageCache(
     html: string,
     documentDir: string,
-    sourceText: string,
-    resolvedRoots?: { projectPath: string | null; libraryPath: string | null },
 ): Promise<Record<string, string>> {
     const cache: Record<string, string> = {};
-    const resolve = resolvedRoots
-        ? createReferenceResolverFromRoots(
-            { project: resolvedRoots.projectPath, library: resolvedRoots.libraryPath },
-            documentDir, expandEnvVars, path.resolve, os.homedir)
-        : createReferenceResolver(sourceText, documentDir, expandEnvVars, path.resolve, os.homedir);
+    const resolve = (src: string) => path.resolve(documentDir, src);
     const imgSrcRegex = /<img\s[^>]*?src\s*=\s*["']([^"']+)["'][^>]*>/gi;
     let match;
 
@@ -931,7 +922,6 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         outputChannel.appendLine('API call successful');
 
         vueUiProvider?.updateConvertErrors(parseConvertErrorHeader(response));
-        const pathRoots = parseConvertPathRootsHeader(response);
 
         // Use the entire API response as the webview HTML
         const apiResponse = await response.text();
@@ -953,13 +943,12 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
 
         outputChannel.appendLine(`HTML Length: ${apiResponse.length} characters`);
 
-        // Build image cache: read local image files and convert to base64 data URIs
-        let imageCacheScript = '';
-        if (activeEditor && !activeEditor.document.isUntitled) {
-            const documentDir = path.dirname(activeEditor.document.uri.fsPath);
-            const imageCache = await buildImageCache(apiResponse, documentDir, activeEditor.document.getText(), pathRoots);
-            imageCacheScript = getImageCacheScript(imageCache);
-        }
+        // Build image cache: read local image files and convert to base64 data URIs.
+        // An untitled document has no folder to join a relative src against, but Core
+        // resolved every token to an absolute path, so those still render.
+        const documentDir = activeEditor && !activeEditor.document.isUntitled
+            ? path.dirname(activeEditor.document.uri.fsPath) : '';
+        const imageCacheScript = getImageCacheScript(await buildImageCache(apiResponse, documentDir));
 
         // Inject JavaScript for error link navigation and console interception
         const errorNavigationScript = getErrorNavigationScript();
@@ -1029,7 +1018,7 @@ async function renderForExport(
     documentContent: string,
     sourceFileUri: vscode.Uri,
     variant: ExportVariant,
-): Promise<{ html: string; projectPath: string | null; libraryPath: string | null }> {
+): Promise<{ html: string }> {
     const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
     const apiBaseUrl = settingsManager.getServerUrl();
     if (!apiBaseUrl) throw new Error('Server URL not configured');
@@ -1066,9 +1055,7 @@ async function renderForExport(
     if (!response || !response.ok) {
         throw new Error(`Server returned ${response?.status ?? 'no response'}`);
     }
-    const html = await response.text();
-    const { projectPath, libraryPath } = parseConvertPathRootsHeader(response);
-    return { html, projectPath, libraryPath };
+    return { html: await response.text() };
 }
 
 /**
@@ -1093,14 +1080,11 @@ async function generatePdfToFile(
     const sourceDir = path.dirname(sourceFileUri.fsPath);
 
     // Step 1: Convert calcpad content to HTML
-    const rendered = await renderForExport(documentContent, sourceFileUri, variant);
-    let html = rendered.html;
+    let { html } = await renderForExport(documentContent, sourceFileUri, variant);
 
     // Inline local images as base64 data URIs so the headless browser can
     // render them (it has no access to the local filesystem).
-    const imageCache = await buildImageCache(html, sourceDir, documentContent,
-        { projectPath: rendered.projectPath, libraryPath: rendered.libraryPath });
-    html = applyImageCache(html, imageCache);
+    html = applyImageCache(html, await buildImageCache(html, sourceDir));
 
     progress?.report({ increment: 50, message: 'Generating PDF...' });
 
@@ -1413,11 +1397,14 @@ function navigateEditorToLine(sourceEditor: vscode.TextEditor, line: number) {
 
 // Editor -> preview sync: tell any open preview panel(s) to scroll to a 1-based
 // source line. Every view matches on data-source-line / line-num anchors, so the
-// same source line works for the preview, unwrapped and report panels.
+// same source line works for the preview, unwrapped, input-form and report panels.
+// The input form is included so sidebar (TOC) navigation lands there too -- it drops
+// the hover arrows but keeps the sync listener.
 function postPreviewSourceLine(line: number) {
     const msg = { type: 'scrollToSourceLine', line };
     wrappedPanel?.webview.postMessage(msg);
     unwrappedPanel?.webview.postMessage(msg);
+    uiPanel?.webview.postMessage(msg);
     uiReportPanel?.webview.postMessage(msg);
 }
 
@@ -2051,7 +2038,15 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage(`Saved ${count} #UI value(s) to the document.`);
     });
 
-    const focusPreviewToLineCommand = vscode.commands.registerCommand('vscode-calcpad.focusPreviewToLine', async () => {
+    // `targetLine` lets a caller name the line (the sidebar's TOC does); invoked from the
+    // palette or a keybinding it arrives undefined and the cursor's line is used. Only that
+    // second form opens a preview when none is showing -- it is a request to see the line,
+    // where a named line only syncs whatever results are already up.
+    const focusPreviewToLineCommand = vscode.commands.registerCommand('vscode-calcpad.focusPreviewToLine', async (targetLine?: number) => {
+        if (typeof targetLine === 'number') {
+            postPreviewSourceLine(targetLine);
+            return;
+        }
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
         const line = editor.selection.active.line + 1;

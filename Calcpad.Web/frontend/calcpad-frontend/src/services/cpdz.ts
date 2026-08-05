@@ -22,17 +22,17 @@ export function isCompiledPath(filePath: string): boolean {
 
 /**
  * Replaces `<img src="local/path">` references with base64 data URIs, resolving
- * each `src` through `resolve` — which handles a `{project}`/`{library}` token
- * and environment variables the same way the rest of the document's references
- * do, then returns an absolute path. Remote and `data:` sources are left alone,
- * so this is idempotent, and a source that cannot be read (or whose token root
- * isn't declared) keeps its original `src` rather than failing the whole
- * document.
+ * each `src` to an absolute path through `resolve`. Remote and `data:` sources
+ * are left alone, so this is idempotent, and a source that cannot be read keeps
+ * its original `src` rather than failing the whole document.
  *
- * Used two ways: to make a compiled worksheet self-contained before it is
- * deflated, and to feed exported HTML to headless Chromium, which has no
- * local-filesystem access. Both accept the same input because the CalcPad
- * source carries images as `'<img src="…">` comment lines.
+ * Used two ways, with a different `resolve` each time. Rendered HTML arrives
+ * with `{project}`/`{library}`/`{user}` and environment variables already
+ * expanded by `Calcpad.Core.ImageReferences`, so it only needs a path made
+ * absolute against the document's folder. Raw `.cpd` source — a compiled
+ * worksheet, which is deflated before Core ever sees it — still needs the full
+ * {@link createReferenceResolver}. Both accept the same input because the
+ * CalcPad source carries images as `'<img src="…">` comment lines.
  */
 export async function inlineImageSources(
     text: string,

@@ -45,7 +45,7 @@ Each root is declared once, with a directive naming the folder it points at — 
 - `#ProjectPath ...` — the job- or document-specific folder, typically outside version control and different for every recipient.
 - `#LibraryPath ...` — a shared folder of reusable `.cpd`/`.txt` files, e.g. a firm-wide function or materials library.
 
-Both directives render nothing, the same as `#include`. A relative value resolves against the folder of the file that declares it; environment variables are expanded in the value using `%VAR%` syntax — on every platform, including macOS/Linux:
+Both directives render nothing, the same as `#include`. A relative value resolves against the folder of the file that declares it — so a module reached through `#include` that declares `#ProjectPath .` means *its own* folder, not the including document's. Environment variables are expanded in the value using `%VAR%` syntax — on every platform, including macOS/Linux:
 
 ```text
 #LibraryPath %HOME%/lib/calcpad
@@ -54,7 +54,7 @@ Both directives render nothing, the same as `#include`. A relative value resolve
 **Rules, kept deliberately simple:**
 
 - **One `#ProjectPath` and one `#LibraryPath` per document.** A second declaration of the same root is an error.
-- **Declare before first use.** A directive must appear above the first line that uses its token, or that line is an error — this also means the document's declared paths can be read once, up front, without worrying about them changing mid-file.
+- **Declare before first use.** An `#include` whose token is used above its declaration is an error, and since includes are expanded before anything else runs, that is where the rule bites. `#read`\`#write` and `<img src>` are resolved after expansion, against the roots the whole document declared, so they are not order-sensitive — but write the declaration first anyway: it is the one order that reads the same as it resolves.
 - **The folder has to actually exist.** A value that doesn't resolve to a real folder on disk is an error at the declaration, not deferred to whatever `#include`/`#read` reaches it later.
 - A token whose root was never declared is an error, not a silent fallback to something else.
 

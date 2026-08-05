@@ -36,7 +36,7 @@ namespace Calcpad.Server.Services
             };
         }
 
-        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors, string? ProjectPath, string? LibraryPath) Convert(
+        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors) Convert(
             string calcpadContent,
             Settings? settings = null,
             bool forceUnwrappedCode = false,
@@ -99,7 +99,7 @@ namespace Calcpad.Server.Services
                     {
                         try
                         {
-                            var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, Debug = true };
+                            var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, PathRoots = macroParser.PathRoots, Debug = true };
                             silent.Parse(outputText, true, false);
                             errors.AddRange(silent.Errors);
                         }
@@ -123,6 +123,7 @@ namespace Calcpad.Server.Services
                         {
                             Settings = coreSettings,
                             SourceFilePath = sourceFilePath,
+                            PathRoots = macroParser.PathRoots,
                             Debug = debug ?? !forPrint,
                             ForPrint = forPrint,
                             EnableUi = enableUi,
@@ -145,9 +146,7 @@ namespace Calcpad.Server.Services
                 var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);
                 FileLogger.LogInfo("Conversion completed successfully", $"Output length: {finalHtml.Length}");
 
-                // macroParser.PathRoots reflects every #ProjectPath/#LibraryPath declaration
-                // found while flattening #includes, not just ones in calcpadContent itself.
-                return (finalHtml, openXmlExpressions, errors, macroParser.PathRoots.Project, macroParser.PathRoots.Library);
+                return (finalHtml, openXmlExpressions, errors);
             }
             catch (OperationCanceledException)
             {

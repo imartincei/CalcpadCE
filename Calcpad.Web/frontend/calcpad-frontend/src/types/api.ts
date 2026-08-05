@@ -303,13 +303,6 @@ export interface CalcpadError {
 export interface ConvertResult {
     html: string;
     errors: CalcpadError[];
-    /**
-     * The document's resolved `#ProjectPath`/`#LibraryPath` roots (via the
-     * `X-Calcpad-PathRoots` header), including any declared inside an `#include`d
-     * file — null when never declared.
-     */
-    projectPath: string | null;
-    libraryPath: string | null;
 }
 
 export interface CpdzDecodeResponse {

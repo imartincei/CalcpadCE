@@ -488,6 +488,20 @@ async function bootstrap(): Promise<void> {
     });
 
     /**
+     * Sidebar line navigation (the TOC) while the input form is up. The editor it would
+     * normally reveal is hidden there, so the form and the report beside it are scrolled
+     * instead. The cursor still moves, without taking focus off the form, so leaving
+     * input mode lands on the heading last navigated to.
+     */
+    activeBridge.onGoToLine = (line: number) => {
+        if (!appInstance.isPreviewVisible() || appInstance.getResultMode() !== 'ui') return false;
+        appInstance.scrollPreviewToSourceLine(activeGroup.id, line);
+        activeGroup.editor.revealLineInCenter(line);
+        activeGroup.editor.setPosition({ lineNumber: line, column: 1 });
+        return true;
+    };
+
+    /**
      * Whether the plain preview renders with the entered #UI values applied. Off by
      * default: preview is where the document itself is read, and seeing its own values
      * is the point. Turned on it becomes a debugging view of the filled-in form.
@@ -568,8 +582,7 @@ async function bootstrap(): Promise<void> {
             // the images-folder / custom-path insert options) render in the
             // sandboxed preview iframe, matching PDF export.
             const finalHtml = tauriBridge
-                ? await tauriBridge.inlineDocumentImages(result.html, content,
-                    { projectPath: result.projectPath, libraryPath: result.libraryPath })
+                ? await tauriBridge.inlineDocumentImages(result.html)
                 : result.html;
             appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine);
             if (mode === 'ui') uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
@@ -600,8 +613,7 @@ async function bootstrap(): Promise<void> {
         if (!result || result instanceof ArrayBuffer) return;
 
         const html = tauriBridge
-            ? await tauriBridge.inlineDocumentImages(result.html, content,
-                { projectPath: result.projectPath, libraryPath: result.libraryPath })
+            ? await tauriBridge.inlineDocumentImages(result.html)
             : result.html;
         appInstance.setUiPrintHtml(group.id, html);
     }
