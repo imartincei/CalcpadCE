@@ -190,6 +190,10 @@ export interface DefinitionsResponse {
     functions: FunctionDefinition[];
     variables: VariableDefinition[];
     customUnits: CustomUnitDefinition[];
+    /** Resolved absolute `#ProjectPath`, or null when undeclared/unresolvable. */
+    projectPath: string | null;
+    /** Resolved absolute `#LibraryPath`, or null when undeclared/unresolvable. */
+    libraryPath: string | null;
 }
 
 export interface MacroDefinition {
@@ -366,4 +370,9 @@ export interface UiConvertOptions {
      * `"L"` covers every declaration of that name.
      */
     uiOverrides?: Record<string, string>;
+    /**
+     * Drops the "on line [N]" source-line reference from error messages, since input
+     * mode has no source editor for it to point at. Defaults to `enableUi`.
+     */
+    hideErrorLines?: boolean;
 }

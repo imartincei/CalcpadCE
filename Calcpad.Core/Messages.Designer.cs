@@ -439,6 +439,15 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
+        // /   Looks up a localized string similar to Error in &quot;{0}&quot;: {1}.
+        // / </summary>
+        public static string Error_in_0_1 {
+            get {
+                return ResourceManager.GetString("Error_in_0_1", resourceCulture);
+            }
+        }
+
+        // / <summary>
         // /   Looks up a localized string similar to Error parsing &quot;{0}&quot; as number..
         // / </summary>
         public static string Error_parsing_0_as_number {

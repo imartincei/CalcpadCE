@@ -13,11 +13,22 @@ export function expandEnvVars(input: string): string {
         .replace(/\$([A-Za-z_][A-Za-z0-9_]*)/g, (_, n) => process.env[n] ?? '');
 }
 
-/** The document's declared `{project}`/`{library}` roots, resolved to absolute directories. */
-export function resolveDocumentPathRoots(document: vscode.TextDocument): ResolvedPathRoots {
+/**
+ * The document's `{project}`/`{library}` roots: `serverRoots`' value when non-null — live
+ * regardless of where in the `#include` chain it was declared — otherwise this document's own
+ * text scan (declares-locally-only, or no server response cached yet).
+ */
+export function resolveDocumentPathRoots(
+    document: vscode.TextDocument,
+    serverRoots?: ResolvedPathRoots,
+): ResolvedPathRoots {
     const documentDir = path.dirname(document.uri.fsPath);
     const declared = scanDeclaredPathRoots(document.getText());
-    return resolveDeclaredPathRoots(declared, documentDir, expandEnvVars, path.resolve, os.homedir());
+    const local = resolveDeclaredPathRoots(declared, documentDir, expandEnvVars, path.resolve, os.homedir());
+    return {
+        project: serverRoots?.project ?? local.project,
+        library: serverRoots?.library ?? local.library,
+    };
 }
 
 /**

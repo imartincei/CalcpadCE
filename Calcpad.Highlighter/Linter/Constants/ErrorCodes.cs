@@ -72,6 +72,9 @@ namespace Calcpad.Highlighter.Linter.Constants
             ["CPD-3413"] = "Invalid #settings JSON",
             ["CPD-3414"] = "Invalid PDF settings in a metadata comment",
             ["CPD-3415"] = "Invalid #UI format",
+            ["CPD-3416"] = "'uiOverrides' metadata comment not on the first line",
+            ["CPD-3417"] = "Duplicate 'uiOverrides' metadata comment",
+            ["CPD-3418"] = "'uiOverrides' sharing a comment with another key",
 
             // Stage 3: Format (CPD-36xx)
             ["CPD-3601"] = "Invalid format specifier"

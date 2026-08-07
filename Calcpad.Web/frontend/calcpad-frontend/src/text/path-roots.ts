@@ -201,6 +201,10 @@ export function expandPathRootToken(
  * in-process OS API for "the current user's home directory" the way Core has
  * `Environment.GetFolderPath`, so it is asked of whichever host embeds this (Tauri, VS Code) the
  * first time a reference actually needs it.
+ *
+ * `serverRoots`, when given, takes priority per root over the text scan — the server sees the
+ * whole `#include` chain, so it knows a root declared inside an included file that a scan of
+ * `sourceText` alone (the entry document only) cannot.
  */
 export function createReferenceResolver(
     sourceText: string,
@@ -208,6 +212,7 @@ export function createReferenceResolver(
     expandEnvVars: (raw: string) => string | Promise<string>,
     resolve: (dir: string, file: string) => string,
     getHomeDir?: () => string | null | Promise<string | null>,
+    serverRoots?: ResolvedPathRoots,
 ): (raw: string) => Promise<string> {
     const declared = scanDeclaredPathRoots(sourceText);
     const declaresUser = (v: string | null) => v !== null && isUserToken(v);
@@ -231,8 +236,8 @@ export function createReferenceResolver(
         if (resolvedRoots === null) {
             const home = rootsNeedHomeDir ? await ensureHomeDir() : null;
             resolvedRoots = {
-                project: await resolveRoot(declared.project, home),
-                library: await resolveRoot(declared.library, home),
+                project: serverRoots?.project ?? await resolveRoot(declared.project, home),
+                library: serverRoots?.library ?? await resolveRoot(declared.library, home),
             };
         }
         const home = isUserToken(raw) ? await ensureHomeDir() : null;

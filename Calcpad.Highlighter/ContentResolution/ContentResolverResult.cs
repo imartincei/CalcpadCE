@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Calcpad.Core;
 using Calcpad.Highlighter.Linter.Helpers;
 
 namespace Calcpad.Highlighter.ContentResolution
@@ -260,6 +261,13 @@ namespace Calcpad.Highlighter.ContentResolution
         public Dictionary<int, SourceInfo> IncludeMap { get; set; }
         public List<MacroDefinition> MacroDefinitions { get; set; }
         public List<DuplicateMacro> DuplicateMacros { get; set; }
+
+        /// <summary>
+        /// The `#ProjectPath`/`#LibraryPath` roots declared anywhere in the root file or its
+        /// `#include` chain, in document order — the same instance <see cref="ContentResolver"/>
+        /// builds while expanding includes.
+        /// </summary>
+        public PathRoots PathRoots { get; set; }
 
         /// <summary>
         /// Maps macro name to its comment parameters (parameters used in comments, directly or transitively).

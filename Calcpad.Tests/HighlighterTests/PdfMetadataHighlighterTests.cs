@@ -158,6 +158,63 @@ namespace Calcpad.Tests.HighlighterTests
         }
 
         [Fact]
+        public void UiOverrides_NotOnFirstLine_WarnsCpd3416()
+        {
+            // The host only ever reads a 'uiOverrides' comment off the file's first line,
+            // so one lower down - e.g. above a #UI line it means to target - is inert.
+            var result = Lint("#UI L = 4\n'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI q = 1");
+
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3416");
+        }
+
+        [Fact]
+        public void UiOverrides_OnFirstLine_DoesNotWarnCpd3416()
+        {
+            var result = Lint("'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI L = 4");
+
+            Assert.DoesNotContain(result.Diagnostics, d => d.Code == "CPD-3416");
+        }
+
+        [Fact]
+        public void UiOverrides_Duplicate_WarnsCpd3417ForTheSecondOne()
+        {
+            // Only the first 'uiOverrides' comment in a file is ever read back, so a second
+            // one - e.g. from a merge or a stray copy-paste - would otherwise fail silently.
+            var result = Lint(
+                "'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI L = 4\n'<!--{\"uiOverrides\":{\"q:1\":\"2\"}}-->\n#UI q = 1");
+
+            var duplicateWarnings = result.Diagnostics.Where(d => d.Code == "CPD-3417").ToList();
+            Assert.Single(duplicateWarnings);
+            Assert.Equal(2, duplicateWarnings[0].Line);
+        }
+
+        [Fact]
+        public void UiOverrides_SharingCommentWithAnotherKey_WarnsCpd3418()
+        {
+            // The Properties tab and the host's save/restore both rewrite this comment by
+            // position, so mixing 'uiOverrides' with another key makes the result unpredictable.
+            var result = Lint("'<!--{\"desc\":\"Beam span\",\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI L = 4");
+
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3418");
+        }
+
+        [Fact]
+        public void UiOverrides_Alone_DoesNotWarnCpd3418()
+        {
+            var result = Lint("'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI L = 4");
+
+            Assert.DoesNotContain(result.Diagnostics, d => d.Code == "CPD-3418");
+        }
+
+        [Fact]
+        public void UiOverrides_Single_DoesNotWarnCpd3417()
+        {
+            var result = Lint("'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI L = 4");
+
+            Assert.DoesNotContain(result.Diagnostics, d => d.Code == "CPD-3417");
+        }
+
+        [Fact]
         public void PdfSettings_SpanningLines_IsValidatedNotSkipped()
         {
             // A `_`-continued comment used to be invisible to this validator, which read

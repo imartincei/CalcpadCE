@@ -1,94 +1,26 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { scanDeclaredPathRoots, getPathRootTokenKind, type PathRootKind } from 'calcpad-frontend';
+import * as os from 'os';
+import {
+    getPathRootTokenKind,
+    isUserToken,
+    parseDirectiveLine,
+    extensionsForDirective,
+    resolveCompletionPathRoots,
+    PATH_ROOT_TOKEN,
+    PATH_ROOT_LABEL,
+    USER_TOKEN,
+    DIRECTIVE_TRIGGER_CHARACTERS,
+} from 'calcpad-frontend';
 import { expandEnvVars } from './calcpadLocationResolver';
-
-const DIRECTIVES = ['include', 'read', 'write', 'append', 'projectpath', 'librarypath'] as const;
-type Directive = typeof DIRECTIVES[number];
-
-const INCLUDE_EXTENSIONS = ['cpd', 'txt'];
-
-export interface DirectiveParse {
-    directive: Directive;
-    /** Column index where the file path begins */
-    pathStartCol: number;
-    /** The partial file path typed so far (everything from pathStartCol to end of line) */
-    partialPath: string;
-}
-
-/**
- * Parse a line to extract the directive type and file path portion.
- * Syntax:
- *   #include FILEPATH
- *   #read varName from FILEPATH[@options...]
- *   #write varName to FILEPATH[@options...]
- *   #append varName to FILEPATH[@options...]
- *   #ProjectPath PATH
- *   #LibraryPath PATH
- *
- * Returns undefined if the line isn't a recognized directive or
- * the cursor hasn't reached the file path portion yet.
- */
-export function parseDirectiveLine(lineText: string): DirectiveParse | undefined {
-    let i = 0;
-
-    // Skip leading whitespace
-    while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) { i++; }
-
-    // Expect '#'
-    if (i >= lineText.length || lineText[i] !== '#') { return undefined; }
-    i++;
-
-    // Read the directive keyword
-    const keywordStart = i;
-    while (i < lineText.length && lineText[i] !== ' ' && lineText[i] !== '\t') { i++; }
-    const keyword = lineText.substring(keywordStart, i).toLowerCase() as Directive;
-
-    if (!DIRECTIVES.includes(keyword)) { return undefined; }
-
-    // Skip whitespace after directive keyword
-    const afterKeyword = i;
-    while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) { i++; }
-    // Need at least one space after the directive keyword
-    if (i === afterKeyword) { return undefined; }
-
-    if (keyword === 'include' || keyword === 'projectpath' || keyword === 'librarypath') {
-        // #include FILEPATH / #ProjectPath PATH / #LibraryPath PATH — path starts here
-        return { directive: keyword, pathStartCol: i, partialPath: lineText.substring(i) };
-    }
-
-    // For #read/#write/#append: skip variable name, then expect 'from' or 'to'
-    // Skip variable name (non-whitespace token)
-    while (i < lineText.length && lineText[i] !== ' ' && lineText[i] !== '\t') { i++; }
-
-    // Skip whitespace after variable name
-    const afterVar = i;
-    while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) { i++; }
-    if (i === afterVar) { return undefined; } // No space after variable name yet
-
-    // Read the connecting keyword ('from' for #read, 'to' for #write/#append)
-    const connStart = i;
-    while (i < lineText.length && lineText[i] !== ' ' && lineText[i] !== '\t') { i++; }
-    const connector = lineText.substring(connStart, i).toLowerCase();
-
-    const expectedConnector = keyword === 'read' ? 'from' : 'to';
-    if (connector !== expectedConnector) { return undefined; }
-
-    // Skip whitespace after connector — path starts after this
-    const afterConn = i;
-    while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) { i++; }
-    if (i === afterConn) { return undefined; } // No space after 'from'/'to' yet
-
-    return { directive: keyword, pathStartCol: i, partialPath: lineText.substring(i) };
-}
-
-const PATH_ROOT_LABEL: Record<PathRootKind, string> = { project: 'Project', library: 'Library' };
-const PATH_ROOT_TOKEN: Record<PathRootKind, string> = { project: '{project}', library: '{library}' };
+import type { CalcpadDefinitionsService } from './calcpadDefinitionsService';
 
 export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemProvider {
     private outputChannel: vscode.OutputChannel;
+    private definitionsService: CalcpadDefinitionsService;
 
-    constructor(outputChannel: vscode.OutputChannel) {
+    constructor(definitionsService: CalcpadDefinitionsService, outputChannel: vscode.OutputChannel) {
+        this.definitionsService = definitionsService;
         this.outputChannel = outputChannel;
     }
 
@@ -106,8 +38,6 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
         }
 
         const { directive, pathStartCol } = parsed;
-        const isInclude = directive === 'include';
-        const isPathRoot = directive === 'projectpath' || directive === 'librarypath';
 
         this.outputChannel.appendLine(`[INCLUDE COMPLETION] Triggered on line: "${lineText}" (directive: #${directive})`);
 
@@ -121,14 +51,11 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
         this.outputChannel.appendLine(`[INCLUDE COMPLETION] Partial path: "${partialPath}"`);
 
         const documentDir = path.dirname(document.uri.fsPath);
+        const homeDir = os.homedir();
         const completionItems: vscode.CompletionItem[] = [];
         const addedEntries = new Set<string>();
 
-        const extensions = isPathRoot
-            ? []
-            : isInclude
-                ? INCLUDE_EXTENSIONS
-                : [...INCLUDE_EXTENSIONS, 'csv', 'tsv', 'xlsx', 'xlsm', 'xls'];
+        const extensions = extensionsForDirective(directive);
 
         // Replace range covers from the start of the file path to the cursor
         const replaceRange = new vscode.Range(
@@ -136,24 +63,38 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
             position.line, position.character
         );
 
-        // The document's own #ProjectPath/#LibraryPath declarations, resolved to absolute
-        // directories — there is no host-level default any more, only what the document itself
-        // declares above this line.
-        const declaredRoots = scanDeclaredPathRoots(document.getText(), position.line);
-        const resolvedRoots: Record<PathRootKind, string | undefined> = { project: undefined, library: undefined };
-        for (const kind of ['project', 'library'] as const) {
-            const declared = declaredRoots[kind];
-            if (declared) {
-                resolvedRoots[kind] = path.resolve(documentDir, expandEnvVars(declared));
-            }
-        }
+        // The document's own #ProjectPath/#LibraryPath roots — the server's resolved value
+        // (live regardless of where in the #include chain it was declared) when cached,
+        // otherwise this document's own text scan.
+        const resolvedRoots = await resolveCompletionPathRoots({
+            serverRoots: this.definitionsService.getCachedPathRoots(document.uri.toString()),
+            sourceText: document.getText(),
+            beforeLine: position.line,
+            documentDir,
+            expandEnvVars,
+            resolve: path.resolve,
+            homeDir,
+        });
         this.outputChannel.appendLine(
-            `[INCLUDE COMPLETION] Declared roots: project="${resolvedRoots.project || '(none)'}" library="${resolvedRoots.library || '(none)'}"`
+            `[INCLUDE COMPLETION] Resolved roots: project="${resolvedRoots.project || '(none)'}" library="${resolvedRoots.library || '(none)'}"`
         );
 
         try {
             const tokenKind = getPathRootTokenKind(partialPath);
-            if (tokenKind !== null) {
+            const isUser = isUserToken(partialPath);
+            if (isUser) {
+                // Drilling into a {user} reference: search the OS home directory, but reinsert
+                // completions in token form so the reference stays portable.
+                const tokenText = partialPath.slice(0, USER_TOKEN.length);
+                let rest = partialPath.slice(tokenText.length);
+                if (rest.startsWith('/') || rest.startsWith('\\')) rest = rest.slice(1);
+                this.outputChannel.appendLine(`[INCLUDE COMPLETION] Inside {user} root, relative path: "${rest}"`);
+                await this.addEntriesFromDirectory(
+                    homeDir, rest, extensions, replaceRange,
+                    document.uri.fsPath, completionItems, addedEntries, token,
+                    undefined, '', `${tokenText}/`
+                );
+            } else if (tokenKind !== null) {
                 // Drilling into a {project}/{library} reference: search the resolved root, but
                 // reinsert completions in token form so the reference stays portable.
                 const root = resolvedRoots[tokenKind];
@@ -198,6 +139,15 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
                             PATH_ROOT_LABEL[kind], '', `${PATH_ROOT_TOKEN[kind]}/`
                         );
                     }
+                }
+
+                if (path.normalize(homeDir) !== docDirNorm) {
+                    this.outputChannel.appendLine(`[INCLUDE COMPLETION] Also searching {user} root: ${homeDir}`);
+                    await this.addEntriesFromDirectory(
+                        homeDir, '', extensions, replaceRange,
+                        document.uri.fsPath, completionItems, addedEntries, token,
+                        'User', '', `${USER_TOKEN}/`
+                    );
                 }
 
                 // Also search each open workspace folder. Skip any folder that coincides with
@@ -356,12 +306,12 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
         }
     }
 
-    public static register(outputChannel: vscode.OutputChannel): vscode.Disposable {
-        const provider = new CalcpadIncludeCompletionProvider(outputChannel);
+    public static register(definitionsService: CalcpadDefinitionsService, outputChannel: vscode.OutputChannel): vscode.Disposable {
+        const provider = new CalcpadIncludeCompletionProvider(definitionsService, outputChannel);
         return vscode.languages.registerCompletionItemProvider(
             ['calcpad', 'plaintext'],
             provider,
-            ' ', '/', '\\'  // space (after 'from'/'to'/#include), path separators
+            ...DIRECTIVE_TRIGGER_CHARACTERS
         );
     }
 }

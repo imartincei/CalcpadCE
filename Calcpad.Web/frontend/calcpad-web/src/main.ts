@@ -36,7 +36,7 @@ import { attachOperatorReplacer } from './editor/operator-replacer';
 import { attachAutoIndenter } from './editor/auto-indent';
 import { registerFormattingCommands } from './editor/formatting-commands';
 import { registerFormatDocumentProvider } from './editor/format-document';
-import { setActiveDocumentKeyResolver, type EditorBridge } from './editor/bridge';
+import { setActiveDocumentKeyResolver, getActiveDocumentKey, type EditorBridge } from './editor/bridge';
 import { EditorGroup } from './editor/editor-group';
 import type { TabManager } from './tabs/tab-manager';
 import type { UiControl } from 'calcpad-frontend';
@@ -609,7 +609,8 @@ async function bootstrap(): Promise<void> {
     ): Promise<void> {
         const result = await activeBridge.api.convert(
             content, apiSettings, 'html', true, sourceFilePath, theme,
-            { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }, true, { key: `preview:${group.id}` });
+            { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)), hideErrorLines: true },
+            true, { key: `preview:${group.id}` });
         if (!result || result instanceof ArrayBuffer) return;
 
         const html = tauriBridge
@@ -1030,6 +1031,7 @@ async function bootstrap(): Promise<void> {
             getOpenedFolder: () => tauriBridge.getOpenedFolder(),
             expandEnvVars: (raw) => tauriBridge.expandEnvVars(raw),
             getHomeDir: () => tauriBridge.getHomeDir(),
+            getServerPathRoots: () => editorBridge.definitions.getCachedPathRoots(getActiveDocumentKey()),
         });
     }
     registerHoverProvider(editorBridge);

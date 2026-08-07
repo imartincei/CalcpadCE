@@ -238,6 +238,8 @@ export type {
 export {
     hasPathRootToken,
     getPathRootTokenKind,
+    isUserToken,
+    expandUserToken,
     parsePathRootDeclaration,
     scanDeclaredPathRoots,
     resolvePathRoot,
@@ -245,3 +247,19 @@ export {
     expandPathRootToken,
     createReferenceResolver,
 } from './text/path-roots';
+export type {
+    Directive,
+    DirectiveParse,
+    CompletionPathRootsParams,
+} from './text/directives';
+export {
+    parseDirectiveLine,
+    INCLUDE_EXTENSIONS,
+    DATA_EXTENSIONS,
+    extensionsForDirective,
+    PATH_ROOT_TOKEN,
+    PATH_ROOT_LABEL,
+    USER_TOKEN,
+    DIRECTIVE_TRIGGER_CHARACTERS,
+    resolveCompletionPathRoots,
+} from './text/directives';

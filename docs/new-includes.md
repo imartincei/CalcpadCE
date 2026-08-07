@@ -70,6 +70,39 @@ Both directives render nothing, the same as `#include`. A relative value resolve
 
 `#local` content is stripped when the file is `#include`d into another document (the same way it always is), so the module's own declaration never reaches — and never clashes with — the including document's. Opened by itself, the module still runs: `#local` sections are only stripped when a file is reached through `#include`.
 
+## `#UI` overrides and includes
+
+> Calcpad.Web only. See [Saving what was entered](new-ui-mode.md#saving-what-was-entered) for the `uiOverrides` comment itself.
+
+A saved `uiOverrides` comment only takes effect on the **first line of the file that carries it**, and only the first such comment counts — a second one anywhere in the same file is ignored. Both rules are enforced, not just documented:
+
+- **A `uiOverrides` comment inside an included file never reaches the document that includes it.** The host restores saved values by scanning the file *you have open*, before `#include` is expanded, so it never looks inside a file an `#include` brings in. On top of that, the server treats any `uiOverrides` comment in an included file's content as if it sat inside that file's own `#local`/`#global` block: it is stripped out before the included text is spliced in, whether or not the file's author wrapped it in `#local` themselves. A `#UI` control that lives in an included file simply renders with whatever default the source itself declares.
+- **Only the includer's own `uiOverrides` comment can override it instead**, by targeting the control's `name:ordinal` key — the same key any `#UI` control gets, whether it was written in the main file or pulled in through an `#include`.
+- The [linter](new-linter.md) warns about a `uiOverrides` comment that will not be the one read back: `CPD-3416` when it isn't on the first line, `CPD-3417` when a valid one on the first line is followed by another later in the file, and `CPD-3418` when it shares its comment with another key (`desc`, `pdf`, and so on) — keep `uiOverrides` in a comment by itself so an edit to the other key can't reshape it unpredictably.
+
+This is deliberate, not a gap to close: resolving an included module's own saved values automatically would mean every document that includes it inherits whatever was last typed into the module when it was opened on its own — a hidden coupling between unrelated documents that would be worse than the control just falling back to its declared default.
+
+**To share entered values across several files, write them out as data instead of relying on `#UI`:**
+
+```text
+' shared/inputs.cpd — run this file on its own after entering values in its form
+#local
+shared = [L; q]
+#write shared to {project}/shared-inputs.csv
+#global
+```
+
+`#write` sits inside `#local` so it only runs when `shared/inputs.cpd` is opened by itself — [`#local` content is stripped out of an `#include`](#path-root-tokens-project-and-library), so including this file elsewhere never re-triggers the write.
+
+```text
+' consumer.cpd
+#read shared from {project}/shared-inputs.csv
+#UI L = shared[1]
+#UI q = shared[2]
+```
+
+Each consuming file `#read`s the numbers back and declares its own `#UI` controls around them, styled and labeled however that file wants. If you don't need `#UI` in the file doing the reading — you only want the numbers — a plain `#read` of the data file is all that's needed, without wrapping anything in `#local`/`#write` at all.
+
 ## Path root token: `{user}`
 
 `{user}` is a third root, usable anywhere `{project}`/`{library}` are — but unlike them, it needs no `#ProjectPath`/`#LibraryPath`-style declaration first. It always expands to the current OS user's home directory: `%USERPROFILE%` on Windows, `$HOME` on macOS/Linux.

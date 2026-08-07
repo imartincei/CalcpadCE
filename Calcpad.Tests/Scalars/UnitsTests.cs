@@ -1791,18 +1791,37 @@
 
         [Fact]
         [Trait("Category", "Mechanical Formulas")]
-        public void Test_ton_ft_s2() => Test("100ton*32.17404855643045ft/s^2", "224kip");
+        public void Test_ton_ft_s2()
+        {
+            // Settings.IsUs defaults to true (US) — go through ExpressionParser rather than
+            // TestCalc/MathParser directly, since only ExpressionParser.Parse reads it.
+            var parser = new ExpressionParser { Settings = new Settings() };
+            parser.Parse("r = 100ton*32.17404855643045ft/s^2", true, false);
+            Assert.Contains("200", parser.HtmlResult);
+        }
 
         [Fact]
         [Trait("Category", "Mechanical Formulas")]
         public void Test_ton_ft_s2_UK()
         {
-            // TestCalc/MathParser never reads Settings.IsUs (only ExpressionParser.Parse
-            // does, at the top of every document parse), so "ton" here is always the bare
-            // Unit._isUs default. #settings can only override IsUs through ExpressionParser.
             var parser = new ExpressionParser { Settings = new Settings() };
             parser.Parse("#settings {\"isUs\": false}\nr = 100ton*32.17404855643045ft/s^2", true, false);
             Assert.Contains("224", parser.HtmlResult);
+        }
+
+        [Fact]
+        [Trait("Category", "Mechanical Formulas")]
+        public async Task ConcurrentParsers_DoNotShareIsUsSetting()
+        {
+            var tasks = Enumerable.Range(0, 32).Select(i => Task.Run(() =>
+            {
+                var isUs = i % 2 == 0;
+                var parser = new ExpressionParser { Settings = new Settings() };
+                parser.Parse($"#settings {{\"isUs\": {(isUs ? "true" : "false")}}}\nr = 100ton*32.17404855643045ft/s^2", true, false);
+                Assert.Contains(isUs ? "200" : "224", parser.HtmlResult);
+            }));
+
+            await Task.WhenAll(tasks);
         }
 
         [Fact]

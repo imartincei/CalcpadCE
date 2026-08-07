@@ -317,7 +317,11 @@ shows the numbers that were entered. Hand-writing an entry works too, and a broa
 more controls — `L:1` covers every pass of that declaration, a bare `L` covers every declaration
 of the name.
 
-See [Metadata Comments](new-metadata-comments.md) for the comment format itself.
+See [Metadata Comments](new-metadata-comments.md) for the comment format itself. The comment has
+to be the **first line of the file** to take effect — including a file reached through
+`#include`, whose own saved values are invisible to whatever includes it. See [`#UI` overrides
+and includes](new-includes.md#ui-overrides-and-includes) for the reasoning and a workaround for
+sharing values across files.
 
 Values do not have to be saved to be exported: an export made while the form is filled in uses
 what is currently entered. Saving is what makes them survive closing the document.

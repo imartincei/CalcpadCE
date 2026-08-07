@@ -1,57 +1,18 @@
 import * as monaco from 'monaco-editor';
-import { scanDeclaredPathRoots, getPathRootTokenKind, type PathRootKind } from 'calcpad-frontend';
-import { isUserToken, expandUserToken } from 'calcpad-frontend/text/path-roots';
+import {
+    getPathRootTokenKind,
+    isUserToken,
+    expandUserToken,
+    resolveCompletionPathRoots,
+    extensionsForDirective,
+    parseDirectiveLine,
+    PATH_ROOT_TOKEN,
+    PATH_ROOT_LABEL,
+    USER_TOKEN,
+    DIRECTIVE_TRIGGER_CHARACTERS,
+    type ResolvedPathRoots,
+} from 'calcpad-frontend';
 import { pathResolve } from 'calcpad-frontend/services/paths';
-
-const DIRECTIVES = ['include', 'read', 'write', 'append', 'projectpath', 'librarypath'] as const;
-type Directive = typeof DIRECTIVES[number];
-
-const INCLUDE_EXTENSIONS = ['cpd', 'txt'];
-const DATA_EXTENSIONS = ['csv', 'tsv', 'xlsx', 'xlsm', 'xls'];
-
-export interface DirectiveParse {
-    directive: Directive;
-    pathStartCol: number;   // 0-indexed
-    partialPath: string;
-}
-
-/** Ported from vscode-calcpad/calcpadIncludeCompletionProvider.ts. */
-export function parseDirectiveLine(lineText: string): DirectiveParse | undefined {
-    let i = 0;
-    while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) i++;
-    if (i >= lineText.length || lineText[i] !== '#') return undefined;
-    i++;
-
-    const keywordStart = i;
-    while (i < lineText.length && lineText[i] !== ' ' && lineText[i] !== '\t') i++;
-    const keyword = lineText.substring(keywordStart, i).toLowerCase() as Directive;
-    if (!DIRECTIVES.includes(keyword)) return undefined;
-
-    const afterKeyword = i;
-    while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) i++;
-    if (i === afterKeyword) return undefined;
-
-    if (keyword === 'include' || keyword === 'projectpath' || keyword === 'librarypath') {
-        return { directive: keyword, pathStartCol: i, partialPath: lineText.substring(i) };
-    }
-
-    while (i < lineText.length && lineText[i] !== ' ' && lineText[i] !== '\t') i++;
-    const afterVar = i;
-    while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) i++;
-    if (i === afterVar) return undefined;
-
-    const connStart = i;
-    while (i < lineText.length && lineText[i] !== ' ' && lineText[i] !== '\t') i++;
-    const connector = lineText.substring(connStart, i).toLowerCase();
-    const expected = keyword === 'read' ? 'from' : 'to';
-    if (connector !== expected) return undefined;
-
-    const afterConn = i;
-    while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) i++;
-    if (i === afterConn) return undefined;
-
-    return { directive: keyword, pathStartCol: i, partialPath: lineText.substring(i) };
-}
 
 function pathDirname(p: string): string {
     const idx = Math.max(p.lastIndexOf('/'), p.lastIndexOf('\\'));
@@ -86,11 +47,9 @@ export interface IncludeCompletionsContext {
     expandEnvVars(raw: string): Promise<string>;
     /** The current OS user's home directory, for the `{user}` path-root token, or null if unknown. */
     getHomeDir(): Promise<string | null>;
+    /** The server's resolved roots for the active document, from the last cached `/definitions`. */
+    getServerPathRoots(): ResolvedPathRoots;
 }
-
-const PATH_ROOT_LABEL: Record<PathRootKind, string> = { project: 'Project', library: 'Library' };
-const PATH_ROOT_TOKEN: Record<PathRootKind, string> = { project: '{project}', library: '{library}' };
-const USER_TOKEN = '{user}';
 
 /**
  * Register a Monaco completion provider for #include / #read / #write / #append /
@@ -112,7 +71,7 @@ export function registerIncludeCompletionProvider(
     ctx: IncludeCompletionsContext
 ): monaco.IDisposable {
     return monaco.languages.registerCompletionItemProvider('calcpad', {
-        triggerCharacters: [' ', '/', '\\'],
+        triggerCharacters: DIRECTIVE_TRIGGER_CHARACTERS,
 
         async provideCompletionItems(model, position) {
             const line = model.getLineContent(position.lineNumber);
@@ -121,13 +80,7 @@ export function registerIncludeCompletionProvider(
             const parsed = parseDirectiveLine(lineToCursor);
             if (!parsed) return { suggestions: [], incomplete: true };
 
-            const isInclude = parsed.directive === 'include';
-            const isPathRoot = parsed.directive === 'projectpath' || parsed.directive === 'librarypath';
-            const extensions = isPathRoot
-                ? []
-                : isInclude
-                    ? INCLUDE_EXTENSIONS
-                    : [...INCLUDE_EXTENSIONS, ...DATA_EXTENSIONS];
+            const extensions = extensionsForDirective(parsed.directive);
 
             // Strip trailing options (@sheet, type=, sep=)
             let partialPath = parsed.partialPath;
@@ -139,15 +92,17 @@ export function registerIncludeCompletionProvider(
             const openedFolder = await ctx.getOpenedFolder();
             const homeDir = await ctx.getHomeDir();
 
-            const declaredRoots = scanDeclaredPathRoots(model.getValue(), position.lineNumber - 1);
-            const resolvedRoots: Record<PathRootKind, string | null> = { project: null, library: null };
-            for (const kind of ['project', 'library'] as const) {
-                const declared = declaredRoots[kind];
-                if (declared && currentDir) {
-                    const withUser = homeDir !== null && isUserToken(declared) ? expandUserToken(declared, homeDir) : declared;
-                    resolvedRoots[kind] = pathResolve(currentDir, await ctx.expandEnvVars(withUser));
-                }
-            }
+            const resolvedRoots = currentDir
+                ? await resolveCompletionPathRoots({
+                    serverRoots: ctx.getServerPathRoots(),
+                    sourceText: model.getValue(),
+                    beforeLine: position.lineNumber - 1,
+                    documentDir: currentDir,
+                    expandEnvVars: (raw) => ctx.expandEnvVars(raw),
+                    resolve: pathResolve,
+                    homeDir,
+                })
+                : { project: null, library: null };
 
             const range: monaco.IRange = {
                 startLineNumber: position.lineNumber,

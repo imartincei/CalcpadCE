@@ -208,6 +208,8 @@ interface DefinitionsResponse {
   functions: FunctionDefinitionDto[];
   variables: VariableDefinitionDto[];
   customUnits: CustomUnitDefinitionDto[];
+  projectPath: string | null;  // Resolved absolute #ProjectPath, or null when undeclared/unresolvable
+  libraryPath: string | null;  // Resolved absolute #LibraryPath, or null when undeclared/unresolvable
 }
 
 interface MacroDefinitionDto {
@@ -327,6 +329,7 @@ interface CalcpadRequest {
                                 // Entered #UI values, keyed by the identity in data-ui-var ("L:1").
   includeLineAnchors?: boolean; // Line anchors + error boxes. Defaults to !forPrint; set true for an
                                 //   on-screen report, false for anything written to a file.
+  hideErrorLines?: boolean;    // Drops "on line [N]" from error messages. Defaults to enableUi.
 }
 ```
 

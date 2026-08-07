@@ -25,6 +25,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         private const string Code = "CPD-3412";
         private const string TypeCode = "CPD-3411";
         private const string PdfCode = "CPD-3414";
+        private const string MisplacedUiOverridesCode = "CPD-3416";
+        private const string DuplicateUiOverridesCode = "CPD-3417";
+        private const string MixedUiOverridesCode = "CPD-3418";
 
         /// <summary>Recognized top-level keys of a metadata comment.</summary>
         private static readonly HashSet<string> KnownKeys = new(StringComparer.OrdinalIgnoreCase)
@@ -34,6 +37,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
         public void Validate(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
+            var sawUiOverrides = false;
             foreach (var block in _parser.Parse(tokenProvider.AllTokens))
             {
                 if (block.StartLine >= stage3.Lines.Count || !tokenProvider.IsCpdMode(block.StartLine))
@@ -60,7 +64,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 reporter.CheckKnownKeys(root, KnownKeys.Contains, "metadata property");
                 ValidateTypes(block, root, stage3, tokenProvider, reporter);
                 ValidateLintRegions(root, reporter);
-                ValidateUiOverrides(root, reporter);
+                ValidateUiOverrides(block, root, reporter, ref sawUiOverrides);
                 ValidatePdf(root, reporter);
             }
         }
@@ -139,10 +143,48 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         /// identity to the expression entered for it, both written as strings. The keys
         /// themselves are not checked - a key may deliberately be broader than any single
         /// control, and one left behind by an edit is not an error.
+        /// <para>
+        /// The host (readUiOverrides in ui-overrides.ts) only ever reads the first
+        /// 'uiOverrides' comment it finds, and only when it sits on the file's first line -
+        /// anywhere else, or any comment after the first, is silently inert. Both are flagged
+        /// here rather than left to fail quietly, since either can happen from an edit or a
+        /// merge as easily as from a file reached through #include.
+        /// </para>
+        /// <para>
+        /// Sharing the comment with another key - a 'desc', a 'pdf' block - is flagged too:
+        /// the Properties tab and the host's own save/restore round-trip both rewrite a
+        /// comment in place by its position, so a comment that also carries other keys stops
+        /// being something either side can predict the shape of after an edit.
+        /// </para>
         /// </summary>
-        private static void ValidateUiOverrides(JsonElement root, DirectiveJsonReporter reporter)
+        private static void ValidateUiOverrides(HtmlCommentBlock block, JsonElement root, DirectiveJsonReporter reporter, ref bool sawUiOverrides)
         {
             if (!root.TryGetProperty("uiOverrides", out var overrides))
+                return;
+
+            if (HasKeyOtherThan(root, "uiOverrides"))
+            {
+                reporter.For(MixedUiOverridesCode, "metadata comment")
+                    .Warn("'uiOverrides' should be the only key in its comment for predictable behavior");
+            }
+
+            var wasMisplacedOrDuplicate = false;
+            if (block.StartLine != 0)
+            {
+                reporter.For(MisplacedUiOverridesCode, "metadata comment")
+                    .Warn("'uiOverrides' has no effect unless its comment is on the first line of the file");
+                wasMisplacedOrDuplicate = true;
+            }
+
+            if (sawUiOverrides)
+            {
+                reporter.For(DuplicateUiOverridesCode, "metadata comment")
+                    .Warn("a second 'uiOverrides' comment is ignored - only the first one in the file is read");
+                wasMisplacedOrDuplicate = true;
+            }
+            sawUiOverrides = true;
+
+            if (wasMisplacedOrDuplicate)
                 return;
 
             if (overrides.ValueKind != JsonValueKind.Object)
@@ -156,6 +198,16 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 if (prop.Value.ValueKind != JsonValueKind.String)
                     reporter.Warn($"'uiOverrides' value for '{prop.Name}' must be a string, e.g. \"8\"");
             }
+        }
+
+        private static bool HasKeyOtherThan(JsonElement root, string key)
+        {
+            foreach (var prop in root.EnumerateObject())
+            {
+                if (!prop.NameEquals(key))
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>

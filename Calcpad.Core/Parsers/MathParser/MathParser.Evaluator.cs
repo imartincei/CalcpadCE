@@ -235,7 +235,7 @@ namespace Calcpad.Core
                 try
                 {
                     if (!_units.TryGetValue(s, out var u))
-                        u = Unit.Get(s);
+                        u = Unit.Get(s, _parser.IsUs);
 
                     t.Type = TokenTypes.Unit;
                     v.SetValue(u);

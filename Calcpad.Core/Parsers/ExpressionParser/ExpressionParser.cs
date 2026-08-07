@@ -59,15 +59,11 @@ namespace Calcpad.Core
         }
         public string HtmlResult { get; private set; }
         public IReadOnlyList<CalcpadError> Errors => _errorList;
-        public static bool IsUs
-        {
-            get => Unit.IsUs;
-            set => Unit.IsUs = value;
-        }
         public bool IsPaused => _startLine > 0;
         public bool Debug { get; set; }
         public bool ForPrint { get; set; }
         public bool ShowWarnings { get; set; } = true;
+        public bool ShowErrorLines { get; set; } = true;
         public readonly List<string> OpenXmlExpressions = new(100);
 
         static ExpressionParser()
@@ -95,7 +91,6 @@ namespace Calcpad.Core
 
         private void Parse(ReadOnlySpan<char> code, bool calculate, bool getXml)
         {
-            Unit.IsUs = Settings.IsUs;
             var lines = new List<int> { 0 };
             var len = code.Length;
             for (int i = 0; i < len; ++i)
@@ -529,6 +524,7 @@ namespace Calcpad.Core
                 if (n > 0)
                     _sb.Remove(_pauseCharCount, n);
             }
+            _parser.IsUs = Settings.IsUs;
             _parser.IsEnabled = _calculate;
             _currentLine = _startLine - 1;
             _isVisible = true;
@@ -651,7 +647,7 @@ namespace Calcpad.Core
                             errText = token.Value.Replace("?", "<input type=\"text\" size=\"2\" name=\"Var\">");
                         else
                             errText = HttpUtility.HtmlEncode(token.Value);
-                        errText = string.Format(Messages.Error_in_0_on_line_1_2, errText, LineHtml(_currentLine), ex.Message);
+                        errText = FormatError(errText, ex.Message, _currentLine);
                         _sb.Append($"<span class=\"err\"{Id(_currentLine)}>{errText}</span>");
                         RecordError(_currentLine, ex.Message, Debug);
 
@@ -667,7 +663,7 @@ namespace Calcpad.Core
         void AppendError(string lineContent, string text, int line)
         {
             string s = lineContent.Replace("<", "&lt;").Replace(">", "&gt;");
-            _sb.Append(ErrHtml(string.Format(Messages.Error_in_0_on_line_1_2, s, LineHtml(line), text), line));
+            _sb.Append(ErrHtml(FormatError(s, text, line), line));
             RecordError(line, text, Debug);
         }
 
@@ -686,6 +682,10 @@ namespace Calcpad.Core
         }
 
         private static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line + 1}\">{line + 1}</a>]";
+        private string FormatError(string expr, string msg, int line) =>
+            ShowErrorLines
+                ? string.Format(Messages.Error_in_0_on_line_1_2, expr, LineHtml(line), msg)
+                : string.Format(Messages.Error_in_0_1, expr, msg);
         private string ErrHtml(string text, int line) => $"<p class=\"err\"{Id(line)}>{text}</p>";
         private string Id(int line)
         {

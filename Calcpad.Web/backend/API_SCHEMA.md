@@ -60,17 +60,21 @@ interface CalcpadRequest {
   includeLineAnchors?: boolean; // Per-line anchors + error-summary boxes for in-preview line links.
                                 //   Defaults to !forPrint. Set true for an on-screen report, false
                                 //   for anything written to a file.
+  hideErrorLines?: boolean;    // Drops the "on line [N]" reference from error messages, since
+                                //   input mode has no source editor for it to point at. Defaults
+                                //   to enableUi; the report pane shown beside the form overrides
+                                //   it to true even though enableUi is false there.
 }
 ```
 
 The four renderings the front ends expose map onto these as:
 
-| Variant | `forPrint` | `enableUi` | `uiOverrides` | `includeLineAnchors` |
-|---------|-----------|-----------|---------------|----------------------|
-| Preview | `false` | `false` | — | on screen: default; export: `false` |
-| Report | `true` | `false` | yes | on screen: `true`; export: `false` |
-| Input form | `false` | `true` | yes | export: `false` |
-| Unwrapped | — | — | — | n/a (`?unwrap=true`) |
+| Variant | `forPrint` | `enableUi` | `uiOverrides` | `includeLineAnchors` | `hideErrorLines` |
+|---------|-----------|-----------|---------------|----------------------|-------------------|
+| Preview | `false` | `false` | — | on screen: default; export: `false` | default (`false`) |
+| Report | `true` | `false` | yes | on screen: `true`; export: `false` | default, unless shown beside input form: `true` |
+| Input form | `false` | `true` | yes | export: `false` | default (`true`) |
+| Unwrapped | — | — | — | n/a (`?unwrap=true`) | n/a |
 
 **Response:** HTML content (`text/html`)
 
@@ -426,6 +430,8 @@ interface DefinitionsResponse {
   functions: FunctionDefinitionDto[];
   variables: VariableDefinitionDto[];
   customUnits: CustomUnitDefinitionDto[];
+  projectPath: string | null;  // Resolved absolute #ProjectPath, or null when undeclared/unresolvable
+  libraryPath: string | null;  // Resolved absolute #LibraryPath, or null when undeclared/unresolvable
 }
 
 interface MacroDefinitionDto {
@@ -703,7 +709,7 @@ interface PortablePackageResponse {
 }
 ```
 
-**400** when the package cannot be built: `{ error, messages: string[] }`. Three refusals, all naming what to fix — a reference that cannot be read (including one through an undeclared `{project}`/`{library}` root), two references sharing a file name (which the flat refs folder cannot hold), and two `#write`/`#append` targets that would collapse onto the same file. Nothing partial is ever returned.
+**400** when the package cannot be built: `{ error, messages: string[] }`. Two refusals, both naming what to fix — a reference that cannot be read (including one through an undeclared `{project}`/`{library}` root), and two `#write`/`#append` targets that would collapse onto the same file. Two references sharing a file name is not one of them: the flat refs folder renames the second, and any further one, `name-1.ext`, `name-2.ext` and so on instead. Nothing partial is ever returned.
 
 ---
 

@@ -14,7 +14,10 @@ namespace Calcpad.Tests
             {
                 Settings = new Settings(),
                 EnableUi = enableUi,
-                UiOverrides = overrides
+                UiOverrides = overrides,
+                // Mirrors CalcpadService's default (hideErrorLines ?? enableUi): input mode
+                // has no source editor for "on line [N]" to point at.
+                ShowErrorLines = !enableUi
             };
             parser.Parse(source, true, false);
             return parser.HtmlResult;
@@ -600,6 +603,21 @@ namespace Calcpad.Tests
             Assert.Contains("data-ui-var=\"L:1\"", html);
             Assert.DoesNotContain("data-ui-var=\"W:1\"", html);
             Assert.Single(Regex.Matches(html, "calcpad-ui-input"));
+        }
+
+        [Fact]
+        public void ErrorLine_IsHiddenInInputModeAndShownInReportMode()
+        {
+            const string source = "#UI x = y";
+            var uiHtml = Render(source, enableUi: true);
+            Assert.Contains("Error in", uiHtml);
+            Assert.DoesNotContain("on line", uiHtml);
+            Assert.DoesNotContain("data-text=", uiHtml);
+
+            var reportHtml = Render(source, enableUi: false);
+            Assert.Contains("Error in", reportHtml);
+            Assert.Contains("on line", reportHtml);
+            Assert.Contains("data-text=", reportHtml);
         }
     }
 }

@@ -331,6 +331,9 @@
   <data name="Error_in_0_on_line_1_2" xml:space="preserve">
         <value>Error in "{0}" on line {1}: {2}</value>
     </data>
+  <data name="Error_in_0_1" xml:space="preserve">
+        <value>Error in "{0}": {1}</value>
+    </data>
   <data name="Number_of_iterations_exceeds_the_maximum_0" xml:space="preserve">
         <value>Number of iterations exceeds the maximum {0}.&lt;/p&gt;</value>
     </data>

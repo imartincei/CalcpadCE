@@ -20,18 +20,16 @@ namespace Calcpad.Server.Controllers
     {
         private readonly CalcpadService _calcpadService;
         private readonly PdfGeneratorService _pdfService;
-        private readonly ParserGate _parserGate;
         private static readonly LintIgnoreRegionParser _lintIgnoreRegionParser = new();
 
-        public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService, ParserGate parserGate)
+        public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService)
         {
             _calcpadService = calcpadService;
             _pdfService = pdfService;
-            _parserGate = parserGate;
         }
 
         [HttpPost("convert")]
-        public async Task<IActionResult> ConvertToHtml(
+        public IActionResult ConvertToHtml(
             [FromBody] CalcpadRequest request, CancellationToken cancellationToken, [FromQuery] bool unwrap = false)
         {
             try
@@ -41,13 +39,11 @@ namespace Calcpad.Server.Controllers
                     return BadRequest("Content is required");
                 }
 
-                using var _ = await _parserGate.AcquireAsync(cancellationToken);
-
                 var forceUnwrapped = unwrap || request.ForceUnwrappedCode;
                 var (htmlResult, _, errors) = _calcpadService.Convert(
                     request.Content, request.Settings, forceUnwrapped, request.Theme, request.SourceFilePath,
                     request.ForPrint, captureOpenXml: false, request.EnableUi, request.UiOverrides,
-                    request.IncludeLineAnchors, cancellationToken);
+                    request.IncludeLineAnchors, request.HideErrorLines, cancellationToken);
                 if (unwrap)
                 {
                     htmlResult = ProcessDataTextLinks(htmlResult);
@@ -122,21 +118,15 @@ namespace Calcpad.Server.Controllers
         /// otherwise be handed out broken.
         /// </summary>
         [HttpPost("portable/bundle")]
-        public async Task<IActionResult> BundlePortable([FromBody] PortableBundleRequest request, CancellationToken cancellationToken)
+        public IActionResult BundlePortable([FromBody] PortableBundleRequest request)
         {
             try
             {
-                using var _ = await _parserGate.AcquireAsync(cancellationToken);
-
                 var result = PortableWorksheet.Build(request.Content, request.SourceFilePath);
                 if (result.Errors.Count > 0)
                     return BadRequest(new { error = "The worksheet is not self-contained", messages = result.Errors });
 
                 return Ok(new PortableBundleResponse { Content = result.Content });
-            }
-            catch (OperationCanceledException)
-            {
-                return StatusCode(499);
             }
             catch (Exception ex)
             {
@@ -311,7 +301,7 @@ namespace Calcpad.Server.Controllers
         /// Returns the .docx bytes; the frontend handles the download / save dialog.
         /// </summary>
         [HttpPost("docx")]
-        public async Task<IActionResult> GenerateDocx([FromBody] CalcpadRequest request, CancellationToken cancellationToken)
+        public IActionResult GenerateDocx([FromBody] CalcpadRequest request, CancellationToken cancellationToken)
         {
             try
             {
@@ -323,17 +313,10 @@ namespace Calcpad.Server.Controllers
                 // never a navigable preview, so line anchors are always off - but ForPrint
                 // and UiOverrides come from the request, so the caller chooses between a
                 // report (#pre hidden, entered #UI values applied) and the preview layout.
-                // Only the Convert call itself needs the gate — the OpenXML write below is
-                // CPU-bound XML generation, not shared parser state.
-                string html;
-                IReadOnlyList<string> openXmlExpressions;
-                using (await _parserGate.AcquireAsync(cancellationToken))
-                {
-                    (html, openXmlExpressions, _) = _calcpadService.Convert(
-                        request.Content, request.Settings, request.ForceUnwrappedCode, request.Theme, request.SourceFilePath,
-                        forPrint: request.ForPrint, captureOpenXml: true, enableUi: false, uiOverrides: request.UiOverrides,
-                        debug: false, cancellationToken: cancellationToken);
-                }
+                var (html, openXmlExpressions, _) = _calcpadService.Convert(
+                    request.Content, request.Settings, request.ForceUnwrappedCode, request.Theme, request.SourceFilePath,
+                    forPrint: request.ForPrint, captureOpenXml: true, enableUi: false, uiOverrides: request.UiOverrides,
+                    debug: false, cancellationToken: cancellationToken);
 
                 using var ms = new MemoryStream();
                 var writer = new OpenXmlWriter(openXmlExpressions.ToList());
@@ -562,7 +545,10 @@ namespace Calcpad.Server.Controllers
                         Source = u.Source ?? "local",
                         SourceFile = u.SourceFile,
                         Description = u.Description
-                    }).ToList()
+                    }).ToList(),
+
+                    ProjectPath = staged.Stage2.PathRoots?.Project,
+                    LibraryPath = staged.Stage2.PathRoots?.Library
                 };
 
                 return Ok(response);
@@ -850,6 +836,12 @@ namespace Calcpad.Server.Controllers
         /// links, and every export wants a rendering <em>without</em> them.
         /// </summary>
         public bool? IncludeLineAnchors { get; set; }
+
+        /// <summary>
+        /// Drops the "on line [N]" source-line reference from error messages, since input
+        /// mode has no source editor for it to point at. Defaults to <see cref="EnableUi"/>.
+        /// </summary>
+        public bool? HideErrorLines { get; set; }
     }
 
     public class CpdzDecodeRequest
@@ -1054,6 +1046,16 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>All custom unit definitions</summary>
         public List<CustomUnitDefinitionDto> CustomUnits { get; set; } = new();
+
+        /// <summary>
+        /// The resolved absolute `#ProjectPath`, if declared anywhere in the document's
+        /// `#include` chain; null when undeclared, when the document is untitled, or in
+        /// browser mode where the server cannot read the included files.
+        /// </summary>
+        public string? ProjectPath { get; set; }
+
+        /// <summary>The resolved absolute `#LibraryPath`, under the same conditions as <see cref="ProjectPath"/>.</summary>
+        public string? LibraryPath { get; set; }
     }
 
     public class MacroDefinitionDto

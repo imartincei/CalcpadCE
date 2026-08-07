@@ -678,8 +678,9 @@ function getScrollbarStyleScript(): string {
  * binds), hence they get their own click handler here.
  *
  * `includeLinks` turns just the arrows off; the chips, the scroll target and the
- * editor->preview sync stay. The report drops them while it accompanies the input
- * form, where the form — not the source — is what you are working in.
+ * editor->preview sync stay. The input form drops them, and so does the report
+ * while it accompanies that form — the form, not the source, is what you are
+ * working in.
  */
 function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true): string {
     const scrollTarget = typeof scrollToLine === 'number' ? String(scrollToLine) : 'null';
@@ -722,10 +723,16 @@ function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true):
                 ${arrows}
 
                 // Error-summary chips: scroll the preview to the referenced output line.
+                // Prefer data-error's err-N id, since an error paragraph has no line-N id
+                // of its own; fall back to data-line's line-N for a non-error output line.
                 document.querySelectorAll('.roundBox').forEach(function(box) {
                     box.addEventListener('click', function() {
-                        var line = box.getAttribute('data-line');
-                        var target = line && document.getElementById('line-' + line);
+                        var errId = box.getAttribute('data-error');
+                        var target = errId ? document.getElementById(errId) : null;
+                        if (!target) {
+                            var line = box.getAttribute('data-line');
+                            target = line ? document.getElementById('line-' + line) : null;
+                        }
                         if (target) target.scrollIntoView({ block: 'start' });
                     });
                 });
@@ -888,7 +895,10 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             uiOverrides: applyOverrides ? uiOverrides.toRecord(docKey) : undefined,
             // The report is a print layout, but on screen beside the editor, so it
             // keeps the line links that forPrint would otherwise suppress.
-            includeLineAnchors: forPrint ? true : undefined
+            includeLineAnchors: forPrint ? true : undefined,
+            // The input form has no source editor for "on line [N]" to point at, and
+            // neither does the report while it's shown behind that form.
+            hideErrorLines: forPrint && uiPanel !== undefined ? true : undefined
         });
         // Routed through the shared client's queue (rather than a bare fetch) so this
         // parser-touching request can't run concurrently with lint/highlight/definitions —
@@ -957,12 +967,13 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         const scrollbarStyleScript = getScrollbarStyleScript();
 
         // Hover line links + roundBox scroll + optional scroll-to-line target. The arrows
-        // need a source editor to navigate to: a compiled worksheet has none, and the
-        // report gives them up while the input form is in front of it. The report gets
-        // them back when it stands alone beside the editor (the 'ui' panel's disposal
-        // re-renders it, so closing input mode restores them).
+        // need a source editor to navigate to: a compiled worksheet has none, the input
+        // form itself hides the editor behind it, and the report gives them up too while
+        // that form is in front of it. The report gets them back when it stands alone
+        // beside the editor (the 'ui' panel's disposal re-renders it, so closing input
+        // mode restores them).
         const lineLinkScript = getLineLinkScript(
-            scrollToLine, !standalone && !(forPrint && uiPanel !== undefined));
+            scrollToLine, !standalone && !enableUi && !(forPrint && uiPanel !== undefined));
 
         // Override VS Code's injected theme to match the selected preview theme
         const themeOverrideScript = getThemeOverrideScript(theme);
@@ -1018,7 +1029,7 @@ async function renderForExport(
     documentContent: string,
     sourceFileUri: vscode.Uri,
     variant: ExportVariant,
-): Promise<{ html: string }> {
+): Promise<string> {
     const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
     const apiBaseUrl = settingsManager.getServerUrl();
     if (!apiBaseUrl) throw new Error('Server URL not configured');
@@ -1055,7 +1066,7 @@ async function renderForExport(
     if (!response || !response.ok) {
         throw new Error(`Server returned ${response?.status ?? 'no response'}`);
     }
-    return { html: await response.text() };
+    return await response.text();
 }
 
 /**
@@ -1080,7 +1091,7 @@ async function generatePdfToFile(
     const sourceDir = path.dirname(sourceFileUri.fsPath);
 
     // Step 1: Convert calcpad content to HTML
-    let { html } = await renderForExport(documentContent, sourceFileUri, variant);
+    let html = await renderForExport(documentContent, sourceFileUri, variant);
 
     // Inline local images as base64 data URIs so the headless browser can
     // render them (it has no access to the local filesystem).
@@ -1192,7 +1203,7 @@ async function saveSourceHtml(variant: ExportVariant = 'report') {
             title: 'Generating HTML…',
             cancellable: false,
         }, async () => {
-            const { html } = await renderForExport(source.text, source.uri, variant);
+            const html = await renderForExport(source.text, source.uri, variant);
             await vscode.workspace.fs.writeFile(saveUri, new TextEncoder().encode(html));
         });
 
@@ -1776,15 +1787,15 @@ export async function activate(context: vscode.ExtensionContext) {
 
         // Initialize #include file completion provider
         outputChannel.appendLine('Initializing include file completion provider...');
-        const includeCompletionDisposable = CalcpadIncludeCompletionProvider.register(outputChannel);
+        const includeCompletionDisposable = CalcpadIncludeCompletionProvider.register(definitionsService, outputChannel);
 
         // Initialize definition provider (Go to Definition)
         outputChannel.appendLine('Initializing definition provider...');
-        const definitionProviderDisposable = CalcpadDefinitionProvider.register(apiClient, outputChannel);
+        const definitionProviderDisposable = CalcpadDefinitionProvider.register(apiClient, definitionsService, outputChannel);
 
         // Initialize #include link provider (always-underlined, clickable paths)
         outputChannel.appendLine('Initializing include link provider...');
-        const includeLinkProviderDisposable = CalcpadIncludeLinkProvider.register(outputChannel);
+        const includeLinkProviderDisposable = CalcpadIncludeLinkProvider.register(definitionsService, outputChannel);
 
         // Initialize reference provider (Find All References)
         outputChannel.appendLine('Initializing reference provider...');
@@ -1948,7 +1959,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
         if (!editor) return null;
         try {
-            const { html } = await renderForExport(editor.document.getText(), editor.document.uri, 'input');
+            const html = await renderForExport(editor.document.getText(), editor.document.uri, 'input');
             const controls = extractUiControls(html);
             uiControls.set(editor.document.uri.toString(), controls);
             return controls;

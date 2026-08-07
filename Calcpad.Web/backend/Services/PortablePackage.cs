@@ -14,20 +14,19 @@ namespace Calcpad.Server.Services
     /// <code>
     /// calc.zip
     ///   calc.cpd
-    ///   calc.cpd.refs/  image.png  data/loads.csv  lib.cpd
+    ///   calc.cpd.refs/  image.png  loads.csv  lib.cpd
     /// </code>
     ///
     /// This is the middle ground between a worksheet that only runs on the machine it was
     /// written on and a compiled <c>.cpdz</c>, which travels anywhere but cannot be read
     /// (see <see cref="PortableWorksheet"/>). The recipient can open, read and edit it.
     ///
-    /// A reference that sits under the document's own folder keeps that structure inside the
-    /// refs folder — <c>./data/loads.csv</c> lands at <c>calc.cpd.refs/data/loads.csv</c> — since
-    /// nothing else could collide with it there. One that reaches outside that folder, whether
-    /// written as an absolute path or via a leading <c>..</c>, is flattened to its bare name
-    /// instead, because there is no tree left to mirror; if two of those bare names collide, the
-    /// second and any further one are renamed <c>name-1.ext</c>, <c>name-2.ext</c> and so on, and
-    /// every path that pointed at the original is rewritten to match.
+    /// Every bundled reference is flattened straight into the refs folder by its bare file name
+    /// alone — the refs folder never carries a subfolder of its own, whatever folder the
+    /// reference sat in on the exporting machine. When two distinct files would land on the same
+    /// bare name, the second and any further one are renamed <c>name-1.ext</c>, <c>name-2.ext</c>
+    /// and so on, in path order, and every reference that named the original is rewritten to
+    /// match.
     ///
     /// A <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c>/<c>&lt;user&gt;</c> reference is resolved
     /// against this exporting machine's own roots and bundled like any other: the token names a
@@ -102,7 +101,7 @@ namespace Calcpad.Server.Services
                 return Failed(errors);
 
             var members = FlatMembers(documents.Texts.Keys.Where(p => !PathComparer.Equals(p, rootPath)),
-                dataFiles, rootDirectory);
+                dataFiles);
             var zipPaths = new Dictionary<string, string>(PathComparer) { [rootPath] = innerName };
             foreach (var (path, name) in members)
                 zipPaths[path] = $"{refsFolder}/{name}";
@@ -300,14 +299,14 @@ namespace Calcpad.Server.Services
             $"{owner}, line {line}: {reference.Directive} {reference.Raw} — {resolved} could not be read.";
 
         /// <summary>
-        /// The path each bundled file takes inside the refs folder, relative to it: the same path
-        /// it has under <paramref name="rootDirectory"/> when it sits there, since nothing else can
-        /// collide with a mirrored tree; otherwise its bare name, renamed <c>name-1.ext</c>,
-        /// <c>name-2.ext</c> and so on when another bare name — mirrored or not — already claims
-        /// it, in path order.
+        /// The bare file name each bundled file takes inside the refs folder — nothing preserves
+        /// a subfolder, so two references that sat in different folders outside are always flat
+        /// siblings inside. When two distinct files would take the same bare name, the second and
+        /// any further one are renamed <c>name-1.ext</c>, <c>name-2.ext</c> and so on, in path
+        /// order.
         /// </summary>
         private static SortedDictionary<string, string> FlatMembers(
-            IEnumerable<string> includes, IEnumerable<string> dataFiles, string rootDirectory)
+            IEnumerable<string> includes, IEnumerable<string> dataFiles)
         {
             var members = new SortedDictionary<string, string>(PathComparer);
             var seen = new HashSet<string>(PathComparer);
@@ -317,22 +316,15 @@ namespace Calcpad.Server.Services
                 if (!seen.Add(path))
                     continue;
 
-                if (TryNestedPath(path, rootDirectory, out var nested))
-                {
-                    members[path] = nested;
-                    continue;
-                }
-
                 var name = Path.GetFileName(path);
                 if (!byName.TryGetValue(name, out var group))
                     byName[name] = group = new();
                 group.Add(path);
             }
 
-            // A bare name only goes to a single claimant once nothing already sitting in the
-            // mirrored tree wants it too — otherwise it joins the multi-claimant files below,
-            // if it hadn't already, and is renamed like them.
-            var taken = new HashSet<string>(members.Values, StringComparer.OrdinalIgnoreCase);
+            // Shared across every basename so a renamed candidate can never land on a name some
+            // other, unrelated file already claims outright.
+            var taken = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var renaming = new List<List<string>>();
             foreach (var (name, group) in byName)
             {
@@ -358,24 +350,6 @@ namespace Calcpad.Server.Services
                 }
             }
             return members;
-        }
-
-        /// <summary>
-        /// Whether <paramref name="path"/> sits under <paramref name="rootDirectory"/> — as
-        /// opposed to reaching it only through a leading <c>..</c>, or an absolute path elsewhere
-        /// entirely — and if so, its path relative to it, with forward slashes for the zip entry.
-        /// </summary>
-        private static bool TryNestedPath(string path, string rootDirectory, out string nested)
-        {
-            var relative = Path.GetRelativePath(rootDirectory, path);
-            if (Path.IsPathRooted(relative) || relative == ".."
-                || relative.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
-            {
-                nested = string.Empty;
-                return false;
-            }
-            nested = relative.Replace(Path.DirectorySeparatorChar, '/');
-            return true;
         }
 
         /// <summary>
@@ -406,8 +380,10 @@ namespace Calcpad.Server.Services
         /// <c>#include</c> is reached from wherever <paramref name="path"/> itself landed in the
         /// zip. Everything else is reached from the root document's own location regardless of
         /// where <paramref name="path"/> landed, because that is where it is resolved from once
-        /// the includes have been expanded — so a bundled include several folders deep can still
-        /// name a reference several folders back up, which reads oddly but is what resolves.
+        /// the includes have been expanded — so even a bundled include sitting right beside its
+        /// own data file in the refs folder still names that file through the refs folder path
+        /// rather than as a bare sibling, because that is what resolves once the include is
+        /// flattened into the root.
         /// </summary>
         private static string RewriteDocument(
             string text,

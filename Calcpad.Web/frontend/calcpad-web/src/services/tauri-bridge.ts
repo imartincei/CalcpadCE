@@ -358,7 +358,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
         // The headless browser has no filesystem access, so on-disk images have to travel
         // as data URIs.
-        const html = await this.inlineDocumentImages(rendered.html);
+        const html = await this.inlineDocumentImages(rendered);
 
         const pdfResp = await fetch(`${this.apiClient.getBaseUrl()}/api/calcpad/pdf`, {
             method: 'POST',
@@ -720,8 +720,10 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     /** Resolves `#include`/reference-navigation paths, expanding `{project}`/`{library}`/`{user}` the same way `buildCompiledSource` does. */
     public async resolveIncludePath(rawFileName: string): Promise<string> {
+        const serverRoots = this.definitionsService.getCachedPathRoots(getActiveDocumentKey());
         const resolve = createReferenceResolver(
-            this.activeTabSourceText(), this.activeTabSourceDir(), (raw) => this.expandEnvVars(raw), pathResolve, () => this.getHomeDir());
+            this.activeTabSourceText(), this.activeTabSourceDir(), (raw) => this.expandEnvVars(raw), pathResolve,
+            () => this.getHomeDir(), serverRoots);
         return resolve(rawFileName);
     }
 

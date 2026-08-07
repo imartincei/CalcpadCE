@@ -1507,8 +1507,9 @@ function setPreviewLoading(groupId: string, loading: boolean): void {
 function setPreviewHtml(groupId: string, html: string, scrollToLine?: number): void {
   const frame = previewEls.get(groupId)
   if (!frame) return
+  const lineLinks = resultMode.value !== 'ui'
   frame.srcdoc = injectPreviewConsole(
-    injectPreviewClipboard(injectLineLinks(html, scrollToLine, groupId), groupId),
+    injectPreviewClipboard(injectLineLinks(html, scrollToLine, groupId, undefined, lineLinks), groupId),
     groupId,
   )
   previewHtmlByGroup.set(groupId, html)
@@ -1569,8 +1570,8 @@ function scrollPreviewToSourceLine(groupId: string, line: number): void {
 // editor, while the menu and find widget belong to whichever frame was clicked.
 //
 // `lineLinks` turns just the hover arrows off; the context menu, find, error chips and
-// editor->preview sync stay. The report beside the input form drops them — the editor
-// they navigate to isn't on screen there.
+// editor->preview sync stay. Both the input form and the report shown beside it drop
+// them — the editor they navigate to isn't on screen in input mode.
 function injectLineLinks(
   html: string,
   scrollToLine: number | undefined,

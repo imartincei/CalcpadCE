@@ -94,7 +94,7 @@ namespace Calcpad.Core
         // between an included module's own declaration and the parent's an error worth having.
         private PathRoots _pathRoots = new();
         public PathRoots PathRoots => _pathRoots;
-        private static readonly Dictionary<string, Macro> Macros = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, Macro> _macros = new(StringComparer.Ordinal);
         public Func<string, Queue<string>, string> Include;
         public string SourceFilePath { get; set; }
         private readonly List<CalcpadError> _errorList = new();
@@ -154,7 +154,7 @@ namespace Calcpad.Core
             if (includeLine == 0)
             {
                 sb = new StringBuilder(sourceCode.Length);
-                Macros.Clear();
+                _macros.Clear();
                 _lineNumbers.Clear();
                 _includeStack.Clear();
                 _parsedLineNumber = 0;
@@ -193,7 +193,7 @@ namespace Calcpad.Core
                         continue;
                     }
 
-                    if (Macros.Count != 0)
+                    if (_macros.Count != 0)
                     {
                         try
                         {
@@ -474,7 +474,7 @@ namespace Calcpad.Core
 
             void AddMacro(ReadOnlySpan<char> lineContent, string name, Macro macro)
             {
-                if (!Macros.TryAdd(name, macro))
+                if (!_macros.TryAdd(name, macro))
                     AppendError(lineContent, string.Format(Messages.Duplicate_macro_name_0, name));
             }
             static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line}\">{line}</a>]";
@@ -490,7 +490,7 @@ namespace Calcpad.Core
             return fields;
         }
 
-        private static string ApplyMacros(ReadOnlySpan<char> lineContent, HashSet<string> currentlyExpanding = null)
+        private string ApplyMacros(ReadOnlySpan<char> lineContent, HashSet<string> currentlyExpanding = null)
         {
             var index = lineContent.IndexOf("$");
             if (index < 0)
@@ -548,7 +548,7 @@ namespace Calcpad.Core
                     for (j = 0; j < mlen; ++j)
                     {
                         var candidate = macroName[j..];
-                        if (Macros.TryGetValue(candidate, out macro))
+                        if (_macros.TryGetValue(candidate, out macro))
                         {
                             macroKey = candidate;
                             break;
@@ -608,7 +608,7 @@ namespace Calcpad.Core
             return stringBuilder.ToString();
         }
 
-        private static string ExpandMacro(Macro macro, List<string> macroArguments, string macroKey, ref HashSet<string> currentlyExpanding)
+        private string ExpandMacro(Macro macro, List<string> macroArguments, string macroKey, ref HashSet<string> currentlyExpanding)
         {
             if (currentlyExpanding != null && currentlyExpanding.Contains(macroKey))
                 throw Exceptions.CircularMacroReference(macroKey);

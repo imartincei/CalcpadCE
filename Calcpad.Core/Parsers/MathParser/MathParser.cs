@@ -41,6 +41,7 @@ namespace Calcpad.Core
         private bool _isCalculated;
         private int _isSolver;
         private Unit _targetUnits;
+        internal bool IsUs { get; set; } = true;
         private int _functionDefinitionIndex;
         private KeyValuePair<string, IValue> _backupVariable;
         private double Precision
@@ -421,7 +422,7 @@ namespace Calcpad.Core
             }
         }
 
-        private static RealValue ParseValue(ReadOnlySpan<char> s)
+        private RealValue ParseValue(ReadOnlySpan<char> s)
         {
             if (s.Length == 0)
                 return RealValue.Zero;
@@ -459,8 +460,8 @@ namespace Calcpad.Core
             if (n < s.Length)
             {
                 var unitSpan = s[n..];
-                if (!Unit.TryGet(unitSpan.ToString(), out u))
-                    u = UnitsParser.Parse(unitSpan, null);
+                if (!Unit.TryGet(unitSpan.ToString(), IsUs, out u))
+                    u = UnitsParser.Parse(unitSpan, null, IsUs);
             }
             return n == 0 ? new(u) : new(d, u);
         }
@@ -472,7 +473,7 @@ namespace Calcpad.Core
             if (Math.Abs(d) == 0d)
                 d = 1d;
 
-            var u = d * (value.Units ?? Unit.Get(string.Empty));
+            var u = d * (value.Units ?? Unit.Get(string.Empty, IsUs));
             u.Text = name;
             if (_units.TryAdd(name, u))
                 _input.DefinedVariables.Add(name);
@@ -617,7 +618,7 @@ namespace Calcpad.Core
             {
                 var s = _rpn[0].Content;
                 ref var u = ref CollectionsMarshal.GetValueRefOrAddDefault(_units, s, out bool _);
-                u = Unit.Get(string.Empty);
+                u = Unit.Get(string.Empty, IsUs);
                 u.Text = s;
             }
         }

@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
+import { parseDirectiveLine } from 'calcpad-frontend';
 import { VSCodeFileSystem } from './adapters';
 import { resolveIncludeDirectiveLocation, resolveDocumentPathRoots } from './calcpadLocationResolver';
-import { parseDirectiveLine } from './calcpadIncludeCompletionProvider';
+import type { CalcpadDefinitionsService } from './calcpadDefinitionsService';
 
 /**
  * Renders `#include FILEPATH` paths as clickable links, using VS Code's
@@ -11,13 +12,18 @@ import { parseDirectiveLine } from './calcpadIncludeCompletionProvider';
 export class CalcpadIncludeLinkProvider implements vscode.DocumentLinkProvider {
     private fileSystem: VSCodeFileSystem;
 
-    constructor(private outputChannel: vscode.OutputChannel) {
+    constructor(
+        private definitionsService: CalcpadDefinitionsService,
+        private outputChannel: vscode.OutputChannel,
+    ) {
         this.fileSystem = new VSCodeFileSystem();
     }
 
     async provideDocumentLinks(document: vscode.TextDocument): Promise<vscode.DocumentLink[]> {
         const links: vscode.DocumentLink[] = [];
-        const roots = resolveDocumentPathRoots(document);
+        const roots = resolveDocumentPathRoots(
+            document, this.definitionsService.getCachedPathRoots(document.uri.toString()),
+        );
         for (let i = 0; i < document.lineCount; i++) {
             const line = document.lineAt(i).text;
             const parsed = parseDirectiveLine(line);
@@ -38,10 +44,10 @@ export class CalcpadIncludeLinkProvider implements vscode.DocumentLinkProvider {
         return links;
     }
 
-    static register(outputChannel: vscode.OutputChannel): vscode.Disposable {
+    static register(definitionsService: CalcpadDefinitionsService, outputChannel: vscode.OutputChannel): vscode.Disposable {
         return vscode.languages.registerDocumentLinkProvider(
             { language: 'calcpad' },
-            new CalcpadIncludeLinkProvider(outputChannel),
+            new CalcpadIncludeLinkProvider(definitionsService, outputChannel),
         );
     }
 }

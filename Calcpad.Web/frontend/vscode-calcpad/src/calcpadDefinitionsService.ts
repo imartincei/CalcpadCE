@@ -4,6 +4,7 @@ import {
     CalcpadDefinitionsService as FrontendDefinitionsService,
     CalcpadApiClient,
     DefinitionsResponse,
+    ResolvedPathRoots,
 } from 'calcpad-frontend';
 import { VSCodeLogger, VSCodeFileSystem } from './adapters';
 
@@ -25,6 +26,10 @@ export class CalcpadDefinitionsService {
 
     public getCachedDefinitions(documentUri: string): DefinitionsResponse | undefined {
         return this.definitionsService.getCachedDefinitions(documentUri);
+    }
+
+    public getCachedPathRoots(documentUri: string): ResolvedPathRoots {
+        return this.definitionsService.getCachedPathRoots(documentUri);
     }
 
     public async refreshDefinitions(document: vscode.TextDocument): Promise<DefinitionsResponse | null> {

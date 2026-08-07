@@ -776,7 +776,7 @@ namespace Calcpad.Core
                     if (dto.IsUs.HasValue)
                     {
                         Settings.IsUs = dto.IsUs.Value;
-                        Unit.IsUs = dto.IsUs.Value;
+                        _parser.IsUs = dto.IsUs.Value;
                     }
                     break;
                 case SettingKey.VectorGraphics:

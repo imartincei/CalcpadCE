@@ -72,6 +72,38 @@ namespace Calcpad.Tests.HighlighterTests
         }
 
         [Fact]
+        public void Stage2PathRoots_DeclaredInsideInclude_IsPopulatedAndUsableByParent()
+        {
+            var temp = new System.IO.DirectoryInfo(System.IO.Path.Combine(
+                System.IO.Path.GetTempPath(), System.IO.Path.GetRandomFileName()));
+            temp.Create();
+            try
+            {
+                var libDir = System.IO.Directory.CreateDirectory(System.IO.Path.Combine(temp.FullName, "lib"));
+                var resolvedDeclFile = System.IO.Path.GetFullPath("decl.cpd", temp.FullName);
+                var resolvedSteelFile = System.IO.Path.GetFullPath("steel.cpd", libDir.FullName);
+                var content = "#include decl.cpd\n#include {library}/steel.cpd\nx = 1";
+                var includeFiles = new Dictionary<string, string>
+                {
+                    [resolvedDeclFile] = $"#LibraryPath {libDir.FullName}",
+                    [resolvedSteelFile] = "y = 2"
+                };
+
+                var staged = new ContentResolver().GetStagedContent(content, includeFiles,
+                    sourceFilePath: System.IO.Path.Combine(temp.FullName, "main.cpd"));
+                var joined = string.Join('\n', staged.Stage2.Lines);
+
+                Assert.DoesNotContain("Error: Include file not provided", joined);
+                Assert.Contains("y = 2", joined);
+                Assert.Equal(libDir.FullName, staged.Stage2.PathRoots?.Library);
+            }
+            finally
+            {
+                temp.Delete(recursive: true);
+            }
+        }
+
+        [Fact]
         public void Include_WithUserToken_ResolvesWithNoDeclaration()
         {
             var home = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);

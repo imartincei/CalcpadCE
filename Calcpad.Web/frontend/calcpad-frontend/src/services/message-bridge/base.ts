@@ -208,7 +208,7 @@ export abstract class BaseMessageBridge {
         // A failed render leaves the panel unresolved rather than empty - "no controls"
         // and "could not tell" must not read the same to a purge button.
         if (rendered == null) return;
-        const controls = extractUiControls(rendered.html);
+        const controls = extractUiControls(rendered);
         this._uiControlsSink?.(controls);
         this.postToVue({ type: 'uiControls', controls });
     }
@@ -674,7 +674,7 @@ export abstract class BaseMessageBridge {
         if (rendered == null) return;
         await this.saveExportedFile({
             defaultName: 'calcpad-output.html',
-            data: rendered.html,
+            data: rendered,
             mime: 'text/html;charset=utf-8',
             extensions: ['html', 'htm'],
             dialogTitle: exportDialogTitle('Save', 'HTML', variant),
@@ -768,14 +768,14 @@ export abstract class BaseMessageBridge {
         apiSettings: unknown,
         sourceFilePath: string | undefined,
         variant: ExportVariant,
-    ): Promise<{ html: string } | null> {
+    ): Promise<string | null> {
         const render = variantRender(variant);
         const result = render.unwrap
             ? await this.apiClient.convertUnwrapped(content, apiSettings, sourceFilePath)
             : await this.apiClient.convert(
                 content, apiSettings, 'html', render.forPrint, sourceFilePath, undefined,
                 this.uiOptionsFor(variant), false);
-        return result && !(result instanceof ArrayBuffer) ? { html: result.html } : null;
+        return result && !(result instanceof ArrayBuffer) ? result.html : null;
     }
 
     private async handleGetPlots(): Promise<void> {

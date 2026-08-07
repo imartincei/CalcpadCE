@@ -22,12 +22,11 @@ namespace Calcpad.Core
         private readonly double[] _factors;
         private int Length => _powers.Length;
 
-        private static bool _isUs;
         private static readonly string CompositeUnitChars = Calculator.NegChar + "∕^";
         private static readonly string[] Names = ["g", "m", "s", "A", "°C", "mol", "cd", "rad", ""];
         private static readonly Unit[] ForceUnits = new Unit[9], ForceUnits_US = new Unit[9];
         private static readonly FrozenDictionary<Unit, Unit> ElectricalUnits;
-        private static FrozenDictionary<string, Unit> Units;
+        private static readonly FrozenDictionary<string, Unit> Units;
         private static readonly string[] UnitNames =
         [
             "therm",
@@ -43,23 +42,18 @@ namespace Calcpad.Core
             "bu",
             "tonf"
         ];
+        // These 12 names (plus the "ton_f" alias) are the only ones that differ between the US
+        // and UK unit systems — resolved per-lookup from isUs rather than baked into Units, so
+        // the table itself can stay immutable and safe for concurrent readers.
+        private static readonly HashSet<string> AmbiguousUnitNames = new(UnitNames, StringComparer.Ordinal) { "ton_f" };
 
-        internal static bool IsUs
+        private static string ResolveKey(string text, bool isUs)
         {
-            get => _isUs;
-            set
-            {
-                _isUs = value;
-                var suffix = value ? "_US" : "_UK";
-                var units = new Dictionary<string, Unit>(Units);
-                for (var i = 0; i < UnitNames.Length; ++i)
-                {
-                    ref var s = ref UnitNames[i];
-                    units[s] = new(Units[s + suffix], s);
-                }
-                units["ton_f"] = new(Units["tonf"], "ton_f");
-                Units = units.ToFrozenDictionary();
-            }
+            if (!AmbiguousUnitNames.Contains(text))
+                return text;
+
+            var baseName = text == "ton_f" ? "tonf" : text;
+            return baseName + (isUs ? "_US" : "_UK");
         }
 
         internal Field GetField()
@@ -307,10 +301,10 @@ namespace Calcpad.Core
             _factors = u._factors;
         }
 
-        internal static Unit Get(string text) => Units[text];
+        internal static Unit Get(string text, bool isUs) => Units[ResolveKey(text, isUs)];
 
-        internal static bool TryGet(string text, out Unit u) =>
-            Units.TryGetValue(text, out u);
+        internal static bool TryGet(string text, bool isUs, out Unit u) =>
+            Units.TryGetValue(ResolveKey(text, isUs), out u);
 
         private static string TemperatureToDelta(string s)
         {

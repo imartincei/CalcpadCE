@@ -2,7 +2,7 @@ import * as monaco from 'monaco-editor';
 import type { SymbolAtPositionResponse, SymbolLocation } from 'calcpad-frontend/types/api';
 import type { EditorBridge } from './bridge';
 import type { FileContextProvider } from './diagnostics';
-import { parseDirectiveLine } from './include-completions';
+import { parseDirectiveLine } from 'calcpad-frontend';
 
 /**
  * Resolves a `SymbolLocation` whose `source !== 'local'` to a Monaco model URI

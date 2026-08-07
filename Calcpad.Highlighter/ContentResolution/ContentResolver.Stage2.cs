@@ -100,7 +100,8 @@ namespace Calcpad.Highlighter.ContentResolution
                 MacroCommentParameters = macroCommentParams,
                 MacroParameterOrder = macroParamOrder,
                 MacroBodies = macroBodies,
-                UserDefinedMacros = tokenizerResult.UserDefinedMacros
+                UserDefinedMacros = tokenizerResult.UserDefinedMacros,
+                PathRoots = pathRoots
             };
         }
 

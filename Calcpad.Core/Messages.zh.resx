@@ -322,6 +322,9 @@
   <data name="Error_in_0_on_line_1_2" xml:space="preserve">
     <value>第 {1}：{2} 行"{0}"出错</value>
   </data>
+  <data name="Error_in_0_1" xml:space="preserve">
+    <value>"{0}"出错：{1}</value>
+  </data>
   <data name="Number_of_iterations_exceeds_the_maximum_0" xml:space="preserve">
     <value>迭代次数超过最大值 {0} !&lt;/p&gt;</value>
   </data>

@@ -27,9 +27,6 @@ namespace Calcpad.Server.Services
             // PDF generation service (singleton for browser reuse)
             builder.Services.AddSingleton<PdfGeneratorService>();
 
-            // Serializes the endpoints that touch Calcpad.Core's process-global parser state.
-            builder.Services.AddSingleton<ParserGate>();
-
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>

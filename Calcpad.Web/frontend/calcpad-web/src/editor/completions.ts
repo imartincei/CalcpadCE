@@ -8,7 +8,7 @@ import {
 } from 'calcpad-frontend/text/completion-format';
 import type { CompletionData, CompletionKind } from 'calcpad-frontend/text/completion-format';
 import { getActiveDocumentKey, type EditorBridge } from './bridge';
-import { parseDirectiveLine } from './include-completions';
+import { parseDirectiveLine } from 'calcpad-frontend';
 
 /**
  * Register a CompletionItemProvider that surfaces:

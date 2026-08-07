@@ -297,15 +297,25 @@ public class PathRootsTests
     [Fact]
     public void ImageSource_WithAnEnvironmentVariable_IsExpanded()
     {
+        // %VAR% is recognized by Environment.ExpandEnvironmentVariables on every platform (see
+        // the note on PathRoots.ExpandUserToken), but an ambient variable like APPDATA only
+        // exists on Windows and $HOME expands on no platform via this API — so this sets its
+        // own variable rather than relying on one the host OS may or may not define.
         using var temp = new TempDir();
-        var appData = Environment.GetEnvironmentVariable("APPDATA")
-            ?? Environment.GetEnvironmentVariable("HOME");
-        Assert.NotNull(appData);
+        const string varName = "CALCPAD_TEST_IMAGE_DIR";
+        var dir = temp.Path.Replace('\\', '/');
+        Environment.SetEnvironmentVariable(varName, dir);
+        try
+        {
+            var (html, errors) = Render($"{Img($"%{varName}%/logo.png")}\n", temp.At("main.cpd"));
 
-        var (html, errors) = Render($"{Img("%APPDATA%/logo.png")}\n", temp.At("main.cpd"));
-
-        Assert.Empty(errors);
-        Assert.Contains($"src=\"{appData.Replace('\\', '/')}/logo.png\"", html);
+            Assert.Empty(errors);
+            Assert.Contains($"src=\"{dir}/logo.png\"", html);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(varName, null);
+        }
     }
 
     [Theory]

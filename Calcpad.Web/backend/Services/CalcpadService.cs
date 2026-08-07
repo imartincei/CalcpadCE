@@ -47,6 +47,7 @@ namespace Calcpad.Server.Services
             bool enableUi = false,
             Dictionary<string, string>? uiOverrides = null,
             bool? debug = null,
+            bool? hideErrorLines = null,
             CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(calcpadContent))
@@ -72,6 +73,11 @@ namespace Calcpad.Server.Services
                 // Printed output is a report by definition, so it never carries controls.
                 // Overrides still apply - the report shows the values that were entered.
                 enableUi &= !forPrint;
+
+                // Input mode hides the source editor, so its "on line [N]" links point at
+                // nothing reachable. Defaults to following enableUi; the report pane beside
+                // the form passes its own override since it isn't gated on enableUi.
+                var showErrorLines = !(hideErrorLines ?? enableUi);
 
                 // 2. Parse macros and includes (server reads referenced files from disk).
                 var macroParser = new MacroParser
@@ -127,7 +133,8 @@ namespace Calcpad.Server.Services
                             Debug = debug ?? !forPrint,
                             ForPrint = forPrint,
                             EnableUi = enableUi,
-                            UiOverrides = uiOverrides
+                            UiOverrides = uiOverrides,
+                            ShowErrorLines = showErrorLines
                         };
                         parser.Parse(outputText, true, captureOpenXml);
                         htmlResult = RemoveEmptyParagraphs(parser.HtmlResult);
@@ -575,6 +582,13 @@ tan_angle = tan(angle°)";
         /// <summary>
         /// Processes included file content to respect #local and #global directives.
         /// Following the pattern from Calcpad.Cli.CalcpadReader.Include
+        /// <para>
+        /// A saved 'uiOverrides' comment only has any effect on the file that carries it -
+        /// the host restores it by scanning the document you have open, before #include is
+        /// expanded, so one coming from an included file would otherwise sit inert in the
+        /// flattened text. Stripped the same way #local content is, whether or not the
+        /// including file wrapped it in #local/#global itself.
+        /// </para>
         /// </summary>
         private static string ProcessIncludedContent(string content)
         {
@@ -582,11 +596,19 @@ tan_angle = tan(angle°)";
                 return content;
 
             var isLocal = false;
+            var isUiOverridesComment = false;
             var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.None);
             var outputLines = new List<string>();
 
             foreach (var line in lines)
             {
+                if (isUiOverridesComment)
+                {
+                    if (line.Contains("-->", StringComparison.Ordinal))
+                        isUiOverridesComment = false;
+
+                    continue;
+                }
                 if (Validator.IsKeyword(line, "#local"))
                 {
                     isLocal = true;
@@ -594,6 +616,10 @@ tan_angle = tan(angle°)";
                 else if (Validator.IsKeyword(line, "#global"))
                 {
                     isLocal = false;
+                }
+                else if (IsUiOverridesCommentStart(line))
+                {
+                    isUiOverridesComment = !line.Contains("-->", StringComparison.Ordinal);
                 }
                 else
                 {
@@ -606,6 +632,20 @@ tan_angle = tan(angle°)";
             }
 
             return string.Join(Environment.NewLine, outputLines);
+        }
+
+        /// <summary>
+        /// True for the first line of a metadata comment ('<!--{...}-->) whose JSON carries
+        /// a 'uiOverrides' key. A cheap substring check rather than a JSON parse, matching
+        /// the rest of this method's line-based approach - good enough since the host always
+        /// writes the key verbatim.
+        /// </summary>
+        private static bool IsUiOverridesCommentStart(string line)
+        {
+            var trimmed = line.TrimStart();
+            return (trimmed.StartsWith('\'') || trimmed.StartsWith('"'))
+                && trimmed.Contains("<!--", StringComparison.Ordinal)
+                && trimmed.Contains("uiOverrides", StringComparison.Ordinal);
         }
     }
 }

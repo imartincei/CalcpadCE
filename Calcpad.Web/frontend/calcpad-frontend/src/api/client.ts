@@ -244,7 +244,8 @@ export class CalcpadApiClient {
     /**
      * @param ui Interactive `#UI` mode. `enableUi` renders `#UI` lines as controls and
      *   hides `#post` content; `uiOverrides` replaces the right hand side of annotated
-     *   assignments and applies in both modes, so a report reflects entered values.
+     *   assignments and applies in both modes, so a report reflects entered values;
+     *   `hideErrorLines` drops the "on line [N]" reference and defaults to `enableUi`.
      * @param includeLineAnchors Per-line anchors and error boxes for in-preview line links.
      *   Defaults server-side to `!forPrint`; pass it to break that pairing — `true` for the
      *   on-screen report, `false` for anything being written to a file.
@@ -271,6 +272,7 @@ export class CalcpadApiClient {
                         enableUi: ui?.enableUi ?? false,
                         uiOverrides: ui?.uiOverrides,
                         includeLineAnchors,
+                        hideErrorLines: ui?.hideErrorLines,
                     }),
                     signal: combineSignals(AbortSignal.timeout(60000), signal),
                 });

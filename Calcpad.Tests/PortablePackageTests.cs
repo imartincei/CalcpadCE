@@ -24,7 +24,7 @@ public class PortablePackageTests
             """);
 
         Assert.Equal(
-            ["root.cpd", "root.cpd.refs/data/loads.csv", "root.cpd.refs/media/logo.png"],
+            ["root.cpd", "root.cpd.refs/loads.csv", "root.cpd.refs/logo.png"],
             Names(zip));
     }
 
@@ -42,9 +42,9 @@ public class PortablePackageTests
             """);
 
         Assert.Equal("""
-            #include root.cpd.refs/inc/lib.cpd
-            #read L from root.cpd.refs/data/loads.csv type=R sep=';'
-            '<img src="root.cpd.refs/media/logo.png">
+            #include root.cpd.refs/lib.cpd
+            #read L from root.cpd.refs/loads.csv type=R sep=';'
+            '<img src="root.cpd.refs/logo.png">
             """, Text(zip, "root.cpd"));
     }
 
@@ -61,8 +61,8 @@ public class PortablePackageTests
         var zip = tree.Pack("#include ./inc/lib.cpd\n");
 
         Assert.Equal(
-            ["root.cpd", "root.cpd.refs/inc/deep.cpd", "root.cpd.refs/inc/lib.cpd"], Names(zip));
-        Assert.Equal("#include deep.cpd\n", Text(zip, "root.cpd.refs/inc/lib.cpd"));
+            ["root.cpd", "root.cpd.refs/deep.cpd", "root.cpd.refs/lib.cpd"], Names(zip));
+        Assert.Equal("#include deep.cpd\n", Text(zip, "root.cpd.refs/lib.cpd"));
     }
 
     /// <summary>
@@ -83,13 +83,12 @@ public class PortablePackageTests
         var zip = tree.Pack("#include ./inc/lib.cpd\n");
 
         Assert.Equal(
-            ["root.cpd", "root.cpd.refs/inc/lib.cpd", "root.cpd.refs/media/detail.png",
-                "root.cpd.refs/tables/fy.csv"],
+            ["root.cpd", "root.cpd.refs/detail.png", "root.cpd.refs/fy.csv", "root.cpd.refs/lib.cpd"],
             Names(zip));
         Assert.Equal("""
-            '<img src="root.cpd.refs/media/detail.png">
-            #read T from root.cpd.refs/tables/fy.csv
-            """, Text(zip, "root.cpd.refs/inc/lib.cpd"));
+            '<img src="root.cpd.refs/detail.png">
+            #read T from root.cpd.refs/fy.csv
+            """, Text(zip, "root.cpd.refs/lib.cpd"));
     }
 
     [Fact]
@@ -99,7 +98,7 @@ public class PortablePackageTests
         tree.Write("inc/lib.cpd", "#include ../root.cpd\n");
         var zip = tree.Pack("#include ./inc/lib.cpd\n");
 
-        Assert.Equal("#include ../../root.cpd\n", Text(zip, "root.cpd.refs/inc/lib.cpd"));
+        Assert.Equal("#include ../root.cpd\n", Text(zip, "root.cpd.refs/lib.cpd"));
     }
 
     [Fact]
@@ -237,7 +236,7 @@ public class PortablePackageTests
         tree.Write("inc/lib.cpd", $"#write R to {absolute}\n");
         var zip = tree.Pack("#include ./inc/lib.cpd\n");
 
-        Assert.Equal("#write R to results.csv\n", Text(zip, "root.cpd.refs/inc/lib.cpd"));
+        Assert.Equal("#write R to results.csv\n", Text(zip, "root.cpd.refs/lib.cpd"));
     }
 
     [Fact]
@@ -270,15 +269,15 @@ public class PortablePackageTests
         tree.Write("inc/lib.cpd", "a = 1\n");
         var zip = tree.Pack("#include ./inc/lib.cpd #{1;2} 'the library\n");
 
-        Assert.Equal("#include root.cpd.refs/inc/lib.cpd #{1;2} 'the library\n", Text(zip, "root.cpd"));
+        Assert.Equal("#include root.cpd.refs/lib.cpd #{1;2} 'the library\n", Text(zip, "root.cpd"));
     }
 
     /// <summary>
-    /// Both sit under the document's own folder, so each keeps its own path in the refs folder
-    /// instead of colliding on the bare name they share.
+    /// Both sit under the document's own folder but share a basename, so — like any other
+    /// basename collision, since nothing preserves a subfolder — both are renamed.
     /// </summary>
     [Fact]
-    public void TwoNestedReferencesWithTheSameBasename_KeepTheirOwnPaths()
+    public void TwoReferencesWithTheSameBasename_AreBothRenamed()
     {
         using var tree = new Tree();
         tree.Write("data/loads.csv", "1\n");
@@ -289,10 +288,10 @@ public class PortablePackageTests
             """);
 
         Assert.Equal(
-            ["root.cpd", "root.cpd.refs/archive/loads.csv", "root.cpd.refs/data/loads.csv"], Names(zip));
+            ["root.cpd", "root.cpd.refs/loads-1.csv", "root.cpd.refs/loads-2.csv"], Names(zip));
         Assert.Equal("""
-            #read A from root.cpd.refs/data/loads.csv
-            #read B from root.cpd.refs/archive/loads.csv
+            #read A from root.cpd.refs/loads-2.csv
+            #read B from root.cpd.refs/loads-1.csv
             """, Text(zip, "root.cpd"));
     }
 
@@ -357,30 +356,6 @@ public class PortablePackageTests
             """, Text(zip, "root.cpd"));
     }
 
-    /// <summary>
-    /// The escaping file cannot keep the bare name the nested one already sits under, so it is
-    /// the one renamed even though nothing else claiming that exact name was escaping too.
-    /// </summary>
-    [Fact]
-    public void AnEscapingReferenceCollidingWithANestedSiblingsName_IsRenamed()
-    {
-        using var tree = new Tree();
-        using var external = new Tree();
-        tree.Write("loads.csv", "1\n");
-        external.Write("loads.csv", "2\n");
-        var zip = tree.Pack($"""
-            #read A from ./loads.csv
-            #read B from {external.At("loads.csv")}
-            """);
-
-        Assert.Equal(
-            ["root.cpd", "root.cpd.refs/loads-1.csv", "root.cpd.refs/loads.csv"], Names(zip));
-        Assert.Equal("""
-            #read A from root.cpd.refs/loads.csv
-            #read B from root.cpd.refs/loads-1.csv
-            """, Text(zip, "root.cpd"));
-    }
-
     [Fact]
     public void AReferenceThatCannotBeRead_IsRefused()
     {
@@ -425,9 +400,9 @@ public class PortablePackageTests
         tree.Write("inc/b.cpd", "#include ./a.cpd\n");
         var zip = tree.Pack("#include ./inc/a.cpd\n");
 
-        Assert.Equal(["root.cpd", "root.cpd.refs/inc/a.cpd", "root.cpd.refs/inc/b.cpd"], Names(zip));
-        Assert.Equal("#include b.cpd\n", Text(zip, "root.cpd.refs/inc/a.cpd"));
-        Assert.Equal("#include a.cpd\n", Text(zip, "root.cpd.refs/inc/b.cpd"));
+        Assert.Equal(["root.cpd", "root.cpd.refs/a.cpd", "root.cpd.refs/b.cpd"], Names(zip));
+        Assert.Equal("#include b.cpd\n", Text(zip, "root.cpd.refs/a.cpd"));
+        Assert.Equal("#include a.cpd\n", Text(zip, "root.cpd.refs/b.cpd"));
     }
 
     [Fact]
@@ -437,7 +412,7 @@ public class PortablePackageTests
         tree.Write("inc/lib.cpd", "a = 1\n");
         var zip = tree.Pack("'first\r\n#include ./inc/lib.cpd\r\n'last");
 
-        Assert.Equal("'first\r\n#include root.cpd.refs/inc/lib.cpd\r\n'last", Text(zip, "root.cpd"));
+        Assert.Equal("'first\r\n#include root.cpd.refs/lib.cpd\r\n'last", Text(zip, "root.cpd"));
     }
 
     [Fact]
@@ -447,7 +422,7 @@ public class PortablePackageTests
         tree.Write("inc/lib.cpd", "a = 1\n");
         var zip = tree.Pack("﻿#include ./inc/lib.cpd\n");
 
-        Assert.Equal("﻿#include root.cpd.refs/inc/lib.cpd\n", Text(zip, "root.cpd"));
+        Assert.Equal("﻿#include root.cpd.refs/lib.cpd\n", Text(zip, "root.cpd"));
     }
 
     [Fact]
@@ -457,7 +432,7 @@ public class PortablePackageTests
         tree.Write("inc/lib.cpd", "a = 1\n");
         var zip = tree.Pack("#include ./inc/lib.cpd\n#include inc/lib.cpd\n");
 
-        Assert.Equal(["root.cpd", "root.cpd.refs/inc/lib.cpd"], Names(zip));
+        Assert.Equal(["root.cpd", "root.cpd.refs/lib.cpd"], Names(zip));
     }
 
     [Fact]
@@ -479,8 +454,8 @@ public class PortablePackageTests
             #include {library}/steel.cpd
             """);
 
-        Assert.Equal(["root.cpd", "root.cpd.refs/lib/steel.cpd"], Names(zip));
-        Assert.Contains("#include root.cpd.refs/lib/steel.cpd", Text(zip, "root.cpd"));
+        Assert.Equal(["root.cpd", "root.cpd.refs/steel.cpd"], Names(zip));
+        Assert.Contains("#include root.cpd.refs/steel.cpd", Text(zip, "root.cpd"));
     }
 
     /// <summary>
@@ -502,15 +477,15 @@ public class PortablePackageTests
             '<img src="{project}/media/logo.png">
             """);
 
-        // The project folder sits under the document's own, so the refs folder mirrors that tree
-        // rather than flattening it — see TryNestedPath.
+        // Every bundled file flattens into the refs folder regardless of where it sat on the
+        // exporting machine — see FlatMembers.
         Assert.Equal(
-            ["root.cpd", "root.cpd.refs/project/data/loads.csv", "root.cpd.refs/project/media/logo.png"],
+            ["root.cpd", "root.cpd.refs/loads.csv", "root.cpd.refs/logo.png"],
             Names(zip));
         var text = Text(zip, "root.cpd");
-        Assert.Contains("#read L from root.cpd.refs/project/data/loads.csv", text);
+        Assert.Contains("#read L from root.cpd.refs/loads.csv", text);
         Assert.Contains("#write R to results.csv", text);
-        Assert.Contains("src=\"root.cpd.refs/project/media/logo.png\"", text);
+        Assert.Contains("src=\"root.cpd.refs/logo.png\"", text);
     }
 
     [Fact]
@@ -605,7 +580,7 @@ public class PortablePackageTests
             #include ./inc/lib.cpd
             """);
 
-        Assert.Equal(["root.cpd", "root.cpd.refs/inc/lib.cpd"], Names(zip));
+        Assert.Equal(["root.cpd", "root.cpd.refs/lib.cpd"], Names(zip));
     }
 
     private static List<string> Names(byte[] zip)

@@ -1,6 +1,7 @@
 import type { CalcpadApiClient } from '../api/client';
 import type { DefinitionsResponse } from '../types/api';
 import type { ILogger } from '../types/interfaces';
+import type { ResolvedPathRoots } from '../text/path-roots';
 
 /**
  * Service for fetching and caching definitions from the Calcpad server.
@@ -24,6 +25,16 @@ export class CalcpadDefinitionsService {
      */
     public getCachedDefinitions(documentKey: string): DefinitionsResponse | undefined {
         return this.cache.get(documentKey);
+    }
+
+    /**
+     * The server's resolved `#ProjectPath`/`#LibraryPath` for this document, from the last
+     * cached `/definitions` response. `{ project: null, library: null }` when there is no cache
+     * entry yet — callers fall back to their own text scan in that case, same as an undeclared root.
+     */
+    public getCachedPathRoots(documentKey: string): ResolvedPathRoots {
+        const cached = this.cache.get(documentKey);
+        return { project: cached?.projectPath ?? null, library: cached?.libraryPath ?? null };
     }
 
     /**
