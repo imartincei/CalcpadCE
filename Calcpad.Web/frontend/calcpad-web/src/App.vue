@@ -362,13 +362,15 @@
           @click="onSaveUiOverrides"
           title="Write the entered values into the document so they survive a reload"
         >Save values</button>
-        <button
-          v-if="uiModeFullscreen"
-          class="toolbar-btn"
-          @click="exitUiMode"
-          title="Return to the editor"
-        >Exit input mode</button>
-        <button v-else class="toolbar-btn" @click="togglePreview">✕</button>
+        <template v-if="!activeTabIsCompiled">
+          <button
+            v-if="uiModeFullscreen"
+            class="toolbar-btn"
+            @click="exitUiMode"
+            title="Return to the editor"
+          >Exit input mode</button>
+          <button v-else class="toolbar-btn" @click="togglePreview">✕</button>
+        </template>
       </div>
       <!-- One preview iframe per editor group, stacked to mirror the editor
            split. allow-scripts is required so the injected console-interception

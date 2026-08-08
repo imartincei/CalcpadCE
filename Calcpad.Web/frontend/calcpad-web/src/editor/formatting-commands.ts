@@ -63,7 +63,7 @@ export function registerFormattingCommands(
     // Comments
     add('calcpad.toggleComment',  'CalcpadCE: Toggle Comment',   [KM.CtrlCmd | KC.KeyQ], () => toggleComment(editor));
     add('calcpad.uncomment',      'CalcpadCE: Uncomment',        [KM.CtrlCmd | KM.Shift | KC.KeyQ], () => uncomment(editor));
-    add('calcpad.pasteAsComment', 'CalcpadCE: Paste as Comment', [KM.CtrlCmd | KM.Shift | KC.KeyV], () => pasteAsComment(editor));
+    add('calcpad.pasteAsComment', 'CalcpadCE: Paste as Comment', [KM.CtrlCmd | KM.Shift | KC.KeyV], () => pasteAsComment(editor, bridge));
 
     return { dispose() { for (const d of disposables) d.dispose(); } };
 }
@@ -325,10 +325,10 @@ function uncomment(editor: monaco.editor.IStandaloneCodeEditor): void {
     editor.executeEdits('calcpad-uncomment', edits);
 }
 
-async function pasteAsComment(editor: monaco.editor.IStandaloneCodeEditor): Promise<void> {
+async function pasteAsComment(editor: monaco.editor.IStandaloneCodeEditor, bridge: EditorBridge): Promise<void> {
     let clipboardText = '';
     try {
-        clipboardText = await navigator.clipboard.readText();
+        clipboardText = await (bridge.readClipboardText ? bridge.readClipboardText() : navigator.clipboard.readText());
     } catch {
         return;
     }

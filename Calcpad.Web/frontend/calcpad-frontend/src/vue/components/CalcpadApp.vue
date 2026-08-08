@@ -138,6 +138,7 @@
         :plots="plots"
         :loading="plotsLoading"
         :version-config="versionConfig"
+        :is-compiled="activeIsCompiled"
         @save-pdf="handleSavePdf"
         @save-html="handleSaveSourceHtml"
         @save-docx="handleSaveDocx"
@@ -290,6 +291,9 @@ const SOURCE_TABS = ['insert', 'variables', 'formatting', 'errors', 'metadata']
 const INPUT_MODE_NOTE = 'Unavailable in input mode — this acts on the document source, which the input form does not edit.'
 const inputMode = ref(false)
 const tabUnavailable = (tabId: string) => inputMode.value && SOURCE_TABS.includes(tabId)
+// A compiled worksheet has no source at all, so the Export tab drops the exports
+// and re-packaging options that would need it.
+const activeIsCompiled = ref(false)
 
 const convertErrors = ref<CalcpadError[]>([])
 
@@ -722,6 +726,7 @@ const handleMessage = (event: MessageEvent) => {
       break
     case 'inputModeChanged':
       inputMode.value = !!message.active
+      activeIsCompiled.value = !!message.compiled
       break
     case 'focusTab':
       if (typeof message.tab === 'string') switchTab(message.tab)

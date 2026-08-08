@@ -307,6 +307,7 @@ namespace Calcpad.Highlighter.ContentResolution
     {
         public List<string> Lines { get; set; }
         public Dictionary<int, int> SourceMap { get; set; }
+        public Dictionary<int, SourceInfo> IncludeMap { get; set; }
         public Dictionary<int, MacroExpansionInfo> MacroExpansions { get; set; }
         public Dictionary<string, FunctionInfo> UserDefinedFunctions { get; set; }
         public List<FunctionDefinition> FunctionsWithParams { get; set; }

@@ -64,7 +64,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 reporter.CheckKnownKeys(root, KnownKeys.Contains, "metadata property");
                 ValidateTypes(block, root, stage3, tokenProvider, reporter);
                 ValidateLintRegions(root, reporter);
-                ValidateUiOverrides(block, root, reporter, ref sawUiOverrides);
+                ValidateUiOverrides(block, root, stage3, reporter, ref sawUiOverrides);
                 ValidatePdf(root, reporter);
             }
         }
@@ -156,10 +156,18 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         /// comment in place by its position, so a comment that also carries other keys stops
         /// being something either side can predict the shape of after an edit.
         /// </para>
+        /// <para>
+        /// A comment reached through #include is skipped entirely: <c>CalcpadService</c>
+        /// strips 'uiOverrides' out of included content before rendering regardless of where
+        /// it sits, so it is dead weight rather than a mistake worth flagging.
+        /// </para>
         /// </summary>
-        private static void ValidateUiOverrides(HtmlCommentBlock block, JsonElement root, DirectiveJsonReporter reporter, ref bool sawUiOverrides)
+        private static void ValidateUiOverrides(HtmlCommentBlock block, JsonElement root, Stage3Context stage3, DirectiveJsonReporter reporter, ref bool sawUiOverrides)
         {
             if (!root.TryGetProperty("uiOverrides", out var overrides))
+                return;
+
+            if (stage3.IncludeMap.TryGetValue(block.StartLine, out var sourceInfo) && sourceInfo.Source == "include")
                 return;
 
             if (HasKeyOtherThan(root, "uiOverrides"))

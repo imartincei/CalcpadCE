@@ -14,6 +14,8 @@ export interface EditorBridge {
     getSettings(): CalcpadSettings;
     getExtraSetting(key: string): string | undefined;
     setExtraSetting(key: string, value: string): void;
+    /** Desktop overrides this with Tauri's native clipboard (WebKitGTK workaround); web falls back to the browser API. */
+    readClipboardText?(): Promise<string>;
 }
 
 /**

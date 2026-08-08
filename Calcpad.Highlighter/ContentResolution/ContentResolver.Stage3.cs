@@ -205,6 +205,7 @@ namespace Calcpad.Highlighter.ContentResolution
             {
                 Lines = lines,
                 SourceMap = sourceMap,
+                IncludeMap = filteredIncludeMap,
                 MacroExpansions = macroExpansions,
                 UserDefinedFunctions = functions,
                 FunctionsWithParams = functionsWithParams,

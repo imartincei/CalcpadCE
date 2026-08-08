@@ -176,6 +176,14 @@ namespace Calcpad.Highlighter.Linter
                 context.Stage3ToStage2Map[kvp.Key] = stage2Line;
             }
 
+            if (stage3Result.IncludeMap != null)
+            {
+                foreach (var kvp in stage3Result.IncludeMap)
+                {
+                    context.IncludeMap[kvp.Key] = kvp.Value;
+                }
+            }
+
             context.DefinedVariables = stage3Result.DefinedVariables;
             context.DefinedFunctions = stage3Result.UserDefinedFunctions;
 

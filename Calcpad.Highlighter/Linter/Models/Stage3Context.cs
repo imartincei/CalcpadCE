@@ -9,6 +9,9 @@ namespace Calcpad.Highlighter.Linter.Models
     {
         // Fully expanded code (includes processed, macros expanded)
         public Dictionary<int, int> Stage3ToStage2Map { get; set; } = new();
+
+        /// <summary>Whether each Stage3 line came from the local file or an #include, keyed by Stage3 line index.</summary>
+        public Dictionary<int, SourceInfo> IncludeMap { get; set; } = new();
         public HashSet<string> DefinedVariables { get; set; } = new();
         public Dictionary<string, FunctionInfo> DefinedFunctions { get; set; } = new(StringComparer.Ordinal);
         public Dictionary<string, MacroInfo> DefinedMacros { get; set; } = new(StringComparer.OrdinalIgnoreCase); // name -> macro info

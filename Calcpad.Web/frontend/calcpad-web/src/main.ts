@@ -446,10 +446,11 @@ async function bootstrap(): Promise<void> {
     function syncInputMode(): void {
         const activeId = activeGroup.tabs.activeId;
         const path = activeId ? activeGroup.tabs.getFilePath(activeId) : null;
-        const active = (!!path && isCompiledPath(path))
+        const compiled = !!path && isCompiledPath(path);
+        const active = compiled
             || (appInstance.isPreviewVisible() && appInstance.getResultMode() === 'ui');
         window.dispatchEvent(new MessageEvent('message', {
-            data: { type: 'inputModeChanged', active },
+            data: { type: 'inputModeChanged', active, compiled },
         }));
     }
 
@@ -1433,6 +1434,9 @@ async function bootstrap(): Promise<void> {
             import('@tauri-apps/api/core'),
         ]);
         invokeTauri = tauriInvoke;
+        // Route Ctrl+Shift+V "Paste as Comment" through the same Tauri-native
+        // clipboard as the rest of the app (WebKitGTK workaround).
+        editorBridge.readClipboardText = () => tauriClipboard.readText();
         // The seeded tab decided the menu state before `invoke` existed, so the cached flag
         // is inverted here to defeat the no-op guard and let the real state through.
         const sourceModesShown = appInstance.resultModeAvailable('unwrapped');
@@ -1894,11 +1898,15 @@ async function bootstrap(): Promise<void> {
             // parameter hints, or output) takes priority over the editor's own
             // model selection, since Monaco renders the main text via its own
             // selection overlay rather than native browser selection.
-            // Copy only: WebKit reports the selection of a focused text control
-            // here as well, and Monaco keeps the editor selection in a hidden
-            // textarea - so a cut routed this way wrote the text to the
-            // clipboard and left the document untouched.
-            if (action === 'copy') {
+            // Copy only, and only when the editor itself doesn't have focus:
+            // Monaco keeps its own selection mirrored into a hidden textarea
+            // for keyboard capture, so window.getSelection() reports non-empty
+            // even while the editor has focus - but for large/multi-line
+            // selections that textarea's value is Monaco's paged screen-reader
+            // representation, truncated with an ellipsis, not the real text.
+            // A cut routed this way also wrote to the clipboard without
+            // touching the document.
+            if (action === 'copy' && !editor.hasTextFocus()) {
                 const domText = window.getSelection()?.toString() ?? '';
                 if (domText) {
                     try { await tauriClipboard.writeText(domText); } catch { /* ignored */ }

@@ -1,7 +1,7 @@
 <template>
   <div class="export-tab">
     <div class="export-container p-3">
-      <div v-for="group in EXPORT_GROUPS" :key="group.variant" class="export-group">
+      <div v-for="group in visibleExportGroups" :key="group.variant" class="export-group">
         <h3 class="export-group-title" :title="group.detail">{{ group.label }}</h3>
         <div class="header-actions">
           <button class="btn" @click="$emit('savePdf', group.variant)" :title="`Save this document's ${group.label.toLowerCase()} as a PDF`">
@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <div class="export-group">
+      <div v-if="!isCompiled" class="export-group">
         <h3 class="export-group-title" :title="COMPILED_DETAIL">Compiled worksheet</h3>
         <div class="header-actions">
           <button
@@ -36,7 +36,7 @@
 
       <!-- Not in the browser: the references are read from the folder the document is saved
            in, and there is neither in a browser tab. -->
-      <div v-if="!versionConfig.isWeb" class="export-group">
+      <div v-if="!versionConfig.isWeb && !isCompiled" class="export-group">
         <h3 class="export-group-title" :title="PORTABLE_DETAIL">Portable package</h3>
         <div class="header-actions">
           <button
@@ -98,6 +98,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { ExportVariant } from '../../types/api'
 import type { VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
@@ -151,13 +152,23 @@ const EXPORT_GROUPS: { variant: ExportVariant; label: string; detail: string; wo
   },
 ]
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   plots: PlotSummary[]
   loading: boolean
   versionConfig?: VersionConfig
+  isCompiled?: boolean
 }>(), {
   versionConfig: () => ({ ...DEFAULT_VERSION_CONFIG }),
+  isCompiled: false,
 })
+
+// A compiled worksheet has no source: Preview and Unwrapped both render from it.
+const SOURCE_EXPORT_VARIANTS: ExportVariant[] = ['preview', 'unwrapped']
+const visibleExportGroups = computed(() =>
+  props.isCompiled
+    ? EXPORT_GROUPS.filter(g => !SOURCE_EXPORT_VARIANTS.includes(g.variant))
+    : EXPORT_GROUPS
+)
 
 defineEmits<{
   savePdf: [variant: ExportVariant]

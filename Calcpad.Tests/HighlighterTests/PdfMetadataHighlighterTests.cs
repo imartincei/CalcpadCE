@@ -215,6 +215,28 @@ namespace Calcpad.Tests.HighlighterTests
         }
 
         [Fact]
+        public void UiOverrides_FromInclude_ReportsNothing()
+        {
+            // CalcpadService strips 'uiOverrides' out of included content unconditionally
+            // (UiOverridesIncludeTests), so a comment only reached through #include is dead
+            // weight regardless of where it sits - not a misplaced comment worth flagging.
+            var mainPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "uioverrides-include", "main.cpd");
+            var subPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "uioverrides-include", "sub.cpd");
+            var content = "#UI L = 4\n#include sub.cpd\n";
+            var includeFiles = new Dictionary<string, string>
+            {
+                [subPath] = "'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI q = 1"
+            };
+
+            var staged = new ContentResolver().GetStagedContent(content, includeFiles, sourceFilePath: mainPath);
+            var ignore = new LintIgnoreRegionParser().ExtractRegions(content);
+            var result = new CalcpadLinter().Lint(staged, ignore);
+
+            Assert.DoesNotContain(result.Diagnostics, d =>
+                d.Code == "CPD-3416" || d.Code == "CPD-3417" || d.Code == "CPD-3418" || d.Code == "CPD-3412");
+        }
+
+        [Fact]
         public void PdfSettings_SpanningLines_IsValidatedNotSkipped()
         {
             // A `_`-continued comment used to be invisible to this validator, which read
