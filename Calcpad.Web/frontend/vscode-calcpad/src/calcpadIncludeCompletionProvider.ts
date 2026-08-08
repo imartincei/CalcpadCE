@@ -11,6 +11,8 @@ import {
     PATH_ROOT_LABEL,
     USER_TOKEN,
     DIRECTIVE_TRIGGER_CHARACTERS,
+    pathRootTokenOptions,
+    hasDanglingCloseBrace,
 } from 'calcpad-frontend';
 import { expandEnvVars } from './calcpadLocationResolver';
 import type { CalcpadDefinitionsService } from './calcpadDefinitionsService';
@@ -57,10 +59,15 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
 
         const extensions = extensionsForDirective(directive);
 
+        // VS Code auto-closes a typed `{` into `{}`, leaving a `}` sitting right after the
+        // cursor — swallow it so inserting a full token doesn't leave it dangling.
+        const nextChar = document.lineAt(position.line).text.charAt(position.character);
+        const extraChar = hasDanglingCloseBrace(partialPath, nextChar) ? 1 : 0;
+
         // Replace range covers from the start of the file path to the cursor
         const replaceRange = new vscode.Range(
             position.line, pathStartCol,
-            position.line, position.character
+            position.line, position.character + extraChar
         );
 
         // The document's own #ProjectPath/#LibraryPath roots — the server's resolved value
@@ -129,25 +136,22 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
                 );
 
                 const docDirNorm = path.normalize(documentDir);
-                for (const kind of ['project', 'library'] as const) {
-                    const root = resolvedRoots[kind];
-                    if (root && path.normalize(root) !== docDirNorm) {
-                        this.outputChannel.appendLine(`[INCLUDE COMPLETION] Also searching ${kind} root: ${root}`);
-                        await this.addEntriesFromDirectory(
-                            root, '', extensions, replaceRange,
-                            document.uri.fsPath, completionItems, addedEntries, token,
-                            PATH_ROOT_LABEL[kind], '', `${PATH_ROOT_TOKEN[kind]}/`
-                        );
-                    }
-                }
 
-                if (path.normalize(homeDir) !== docDirNorm) {
-                    this.outputChannel.appendLine(`[INCLUDE COMPLETION] Also searching {user} root: ${homeDir}`);
-                    await this.addEntriesFromDirectory(
-                        homeDir, '', extensions, replaceRange,
-                        document.uri.fsPath, completionItems, addedEntries, token,
-                        'User', '', `${USER_TOKEN}/`
-                    );
+                // Offer {user}/{project}/{library} as pick-a-root placeholders rather than
+                // eagerly flattening their contents in — selecting one inserts just the token
+                // and re-triggers completion, which then drills into that root above.
+                for (const opt of pathRootTokenOptions(resolvedRoots, true)) {
+                    const item = new vscode.CompletionItem(opt.label, vscode.CompletionItemKind.Folder);
+                    item.insertText = `${opt.token}/`;
+                    item.filterText = `${opt.token}/`;
+                    item.range = replaceRange;
+                    item.detail = opt.detail;
+                    item.sortText = '0_' + opt.label;
+                    item.command = {
+                        command: 'editor.action.triggerSuggest',
+                        title: 'Re-trigger completions'
+                    };
+                    completionItems.push(item);
                 }
 
                 // Also search each open workspace folder. Skip any folder that coincides with
@@ -243,7 +247,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
 
             const insertPath = useAbsolute
                 ? absPath + path.sep
-                : libraryPrefix + pathPrefix + name + '\\';
+                : libraryPrefix + pathPrefix + name + path.sep;
 
             if (addedEntries.has(insertPath)) {
                 continue;

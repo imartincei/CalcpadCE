@@ -31,6 +31,8 @@ The **CalcpadCE** view is organized into tabs:
 | **Export** | PDF / HTML / Word save actions, grouped by which rendering they capture, plus per-plot and ZIP-all image export from any plots produced by the document. See [Export](#export). |
 | **Errors** | Full list of calculation errors from the engine, each linking to its source line. |
 
+While a [`#UI` input form](new-ui-mode.md) (or a compiled `.cpdz` worksheet) is the active document, **Insert**, **Variables**, **Formatting**, **Errors**, and **Properties** go inactive — they act on the document source, which the form doesn't edit. **TOC**, **Settings**, and **Export** stay available.
+
 ### Insert
 
 A searchable palette grouped by category.
@@ -61,7 +63,7 @@ See [Metadata Comments](new-metadata-comments.md) for the full format.
 ### TOC
 
 A live outline of the headings in your document.
-Selecting a heading scrolls the editor to that line.
+Selecting a heading scrolls the editor to that line — or, while a [`#UI` input form](new-ui-mode.md) is open and there is no editor to scroll, scrolls the form (or its Report companion) to that heading instead.
 It rebuilds as you edit.
 
 ### Formatting (Prettify)
@@ -90,6 +92,12 @@ Word is offered for the report and the preview only — a fill-in form and a cod
 meaningful Word rendering. See **[UI Mode → Exporting](new-ui-mode.md)** for what each variant
 is for. PDF uses the page setup from the **Settings** tab's **PDF Export** section, overridden by the
 document's own `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings) where it sets one.
+
+Two more groups sit above the rendering variants and save a whole file rather than one rendering:
+**Save Compiled…** writes the document out as a `.cpdz` compiled worksheet (hidden once the open
+file already is one), and **Export Portable…** bundles it with everything it reads into a `.zip`
+(hidden for compiled files, and in the plain browser build). See [Working with Files](working-with-files.md)
+for what each one produces.
 
 Below those, the **Plots** section lists every plot the document emits, each with a thumbnail, filename, and size:
 

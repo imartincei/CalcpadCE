@@ -17,24 +17,28 @@ Editing settings here keeps them in sync with the host and the server — in VS 
 | **Zero Small Matrix Elements** | on/off | Show very small matrix/vector values as `0` instead of using scientific notation. |
 | **Show Hidden Output** | on/off | Ignore `#hide` so suppressed content is rendered anyway. For debugging. |
 | **Max Output Count** | 5–100 | Maximum number of rows/columns shown for large matrices and vectors. |
+| **Numerical Precision** | 1e-15–1e-2 | Relative precision used by integration, root-finding, and other numerical methods. |
+| **Solver Tolerance** | 1e-15–1e-2 | Target tolerance for the iterative (PCG/eigen) solver. |
 
 ## Plot
 
 | Setting | Values | Meaning |
 |---------|--------|---------|
 | **Adaptive Plotting** | on/off | Adaptively sample plotted functions. |
-| **Screen Scale Factor** | 0.1–5 | Scale of rendered plots/images. |
+| **Screen Scale Factor** | 0.1–5 | Scale of rendered plots/images. App-level display setting; not part of `#settings`. |
+| **Plot Width / Height** | ≥1 (px) | Default size of the plot canvas. |
+| **Plot Mesh Step** | ≥0 (px) | Mesh size for surface/map plots; `0` samples automatically. |
 | **Image Path** | text | Directory used for generated plot images. |
 | **Vector Graphics** | on/off | Emit SVG plots instead of raster images. |
-| **Color Scale** | Rainbow / Grayscale / Hot / Cool / Jet / Parula | Palette for 3D/surface plots. |
+| **Color Scale** | None / Gray / Rainbow / Terrain / VioletToYellow / GreenToYellow / Blues / BlueToYellow / BlueToRed / PurpleToYellow | Palette for 3D/surface plots. |
 | **Smooth Scale** | on/off | Smooth the color scale. |
 | **Shadows** | on/off | Render shadows on 3D surfaces. |
-| **Light Direction** | text | Light direction vector for 3D shading. |
+| **Light Direction** | text | Light direction vector for 3D shading. App-level display setting; not part of `#settings`. |
 
 ## Units
 
 - **Default Input Length Unit** — `m` / `cm` / `mm`. Used for `%u` placeholders in input forms.
-- **Non-Metric Units** — **UK (Imperial)** or **US Customary**. Selects the definition of bare unit names that differ between the two systems (`gal`, `ton`, `cwt`, `pt`, `qt`, `bbl`, `tonf`, `therm`, …). This lives on `Settings.IsUs` and is unified across the WPF app, the CLI, and the web/desktop/VS Code hosts.
+- **Non-Metric Units** — **UK (Imperial)** or **US Customary**, defaulting to **US Customary**. Selects the definition of bare unit names that differ between the two systems (`gal`, `ton`, `cwt`, `pt`, `qt`, `bbl`, `tonf`, `therm`, …). This lives on `Settings.IsUs` and is unified across the WPF app, the CLI, and the web/desktop/VS Code hosts.
 
 ## PDF Export
 

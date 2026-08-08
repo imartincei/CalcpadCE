@@ -2,14 +2,14 @@ import * as monaco from 'monaco-editor';
 import {
     getPathRootTokenKind,
     isUserToken,
-    expandUserToken,
     resolveCompletionPathRoots,
     extensionsForDirective,
     parseDirectiveLine,
     PATH_ROOT_TOKEN,
-    PATH_ROOT_LABEL,
     USER_TOKEN,
     DIRECTIVE_TRIGGER_CHARACTERS,
+    pathRootTokenOptions,
+    hasDanglingCloseBrace,
     type ResolvedPathRoots,
 } from 'calcpad-frontend';
 import { pathResolve } from 'calcpad-frontend/services/paths';
@@ -104,11 +104,16 @@ export function registerIncludeCompletionProvider(
                 })
                 : { project: null, library: null };
 
+            // Monaco auto-closes a typed `{` into `{}`, leaving a `}` sitting right after the
+            // cursor — swallow it so inserting a full token doesn't leave it dangling.
+            const nextChar = line.charAt(position.column - 1);
+            const extraColumn = hasDanglingCloseBrace(partialPath, nextChar) ? 1 : 0;
+
             const range: monaco.IRange = {
                 startLineNumber: position.lineNumber,
                 startColumn: parsed.pathStartCol + 1,
                 endLineNumber: position.lineNumber,
-                endColumn: position.column,
+                endColumn: position.column + extraColumn,
             };
 
             const suggestions: monaco.languages.CompletionItem[] = [];
@@ -171,25 +176,23 @@ export function registerIncludeCompletionProvider(
                         currentFilePath, suggestions, seenAbsolute, 'Workspace', true
                     );
                 }
-                if (homeDir
-                    && normalize(homeDir) !== normalize(currentDir)
-                    && (!openedFolder || normalize(homeDir) !== normalize(openedFolder))) {
-                    await addEntries(
-                        ctx, homeDir, partialPath, extensions, range,
-                        currentFilePath, suggestions, seenAbsolute, 'User', false, `${USER_TOKEN}/`
-                    );
-                }
-                for (const kind of ['project', 'library'] as const) {
-                    const root = resolvedRoots[kind];
-                    if (root
-                        && normalize(root) !== normalize(currentDir)
-                        && (!openedFolder || normalize(root) !== normalize(openedFolder))) {
-                        await addEntries(
-                            ctx, root, partialPath, extensions, range,
-                            currentFilePath, suggestions, seenAbsolute, PATH_ROOT_LABEL[kind], false,
-                            `${PATH_ROOT_TOKEN[kind]}/`
-                        );
-                    }
+                // Offer {user}/{project}/{library} as pick-a-root placeholders rather than
+                // eagerly flattening their contents in — selecting one inserts just the token
+                // and re-triggers completion, which then drills into that root above.
+                for (const opt of pathRootTokenOptions(resolvedRoots, homeDir !== null)) {
+                    suggestions.push({
+                        label: opt.label,
+                        kind: monaco.languages.CompletionItemKind.Folder,
+                        insertText: `${opt.token}/`,
+                        filterText: `${opt.token}/`,
+                        range,
+                        sortText: '0_' + opt.label,
+                        detail: opt.detail,
+                        command: {
+                            id: 'editor.action.triggerSuggest',
+                            title: 'Re-trigger completions',
+                        },
+                    });
                 }
             }
 

@@ -45,11 +45,16 @@ Each root is declared once, with a directive naming the folder it points at — 
 - `#ProjectPath ...` — the job- or document-specific folder, typically outside version control and different for every recipient.
 - `#LibraryPath ...` — a shared folder of reusable `.cpd`/`.txt` files, e.g. a firm-wide function or materials library.
 
-Both directives render nothing, the same as `#include`. A relative value resolves against the folder of the file that declares it — so a module reached through `#include` that declares `#ProjectPath .` means *its own* folder, not the including document's. Environment variables are expanded in the value using `%VAR%` syntax — on every platform, including macOS/Linux:
+Both directives render nothing, the same as `#include`. A relative value resolves against the folder of the file that declares it — so a module reached through `#include` that declares `#ProjectPath .` means *its own* folder, not the including document's.
+
+**Environment variables expand in every path, not just these two directives.** `%VAR%` is expanded — on every platform, including macOS/Linux — in `#include`, `#read`/`#write`/`#append`, `<img src="...">`, and a `#ProjectPath`/`#LibraryPath` value itself, whether or not a path-root token is involved:
 
 ```text
-#LibraryPath %HOME%/lib/calcpad
+#LibraryPath %APPDATA%/Calcpad/lib
+#include %APPDATA%/Calcpad/scratch/notes.cpd
 ```
+
+These are your OS's own environment variables — CalcpadCE doesn't define any, so make sure the one you reference is actually set. `%VAR%` left unmatched (nothing by that name is set) is not expanded and not an error by itself — it just becomes part of a path that then has to resolve, so an unset variable usually surfaces as a plain "file/folder not found" instead.
 
 **Rules, kept deliberately simple:**
 
@@ -126,6 +131,8 @@ Neither export form keeps a token. An [exported portable package](working-with-f
 The reason is the same for all three tokens: each names a folder on the machine that wrote the document, and there is no reason to expect the recipient's machine has the same file in the same place. An export that left the token in would only run where the recipient happened to have declared a matching root, which is the opposite of what either format is for. So the root has to be declared here, and its folder has to exist, or the export is refused naming the directive.
 
 What a token *is* for is the document itself. If you want a recipient to resolve a shared library from their own folders, give them the `.cpd` and let them point `#ProjectPath`/`#LibraryPath` wherever their copy lives — one line to change, and nothing duplicated.
+
+A `#write`/`#append` target counts as absolute for this purpose, the same as a rooted path, so it collapses to a bare filename rather than being refused: `#write R to {project}/out/results.csv` becomes `#write R to results.csv` in either export.
 
 ## Errors point to the right place
 

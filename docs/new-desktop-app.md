@@ -68,6 +68,8 @@ There are several ways to open documents:
 - **Files tab** in the sidebar — open a folder and browse its tree.
 - **Recent files** — tracked automatically and available from the File menu.
 
+Compiled **`.cpdz`** worksheets open the same way and are registered as their own file type — double-clicking one opens the app straight to its `#UI` input form, source locked. See [UI Mode](new-ui-mode.md#compiled-cpdz-worksheets).
+
 ## The editor
 
 - **Syntax highlighting** for numbers, units, operators, variables, functions, macros, keywords, commands, and embedded HTML/Markdown in comments.
@@ -87,7 +89,7 @@ These are the same editor features as the [VS Code extension](new-vscode-extensi
 ## The CalcpadCE sidebar
 
 Toggle the sidebar with **View → Toggle Sidebar**.
-It has a **Files** view and a **CalcpadCE** view; the CalcpadCE view is split into tabs (Insert, TOC, Settings, Variables, PDF, Formatting, Export, Errors).
+It has a **Files** view and a **CalcpadCE** view; the CalcpadCE view is split into tabs (Insert, TOC, Settings, Variables, Formatting, Export, Errors, Properties).
 
 The sidebar is the same across every CalcpadCE front end — see **[The CalcpadCE Panel & Settings](new-calcpad-panel.md)** for a full walkthrough of each tab, including Prettify options and the Export buttons.
 
@@ -102,6 +104,7 @@ Its toolbar (and **View → Result Mode**) offers four modes:
 - **Report** — the print layout: `#pre` hidden, and the values entered into the form applied. In **Report** and **Input** a **Print PDF** button on the toolbar exports it.
 
 **View → Toggle Preview** shows and hides the pane.
+Drag the border between the editor and the results pane to resize either side — and, in **Input** mode, the border between the form and its **Report** companion — the split is remembered between sessions.
 See **[UI Mode](new-ui-mode.md)** for `#pre`/`#post` and the input form.
 
 ### Running on demand (Auto-Run off)
@@ -157,7 +160,7 @@ The **Export** tab also has a **Plots** section that lists every plot the docume
 
 The menu bar drives the whole app:
 
-- **File** — New Tab · Open… · Save · Save As… · Close Tab · Export ▸ · Quit
+- **File** — New Tab · Open… · Save · Save As… · Save As Compiled Worksheet… · Export Portable Package… · Close Tab · Export ▸ · Quit — see [Working with Files](working-with-files.md) for what the two compiled/portable commands produce
 - **Edit** — Undo · Redo · Cut · Copy · Paste · Select All · Find · Replace
 - **View** — Toggle Sidebar · Toggle Preview · Toggle Word Wrap · Split Editor · Result Mode: Preview / Unwrapped / Input / Report
 - **Server** — Refresh (**Ctrl+Alt+X**) · Show Server Log · Stop Server · Restart Server

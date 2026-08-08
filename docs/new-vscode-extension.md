@@ -121,14 +121,14 @@ When you type a path after `#include`, `#read`, `#write`, or `#append`, the exte
 - `#include`: `.cpd`, `.txt`
 - `#read` / `#write` / `#append`: `.cpd`, `.txt`, `.csv`, `.tsv`, `.xlsx`, `.xlsm`, `.xls`
 - Both `/` and `\` separators work, and it drills into subdirectories.
-- Environment variables expand: `%VAR%` on Windows, `$VAR` on macOS/Linux.
+- The completion list itself expands `%VAR%`, `$VAR`, and `${VAR}` so it can navigate into the target folder — but only `%VAR%` is understood when the document actually renders or compiles (see [Includes and File Reads](new-includes.md#path-root-tokens-project-and-library)). Stick to `%VAR%` in the path itself; `$VAR` will autocomplete but won't resolve at render time.
 
 Declare `#ProjectPath ...` and/or `#LibraryPath ...` at the top of a document and both roots show up in completion at the root level, alongside workspace files, drilling into `{project}/…`/`{library}/…` as you type — an easy way for a team to share a common library without copying it into every project. See [Includes and File Reads](new-includes.md#path-root-tokens-project-and-library) for the directive itself.
 
 ## The CalcpadCE panel
 
 Click the **CalcpadCE** icon in the activity bar (left edge) to open the panel.
-It has **Files** and **CalcpadCE** views, and the CalcpadCE view is organized into tabs (Insert, TOC, Settings, Variables, PDF, Formatting, Export, Errors).
+It has **Files** and **CalcpadCE** views, and the CalcpadCE view is organized into tabs (Insert, TOC, Settings, Variables, Formatting, Export, Errors, Properties).
 The view title bar has **CalcpadCE: Run Preview** (re-renders the active file and refreshes plots) and **Stop Server** buttons.
 
 The panel is the same across every CalcpadCE front end — see **[The CalcpadCE Panel & Settings](new-calcpad-panel.md)** for a full walkthrough of each tab.

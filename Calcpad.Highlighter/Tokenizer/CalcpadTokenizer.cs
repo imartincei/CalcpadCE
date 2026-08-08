@@ -175,8 +175,9 @@ namespace Calcpad.Highlighter.Tokenizer
                 }
 
                 // Format string handling - accumulate format specifier characters
-                // Stops at whitespace, comment chars, or end of line
-                if (_state.CurrentType == TokenType.Format && c != '\'' && c != '"' && !char.IsWhiteSpace(c))
+                // Stops at whitespace, comment chars, '$' (a macro reference may immediately
+                // follow, e.g. "5ft|in:f2text$"), or end of line
+                if (_state.CurrentType == TokenType.Format && c != '\'' && c != '"' && c != '$' && !char.IsWhiteSpace(c))
                 {
                     _builder.Append(c);
                     continue;

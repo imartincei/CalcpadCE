@@ -95,7 +95,7 @@ The tables below group them by the kind of problem.
 | CPD-3410 | Error | Outer-scope assignment (`←`) to an undefined variable |
 | CPD-3411 | Warning | Invalid `paramType` value in a metadata comment |
 | CPD-3412 | Warning | Invalid metadata-comment JSON |
-| CPD-3413 | Error| Invalid #settings JSON |
+| CPD-3413 | Warning | Invalid #settings JSON |
 | CPD-3414 | Warning | Invalid PDF settings in a metadata comment |
 | CPD-3415 | Warning | Invalid `#UI` format |
 

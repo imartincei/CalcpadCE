@@ -85,6 +85,44 @@ export const USER_TOKEN = '{user}';
 /** `{` opens the completion widget on a bare directive line too, not just after a separator. */
 export const DIRECTIVE_TRIGGER_CHARACTERS = [' ', '/', '\\', '{'];
 
+export interface PathRootTokenOption {
+    /** The word to show/insert-as, e.g. `user`. */
+    label: string;
+    /** The full token, e.g. `{user}`. */
+    token: string;
+    detail: string;
+}
+
+/**
+ * The `{user}`/`{project}`/`{library}` options to offer at root level, before the user has
+ * committed to one — picking one inserts just the token (plus a trailing separator) and
+ * re-triggers completion, which then drills into that root via `getPathRootTokenKind`/
+ * `isUserToken`. `{user}` needs no declaration so it's offered whenever `homeDirAvailable`;
+ * `{project}`/`{library}` only when declared for this document, per `roots`.
+ */
+export function pathRootTokenOptions(roots: ResolvedPathRoots, homeDirAvailable: boolean): PathRootTokenOption[] {
+    const options: PathRootTokenOption[] = [];
+    if (homeDirAvailable) options.push({ label: 'user', token: USER_TOKEN, detail: 'User' });
+    for (const kind of ['project', 'library'] as const) {
+        if (roots[kind] !== null) options.push({ label: kind, token: PATH_ROOT_TOKEN[kind], detail: PATH_ROOT_LABEL[kind] });
+    }
+    return options;
+}
+
+/**
+ * Whether `nextChar` (the character immediately after the cursor) is an editor-auto-inserted `}`
+ * pairing an unmatched `{` in `partialPath` — both Monaco and VS Code auto-close a typed `{` into
+ * `{}` with the cursor left in between. A completion's replace range needs to extend one column
+ * further to swallow it, or inserting a full `{user}`/`{project}`/`{library}` token leaves a
+ * stray `}` behind.
+ */
+export function hasDanglingCloseBrace(partialPath: string, nextChar: string): boolean {
+    if (nextChar !== '}') return false;
+    const openBraces = (partialPath.match(/\{/g) || []).length;
+    const closeBraces = (partialPath.match(/\}/g) || []).length;
+    return openBraces > closeBraces;
+}
+
 export interface CompletionPathRootsParams {
     /** The server's resolved roots for this document, or null when none is cached yet. */
     serverRoots: ResolvedPathRoots | null;

@@ -1,6 +1,6 @@
 # Metadata Comments
 
-> Part of Calcpad.Web. The **Properties** tab described here currently appears in the [VS Code extension](new-vscode-extension.md). The comments it writes are understood everywhere — the [linter](new-linter.md), the preview, and [PDF export](new-pdf-export.md) — no matter which editor created them.
+> Part of Calcpad.Web. The **Properties** tab described here currently appears in the [VS Code extension](new-vscode-extension.md) and the [desktop app](new-desktop-app.md). The comments it writes are understood everywhere — the [linter](new-linter.md), the preview, and [PDF export](new-pdf-export.md) — no matter which editor created them.
 
 Sometimes you want to tell Calcpad something about your document without that note showing up in the printed report — what a function's inputs mean, that a section is a work-in-progress the linter should leave alone, or which page size this particular report has to print at.
 
@@ -8,9 +8,10 @@ A **metadata comment** does exactly that. It looks like an ordinary comment, so 
 
 ## The Properties tab
 
-Open the [CalcPad panel](new-calcpad-panel-and-settings.md) and switch to the **Properties** tab. Then click a line in your document, and the tab shows a small form for that line:
+Open the [CalcPad panel](new-calcpad-panel.md) and switch to the **Properties** tab. Then click a line in your document, and the tab shows a small form for that line:
 
 - **On a definition** (a variable, function, macro, or custom unit) you can add a **description**, and for functions and macros, a **type and description for each parameter** and the **return type**. The parameter rows are filled in to match the definition automatically.
+- **On a `#UI` line** you get a form for its JSON properties — control type, style, options, grid size, and so on — instead of hand-writing the `{...}` block, plus a **Saved #UI values** list of every entry already saved for the document. Click an entry to jump to its control, edit its value inline, or **Purge unused** to drop entries that no longer match a control still in the document. See [UI Mode](new-ui-mode.md).
 - **Document settings** are always available. Editing them writes a [`#settings` directive](#document-settings) at the top of the file — not a metadata comment — so they take effect during calculation.
 - **On any other line** you also get the **lint-ignore** regions and the [**PDF export** settings](#pdf-export-settings).
 
@@ -63,7 +64,7 @@ You can pin settings — decimals, angle units, and so on — to a document so i
 #settings {"decimals": 2, "degrees": 1, "units": "cm"}
 ```
 
-Unlike the other properties on this tab, `#settings` is a real Calcpad directive, not a metadata comment — the engine reads it while calculating. It applies to **every line after it**, so you can change settings partway through a document by adding another `#settings` directive. If you keep one near the top, it configures the whole file; the **Properties** tab writes it there for you. The settings you can set are the same ones on the [Settings tab](new-calcpad-panel-and-settings.md#settings):
+Unlike the other properties on this tab, `#settings` is a real Calcpad directive, not a metadata comment — the engine reads it while calculating. It applies to **every line after it**, so you can change settings partway through a document by adding another `#settings` directive. If you keep one near the top, it configures the whole file; the **Properties** tab writes it there for you. The settings you can set are the ones on the [Settings tab](new-calcpad-panel.md#settings), except **Screen Scale Factor** and **Light Direction**, which are app-level display settings only:
 
 | Setting | Values |
 |---------|--------|
@@ -76,14 +77,21 @@ Unlike the other properties on this tab, `#settings` is a real Calcpad directive
 | `showHiddenOutput` | `true` / `false` — ignore `#hide` and render hidden content (debugging) |
 | `maxOutputCount` | 5–100 rows shown for big matrices/vectors |
 | `units` | unit system, e.g. `m`, `cm`, `mm` |
+| `isUs` | `true` / `false` — US customary vs. UK imperial for unit names that differ between the two |
 | `vectorGraphics` | `true` / `false` — SVG plots instead of images |
 | `colorScale` | plot palette (see below) |
 | `smoothScale` | `true` / `false` — smooth the color scale |
 | `shadows` | `true` / `false` — shadows on 3-D surfaces |
 | `adaptivePlot` | `true` / `false` — adaptive plot sampling |
+| `plotWidth` · `plotHeight` | plot area size, in pixels |
+| `plotStep` | mesh size for surface/map plots, in pixels (`0` = automatic) |
+| `precision` | relative precision for numerical methods, `1e-15`–`1e-2` |
+| `tol` | target tolerance for the iterative solver, `1e-15`–`1e-2` |
 
 `colorScale` can be `None`, `Gray`, `Rainbow`, `Terrain`, `VioletToYellow`, `GreenToYellow`, `Blues`, `BlueToYellow`, `BlueToRed`, or `PurpleToYellow`.
 Anything the app doesn't recognize is ignored.
+
+The plot and solver settings above can also still be set with the older dedicated variables (`PlotWidth`, `PlotHeight`, `PlotStep`, `Precision`, `Tol`, `PlotSVG`, `PlotAdaptive`, `PlotPalette`, `PlotShadows`, `PlotSmooth`) for backwards compatibility. Whichever one — the `#settings` key or the variable assignment — appears later in the file wins.
 
 ## PDF export settings
 
@@ -94,7 +102,7 @@ Put a `pdf` object in a metadata comment — near the top is the natural place, 
 '<!--{"pdf": {"format": "A4", "orientation": "landscape", "marginTop": "2cm"}}-->
 ```
 
-Each key you set overrides the matching option on the [Settings tab](new-settings.md); everything you leave out keeps whatever the app is configured with.
+Each key you set overrides the matching option on the [Settings tab](new-settings.md#pdf-export); everything you leave out keeps whatever the app is configured with.
 So a document that only cares about its margins can say just that, and still follow your usual paper size.
 
 | Key | Values |
@@ -122,7 +130,7 @@ prototype_var = 5
 '<!--{"EndLintIgnore": []}-->
 ```
 
-The **Properties** tab has a picker for the codes, so you don't have to memorize them. See [Suppressing diagnostics](new-linter.md) for the details.
+The **Properties** tab has a picker for the codes, so you don't have to memorize them. See [Suppressing diagnostics](new-linter.md#suppressing-diagnostics-lint-ignore) for the details.
 
 ## Leaving sections out of the PDF
 
@@ -135,7 +143,7 @@ debug_x = 5
 ```
 
 The section still shows in the preview but is dropped from the PDF.
-The old `NoPrintStart` / `NoPrintEnd` markers are gone — see [Excluding sections from the PDF](new-pdf-export.md).
+The old `NoPrintStart` / `NoPrintEnd` markers are gone — see [Excluding sections from the PDF](new-pdf-export.md) and, for the full `#end`/condition syntax these directives share, [New Syntax](new-syntax.md).
 
 ## See also
 

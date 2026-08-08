@@ -39,6 +39,7 @@ behaviour off with **Open #UI Documents in Input Mode** on the panel's **Setting
 | `CalcpadCE: Toggle Report Preview` | Opens the report — beside the form, or on its own |
 | `CalcpadCE: Print Report to PDF` | Exports the report as a PDF |
 | `CalcpadCE: Save #UI Values to Document` | Writes the values you entered into the file |
+| `CalcpadCE: Save Values to Compiled Worksheet` | The `.cpdz` equivalent of the command above |
 
 Closing the form asks whether to save the values first; declining discards them. The report
 preview is not tied to the form: open it on its own to read the print layout beside the editor,
@@ -143,10 +144,13 @@ Comment segments separate assignments, so one `#UI` line can declare more than o
 They share the line's JSON properties but are saved and overridden separately.
 
 ```text
-#UI 'b = 'b = 200mm', 'h = 'h = 400mm
+#UI 'b = 'b = 200mm', h = 'h = 400mm
 ```
 
 ## JSON properties
+
+You don't have to write this `{...}` block by hand — the [Properties tab](new-metadata-comments.md#the-properties-tab)
+has a form for it that fills in the fields that apply to the control type it detects.
 
 | Property | Type | Applies to | Meaning |
 |----------|------|-----------|---------|
@@ -358,6 +362,11 @@ adding or removing one of those declarations later will still shift the rest.
 If a document's values do end up scrambled, the metadata comment is plain text: fix the keys by
 hand, or clear the `uiOverrides` entry to start the form from the document's own values again.
 
+The [Properties tab](new-metadata-comments.md#the-properties-tab) does this without hand-editing:
+its **Saved #UI values** list shows every entry, lets you edit one in place or jump to its
+control, flags entries that no longer match a control still in the document, and has a
+**Purge unused** button to drop them.
+
 ## Exporting
 
 Exports come in variants, one per rendering, and **report is the default** — a plain "Export
@@ -380,6 +389,20 @@ Two things to know about the exported files:
   navigation. Those belong to the screen; a file is read, not clicked through.
 - An exported **input form** is static. Its controls render, but nothing is behind them to
   recalculate — it is a picture of the form, useful for printing a blank or filled-in sheet.
+
+## Compiled (`.cpdz`) worksheets
+
+A [compiled worksheet](working-with-files.md#save-as-compiled-worksheet) is a `.cpdz` file with
+its source locked and only the `#UI` form left editable. It changes a few things from the
+ordinary-file behaviour described above:
+
+- It always opens as its input form — the "first time you open it" auto-detection under
+  [Turning it on](#turning-it-on) doesn't apply, since there is no other mode to default to.
+- Exporting drops the **Preview** and **Unwrapped** variants: there is no source to render them
+  from, so only **Report** and **Input form** are offered.
+- Saving values uses a separate command — **Save Values to Compiled Worksheet** rather than
+  **Save #UI Values to Document** — since the values are written back into the compiled file
+  itself, not a `.cpd` source file.
 
 ## `#UI` in macros, conditions and loops
 
@@ -431,5 +454,6 @@ engine when you run the document:
 | The `#UI` … requires both keys and values arrays. | A drop-down or radio group is missing one |
 | The `#UI` … keys and values arrays must have the same length. | They are paired, so the counts must match |
 | The `#UI` … has *n* entries but the grid has *m* … | More headers than rows or columns |
+| `#UI` '…' must not be negative. | `rows` or `columns` was given a negative number |
 
 See [Linter and Diagnostics](new-linter.md) for how diagnostics are surfaced.

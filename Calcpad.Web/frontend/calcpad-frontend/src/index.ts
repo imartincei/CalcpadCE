@@ -251,6 +251,7 @@ export type {
     Directive,
     DirectiveParse,
     CompletionPathRootsParams,
+    PathRootTokenOption,
 } from './text/directives';
 export {
     parseDirectiveLine,
@@ -262,4 +263,6 @@ export {
     USER_TOKEN,
     DIRECTIVE_TRIGGER_CHARACTERS,
     resolveCompletionPathRoots,
+    pathRootTokenOptions,
+    hasDanglingCloseBrace,
 } from './text/directives';
