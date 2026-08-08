@@ -4,7 +4,7 @@ using Calcpad.Highlighter.HtmlComment;
 using Calcpad.Highlighter.Linter.Models;
 using Calcpad.Highlighter.Tokenizer;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     public class HTMLCommentTests : IClassFixture<HighlighterLinterFixture>
     {

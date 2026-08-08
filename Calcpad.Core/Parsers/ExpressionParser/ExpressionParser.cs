@@ -38,16 +38,7 @@ namespace Calcpad.Core
         public string SourceFilePath { get; set; }
         private PathRoots _pathRoots = new();
         private bool _hasInheritedPathRoots;
-        /// <summary>
-        /// The document's <c>{project}</c>/<c>{library}</c> roots. Assign
-        /// <see cref="MacroParser.PathRoots"/> — read <em>after</em> that parser has run, since it
-        /// replaces its instance on every top-level parse — so a declaration written inside an
-        /// included file keeps that file's folder as its base. The flattened text this parser sees
-        /// no longer records which file each line came from, so declaring the directives here again
-        /// would resolve a relative value against the root document instead. Left unset, this
-        /// parser declares them itself, for a caller running it without a
-        /// <see cref="MacroParser"/> at all.
-        /// </summary>
+
         public PathRoots PathRoots
         {
             get => _pathRoots;

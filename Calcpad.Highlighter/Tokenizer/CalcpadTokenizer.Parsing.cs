@@ -86,7 +86,7 @@ namespace Calcpad.Highlighter.Tokenizer
                     }
                     else if (isPathRoot)
                     {
-                        _state.CurrentType = TokenType.PathRoot;
+                        _state.CurrentType = TokenType.FilePath;
                         // Set start column to AFTER this space for the path value token
                         _state.TokenStartColumn = position + 1;
                     }
@@ -97,13 +97,12 @@ namespace Calcpad.Highlighter.Tokenizer
                 }
 
                 // Emit whitespace as None type to preserve column positions
-                // But preserve FilePath, Include, Format, SettingsJson, and PathRoot modes
+                // But preserve FilePath, Include, Format, and SettingsJson modes
                 var inFilePath = _state.CurrentType == TokenType.FilePath;
                 var inIncludeMode = _state.CurrentType == TokenType.Include;
                 var inFormatMode = _state.CurrentType == TokenType.Format;
                 var inSettingsMode = _state.CurrentType == TokenType.SettingsJson;
-                var inPathRootMode = _state.CurrentType == TokenType.PathRoot;
-                if (inFilePath || inIncludeMode || inSettingsMode || inPathRootMode)
+                if (inFilePath || inIncludeMode || inSettingsMode)
                 {
                     // For filepath/include, spaces within are part of the token
                     // But if this is the FIRST char (builder is empty), skip leading space

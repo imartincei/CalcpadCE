@@ -322,9 +322,6 @@
   <data name="Error_in_0_on_line_1_2" xml:space="preserve">
     <value>第 {1}：{2} 行"{0}"出错</value>
   </data>
-  <data name="Error_in_0_1" xml:space="preserve">
-    <value>"{0}"出错：{1}</value>
-  </data>
   <data name="Number_of_iterations_exceeds_the_maximum_0" xml:space="preserve">
     <value>迭代次数超过最大值 {0} !&lt;/p&gt;</value>
   </data>
@@ -582,17 +579,5 @@
   </data>
   <data name="CannotModifyConstant" xml:space="preserve">
     <value>无法修改常量“{0}”.</value>
-  </data>
-  <data name="Missing_path_value_0" xml:space="preserve">
-    <value>{0} 需要路径。</value>
-  </data>
-  <data name="Duplicate_path_declaration_0" xml:space="preserve">
-    <value>{0} 已在此文档中声明。</value>
-  </data>
-  <data name="Path_root_not_declared_0_1" xml:space="preserve">
-    <value>{0} 未声明。请在此行之前添加 {1}。</value>
-  </data>
-  <data name="Path_root_folder_not_found_0_1" xml:space="preserve">
-    <value>找不到 {0} 文件夹：{1}。</value>
   </data>
 </root>

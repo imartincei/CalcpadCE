@@ -4,7 +4,7 @@ using Calcpad.Highlighter.Linter.Models;
 using Calcpad.Highlighter.Tokenizer;
 using Calcpad.Highlighter.Tokenizer.Models;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     public class UiDirectiveHighlighterTests : IClassFixture<HighlighterLinterFixture>
     {
@@ -112,7 +112,7 @@ namespace Calcpad.Tests.HighlighterTests
         [InlineData("#UI {\"mode\": \"string\"} a = 1")]
         [InlineData("#UI a$ = 1")]
         public void StringMode_IsReported(string source) =>
-            Assert.Contains(Messages(source), m => m.Contains("String mode is not supported"));
+            Assert.Contains(Messages(source), m => m.Contains("Only numbers are supported"));
 
         [Fact]
         public void MissingAssignment_IsReported() =>

@@ -1,6 +1,6 @@
 using Calcpad.Highlighter.ContentResolution;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     public class SymbolResolverTests
     {

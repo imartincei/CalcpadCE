@@ -170,10 +170,7 @@ export enum CalcpadTokenType {
     // [Future Reserved] 28-30 used to hold StringVariable, StringFunction, StringTable
     FutureReserved28 = 28,
     FutureReserved29 = 29,
-    FutureReserved30 = 30,
-
-    /** #ProjectPath/#LibraryPath declaration values */
-    PathRoot = 31
+    FutureReserved30 = 30
 }
 
 // ============================================

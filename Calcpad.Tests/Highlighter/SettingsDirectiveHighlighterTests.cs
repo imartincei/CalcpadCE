@@ -6,7 +6,7 @@ using Calcpad.Highlighter.Linter.Models;
 using Calcpad.Highlighter.Tokenizer;
 using Calcpad.Highlighter.Tokenizer.Models;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     public class SettingsDirectiveHighlighterTests
     {

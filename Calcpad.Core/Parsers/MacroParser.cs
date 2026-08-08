@@ -89,9 +89,6 @@ namespace Calcpad.Core
         private static readonly StringComparer PathComparer =
             OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
         private readonly HashSet<string> _includeStack = new(PathComparer);
-        // Not reset between an #include and the file it pulls in — a document and everything it
-        // includes share one set of {project}/{library} roots, which is what makes a clash
-        // between an included module's own declaration and the parent's an error worth having.
         private PathRoots _pathRoots = new();
         public PathRoots PathRoots => _pathRoots;
         private readonly Dictionary<string, Macro> _macros = new(StringComparer.Ordinal);
@@ -118,14 +115,6 @@ namespace Calcpad.Core
             return Keywords.None;
         }
 
-        /// <summary>
-        /// Locates the file name of an <c>#include</c> directive within <paramref name="line"/>,
-        /// which must start at the <c>#</c> — the parser trims each line before it gets here, so
-        /// a caller working on raw source adds its own indent to <paramref name="start"/>.
-        /// The name runs to the first <c>'</c> or <c>"</c> (a trailing comment) or to the last
-        /// <c>#</c> (an input-field block), whichever comes first, and so may contain spaces.
-        /// </summary>
-        /// <returns>False when the line is not an <c>#include</c> or names nothing.</returns>
         public static bool TryGetIncludePath(ReadOnlySpan<char> line, out int start, out int length)
         {
             start = 0;
@@ -252,10 +241,6 @@ namespace Calcpad.Core
                 }
             }
 
-            // The line is declared here, for #include resolution during this very pass, but is
-            // otherwise left standing rather than consumed the way #include is — ExpressionParser
-            // runs over this same flattened text next and independently declares its own root
-            // from it, which is what lets #read/#write resolve a token later in the document.
             void ParsePathRoot(ReadOnlySpan<char> lineContent, ReadOnlySpan<char> sourceLine)
             {
                 PathRoots.IsDeclaration(lineContent, out var isProject, out var start, out var length);

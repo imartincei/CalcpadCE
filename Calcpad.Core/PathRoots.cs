@@ -3,15 +3,6 @@ using System.IO;
 
 namespace Calcpad.Core
 {
-    /// <summary>
-    /// Tracks a document's <c>#ProjectPath</c>/<c>#LibraryPath</c> declarations and expands a
-    /// leading <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> token in a reference against them.
-    /// One instance follows a single consumer's own top-to-bottom walk of the document, so
-    /// "declared before first use" falls out of the order lines are fed in rather than needing
-    /// a separate check — a token reached before its declaration simply finds the root unset.
-    /// A third token, <c>&lt;user&gt;</c>, needs no declaration at all: it always expands to the
-    /// current OS user's home directory (see <see cref="IsUserToken"/>).
-    /// </summary>
     public sealed class PathRoots
     {
         private const string ProjectToken = "{project}";
@@ -23,25 +14,13 @@ namespace Calcpad.Core
         public string Project { get; private set; }
         public string Library { get; private set; }
 
-        /// <summary>Whether <paramref name="path"/> starts with a root token.</summary>
         public static bool HasToken(ReadOnlySpan<char> path) =>
             path.StartsWith(ProjectToken, StringComparison.OrdinalIgnoreCase)
             || path.StartsWith(LibraryToken, StringComparison.OrdinalIgnoreCase);
 
-        /// <summary>
-        /// Whether <paramref name="path"/> starts with the <c>&lt;user&gt;</c> token — the
-        /// current OS user's home directory. Unlike <see cref="HasToken"/>'s two roots, this one
-        /// needs no <c>#ProjectPath</c>/<c>#LibraryPath</c>-style declaration and always
-        /// resolves, so it is checked and expanded separately from them rather than folded into
-        /// <see cref="TryGetTokenKind"/>/<see cref="TryExpand"/>'s declared-root machinery.
-        /// </summary>
         public static bool IsUserToken(ReadOnlySpan<char> path) =>
             path.StartsWith(UserToken, StringComparison.OrdinalIgnoreCase);
 
-        // Expands the {user} token itself. Kept separate from Environment.ExpandEnvironmentVariables
-        // (called on the result afterward by every caller) because that API only recognizes
-        // %VAR%-style references on every platform — it never expands $HOME on Linux/macOS despite
-        // looking like it should.
         private static string ExpandUserToken(string raw)
         {
             var rest = raw[UserToken.Length..];
@@ -51,11 +30,6 @@ namespace Calcpad.Core
             var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             return rest.Length == 0 ? home : Path.Combine(home, rest);
         }
-
-        /// <summary>
-        /// Which root <paramref name="path"/> starts with, for a caller that treats the two
-        /// roots differently — e.g. a separate "bundle this root's references" choice for each.
-        /// </summary>
         public static bool TryGetTokenKind(ReadOnlySpan<char> path, out bool isProject)
         {
             if (path.StartsWith(ProjectToken, StringComparison.OrdinalIgnoreCase))
@@ -72,14 +46,6 @@ namespace Calcpad.Core
             return false;
         }
 
-        /// <summary>
-        /// Whether <paramref name="line"/> is a <c>#ProjectPath</c>/<c>#LibraryPath</c>
-        /// declaration. <paramref name="start"/>/<paramref name="length"/> locate the value —
-        /// up to a trailing comment, the same convention <see cref="MacroParser.TryGetIncludePath"/>
-        /// uses, with the value following the keyword directly (<c>#ProjectPath path</c>, no
-        /// <c>=</c>). An empty value still reports <c>true</c>, with <paramref name="length"/>
-        /// zero, so the caller can report the specific error.
-        /// </summary>
         public static bool IsDeclaration(ReadOnlySpan<char> line, out bool isProject, out int start, out int length)
         {
             isProject = false;
@@ -107,20 +73,9 @@ namespace Calcpad.Core
             return true;
         }
 
-        // Matches the host OS the way PortablePackage's own comparer does, so a redeclaration
-        // that resolves to the same file — most notably the same #ProjectPath/#LibraryPath line
-        // revisited by a #for/#while/#repeat loop it happens to sit inside — is recognized as
-        // the harmless no-op it is rather than a conflicting second declaration.
         private static readonly StringComparer PathComparer =
             OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
-        /// <summary>
-        /// Records a declaration read at <paramref name="declaringDirectory"/> — the folder of
-        /// the file the line was written in, so a relative value resolves the way any other
-        /// path in that file does. False and <paramref name="error"/> on an empty value, a value
-        /// that doesn't resolve to a folder that actually exists, or a second declaration of the
-        /// same root that resolves to a different path.
-        /// </summary>
         public bool TryDeclare(bool isProject, string rawValue, string declaringDirectory, out string error)
         {
             error = null;
@@ -171,12 +126,6 @@ namespace Calcpad.Core
             return true;
         }
 
-        /// <summary>
-        /// Expands a leading root token in <paramref name="raw"/>. Leaves anything else
-        /// untouched and returns true, so a caller can run this unconditionally before its own
-        /// environment-variable expansion. False and <paramref name="error"/> only when the
-        /// token's root was never declared above this point in the walk.
-        /// </summary>
         public bool TryExpand(string raw, out string expanded, out string error)
         {
             error = null;

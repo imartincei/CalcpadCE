@@ -4,7 +4,7 @@ using Calcpad.Highlighter.ContentResolution;
 using Calcpad.Highlighter.Linter;
 using Calcpad.Highlighter.Linter.Models;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     /// <summary>
     /// The <c>pdf</c> object of a metadata comment, and the metadata-comment checks that

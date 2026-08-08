@@ -325,9 +325,6 @@
   <data name="Error_in_0_on_line_1_2" xml:space="preserve">
         <value>Грешка в "{0}" на ред {1}: {2}</value>
     </data>
-  <data name="Error_in_0_1" xml:space="preserve">
-        <value>Грешка в "{0}": {1}</value>
-    </data>
   <data name="Number_of_iterations_exceeds_the_maximum_0" xml:space="preserve">
         <value>Броят на итерациите е по-голям от максималния {0}.&lt;/p&gt;</value>
     </data>
@@ -576,17 +573,5 @@
   </data>
   <data name="CannotModifyConstant" xml:space="preserve">
     <value>Не може да се промени константа "{0}".</value>
-  </data>
-  <data name="Missing_path_value_0" xml:space="preserve">
-    <value>{0} изисква път.</value>
-  </data>
-  <data name="Duplicate_path_declaration_0" xml:space="preserve">
-    <value>{0} вече е обявен в този документ.</value>
-  </data>
-  <data name="Path_root_not_declared_0_1" xml:space="preserve">
-    <value>{0} не е обявен. Добавете {1} преди този ред.</value>
-  </data>
-  <data name="Path_root_folder_not_found_0_1" xml:space="preserve">
-    <value>Папката за {0} не е намерена: {1}.</value>
   </data>
 </root>

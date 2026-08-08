@@ -7,15 +7,6 @@ namespace Calcpad.Core
     /// <summary>A value the directive supplied that its own rules reject.</summary>
     public readonly record struct DirectiveError<TKey>(TKey Key, string Message) where TKey : struct, Enum;
 
-    /// <summary>
-    /// Shared behaviour of the directives that carry a JSON payload - <c>#settings {...}</c>
-    /// and <c>#UI {...}</c>: case insensitive deserialization, the recognized key set derived
-    /// from <typeparamref name="TKey"/>, and the range check the rules are built from.
-    /// Living in Core is what lets the linter and the runtime parser judge a payload by the
-    /// same rules rather than each carrying its own copy of them.
-    /// </summary>
-    /// <typeparam name="TSelf">The payload type itself, so <see cref="Parse"/> returns it.</typeparam>
-    /// <typeparam name="TKey">Enum whose names are the recognized keys.</typeparam>
     public abstract class DirectiveDto<TSelf, TKey>
         where TSelf : DirectiveDto<TSelf, TKey>
         where TKey : struct, Enum

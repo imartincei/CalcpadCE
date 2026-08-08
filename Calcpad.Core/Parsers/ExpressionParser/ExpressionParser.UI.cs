@@ -15,21 +15,12 @@ namespace Calcpad.Core
             public string Style { get; init; }
             public string ReportStyle { get; init; }
             public string VariableName { get; init; }
-            /// <summary>Grid cells captured for the widget; set while the value is prepared.</summary>
             public string DataValues { get; set; }
-            /// <summary>"name:n", n being the ordinal of this declaration among same named ones.</summary>
             public string DeclarationKey { get; init; }
-            /// <summary>
-            /// The control identity: <see cref="DeclarationKey"/>, with ":p" or ":p.q"
-            /// appended inside loops for the enclosing pass numbers.
-            /// </summary>
+
             public string Key { get; init; }
-            /// <summary>Grid rows; filled in from the evaluated value when the source sized
-            /// the grid with an expression, so not known until the line has been calculated.</summary>
             public int Rows { get; set; }
             public int Columns { get; set; }
-            /// <summary>True when the JSON declared both rows and columns, rather than them
-            /// being auto-detected. Only then is the right hand side literal reshaped.</summary>
             public bool HasDeclaredShape { get; init; }
             public string[] ColumnHeaders { get; init; }
             public string[] RowHeaders { get; init; }
@@ -37,51 +28,18 @@ namespace Calcpad.Core
             public string[] Values { get; init; }
         }
 
-        /// <summary>
-        /// When true, #UI keywords inject interactive input elements into the HTML output
-        /// and #post blocks are hidden. When false, #UI lines render exactly as they would
-        /// without the keyword, apart from an optional "reportStyle" class.
-        /// </summary>
         public bool EnableUi { get; set; }
-
-        /// <summary>
-        /// Maps #UI control keys to override values. An entry here replaces the right hand
-        /// side of the annotated assignment before it is evaluated. Applied in both UI and
-        /// report mode, so a report shows the values that were entered.
-        /// Keys are the control identity emitted in data-ui-var, e.g. "name:2" or "name:2:3"
-        /// inside a loop. Progressively broader forms are accepted as fallbacks: "name:2"
-        /// covers every pass of that declaration, a bare "name" covers every declaration.
-        /// </summary>
         public Dictionary<string, string> UiOverrides { get; set; }
-
-        /// <summary>
-        /// The controls declared on the current line, in source order. A #UI line may carry
-        /// several assignments separated by inline comments - <c>#UI 'd ='d = 1', 'x = 2'</c> -
-        /// and each one becomes its own control, sharing the line's JSON properties but
-        /// keyed and overridden separately.
-        /// </summary>
         private List<UiPropertyMetadata> _lineUiControls;
-        /// <summary>How far <see cref="TakeUiControl"/> has consumed <see cref="_lineUiControls"/>.</summary>
         private int _uiTakeIndex;
         private int _uiSkipChars;
         private readonly Dictionary<string, int> _uiVarCounts = [];
         private readonly Dictionary<(string Name, int Line, int Occurrence), int> _uiDeclarationIndex = [];
-        /// <summary>Occurrences of each name so far on the current line, so a name used twice gets two keys.</summary>
         private readonly Dictionary<string, int> _uiLineOccurrences = [];
-
-        /// <summary>True when the current line declared any #UI control.</summary>
         private bool HasUiControls => _lineUiControls is { Count: > 0 };
-
         private const int UiKeywordLength = 3; // "#ui"
         private const char ThinSpace = '\u2009'; // MathParser separates a value from its unit with this
 
-        /// <summary>
-        /// Parses the #UI keyword arguments from the line. The JSON block is optional -
-        /// type and grid size are auto-detected from the expression when it is omitted.
-        /// Always computes _uiSkipChars so the prefix is stripped before tokenization.
-        /// One control is recorded per assignment on the line; each is consumed later,
-        /// once MathParser has rendered the expression it belongs to.
-        /// </summary>
         private KeywordResult ParseKeywordUi(ReadOnlySpan<char> s)
         {
             ResetUiState();
@@ -130,7 +88,7 @@ namespace Calcpad.Core
             {
                 if (assignment.Name.EndsWith('$'))
                 {
-                    AppendError(s.ToString(), Messages.String_mode_is_not_supported_by_the_UI_keyword, _currentLine);
+                    AppendError(s.ToString(), Messages.Only_numbers_are_supported_by_the_UI_keyword, _currentLine);
                     return KeywordResult.None;
                 }
                 if (!UiSyntax.IsValue(assignment.Rhs))
@@ -175,12 +133,6 @@ namespace Calcpad.Core
             return KeywordResult.None;
         }
 
-        /// <summary>
-        /// The control for the expression about to be rendered, or null when it declares
-        /// none. Matched by variable name rather than by position, so a segment that is not
-        /// an assignment - or any mismatch between comment splitting and tokenization -
-        /// simply renders as it normally would.
-        /// </summary>
         private UiPropertyMetadata TakeUiControl(string expression)
         {
             if (!HasUiControls)
@@ -202,15 +154,6 @@ namespace Calcpad.Core
             return null;
         }
 
-        /// <summary>
-        /// Builds the identity of a control: the variable name, the ordinal of its
-        /// declaration among same named ones, and the enclosing loop passes.
-        ///
-        /// The ordinal is keyed on the source line, so re-running a line - which is what a
-        /// loop does - reuses it rather than advancing the count. It is assigned even when
-        /// the line is inside an unsatisfied #if, so flipping a branch does not renumber the
-        /// controls that follow it. Loop passes then separate the repeats of one declaration.
-        /// </summary>
         private (string DeclarationKey, string Key) GetUiKey(string varName)
         {
             var occurrence = _uiLineOccurrences.GetValueOrDefault(varName);
@@ -234,12 +177,6 @@ namespace Calcpad.Core
             return (declarationKey, $"{declarationKey}:{string.Join('.', passes)}");
         }
 
-        /// <summary>
-        /// Index of the assignment '=' in <paramref name="s"/>, ignoring inline comments.
-        /// A #UI line usually labels its control with one, and the label can itself contain
-        /// an '=' - <c>#UI '2&amp;middot;&lt;i&gt;r&lt;/i&gt; ='d = 1</c>. Returns -1 when
-        /// the line makes no assignment.
-        /// </summary>
         private static int IndexOfAssignment(ReadOnlySpan<char> s)
         {
             // Segments are the consumed prefix each time, so their lengths sum to the offset.
@@ -257,10 +194,6 @@ namespace Calcpad.Core
             return -1;
         }
 
-        /// <summary>
-        /// The variable name on the left of the assignment, with the inline comment that
-        /// labels the control removed - it is display text, not part of the name.
-        /// </summary>
         private static string ExtractVariableName(ReadOnlySpan<char> lhs)
         {
             var sb = new StringBuilder();
@@ -279,17 +212,11 @@ namespace Calcpad.Core
             return start;
         }
 
-        /// <summary>
-        /// True when the right hand side is a vector/matrix literal or a vector()/matrix() call.
-        /// </summary>
         private static bool IsDatagridRhs(ReadOnlySpan<char> rhs) =>
             rhs.Length > 1 && rhs[0] == '[' && rhs[^1] == ']' ||
             StartsWithFunction(rhs, "vector") ||
             StartsWithFunction(rhs, "matrix");
 
-        /// <summary>
-        /// Checks if rhs starts with a function name followed by optional whitespace then '('.
-        /// </summary>
         private static bool StartsWithFunction(ReadOnlySpan<char> rhs, ReadOnlySpan<char> funcName)
         {
             if (!rhs.StartsWith(funcName, StringComparison.OrdinalIgnoreCase))
@@ -299,11 +226,6 @@ namespace Calcpad.Core
             return rest.Length > 0 && rest[0] == '(';
         }
 
-        /// <summary>
-        /// Auto-detects rows and columns from a vector/matrix literal.
-        /// '|' separates rows, ';' separates elements within a row, so a vector
-        /// [1; 2; 3] is displayed as a single row of three columns.
-        /// </summary>
         private static void AutoDetectGridSize(ReadOnlySpan<char> rhs, ref int rows, ref int columns)
         {
             var bracketStart = rhs.IndexOf('[');
@@ -320,11 +242,6 @@ namespace Calcpad.Core
                 columns = firstRow.Count(';') + 1;
         }
 
-        /// <summary>
-        /// Auto-detects rows and columns from a vector(n) or matrix(m; n) call written with
-        /// literal counts. Computed ones - matrix(r; c), matrix(len(x); len(y)) - are left
-        /// for <see cref="ResolveDatagridShape"/> to read off the evaluated value.
-        /// </summary>
         private static void AutoDetectGridSizeFromFunction(ReadOnlySpan<char> rhs, ref int rows, ref int columns)
         {
             var parenStart = rhs.IndexOf('(');
@@ -352,12 +269,6 @@ namespace Calcpad.Core
             }
         }
 
-        /// <summary>
-        /// Fills in a grid shape the source did not spell out - matrix(r; c),
-        /// matrix(len(x); len(y)) - from the vector or matrix the line evaluated to, a vector
-        /// being a single row. Runs once the line has been calculated, which is why the
-        /// grid element is the one carrying the shape the widget reads.
-        /// </summary>
         private void ResolveDatagridShape(UiPropertyMetadata ui)
         {
             if (ui.Rows > 0 && ui.Columns > 0)
@@ -371,14 +282,6 @@ namespace Calcpad.Core
                 ui.Columns = columns;
         }
 
-        /// <summary>
-        /// Fills in the grid shape from a vector(n)/matrix(m; n) call whose counts are
-        /// expressions, by evaluating the arguments. An override replaces the whole call, so
-        /// the shape it asks for has to be known before that happens - otherwise the entered
-        /// values keep whatever shape they were saved with and editing the source no longer
-        /// resizes the grid. Leaves the shape alone when an argument cannot be evaluated,
-        /// which puts <see cref="ResolveDatagridShape"/> back in charge of it.
-        /// </summary>
         private void ResolveShapeFromSizingCall(UiPropertyMetadata ui, string expression)
         {
             if (ui.Rows > 0 && ui.Columns > 0 || !_calculate || _isVal < 0)
@@ -428,10 +331,6 @@ namespace Calcpad.Core
             }
         }
 
-        /// <summary>
-        /// Index of the ';' separating the arguments of a call, ignoring the ones belonging to
-        /// a nested call - matrix(max(a; b); n). Returns -1 when there is only one argument.
-        /// </summary>
         private static int IndexOfArgumentSeparator(ReadOnlySpan<char> args)
         {
             var depth = 0;
@@ -448,12 +347,6 @@ namespace Calcpad.Core
             return -1;
         }
 
-        /// <summary>
-        /// The whole number a grid sizing argument evaluates to, or 0 when it does not
-        /// evaluate to one. Runs on the live parser, so it reads the same variables the line
-        /// itself will - including ones a #UI control has overridden. The caller parses the
-        /// real expression straight afterwards, which resets what this leaves behind.
-        /// </summary>
         private int EvaluateCount(ReadOnlySpan<char> expression)
         {
             try
@@ -470,17 +363,6 @@ namespace Calcpad.Core
             }
         }
 
-        /// <summary>
-        /// Rewrites the assignment before MathParser evaluates it: fits a datagrid literal
-        /// to the declared shape, applies any override, then captures the resulting cells
-        /// for the grid widget. Only the override runs in report mode - it is the entered
-        /// value - while the declared shape describes the grid and so applies to the form.
-        ///
-        /// A datagrid override is fitted to the shape the source asks for, so editing the
-        /// source resizes the grid even once values have been entered: cells outside the new
-        /// shape are trimmed off and new ones come in as zeros. What was saved is left alone,
-        /// so shrinking a grid and growing it back brings the trimmed values with it.
-        /// </summary>
         private string PrepareUiExpression(UiPropertyMetadata ui, string expression)
         {
             var isDatagrid = ui.Type == "datagrid";
@@ -506,21 +388,9 @@ namespace Calcpad.Core
             return expression;
         }
 
-        /// <summary>
-        /// Fits the right hand side literal to the rows and columns the JSON block declared,
-        /// keeping the values already written: cells beyond the literal become 0, and cells
-        /// beyond the declared shape are dropped. A right hand side that is not a bracket
-        /// literal - vector(n), matrix(m; n) - is left alone, since it sizes itself.
-        /// </summary>
         private static string ResizeDatagridMatrixToFit(UiPropertyMetadata ui, string expression) =>
             ui.HasDeclaredShape ? ReshapeMatrixLiteral(expression, ui.Rows, ui.Columns) : expression;
 
-        /// <summary>
-        /// Rewrites the bracket literal in <paramref name="s"/> to <paramref name="rows"/> by
-        /// <paramref name="columns"/> cells, keeping the values already written: cells the
-        /// literal does not reach become 0 and cells outside the shape are dropped. Text with
-        /// no literal in it is returned unchanged.
-        /// </summary>
         private static string ReshapeMatrixLiteral(string s, int rows, int columns)
         {
             var bracketStart = s.IndexOf('[');
@@ -547,10 +417,6 @@ namespace Calcpad.Core
             return string.Concat(s.AsSpan(0, bracketStart + 1), sb.ToString(), s.AsSpan(bracketEnd));
         }
 
-        /// <summary>
-        /// Splits the inside of a vector/matrix literal into rows of cells.
-        /// '|' separates rows, ';' separates cells within a row.
-        /// </summary>
         private static List<string[]> SplitMatrixLiteral(string content)
         {
             var rows = new List<string[]>();
@@ -565,10 +431,6 @@ namespace Calcpad.Core
             return rows;
         }
 
-        /// <summary>
-        /// Captures the datagrid cell values so they can be handed to the grid widget.
-        /// Bracket literals are taken as written; vector(n)/matrix(m; n) produce zeros.
-        /// </summary>
         private static void CaptureDatagridValues(UiPropertyMetadata ui, string expression)
         {
             var eqIndex = IndexOfAssignment(expression);
@@ -587,12 +449,6 @@ namespace Calcpad.Core
             ui.DataValues = string.Join("|", Enumerable.Repeat(row, ui.Rows));
         }
 
-        /// <summary>
-        /// The override that applies to a control, if any. Narrowest match wins: this exact
-        /// control, then every pass of this declaration, then every declaration of the name -
-        /// the last being what a hand written override for a variable that appears only once
-        /// looks like.
-        /// </summary>
         private bool TryGetUiOverride(UiPropertyMetadata ui, out string value)
         {
             value = null;
@@ -602,11 +458,6 @@ namespace Calcpad.Core
                 UiOverrides.TryGetValue(ui.VariableName, out value));
         }
 
-        /// <summary>
-        /// Substitutes the override value into the assignment before MathParser sees it.
-        /// Returns null when the assignment has nothing to substitute into, so the caller
-        /// keeps the original text.
-        /// </summary>
         private static string ApplyUiOverride(UiPropertyMetadata ui, string expression, string value)
         {
             var eqIndex = IndexOfAssignment(expression);
@@ -617,16 +468,12 @@ namespace Calcpad.Core
             var rhs = expression[(eqIndex + 1)..].TrimStart();
             if (ui.Type == "datagrid")
             {
-                // A grid sized by vector(n)/matrix(m; n) has no literal to write into, so the
-                // entered one takes the place of the whole call.
                 var bracketEnd = rhs.LastIndexOf(']');
                 return bracketEnd < 0 || rhs.IndexOf('[') < 0 ?
                     $"{lhs} {value}" :
                     $"{lhs} {value}{rhs[(bracketEnd + 1)..]}";
             }
-            // A dropdown or radio picks one of the declared values, which carries its own
-            // unit, so it replaces the whole right hand side. An entry holds the number
-            // alone - the unit stays in the markup beside it - so only the number is swapped.
+
             if (ui.Type is "dropdown" or "radio")
                 return $"{lhs} {value}";
 
@@ -640,9 +487,6 @@ namespace Calcpad.Core
         private static bool IsNumericChar(char c) =>
             c is >= '0' and <= '9' or '.' or '-' or '+' or 'e' or 'E';
 
-        /// <summary>
-        /// Returns the data-ui-* attributes for the element wrapping the whole line.
-        /// </summary>
         private string GetUiAttributes(UiPropertyMetadata ui)
         {
             var sb = new StringBuilder()
@@ -657,10 +501,6 @@ namespace Calcpad.Core
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Merges the "reportStyle" class into the attribute string produced by HtmlId,
-        /// which already carries a class in Debug mode.
-        /// </summary>
         private string AddReportStyle(UiPropertyMetadata ui, string attributes)
         {
             var style = ui.ReportStyle;
@@ -674,12 +514,6 @@ namespace Calcpad.Core
                 attributes.Insert(i + classAttr.Length, HttpUtility.HtmlAttributeEncode(style) + " ");
         }
 
-        /// <summary>
-        /// Replaces the result part of the rendered equation with the matching input control.
-        /// An entry keeps the "name = " prefix and the unit around it, since it shows the
-        /// number itself; the other controls stand alone, so the whole equation gives way to
-        /// them and any label is the text the author writes beside the directive.
-        /// </summary>
         private string InjectUiInput(UiPropertyMetadata ui, string equationHtml) =>
             ui.Type switch
             {
@@ -699,11 +533,6 @@ namespace Calcpad.Core
             return equationHtml[..resultStart] + build(value, unitHtml) + unitHtml;
         }
 
-        /// <summary>
-        /// Renders the control in place of the whole equation. The value and unit are still
-        /// read off it, since a dropdown or radio needs them to tell which of its values is
-        /// the current one.
-        /// </summary>
         private static string ReplaceEquation(string equationHtml, Func<string, string, string> build)
         {
             var resultStart = ResultStart(equationHtml);
@@ -714,7 +543,6 @@ namespace Calcpad.Core
             return build(value, unitHtml);
         }
 
-        /// <summary>Index just past the last " = " of the rendered equation, or -1.</summary>
         private static int ResultStart(string equationHtml)
         {
             const string assignOp = " = ";
@@ -722,10 +550,6 @@ namespace Calcpad.Core
             return lastAssign < 0 ? -1 : lastAssign + assignOp.Length;
         }
 
-        /// <summary>
-        /// The rendered result as a declared value looks - number and unit, no markup and
-        /// no spaces - so it can be matched against the "values" the JSON block listed.
-        /// </summary>
         private static string SelectedValue(string value, string unitHtml)
         {
             var sb = new StringBuilder(StripSpaces(value));
@@ -749,11 +573,6 @@ namespace Calcpad.Core
                 baseClass :
                 $"{baseClass} {ui.Style}");
 
-        /// <summary>
-        /// The control identity plus the source line it came from, so a host can write an
-        /// edited value back into the document. The line matches the "data-source-line" the
-        /// wrapping tag carries, i.e. 1 based and mapped back through macro expansion.
-        /// </summary>
         private string UiBinding(UiPropertyMetadata ui) =>
             $" data-ui-var=\"{HttpUtility.HtmlAttributeEncode(ui.Key)}\" data-ui-line=\"{_parser.Line}\"";
 
@@ -794,10 +613,6 @@ namespace Calcpad.Core
             return $"<input type=\"checkbox\" class=\"{UiClass(ui, "calcpad-ui-checkbox")}\"{UiBinding(ui)}{isChecked}>";
         }
 
-        /// <summary>
-        /// Returns the grid container. Emitted after the closing tag of the line so it is a
-        /// block level sibling rather than nested inside inline elements.
-        /// </summary>
         private string BuildUiDatagrid(UiPropertyMetadata ui)
         {
             var sb = new StringBuilder()
@@ -812,13 +627,6 @@ namespace Calcpad.Core
             return sb.Append("></div>").ToString();
         }
 
-        /// <summary>
-        /// Splits a result fragment like "5 &lt;i&gt;ft&lt;/i&gt;" into value and unit markup,
-        /// so the unit stays outside the input control. The value is plain text, so the
-        /// markup begins where the unit does - splitting on the first tag rather than on
-        /// the first &lt;i&gt; keeps a compound unit, which wraps its parts in a span,
-        /// whole instead of cutting into it.
-        /// </summary>
         private static void SplitValueAndUnit(string resultHtml, out string value, out string unitHtml)
         {
             var unitStart = resultHtml.IndexOf('<');

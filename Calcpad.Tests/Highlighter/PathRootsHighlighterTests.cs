@@ -4,7 +4,7 @@ using Calcpad.Highlighter.ContentResolution;
 using Calcpad.Highlighter.Tokenizer;
 using Calcpad.Highlighter.Tokenizer.Models;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     public class PathRootsHighlighterTests
     {
@@ -18,7 +18,7 @@ namespace Calcpad.Tests.HighlighterTests
         public void Declaration_TokenizesValueAsSingleToken()
         {
             var result = new CalcpadTokenizer().Tokenize("#ProjectPath C:/Jobs/1042");
-            var pathRootTokens = result.Tokens.Where(t => t.Type == TokenType.PathRoot).ToList();
+            var pathRootTokens = result.Tokens.Where(t => t.Type == TokenType.FilePath).ToList();
             var token = Assert.Single(pathRootTokens);
             Assert.Equal("C:/Jobs/1042", token.Text);
         }

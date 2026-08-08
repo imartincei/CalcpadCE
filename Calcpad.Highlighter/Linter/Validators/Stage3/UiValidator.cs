@@ -74,7 +74,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             {
                 if (name.EndsWith('$'))
                 {
-                    reporter.Warn(Messages.String_mode_is_not_supported_by_the_UI_keyword);
+                    reporter.Warn(Messages.Only_numbers_are_supported_by_the_UI_keyword);
                     return;
                 }
                 if (!UiSyntax.IsValue(rhs))

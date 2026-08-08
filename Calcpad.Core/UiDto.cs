@@ -48,7 +48,7 @@ namespace Calcpad.Core
                     Messages.The_UI_type_0_is_not_recognized_expected_one_of_1, Type, string.Join(", ", KnownTypes))));
 
             if (Mode is not null && !Mode.Equals("number", StringComparison.OrdinalIgnoreCase))
-                errors.Add(new(UiKey.Mode, Messages.String_mode_is_not_supported_by_the_UI_keyword));
+                errors.Add(new(UiKey.Mode, Messages.Only_numbers_are_supported_by_the_UI_keyword));
 
             CheckNotNegative(errors, UiKey.Rows, "rows", Rows);
             CheckNotNegative(errors, UiKey.Columns, "columns", Columns);

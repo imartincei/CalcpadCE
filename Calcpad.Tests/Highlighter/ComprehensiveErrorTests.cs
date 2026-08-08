@@ -1,7 +1,7 @@
 using System.IO;
 using System.Linq;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     public class ComprehensiveErrorTests : IClassFixture<HighlighterLinterFixture>
     {

@@ -2,7 +2,7 @@ using System.IO;
 using System.Linq;
 using Calcpad.Highlighter.Linter.Models;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     /// <summary>
     /// Directives used to be skipped wholesale by the usage checks, which was fine when none

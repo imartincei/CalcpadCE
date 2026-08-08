@@ -1681,11 +1681,11 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to String mode is not supported by the #UI keyword..
+        // /   Looks up a localized string similar to Only numbers are supported by the #UI keyword..
         // / </summary>
-        public static string String_mode_is_not_supported_by_the_UI_keyword {
+        public static string Only_numbers_are_supported_by_the_UI_keyword {
             get {
-                return ResourceManager.GetString("String_mode_is_not_supported_by_the_UI_keyword", resourceCulture);
+                return ResourceManager.GetString("Only_numbers_are_supported_by_the_UI_keyword", resourceCulture);
             }
         }
 

@@ -2,7 +2,7 @@ using System.IO;
 using System.Linq;
 using Calcpad.Highlighter.Linter.Models;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     /// <summary>
     /// Columns reported on a macro-expanded line index into the substituted macro body, which

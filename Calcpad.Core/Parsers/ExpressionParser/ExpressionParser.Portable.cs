@@ -6,25 +6,6 @@ namespace Calcpad.Core
 {
     public partial class ExpressionParser
     {
-        /// <summary>
-        /// Rewrites a <c>#read</c> directive as the code that assigns the data it imports, so
-        /// a worksheet can be bundled with nothing beside it. The value keeps the structure
-        /// the directive asked for — a symmetric read stays symmetric — but never a high
-        /// performance one: <c>type=S_hp</c> yields a plain symmetric matrix.
-        /// </summary>
-        /// <param name="line">The directive, from <c>#read</c> onwards.</param>
-        /// <param name="sourceFilePath">
-        /// The worksheet holding the directive. A relative data path resolves against its
-        /// folder, exactly as it does when the directive runs.
-        /// </param>
-        /// <param name="pathRoots">
-        /// The <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> roots declared so far in the
-        /// document, or <c>null</c> to leave a token in the path unresolved.
-        /// </param>
-        /// <returns>
-        /// The assignment, or <c>null</c> when the directive names no variable or the file
-        /// holds no data — both assign nothing when the directive runs.
-        /// </returns>
         public static string InlineReadDirective(ReadOnlySpan<char> line, string sourceFilePath, PathRoots pathRoots = null)
         {
             var sourceDir = string.IsNullOrEmpty(sourceFilePath)
@@ -38,18 +19,6 @@ namespace Calcpad.Core
             return literal is null ? null : $"{options.Name} = {literal}";
         }
 
-        /// <summary>
-        /// Locates the <c>Path.Ext</c> token of a <c>#read</c>, <c>#write</c> or <c>#append</c>
-        /// directive within <paramref name="line"/>, which must start at the <c>#</c>. The span is
-        /// the one the directive itself reads: from just after the <c>from</c>/<c>to</c> connector
-        /// to the end of the extension, which the last <c>.</c> of the line opens and a <c>@</c>,
-        /// <c>!</c>, <c>:</c> or space closes. A sheet, a range, <c>type=</c> and <c>sep=</c> all
-        /// fall outside it, so replacing the span rewrites the file and nothing else.
-        /// </summary>
-        /// <returns>
-        /// False when the line is not one of those directives, or names a file the directive could
-        /// not read either — no connector, or no extension to resolve.
-        /// </returns>
         public static bool TryGetDataPath(ReadOnlySpan<char> line, out int start, out int length)
         {
             start = 0;
@@ -95,13 +64,6 @@ namespace Calcpad.Core
             return length > 0;
         }
 
-        /// <summary>
-        /// The literal that recreates <paramref name="data"/> the way <paramref name="type"/>
-        /// asks for, mirroring <see cref="MathParser"/>'s <c>SetMatrix</c>/<c>SetVector</c>.
-        /// Structured types are built by copying a rectangle into an empty matrix of that
-        /// type, which drops the cells falling outside the structure just as the assignment
-        /// does.
-        /// </summary>
         private static string DataLiteral(string[][] data, char type)
         {
             var rows = data?.Length ?? 0;
@@ -179,10 +141,6 @@ namespace Calcpad.Core
             return [.. cells];
         }
 
-        /// <summary>
-        /// The values a column or diagonal read takes: a single row is read along, anything
-        /// else down its first column.
-        /// </summary>
         private static string[] Axis(string[][] data)
         {
             if (data.Length == 1)
@@ -195,11 +153,6 @@ namespace Calcpad.Core
             return values;
         }
 
-        /// <summary>
-        /// Shifts row <c>i</c> right by <c>i</c> columns. Upper triangular and symmetric
-        /// reads take each row as starting on the diagonal, so the cells have to be moved
-        /// there before they can be written as a rectangle.
-        /// </summary>
         private static string[][] Skyline(string[][] data)
         {
             var n = data.Length;
