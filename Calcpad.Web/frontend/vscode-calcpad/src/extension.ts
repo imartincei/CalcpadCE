@@ -750,14 +750,17 @@ function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true):
                 // code view's line-num anchors, falling back to the nearest
                 // preceding source line so blank/continuation lines still resolve.
                 var focusTimer = null;
-                function focusPreviewLine(line) {
+                // "exact" comes from a TOC click: skip the nearest-preceding-line fallback so a
+                // heading hidden by #pre/#post (no element for it at all) does nothing instead of
+                // landing on an unrelated line.
+                function focusPreviewLine(line, exact) {
                     if (typeof line !== 'number' || isNaN(line)) return;
                     var target = document.querySelector('[data-source-line="' + line + '"]');
                     if (!target) {
                         var anchor = document.querySelector('a.line-num[data-text="' + line + '"]');
                         if (anchor) target = anchor.closest('.line-text') || anchor;
                     }
-                    if (!target) {
+                    if (!target && !exact) {
                         var best = null, bestSrc = -1;
                         document.querySelectorAll('[data-source-line]').forEach(function(el) {
                             var s = parseInt(el.getAttribute('data-source-line'), 10);
@@ -774,7 +777,7 @@ function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true):
                 }
                 window.addEventListener('message', function(e) {
                     var d = e.data;
-                    if (d && d.type === 'scrollToSourceLine') focusPreviewLine(d.line);
+                    if (d && d.type === 'scrollToSourceLine') focusPreviewLine(d.line, d.exact);
                 });
             });
         </script>
@@ -900,11 +903,10 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             // neither does the report while it's shown behind that form.
             hideErrorLines: forPrint && uiPanel !== undefined ? true : undefined
         });
-        // Routed through the shared client's queue (rather than a bare fetch) so this
-        // parser-touching request can't run concurrently with lint/highlight/definitions —
-        // see the invariant documented on CalcpadApiClient.requestQueue. A newer preview
-        // request for the same document aborts this one; that's not a real failure, so it
-        // resolves to null instead of throwing (a genuine fetch error still throws).
+        // Routed through the shared client (rather than a bare fetch) so a newer preview
+        // request for the same document aborts this one via the `key` below — that's not
+        // a real failure, so it resolves to null instead of throwing (a genuine fetch
+        // error still throws).
         const runRequest = async (signal: AbortSignal): Promise<Response | null> => {
             try {
                 return await fetch(`${apiBaseUrl}${endpoint}`, {
@@ -919,7 +921,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             }
         };
         const response = sharedApiClient
-            ? await sharedApiClient.runSerialized(runRequest, { key: `preview:${docKey}` })
+            ? await sharedApiClient.runWithSupersession(runRequest, { key: `preview:${docKey}` })
             : await runRequest(new AbortController().signal);
         if (!response) {
             // Superseded by a newer preview request for this document — that
@@ -1042,10 +1044,8 @@ async function renderForExport(
     const render = variantRender(variant);
     const endpoint = render.unwrap ? '/api/calcpad/convert?unwrap=true' : '/api/calcpad/convert';
 
-    // Routed through the shared client's queue (rather than a bare fetch) so this
-    // parser-touching request can't run concurrently with lint/highlight/definitions —
-    // see the invariant documented on CalcpadApiClient.requestQueue. Unkeyed: an
-    // export is an explicit one-off action, never superseded by a later one.
+    // Routed through the shared client (rather than a bare fetch) for a consistent request
+    // path. Unkeyed: an export is an explicit one-off action, never superseded by a later one.
     const runRequest = (signal: AbortSignal) => fetch(`${apiBaseUrl}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1061,7 +1061,7 @@ async function renderForExport(
         signal: combineSignals(AbortSignal.timeout(30000), signal),
     });
     const response = sharedApiClient
-        ? await sharedApiClient.runSerialized(runRequest)
+        ? await sharedApiClient.runWithSupersession(runRequest)
         : await runRequest(new AbortController().signal);
     if (!response || !response.ok) {
         throw new Error(`Server returned ${response?.status ?? 'no response'}`);
@@ -1255,9 +1255,6 @@ async function saveDocx(variant: ExportVariant = 'report') {
         }, async () => {
             const settings = await settingsManager.getApiSettings();
 
-            // Goes through the shared client (instead of a bare fetch) so it joins the
-            // same queue as lint/highlight/definitions/convert — see the invariant
-            // documented on CalcpadApiClient.requestQueue.
             const buf = await sharedApiClient?.convertDocx(source.text, settings, source.uri.fsPath, {
                 forPrint: render.forPrint,
                 uiOverrides: render.useOverrides ? uiOverrides.toRecord(source.uri.toString()) : undefined,
@@ -1411,8 +1408,12 @@ function navigateEditorToLine(sourceEditor: vscode.TextEditor, line: number) {
 // same source line works for the preview, unwrapped, input-form and report panels.
 // The input form is included so sidebar (TOC) navigation lands there too -- it drops
 // the hover arrows but keeps the sync listener.
-function postPreviewSourceLine(line: number) {
-    const msg = { type: 'scrollToSourceLine', line };
+// `exact` disables the nearest-preceding-line fallback in the preview's focusPreviewLine:
+// a TOC heading that fell inside a hidden #pre/#post block has no element to land on, and
+// the fallback would jump to an unrelated line, so TOC navigation should do nothing rather
+// than land somewhere odd.
+function postPreviewSourceLine(line: number, exact: boolean = false) {
+    const msg = { type: 'scrollToSourceLine', line, exact };
     wrappedPanel?.webview.postMessage(msg);
     unwrappedPanel?.webview.postMessage(msg);
     uiPanel?.webview.postMessage(msg);
@@ -2055,7 +2056,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // where a named line only syncs whatever results are already up.
     const focusPreviewToLineCommand = vscode.commands.registerCommand('vscode-calcpad.focusPreviewToLine', async (targetLine?: number) => {
         if (typeof targetLine === 'number') {
-            postPreviewSourceLine(targetLine);
+            postPreviewSourceLine(targetLine, true);
             return;
         }
         const editor = vscode.window.activeTextEditor;

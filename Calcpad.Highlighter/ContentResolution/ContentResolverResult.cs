@@ -294,6 +294,13 @@ namespace Calcpad.Highlighter.ContentResolution
         /// Key: macro name (case-insensitive), Value: MacroInfo with param counts.
         /// </summary>
         public Dictionary<string, MacroInfo> UserDefinedMacros { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// SHA256 hex digest of each `#include`d file's content, keyed by its resolved absolute
+        /// path, as read from disk during this resolution. Lets a caller detect a changed include
+        /// by re-hashing just these files, without rerunning include resolution/macro expansion.
+        /// </summary>
+        public Dictionary<string, string> IncludedFileHashes { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
     }
 
     public class Stage3Result

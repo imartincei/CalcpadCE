@@ -495,7 +495,7 @@ async function bootstrap(): Promise<void> {
      */
     activeBridge.onGoToLine = (line: number) => {
         if (!appInstance.isPreviewVisible() || appInstance.getResultMode() !== 'ui') return false;
-        appInstance.scrollPreviewToSourceLine(activeGroup.id, line);
+        appInstance.scrollPreviewToSourceLine(activeGroup.id, line, true);
         activeGroup.editor.revealLineInCenter(line);
         activeGroup.editor.setPosition({ lineNumber: line, column: 1 });
         return true;

@@ -30,21 +30,11 @@ export class CalcpadApiClient {
     private baseUrl: string;
     private logger?: ILogger;
 
-    // Serializes every parser-touching request. Calcpad.Core parses through a
-    // process-global `MacroParser.Macros` dictionary that is cleared and
-    // repopulated per request, so two in-flight requests corrupt each other's
-    // macro state (and can crash the server). Chaining requests through this
-    // promise guarantees at most one runs at a time — this matters now that the
-    // desktop app can drive two editor groups (two previews + two linters).
-    private requestQueue: Promise<unknown> = Promise.resolve();
-
-    // Per-key "latest wins" bookkeeping, layered on top of the queue above. A
-    // caller passes `key` (e.g. an editor group id) to mean "only the newest
-    // request for this key still matters" — an older request sharing the same
-    // key is dropped before it ever runs (if still queued) or aborted (if
-    // already in flight), instead of piling up and running to completion long
-    // after it stopped mattering. Requests with no key keep today's plain FIFO
-    // behavior.
+    // Per-key "latest wins" bookkeeping. A caller passes `key` (e.g. an editor
+    // group id) to mean "only the newest request for this key still matters"
+    // — an older request sharing the same key is aborted once a newer one for
+    // that key starts, instead of running to completion long after it stopped
+    // mattering. Requests with no key run independently with no supersession.
     private keySeq = new Map<string, number>();
     private keyAbort = new Map<string, AbortController>();
 
@@ -62,24 +52,14 @@ export class CalcpadApiClient {
     }
 
     /**
-     * Run `task` only after every previously-queued request has settled, so
-     * parser requests never overlap. A task's failure never breaks the chain.
+     * Runs `task` immediately. If `key` is given, a later call sharing that
+     * key aborts this one's signal instead of letting it run to completion
+     * after it stops mattering. A superseded call resolves to `null` — the
+     * same outcome callers already handle for a failed or non-OK response, so
+     * no caller needs to special-case it.
      */
-    private serialize<T>(task: () => Promise<T>): Promise<T> {
-        const run = this.requestQueue.then(task, task);
-        this.requestQueue = run.then(() => undefined, () => undefined);
-        return run;
-    }
-
-    /**
-     * Like {@link serialize}, but a later call sharing `key` supersedes this
-     * one: still-queued work is skipped without ever reaching the network,
-     * already in-flight work has its `signal` aborted. A superseded call
-     * resolves to `null` — the same outcome callers already handle for a
-     * failed or non-OK response, so no caller needs to special-case it.
-     */
-    private serializeKeyed<T>(key: string | undefined, task: (signal: AbortSignal) => Promise<T>): Promise<T | null> {
-        if (!key) return this.serialize(() => task(new AbortController().signal));
+    private withSupersession<T>(key: string | undefined, task: (signal: AbortSignal) => Promise<T>): Promise<T | null> {
+        if (!key) return task(new AbortController().signal);
 
         const mySeq = (this.keySeq.get(key) ?? 0) + 1;
         this.keySeq.set(key, mySeq);
@@ -87,14 +67,13 @@ export class CalcpadApiClient {
         const controller = new AbortController();
         this.keyAbort.set(key, controller);
 
-        return this.serialize(async (): Promise<T | null> => {
-            if (this.keySeq.get(key) !== mySeq) return null;
+        return (async (): Promise<T | null> => {
             try {
                 return await task(controller.signal);
             } finally {
                 if (this.keyAbort.get(key) === controller) this.keyAbort.delete(key);
             }
-        });
+        })();
     }
 
     public async lint(content: string, sourceFilePath?: string, opts?: { key?: string }): Promise<LintResponse | null> {
@@ -161,7 +140,7 @@ export class CalcpadApiClient {
         content: string,
         sourceFilePath?: string,
     ): Promise<PortableBundleResult> {
-        return this.serialize(async () => {
+        return (async () => {
             try {
                 const response = await fetch(`${this.baseUrl}/api/calcpad/portable/bundle`, {
                     method: 'POST',
@@ -183,7 +162,7 @@ export class CalcpadApiClient {
                 this.logError('BundlePortable', error);
                 return { errors: [error instanceof Error ? error.message : String(error)] };
             }
-        });
+        })();
     }
 
     /**
@@ -196,7 +175,7 @@ export class CalcpadApiClient {
         content: string,
         sourceFilePath?: string,
     ): Promise<PortablePackageResult> {
-        return this.serialize(async () => {
+        return (async () => {
             try {
                 const response = await fetch(`${this.baseUrl}/api/calcpad/portable/package`, {
                     method: 'POST',
@@ -225,7 +204,7 @@ export class CalcpadApiClient {
                 this.logError('PackagePortable', error);
                 return { bundled: [], errors: [error instanceof Error ? error.message : String(error)] };
             }
-        });
+        })();
     }
 
     public async snippets(): Promise<SnippetsResponse | null> {
@@ -261,7 +240,7 @@ export class CalcpadApiClient {
         includeLineAnchors?: boolean,
         opts?: { key?: string },
     ): Promise<ArrayBuffer | ConvertResult | null> {
-        return this.serializeKeyed(opts?.key, async (signal) => {
+        return this.withSupersession(opts?.key, async (signal) => {
             const url = this.baseUrl + '/api/calcpad/convert';
             try {
                 const response = await fetch(url, {
@@ -304,7 +283,7 @@ export class CalcpadApiClient {
         sourceFilePath?: string,
         opts?: { forPrint?: boolean; uiOverrides?: Record<string, string> },
     ): Promise<ArrayBuffer | null> {
-        return this.serialize(async () => {
+        return (async () => {
             const url = this.baseUrl + '/api/calcpad/docx';
             try {
                 const response = await fetch(url, {
@@ -325,7 +304,7 @@ export class CalcpadApiClient {
                 this.logError('ConvertDocx', error);
                 return null;
             }
-        });
+        })();
     }
 
     /**
@@ -339,7 +318,7 @@ export class CalcpadApiClient {
         theme?: 'light' | 'dark',
         opts?: { key?: string },
     ): Promise<ConvertResult | null> {
-        return this.serializeKeyed(opts?.key, async (signal) => {
+        return this.withSupersession(opts?.key, async (signal) => {
             const url = this.baseUrl + '/api/calcpad/convert?unwrap=true';
             try {
                 const response = await fetch(url, {
@@ -359,17 +338,16 @@ export class CalcpadApiClient {
     }
 
     /**
-     * Runs an arbitrary request through the same global queue and per-key
-     * supersession as the built-in methods above, for a caller whose request
-     * body isn't shaped like any of them (e.g. an endpoint-specific extra
-     * field none of the typed methods carry). `task` gets an `AbortSignal`
-     * that fires when it's superseded — pass it as the `fetch` call's
-     * `signal` (combined with any timeout signal of the caller's own) so a
-     * superseded request actually aborts instead of running to completion
-     * unseen.
+     * Runs an arbitrary request with the same per-key supersession as the
+     * built-in methods above, for a caller whose request body isn't shaped
+     * like any of them (e.g. an endpoint-specific extra field none of the
+     * typed methods carry). `task` gets an `AbortSignal` that fires when it's
+     * superseded — pass it as the `fetch` call's `signal` (combined with any
+     * timeout signal of the caller's own) so a superseded request actually
+     * aborts instead of running to completion unseen.
      */
-    public runSerialized<T>(task: (signal: AbortSignal) => Promise<T>, opts?: { key?: string }): Promise<T | null> {
-        return this.serializeKeyed(opts?.key, task);
+    public runWithSupersession<T>(task: (signal: AbortSignal) => Promise<T>, opts?: { key?: string }): Promise<T | null> {
+        return this.withSupersession(opts?.key, task);
     }
 
     public async checkHealth(): Promise<boolean> {
@@ -384,9 +362,7 @@ export class CalcpadApiClient {
     }
 
     private post<T>(endpoint: string, body: unknown, tag: string, key?: string): Promise<T | null> {
-        // Serialized: every POST endpoint runs the Calcpad.Core parser, whose
-        // static macro state cannot be shared by concurrent requests.
-        return this.serializeKeyed(key, async (signal) => {
+        return this.withSupersession(key, async (signal) => {
             const url = this.baseUrl + endpoint;
             try {
                 this.logger?.appendLine(`[${tag}] Sending request to server...`);

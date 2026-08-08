@@ -20,12 +20,14 @@ namespace Calcpad.Server.Controllers
     {
         private readonly CalcpadService _calcpadService;
         private readonly PdfGeneratorService _pdfService;
+        private readonly ContentResolutionCache _contentResolutionCache;
         private static readonly LintIgnoreRegionParser _lintIgnoreRegionParser = new();
 
-        public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService)
+        public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService, ContentResolutionCache contentResolutionCache)
         {
             _calcpadService = calcpadService;
             _pdfService = pdfService;
+            _contentResolutionCache = contentResolutionCache;
         }
 
         [HttpPost("convert")]
@@ -363,8 +365,7 @@ namespace Calcpad.Server.Controllers
                 // referenced files from disk via SourceFilePath when no in-memory cache is supplied).
                 if (!string.IsNullOrEmpty(request.SourceFilePath))
                 {
-                    var resolver = new ContentResolver();
-                    var staged = resolver.GetStagedContent(request.Content, sourceFilePath: request.SourceFilePath);
+                    var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
                     tokenizer.SetMacroCommentParameters(
                         staged.Stage2.MacroCommentParameters,
                         staged.Stage2.MacroParameterOrder,
@@ -422,10 +423,9 @@ namespace Calcpad.Server.Controllers
 
                 FileLogger.LogInfo("Lint request received", "Length: " + request.Content.Length);
 
-                var resolver = new ContentResolver();
                 var linter = new CalcpadLinter();
 
-                var staged = resolver.GetStagedContent(request.Content, sourceFilePath: request.SourceFilePath);
+                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
 
                 // Extract LintIgnore regions from raw source, then lint with suppression
                 var ignoreRegions = _lintIgnoreRegionParser.ExtractRegions(request.Content);
@@ -478,8 +478,7 @@ namespace Calcpad.Server.Controllers
 
                 FileLogger.LogInfo("Definitions request received", "Length: " + request.Content.Length);
 
-                var resolver = new ContentResolver();
-                var staged = resolver.GetStagedContent(request.Content, sourceFilePath: request.SourceFilePath);
+                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
 
                 var typeTracker = staged.Stage3.TypeTracker;
 
@@ -581,8 +580,7 @@ namespace Calcpad.Server.Controllers
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var resolver = new ContentResolver();
-                var staged = resolver.GetStagedContent(request.Content, sourceFilePath: request.SourceFilePath);
+                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
                 var hit = SymbolResolver.ResolveSymbolAt(staged.Stage3, request.Line, request.Column);
                 if (hit == null) return Ok(null);
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using Calcpad.Core;
 using Calcpad.Highlighter.Linter.Helpers;
@@ -28,6 +29,7 @@ namespace Calcpad.Highlighter.ContentResolution
             var sourceMap = new Dictionary<int, int>();  // expanded line -> stage1 line
             var includeMap = new Dictionary<int, SourceInfo>();
             var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var includedFileHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var rootDir = !string.IsNullOrEmpty(sourceFilePath)
                 ? Path.GetDirectoryName(sourceFilePath) : null;
             // Shared across the root and every included file, exactly like MacroParser's own
@@ -54,7 +56,7 @@ namespace Calcpad.Highlighter.ContentResolution
                     var rawFileName = ExtractIncludeFilename(trimmedSpan);
                     pathRoots.TryExpand(rawFileName, out rawFileName, out _);
                     ExpandInclude(rawFileName, i, includeFiles, clientFileCache,
-                        expandedLines, sourceMap, includeMap, visited, 0, rootDir, pathRoots);
+                        expandedLines, sourceMap, includeMap, visited, includedFileHashes, 0, rootDir, pathRoots);
                     continue;
                 }
 
@@ -101,7 +103,8 @@ namespace Calcpad.Highlighter.ContentResolution
                 MacroParameterOrder = macroParamOrder,
                 MacroBodies = macroBodies,
                 UserDefinedMacros = tokenizerResult.UserDefinedMacros,
-                PathRoots = pathRoots
+                PathRoots = pathRoots,
+                IncludedFileHashes = includedFileHashes
             };
         }
 
@@ -343,6 +346,7 @@ namespace Calcpad.Highlighter.ContentResolution
             Dictionary<int, int> sourceMap,
             Dictionary<int, SourceInfo> includeMap,
             HashSet<string> visited,
+            Dictionary<string, string> includedFileHashes,
             int depth,
             string sourceDir = null,
             PathRoots pathRoots = null)
@@ -356,7 +360,7 @@ namespace Calcpad.Highlighter.ContentResolution
                 return;
             }
 
-            var (fileContent, resolvedPath) = ResolveFileContent(rawFileName, sourceDir, includeFiles, clientFileCache);
+            var (fileContent, resolvedPath, fromFilesystem) = ResolveFileContent(rawFileName, sourceDir, includeFiles, clientFileCache);
             if (fileContent == null)
             {
                 expandedLines.Add("' Error: Include file not provided: " + rawFileName);
@@ -364,6 +368,9 @@ namespace Calcpad.Highlighter.ContentResolution
                 includeMap[expandedLines.Count - 1] = new SourceInfo { Source = "include", SourceFile = rawFileName };
                 return;
             }
+
+            if (fromFilesystem)
+                includedFileHashes[resolvedPath] = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(fileContent)));
 
             // Process included content through Stage1 (line continuations)
             var includedLines = new List<string>();
@@ -407,7 +414,7 @@ namespace Calcpad.Highlighter.ContentResolution
                     var nestedFileName = ExtractIncludeFilename(trimmedSpan);
                     pathRoots.TryExpand(nestedFileName, out nestedFileName, out _);
                     ExpandInclude(nestedFileName, stage1Line, includeFiles, clientFileCache,
-                        expandedLines, sourceMap, includeMap, visited, depth + 1, nestedSourceDir, pathRoots);
+                        expandedLines, sourceMap, includeMap, visited, includedFileHashes, depth + 1, nestedSourceDir, pathRoots);
                     continue;
                 }
 
@@ -429,9 +436,12 @@ namespace Calcpad.Highlighter.ContentResolution
         /// 1. Try filesystem (Path.GetFullPath + File.Exists)
         /// 2. Try includeFiles dictionary (plain text, client-provided)
         /// 3. Try clientFileCache dictionary (raw bytes, pre-fetched by Web layer)
-        /// Returns the content and the resolved full path (for tracking source directory in nested includes).
+        /// Returns the content, the resolved full path (for tracking source directory in nested
+        /// includes), and whether it came from the filesystem (branch 1) as opposed to
+        /// client-provided content — only a filesystem hit has independent on-disk state worth
+        /// hashing for cache invalidation.
         /// </summary>
-        private static (string content, string resolvedPath) ResolveFileContent(string rawFileName, string sourceDir,
+        private static (string content, string resolvedPath, bool fromFilesystem) ResolveFileContent(string rawFileName, string sourceDir,
             Dictionary<string, string> includeFiles, Dictionary<string, byte[]> clientFileCache)
         {
             string resolvedPath = null;
@@ -444,23 +454,23 @@ namespace Calcpad.Highlighter.ContentResolution
                     ? Path.GetFullPath(expandedPath, sourceDir)
                     : Path.GetFullPath(expandedPath);
                 if (File.Exists(resolvedPath))
-                    return (File.ReadAllText(resolvedPath), resolvedPath);
+                    return (File.ReadAllText(resolvedPath), resolvedPath, true);
             }
             catch { /* Not a valid filesystem path (URLs, API syntax, etc.) */ }
 
             // 2. Try includeFiles — resolved path first, then raw filename
             if (resolvedPath != null && includeFiles.TryGetValue(resolvedPath, out var content))
-                return (content, resolvedPath);
+                return (content, resolvedPath, false);
             if (includeFiles.TryGetValue(rawFileName, out content))
-                return (content, null);
+                return (content, null, false);
 
             // 3. Try clientFileCache — resolved path first, then raw filename
             if (resolvedPath != null && clientFileCache.TryGetValue(resolvedPath, out var contentBytes))
-                return (Encoding.UTF8.GetString(contentBytes), resolvedPath);
+                return (Encoding.UTF8.GetString(contentBytes), resolvedPath, false);
             if (clientFileCache.TryGetValue(rawFileName, out contentBytes))
-                return (Encoding.UTF8.GetString(contentBytes), null);
+                return (Encoding.UTF8.GetString(contentBytes), null, false);
 
-            return (null, null);
+            return (null, null, false);
         }
 
         private static List<string> ParseParameters(string paramsStr)

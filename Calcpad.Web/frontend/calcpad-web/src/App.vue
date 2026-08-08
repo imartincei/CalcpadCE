@@ -1,5 +1,5 @@
 <template>
-  <div class="app-layout">
+  <div class="app-layout" :class="{ resizing: isAnyDividerDragging }">
     <!-- Use v-show (not v-if) so #vue-sidebar stays in the DOM and the
          Vue app mounted to it in main.ts isn't orphaned across collapses. -->
     <div
@@ -295,10 +295,22 @@
       </div>
     </div>
 
+    <!-- Draggable divider between the editor and the results pane. Hidden in UI mode,
+         where the editor side collapses to just the tab strip and isn't resizable. -->
+    <div
+      v-if="previewVisible && !uiModeFullscreen"
+      class="pane-divider"
+      :class="{ dragging: draggingPreviewDivider }"
+      @mousedown="onPreviewDividerMouseDown"
+      title="Drag to resize"
+      role="separator"
+      aria-orientation="vertical"
+    ></div>
+
     <!-- Holds the input form and the report beside it, so UI mode can lay them out as a
          row underneath the tab strip. Dissolved by `display: contents` otherwise. -->
     <div class="preview-area">
-    <div v-if="previewVisible" class="preview-pane" :class="{ fullscreen: uiModeFullscreen }">
+    <div v-if="previewVisible" class="preview-pane" :class="{ fullscreen: uiModeFullscreen }" :style="previewPaneStyle()">
       <div class="preview-toolbar" @contextmenu.prevent>
         <span>Results</span>
         <div class="preview-mode-group">
@@ -408,10 +420,21 @@
       </div>
     </div>
 
+    <!-- Draggable divider between the input form and its report companion. -->
+    <div
+      v-if="uiModeFullscreen && uiPrintVisible"
+      class="pane-divider"
+      :class="{ dragging: draggingUiPrintDivider }"
+      @mousedown="onUiPrintDividerMouseDown"
+      title="Drag to resize"
+      role="separator"
+      aria-orientation="vertical"
+    ></div>
+
     <!-- Report companion to the input form: the print layout of the document
          with the entered values applied, so the effect of each entry is visible
          while filling it in. Toggled from the input toolbar. -->
-    <div v-if="uiModeFullscreen && uiPrintVisible" class="preview-pane ui-print-pane">
+    <div v-if="uiModeFullscreen && uiPrintVisible" class="preview-pane ui-print-pane" :style="uiPrintPaneStyle()">
       <div class="preview-toolbar" @contextmenu.prevent>
         <span>Report</span>
         <span class="spacer"></span>
@@ -710,6 +733,86 @@ function onEditorDividerMouseDown(e: MouseEvent): void {
     draggingEditorDivider.value = false
     window.removeEventListener('mousemove', onMove)
     window.removeEventListener('mouseup', onUp)
+  }
+  window.addEventListener('mousemove', onMove)
+  window.addEventListener('mouseup', onUp)
+}
+
+// ---- Pane split ratios (editor ↔ results, and input form ↔ report) ----
+const PANE_RATIO_MIN = 0.15
+const PANE_RATIO_MAX = 0.85
+
+function loadPaneRatio(key: string, fallback: number): number {
+  const raw = parseFloat(localStorage.getItem(key) ?? '')
+  if (!Number.isFinite(raw)) return fallback
+  return Math.min(PANE_RATIO_MAX, Math.max(PANE_RATIO_MIN, raw))
+}
+
+const previewWidthRatio = ref<number>(loadPaneRatio('calcpad.previewWidthRatio', 0.45))
+const draggingPreviewDivider = ref(false)
+const uiPrintWidthRatio = ref<number>(loadPaneRatio('calcpad.uiPrintWidthRatio', 0.5))
+const draggingUiPrintDivider = ref(false)
+
+// True while any drag-to-resize is in progress. Drives `.app-layout.resizing`, which
+// disables pointer-events on the preview/report iframes: without it, the moment the
+// cursor crosses into an iframe mid-drag the mousemove/mouseup listeners below — bound
+// to the outer `window` — stop receiving events (they fire in the iframe's own window
+// instead), so the drag never sees its mouseup and the pane appears stuck mid-resize.
+const isAnyDividerDragging = computed(() =>
+  isResizing.value || draggingEditorDivider.value || draggingPreviewDivider.value || draggingUiPrintDivider.value)
+
+function previewPaneStyle(): Record<string, string> | undefined {
+  if (uiModeFullscreen.value) {
+    return uiPrintVisible.value ? { flex: `0 0 ${(1 - uiPrintWidthRatio.value) * 100}%` } : undefined
+  }
+  return { width: `${previewWidthRatio.value * 100}%` }
+}
+
+function uiPrintPaneStyle(): Record<string, string> {
+  return { flex: `0 0 ${uiPrintWidthRatio.value * 100}%` }
+}
+
+// Dragged against `.app-layout`'s box rather than the divider's own parent
+// (`.work-area`), which is `display: contents` and so has no box of its own.
+function onPreviewDividerMouseDown(e: MouseEvent): void {
+  e.preventDefault()
+  draggingPreviewDivider.value = true
+  const container = (e.currentTarget as HTMLElement).closest('.app-layout') as HTMLElement | null
+  if (!container) return
+  const rect = container.getBoundingClientRect()
+  let moved = false
+  const onMove = (ev: MouseEvent) => {
+    moved = true
+    const frac = (rect.right - ev.clientX) / rect.width
+    previewWidthRatio.value = Math.min(PANE_RATIO_MAX, Math.max(PANE_RATIO_MIN, frac))
+  }
+  const onUp = () => {
+    draggingPreviewDivider.value = false
+    window.removeEventListener('mousemove', onMove)
+    window.removeEventListener('mouseup', onUp)
+    if (moved) localStorage.setItem('calcpad.previewWidthRatio', String(previewWidthRatio.value))
+  }
+  window.addEventListener('mousemove', onMove)
+  window.addEventListener('mouseup', onUp)
+}
+
+function onUiPrintDividerMouseDown(e: MouseEvent): void {
+  e.preventDefault()
+  draggingUiPrintDivider.value = true
+  const container = (e.currentTarget as HTMLElement).parentElement
+  if (!container) return
+  const rect = container.getBoundingClientRect()
+  let moved = false
+  const onMove = (ev: MouseEvent) => {
+    moved = true
+    const frac = (rect.right - ev.clientX) / rect.width
+    uiPrintWidthRatio.value = Math.min(PANE_RATIO_MAX, Math.max(PANE_RATIO_MIN, frac))
+  }
+  const onUp = () => {
+    draggingUiPrintDivider.value = false
+    window.removeEventListener('mousemove', onMove)
+    window.removeEventListener('mouseup', onUp)
+    if (moved) localStorage.setItem('calcpad.uiPrintWidthRatio', String(uiPrintWidthRatio.value))
   }
   window.addEventListener('mousemove', onMove)
   window.addEventListener('mouseup', onUp)
@@ -1552,8 +1655,11 @@ function setPreviewHtmlOutput(groupId: string, html: string): void {
 // the listener injected by injectLineLinks; no-op if that frame isn't shown. The
 // report beside the input form gets it too, so navigating in input mode moves both
 // panes together -- it keeps the sync listener even though it drops the hover arrows.
-function scrollPreviewToSourceLine(groupId: string, line: number): void {
-  const msg = { type: 'scrollPreviewToLine', line }
+// `exact` disables the nearest-preceding-line fallback: a TOC heading that fell inside
+// a hidden #pre/#post block has no element to land on, and the fallback would jump to
+// an unrelated line, so TOC navigation should do nothing rather than land somewhere odd.
+function scrollPreviewToSourceLine(groupId: string, line: number, exact = false): void {
+  const msg = { type: 'scrollPreviewToLine', line, exact }
   previewEls.get(groupId)?.contentWindow?.postMessage(msg, '*')
   uiPrintEls.get(groupId)?.contentWindow?.postMessage(msg, '*')
 }
@@ -1664,14 +1770,14 @@ function injectLineLinks(
     "    if (target) target.scrollIntoView({ block: 'center' });",
     "  }",
     "  var focusTimer = null;",
-    "  function focusPreviewLine(line) {",
+    "  function focusPreviewLine(line, exact) {",
     "    if (typeof line !== 'number' || isNaN(line)) return;",
     "    var target = document.querySelector('[data-source-line=\"' + line + '\"]');",
     "    if (!target) {",
     "      var anchor = document.querySelector('a.line-num[data-text=\"' + line + '\"]');",
     "      if (anchor) target = anchor.closest('.line-text') || anchor;",
     "    }",
-    "    if (!target) {",
+    "    if (!target && !exact) {",
     "      var best = null, bestSrc = -1;",
     "      document.querySelectorAll('[data-source-line]').forEach(function(el) {",
     "        var s = parseInt(el.getAttribute('data-source-line'), 10);",
@@ -1688,7 +1794,7 @@ function injectLineLinks(
     "  }",
     "  window.addEventListener('message', function(e) {",
     "    var d = e.data;",
-    "    if (d && d.type === 'scrollPreviewToLine') focusPreviewLine(d.line);",
+    "    if (d && d.type === 'scrollPreviewToLine') focusPreviewLine(d.line, d.exact);",
     "  });",
     "});",
   ].join('\n')

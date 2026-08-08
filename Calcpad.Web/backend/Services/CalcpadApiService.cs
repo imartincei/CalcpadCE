@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Caching.Memory;
+
 namespace Calcpad.Server.Services
 {
     /// <summary>
@@ -26,6 +28,16 @@ namespace Calcpad.Server.Services
 
             // PDF generation service (singleton for browser reuse)
             builder.Services.AddSingleton<PdfGeneratorService>();
+
+            // Caches ContentResolver's staged-content output across lint/highlight/definitions/
+            // symbol-at-position for the same content, singleton so entries survive across requests.
+            builder.Services.AddMemoryCache(options =>
+            {
+                options.SizeLimit = int.TryParse(
+                    Environment.GetEnvironmentVariable("CALCPAD_CONTENT_CACHE_SIZE_LIMIT"), out var limit)
+                    ? limit : 100;
+            });
+            builder.Services.AddSingleton<ContentResolutionCache>();
 
             builder.Services.AddCors(options =>
             {

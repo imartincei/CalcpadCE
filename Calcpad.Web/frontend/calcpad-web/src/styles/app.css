@@ -49,6 +49,14 @@ select option {
     font-family: var(--vscode-font-family);
 }
 
+/* While any divider is being dragged, iframes must not swallow the drag's mousemove/
+   mouseup — those are bound to the outer window, and an iframe routes mouse events to
+   its own document instead of bubbling them out, which would strand the drag mid-resize
+   the moment the cursor crosses into one. */
+.app-layout.resizing iframe {
+    pointer-events: none;
+}
+
 /* Wrappers around the editor and preview panes. Normally they contribute nothing:
    `display: contents` dissolves them so their children are direct flex items of
    `.app-layout` and sit side by side. In #UI input mode `.work-area` becomes a column
@@ -484,11 +492,25 @@ select option {
     background: var(--vscode-toolbar-hoverBackground, #2a2d2e);
 }
 
+/* Draggable vertical divider between side-by-side panes: the editor and the
+ * results pane, and the input form and its report companion in UI mode.
+ * Replaces the border those panes used to draw for the same visual split. */
+.pane-divider {
+    width: 4px;
+    flex-shrink: 0;
+    cursor: col-resize;
+    background: var(--vscode-widget-border, #1e1e1e);
+    transition: background 0.15s;
+}
+.pane-divider:hover,
+.pane-divider.dragging {
+    background: var(--vscode-focusBorder, #007acc);
+}
+
 /* Preview pane */
 .preview-pane {
     width: 45%;
     min-width: 300px;
-    border-left: 1px solid var(--vscode-widget-border);
     display: flex;
     flex-direction: column;
     position: relative;
@@ -499,11 +521,11 @@ select option {
 .preview-pane.fullscreen {
     width: auto;
     flex: 1;
-    border-left: none;
 }
 
-/* Report pane beside the input form. Splits the window with it, so the
-   fullscreen form's flex:1 and this one each take half. */
+/* Report pane beside the input form. Splits the window with it via the
+   `.pane-divider` between them; flex:1 here is just the fallback when that
+   divider (and the report pane itself) isn't rendered. */
 .ui-print-pane {
     width: auto;
     flex: 1;
