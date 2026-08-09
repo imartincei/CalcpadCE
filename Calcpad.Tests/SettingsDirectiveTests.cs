@@ -73,7 +73,7 @@ namespace Calcpad.Tests
         {
             var parser = new ExpressionParser { Settings = new Settings(), Debug = true };
             parser.Parse("#settings {not valid}\nx = 1", true, false);
-            Assert.Contains("Invalid settings", parser.HtmlResult);
+            Assert.Contains("Invalid JSON in #settings", parser.HtmlResult);
         }
 
         [Fact]
@@ -82,7 +82,7 @@ namespace Calcpad.Tests
             // Unrecognized keys are silently ignored by the engine (the linter warns).
             var parser = new ExpressionParser { Settings = new Settings(), Debug = true };
             parser.Parse("#settings {\"nonsense\": 4}\nx = 1", true, false);
-            Assert.DoesNotContain("Invalid settings", parser.HtmlResult);
+            Assert.DoesNotContain("Invalid JSON in #settings", parser.HtmlResult);
         }
     }
 }
