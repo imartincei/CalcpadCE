@@ -1,0 +1,3618 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="CalcpadCE treats vectors as first-class values: a one-dimensional sequence of numbers that flows through the same arithmetic, comparison and function calls as plain scalars, with element-wise rules that keep formulas readable on the worksheet.">
+      
+      
+      
+      
+        <link rel="prev" href="special-math-functions.html">
+      
+      
+        <link rel="next" href="vectors-high-performance.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Vectors (4) - CalcpadCE Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../stylesheets/calcpad-output.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+  <script src="../javascripts/jquery-3.6.3.min.js"></script>
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#vectors" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="CalcpadCE Documentation" class="md-header__button md-logo" aria-label="CalcpadCE Documentation" data-md-component="logo">
+      
+  <img src="../media/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CalcpadCE Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Vectors (4)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../index.html" class="md-tabs__link">
+          
+  
+  
+  Documentation
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../new-vscode-extension.html" class="md-tabs__link">
+          
+  
+  
+  New Apps and Features (beta)
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../quick-reference.html" class="md-tabs__link">
+          
+  
+  
+  Quick Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="getting-started.html" class="md-tabs__link">
+          
+  
+  
+  Engineering Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="simply-supported-beams.html" class="md-tabs__link">
+          
+  
+  
+  Structural Engineering Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="CalcpadCE Documentation" class="md-nav__button md-logo" aria-label="CalcpadCE Documentation" data-md-component="logo">
+      
+  <img src="../media/logo.svg" alt="logo">
+
+    </a>
+    CalcpadCE Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Documentation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About CalcpadCE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fields-of-application.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fields of Application
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../licensing-and-terms-of-use.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Licensing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how-it-works.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../theoretical-background.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theoretical Background
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writing-math.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Math
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reporting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reporting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../programming.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Programming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../working-with-files.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../constants.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Constants
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variables.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../operators.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../brackets.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Brackets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plotting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../numerical-methods.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Numerical Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iterative-procedures.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iterative Procedures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../units.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Units
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vectors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../high-performance-vectors-and-matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Performance Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    New Apps and Features (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    New Apps and Features (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-vscode-extension.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VS Code Extension
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-desktop-app.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop App
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-calcpad-panel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CalcpadCE Panel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-pdf-export.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PDF Export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-includes.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Includes and File Reads
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-linter.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linter and Diagnostics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-table-of-contents.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table of Contents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-web-deployment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running the Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new-metadata-comments.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata Comments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Quick Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-reference.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engineering Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Engineering Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="getting-started.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="areas.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Areas (15)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="volumes.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Volumes (15)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="geometrical.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometrical (24)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="fractals.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fractals (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="3d-plotting-drawing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D, Plotting, Drawing (7)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="interpolation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpolation (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="numerical.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Numerical (7)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="pendulums.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pendulums (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="waves.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waves (10)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="parametric-curves.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parametric Curves (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="elastic-analysis.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Elastic Analysis (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="finite-elements.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Finite Elements (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="fourier.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="special-math-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Special Math Functions (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors (4)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="vectors.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vector-initialization-indexing-and-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector Initialization, Indexing and Operators
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vector-data-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector Data Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vector-math-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector Math Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vector-structural-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector Structural Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="vectors-high-performance.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vectors: High Performance (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="matrices.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="matrices-high-performance.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrices: High Performance (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="multiline-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multiline Functions (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="custom-units.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Units (2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="formatting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Formatting (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="others.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Others (8)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Engineering Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Structural Engineering Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="simply-supported-beams.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simply Supported Beams (6)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="cantilevers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cantilevers (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="propped-cantilevers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Propped Cantilevers (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="continuous-beam.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Continuous Beam (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="deflections.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deflections (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="frames.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frames (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="fully-restrained-beams.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fully Restrained Beams (5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="loads.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loads (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="nonlinear.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nonlinear (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="soil-mechanics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soil Mechanics (1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="steel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Steel (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="structural-dynamics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Dynamics (4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reinforced-concrete.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete (12)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reinforced-concrete-punching.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Punching (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reinforced-concrete-plates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Plates (9)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reinforced-concrete-seismic-detailing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforced Concrete: Seismic Detailing (3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vector-initialization-indexing-and-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector Initialization, Indexing and Operators
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vector-data-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector Data Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vector-math-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector Math Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vector-structural-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector Structural Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="vectors">Vectors<a class="headerlink" href="#vectors" title="Permanent link">&para;</a></h1>
+<p><a href="https://calcpad-ce.org">CalcpadCE</a> treats <a href="https://en.wikipedia.org/wiki/Euclidean_vector">vectors</a> as first-class values: a one-dimensional sequence of numbers that flows through the same arithmetic, comparison and function calls as plain scalars, with element-wise rules that keep formulas readable on the worksheet.</p>
+<p>The worksheets in this group walk through the full vector toolkit step by step.
+The journey starts with <a href="#vector-initialization-indexing-and-operators">literal and creational construction, indexing and the broadcast arithmetic that powers every later example</a>, then moves into <a href="#vector-data-functions">sorting, ordering, searching and the reductions</a> used to summarise data series.
+From there, <a href="#vector-math-functions">norms, dot and cross products, and the math primitives</a> that turn raw numbers into geometric and statistical quantities take over, and the tour closes with <a href="#vector-structural-functions">resizing, slicing, joining and reshaping</a> — the structural plumbing that lets one expression feed the next.</p>
+<p>Together, the four worksheets are a working reference for how vectors behave in CalcpadCE and a base for matrices, parametric curves and any vectorised model built on top.</p>
+<h2 id="vector-initialization-indexing-and-operators">Vector Initialization, Indexing and Operators<a class="headerlink" href="#vector-initialization-indexing-and-operators" title="Permanent link">&para;</a></h2>
+<p>Foundations of vectors in CalcpadCE: literal lists with <span class="arithmatex">\([\, \ldots\, ]\)</span>, splicing existing vectors, custom-function generators and creational helpers like <span class="arithmatex">\(vector\)</span>, <span class="arithmatex">\(range\)</span> and <span class="arithmatex">\(fill\)</span>. Covers indexing, slicing and the element-wise operators that broadcast scalars across whole arrays.</p>
+<div class="example-grid">
+<figure>
+<figcaption>Code:</figcaption>
+<div class="highlight"><pre><span></span><code><span class="c1">&#39;Direct:</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nb">cos</span><span class="p">(</span><span class="m">0</span><span class="p">);</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">]</span>
+<span class="c1">&#39;Direct with another vector:</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="m">8</span><span class="p">]</span>
+<span class="c1">&#39;From a custom function:</span>
+<span class="nv">a</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">x</span><span class="o">^</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="nv">x</span><span class="o">^</span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="nv">x</span><span class="o">^</span><span class="m">4</span><span class="p">]</span>
+<span class="nv">a</span><span class="p">(</span><span class="m">2</span><span class="p">)</span>
+<span class="nv">a</span><span class="p">(</span><span class="m">3</span><span class="p">)</span>
+<span class="c1">&#39;By creational functions:</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector</span><span class="p">(</span><span class="m">5</span><span class="p">)</span><span class="c1">&#39;- creates an empty vector with 5 elements</span>
+<span class="nb">fill</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">)</span><span class="c1">&#39;- fills the vector with a value of 5</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;- creates a vector from a range of values, starting from 0 to 10 with step 2</span>
+
+<span class="cs">&quot;Indexing</span>
+<span class="c1">&#39;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">8</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">]</span>
+<span class="nv">a</span><span class="m">.2</span><span class="c1">&#39;- simple dot operator (constant index)</span>
+<span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="c1">&#39;, &#39;</span><span class="nv">a</span><span class="p">.</span><span class="nv">k</span><span class="c1">&#39;- variable index</span>
+<span class="nv">a</span><span class="p">.(</span><span class="m">2</span><span class="o">*</span><span class="nv">k</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="c1">&#39;- expression index</span>
+<span class="nv">a</span><span class="m">.5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="c1">&#39; - assign a new value to element:&#39;</span><span class="nv">a</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector</span><span class="p">(</span><span class="m">6</span><span class="p">)</span><span class="c1">&#39;,&#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector</span><span class="p">(</span><span class="m">6</span><span class="p">)</span>
+<span class="c1">&#39;Initalize values in a block loop</span>
+<span class="k">#hide</span>
+<span class="k">#for</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">a</span><span class="p">.</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">k</span><span class="o">^</span><span class="m">2</span>
+<span class="k">#loop</span>
+<span class="k">#show</span>
+<span class="nv">a</span>
+<span class="c1">&#39;Inline loop</span>
+<span class="nd">$Repeat</span><span class="p">{</span><span class="nv">b</span><span class="p">.</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">a</span><span class="p">.(</span><span class="nv">k</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nv">b</span><span class="p">)}</span>
+<span class="nv">b</span>
+
+<span class="cs">&quot;Vector operators</span>
+<span class="c1">&#39;&lt;h4&gt;Vector-vector&lt;/h4&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">]</span><span class="c1">&#39;, &#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">]</span>
+<span class="c1">&#39;Arithmetic:</span>
+<span class="nv">a</span><span class="o">!</span><span class="c1">&#39;- factorial</span>
+<span class="nv">a</span><span class="o">^</span><span class="nv">b</span><span class="c1">&#39;- exponentiation</span>
+<span class="nv">a</span><span class="o">/</span><span class="nv">b</span><span class="c1">&#39;- floating point division</span>
+<span class="nv">a</span><span class="o">\</span><span class="nv">b</span><span class="c1">&#39;- integer division</span>
+<span class="nv">a</span><span class="o">÷</span><span class="nv">b</span><span class="c1">&#39;- division bar</span>
+<span class="nv">a</span><span class="o">⦼</span><span class="nv">b</span><span class="c1">&#39;- modulo(⦼, remainder)</span>
+<span class="nv">a</span><span class="o">*</span><span class="nv">b</span><span class="c1">&#39;- multiplication</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- subtraction</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- addition</span>
+<span class="c1">&#39;Relational (comparison):</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- equal to</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≠</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- unequal to</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- less then</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- greater than</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- less or equal</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≥</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- greater or equal</span>
+<span class="c1">&#39;Logical:</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">∧</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- logical &quot;and&quot;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">∨</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- logical &quot;or&quot;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">⊕</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- logical &quot;xor&quot;</span>
+
+<span class="c1">&#39;&lt;h4&gt;Vector-scalar&lt;/h4&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">]</span><span class="c1">&#39;, &#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span>
+<span class="c1">&#39;Arithmetic:</span>
+<span class="nv">a</span><span class="o">^</span><span class="m">2</span><span class="c1">&#39;- exponentiation</span>
+<span class="nv">a</span><span class="o">/</span><span class="m">2</span><span class="c1">&#39;- floating point division</span>
+<span class="nv">a</span><span class="o">\</span><span class="m">2</span><span class="c1">&#39;- integer division</span>
+<span class="nv">a</span><span class="o">÷</span><span class="m">2</span><span class="c1">&#39;- division bar</span>
+<span class="nv">a</span><span class="o">⦼</span><span class="m">2</span><span class="c1">&#39;- modulo(⦼, remainder)</span>
+<span class="nv">a</span><span class="o">*</span><span class="m">2</span><span class="c1">&#39;- multiplication</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- subtraction</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- addition</span>
+<span class="c1">&#39;Relational (comparison):</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- equal to</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≠</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- unequal to</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- less then</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- greater than</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- less or equal</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≥</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- greater or equal</span>
+<span class="c1">&#39;Logical:</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">∧</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- logical &quot;and&quot;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">∨</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- logical &quot;or&quot;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">⊕</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- logical &quot;xor&quot;</span>
+
+<span class="c1">&#39;&lt;h4&gt;Scalar-vector&lt;/h4&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;, &#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">]</span>
+<span class="c1">&#39;Arithmetic:</span>
+<span class="m">2</span><span class="o">^</span><span class="nv">b</span><span class="c1">&#39;- exponentiation</span>
+<span class="m">2</span><span class="o">/</span><span class="nv">b</span><span class="c1">&#39;- floating point division</span>
+<span class="m">2</span><span class="o">\</span><span class="nv">b</span><span class="c1">&#39;- integer division</span>
+<span class="m">2</span><span class="o">÷</span><span class="nv">b</span><span class="c1">&#39;- division bar</span>
+<span class="m">2</span><span class="o">⦼</span><span class="nv">b</span><span class="c1">&#39;- modulo(⦼, remainder)</span>
+<span class="m">2</span><span class="o">*</span><span class="nv">b</span><span class="c1">&#39;- multiplication</span>
+<span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- subtraction</span>
+<span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- addition</span>
+<span class="c1">&#39;Relational (comparison):</span>
+<span class="m">2</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- equal to</span>
+<span class="m">2</span><span class="w"> </span><span class="o">≠</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- unequal to</span>
+<span class="m">2</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- less then</span>
+<span class="m">2</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- greater than</span>
+<span class="m">2</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- less or equal</span>
+<span class="m">2</span><span class="w"> </span><span class="o">≥</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- greater or equal</span>
+<span class="c1">&#39;Logical:</span>
+<span class="m">2</span><span class="w"> </span><span class="o">∧</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- logical &quot;and&quot;</span>
+<span class="m">2</span><span class="w"> </span><span class="o">∨</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- logical &quot;or</span>
+<span class="m">2</span><span class="w"> </span><span class="o">⊕</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- logical &quot;xor&quot;</span>
+</code></pre></div>
+
+</figure>
+<figure class="example-output">
+<figcaption>Rendered Output:</figcaption>
+<div class="calcpad-output"><!-- Foundations of vectors in CalcpadCE: literal lists with $[\, \ldots\, ]$, splicing existing vectors, custom-function generators and creational helpers like $vector$, $range$ and $fill$. Covers indexing, slicing and the element-wise operators that broadcast scalars across whole arrays. --> 
+<p>Direct: </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span><b>cos</b> ( 0 ) ; 2; 3; 2 · 2; 6 − 1<span class="b0">]</span> = <b class="b0">[</b>1 2 3 4 5<b class="b0">]</b></span></p>
+<p>Direct with another vector: </p>
+<p><span class="eq"><var><span class="vec">⃗</span>b</var> = <span class="b0">[</span>0; <var><span class="vec">⃗</span>a</var>; 6; 7; 8<span class="b0">]</span> = <b class="b0">[</b>0 1 2 3 4 5 6 7 8<b class="b0">]</b></span></p>
+<p>From a custom function: </p>
+<p><span class="eq"><var>a</var> ( <var>x</var> )  = <span class="b0">[</span>1; <var>x</var>; <var>x</var><sup>2</sup>; <var>x</var><sup>3</sup>; <var>x</var><sup>4</sup><span class="b0">]</span></span></p>
+<p><span class="eq"><var>a</var>  ( 2 )  = <b class="b0">[</b>1 2 4 8 16<b class="b0">]</b></span></p>
+<p><span class="eq"><var>a</var>  ( 3 )  = <b class="b0">[</b>1 3 9 27 81<b class="b0">]</b></span></p>
+<p>By creational functions: </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <b>vector</b> ( 5 )  = <b class="b0">[</b>0 0 0 0 0<b class="b0">]</b></span> - creates an empty vector with 5 elements </p>
+<p><span class="eq"><b>fill</b> ( <var><span class="vec">⃗</span>a</var>; 5 )  = <b class="b0">[</b>5 5 5 5 5<b class="b0">]</b></span> - fills the vector with a value of 5 </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <b>range</b> ( 0; 10; 2 )  = <b class="b0">[</b>0 2 4 6 8 10<b class="b0">]</b></span> - creates a vector from a range of values, starting from 0 to 10 with step 2 </p>
+<p>&nbsp;</p>
+<div class="calcpad-h3">Indexing </div>
+<hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>2; 4; 6; 8; 10<span class="b0">]</span> = <b class="b0">[</b>2 4 6 8 10<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var><sub>2</sub> = 4</span> - simple dot operator (constant index) </p>
+<p><span class="eq"><var>k</var> = 3</span> ,  <span class="eq"><var><span class="vec">⃗</span>a</var><sub>3</sub> = 6</span> - variable index </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var><sub>5</sub> = 10</span> - expression index </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var><sub>5</sub> = 0</span>  - assign a new value to element: <span class="eq"><var><span class="vec">⃗</span>a</var> = <b class="b0">[</b>2 4 6 8 0<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <b>vector</b> ( 6 )  = <b class="b0">[</b>0 0 0 0 0 0<b class="b0">]</b></span> , <span class="eq"><var><span class="vec">⃗</span>b</var> = <b>vector</b> ( 6 )  = <b class="b0">[</b>0 0 0 0 0 0<b class="b0">]</b></span></p>
+<p>Initalize values in a block loop </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <b class="b0">[</b>1 4 9 16 25 36<b class="b0">]</b></span></p>
+<p>Inline loop </p>
+<p><span class="eq"><span class="cond">$Repeat</span>{<var><span class="vec">⃗</span>b</var><sub><var>k</var></sub> = <var><span class="vec">⃗</span>a</var><sub><var>k</var> − 1</sub> <span class="cond">for</span> <var>k</var> = 2...<b>len</b> ( <var><span class="vec">⃗</span>b</var> ) } = 25</span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>0 1 4 9 16 25<b class="b0">]</b></span></p>
+<p>&nbsp;</p>
+<div class="calcpad-h3">Vector operators </div>
+<div class="calcpad-h4">Vector-vector</div> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>1; 2; 3; 0<span class="b0">]</span> = <b class="b0">[</b>1 2 3 0<b class="b0">]</b></span> ,  <span class="eq"><var><span class="vec">⃗</span>b</var> = <span class="b0">[</span>0; 4; 5; 6; 7<span class="b0">]</span> = <b class="b0">[</b>0 4 5 6 7<b class="b0">]</b></span></p>
+<p>Arithmetic: </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var>! = <b class="b0">[</b>1 2 6 1<b class="b0">]</b></span> - factorial </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var><sup><small class="nth">⊙</small> <var><span class="vec">⃗</span>b</var></sup> = <b class="b0">[</b>1 16 243 0 0<b class="b0">]</b></span> - exponentiation </p>
+<p><span class="eq"><span class="dvc"><var><span class="vec">⃗</span>a</var><span class="dvl"></span><var><span class="vec">⃗</span>b</var></span> = <b class="b0">[</b><span class="err">+∞</span> 0.5 0.6 0 0<b class="b0">]</b></span> - floating point division </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var>\<var><span class="vec">⃗</span>b</var> = <b class="b0">[</b><span class="err"> Undefined </span> 0 0 0 0<b class="b0">]</b></span> - integer division </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var><em> / </em><var><span class="vec">⃗</span>b</var> = <b class="b0">[</b><span class="err">+∞</span> 0.5 0.6 0 0<b class="b0">]</b></span> - division bar </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> mod <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b><span class="err"> Undefined </span> 2 3 0 0<b class="b0">]</b></span> - modulo(⦼, remainder) </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var><small class="nth">⊙</small><var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>0 8 15 0 0<b class="b0">]</b></span> - multiplication </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> − <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>1 -2 -2 -6 -7<b class="b0">]</b></span> - subtraction </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> + <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>1 6 8 6 7<b class="b0">]</b></span> - addition </p>
+<p>Relational (comparison): </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> ≡ <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>0 0 0 0 0<b class="b0">]</b></span> - equal to </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> ≠ <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>1 1 1 1 1<b class="b0">]</b></span> - unequal to </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> &lt; <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>0 1 1 1 1<b class="b0">]</b></span> - less then </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> &gt; <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>1 0 0 0 0<b class="b0">]</b></span> - greater than </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> &le; <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>0 1 1 1 1<b class="b0">]</b></span> - less or equal </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> &ge; <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>1 0 0 0 0<b class="b0">]</b></span> - greater or equal </p>
+<p>Logical: </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> and <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>0 1 1 0 0<b class="b0">]</b></span> - logical "and" </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> or <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>1 1 1 1 1<b class="b0">]</b></span> - logical "or" </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> xor <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>1 0 0 1 1<b class="b0">]</b></span> - logical "xor" </p>
+<p>&nbsp;</p>
+<div class="calcpad-h4">Vector-scalar</div> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>1; 2; 3; 0<span class="b0">]</span> = <b class="b0">[</b>1 2 3 0<b class="b0">]</b></span> ,  <span class="eq"><var>b</var> = 2</span></p>
+<p>Arithmetic: </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var><sup><small class="nth">⊙</small> 2</sup> = <b class="b0">[</b>1 4 9 0<b class="b0">]</b></span> - exponentiation </p>
+<p><span class="eq"><span class="dvc"><var><span class="vec">⃗</span>a</var><span class="dvl"></span>2</span> = <b class="b0">[</b>0.5 1 1.5 0<b class="b0">]</b></span> - floating point division </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var>\2 = <b class="b0">[</b>0 1 1 0<b class="b0">]</b></span> - integer division </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var><em> / </em>2 = <b class="b0">[</b>0.5 1 1.5 0<b class="b0">]</b></span> - division bar </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> mod 2 = <b class="b0">[</b>1 0 1 0<b class="b0">]</b></span> - modulo(⦼, remainder) </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> · 2 = <b class="b0">[</b>2 4 6 0<b class="b0">]</b></span> - multiplication </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> − 2 = <b class="b0">[</b>-1 0 1 -2<b class="b0">]</b></span> - subtraction </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> + 2 = <b class="b0">[</b>3 4 5 2<b class="b0">]</b></span> - addition </p>
+<p>Relational (comparison): </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> ≡ 2 = <b class="b0">[</b>0 1 0 0<b class="b0">]</b></span> - equal to </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> ≠ 2 = <b class="b0">[</b>1 0 1 1<b class="b0">]</b></span> - unequal to </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> &lt; 2 = <b class="b0">[</b>1 0 0 1<b class="b0">]</b></span> - less then </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> &gt; 2 = <b class="b0">[</b>0 0 1 0<b class="b0">]</b></span> - greater than </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> &le; 2 = <b class="b0">[</b>1 1 0 1<b class="b0">]</b></span> - less or equal </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> &ge; 2 = <b class="b0">[</b>0 1 1 0<b class="b0">]</b></span> - greater or equal </p>
+<p>Logical: </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> and 2 = <b class="b0">[</b>1 1 1 0<b class="b0">]</b></span> - logical "and" </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> or 2 = <b class="b0">[</b>1 1 1 1<b class="b0">]</b></span> - logical "or" </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> xor 2 = <b class="b0">[</b>0 0 0 1<b class="b0">]</b></span> - logical "xor" </p>
+<p>&nbsp;</p>
+<div class="calcpad-h4">Scalar-vector</div> 
+<p><span class="eq"><var>a</var> = 2</span> ,  <span class="eq"><var><span class="vec">⃗</span>b</var> = <span class="b0">[</span>0; 4; 5; 6; 7<span class="b0">]</span> = <b class="b0">[</b>0 4 5 6 7<b class="b0">]</b></span></p>
+<p>Arithmetic: </p>
+<p><span class="eq">2<sup><var><span class="vec">⃗</span>b</var></sup> = <b class="b0">[</b>1 16 32 64 128<b class="b0">]</b></span> - exponentiation </p>
+<p><span class="eq"><span class="dvc">2<span class="dvl"></span><var><span class="vec">⃗</span>b</var></span> = <b class="b0">[</b><span class="err">+∞</span> 0.5 0.4 0.333 0.286<b class="b0">]</b></span> - floating point division </p>
+<p><span class="eq">2\<var><span class="vec">⃗</span>b</var> = <b class="b0">[</b><span class="err"> Undefined </span> 0 0 0 0<b class="b0">]</b></span> - integer division </p>
+<p><span class="eq">2<em> / </em><var><span class="vec">⃗</span>b</var> = <b class="b0">[</b><span class="err">+∞</span> 0.5 0.4 0.333 0.286<b class="b0">]</b></span> - division bar </p>
+<p><span class="eq">2 mod <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b><span class="err"> Undefined </span> 2 2 2 2<b class="b0">]</b></span> - modulo(⦼, remainder) </p>
+<p><span class="eq">2 · <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>0 8 10 12 14<b class="b0">]</b></span> - multiplication </p>
+<p><span class="eq">2 − <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>2 -2 -3 -4 -5<b class="b0">]</b></span> - subtraction </p>
+<p><span class="eq">2 + <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>2 6 7 8 9<b class="b0">]</b></span> - addition </p>
+<p>Relational (comparison): </p>
+<p><span class="eq">2 ≡ <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>0 0 0 0 0<b class="b0">]</b></span> - equal to </p>
+<p><span class="eq">2 ≠ <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>1 1 1 1 1<b class="b0">]</b></span> - unequal to </p>
+<p><span class="eq">2 &lt; <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>0 1 1 1 1<b class="b0">]</b></span> - less then </p>
+<p><span class="eq">2 &gt; <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>1 0 0 0 0<b class="b0">]</b></span> - greater than </p>
+<p><span class="eq">2 &le; <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>0 1 1 1 1<b class="b0">]</b></span> - less or equal </p>
+<p><span class="eq">2 &ge; <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>1 0 0 0 0<b class="b0">]</b></span> - greater or equal </p>
+<p>Logical: </p>
+<p><span class="eq">2 and <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>0 1 1 1 1<b class="b0">]</b></span> - logical "and" </p>
+<p><span class="eq">2 or <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>1 1 1 1 1<b class="b0">]</b></span> - logical "or </p>
+<p><span class="eq">2 xor <var><span class="vec">⃗</span>b</var> = <b class="b0">[</b>1 0 0 0 0<b class="b0">]</b></span> - logical "xor" </p>
+</div>
+</figure>
+</div>
+
+<h2 id="vector-data-functions">Vector Data Functions<a class="headerlink" href="#vector-data-functions" title="Permanent link">&para;</a></h2>
+<p>Reference for the data-oriented vector toolkit: <span class="arithmatex">\(sort\)</span>, <span class="arithmatex">\(rsort\)</span>, <span class="arithmatex">\(order\)</span> and <span class="arithmatex">\(revorder\)</span> for ranking, <span class="arithmatex">\(find\)</span>, <span class="arithmatex">\(count\)</span> and <span class="arithmatex">\(search\)</span> for lookup, plus the standard reductions (<span class="arithmatex">\(sum\)</span>, <span class="arithmatex">\(product\)</span>, <span class="arithmatex">\(min\)</span>, <span class="arithmatex">\(max\)</span>, <span class="arithmatex">\(mean\)</span> and friends) used to condense a series into a single number.</p>
+<div class="example-grid">
+<figure>
+<figcaption>Code:</figcaption>
+<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;style&gt;em {font-family:&quot;Times New Roman&quot;;}&lt;/style&gt;</span>
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Sort&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) and &lt;b&gt;Rsort&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">]</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sort</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- vector sorted in ascending order</span>
+<span class="nv">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">rsort</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- vector sorted in descending order</span>
+<span class="nv">a</span><span class="c1">&#39; - remained unchanged</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Order&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) and &lt;b&gt;Revorder&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">x_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">]</span><span class="c1">&#39;</span>
+<span class="nv">y_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">]</span>
+<span class="nv">i_asc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">order</span><span class="p">(</span><span class="nv">x_a</span><span class="p">)</span><span class="c1">&#39;- indexes in ascending order of &lt;em&gt;x&lt;/em&gt;-values</span>
+<span class="nv">i_desc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">revorder</span><span class="p">(</span><span class="nv">x_a</span><span class="p">)</span><span class="c1">&#39;- indexes in descending order of &lt;em&gt;x&lt;/em&gt;-values</span>
+<span class="c1">&#39;Sorts points by ascending order of &lt;em&gt;x&lt;/em&gt;-values</span>
+<span class="nv">x_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">extract</span><span class="p">(</span><span class="nv">x_a</span><span class="p">;</span><span class="w"> </span><span class="nv">i_asc</span><span class="p">)</span>
+<span class="nv">y_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">extract</span><span class="p">(</span><span class="nv">y_a</span><span class="p">;</span><span class="w"> </span><span class="nv">i_asc</span><span class="p">)</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Reverse&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nb">reverse</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">])</span><span class="c1">&#39;- the elements of the vector in reverse order</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Count&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;value&lt;/em&gt;; &lt;em&gt;starting index&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nb">count</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">];</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">)</span><span class="c1">&#39;- the number of elements equal to 1 and index ≥ 4</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Search&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;value&lt;/em&gt;; &lt;em&gt;starting index&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">]</span>
+<span class="nb">search</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">&#39;- the index of the first element in &lt;em&gt;a&lt;/em&gt; with value 1 and index ≥ 3</span>
+<span class="nb">search</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">)</span><span class="c1">&#39;- when the index is out of range or nothing is found, returns 0</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Find&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;value&lt;/em&gt;; &lt;em&gt;starting index&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">]</span>
+<span class="nb">find</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;- the indexes of all elements with value 1, from the 2nd onwards</span>
+<span class="nb">find</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;- if the indexes are out of range or nothing is found, returns 0</span>
+<span class="nb">find_lt</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;- the indexes of all elements, from the 2nd onwards, that are &lt; 3</span>
+<span class="nb">find_ge</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;- the indexes of all elements, from the 2nd onwards, that are ≥ 3</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Lookup&lt;/b&gt;(&lt;em&gt;vector_a&lt;/em&gt;; &lt;em&gt;vector_b&lt;/em&gt;; &lt;em&gt;value&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">]</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">]</span>
+<span class="nb">lookup</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="c1">&#39;- the values ​​from vector &lt;em&gt;b&lt;/em&gt; for which the corresponding values ​​in vector &lt;em&gt;a&lt;/em&gt; are equal to 0</span>
+<span class="nb">lookup</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;- the values ​​from vector &lt;em&gt;b&lt;/em&gt; for which the corresponding values ​​in vector &lt;em&gt;a&lt;/em&gt; are equal to 2</span>
+<span class="nb">lookup_ge</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="c1">&#39;- the values ​​from vector &lt;em&gt;b&lt;/em&gt; for which the corresponding values ​​in vector &lt;em&gt;a&lt;/em&gt; are ≥ 1</span>
+<span class="nb">lookup_ne</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="c1">&#39;- the values ​​from vector &lt;em&gt;b&lt;/em&gt; for which the corresponding values ​​in vector &lt;em&gt;a&lt;/em&gt; are ≠ 1</span>
+</code></pre></div>
+
+</figure>
+<figure class="example-output">
+<figcaption>Rendered Output:</figcaption>
+<div class="calcpad-output"><!-- Reference for the data-oriented vector toolkit: $sort$, $rsort$, $order$ and $revorder$ for ranking, $find$, $count$ and $search$ for lookup, plus the standard reductions ($sum$, $product$, $min$, $max$, $mean$ and friends) used to condense a series into a single number. --> 
+<style>em {font-family:"Times New Roman";}</style> 
+<p><b>Sort</b>(<em>vector</em>) and <b>Rsort</b>(<em>vector</em>)</p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>4; 0; 2; 3; -1; 1<span class="b0">]</span> = <b class="b0">[</b>4 0 2 3 -1 1<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>b</var> = <b>sort</b> ( <var><span class="vec">⃗</span>a</var> )  = <b class="b0">[</b>-1 0 1 2 3 4<b class="b0">]</b></span> - vector sorted in ascending order </p>
+<p><span class="eq"><var><span class="vec">⃗</span>c</var> = <b>rsort</b> ( <var><span class="vec">⃗</span>a</var> )  = <b class="b0">[</b>4 3 2 1 0 -1<b class="b0">]</b></span> - vector sorted in descending order </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <b class="b0">[</b>4 0 2 3 -1 1<b class="b0">]</b></span>  - remained unchanged </p>
+<p>&nbsp;</p>
+<p><b>Order</b>(<em>vector</em>) and <b>Revorder</b>(<em>vector</em>)</p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>x</var><sub>a</sub> = <span class="b0">[</span>4; 0; 2; 3; -1; 1<span class="b0">]</span> = <b class="b0">[</b>4 0 2 3 -1 1<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>y</var><sub>a</sub> = <span class="b0">[</span>1; 2; 3; 4; 5; 6<span class="b0">]</span> = <b class="b0">[</b>1 2 3 4 5 6<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>i</var><sub>asc</sub> = <b>order</b> ( <var><span class="vec">⃗</span>x</var><sub>a</sub> )  = <b class="b0">[</b>5 2 6 3 4 1<b class="b0">]</b></span> - indexes in ascending order of <em>x</em>-values </p>
+<p><span class="eq"><var><span class="vec">⃗</span>i</var><sub>desc</sub> = <b>revorder</b> ( <var><span class="vec">⃗</span>x</var><sub>a</sub> )  = <b class="b0">[</b>1 4 3 6 2 5<b class="b0">]</b></span> - indexes in descending order of <em>x</em>-values </p>
+<p>Sorts points by ascending order of <em>x</em>-values </p>
+<p><span class="eq"><var><span class="vec">⃗</span>x</var><sub>b</sub> = <b>extract</b> ( <var><span class="vec">⃗</span>x</var><sub>a</sub>; <var><span class="vec">⃗</span>i</var><sub>asc</sub> )  = <b class="b0">[</b>-1 0 1 2 3 4<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>y</var><sub>b</sub> = <b>extract</b> ( <var><span class="vec">⃗</span>y</var><sub>a</sub>; <var><span class="vec">⃗</span>i</var><sub>asc</sub> )  = <b class="b0">[</b>5 2 6 3 4 1<b class="b0">]</b></span></p>
+<p>&nbsp;</p>
+<p><b>Reverse</b>(<em>vector</em>)</p><hr/> 
+<p><span class="eq"><b>reverse</b> ( <span class="b0">[</span>1; 2; 3; 4; 5<span class="b0">]</span> )  = <b class="b0">[</b>5 4 3 2 1<b class="b0">]</b></span> - the elements of the vector in reverse order </p>
+<p>&nbsp;</p>
+<p><b>Count</b>(<em>vector</em>; <em>value</em>; <em>starting index</em>)</p><hr/> 
+<p><span class="eq"><b>count</b> ( <span class="b0">[</span>0; 1; 2; 1; 4; 1<span class="b0">]</span>; 1; 4 )  = 2</span> - the number of elements equal to 1 and index ≥ 4 </p>
+<p>&nbsp;</p>
+<p><b>Search</b>(<em>vector</em>; <em>value</em>; <em>starting index</em>)</p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>0; 1; 2; 1; 4; 1<span class="b0">]</span> = <b class="b0">[</b>0 1 2 1 4 1<b class="b0">]</b></span></p>
+<p><span class="eq"><b>search</b> ( <var><span class="vec">⃗</span>a</var>; 1; 3 )  = 4</span> - the index of the first element in <em>a</em> with value 1 and index ≥ 3 </p>
+<p><span class="eq"><b>search</b> ( <var><span class="vec">⃗</span>a</var>; 1; 7 )  = 0</span> - when the index is out of range or nothing is found, returns 0 </p>
+<p>&nbsp;</p>
+<p><b>Find</b>(<em>vector</em>; <em>value</em>; <em>starting index</em>)</p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>0; 1; 2; 1; 4; 1<span class="b0">]</span> = <b class="b0">[</b>0 1 2 1 4 1<b class="b0">]</b></span></p>
+<p><span class="eq"><b>find</b> ( <var><span class="vec">⃗</span>a</var>; 1; 2 )  = <b class="b0">[</b>2 4 6<b class="b0">]</b></span> - the indexes of all elements with value 1, from the 2nd onwards </p>
+<p><span class="eq"><b>find</b> ( <var><span class="vec">⃗</span>a</var>; 3; 2 )  = <b class="b0">[</b><b class="b0">]</b></span> - if the indexes are out of range or nothing is found, returns 0 </p>
+<p><span class="eq"><b>find</b><sub>lt</sub> ( <var><span class="vec">⃗</span>a</var>; 3; 2 )  = <b class="b0">[</b>2 3 4 6<b class="b0">]</b></span> - the indexes of all elements, from the 2nd onwards, that are < 3 </p>
+<p><span class="eq"><b>find</b><sub>ge</sub> ( <var><span class="vec">⃗</span>a</var>; 3; 2 )  = <b class="b0">[</b>5<b class="b0">]</b></span> - the indexes of all elements, from the 2nd onwards, that are ≥ 3 </p>
+<p>&nbsp;</p>
+<p><b>Lookup</b>(<em>vector_a</em>; <em>vector_b</em>; <em>value</em>)</p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>0; 1; 0; 0; 1; 2<span class="b0">]</span> = <b class="b0">[</b>0 1 0 0 1 2<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>b</var> = <span class="b0">[</span>1; 2; 3; 4; 5; 6<span class="b0">]</span> = <b class="b0">[</b>1 2 3 4 5 6<b class="b0">]</b></span></p>
+<p><span class="eq"><b>lookup</b> ( <var><span class="vec">⃗</span>a</var>; <var><span class="vec">⃗</span>b</var>; 0 )  = <b class="b0">[</b>1 3 4<b class="b0">]</b></span> - the values ​​from vector <em>b</em> for which the corresponding values ​​in vector <em>a</em> are equal to 0 </p>
+<p><span class="eq"><b>lookup</b> ( <var><span class="vec">⃗</span>a</var>; <var><span class="vec">⃗</span>b</var>; 2 )  = <b class="b0">[</b>6<b class="b0">]</b></span> - the values ​​from vector <em>b</em> for which the corresponding values ​​in vector <em>a</em> are equal to 2 </p>
+<p><span class="eq"><b>lookup</b><sub>ge</sub> ( <var><span class="vec">⃗</span>a</var>; <var><span class="vec">⃗</span>b</var>; 1 )  = <b class="b0">[</b>2 5 6<b class="b0">]</b></span> - the values ​​from vector <em>b</em> for which the corresponding values ​​in vector <em>a</em> are ≥ 1 </p>
+<p><span class="eq"><b>lookup</b><sub>ne</sub> ( <var><span class="vec">⃗</span>a</var>; <var><span class="vec">⃗</span>b</var>; 1 )  = <b class="b0">[</b>1 3 4 6<b class="b0">]</b></span> - the values ​​from vector <em>b</em> for which the corresponding values ​​in vector <em>a</em> are ≠ 1 </p>
+</div>
+</figure>
+</div>
+
+<h2 id="vector-math-functions">Vector Math Functions<a class="headerlink" href="#vector-math-functions" title="Permanent link">&para;</a></h2>
+<p>Mathematical operations on vectors: <span class="arithmatex">\(L_p\)</span>, <span class="arithmatex">\(L_1\)</span>, <span class="arithmatex">\(L_2\)</span> and <span class="arithmatex">\(L_\infty\)</span> norms, dot and cross products, element-wise transcendental functions, plus the statistical primitives (<span class="arithmatex">\(mean\)</span>, <span class="arithmatex">\(median\)</span>, <span class="arithmatex">\(variance\)</span>, standard deviation) used to characterise a sample.</p>
+<div class="example-grid">
+<figure>
+<figcaption>Code:</figcaption>
+<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;style&gt;em {font-family:&quot;Times New Roman&quot;;}&lt;/style&gt;</span>
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Norm_p&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nb">norm_p</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">];</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">&#39;- the Lp norm of the vector for &#39;</span><span class="nv">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Norm_1&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nb">norm_1</span><span class="p">([</span><span class="o">-</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">])</span><span class="c1">&#39;- the L1 (Manhattan or taxicab) norm of the vector</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Norm&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) or &lt;b&gt;Norm_2&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) or &lt;b&gt;Norm_e&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">]</span>
+<span class="nb">norm</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span>
+<span class="nb">norm_2</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span>
+<span class="nb">norm_e</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- the L2 (Euclidian) norm of vector &lt;em&gt;a&lt;/em&gt;</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Norm_i&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nb">norm_i</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">])</span><span class="c1">&#39;- the L∞ (infinity) norm of the vector</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Unit&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nb">unit</span><span class="p">([</span><span class="o">-</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">])</span><span class="c1">&#39;- the normalized (unit) vector</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Dot&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">]</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">]</span>
+<span class="nb">dot</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">)</span><span class="c1">&#39;- scalar (dot) product of vectors &lt;em&gt;a&lt;/em&gt; and &lt;em&gt;b&lt;/em&gt;;</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Cross&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">]</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">]</span>
+<span class="nb">cross</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">)</span><span class="c1">&#39;- cross product of vectors &lt;em&gt;a&lt;/em&gt; and &lt;em&gt;b&lt;/em&gt;;</span>
+
+<span class="k">#rad</span>
+<span class="c1">&#39;Trigonometric:&lt;hr/&gt;</span>
+<span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">30</span><span class="p">;</span><span class="w"> </span><span class="m">45</span><span class="p">;</span><span class="w"> </span><span class="m">60</span><span class="p">;</span><span class="w"> </span><span class="m">90</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="nv">π</span><span class="o">/</span><span class="m">180</span><span class="p">)</span>
+<span class="nb">sin</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- sine</span>
+<span class="nb">cos</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- cosine</span>
+<span class="nb">tan</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- tangent</span>
+<span class="nb">csc</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- cosecant</span>
+<span class="nb">sec</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- secant</span>
+<span class="nb">cot</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- cotangent</span>
+
+<span class="c1">&#39;Hyperbolic:&lt;hr/&gt;</span>
+<span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">0.5</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">]</span>
+<span class="nb">sinh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- hyperbolic sine</span>
+<span class="nb">cosh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- hyperbolic cosine</span>
+<span class="nb">tanh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- hyperbolic tangent</span>
+<span class="nb">csch</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- hyperbolic cosecant</span>
+<span class="nb">sech</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- hyperbolic secant</span>
+<span class="nb">coth</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- hyperbolic cotangent</span>
+
+<span class="c1">&#39;Inverse trigonometric:&lt;hr/&gt;</span>
+<span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">0.5</span><span class="p">;</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="m">2</span><span class="p">)</span><span class="o">/</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="m">3</span><span class="p">)</span><span class="o">/</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">]</span>
+<span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">reverse</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span>
+<span class="nb">asin</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse sine</span>
+<span class="nb">acos</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse cosine</span>
+<span class="nb">atan</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse tangent</span>
+<span class="nb">atan2</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="c1">&#39;- the angle whose tangent is the quotient of y and x</span>
+<span class="nb">acsc</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse cosecant</span>
+<span class="nb">asec</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse secant</span>
+<span class="nb">acot</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse cotangent</span>
+
+<span class="c1">&#39;Inverse hyperbolic:&lt;hr/&gt;</span>
+<span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">]</span>
+<span class="nb">asinh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse hyperbolic sine</span>
+<span class="nb">acosh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse hyperbolic cosine</span>
+<span class="nb">atanh</span><span class="p">(</span><span class="nv">x</span><span class="o">/</span><span class="m">5</span><span class="p">)</span><span class="c1">&#39;- inverse hyperbolic tangent</span>
+<span class="nb">acsch</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse hyperbolic cosecant</span>
+<span class="nb">asech</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse hyperbolic secant</span>
+<span class="nb">acoth</span><span class="p">(</span><span class="m">5</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse hyperbolic cotangent</span>
+
+<span class="c1">&#39;Logarithmic, exponential and roots:&lt;hr/&gt;</span>
+<span class="nb">log</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- decimal logarithm</span>
+<span class="nb">ln</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- natural logarithm</span>
+<span class="nb">log_2</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- binary logarithm</span>
+<span class="nb">exp</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- natural exponent = eˣ</span>
+<span class="nb">sqr</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- square root</span>
+<span class="nb">cbrt</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- cubic root</span>
+<span class="nb">root</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">&#39;- n-th root</span>
+
+<span class="c1">&#39;Rounding:&lt;hr/&gt;</span>
+<span class="nb">round</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- round to the nearest integer</span>
+<span class="nb">floor</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- round to the smaller integer(towards - ∞)</span>
+<span class="nb">ceiling</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- round to the greater integer(towards + ∞)</span>
+<span class="nb">trunc</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- round to the smaller integer(towards zero)</span>
+
+<span class="c1">&#39;Integer:&lt;hr/&gt;</span>
+<span class="nv">x</span>
+<span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span>
+<span class="nb">mod</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="c1">&#39;- the remainder of an integer division</span>
+<span class="nb">gcd</span><span class="p">(</span><span class="nv">y</span><span class="p">)</span><span class="c1">&#39;- the greatest common divisor of several integers</span>
+<span class="nb">lcm</span><span class="p">(</span><span class="nv">y</span><span class="p">)</span><span class="c1">&#39;- the least common multiple of several integers</span>
+
+<span class="c1">&#39;Aggregate and interpolation:&lt;hr /&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">]</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">]</span>
+<span class="nb">min</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- minimum of multiple values</span>
+<span class="nb">max</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- maximum of multiple values</span>
+<span class="nb">sum</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- sum of multiple values</span>
+<span class="nb">sumsq</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- sum of squares</span>
+<span class="nb">srss</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- square root of sum of squares</span>
+<span class="nb">average</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- average of multiple values</span>
+<span class="nb">product</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- product of multiple values</span>
+<span class="nb">mean</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- geometric mean</span>
+<span class="nb">take</span><span class="p">(</span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- the 3-rd element from the list</span>
+<span class="nb">line</span><span class="p">(</span><span class="m">1.5</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- linear interpolation</span>
+<span class="nb">spline</span><span class="p">(</span><span class="m">1.5</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- Hermite spline interpolation</span>
+</code></pre></div>
+
+</figure>
+<figure class="example-output">
+<figcaption>Rendered Output:</figcaption>
+<div class="calcpad-output"><!-- Mathematical operations on vectors: $L_p$, $L_1$, $L_2$ and $L_\infty$ norms, dot and cross products, element-wise transcendental functions, plus the statistical primitives ($mean$, $median$, $variance$, standard deviation) used to characterise a sample. --> 
+<style>em {font-family:"Times New Roman";}</style> 
+<p><b>Norm_p</b>(<em>vector</em>)</p><hr/> 
+<p><span class="eq"><b>norm</b><sub>p</sub> ( <span class="b0">[</span>1; 2; 3<span class="b0">]</span>; 3 )  = 3.3</span> - the Lp norm of the vector for  <span class="eq"><var>p</var> = 3</span></p>
+<p>&nbsp;</p>
+<p><b>Norm_1</b>(<em>vector</em>)</p><hr/> 
+<p><span class="eq"><b>norm</b><sub>1</sub> ( <span class="b0">[</span>-1; 2; 3<span class="b0">]</span> )  = 6</span> - the L1 (Manhattan or taxicab) norm of the vector </p>
+<p>&nbsp;</p>
+<p><b>Norm</b>(<em>vector</em>) or <b>Norm_2</b>(<em>vector</em>) or <b>Norm_e</b>(<em>vector</em>)</p></p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>1; 2; 3<span class="b0">]</span> = <b class="b0">[</b>1 2 3<b class="b0">]</b></span></p>
+<p><span class="eq"><b>norm</b> ( <var><span class="vec">⃗</span>a</var> )  = 3.74</span></p>
+<p><span class="eq"><b>norm</b><sub>2</sub> ( <var><span class="vec">⃗</span>a</var> )  = 3.74</span></p>
+<p><span class="eq"><b>norm</b><sub>e</sub> ( <var><span class="vec">⃗</span>a</var> )  = 3.74</span> - the L2 (Euclidian) norm of vector <em>a</em> </p>
+<p>&nbsp;</p>
+<p><b>Norm_i</b>(<em>vector</em>)</p><hr/> 
+<p><span class="eq"><b>norm</b><sub>i</sub> ( <span class="b0">[</span>1; 2; 3<span class="b0">]</span> )  = 3</span> - the L∞ (infinity) norm of the vector </p>
+<p>&nbsp;</p>
+<p><b>Unit</b>(<em>vector</em>)</p><hr/> 
+<p><span class="eq"><b>unit</b> ( <span class="b0">[</span>-1; 2; 3<span class="b0">]</span> )  = <b class="b0">[</b>-0.267 0.535 0.802<b class="b0">]</b></span> - the normalized (unit) vector </p>
+<p>&nbsp;</p>
+<p><b>Dot</b>(<em>vector</em>; <em>vector</em>)</p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>1; 2; 4<span class="b0">]</span> = <b class="b0">[</b>1 2 4<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>b</var> = <span class="b0">[</span>5; 3; 1<span class="b0">]</span> = <b class="b0">[</b>5 3 1<b class="b0">]</b></span></p>
+<p><span class="eq"><b>dot</b> ( <var><span class="vec">⃗</span>a</var>; <var><span class="vec">⃗</span>b</var> )  = 15</span> - scalar (dot) product of vectors <em>a</em> and <em>b</em>; </p>
+<p>&nbsp;</p>
+<p><b>Cross</b>(<em>vector</em>; <em>vector</em>)</p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>1; 2; 4<span class="b0">]</span> = <b class="b0">[</b>1 2 4<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>b</var> = <span class="b0">[</span>5; 3; 1<span class="b0">]</span> = <b class="b0">[</b>5 3 1<b class="b0">]</b></span></p>
+<p><span class="eq"><b>cross</b> ( <var><span class="vec">⃗</span>a</var>; <var><span class="vec">⃗</span>b</var> )  = <b class="b0">[</b>-10 19 -7<b class="b0">]</b></span> - cross product of vectors <em>a</em> and <em>b</em>; </p>
+<p>&nbsp;</p>
+<p>Trigonometric:<hr/> </p>
+<p><span class="eq"><var><span class="vec">⃗</span>x</var> = <span class="b0">[</span>0; 30; 45; 60; 90<span class="b0">]</span> · <span class="dvc"><var>π</var><span class="dvl"></span>180</span> = <span class="b0">[</span>0; 30; 45; 60; 90<span class="b0">]</span> · <span class="dvc">3.14<span class="dvl"></span>180</span> = <b class="b0">[</b>0 0.524 0.785 1.05 1.57<b class="b0">]</b></span></p>
+<p><span class="eq"><b>sin</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>0 0.5 0.707 0.866 1<b class="b0">]</b></span> - sine </p>
+<p><span class="eq"><b>cos</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>1 0.866 0.707 0.5 0<b class="b0">]</b></span> - cosine </p>
+<p><span class="eq"><b>tan</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>0 0.577 1 1.73 1.63×10<sup>16</sup><b class="b0">]</b></span> - tangent </p>
+<p><span class="eq"><b>csc</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b><span class="err">+∞</span> 2 1.41 1.15 1<b class="b0">]</b></span> - cosecant </p>
+<p><span class="eq"><b>sec</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>1 1.15 1.41 2 1.63×10<sup>16</sup><b class="b0">]</b></span> - secant </p>
+<p><span class="eq"><b>cot</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b><span class="err">+∞</span> 1.73 1 0.577 0<b class="b0">]</b></span> - cotangent </p>
+<p>&nbsp;</p>
+<p>Hyperbolic:<hr/> </p>
+<p><span class="eq"><var><span class="vec">⃗</span>x</var> = <span class="b0">[</span>0; 0.5; 1<span class="b0">]</span> = <b class="b0">[</b>0 0.5 1<b class="b0">]</b></span></p>
+<p><span class="eq"><b>sinh</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>0 0.521 1.18<b class="b0">]</b></span> - hyperbolic sine </p>
+<p><span class="eq"><b>cosh</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>1 1.13 1.54<b class="b0">]</b></span> - hyperbolic cosine </p>
+<p><span class="eq"><b>tanh</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>0 0.462 0.762<b class="b0">]</b></span> - hyperbolic tangent </p>
+<p><span class="eq"><b>csch</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b><span class="err">+∞</span> 1.92 0.851<b class="b0">]</b></span> - hyperbolic cosecant </p>
+<p><span class="eq"><b>sech</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>1 0.887 0.648<b class="b0">]</b></span> - hyperbolic secant </p>
+<p><span class="eq"><b>coth</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b><span class="err">+∞</span> 2.16 1.31<b class="b0">]</b></span> - hyperbolic cotangent </p>
+<p>&nbsp;</p>
+<p>Inverse trigonometric:<hr/> </p>
+<p><span class="eq"><var><span class="vec">⃗</span>x</var> = <span class="b1">[</span>0; 0.5; <span class="dvc">&ensp;&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;2</span><span class="dvl"></span>2</span>; <span class="dvc">&ensp;&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;3</span><span class="dvl"></span>2</span>; 1<span class="b1">]</span> = <b class="b0">[</b>0 0.5 0.707 0.866 1<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>y</var> = <b>reverse</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>1 0.866 0.707 0.5 0<b class="b0">]</b></span></p>
+<p><span class="eq"><b>asin</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>0 0.524 0.785 1.05 1.57<b class="b0">]</b></span> - inverse sine </p>
+<p><span class="eq"><b>acos</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>1.57 1.05 0.785 0.524 0<b class="b0">]</b></span> - inverse cosine </p>
+<p><span class="eq"><b>atan</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>0 0.464 0.615 0.714 0.785<b class="b0">]</b></span> - inverse tangent </p>
+<p><span class="eq"><b>atan2</b> ( <var><span class="vec">⃗</span>x</var>; <var><span class="vec">⃗</span>y</var> )  = <b class="b0">[</b>1.57 1.05 0.785 0.524 0<b class="b0">]</b></span> - the angle whose tangent is the quotient of y and x </p>
+<p><span class="eq"><b>acsc</b><span class="b1">(</span><span class="dvc">1<span class="dvl"></span><var><span class="vec">⃗</span>x</var></span><span class="b1">)</span> = <b class="b0">[</b>0 0.524 0.785 1.05 1.57<b class="b0">]</b></span> - inverse cosecant </p>
+<p><span class="eq"><b>asec</b><span class="b1">(</span><span class="dvc">1<span class="dvl"></span><var><span class="vec">⃗</span>x</var></span><span class="b1">)</span> = <b class="b0">[</b>1.57 1.05 0.785 0.524 0<b class="b0">]</b></span> - inverse secant </p>
+<p><span class="eq"><b>acot</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>1.57 1.11 0.955 0.857 0.785<b class="b0">]</b></span> - inverse cotangent </p>
+<p>&nbsp;</p>
+<p>Inverse hyperbolic:<hr/> </p>
+<p><span class="eq"><var><span class="vec">⃗</span>x</var> = <span class="b0">[</span>1; 2; 4<span class="b0">]</span> = <b class="b0">[</b>1 2 4<b class="b0">]</b></span></p>
+<p><span class="eq"><b>asinh</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>0.881 1.44 2.09<b class="b0">]</b></span> - inverse hyperbolic sine </p>
+<p><span class="eq"><b>acosh</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>0 1.32 2.06<b class="b0">]</b></span> - inverse hyperbolic cosine </p>
+<p><span class="eq"><b>atanh</b><span class="b1">(</span><span class="dvc"><var><span class="vec">⃗</span>x</var><span class="dvl"></span>5</span><span class="b1">)</span> = <b class="b0">[</b>0.203 0.424 1.1<b class="b0">]</b></span> - inverse hyperbolic tangent </p>
+<p><span class="eq"><b>acsch</b><span class="b1">(</span><span class="dvc">1<span class="dvl"></span><var><span class="vec">⃗</span>x</var></span><span class="b1">)</span> = <b class="b0">[</b>0.881 1.44 2.09<b class="b0">]</b></span> - inverse hyperbolic cosecant </p>
+<p><span class="eq"><b>asech</b><span class="b1">(</span><span class="dvc">1<span class="dvl"></span><var><span class="vec">⃗</span>x</var></span><span class="b1">)</span> = <b class="b0">[</b>0 1.32 2.06<b class="b0">]</b></span> - inverse hyperbolic secant </p>
+<p><span class="eq"><b>acoth</b><span class="b1">(</span><span class="dvc">5<span class="dvl"></span><var><span class="vec">⃗</span>x</var></span><span class="b1">)</span> = <b class="b0">[</b>0.203 0.424 1.1<b class="b0">]</b></span> - inverse hyperbolic cotangent </p>
+<p>&nbsp;</p>
+<p>Logarithmic, exponential and roots:<hr/> </p>
+<p><span class="eq"><b>log</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>0 0.301 0.602<b class="b0">]</b></span> - decimal logarithm </p>
+<p><span class="eq"><b>ln</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>0 0.693 1.39<b class="b0">]</b></span> - natural logarithm </p>
+<p><span class="eq"><b>log</b><sub>2</sub> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>0 1 2<b class="b0">]</b></span> - binary logarithm </p>
+<p><span class="eq"><b>exp</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>2.72 7.39 54.6<b class="b0">]</b></span> - natural exponent = eˣ </p>
+<p><span class="eq">&ensp;&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;<var><span class="vec">⃗</span>x</var></span> = <b class="b0">[</b>1 1.41 2<b class="b0">]</b></span> - square root </p>
+<p><span class="eq">&hairsp;<sup class="nth">3</sup>&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;<var><span class="vec">⃗</span>x</var></span> = <b class="b0">[</b>1 1.26 1.59<b class="b0">]</b></span> - cubic root </p>
+<p><span class="eq">&hairsp;<sup class="nth">3</sup>&hairsp;&hairsp;<span class="o0"><span class="r">√</span>&hairsp;<var><span class="vec">⃗</span>x</var></span> = <b class="b0">[</b>1 1.26 1.59<b class="b0">]</b></span> - n-th root </p>
+<p>&nbsp;</p>
+<p>Rounding:<hr/> </p>
+<p><span class="eq"><b>round</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>1 2 4<b class="b0">]</b></span> - round to the nearest integer </p>
+<p><span class="eq"><b>floor</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>1 2 4<b class="b0">]</b></span> - round to the smaller integer(towards - ∞) </p>
+<p><span class="eq"><b>ceiling</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>1 2 4<b class="b0">]</b></span> - round to the greater integer(towards + ∞) </p>
+<p><span class="eq"><b>trunc</b> ( <var><span class="vec">⃗</span>x</var> )  = <b class="b0">[</b>1 2 4<b class="b0">]</b></span> - round to the smaller integer(towards zero) </p>
+<p>&nbsp;</p>
+<p>Integer:<hr/> </p>
+<p><span class="eq"><var><span class="vec">⃗</span>x</var> = <b class="b0">[</b>1 2 4<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>y</var> = <var><span class="vec">⃗</span>x</var> + 2 = <b class="b0">[</b>3 4 6<b class="b0">]</b></span></p>
+<p><span class="eq"><b>mod</b> ( <var><span class="vec">⃗</span>x</var>; <var><span class="vec">⃗</span>y</var> )  = <b class="b0">[</b>1 2 4<b class="b0">]</b></span> - the remainder of an integer division </p>
+<p><span class="eq"><b>gcd</b> ( <var><span class="vec">⃗</span>y</var> )  = 1</span> - the greatest common divisor of several integers </p>
+<p><span class="eq"><b>lcm</b> ( <var><span class="vec">⃗</span>y</var> )  = 12</span> - the least common multiple of several integers </p>
+<p>&nbsp;</p>
+<p>Aggregate and interpolation:<hr /> </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>0; 2; 6<span class="b0">]</span> = <b class="b0">[</b>0 2 6<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>b</var> = <span class="b0">[</span>5; 3; 1<span class="b0">]</span> = <b class="b0">[</b>5 3 1<b class="b0">]</b></span></p>
+<p><span class="eq"><b>min</b> ( 4; <var><span class="vec">⃗</span>a</var>; 7; <var><span class="vec">⃗</span>b</var>; 10; 11 )  = 0</span> - minimum of multiple values </p>
+<p><span class="eq"><b>max</b> ( 4; <var><span class="vec">⃗</span>a</var>; 7; <var><span class="vec">⃗</span>b</var>; 10; 11 )  = 11</span> - maximum of multiple values </p>
+<p><span class="eq"><b>sum</b> ( 4; <var><span class="vec">⃗</span>a</var>; 7; <var><span class="vec">⃗</span>b</var>; 10; 11 )  = 49</span> - sum of multiple values </p>
+<p><span class="eq"><b>sumsq</b> ( 4; <var><span class="vec">⃗</span>a</var>; 7; <var><span class="vec">⃗</span>b</var>; 10; 11 )  = 361</span> - sum of squares </p>
+<p><span class="eq"><b>srss</b> ( 4; <var><span class="vec">⃗</span>a</var>; 7; <var><span class="vec">⃗</span>b</var>; 10; 11 )  = 19</span> - square root of sum of squares </p>
+<p><span class="eq"><b>average</b> ( 4; <var><span class="vec">⃗</span>a</var>; 7; <var><span class="vec">⃗</span>b</var>; 10; 11 )  = 4.9</span> - average of multiple values </p>
+<p><span class="eq"><b>product</b> ( 4; <var><span class="vec">⃗</span>a</var>; 7; <var><span class="vec">⃗</span>b</var>; 10; 11 )  = 0</span> - product of multiple values </p>
+<p><span class="eq"><b>mean</b> ( 4; <var><span class="vec">⃗</span>a</var>; 7; <var><span class="vec">⃗</span>b</var>; 10; 11 )  = 0</span> - geometric mean </p>
+<p><span class="eq"><b>take</b> ( 3; <var><span class="vec">⃗</span>a</var> )  = 6</span> - the 3-rd element from the list </p>
+<p><span class="eq"><b>line</b> ( 1.5; <var><span class="vec">⃗</span>a</var> )  = 1</span> - linear interpolation </p>
+<p><span class="eq"><b>spline</b> ( 1.5; <var><span class="vec">⃗</span>a</var> )  = 0.812</span> - Hermite spline interpolation </p>
+</div>
+</figure>
+</div>
+
+<h2 id="vector-structural-functions">Vector Structural Functions<a class="headerlink" href="#vector-structural-functions" title="Permanent link">&para;</a></h2>
+<p>Structural plumbing for vectors: <span class="arithmatex">\(len\)</span> and <span class="arithmatex">\(size\)</span>, <span class="arithmatex">\(resize\)</span> to grow or shrink, <span class="arithmatex">\(slice\)</span> and <span class="arithmatex">\(first/last\)</span> to extract ranges, plus <span class="arithmatex">\(join\)</span> and <span class="arithmatex">\(reverse\)</span> to assemble new vectors out of existing ones — the glue between the data and math toolkits.</p>
+<div class="example-grid">
+<figure>
+<figcaption>Code:</figcaption>
+<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;style&gt;em {font-family:&quot;Times New Roman&quot;;}&lt;/style&gt;</span>
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Len&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) and &lt;b&gt;Size&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">&#39;Explicitly initialized short vectors:</span>
+<span class="nb">len</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">])</span><span class="c1">&#39;- vector length</span>
+<span class="nb">size</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">])</span><span class="c1">&#39;- the actual size in memory</span>
+<span class="c1">&#39;Size is equal to length even if last elements are zero</span>
+<span class="c1">&#39;Implicitly initialized large vectors:</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector</span><span class="p">(</span><span class="m">200</span><span class="p">)</span>
+<span class="nv">a</span><span class="m">.35</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span>
+<span class="nb">len</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- the lenght is equal to the count of all elements</span>
+<span class="nb">size</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- the size is equal to the index of the last element intitalized with a non-zero value</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Resize&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;new length&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">]</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">resize</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">&#39; - set a new size and return a reference to &lt;var&gt;a&lt;/var&gt;</span>
+<span class="nv">a</span><span class="c1">&#39;- the original vector was modified</span>
+<span class="nv">b</span><span class="m">.1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="c1">&#39;- changing a value in the referece...</span>
+<span class="nv">a</span><span class="c1">&#39;- also changes the original vector.</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Join&lt;/b&gt;(&lt;em&gt;mixed list of arguments&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">|</span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">]</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="m">8</span><span class="p">;</span><span class="w"> </span><span class="m">9</span><span class="p">]</span>
+<span class="nv">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">join</span><span class="p">(</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">A</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">)</span><span class="c1">&#39;- by function...</span>
+<span class="nv">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">A</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">]</span><span class="c1">&#39;- or by square brackets initializer.</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Slice&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;start index&lt;/em&gt;; &lt;em&gt;end index&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="m">8</span><span class="p">]</span>
+<span class="nb">slice</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">)</span><span class="c1">&#39;- segment between the 3-rd and 7-th elements of vector &lt;em&gt;a&lt;/em&gt;, incl.</span>
+<span class="nb">slice</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">)</span><span class="c1">&#39;- if the index is &gt; of the vector length, returns the elements up to the end</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;First&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;count&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">]</span>
+<span class="nb">first</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">&#39;- the first 3 elements of the vector &lt;em&gt;a&lt;/em&gt;</span>
+<span class="nb">first</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">)</span><span class="c1">&#39;- if the number of elements is &gt; the vector  length, returns all elements</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Last&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;count&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">]</span>
+<span class="nb">last</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">&#39;- the last 3 elements of the vector &lt;em&gt;a&lt;/em&gt;</span>
+<span class="nb">last</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">)</span><span class="c1">&#39;- if the number of elements is &gt; the length of the vector, returns all elements</span>
+
+<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Extract&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;indexes&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">]</span>
+<span class="nb">extract</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="p">[</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">])</span><span class="c1">&#39;- the elements of &lt;em&gt;a&lt;/em&gt;, with indexes 3, 4, and 6</span>
+</code></pre></div>
+
+</figure>
+<figure class="example-output">
+<figcaption>Rendered Output:</figcaption>
+<div class="calcpad-output"><!-- Structural plumbing for vectors: $len$ and $size$, $resize$ to grow or shrink, $slice$ and $first/last$ to extract ranges, plus $join$ and $reverse$ to assemble new vectors out of existing ones — the glue between the data and math toolkits. --> 
+<style>em {font-family:"Times New Roman";}</style> 
+<p><b>Len</b>(<em>vector</em>) and <b>Size</b>(<em>vector</em>)</p><hr/> 
+<p>Explicitly initialized short vectors: </p>
+<p><span class="eq"><b>len</b> ( <span class="b0">[</span>1; 2; 3; 0; 0<span class="b0">]</span> )  = 5</span> - vector length </p>
+<p><span class="eq"><b>size</b> ( <span class="b0">[</span>1; 2; 3; 0; 0<span class="b0">]</span> )  = 5</span> - the actual size in memory </p>
+<p>Size is equal to length even if last elements are zero </p>
+<p>Implicitly initialized large vectors: </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <b>vector</b> ( 200 )  = <b class="b0">[</b>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 <span title="179 elements skipped.">...</span> 0<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var><sub>35</sub> = 1</span></p>
+<p><span class="eq"><b>len</b> ( <var><span class="vec">⃗</span>a</var> )  = 200</span> - the lenght is equal to the count of all elements </p>
+<p><span class="eq"><b>size</b> ( <var><span class="vec">⃗</span>a</var> )  = 35</span> - the size is equal to the index of the last element intitalized with a non-zero value </p>
+<p>&nbsp;</p>
+<p><b>Resize</b>(<em>vector</em>; <em>new length</em>)</p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>1; 2; 3; 4; 5<span class="b0">]</span> = <b class="b0">[</b>1 2 3 4 5<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>b</var> = <b>resize</b> ( <var><span class="vec">⃗</span>a</var>; 3 )  = <b class="b0">[</b>1 2 3<b class="b0">]</b></span>  - set a new size and return a reference to <var>a</var> </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <b class="b0">[</b>1 2 3<b class="b0">]</b></span> - the original vector was modified </p>
+<p><span class="eq"><var><span class="vec">⃗</span>b</var><sub>1</sub> = 0</span> - changing a value in the referece... </p>
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <b class="b0">[</b>0 2 3<b class="b0">]</b></span> - also changes the original vector. </p>
+<p>&nbsp;</p>
+<p><b>Join</b>(<em>mixed list of arguments</em>)</p><hr/> 
+<p><span class="eq"><b><var>A</var></b> = <span class="b0">[</span>1; 2 <span class="b0">|</span> 3; 4<span class="b0">]</span> = <span class="matrix">
+<span class="tr"><span class="td"></span><span class="td">1</span><span class="td">2</span><span class="td"></span></span>
+<span class="tr"><span class="td"></span><span class="td">3</span><span class="td">4</span><span class="td"></span></span>
+</span>
+</span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>b</var> = <span class="b0">[</span>7; 8; 9<span class="b0">]</span> = <b class="b0">[</b>7 8 9<b class="b0">]</b></span></p>
+<p><span class="eq"><var><span class="vec">⃗</span>c</var> = <b>join</b> ( 0; <b><var>A</var></b>; 5; 6; <var><span class="vec">⃗</span>b</var> )  = <b class="b0">[</b>0 1 2 3 4 5 6 7 8 9<b class="b0">]</b></span> - by function... </p>
+<p><span class="eq"><var><span class="vec">⃗</span>c</var> = <span class="b0">[</span>0; <b><var>A</var></b>; 5; 6; <var><span class="vec">⃗</span>b</var><span class="b0">]</span> = <b class="b0">[</b>0 1 2 3 4 5 6 7 8 9<b class="b0">]</b></span> - or by square brackets initializer. </p>
+<p>&nbsp;</p>
+<p><b>Slice</b>(<em>vector</em>; <em>start index</em>; <em>end index</em>)</p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>1; 2; 3; 4; 5; 6; 7; 8<span class="b0">]</span> = <b class="b0">[</b>1 2 3 4 5 6 7 8<b class="b0">]</b></span></p>
+<p><span class="eq"><b>slice</b> ( <var><span class="vec">⃗</span>a</var>; 3; 7 )  = <b class="b0">[</b>3 4 5 6 7<b class="b0">]</b></span> - segment between the 3-rd and 7-th elements of vector <em>a</em>, incl. </p>
+<p><span class="eq"><b>slice</b> ( <var><span class="vec">⃗</span>a</var>; 6; 10 )  = <b class="b0">[</b>6 7 8<b class="b0">]</b></span> - if the index is > of the vector length, returns the elements up to the end </p>
+<p>&nbsp;</p>
+<p><b>First</b>(<em>vector</em>; <em>count</em>)</p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>0; 1; 2; 3; 4; 5; 6<span class="b0">]</span> = <b class="b0">[</b>0 1 2 3 4 5 6<b class="b0">]</b></span></p>
+<p><span class="eq"><b>first</b> ( <var><span class="vec">⃗</span>a</var>; 3 )  = <b class="b0">[</b>0 1 2<b class="b0">]</b></span> - the first 3 elements of the vector <em>a</em> </p>
+<p><span class="eq"><b>first</b> ( <var><span class="vec">⃗</span>a</var>; 10 )  = <b class="b0">[</b>0 1 2 3 4 5 6<b class="b0">]</b></span> - if the number of elements is > the vector  length, returns all elements </p>
+<p>&nbsp;</p>
+<p><b>Last</b>(<em>vector</em>; <em>count</em>)</p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>0; 1; 2; 3; 4; 5; 6<span class="b0">]</span> = <b class="b0">[</b>0 1 2 3 4 5 6<b class="b0">]</b></span></p>
+<p><span class="eq"><b>last</b> ( <var><span class="vec">⃗</span>a</var>; 3 )  = <b class="b0">[</b>4 5 6<b class="b0">]</b></span> - the last 3 elements of the vector <em>a</em> </p>
+<p><span class="eq"><b>last</b> ( <var><span class="vec">⃗</span>a</var>; 10 )  = <b class="b0">[</b>0 1 2 3 4 5 6<b class="b0">]</b></span> - if the number of elements is > the length of the vector, returns all elements </p>
+<p>&nbsp;</p>
+<p><b>Extract</b>(<em>vector</em>; <em>indexes</em>)</p><hr/> 
+<p><span class="eq"><var><span class="vec">⃗</span>a</var> = <span class="b0">[</span>0; 1; 2; 3; 4; 5; 6<span class="b0">]</span> = <b class="b0">[</b>0 1 2 3 4 5 6<b class="b0">]</b></span></p>
+<p><span class="eq"><b>extract</b> ( <var><span class="vec">⃗</span>a</var>; <span class="b0">[</span>2; 4; 6<span class="b0">]</span> )  = <b class="b0">[</b>1 3 5<b class="b0">]</b></span> - the elements of <em>a</em>, with indexes 3, 4, and 6 </p>
+</div>
+</figure>
+</div>
+
+<p>Spotted an error? <a href="https://github.com/imartincei/CalcpadCE/tree/main/Examples/Engineering/Vectors">Edit</a> these examples.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+  
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="../javascripts/mathjax/tex-chtml.js"></script>
+      
+    
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      $("body").on("click", ".fold > :first-child, .unfold > :first-child", function () {
+        var parent = $(this).parent();
+        if (parent.hasClass("fold")) {
+          parent.removeClass("fold").addClass("unfold");
+        } else {
+          parent.removeClass("unfold").addClass("fold");
+        }
+      });
+    });
+  </script>
+
+  </body>
+</html>
