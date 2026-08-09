@@ -86,7 +86,7 @@ namespace Calcpad.Tests.Highlighter
 
         [Fact]
         public void MalformedJson_IsReported() =>
-            Assert.Contains("malformed", Assert.Single(Messages("#UI {not json} a = 1")));
+            Assert.Contains("Invalid JSON in #UI", Assert.Single(Messages("#UI {not json} a = 1")));
 
         [Fact]
         public void UnknownProperty_IsReported() =>

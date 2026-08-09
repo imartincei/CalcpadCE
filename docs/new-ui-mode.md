@@ -448,7 +448,7 @@ engine when you run the document:
 | `#UI` directives do not support expressions. | The right-hand side is computed, not a value |
 | String mode is not supported by the `#UI` keyword. | The variable ends with `$`, or `"mode"` is not `number` |
 | Improper format for `#UI` keyword. Missing closing brace. | The JSON block is unterminated |
-| Improper format for `#UI` keyword. Invalid JSON. | The block is not valid JSON |
+| Invalid JSON in `#UI`. | The block is not valid JSON |
 | A `#UI` value has the wrong type. | A property was given the wrong kind of value |
 | The `#UI` type '…' is not recognized… | `"type"` is not one of the five |
 | The `#UI` … requires both keys and values arrays. | A drop-down or radio group is missing one |

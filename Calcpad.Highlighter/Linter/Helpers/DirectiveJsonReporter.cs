@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json;
+using Calcpad.Core;
 using Calcpad.Highlighter.Linter.Models;
 
 namespace Calcpad.Highlighter.Linter.Helpers
@@ -42,6 +43,13 @@ namespace Calcpad.Highlighter.Linter.Helpers
             _result.AddWarning(_lineIndex, _from, _to, _code, message);
 
         /// <summary>
+        /// Reports the payload as unparsable, in the same wording the engine uses, so a
+        /// document rejected while typing reads the same way when it is calculated.
+        /// </summary>
+        public void WarnInvalidJson() =>
+            Warn(string.Format(Messages.Invalid_JSON_in_0, _directive));
+
+        /// <summary>
         /// Parses the payload, returning null and reporting the failure when it is malformed.
         /// The caller owns the returned document.
         /// </summary>
@@ -53,7 +61,7 @@ namespace Calcpad.Highlighter.Linter.Helpers
             }
             catch (JsonException)
             {
-                Warn($"malformed JSON in {_directive} directive");
+                WarnInvalidJson();
                 return null;
             }
         }

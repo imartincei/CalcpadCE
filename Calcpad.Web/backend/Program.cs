@@ -226,6 +226,28 @@ try
     lifetime.ApplicationStopping.Register(() => FileLogger.LogInfo("ApplicationStopping"));
     lifetime.ApplicationStopped.Register(() => FileLogger.LogInfo("ApplicationStopped"));
 
+    // The startup check above validates the URL string handed to UseUrls, which is
+    // the intent rather than the outcome — a Kestrel:Endpoints section in
+    // appsettings.json overrides UseUrls entirely and would never appear in it.
+    // app.Urls is the ground truth, so re-check it once Kestrel has actually bound
+    // and stop the host if anything non-loopback got through. Registered before the
+    // port-file writer so `bindingRejected` is already set when that runs.
+    var bindingRejected = false;
+    lifetime.ApplicationStarted.Register(() =>
+    {
+        foreach (var bound in app.Urls)
+        {
+            if (Program.IsLoopbackUrl(bound)) continue;
+            bindingRejected = true;
+            FileLogger.LogError(
+                $"Bound to non-loopback address '{bound}' — shutting down",
+                new InvalidOperationException("non-loopback binding"));
+            Console.Error.WriteLine($"ERROR: refusing to serve on non-loopback address '{bound}'.");
+            lifetime.StopApplication();
+            return;
+        }
+    });
+
     // When --port-file was given, write the bound URL once Kestrel is
     // listening. The frontend (Tauri desktop) polls this file to discover
     // the random-port server without hard-coding 9420.
@@ -233,6 +255,9 @@ try
     {
         lifetime.ApplicationStarted.Register(() =>
         {
+            // A rejected binding is being torn down; publishing its URL would point
+            // the frontend at a server that is about to stop.
+            if (bindingRejected) return;
             try
             {
                 // Use the first listening URL — Kestrel resolves any
@@ -303,8 +328,18 @@ internal static partial class Program
     internal static bool IsLoopbackUrl(string urlString)
     {
         if (!Uri.TryCreate(urlString, UriKind.Absolute, out var uri)) return false;
-        var host = uri.Host;
+        return IsLoopbackHost(uri.Host);
+    }
+
+    /// <summary>
+    /// True for a bare hostname that denotes this machine (localhost, 127.0.0.0/8, ::1).
+    /// Takes a hostname without scheme or port, as found in a <c>Host</c> header.
+    /// </summary>
+    internal static bool IsLoopbackHost(string host)
+    {
         if (string.Equals(host, "localhost", StringComparison.OrdinalIgnoreCase)) return true;
-        return IPAddress.TryParse(host, out var ip) && IPAddress.IsLoopback(ip);
+        // Uri.Host keeps IPv6 literals in brackets; IPAddress.TryParse wants them bare.
+        var bare = host.StartsWith('[') && host.EndsWith(']') ? host[1..^1] : host;
+        return IPAddress.TryParse(bare, out var ip) && IPAddress.IsLoopback(ip);
     }
 }

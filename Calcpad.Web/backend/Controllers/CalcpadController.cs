@@ -21,13 +21,15 @@ namespace Calcpad.Server.Controllers
         private readonly CalcpadService _calcpadService;
         private readonly PdfGeneratorService _pdfService;
         private readonly ContentResolutionCache _contentResolutionCache;
+        private readonly IWebHostEnvironment _environment;
         private static readonly LintIgnoreRegionParser _lintIgnoreRegionParser = new();
 
-        public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService, ContentResolutionCache contentResolutionCache)
+        public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService, ContentResolutionCache contentResolutionCache, IWebHostEnvironment environment)
         {
             _calcpadService = calcpadService;
             _pdfService = pdfService;
             _contentResolutionCache = contentResolutionCache;
+            _environment = environment;
         }
 
         [HttpPost("convert")]
@@ -208,6 +210,11 @@ namespace Calcpad.Server.Controllers
         [HttpGet("debug-crash")]
         public IActionResult DebugCrash([FromQuery] string mode = "background-thread")
         {
+            // A plain GET needs no preflight, so outside Development any page the user
+            // visits could reach this and terminate their local server.
+            if (!_environment.IsDevelopment())
+                return NotFound();
+
             FileLogger.LogInfo("debug-crash invoked", $"mode={mode}");
 
             switch (mode)

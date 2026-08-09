@@ -37,13 +37,13 @@ namespace Calcpad.Core
         private readonly Dictionary<(string Name, int Line, int Occurrence), int> _uiDeclarationIndex = [];
         private readonly Dictionary<string, int> _uiLineOccurrences = [];
         private bool HasUiControls => _lineUiControls is { Count: > 0 };
-        private const int UiKeywordLength = 3; // "#ui"
+        private const string UiKeyword = "#UI";
         private const char ThinSpace = '\u2009'; // MathParser separates a value from its unit with this
 
         private KeywordResult ParseKeywordUi(ReadOnlySpan<char> s)
         {
             ResetUiState();
-            var cursor = UiKeywordLength;
+            var cursor = UiKeyword.Length;
             while (cursor < s.Length && s[cursor] == ' ')
                 ++cursor;
 
@@ -63,8 +63,8 @@ namespace Calcpad.Core
                 }
                 catch (JsonException)
                 {
-                    AppendError(s.ToString(), Messages.Improper_format_for_UI_keyword_Invalid_JSON, _currentLine);
-                    _uiSkipChars = SkipSpaces(s, UiKeywordLength);
+                    AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, UiKeyword), _currentLine);
+                    _uiSkipChars = SkipSpaces(s, UiKeyword.Length);
                     return KeywordResult.None;
                 }
                 _uiSkipChars = SkipSpaces(s, braceEnd + 1);

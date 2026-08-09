@@ -374,7 +374,14 @@
       </div>
       <!-- One preview iframe per editor group, stacked to mirror the editor
            split. allow-scripts is required so the injected console-interception
-           script (and any user #HTML script) actually runs in the iframe. -->
+           script (and any user #HTML script) actually runs in the iframe.
+           allow-same-origin is deliberately absent: paired with allow-scripts it
+           would leave the frame holding this window's origin, so script in a
+           #HTML block of an untrusted worksheet could walk window.parent into the
+           app and, on desktop, into the Tauri IPC behind it. An opaque origin
+           makes postMessage the only channel — see injectPreviewAgent. It also
+           denies the frame localStorage/indexedDB, which throw on an opaque
+           origin. -->
       <!-- Find-in-preview widget (VS Code style). Opened via Ctrl+F while the
            preview is focused, or the preview context menu. -->
       <div v-if="previewFind" class="preview-find" @contextmenu.prevent>
@@ -404,7 +411,7 @@
             :class="{ 'active-group': group.id === activeGroupId && isSplit && !uiModeFullscreen }"
             :style="previewGroupStyle(gi)"
             :ref="el => setPreviewRef(group.id, el)"
-            sandbox="allow-same-origin allow-scripts"
+            sandbox="allow-scripts"
           ></iframe>
           <div
             v-if="gi === 0 && isSplit && !uiModeFullscreen"
@@ -448,7 +455,7 @@
           class="preview-frame"
           :style="{ flex: '1 1 0', minHeight: '0' }"
           :ref="el => setUiPrintRef(activeGroup.id, el)"
-          sandbox="allow-same-origin allow-scripts"
+          sandbox="allow-scripts"
         ></iframe>
       </div>
     </div>
@@ -637,6 +644,23 @@ const previewEls = new Map<string, HTMLIFrameElement>()
 const uiPrintEls = new Map<string, HTMLIFrameElement>()
 // Last full (unstripped) HTML rendered per group, kept for "Open Full HTML".
 const previewHtmlByGroup = new Map<string, string>()
+// Where the user was in each frame's #UI form — focused control, caret, datagrid
+// cell, scroll offsets. Held here because the frame cannot keep it itself: a
+// re-render assigns srcdoc, and the fresh browsing context that creates has
+// neither the previous window nor, on an opaque origin, sessionStorage. Posted by
+// the backend's #UI script and seeded back into the next render.
+const uiPositionByFrame = new Map<string, unknown>()
+// Scroll offsets per frame *and* document, so re-rendering a document lands back
+// where the user was while switching tabs still starts at the top. Covers the
+// frames the backend's #UI script does not: preview, unwrapped and report modes,
+// plus the report companion beside the input form. The input form itself keeps
+// using that script, which restores the focused control and caret as well.
+const scrollByFrameDoc = new Map<string, { x: number; y: number }>()
+const docKeyByFrame = new Map<string, string>()
+
+function scrollKey(frameId: string, docKey: string): string {
+  return frameId + ' ' + docKey
+}
 
 function setEditorRef(id: string, el: unknown): void {
   if (el instanceof HTMLElement) editorEls.set(id, el)
@@ -840,6 +864,15 @@ function removeGroup(id: string): void {
   groups.value.splice(idx, 1)
   editorEls.delete(id)
   previewEls.delete(id)
+  uiPositionByFrame.delete(id)
+  uiPositionByFrame.delete(UI_PRINT_FRAME + id)
+  docKeyByFrame.delete(id)
+  docKeyByFrame.delete(UI_PRINT_FRAME + id)
+  for (const key of [...scrollByFrameDoc.keys()]) {
+    if (key.startsWith(id + ' ') || key.startsWith(UI_PRINT_FRAME + id + ' ')) {
+      scrollByFrameDoc.delete(key)
+    }
+  }
   if (activeGroupId.value === id) {
     activeGroupId.value = groups.value[0]?.id ?? 'g0'
   }
@@ -884,7 +917,7 @@ const onTabCopyRelativePathRequest = ref<((groupId: string, id: string) => void)
 const onCopyTextRequest = ref<((text: string) => void) | null>(null)
 // Read counterpart, set by the desktop host only. Its presence is what marks a
 // WebView whose frames have no usable native clipboard, so the preview takes
-// over its own Ctrl+C/X/V (see injectPreviewClipboard).
+// over its own Ctrl+C/X/V (see injectPreviewAgent).
 const onClipboardReadRequest = ref<(() => Promise<string>) | null>(null)
 
 // Opens the full rendered HTML as raw text in a new (unsaved) editor tab in
@@ -1049,7 +1082,10 @@ function onCopyAllOutput(): void {
 interface PreviewContextMenuState {
   x: number
   y: number
+  /** Owning editor group — what find and "Open Full HTML" act on. */
   groupId: string
+  /** The frame actually clicked; differs from groupId for a report pane. */
+  frameId: string
   selection: string
   editable: boolean
 }
@@ -1060,21 +1096,13 @@ function closePreviewContextMenu(): void {
 }
 
 function onPreviewClipboard(action: PreviewClipboardAction): void {
-  const groupId = previewContextMenu.value?.groupId
+  const frameId = previewContextMenu.value?.frameId
   closePreviewContextMenu()
-  if (groupId) void runPreviewClipboardAction(groupId, action)
+  if (frameId) void runPreviewClipboardAction(frameId, action)
 }
 
 // ---- Clipboard inside the preview (#UI input form) ----
 type PreviewClipboardAction = 'cut' | 'copy' | 'paste'
-
-// The slice of jspreadsheet the input form's datagrids are driven through.
-interface PreviewSheet {
-  selectedCell?: [number, number, number, number]
-  getData(): string[][]
-  setValueFromCoords(x: number, y: number, value: string): void
-  paste(x: number, y: number, text: string): void
-}
 
 // Clipboard-capable frames are addressed by group, with the report pane beside
 // the input form distinguished by a prefix since it shares its group's id.
@@ -1086,94 +1114,51 @@ function clipboardFrame(frameId: string): HTMLIFrameElement | null {
     : previewEls.get(frameId) ?? null
 }
 
-function frameSheet(frame: HTMLIFrameElement | null): PreviewSheet | null {
-  const win = frame?.contentWindow as
-    (Window & { jspreadsheet?: { current?: PreviewSheet } }) | null | undefined
-  const sheet = win?.jspreadsheet?.current
-  return sheet?.selectedCell ? sheet : null
-}
-
-// The value field the frame is sitting in. A datagrid keeps its position in the
-// library rather than in the focused element, so its own inputs (the hidden
-// copy textarea, an open cell editor) belong to the sheet path instead.
-function frameInput(frame: HTMLIFrameElement | null): HTMLInputElement | HTMLTextAreaElement | null {
-  const el = frame?.contentDocument?.activeElement as HTMLElement | null
-  if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return null
-  if (el.closest('.calcpad-ui-datagrid')) return null
-  return el as HTMLInputElement | HTMLTextAreaElement
-}
-
-function previewHasEditableTarget(groupId: string): boolean {
-  const frame = previewEls.get(groupId) ?? null
-  return frameInput(frame) !== null || frameSheet(frame) !== null
-}
-
 async function readClipboardText(): Promise<string> {
   if (onClipboardReadRequest.value) return await onClipboardReadRequest.value()
   try { return await navigator.clipboard.readText() } catch { return '' }
 }
 
-// The #UI script filters keystrokes on 'input' and commits the field on
-// 'change'; a programmatic edit raises neither. An edit that has not produced a
-// number is left uncommitted rather than reverted, so the text stays put.
-const UI_NUMBER = /^[-+]?(\d+\.?\d*|\.\d+)$/
-
-function commitPreviewInput(input: HTMLInputElement | HTMLTextAreaElement): void {
-  input.dispatchEvent(new Event('input', { bubbles: true }))
-  if (UI_NUMBER.test(input.value.trim())) input.dispatchEvent(new Event('change', { bubbles: true }))
+/** Sends a command to a preview frame's injected agent. See injectPreviewAgent. */
+function postToPreviewFrame(frameId: string, message: Record<string, unknown>): void {
+  // The frame is sandboxed to an opaque origin, so '*' is the only targetOrigin
+  // that can address it. That is safe in this direction: these commands carry no
+  // secrets, and the frame is the untrusted party — the boundary being defended
+  // is the other way round, in onPreviewWindowMessage.
+  clipboardFrame(frameId)?.contentWindow?.postMessage(message, '*')
 }
 
 /**
  * Runs a clipboard action against whatever the frame is focused on — a value
  * field, a datagrid selection, or the document selection for a plain copy.
  * Needed because the desktop WebView leaves the frame's own clipboard inert.
+ *
+ * The frame does the work: reaching into its DOM from here would require
+ * allow-same-origin on the iframe, which would also hand any script in an
+ * untrusted worksheet the run of this window (and, on desktop, the Tauri IPC).
+ * Paste text is resolved first because only the host can read the clipboard.
  */
 async function runPreviewClipboardAction(frameId: string, action: PreviewClipboardAction): Promise<void> {
-  const frame = clipboardFrame(frameId)
-  const input = frameInput(frame)
-  if (input) {
-    const start = input.selectionStart ?? 0
-    const end = input.selectionEnd ?? start
-    if (action === 'paste') {
-      const text = (await readClipboardText()).trim()
-      if (!text) return
-      input.setRangeText(text, start, end, 'end')
-      commitPreviewInput(input)
-      return
-    }
-    if (end === start) return
-    copyText(input.value.substring(start, end))
-    if (action === 'cut') {
-      input.setRangeText('', start, end, 'end')
-      commitPreviewInput(input)
-    }
-    return
-  }
+  const text = action === 'paste' ? await readClipboardText() : undefined
+  if (action === 'paste' && !text) return
+  if (action !== 'paste') armClipboardCopy(frameId)
+  postToPreviewFrame(frameId, { type: 'cpdClipboardExec', action, text })
+}
 
-  const sheet = frameSheet(frame)
-  if (sheet) {
-    const [sx, sy, ex, ey] = sheet.selectedCell!
-    const x1 = Math.min(sx, ex), x2 = Math.max(sx, ex)
-    const y1 = Math.min(sy, ey), y2 = Math.max(sy, ey)
-    if (action === 'paste') {
-      const text = await readClipboardText()
-      if (text) sheet.paste(x1, y1, text)
-      return
-    }
-    const data = sheet.getData()
-    const rows: string[] = []
-    for (let r = y1; r <= y2; r++) rows.push(data[r].slice(x1, x2 + 1).join('\t'))
-    copyText(rows.join('\n'))
-    // Every cell is an element of a matrix literal, so a cleared one is a zero.
-    if (action === 'cut')
-      for (let r = y1; r <= y2; r++)
-        for (let c = x1; c <= x2; c++) sheet.setValueFromCoords(c, r, '0')
-    return
-  }
+// A copy/cut reply is only honoured just after the host asked for one. The frame
+// supplies the text, so without this an untrusted worksheet could post
+// previewClipboardText on a timer and quietly own the user's clipboard.
+const clipboardCopyArmed = new Map<string, number>()
+const CLIPBOARD_REPLY_WINDOW_MS = 2000
 
-  if (action === 'paste') return
-  const selection = frame?.contentWindow?.getSelection()?.toString() ?? ''
-  if (selection) copyText(selection)
+function armClipboardCopy(frameId: string): void {
+  clipboardCopyArmed.set(frameId, performance.now())
+}
+
+function takeClipboardCopyArmed(frameId: string): boolean {
+  const at = clipboardCopyArmed.get(frameId)
+  clipboardCopyArmed.delete(frameId)
+  return at !== undefined && performance.now() - at < CLIPBOARD_REPLY_WINDOW_MS
 }
 
 // One Ctrl+V can reach here twice — from the frame's key handler and from the
@@ -1257,93 +1242,32 @@ function closePreviewFind(): void {
   previewFind.value = null
 }
 
-function previewDoc(groupId: string): Document | null {
-  return previewEls.get(groupId)?.contentDocument ?? null
-}
-
+// Find runs inside the frame (see injectPreviewAgent): the marking walk needs the
+// preview's DOM, and reaching it from here would mean allow-same-origin on a frame
+// that renders untrusted worksheet HTML. The host keeps only the counts, which the
+// frame reports back as cpdFindResult.
 function clearPreviewMarks(groupId: string): void {
-  const doc = previewDoc(groupId)
-  if (!doc) return
-  doc.querySelectorAll('mark.cpd-find').forEach(m => {
-    const parent = m.parentNode
-    if (!parent) return
-    parent.replaceChild(doc.createTextNode(m.textContent ?? ''), m)
-    parent.normalize()
-  })
+  postToPreviewFrame(groupId, { type: 'cpdFindClear' })
 }
 
 function applyPreviewSearch(): void {
   const f = previewFind.value
   if (!f) return
-  clearPreviewMarks(f.groupId)
-  const doc = previewDoc(f.groupId)
-  const query = f.query
-  if (!doc || !query) {
-    f.total = 0
-    f.current = 0
-    return
-  }
-  const needle = query.toLowerCase()
-  const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
-    acceptNode(node) {
-      const p = node.parentElement
-      if (!node.nodeValue || !p) return NodeFilter.FILTER_REJECT
-      const tag = p.tagName
-      if (tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT
-      return node.nodeValue.toLowerCase().includes(needle)
-        ? NodeFilter.FILTER_ACCEPT
-        : NodeFilter.FILTER_REJECT
-    },
-  })
-  const targets: Text[] = []
-  let n = walker.nextNode()
-  while (n) {
-    targets.push(n as Text)
-    n = walker.nextNode()
-  }
-  let count = 0
-  for (const node of targets) {
-    const text = node.nodeValue ?? ''
-    const hay = text.toLowerCase()
-    const frag = doc.createDocumentFragment()
-    let last = 0
-    let idx = hay.indexOf(needle)
-    while (idx !== -1) {
-      if (idx > last) frag.appendChild(doc.createTextNode(text.slice(last, idx)))
-      const mark = doc.createElement('mark')
-      mark.className = 'cpd-find'
-      mark.textContent = text.slice(idx, idx + query.length)
-      frag.appendChild(mark)
-      count++
-      last = idx + query.length
-      idx = hay.indexOf(needle, last)
-    }
-    if (last < text.length) frag.appendChild(doc.createTextNode(text.slice(last)))
-    node.parentNode?.replaceChild(frag, node)
-  }
-  f.total = count
-  f.current = 0
-  highlightCurrentMatch()
-}
-
-function highlightCurrentMatch(): void {
-  const f = previewFind.value
-  const doc = f && previewDoc(f.groupId)
-  if (!f || !doc) return
-  const marks = doc.querySelectorAll('mark.cpd-find')
-  marks.forEach(m => m.classList.remove('cpd-find-current'))
-  const target = marks[f.current] as HTMLElement | undefined
-  if (target) {
-    target.classList.add('cpd-find-current')
-    target.scrollIntoView({ block: 'center' })
-  }
+  postToPreviewFrame(f.groupId, { type: 'cpdFindApply', query: f.query })
 }
 
 function previewFindStep(dir: number): void {
   const f = previewFind.value
   if (!f || f.total === 0) return
-  f.current = (f.current + dir + f.total) % f.total
-  highlightCurrentMatch()
+  postToPreviewFrame(f.groupId, { type: 'cpdFindStep', dir })
+}
+
+/** Applies the match counts a frame reports after running a find command. */
+function onPreviewFindResult(groupId: string, total: number, current: number): void {
+  const f = previewFind.value
+  if (!f || f.groupId !== groupId) return
+  f.total = total
+  f.current = current
 }
 
 function onDocumentInteractionForTabMenu(e: MouseEvent | KeyboardEvent): void {
@@ -1354,33 +1278,97 @@ function onDocumentInteractionForTabMenu(e: MouseEvent | KeyboardEvent): void {
   closePreviewContextMenu()
 }
 
+/**
+ * The frame a message came from, or null if it was not one of ours. Preview
+ * frames are sandboxed to an opaque origin, so `e.origin` is the string "null"
+ * for all of them and cannot tell them apart from any other opaque sender —
+ * window identity is the check that means something. Anything else reaching this
+ * listener (an ad frame in an embedded page, a popup that kept a handle on this
+ * window) is dropped before it can drive the clipboard or the context menu.
+ */
+function senderFrameId(source: MessageEventSource | null): string | null {
+  if (!source) return null
+  for (const [groupId, el] of previewEls) {
+    if (el.contentWindow === source) return groupId
+  }
+  for (const [groupId, el] of uiPrintEls) {
+    if (el.contentWindow === source) return UI_PRINT_FRAME + groupId
+  }
+  return null
+}
+
+/**
+ * True if a message came from one of this app's preview frames. Exposed so the
+ * host's own listener in main.ts can apply the same check to the frame-originated
+ * messages it handles (previewConsole, navigateToLine, uiValueChange).
+ */
+function isPreviewFrameSource(source: MessageEventSource | null): boolean {
+  return senderFrameId(source) !== null
+}
+
 function onPreviewWindowMessage(e: MessageEvent): void {
   const data = e.data
   if (!data || typeof data.type !== 'string') return
+  const frameId = senderFrameId(e.source)
+  if (!frameId) return
+  // A frame may only speak for itself: the ids it sends are used to route
+  // clipboard and find commands, so taking them on trust would let one preview
+  // drive another's.
+  const groupId = frameId.startsWith(UI_PRINT_FRAME)
+    ? frameId.slice(UI_PRINT_FRAME.length)
+    : frameId
+
   if (data.type === 'previewContextMenuDismiss') {
     closePreviewContextMenu()
     return
   }
   if (data.type === 'previewContextMenu') {
-    const iframe = previewEls.get(data.groupId)
+    const iframe = clipboardFrame(frameId)
     if (!iframe) return
     const rect = iframe.getBoundingClientRect()
     previewContextMenu.value = {
       x: rect.left + (Number(data.x) || 0),
       y: rect.top + (Number(data.y) || 0),
-      groupId: data.groupId,
+      groupId,
+      frameId,
       selection: typeof data.selection === 'string' ? data.selection : '',
-      editable: previewHasEditableTarget(data.groupId),
+      // Reported by the frame, which is the only side that can see what it has
+      // focused now that the host cannot reach into its document.
+      editable: data.editable === true,
     }
     return
   }
   if (data.type === 'previewClipboardAction') {
     const action = data.action as PreviewClipboardAction
-    if (!isRepeatedPreviewClipboard(action)) void runPreviewClipboardAction(data.frameId, action)
+    if (!isRepeatedPreviewClipboard(action)) void runPreviewClipboardAction(frameId, action)
+    return
+  }
+  // Copy/cut text the frame extracted, on its way to the host-owned clipboard.
+  // Only accepted as the reply to a copy the host just requested.
+  if (data.type === 'previewClipboardText') {
+    if (!takeClipboardCopyArmed(frameId)) return
+    if (typeof data.text === 'string') copyText(data.text)
+    return
+  }
+  if (data.type === 'cpdFindResult') {
+    onPreviewFindResult(groupId, Number(data.total) || 0, Number(data.current) || 0)
+    return
+  }
+  if (data.type === 'cpdUiState') {
+    if (data.state && typeof data.state === 'object') uiPositionByFrame.set(frameId, data.state)
+    return
+  }
+  if (data.type === 'cpdScrollState') {
+    const docKey = docKeyByFrame.get(frameId)
+    if (docKey === undefined) return
+    scrollByFrameDoc.set(scrollKey(frameId, docKey), {
+      x: Number(data.x) || 0,
+      y: Number(data.y) || 0,
+    })
     return
   }
   if (data.type === 'previewFindOpen') {
-    openPreviewFind(data.groupId ?? activeGroupId.value)
+    openPreviewFind(groupId)
   }
 }
 
@@ -1609,14 +1597,26 @@ function setPreviewLoading(groupId: string, loading: boolean): void {
 // prone to desync after certain content swaps (e.g. a resultMode change) -- once that
 // happened, the preview's scrollbar was gone for good until the iframe itself was
 // recreated. A fresh navigation each render sidesteps that entirely.
-function setPreviewHtml(groupId: string, html: string, scrollToLine?: number): void {
+function setPreviewHtml(groupId: string, html: string, scrollToLine?: number, docKey = ''): void {
   const frame = previewEls.get(groupId)
   if (!frame) return
-  const lineLinks = resultMode.value !== 'ui'
-  frame.srcdoc = injectPreviewConsole(
-    injectPreviewClipboard(injectLineLinks(html, scrollToLine, groupId, undefined, lineLinks), groupId),
+  // In input mode the backend's #UI script owns the position, restoring the focused
+  // control and caret along with the offset; elsewhere it is not injected at all,
+  // so the agent carries the scroll.
+  const isUi = resultMode.value === 'ui'
+  docKeyByFrame.set(groupId, docKey)
+  let out = injectPreviewAgent(
+    injectLineLinks(html, scrollToLine, groupId, undefined, !isUi),
     groupId,
+    !!onClipboardReadRequest.value,
+    !isUi,
   )
+  out = injectPreviewConsole(out, groupId)
+  out = injectUiPosition(out, groupId)
+  // An explicit line target is a navigation the user asked for, and outranks
+  // returning them to where they were.
+  if (!isUi && scrollToLine === undefined) out = injectSavedScroll(out, groupId, docKey)
+  frame.srcdoc = out
   previewHtmlByGroup.set(groupId, html)
   setPreviewHtmlOutput(groupId, html)
 }
@@ -1628,11 +1628,21 @@ function setPreviewHtml(groupId: string, html: string, scrollToLine?: number): v
  * hover line links: input mode hides the editor they would navigate to. The report shown
  * in report mode, where the editor is on screen, keeps them.
  */
-function setUiPrintHtml(groupId: string, html: string): void {
+function setUiPrintHtml(groupId: string, html: string, docKey = ''): void {
   const frame = uiPrintEls.get(groupId)
   if (!frame) return
   const frameId = UI_PRINT_FRAME + groupId
-  frame.srcdoc = injectPreviewClipboard(injectLineLinks(html, undefined, groupId, frameId, false), frameId)
+  docKeyByFrame.set(frameId, docKey)
+  frame.srcdoc = injectSavedScroll(
+    injectPreviewAgent(
+      injectLineLinks(html, undefined, groupId, frameId, false),
+      frameId,
+      !!onClipboardReadRequest.value,
+      true,
+    ),
+    frameId,
+    docKey,
+  )
 }
 
 function isUiPrintVisible(): boolean {
@@ -1702,7 +1712,11 @@ function injectLineLinks(
     // right-click nets an open menu and any other click dismisses it.
     "  var postMenu = function(type, e) {",
     "    var sel = ''; try { sel = String(window.getSelection() || ''); } catch (_e) {}",
-    "    try { window.parent.postMessage({ type: type, x: e ? e.clientX : 0, y: e ? e.clientY : 0, selection: sel, groupId: FRAME_ID }, '*'); } catch (_e2) {}",
+    // Whether the menu offers cut/paste depends on what this frame has focused,
+    // which only this side can see. injectPreviewAgent publishes the probe.
+    "    var editable = false;",
+    "    try { editable = !!(window.__calcpadPreviewEditable && window.__calcpadPreviewEditable()); } catch (_e1) {}",
+    "    try { window.parent.postMessage({ type: type, x: e ? e.clientX : 0, y: e ? e.clientY : 0, selection: sel, editable: editable, groupId: FRAME_ID }, '*'); } catch (_e2) {}",
     "  };",
     // Datagrids bring their own menu, so a right-click inside one is left alone.
     "  document.addEventListener('contextmenu', function(e) {",
@@ -1803,6 +1817,35 @@ function injectLineLinks(
   return insertHeadScript(html, body)
 }
 
+/**
+ * Seeds the position the frame reported before this render into the new document,
+ * where the backend's #UI script picks it up as the fallback its readState()
+ * already looks for. Consumed once, matching that script's own semantics: a stale
+ * position must not steal focus when a document is opened fresh rather than
+ * re-rendered. Goes in <head>, so it runs before the #UI script at </body>.
+ */
+function injectUiPosition(html: string, frameId: string): string {
+  const state = uiPositionByFrame.get(frameId)
+  if (state === undefined) return html
+  uiPositionByFrame.delete(frameId)
+  // The state carries a control key taken from the document, so close any tag the
+  // serialization could otherwise open.
+  const json = JSON.stringify(state).replace(/</g, '\\u003c')
+  return insertHeadScript(html, 'window.__calcpadUiPosition = ' + json + ';')
+}
+
+/**
+ * Seeds the offset this frame last reported for this document, so the agent can
+ * scroll back once the replacement has laid out. Unlike the #UI position this is
+ * not consumed on read: a render that follows one the user did not scroll through
+ * should still land where they were.
+ */
+function injectSavedScroll(html: string, frameId: string, docKey: string): string {
+  const pos = scrollByFrameDoc.get(scrollKey(frameId, docKey))
+  if (!pos || (pos.x === 0 && pos.y === 0)) return html
+  return insertHeadScript(html, 'window.__calcpadScrollPosition = ' + JSON.stringify(pos) + ';')
+}
+
 function insertHeadScript(html: string, body: string): string {
   const script = '<' + 'script>' + body + '</' + 'script>'
   const headIdx = html.indexOf('<head>')
@@ -1812,19 +1855,106 @@ function insertHeadScript(html: string, body: string): string {
   return script + html
 }
 
-// Hand the frame's Ctrl+C/X/V to the parent, which owns the only working
-// clipboard on a host whose WebView leaves the frame's inert (WebKitGTK, in the
-// desktop app). Capture phase with propagation stopped, so the datagrid library
-// never sees the keys either: its own Ctrl+X would clear the cells before the
-// copy could read them, and its paste depends on an event that never fires.
-// Only injected where the host has offered a clipboard to route through — in a
-// browser the frame's native handling is the better one.
-function injectPreviewClipboard(html: string, frameId: string): string {
-  if (!onClipboardReadRequest.value) return html
+/**
+ * The frame's half of find-in-preview and the clipboard bridge.
+ *
+ * Both used to run in the host, reaching through `iframe.contentDocument`. That
+ * needs `allow-same-origin`, which — combined with the `allow-scripts` the
+ * rendered report requires — is not a sandbox at all: the frame keeps this
+ * window's origin, so script in a `#HTML` block of an untrusted worksheet could
+ * walk `window.parent` into the app, and on desktop into the Tauri IPC. Keeping
+ * the DOM work on this side lets the frame hold an opaque origin, leaving
+ * postMessage as the only channel across.
+ *
+ * `interceptClipboard` mirrors the old injection condition: only a host that has
+ * offered a clipboard to route through takes the frame's Ctrl+C/X/V, since in a
+ * browser the frame's own handling is the better one. Capture phase with
+ * propagation stopped, so the datagrid library never sees the keys either — its
+ * Ctrl+X would clear the cells before the copy could read them, and its paste
+ * depends on an event that never fires.
+ */
+function injectPreviewAgent(
+  html: string,
+  frameId: string,
+  interceptClipboard: boolean,
+  ownScroll: boolean,
+): string {
   const id = JSON.stringify(frameId)
   const body = [
     '(function() {',
     '  var FRAME_ID = ' + id + ';',
+    '  if (window.__calcpadAgentReady) return;',
+    '  window.__calcpadAgentReady = true;',
+    "  var send = function(msg) { msg.frameId = FRAME_ID; try { window.parent.postMessage(msg, '*'); } catch (_e) {} };",
+    '',
+    // ---- focus probes ----
+    // A datagrid keeps its position in the library rather than in the focused
+    // element, so its own inputs (the hidden copy textarea, an open cell editor)
+    // belong to the sheet path instead.
+    '  function activeInput() {',
+    '    var el = document.activeElement;',
+    "    if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return null;",
+    "    if (el.closest && el.closest('.calcpad-ui-datagrid')) return null;",
+    '    return el;',
+    '  }',
+    '  function activeSheet() {',
+    '    var js = window.jspreadsheet;',
+    '    var sheet = js && js.current;',
+    '    return sheet && sheet.selectedCell ? sheet : null;',
+    '  }',
+    // Read by the context-menu post in injectLineLinks, which runs later.
+    '  window.__calcpadPreviewEditable = function() {',
+    '    return !!(activeInput() || activeSheet());',
+    '  };',
+    '',
+    // ---- clipboard ----
+    // The #UI script filters keystrokes on 'input' and commits the field on
+    // 'change'; a programmatic edit raises neither. An edit that has not produced
+    // a number is left uncommitted rather than reverted, so the text stays put.
+    '  var UI_NUMBER = /^[-+]?(\\d+\\.?\\d*|\\.\\d+)$/;',
+    '  function commit(input) {',
+    "    input.dispatchEvent(new Event('input', { bubbles: true }));",
+    "    if (UI_NUMBER.test(input.value.trim())) input.dispatchEvent(new Event('change', { bubbles: true }));",
+    '  }',
+    '  function runClipboard(action, text) {',
+    '    var input = activeInput();',
+    '    if (input) {',
+    '      var start = input.selectionStart || 0;',
+    '      var end = input.selectionEnd == null ? start : input.selectionEnd;',
+    "      if (action === 'paste') {",
+    "        var t = (text || '').trim();",
+    '        if (!t) return;',
+    "        input.setRangeText(t, start, end, 'end');",
+    '        commit(input);',
+    '        return;',
+    '      }',
+    '      if (end === start) return;',
+    "      send({ type: 'previewClipboardText', text: input.value.substring(start, end) });",
+    "      if (action === 'cut') { input.setRangeText('', start, end, 'end'); commit(input); }",
+    '      return;',
+    '    }',
+    '    var sheet = activeSheet();',
+    '    if (sheet) {',
+    '      var sel = sheet.selectedCell;',
+    '      var x1 = Math.min(sel[0], sel[2]), x2 = Math.max(sel[0], sel[2]);',
+    '      var y1 = Math.min(sel[1], sel[3]), y2 = Math.max(sel[1], sel[3]);',
+    "      if (action === 'paste') { if (text) sheet.paste(x1, y1, text); return; }",
+    '      var data = sheet.getData();',
+    '      var rows = [];',
+    "      for (var r = y1; r <= y2; r++) rows.push(data[r].slice(x1, x2 + 1).join('\\t'));",
+    "      send({ type: 'previewClipboardText', text: rows.join('\\n') });",
+    // Every cell is an element of a matrix literal, so a cleared one is a zero.
+    "      if (action === 'cut')",
+    '        for (var r2 = y1; r2 <= y2; r2++)',
+    "          for (var c = x1; c <= x2; c++) sheet.setValueFromCoords(c, r2, '0');",
+    '      return;',
+    '    }',
+    "    if (action === 'paste') return;",
+    "    var selection = '';",
+    "    try { selection = String(window.getSelection() || ''); } catch (_e) {}",
+    "    if (selection) send({ type: 'previewClipboardText', text: selection });",
+    '  }',
+    ...(interceptClipboard ? [
     "  var ACTIONS = { c: 'copy', x: 'cut', v: 'paste' };",
     "  document.addEventListener('keydown', function(e) {",
     '    if ((!e.ctrlKey && !e.metaKey) || e.altKey || e.shiftKey) return;',
@@ -1832,8 +1962,118 @@ function injectPreviewClipboard(html: string, frameId: string): string {
     '    if (!action) return;',
     '    e.preventDefault();',
     '    e.stopImmediatePropagation();',
-    "    try { window.parent.postMessage({ type: 'previewClipboardAction', action: action, frameId: FRAME_ID }, '*'); } catch (_e) {}",
+    // The host resolves paste text and echoes the action back as cpdClipboardExec.
+    "    send({ type: 'previewClipboardAction', action: action });",
     '  }, true);',
+    ] : []),
+    '',
+    // ---- find ----
+    '  var matches = [];',
+    '  var current = 0;',
+    '  function clearMarks() {',
+    "    var marks = document.querySelectorAll('mark.cpd-find');",
+    '    for (var i = 0; i < marks.length; i++) {',
+    '      var m = marks[i];',
+    '      var parent = m.parentNode;',
+    '      if (!parent) continue;',
+    "      parent.replaceChild(document.createTextNode(m.textContent || ''), m);",
+    '      parent.normalize();',
+    '    }',
+    '    matches = [];',
+    '    current = 0;',
+    '  }',
+    '  function highlight() {',
+    '    for (var i = 0; i < matches.length; i++) matches[i].classList.remove(\'cpd-find-current\');',
+    '    var target = matches[current];',
+    '    if (!target) return;',
+    "    target.classList.add('cpd-find-current');",
+    "    target.scrollIntoView({ block: 'center' });",
+    '  }',
+    '  function applyFind(query) {',
+    '    clearMarks();',
+    '    if (!query || !document.body) { send({ type: \'cpdFindResult\', total: 0, current: 0 }); return; }',
+    '    var needle = query.toLowerCase();',
+    '    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {',
+    '      acceptNode: function(node) {',
+    '        var p = node.parentElement;',
+    '        if (!node.nodeValue || !p) return NodeFilter.FILTER_REJECT;',
+    "        if (p.tagName === 'SCRIPT' || p.tagName === 'STYLE') return NodeFilter.FILTER_REJECT;",
+    '        return node.nodeValue.toLowerCase().indexOf(needle) !== -1',
+    '          ? NodeFilter.FILTER_ACCEPT',
+    '          : NodeFilter.FILTER_REJECT;',
+    '      }',
+    '    });',
+    '    var targets = [];',
+    '    var n = walker.nextNode();',
+    '    while (n) { targets.push(n); n = walker.nextNode(); }',
+    '    for (var i = 0; i < targets.length; i++) {',
+    '      var node = targets[i];',
+    "      var text = node.nodeValue || '';",
+    '      var hay = text.toLowerCase();',
+    '      var frag = document.createDocumentFragment();',
+    '      var last = 0;',
+    '      var idx = hay.indexOf(needle);',
+    '      while (idx !== -1) {',
+    '        if (idx > last) frag.appendChild(document.createTextNode(text.slice(last, idx)));',
+    "        var mark = document.createElement('mark');",
+    "        mark.className = 'cpd-find';",
+    '        mark.textContent = text.slice(idx, idx + query.length);',
+    '        frag.appendChild(mark);',
+    '        matches.push(mark);',
+    '        last = idx + query.length;',
+    '        idx = hay.indexOf(needle, last);',
+    '      }',
+    '      if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));',
+    '      if (node.parentNode) node.parentNode.replaceChild(frag, node);',
+    '    }',
+    '    current = 0;',
+    '    highlight();',
+    "    send({ type: 'cpdFindResult', total: matches.length, current: current });",
+    '  }',
+    '  function stepFind(dir) {',
+    '    if (!matches.length) return;',
+    '    current = (current + dir + matches.length) % matches.length;',
+    '    highlight();',
+    "    send({ type: 'cpdFindResult', total: matches.length, current: current });",
+    '  }',
+    '',
+    // ---- scroll ----
+    // Every render replaces the document (srcdoc forces a fresh browsing context),
+    // so the offset has to be handed to the host and seeded back. Skipped for the
+    // input form, whose #UI script restores scroll along with focus and caret.
+    ...(ownScroll ? [
+    '  var startAt = window.__calcpadScrollPosition || null;',
+    '  window.__calcpadScrollPosition = null;',
+    '  if (startAt) {',
+    '    var scrollBack = function() { window.scrollTo(startAt.x || 0, startAt.y || 0); };',
+    "    document.addEventListener('DOMContentLoaded', scrollBack);",
+    // Late-loading images reflow the page and clamp the offset, so the position is
+    // only final once everything has laid out.
+    "    window.addEventListener('load', scrollBack);",
+    '  }',
+    '  var scrollQueued = false;',
+    "  window.addEventListener('scroll', function() {",
+    '    if (scrollQueued) return;',
+    '    scrollQueued = true;',
+    '    requestAnimationFrame(function() {',
+    '      scrollQueued = false;',
+    "      send({ type: 'cpdScrollState', x: window.scrollX, y: window.scrollY });",
+    '    });',
+    '  });',
+    ] : []),
+    '',
+    // ---- command channel ----
+    // Only the host embeds this document, so window.parent is the one sender that
+    // can reach here; commands from anywhere else are ignored.
+    "  window.addEventListener('message', function(e) {",
+    '    if (e.source !== window.parent) return;',
+    '    var d = e.data;',
+    "    if (!d || typeof d.type !== 'string') return;",
+    "    if (d.type === 'cpdFindApply') applyFind(String(d.query || ''));",
+    "    else if (d.type === 'cpdFindStep') stepFind(Number(d.dir) || 0);",
+    "    else if (d.type === 'cpdFindClear') clearMarks();",
+    "    else if (d.type === 'cpdClipboardExec') runClipboard(d.action, d.text);",
+    '  });',
     '})();',
   ].join('\n')
   return insertHeadScript(html, body)
@@ -2026,6 +2266,7 @@ defineExpose({
   setPreviewHtml,
   setPreviewLoading,
   scrollPreviewToSourceLine,
+  isPreviewFrameSource,
   setProblems,
   onGotoProblem,
   onPreviewToggled,

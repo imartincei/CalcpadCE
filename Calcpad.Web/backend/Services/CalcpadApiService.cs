@@ -41,9 +41,9 @@ namespace Calcpad.Server.Services
 
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", policy =>
+                options.AddPolicy(CorsPolicyName, policy =>
                 {
-                    policy.AllowAnyOrigin()
+                    policy.SetIsOriginAllowed(IsAllowedOrigin)
                           .AllowAnyMethod()
                           .AllowAnyHeader()
                           .WithExposedHeaders("X-Calcpad-Errors");
@@ -51,6 +51,65 @@ namespace Calcpad.Server.Services
             });
 
             return builder;
+        }
+
+        internal const string CorsPolicyName = "CalcpadHosts";
+
+        /// <summary>
+        /// Origins permitted to call the API from a browsing context.
+        /// </summary>
+        /// <remarks>
+        /// Binding to loopback keeps remote machines out, but not other programs on
+        /// this one — and that includes the user's ordinary web browser. A page the
+        /// user visits in Chrome can POST to <c>http://127.0.0.1:{port}/api/calcpad/convert</c>
+        /// with <c>#include ~/.ssh/id_rsa</c>; include resolution reads whatever path
+        /// it is handed (see <see cref="CalcpadService.CreateIncludeDelegate"/>) and
+        /// returns it in the rendered HTML. The server has no authentication, so the
+        /// requesting origin is the only thing standing between that page and the
+        /// file. <c>AllowAnyOrigin</c> removed it. The desktop app's own WebView is
+        /// not involved in any of this.
+        /// <para>
+        /// The random port is not a defense: an ephemeral range is a few tens of
+        /// thousands of ports, sweepable from a page in seconds and fingerprintable
+        /// off <c>/api/calcpad/sample</c>.
+        /// </para>
+        /// <para>
+        /// Restricting the origin blocks the request rather than just the response.
+        /// The endpoints take <c>[FromBody]</c> on an <c>[ApiController]</c>, so they
+        /// require <c>Content-Type: application/json</c> — a non-simple request that
+        /// needs a successful preflight before the browser will send it at all.
+        /// </para>
+        /// <para>
+        /// This does not stop DNS rebinding, where the attacker's own hostname
+        /// resolves to 127.0.0.1 and the request is therefore same-origin with no
+        /// CORS check at all. <see cref="ConfigureApp"/> validates the Host header
+        /// for that.
+        /// </para>
+        /// <para>
+        /// Native callers (the VS Code extension host, build scripts) send no Origin
+        /// header and never reach this — CORS is enforced by browsers, not servers.
+        /// <c>vscode-webview://</c> is deliberately absent: VS Code webviews reach
+        /// the API through the extension host over postMessage, never by fetch.
+        /// </para>
+        /// <para>
+        /// "null" is rejected. That is what a sandboxed, opaque-origin frame sends,
+        /// which is exactly how the desktop app renders untrusted worksheet HTML.
+        /// </para>
+        /// </remarks>
+        internal static bool IsAllowedOrigin(string origin)
+        {
+            if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri)) return false;
+
+            // Tauri serves the desktop shell from a custom scheme: tauri://localhost
+            // on Linux/macOS, http(s)://tauri.localhost on Windows (WebView2).
+            if (uri.Scheme.Equals("tauri", StringComparison.OrdinalIgnoreCase)) return true;
+            if (uri.Host.Equals("tauri.localhost", StringComparison.OrdinalIgnoreCase)) return true;
+
+            // The browser build of the editor, served from loopback on any port. This
+            // also admits any other local server's pages, which is the accepted floor:
+            // anything able to serve on this machine's loopback is already past the
+            // boundary this policy defends.
+            return Program.IsLoopbackHost(uri.Host);
         }
 
         /// <summary>
@@ -77,6 +136,28 @@ namespace Calcpad.Server.Services
                 }
             });
 
+            // DNS rebinding defense, and the reason CORS alone is not enough. An
+            // attacker who points their own hostname at 127.0.0.1 makes the request
+            // same-origin from the browser's point of view, so no CORS check runs —
+            // but the Host header still carries their name rather than ours. Only
+            // loopback names are served. Requests with no Host header at all are let
+            // through: HTTP/1.1 requires one and browsers always send it, so its
+            // absence means a native client, which was never the exposure here.
+            app.Use(async (context, next) =>
+            {
+                var host = context.Request.Host.Host;
+                if (!string.IsNullOrEmpty(host) && !Program.IsLoopbackHost(host))
+                {
+                    FileLogger.LogWarning(
+                        "Rejected request with non-loopback Host header",
+                        $"{host} — {context.Request.Method} {context.Request.Path}");
+                    context.Response.StatusCode = 421; // Misdirected Request
+                    await context.Response.WriteAsync("Misdirected Request");
+                    return;
+                }
+                await next();
+            });
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -84,7 +165,7 @@ namespace Calcpad.Server.Services
             }
 
             app.UseHttpsRedirection();
-            app.UseCors("AllowAll");
+            app.UseCors(CorsPolicyName);
 
             app.MapControllers();
 

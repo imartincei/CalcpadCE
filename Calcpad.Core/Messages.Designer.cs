@@ -718,11 +718,11 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to Invalid settings JSON: {0}..
+        // /   Looks up a localized string similar to Invalid JSON in {0}..
         // / </summary>
-        public static string Invalid_settings_0 {
+        public static string Invalid_JSON_in_0 {
             get {
-                return ResourceManager.GetString("Invalid_settings_0", resourceCulture);
+                return ResourceManager.GetString("Invalid_JSON_in_0", resourceCulture);
             }
         }
 
@@ -1650,15 +1650,6 @@ namespace Calcpad.Core {
         public static string Improper_format_for_UI_keyword_Missing_closing_brace {
             get {
                 return ResourceManager.GetString("Improper_format_for_UI_keyword_Missing_closing_brace", resourceCulture);
-            }
-        }
-
-        // / <summary>
-        // /   Looks up a localized string similar to Improper format for #UI keyword. Invalid JSON..
-        // / </summary>
-        public static string Improper_format_for_UI_keyword_Invalid_JSON {
-            get {
-                return ResourceManager.GetString("Improper_format_for_UI_keyword_Invalid_JSON", resourceCulture);
             }
         }
 

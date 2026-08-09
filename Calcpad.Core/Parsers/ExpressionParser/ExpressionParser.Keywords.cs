@@ -700,7 +700,7 @@ namespace Calcpad.Core
             var json = s[SettingsKeyword.Length..].Trim();
             if (json.IsEmpty)
             {
-                AppendError(s.ToString(), string.Format(Messages.Invalid_settings_0, json.ToString()), _currentLine);
+                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine);
                 return;
             }
             try
@@ -722,7 +722,7 @@ namespace Calcpad.Core
             }
             catch (JsonException)
             {
-                AppendError(s.ToString(), string.Format(Messages.Invalid_settings_0, json.ToString()), _currentLine);
+                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine);
             }
         }
 

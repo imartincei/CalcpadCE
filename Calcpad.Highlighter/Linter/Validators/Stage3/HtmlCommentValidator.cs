@@ -53,7 +53,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
                 if (block.Status != HtmlCommentParseStatus.Success || block.Data is null)
                 {
-                    reporter.Warn("malformed JSON in metadata comment");
+                    reporter.WarnInvalidJson();
                     continue;
                 }
 

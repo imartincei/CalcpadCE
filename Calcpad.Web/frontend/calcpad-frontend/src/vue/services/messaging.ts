@@ -48,7 +48,16 @@ export function initMessaging(): IMessaging {
         instance = {
             postMessage: (msg: unknown) => bridge.handleMessage(serializeForPostMessage(msg)),
             onMessage: (handler: (message: unknown) => void) => {
-                window.addEventListener('message', (e: MessageEvent) => handler(e.data));
+                // This window also hosts the preview iframes, which render untrusted
+                // worksheet HTML and can post anything they like. The host bridge
+                // announces itself with a synthetic MessageEvent, which carries no
+                // source (see BaseMessageBridge.postToVue), so a null source is what
+                // distinguishes a real host message from a forged one. Without this,
+                // a #HTML block could drive any command the panel understands.
+                window.addEventListener('message', (e: MessageEvent) => {
+                    if (e.source !== null) return;
+                    handler(e.data);
+                });
             },
         };
     } else if (import.meta.env.VITE_PLATFORM === 'electron') {
@@ -65,6 +74,10 @@ export function initMessaging(): IMessaging {
         instance = {
             postMessage: (msg: unknown) => vscode.postMessage(serializeForPostMessage(msg)),
             onMessage: (handler: (message: unknown) => void) => {
+                // No source filter here, unlike the web branch: the panel webview
+                // embeds no untrusted frames (its CSP is default-src 'none' with
+                // nonce'd scripts — see CalcpadVueUIProvider), and the source VS Code
+                // attaches to extension-host messages is not contractual.
                 window.addEventListener('message', (e: MessageEvent) => handler(e.data));
             },
         };

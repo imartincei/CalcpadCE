@@ -585,7 +585,7 @@ async function bootstrap(): Promise<void> {
             const finalHtml = tauriBridge
                 ? await tauriBridge.inlineDocumentImages(result.html)
                 : result.html;
-            appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine);
+            appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine, uiDocKeyFor(group));
             if (mode === 'ui') uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
             window.dispatchEvent(new MessageEvent('message', {
                 data: { type: 'updateConvertErrors', errors: result.errors },
@@ -617,7 +617,7 @@ async function bootstrap(): Promise<void> {
         const html = tauriBridge
             ? await tauriBridge.inlineDocumentImages(result.html)
             : result.html;
-        appInstance.setUiPrintHtml(group.id, html);
+        appInstance.setUiPrintHtml(group.id, html, uiDocKeyFor(group));
     }
 
     function refreshAllPreviews(): void {
@@ -1125,9 +1125,22 @@ async function bootstrap(): Promise<void> {
         const data = e.data;
         if (!data) return;
 
+        // Two kinds of sender reach this listener, and they must not be conflated.
+        // The host's own bridge announces settings changes with a synthetic
+        // MessageEvent (base.ts:postToVue), which carries no source. Everything
+        // else here comes from a preview frame rendering untrusted worksheet HTML,
+        // and those messages drive editor navigation and #UI values — so they are
+        // accepted only from a window that really is one of our preview frames.
+        // The frames are sandboxed to an opaque origin, making e.origin the string
+        // "null" for all of them, so window identity is the only usable check.
+        const fromHost = e.source === null;
+        const fromPreview = appInstance.isPreviewFrameSource(e.source);
+        if (!fromHost && !fromPreview) return;
+
         // Forward console.* + uncaught errors to the "Preview Console" channel,
         // tagged with the originating group.
         if (data.type === 'previewConsole') {
+            if (!fromPreview) return;
             const level: 'info' | 'warn' | 'error' | 'debug' =
                 data.level === 'warn' ? 'warn'
                 : data.level === 'error' ? 'error'
@@ -1137,8 +1150,11 @@ async function bootstrap(): Promise<void> {
             return;
         }
 
+        // Settings announcements are the host talking to itself; a preview must not
+        // be able to trigger a full re-render loop by forging one.
         if (data.type === 'previewThemeChanged' || data.type === 'settingsChanged'
             || data.type === 'previewUiOverridesChanged') {
+            if (!fromHost) return;
             refreshAllPreviews();
             return;
         }
@@ -1146,6 +1162,7 @@ async function bootstrap(): Promise<void> {
         // A #UI control was edited in the preview. Record the value and re-render
         // that group so dependent results recalculate.
         if (data.type === 'uiValueChange') {
+            if (!fromPreview) return;
             const group = (data.groupId && groups.get(data.groupId)) || activeGroup;
             const docKey = uiDocKeyFor(group);
             if (!uiOverrides.set(docKey, String(data.varName), String(data.newValue))) return;
@@ -1161,6 +1178,7 @@ async function bootstrap(): Promise<void> {
         // there (the two-step). A 'source' line navigates Monaco directly. The
         // message's groupId selects which group to act on.
         if (data.type === 'navigateToLine') {
+            if (!fromPreview) return;
             const line = Number(data.line);
             if (!Number.isFinite(line) || line < 1) return;
             const group = (data.groupId && groups.get(data.groupId)) || activeGroup;

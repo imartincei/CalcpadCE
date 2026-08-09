@@ -55,10 +55,23 @@ namespace Calcpad.Server.Services
     // the document afresh - rather than having it re-rendered - never moves focus.
     var armed = false;
 
-    // The iframe hosts reuse the window across document.write, the VS Code webview
-    // reloads it; sessionStorage covers both, with the window as the fallback for
-    // when it is unreachable.
+    // Handing the state to the host is what carries it across a re-render in the web
+    // and desktop editors. They swap the document by assigning srcdoc, which builds a
+    // fresh browsing context, so this window does not survive; and the preview frame is
+    // sandboxed to an opaque origin, where touching sessionStorage throws. The host
+    // seeds __calcpadUiPosition into the next document for readState to pick up.
+    // The VS Code webview is the top window, never posts, and keeps using
+    // sessionStorage, which works there because it has a real origin.
+    function postState(state) {
+        if (window.parent === window) return;
+        try {
+            window.parent.postMessage(
+                { type: 'cpdUiState', state: state, groupId: window.__calcpadGroupId }, '*');
+        } catch (e) { }
+    }
+
     function writeState(state) {
+        postState(state);
         try {
             sessionStorage.setItem(STATE_KEY, JSON.stringify(state));
             return;

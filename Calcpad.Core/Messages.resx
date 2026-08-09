@@ -529,8 +529,8 @@
   <data name="Invalid_keyword_0" xml:space="preserve">
     <value>Invalid keyword: {0}.</value>
   </data>
-  <data name="Invalid_settings_0" xml:space="preserve">
-    <value>Invalid settings JSON: {0}.</value>
+  <data name="Invalid_JSON_in_0" xml:space="preserve">
+    <value>Invalid JSON in {0}.</value>
   </data>
   <data name="_must_be_matrix" xml:space="preserve">
     <value> must be matrix.</value>
@@ -588,9 +588,6 @@
   </data>
   <data name="Improper_format_for_UI_keyword_Missing_closing_brace" xml:space="preserve">
     <value>Improper format for #UI keyword. Missing closing brace '}'.</value>
-  </data>
-  <data name="Improper_format_for_UI_keyword_Invalid_JSON" xml:space="preserve">
-    <value>Improper format for #UI keyword. Invalid JSON.</value>
   </data>
   <data name="The_UI_keyword_requires_a_variable_assignment" xml:space="preserve">
     <value>The #UI keyword requires a variable assignment.</value>

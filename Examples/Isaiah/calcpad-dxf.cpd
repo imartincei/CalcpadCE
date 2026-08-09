@@ -78,12 +78,6 @@
 	'</script>
 #end def
 '
-#def drawText$(x$; y$; height$; rotation$; text$)
-	'<script type="module">
-	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawText('x$', 'y$', 'height$', 'rotation$', text$); } }
-	'</script>
-#end def
-'
 #def renderDXF$(imgWidth$; id$)
 	'<div id="dxf-render-container-id$" style="position:fixed; left:-9999px; top:0; width:1px; height:1px; overflow:hidden;"></div>
 	'<img id="dxf-output-img-id$" style="display:none; width:'imgWidth$'px; max-width:100%; height:auto; margin-top:30px; border:2px solid #ddd; border-radius:8px; background:#fff;" />
@@ -95,7 +89,6 @@
 	'console.log("MODULE SCRIPT START id$");
 	'import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/+esm";
 	'import * as DxfViewerModule from "https://cdn.jsdelivr.net/npm/dxf-viewer@1.0.46/+esm";
-	'import opentype from "https://cdn.skypack.dev/opentype.js";
 	'const DxfViewer = DxfViewerModule.default || DxfViewerModule.DxfViewer;
 	'console.log("DXF render script loaded id$, DxfViewer:", typeof DxfViewer);
 	'
@@ -125,36 +118,13 @@
 	'    preserveDrawingBuffer: true
 	'  });
 	'
-	'  console.log("Loading font...");
-	'  let woffData;
-	'  const bundled = window.__calcpadFonts && window.__calcpadFonts["FivoSans-Regular.woff"];
-	'  if (bundled) {
-	'    const b64 = bundled.split(",")[1];
-	'    const bin = atob(b64);
-	'    const buf = new Uint8Array(bin.length);
-	'    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
-	'    woffData = buf.buffer;
-	'  } else {
-	'    const woffResponse = await fetch("https://fonts.cdnfonts.com/s/18153/FivoSans-Regular.woff");
-	'    woffData = await woffResponse.arrayBuffer();
-	'  }
-	'  const font = opentype.parse(woffData);
-	'  const ttfBuffer = font.toArrayBuffer();
-	'  const uint8Array = new Uint8Array(ttfBuffer);
-	'  const binaryParts = [];
-	'  for (let i = 0; i < uint8Array.byteLength; i++) {
-	'    binaryParts.push(String.fromCharCode(uint8Array[i]));
-	'  }
-	'  const base64 = btoa(binaryParts.join(String()));
-	'  const fontUrl = "data:font/ttf;base64," + base64;
-	'
 	'  const dxfString = drawing.toDxfString();
 	'  console.log(dxfString);
 	'  const blob = new Blob([dxfString], { type: "application/dxf" });
 	'  const url = URL.createObjectURL(blob);
 	'
 	'  console.log("Loading DXF " + dxfId + "...");
-	'  await viewer.Load({ url: url, fonts: [fontUrl] });
+	'  await viewer.Load({ url: url });
 	'  URL.revokeObjectURL(url);
 	'
 	'  const bounds = viewer.GetBounds();
@@ -252,10 +222,6 @@ cx = (x1 + x2)/2
 cy = (y1 + y2)/2
 radius = 1
 drawCircle$(cx; cy; radius)
-
-addLayer$(TEXT; 8; CONTINUOUS)
-setLayer$(TEXT)
-drawText$(1; 4; 2; 0; "HELLO")
 
 'Render the DXF as image (width in pixels)
 renderDXF$(800; sample)
