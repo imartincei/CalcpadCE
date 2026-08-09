@@ -95,6 +95,22 @@ namespace Calcpad.Core
             tokens.Add(token);
         }
 
+        private void ExpandImageSources(List<Token> tokens)
+        {
+            var directory = string.IsNullOrEmpty(SourceFilePath)
+                ? null : System.IO.Path.GetDirectoryName(SourceFilePath);
+            foreach (var token in tokens)
+            {
+                if (token.Type == TokenTypes.Expression ||
+                    !token.Value.Contains("<img", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var value = token.Value;
+                token.Value = ImageReferences.ExpandSources(value, _pathRoots, directory,
+                    error => AppendError(value, error, _currentLine));
+            }
+        }
+
         private static TokenTypes GetTokenType(char separator)
         {
             return separator switch

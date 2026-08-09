@@ -32,11 +32,13 @@ namespace Calcpad.Core
             Math.PI / 200.0
         ];
 
+        // Angle units never differ between US/UK, and this table is built at type-load,
+        // before any request's setting exists, so the isUs argument is irrelevant here.
         protected static readonly Unit[] AngleUnits =
         [
-            Unit.Get("deg"),
-            Unit.Get("rad"),
-            Unit.Get("grad")
+            Unit.Get("deg", false),
+            Unit.Get("rad", false),
+            Unit.Get("grad", false)
         ];
 
         protected Function3[] Functions3 =

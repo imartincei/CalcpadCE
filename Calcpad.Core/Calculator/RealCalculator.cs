@@ -518,6 +518,6 @@ namespace Calcpad.Core
             new(value * FromRad[_degrees], AngleUnits[_degrees]) :
             new(value * FromRad[_degrees]);
 
-        protected static RealValue Timer(in RealValue _) => new(Timer(), Unit.Get("s"));
+        protected static RealValue Timer(in RealValue _) => new(Timer(), Unit.Get("s", false));
     }
 }

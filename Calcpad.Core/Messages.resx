@@ -331,6 +331,9 @@
   <data name="Error_in_0_on_line_1_2" xml:space="preserve">
         <value>Error in "{0}" on line {1}: {2}</value>
     </data>
+  <data name="Error_in_0_1" xml:space="preserve">
+        <value>Error in "{0}": {1}</value>
+    </data>
   <data name="Number_of_iterations_exceeds_the_maximum_0" xml:space="preserve">
         <value>Number of iterations exceeds the maximum {0}.&lt;/p&gt;</value>
     </data>
@@ -526,8 +529,8 @@
   <data name="Invalid_keyword_0" xml:space="preserve">
     <value>Invalid keyword: {0}.</value>
   </data>
-  <data name="Invalid_settings_0" xml:space="preserve">
-    <value>Invalid settings JSON: {0}.</value>
+  <data name="Invalid_JSON_in_0" xml:space="preserve">
+    <value>Invalid JSON in {0}.</value>
   </data>
   <data name="_must_be_matrix" xml:space="preserve">
     <value> must be matrix.</value>
@@ -582,5 +585,47 @@
   </data>
   <data name="CannotModifyConstant" xml:space="preserve">
     <value>Cannot modify constant "{0}".</value>
+  </data>
+  <data name="Improper_format_for_UI_keyword_Missing_closing_brace" xml:space="preserve">
+    <value>Improper format for #UI keyword. Missing closing brace '}'.</value>
+  </data>
+  <data name="The_UI_keyword_requires_a_variable_assignment" xml:space="preserve">
+    <value>The #UI keyword requires a variable assignment.</value>
+  </data>
+  <data name="UI_directives_do_not_support_expressions" xml:space="preserve">
+    <value>#UI directives do not support expressions.</value>
+  </data>
+  <data name="Only_numbers_are_supported_by_the_UI_keyword" xml:space="preserve">
+    <value>Only numbers are supported by the #UI keyword.</value>
+  </data>
+  <data name="The_UI_0_requires_both_keys_and_values_arrays" xml:space="preserve">
+    <value>#UI {0} requires both 'keys' and 'values' arrays.</value>
+  </data>
+  <data name="The_UI_0_keys_and_values_arrays_must_have_the_same_length" xml:space="preserve">
+    <value>#UI {0} has {1} keys but {2} values, the 'keys' and 'values' arrays must have the same length.</value>
+  </data>
+  <data name="The_UI_type_0_is_not_recognized_expected_one_of_1" xml:space="preserve">
+    <value>'{0}' is not a recognized #UI type, expected one of {1}.</value>
+  </data>
+  <data name="The_UI_0_must_not_be_negative" xml:space="preserve">
+    <value>#UI '{0}' must not be negative.</value>
+  </data>
+  <data name="The_UI_0_has_1_entries_but_the_grid_has_2_3" xml:space="preserve">
+    <value>#UI '{0}' has {1} entries but the grid has {2} {3}.</value>
+  </data>
+  <data name="A_UI_value_has_the_wrong_type" xml:space="preserve">
+    <value>A #UI value has the wrong type.</value>
+  </data>
+  <data name="Missing_path_value_0" xml:space="preserve">
+    <value>{0} requires a path.</value>
+  </data>
+  <data name="Duplicate_path_declaration_0" xml:space="preserve">
+    <value>{0} is already declared in this document.</value>
+  </data>
+  <data name="Path_root_not_declared_0_1" xml:space="preserve">
+    <value>{0} is not declared. Add {1} before this line.</value>
+  </data>
+  <data name="Path_root_folder_not_found_0_1" xml:space="preserve">
+    <value>{0} folder not found: {1}.</value>
   </data>
 </root>

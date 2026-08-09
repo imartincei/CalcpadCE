@@ -480,7 +480,7 @@ namespace Calcpad.Core
                             _parser._targetUnits = null;
                         }
                         else
-                            _parser._targetUnits = UnitsParser.Parse(unit.Trim(), _units);
+                            _parser._targetUnits = UnitsParser.Parse(unit.Trim(), _units, _parser.IsUs);
                     }
                 }
                 else
@@ -717,11 +717,11 @@ namespace Calcpad.Core
                 }
             }
 
-            private static ValueToken MakeUnitValueToken(string units)
+            private ValueToken MakeUnitValueToken(string units)
             {
                 try
                 {
-                    var unit = Unit.Get(units);
+                    var unit = Unit.Get(units, _parser.IsUs);
                     var v = new RealValue(unit);
                     return new ValueToken(v)
                     {
@@ -777,7 +777,7 @@ namespace Calcpad.Core
                         i >= assignmentIndex &&
                         t.Type == TokenTypes.Variable &&
                         !DefinedVariables.Contains(t.Content) &&
-                        Unit.TryGet(t.Content, out var u)
+                        Unit.TryGet(t.Content, _parser.IsUs, out var u)
                     )
                     {
                         t.Type = TokenTypes.Unit;

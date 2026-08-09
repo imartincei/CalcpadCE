@@ -15,6 +15,8 @@ namespace Calcpad.Core
             internal int Iteration => _iteration;
             internal int InitialCount { get; }
             internal bool IsFirstPass => _iteration == InitialCount;
+            /// <summary>1 based pass number. _iteration counts down, so this counts up.</summary>
+            internal int Pass => InitialCount - _iteration + 1;
             private protected Loop(int startLine, double count, int id)
             {
                 _startLine = startLine;

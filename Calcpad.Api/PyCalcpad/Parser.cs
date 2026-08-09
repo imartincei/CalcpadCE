@@ -41,7 +41,8 @@ namespace PyCalcpad
             var code = Reader.Read(inputFileName);
             var macroParser = new MacroParser
             {
-                Include = Reader.Include
+                Include = Reader.Include,
+                SourceFilePath = inputFileName
             };
             var hasMacroErrors = macroParser.Parse(code, out var unwrappedCode, null, 0, true);
             string htmlResult;
@@ -54,7 +55,9 @@ namespace PyCalcpad
             }
             ExpressionParser parser = new()
             {
-                Settings = ConvertSettings(Settings)
+                Settings = ConvertSettings(Settings),
+                SourceFilePath = inputFileName,
+                PathRoots = macroParser.PathRoots
             };
             parser.Parse(unwrappedCode, true, ext == ".docx");
             htmlResult = parser.HtmlResult;

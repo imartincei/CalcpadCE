@@ -16,9 +16,16 @@ namespace Calcpad.Core
             Show,
             Pre,
             Post,
+            End_Hide,
+            End_Show,
+            End_Pre,
+            End_Post,
             Val,
             Equ,
             Noc,
+            End_Val,
+            End_Equ,
+            End_Noc,
             NoSub,
             NoVar,
             VarSub,
@@ -51,6 +58,9 @@ namespace Calcpad.Core
             Phasor,
             Complex,
             Settings,
+            Ui,
+            ProjectPath,
+            LibraryPath,
             SkipLine
         }
         private enum KeywordResult
@@ -110,6 +120,12 @@ namespace Calcpad.Core
             return Keyword.None;
         }
 
+        /// <summary>
+        /// The number of characters a keyword occupies in the source line, including the leading '#'.
+        /// </summary>
+        private static int KeywordLength(Keyword keyword) =>
+            KeywordNames[(int)keyword - 1].Length + 1;
+
         KeywordResult ParseKeyword(ReadOnlySpan<char> s, ref Keyword keyword)
         {
             if (_isPausedByUser)
@@ -122,30 +138,27 @@ namespace Calcpad.Core
 
             switch (keyword)
             {
-                case Keyword.Hide:
-                    _isVisible = false;
-                    break;
-                case Keyword.Show:
-                    _isVisible = true;
-                    break;
-                case Keyword.Pre:
-                    _isVisible = !_calculate;
-                    break;
-                case Keyword.Post:
-                    _isVisible = _calculate;
+                case Keyword.Hide: SetVisibility(s, keyword, Settings.Math.ShowHiddenOutput && _isVisible); break;
+                case Keyword.Show: SetVisibility(s, keyword, true); break;
+                case Keyword.Pre: SetVisibility(s, keyword, !ForPrint); break;
+                case Keyword.Post: SetVisibility(s, keyword, !EnableUi); break;
+                case Keyword.End_Hide:
+                case Keyword.End_Show:
+                case Keyword.End_Pre:
+                case Keyword.End_Post:
+                    _isVisible = _visibilityStack.Count > 0 ? _visibilityStack.Pop() : true;
                     break;
                 case Keyword.Input:
                     return ParseKeywordInput();
                 case Keyword.Pause:
                     return ParseKeywordPause();
-                case Keyword.Val:
-                    _isVal = 1;
-                    break;
-                case Keyword.Equ:
-                    _isVal = 0;
-                    break;
-                case Keyword.Noc:
-                    _isVal = -1;
+                case Keyword.Val: SetOutputMode(s, keyword, 1); break;
+                case Keyword.Equ: SetOutputMode(s, keyword, 0); break;
+                case Keyword.Noc: SetOutputMode(s, keyword, -1); break;
+                case Keyword.End_Val:
+                case Keyword.End_Equ:
+                case Keyword.End_Noc:
+                    _isVal = _outputModeStack.Count > 0 ? _outputModeStack.Pop() : 0;
                     break;
                 case Keyword.NoSub:
                     _parser.VariableSubstitution = MathParser.VariableSubstitutionOptions.VariablesOnly;
@@ -218,12 +231,61 @@ namespace Calcpad.Core
                 case Keyword.Settings:
                     ParseKeywordSettings(s);
                     break;
+                case Keyword.Ui:
+                    return ParseKeywordUi(s);
+                case Keyword.ProjectPath:
+                case Keyword.LibraryPath:
+                    ParseKeywordPathRoot(s);
+                    break;
                 default:
                     if (keyword != Keyword.Global && keyword != Keyword.Local)
                         return KeywordResult.None;
                     break;
             }
             return KeywordResult.Continue;
+        }
+
+        private void SetVisibility(ReadOnlySpan<char> s, Keyword keyword, bool value)
+        {
+            _visibilityStack.Push(_isVisible);
+            if (IsDirectiveConditionMet(s, keyword))
+                _isVisible = value;
+        }
+
+        private void SetOutputMode(ReadOnlySpan<char> s, Keyword keyword, int value)
+        {
+            _outputModeStack.Push(_isVal);
+            if (IsDirectiveConditionMet(s, keyword))
+                _isVal = value;
+        }
+
+        private bool IsDirectiveConditionMet(ReadOnlySpan<char> s, Keyword keyword)
+        {
+            if (!_condition.IsSatisfied)
+                return false;
+
+            var kwdLength = KeywordLength(keyword);
+            if (s.Length <= kwdLength)
+                return true;
+
+            var expr = s[kwdLength..].Trim();
+            if (expr.IsWhiteSpace())
+                return true;
+
+            if (!_calculate)
+                return false;
+
+            try
+            {
+                _parser.Parse(expr);
+                _parser.Calculate();
+                return Condition.IsTrue(_parser.Result);
+            }
+            catch (MathParserException ex)
+            {
+                AppendError(s.ToString(), ex.Message, _currentLine);
+                return false;
+            }
         }
 
         KeywordResult ParseKeywordInput()
@@ -270,9 +332,10 @@ namespace Calcpad.Core
 
         private void ParseKeywordRound(ReadOnlySpan<char> s)
         {
-            if (s.Length > 6)
+            var kwdLength = KeywordLength(Keyword.Round);
+            if (s.Length > kwdLength)
             {
-                var expr = s[6..].Trim();
+                var expr = s[kwdLength..].Trim();
                 if (expr.SequenceEqual("default"))
                     Settings.Math.Decimals = _decimals;
                 else if (int.TryParse(expr, out int n))
@@ -297,8 +360,9 @@ namespace Calcpad.Core
 
         private void ParseKeywordRepeat(ReadOnlySpan<char> s)
         {
-            ReadOnlySpan<char> expression = s.Length > 7 ? // #repeat - 7
-                s[7..].Trim() :
+            var kwdLength = KeywordLength(Keyword.Repeat);
+            ReadOnlySpan<char> expression = s.Length > kwdLength ?
+                s[kwdLength..].Trim() :
                 [];
 
             if (_calculate)
@@ -349,8 +413,9 @@ namespace Calcpad.Core
 
         private void ParseKeywordFor(ReadOnlySpan<char> s)
         {
-            ReadOnlySpan<char> expression = s.Length > 4 ? // #for - 4
-                s[4..].Trim() :
+            var kwdLength = KeywordLength(Keyword.For);
+            ReadOnlySpan<char> expression = s.Length > kwdLength ?
+                s[kwdLength..].Trim() :
                 [];
 
             if (expression.IsWhiteSpace())
@@ -428,8 +493,9 @@ namespace Calcpad.Core
 
         private void ParseKeywordWhile(ReadOnlySpan<char> s)
         {
-            ReadOnlySpan<char> expression = s.Length > 6 ? // #while - 6
-                s[7..].Trim() :
+            var kwdLength = KeywordLength(Keyword.While);
+            ReadOnlySpan<char> expression = s.Length > kwdLength ?
+                s[kwdLength..].Trim() :
                 [];
 
             if (expression.IsWhiteSpace())
@@ -599,9 +665,10 @@ namespace Calcpad.Core
 
         private void ParseKeywordFormat(ReadOnlySpan<char> s)
         {
-            if (s.Length > 7)
+            var kwdLength = KeywordLength(Keyword.Format);
+            if (s.Length > kwdLength)
             {
-                var expr = s[7..].Trim();
+                var expr = s[kwdLength..].Trim();
                 if (expr.SequenceEqual("default"))
                     Settings.Math.FormatString = null;
                 else
@@ -616,6 +683,28 @@ namespace Calcpad.Core
             else
                 Settings.Math.FormatString = null;
         }
+        private void ParseKeywordPathRoot(ReadOnlySpan<char> s)
+        {
+            // MacroParser already declared and validated this line against the folder of the file
+            // that wrote it — which this flattened text no longer identifies — so its answer wins.
+            if (_hasInheritedPathRoots)
+                return;
+
+            PathRoots.IsDeclaration(s, out var isProject, out var start, out var length);
+            if (length == 0)
+            {
+                AppendError(s.ToString(), string.Format(Messages.Missing_path_value_0,
+                    isProject ? "#ProjectPath" : "#LibraryPath"), _currentLine);
+                return;
+            }
+
+            var rawValue = s.Slice(start, length).ToString();
+            var declaringDir = !string.IsNullOrEmpty(SourceFilePath)
+                ? System.IO.Path.GetDirectoryName(SourceFilePath) : null;
+            if (!_pathRoots.TryDeclare(isProject, rawValue, declaringDir, out var error))
+                AppendError(s.ToString(), error, _currentLine);
+        }
+
         private const string SettingsKeyword = "#settings";
 
         private void ParseKeywordSettings(ReadOnlySpan<char> s)
@@ -623,7 +712,7 @@ namespace Calcpad.Core
             var json = s[SettingsKeyword.Length..].Trim();
             if (json.IsEmpty)
             {
-                AppendError(s.ToString(), string.Format(Messages.Invalid_settings_0, json.ToString()), _currentLine);
+                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine);
                 return;
             }
             try
@@ -645,7 +734,7 @@ namespace Calcpad.Core
             }
             catch (JsonException)
             {
-                AppendError(s.ToString(), string.Format(Messages.Invalid_settings_0, json.ToString()), _currentLine);
+                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine);
             }
         }
 
@@ -680,6 +769,10 @@ namespace Calcpad.Core
                     if (dto.ZeroSmallMatrixElements.HasValue)
                         Settings.Math.ZeroSmallMatrixElements = dto.ZeroSmallMatrixElements.Value;
                     break;
+                case SettingKey.ShowHiddenOutput:
+                    if (dto.ShowHiddenOutput.HasValue)
+                        Settings.Math.ShowHiddenOutput = dto.ShowHiddenOutput.Value;
+                    break;
                 case SettingKey.MaxOutputCount:
                     if (dto.MaxOutputCount.HasValue)
                         Settings.Math.MaxOutputCount = dto.MaxOutputCount.Value;
@@ -695,7 +788,7 @@ namespace Calcpad.Core
                     if (dto.IsUs.HasValue)
                     {
                         Settings.IsUs = dto.IsUs.Value;
-                        Unit.IsUs = dto.IsUs.Value;
+                        _parser.IsUs = dto.IsUs.Value;
                     }
                     break;
                 case SettingKey.VectorGraphics:
@@ -774,9 +867,10 @@ namespace Calcpad.Core
 
         private void ParseKeywordMd(ReadOnlySpan<char> s)
         {
-            if (s.Length > 3)
+            var kwdLength = KeywordLength(Keyword.Md);
+            if (s.Length > kwdLength)
             {
-                var expr = s[3..].Trim();
+                var expr = s[kwdLength..].Trim();
                 if (expr.Equals("on", StringComparison.OrdinalIgnoreCase))
                     _isMarkdownOn = true;
                 else if (expr.Equals("off", StringComparison.OrdinalIgnoreCase))
@@ -796,7 +890,7 @@ namespace Calcpad.Core
                 {
                     var sourceDir = !string.IsNullOrEmpty(SourceFilePath)
                         ? System.IO.Path.GetDirectoryName(SourceFilePath) : null;
-                    var options = new ReadWriteOptions(s, 0, sourceDir);
+                    var options = new ReadWriteOptions(s, 0, sourceDir, _pathRoots);
                     if (options.Name.IsEmpty)
                         return;
 
@@ -811,7 +905,7 @@ namespace Calcpad.Core
                 }
             }
             else if (_isVisible)
-                _sb.Append($"<p><span{HtmlId} class=\"cond\">#read</span> {s[5..]}</p>");
+                _sb.Append($"<p><span{HtmlId} class=\"cond\">#read</span> {s[KeywordLength(Keyword.Read)..]}</p>");
         }
 
         private void ParseKeywordWrite(ReadOnlySpan<char> s, Keyword keyword)
@@ -822,7 +916,7 @@ namespace Calcpad.Core
                 {
                     var sourceDir = !string.IsNullOrEmpty(SourceFilePath)
                         ? System.IO.Path.GetDirectoryName(SourceFilePath) : null;
-                    var options = new ReadWriteOptions(s, keyword - Keyword.Read, sourceDir);
+                    var options = new ReadWriteOptions(s, keyword - Keyword.Read, sourceDir, _pathRoots);
                     if (options.Name.IsEmpty)
                         return;
 
@@ -833,7 +927,10 @@ namespace Calcpad.Core
                 }
             }
             else if (_isVisible)
-                _sb.Append($"<p><span{HtmlId} class=\"cond\">#write</span> {s[6..]}</p>");
+            {
+                var kwdLength = KeywordLength(keyword);
+                _sb.Append($"<p><span{HtmlId} class=\"cond\">{s[..kwdLength]}</span> {s[kwdLength..]}</p>");
+            }
         }
 
         private void ReportDataExchageResult(ReadWriteOptions options, string command)
