@@ -83,6 +83,12 @@ namespace Calcpad.Core
             ProjectPath,
             LibraryPath,
         }
+        private const string DefKeyword = "#def";
+        private const string EndDefKeyword = "#end def";
+        private const string IncludeKeyword = "#include";
+        private const string ProjectPathKeyword = "#projectpath";
+        private const string LibraryPathKeyword = "#librarypath";
+        private const string FieldsMarker = "#{";
         private readonly List<int> _lineNumbers = [];
         // Filesystem path comparison must match the host OS to avoid false-positive circular
         // detection on case-sensitive filesystems (Linux) or missed detection on Windows.
@@ -99,17 +105,17 @@ namespace Calcpad.Core
 
         private static Keywords GetKeyword(ReadOnlySpan<char> s)
         {
-            if (s.Length < 4)
+            if (s.Length < DefKeyword.Length)
                 return Keywords.None;
-            if (s.StartsWith("#def", StringComparison.OrdinalIgnoreCase))
+            if (s.StartsWith(DefKeyword, StringComparison.OrdinalIgnoreCase))
                 return Keywords.Def;
-            if (s.StartsWith("#end def", StringComparison.OrdinalIgnoreCase))
+            if (s.StartsWith(EndDefKeyword, StringComparison.OrdinalIgnoreCase))
                 return Keywords.EndDef;
-            if (s.StartsWith("#include", StringComparison.OrdinalIgnoreCase))
+            if (s.StartsWith(IncludeKeyword, StringComparison.OrdinalIgnoreCase))
                 return Keywords.Include;
-            if (s.StartsWith("#projectpath", StringComparison.OrdinalIgnoreCase))
+            if (s.StartsWith(ProjectPathKeyword, StringComparison.OrdinalIgnoreCase))
                 return Keywords.ProjectPath;
-            if (s.StartsWith("#librarypath", StringComparison.OrdinalIgnoreCase))
+            if (s.StartsWith(LibraryPathKeyword, StringComparison.OrdinalIgnoreCase))
                 return Keywords.LibraryPath;
 
             return Keywords.None;
@@ -119,19 +125,20 @@ namespace Calcpad.Core
         {
             start = 0;
             length = 0;
-            if (!line.StartsWith("#include", StringComparison.OrdinalIgnoreCase))
+            if (!line.StartsWith(IncludeKeyword, StringComparison.OrdinalIgnoreCase))
                 return false;
 
+            var pathStart = IncludeKeyword.Length;
             var n = line.IndexOfAny('\'', '"');
             var nf1 = line.LastIndexOf('#');
-            if (n < 9 || nf1 > 0 && nf1 < n)
+            if (n <= pathStart || nf1 > 0 && nf1 < n)
                 n = nf1;
 
-            if (n < 9)
+            if (n <= pathStart)
                 n = line.Length;
 
-            var name = line[8..n];
-            start = 8 + name.Length - name.TrimStart().Length;
+            var name = line[pathStart..n];
+            start = pathStart + name.Length - name.TrimStart().Length;
             length = name.Trim().Length;
             return length > 0;
         }
@@ -262,7 +269,7 @@ namespace Calcpad.Core
 
             void ParseInclude(ReadOnlySpan<char> lineContent)
             {
-                if (lineContent.Length < 9)
+                if (lineContent.Length <= IncludeKeyword.Length)
                     AppendError(lineContent, Messages.Missing_source_file_for_include);
 
                 TryGetIncludePath(lineContent, out var start, out var length);
@@ -277,7 +284,7 @@ namespace Calcpad.Core
                         AppendError(lineContent, Messages.Brackets_not_closed);
                     else
                     {
-                        SplitEnumerator split = lineContent[(nf1 + 2)..nf2].EnumerateSplits(';');
+                        SplitEnumerator split = lineContent[(nf1 + FieldsMarker.Length)..nf2].EnumerateSplits(';');
                         foreach (var item in split)
                             fields.Enqueue(item.Trim().ToString());
                     }
@@ -329,7 +336,7 @@ namespace Calcpad.Core
                 var textSpan = new TextSpan(lineContent);
                 if (macroDefCount == 0)
                 {
-                    int i = 4, len = lineContent.Length;
+                    int i = DefKeyword.Length, len = lineContent.Length;
                     var c = EatSpace(lineContent, ref i);
                     textSpan.Reset(i);
                     while (i < len)
@@ -481,7 +488,7 @@ namespace Calcpad.Core
             if (index < 0)
                 return lineContent.ToString();
 
-            index = lineContent.IndexOf("#{");
+            index = lineContent.IndexOf(FieldsMarker);
             var stringBuilder = new StringBuilder(200);
             var macroArguments = new List<string>();
             var bracketCount = 0;
@@ -491,7 +498,7 @@ namespace Calcpad.Core
             Queue<string> fields = null;
             if (index >= 0)
             {
-                var s = lineContent[(index + 2)..];
+                var s = lineContent[(index + FieldsMarker.Length)..];
                 lineContent = lineContent[..index];
                 var n = s.IndexOf('}');
                 if (n < 0)

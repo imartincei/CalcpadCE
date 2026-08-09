@@ -84,8 +84,8 @@ namespace Calcpad.Core
                 }
 
                 var type = (Types)(index + 1);
-                _keywordLength = GetKeywordLength(type);
                 _keyword = GetConditinalKeyword(type);
+                _keywordLength = _keyword.AsSpan().TrimEnd().Length;
                 IsUnchecked = type == Types.If || type == Types.ElseIf;
                 if (type > Types.If && type < Types.While && _count == 0)
                     throw Exceptions.ConditionNotInitialized();
@@ -149,19 +149,6 @@ namespace Calcpad.Core
                 if (string.IsNullOrEmpty(_keyword))
                     return _keyword;
                 return $"<span class=\"cond\">{_keyword}</span>";
-            }
-
-            private static int GetKeywordLength(Types type)
-            {
-                return type switch
-                {
-                    Types.If => 3,
-                    Types.Else => 5,
-                    Types.While => 6,
-                    Types.EndIf => 7,
-                    Types.ElseIf => 8,
-                    _ => 0,
-                };
             }
 
             private static string GetConditinalKeyword(Types type)

@@ -187,7 +187,7 @@ namespace Calcpad.Core
                         else
                         {
                             var skipChars = keyword == Keyword.Ui ? _uiSkipChars :
-                                keyword == Keyword.Const ? 7 : _condition.KeywordLength;
+                                keyword == Keyword.Const ? KeywordLength(Keyword.Const) : _condition.KeywordLength;
                             tokens = GetTokens(textSpan[skipChars..]);
                             if (_isMarkdownOn)
                                 ParseMarkdown(tokens);
@@ -399,9 +399,6 @@ namespace Calcpad.Core
                         if (_isVal != 1)
                         {
                             htmlId = HtmlId;
-                            // Line level attributes describe one control, so they only apply
-                            // when the line declares exactly one; the per control attributes
-                            // on the inputs themselves are what the preview script reads.
                             if (HasUiControls)
                             {
                                 htmlId = EnableUi
@@ -421,8 +418,6 @@ namespace Calcpad.Core
                         if (_isVal != 1)
                             AppendHtmlLineEnd(lineType, keyword == Keyword.If);
 
-                        // A grid replaces the matrix rendering, so it goes after the closing
-                        // tag as a block level sibling rather than inside it.
                         if (EnableUi && HasUiControls)
                         {
                             foreach (var ui in _lineUiControls)
@@ -583,8 +578,6 @@ namespace Calcpad.Core
                     try
                     {
                         var ui = TakeUiControl(token.Value);
-                        // #UI lines can be rewritten by an override, so they never use the
-                        // equation cache - the cached form would be the pre-override one.
                         var cacheID = ui is null ? token.CacheID : -1;
                         if (ui is not null)
                             _parser.Parse(PrepareUiExpression(ui, token.Value));
@@ -610,8 +603,6 @@ namespace Calcpad.Core
                             {
                                 var html = _parser.ToHtml();
                                 if (EnableUi && ui is not null)
-                                    // The grid follows the line as a sibling, so the equation
-                                    // it stands for leaves nothing behind.
                                     html = ui.Type == "datagrid" ?
                                         string.Empty :
                                         InjectUiInput(ui, html);
