@@ -3138,6 +3138,7 @@ A small <a href="#areas-of-reinforcement-bars">reinforcement-area picker</a> ret
 <div class="calcpad-output"><script src="https://code.jquery.com/jquery-3.6.3.min.js"></script><!-- Lookup table that returns the total reinforcement area $A_s$ for a chosen bar diameter and bar count, with the cells highlighting the picked combination on hover. --> 
 <style>td:hover {color:red;} table {cursor:default;}</style> 
 <p>Required reinforcement area - <span class="eq"><var>A</var><sub>s,req</sub> = <u class="input-6">7</u> </span> cm² </p>
+<img style="height:104pt; width:122pt;" src="Images/structures/rc/design/bars.png" alt="bars.png"> 
 <table class="bordered"><tr><th>Count</th><!--00--><th id="c1">1</th><th id="c2">2</th><th id="c3">3</th><th id="c4">4</th><th id="c5">5</th><th id="c6">6</th><th id="c7">6.67</th><th id="c8">7</th><th id="c9">8</th><th id="c10">8.33</th><th id="c11">9</th><th id="c12">10</th></tr><!--60--><!--01--><tr><th id="r1">Ø8</th><td align="right">0.5</td><td align="right">1.01</td><td align="right">1.51</td><td align="right">2.01</td><td align="right">2.51</td><td align="right">3.02</td><td align="right">3.35</td><td align="right">3.52</td><td align="right">4.02</td><td align="right">4.19</td><td align="right">4.52</td><td align="right">5.03</td><!--02--><tr><th id="r2">Ø10</th><td align="right">0.79</td><td align="right">1.57</td><td align="right">2.36</td><td align="right">3.14</td><td align="right">3.93</td><td align="right">4.71</td><td align="right">5.24</td><td align="right">5.5</td><td align="right">6.28</td><td align="right">6.54</td><td style="background:#EAFFCA" align="right">7.07</td><td style="background:#EAFFCA" align="right">7.85</td><!--03--><tr><th id="r3">Ø12</th><td align="right">1.13</td><td align="right">2.26</td><td align="right">3.39</td><td align="right">4.52</td><td align="right">5.65</td><td align="right">6.79</td><td style="background:#EAFFCA" align="right">7.54</td><td style="background:#EAFFCA" align="right">7.92</td><td style="background:#EAFFCA" align="right">9.05</td><td style="background:#EAFFCA" align="right">9.42</td><td style="background:#EAFFCA" align="right">10.18</td><td style="background:#EAFFCA" align="right">11.31</td><!--04--><tr><th id="r4">Ø14</th><td align="right">1.54</td><td align="right">3.08</td><td align="right">4.62</td><td align="right">6.16</td><td style="background:#EAFFCA" align="right">7.7</td><td style="background:#EAFFCA" align="right">9.24</td><td style="background:#EAFFCA" align="right">10.26</td><td style="background:#EAFFCA" align="right">10.78</td><td style="background:#EAFFCA" align="right">12.32</td><td style="background:#EAFFCA" align="right">12.83</td><td style="background:#EAFFCA" align="right">13.85</td><td style="background:#EAFFCA" align="right">15.39</td><!--05--><tr><th id="r5">Ø16</th><td align="right">2.01</td><td align="right">4.02</td><td align="right">6.03</td><td style="background:#EAFFCA" align="right">8.04</td><td style="background:#EAFFCA" align="right">10.05</td><td style="background:#EAFFCA" align="right">12.06</td><td style="background:#EAFFCA" align="right">13.4</td><td style="background:#EAFFCA" align="right">14.07</td><td style="background:#EAFFCA" align="right">16.08</td><td style="background:#EAFFCA" align="right">16.76</td><td style="background:#EAFFCA" align="right">18.1</td><td style="background:#EAFFCA" align="right">20.11</td><!--06--><tr><th id="r6">Ø18</th><td align="right">2.54</td><td align="right">5.09</td><td style="background:#EAFFCA" align="right">7.63</td><td style="background:#EAFFCA" align="right">10.18</td><td style="background:#EAFFCA" align="right">12.72</td><td style="background:#EAFFCA" align="right">15.27</td><td style="background:#EAFFCA" align="right">16.96</td><td style="background:#EAFFCA" align="right">17.81</td><td style="background:#EAFFCA" align="right">20.36</td><td style="background:#EAFFCA" align="right">21.21</td><td style="background:#EAFFCA" align="right">22.9</td><td style="background:#EAFFCA" align="right">25.45</td><!--07--><tr><th id="r7">Ø20</th><td align="right">3.14</td><td align="right">6.28</td><td style="background:#EAFFCA" align="right">9.42</td><td style="background:#EAFFCA" align="right">12.57</td><td style="background:#EAFFCA" align="right">15.71</td><td style="background:#EAFFCA" align="right">18.85</td><td style="background:#EAFFCA" align="right">20.94</td><td style="background:#EAFFCA" align="right">21.99</td><td style="background:#EAFFCA" align="right">25.13</td><td style="background:#EAFFCA" align="right">26.18</td><td style="background:#EAFFCA" align="right">28.27</td><td style="background:#EAFFCA" align="right">31.42</td><!--08--><tr><th id="r8">Ø22</th><td align="right">3.8</td><td style="background:#EAFFCA" align="right">7.6</td><td style="background:#EAFFCA" align="right">11.4</td><td style="background:#EAFFCA" align="right">15.21</td><td style="background:#EAFFCA" align="right">19.01</td><td style="background:#EAFFCA" align="right">22.81</td><td style="background:#EAFFCA" align="right">25.34</td><td style="background:#EAFFCA" align="right">26.61</td><td style="background:#EAFFCA" align="right">30.41</td><td style="background:#EAFFCA" align="right">31.68</td><td style="background:#EAFFCA" align="right">34.21</td><td style="background:#EAFFCA" align="right">38.01</td><!--09--><tr><th id="r9">Ø25</th><td align="right">4.91</td><td style="background:#EAFFCA" align="right">9.82</td><td style="background:#EAFFCA" align="right">14.73</td><td style="background:#EAFFCA" align="right">19.63</td><td style="background:#EAFFCA" align="right">24.54</td><td style="background:#EAFFCA" align="right">29.45</td><td style="background:#EAFFCA" align="right">32.72</td><td style="background:#EAFFCA" align="right">34.36</td><td style="background:#EAFFCA" align="right">39.27</td><td style="background:#EAFFCA" align="right">40.91</td><td style="background:#EAFFCA" align="right">44.18</td><td style="background:#EAFFCA" align="right">49.09</td><!--010--><tr><th id="r10">Ø28</th><td align="right">6.16</td><td style="background:#EAFFCA" align="right">12.32</td><td style="background:#EAFFCA" align="right">18.47</td><td style="background:#EAFFCA" align="right">24.63</td><td style="background:#EAFFCA" align="right">30.79</td><td style="background:#EAFFCA" align="right">36.95</td><td style="background:#EAFFCA" align="right">41.05</td><td style="background:#EAFFCA" align="right">43.1</td><td style="background:#EAFFCA" align="right">49.26</td><td style="background:#EAFFCA" align="right">51.31</td><td style="background:#EAFFCA" align="right">55.42</td><td style="background:#EAFFCA" align="right">61.58</td><!--011--><tr><th id="r11">Ø32</th><td style="background:#EAFFCA" align="right">8.04</td><td style="background:#EAFFCA" align="right">16.08</td><td style="background:#EAFFCA" align="right">24.13</td><td style="background:#EAFFCA" align="right">32.17</td><td style="background:#EAFFCA" align="right">40.21</td><td style="background:#EAFFCA" align="right">48.25</td><td style="background:#EAFFCA" align="right">53.62</td><td style="background:#EAFFCA" align="right">56.3</td><td style="background:#EAFFCA" align="right">64.34</td><td style="background:#EAFFCA" align="right">67.02</td><td style="background:#EAFFCA" align="right">72.38</td><td style="background:#EAFFCA" align="right">80.42</td></table><script>var col=0;var row=0;$("td").hover(function(){$("#r"+row+",#c"+col).css("color","black").css("background-color","#F0F0F0");col=$(this).parent().children().index($(this));row=$(this).parent().parent().children().index($(this).parent());$("#r"+row+",#c"+col).css("color","red").css("background-color","#FFF0A0");;});</script></div>
 </figure>
 </div>
@@ -3949,6 +3950,7 @@ A small <a href="#areas-of-reinforcement-bars">reinforcement-area picker</a> ret
 <tr><td>№ 4 - </td><td> <span class="eq"><var>M</var><sub>Ed_4</sub> = <u class="input-25">100</u> </span> kN·m, </td><td> <span class="eq"><var>N</var><sub>Ed_4</sub> = <u class="input-25">2000</u> </span> kN</td></tr> 
 <tr><td>№ 5 - </td><td> <span class="eq"><var>M</var><sub>Ed_5</sub> = <u class="input-26">100</u> </span> kN·m, </td><td> <span class="eq"><var>N</var><sub>Ed_5</sub> = <u class="input-26">2500</u> </span> kN</td></tr> 
 </table> 
+<p>All input values for M<sub>Ed</sub> and N<sub>Ed</sub> must be positive! </p>
 <p>Positive axial force is compressive! </p>
 <div class="calcpad-h4">Material properties</div> 
 <p class="ref" style="float:right">[EN 1992-1-1, Table 3.1]</p> 
@@ -4392,6 +4394,12 @@ A small <a href="#areas-of-reinforcement-bars">reinforcement-area picker</a> ret
 <img class="side" style="width:190pt;" src="Images/structures/rc/design/column-biaxial.png" alt="column-biaxial.png"> 
 <div class="calcpad-h4">Biaxial bending design</div> 
 <p>For the other direction: </p>
+<p>Design moment - <span class="eq"><var>M</var><sub>Edy</sub> = <u class="input-192">50</u> </span> kN·m </p>
+<p>Bending resistance - <span class="eq"><var>M</var><sub>Rdy</sub> = <u class="input-193">100</u> </span> kN·m </p>
+<p>Effective length - <span class="eq"><var>L</var><sub>oy</sub> = <u class="input-194">1</u>  · <var>L</var> = <u class="input-194">1</u>  · 4000 = 4000</span> mm </p>
+<img class="side" style="width:190pt;" src="Images/structures/rc/design/column-biaxial.png" alt="column-biaxial.png"> 
+<div class="calcpad-h4">Biaxial bending design</div> 
+<p>For the other direction: </p>
 <p>Design moment - <span class="eq"><var>M</var><sub>Edy</sub> = 50</span> kN.m </p>
 <p>Bending resistance - <span class="eq"><var>M</var><sub>Rdy</sub> = 100</span> kN.m </p>
 <p>Effective length - <span class="eq"><var>L</var><sub>oy</sub> = 4000</span> mm </p>
@@ -4817,6 +4825,12 @@ A small <a href="#areas-of-reinforcement-bars">reinforcement-area picker</a> ret
 <p>Bending moment is less than moment resistance: </p>
 <p><span class="eq"><var>M</var><sub>Ed</sub> = 225.21 <i>kNm</i></span> ≤ <span class="eq"><var>M</var><sub>Rd</sub> = 398.62 <i>kNm</i></span></p>
 <p>The design check is satisfied. </p>
+<img class="side" style="width:190pt;" src="Images/structures/rc/design/column-biaxial.png" alt="Column_Biaxial.png"> 
+<div class="calcpad-h4">Biaxial bending design</div> 
+<p>For the other direction: </p>
+<p>Design moment - <span class="eq"><var>M</var><sub>Edy</sub> = <u class="input-194">50</u>  <i>kNm</i></span></p>
+<p>Bending resistance - <span class="eq"><var>M</var><sub>Rdy</sub> = <u class="input-195">100</u>  <i>kNm</i></span></p>
+<p>Effective length - <span class="eq"><var>L</var><sub>oy</sub> = <u class="input-196">1</u>  · <var>L</var> = <u class="input-196">1</u>  · 4 <i>m</i> = 4 <i>m</i></span></p>
 <img class="side" style="width:190pt;" src="Images/structures/rc/design/column-biaxial.png" alt="Column_Biaxial.png"> 
 <div class="calcpad-h4">Biaxial bending design</div> 
 <p>For the other direction: </p>
@@ -5738,11 +5752,21 @@ Provide <b>doubly closed links</b>: Ø8/140mm with total area A<sub>s,w</sub> = 
 <div style="max-width:180mm"> 
 <div class="calcpad-h4">Static scheme</div> 
 <p id="type" class="flip_base" style="display:none"> <span class="eq"><var>type</var> = <u class="input-8">0</u> </span> </p> 
+<p><select data-target="type" class="flip_trigger"> 
+<option value="1">Cantilever with concentrated load</option> 
+<option value="2">Cantilever with uniformly distributed load</option> 
+<option value="3">Simply supported beam with concentrated load</option> 
+<option value="0">Simply supported beam with uniformly distributed load</option> 
+</select></p> 
 <img class="side flip flip_0" src="Images/structures/rc/design/deflection-beam-uniform.png" alt="deflection-beam-uniform.png" style="width:150pt;"> 
 <p>Simply supported beam with uniformly distributed load </p>
 <p>Beam length - <span class="eq"><var>L</var> = <u class="input-43">7</u> </span> m </p>
 <p>Exposure class: </p>
 <p id="w_max" style="display:none"> <span class="eq"><var>w</var><sub>max</sub> = <u class="input-45">0.4</u> </span> </p> 
+<p><select data-target="w_max"> 
+<option value="0.4">X0 or XC1</option> 
+<option value="0.3">XC2, XC3, XC4, XD1, XD2, XS2 or XS3</option> 
+</select></p> 
 <p>X0 or XC1 </p>
 <p></p>
 <div class="calcpad-h4">Bending moments</div> 
@@ -5960,6 +5984,7 @@ Provide <b>doubly closed links</b>: Ø8/140mm with total area A<sub>s,w</sub> = 
 </div> 
 <p><span class="eq"><var>δ</var> = 19.45</span> mm &le; <span class="eq"><var>δ</var><sub>max</sub> = 28</span> mm - The condition is satisfied! </p>
 </div> 
+<script>if(window.jQuery){$(".flip_trigger").change(function(){$(".flip").hide();$(".flip_"+$(this).val()).show();});$(".flip").hide();$(".flip_"+$(".flip_base input").val()).show();}</script> 
 </div>
 </figure>
 </div>
@@ -6375,11 +6400,21 @@ Provide <b>doubly closed links</b>: Ø8/140mm with total area A<sub>s,w</sub> = 
 <div style="max-width:180mm"> 
 <div class="calcpad-h4">Static scheme</div> 
 <p id="type" class="flip_base" style="display:none"> <span class="eq"><var>type</var> = <u class="input-8">0</u> </span> </p> 
+<p><select data-target="type" class="flip_trigger"> 
+<option value="1">Cantilever with concentrated load</option> 
+<option value="2">Cantilever with uniformly distributed load</option> 
+<option value="3">Simply supported beam with concentrated load</option> 
+<option value="0">Simply supported beam with uniformly distributed load</option> 
+</select></p> 
 <img class="side flip flip_0" src="Images/structures/rc/design/deflection-beam-uniform.png" alt="deflection-beam-uniform.png" style="width:150pt;"> 
 <p>Simply supported beam with uniformly distributed load </p>
 <p>Beam length - <span class="eq"><var>L</var> = <u class="input-43">5.75</u> </span> m </p>
 <p>Exposure class: </p>
 <p id="w_max" style="display:none"> <span class="eq"><var>w</var><sub>max</sub> = <u class="input-45">0.4</u> </span> </p> 
+<p><select data-target="w_max"> 
+<option value="0.4">X0 or XC1</option> 
+<option value="0.3">XC2, XC3, XC4, XD1, XD2, XS2 или XS3</option> 
+</select></p> 
 <p>X0 or XC1 </p>
 <p></p>
 <div class="calcpad-h4">Bending moments</div> 
@@ -6604,6 +6639,7 @@ Provide <b>doubly closed links</b>: Ø8/140mm with total area A<sub>s,w</sub> = 
 </div> 
 <p><span class="eq"><var>δ</var> = 13.46</span> mm &le; <span class="eq"><var>δ</var><sub>max</sub> = 23</span> mm - The condition is satisfied! </p>
 </div> 
+<script>if(window.jQuery){$(".flip_trigger").change(function(){$(".flip").hide();$(".flip_"+$(this).val()).show();});$(".flip").hide();$(".flip_"+$(".flip_base input").val()).show();}</script> 
 </div>
 </figure>
 </div>

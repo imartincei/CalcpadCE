@@ -3215,6 +3215,8 @@ The <a href="#i-section-properties-excel">Excel-driven version</a> reads the dim
 <p></p>
 <table><tr><td> 
 <div class="calcpad-h4">Dimensions</div> 
+<p>Select section - 
+<select data-target="section"> 
 <p>Section type - 
 <select data-target="section" style="font-weight:bold; border:none; background: none; color: black; box-shadow:none; appearance: none;"> 
 <option value=80;3.9;42;5.9;42;5.9;3.9;2.3>IPN 80</option> 
@@ -3418,6 +3420,11 @@ The <a href="#i-section-properties-excel">Excel-driven version</a> reads the dim
 <tr><td style="padding-right: 10px;"> <span class="eq"><var>r</var> = <u class="input-213">19</u> </span> mm, </td><td style="display:none"> <span class="eq"><var>r</var><sub>2</sub> = <u class="input-213">11.9</u> </span> mm</td></tr> 
 </table> 
 <p><span class="eq"><var>h</var><sub>w</sub> = <var>h</var> − <var>t</var><sub>f1</sub> − <var>t</var><sub>f2</sub> = 550 − 30 − 30 = 490</span> mm </p>
+<p>Section type - 
+<select data-target="rolled"> 
+<option value="1">Rolled</option> 
+<option value="0">Welded</option> 
+</select></p> 
 <p style="display:none;" id="rolled"> <span class="eq"><var>rolled</var> = <u class="input-223">1</u> </span> </p> 
 <p>Section type - Rolled </p>
 <p></p>
@@ -3788,6 +3795,8 @@ The <a href="#i-section-properties-excel">Excel-driven version</a> reads the dim
 <table><tr><td> 
 <p>&nbsp;</p>
 <div class="calcpad-h4">Dimensions</div> 
+<p>Select section - 
+<select data-target="section"> 
 <p>Section type - 
 <select data-target="section" style="font-weight:bold; border:none; background: none; color: black; box-shadow:none; appearance: none;"> 
 <option value=1>IPE 100A</option> 
@@ -4364,9 +4373,12 @@ The <a href="#i-section-properties-excel">Excel-driven version</a> reads the dim
 <figcaption>Rendered Output:</figcaption>
 <div class="calcpad-output"><!-- Catalogue-driven variant of the I-section properties calculation: a single drop-down selector populates the dimensions and an SVG sketch of the chosen rolled section is rendered alongside the results. --> 
 <div class="calcpad-h3">Design of steel I-Section <hr/><small>According to <strong>Eurocode</strong>: EN 1993-1-1 </small> </div>
+<div style="max-width:150mm; padding-left:5mm; background:#f0f0ee; border: solid 1pt #e4e4e0; border-radius:6pt; box-shadow: 3pt 3pt 6pt rgba(0, 0, 0, 0.4)"> 
 <p></p>
 <table><tr><td> 
 <div class="calcpad-h4">Dimensions</div> 
+<p>Select section - 
+<select data-target="section"> 
 <p>Section type - 
 <select data-target="section" style="font-weight:bold; border:none; background: none; color: black; box-shadow:none; appearance: none;"> 
 <option value=100;4.1;55;5.7;55;5.7;7;0>IPE 100 </option> 
@@ -4550,6 +4562,11 @@ The <a href="#i-section-properties-excel">Excel-driven version</a> reads the dim
 <tr><td style="padding-right: 10px;"> <span class="eq"><var>r</var> = <u class="input-195">9</u> </span> mm, </td><td style="display:none"> <span class="eq"><var>r</var><sub>2</sub> = <u class="input-195">0</u> </span> mm</td></tr> 
 </table> 
 <p><span class="eq"><var>h</var><sub>w</sub> = <var>h</var> − <var>t</var><sub>f1</sub> − <var>t</var><sub>f2</sub> = 180 − 8 − 8 = 164</span> mm </p>
+<p>Section type - 
+<select data-target="rolled"> 
+<option value="1">Rolled</option> 
+<option value="0">Welded</option> 
+</select></p> 
 <p style="display:none;" id="rolled"> <span class="eq"><var>rolled</var> = <u class="input-205">1</u> </span> </p> 
 <p>Section type - Rolled </p>
 <p></p>
@@ -4557,10 +4574,12 @@ The <a href="#i-section-properties-excel">Excel-driven version</a> reads the dim
 <div class="calcpad-h4">Steel properties</div> 
 <p>Yield strength -  <span class="eq"><var>f</var><sub>y</sub> = <u class="input-216">235</u> </span> MPa </p>
 <p>Tensile strength -  <span class="eq"><var>f</var><sub>u</sub> = <u class="input-217">360</u> </span> MPa </p>
+<p>&nbsp;</p>
 <p>Modulus of elasticity -  <span class="eq"><var>E</var> = 210000</span> MPa </p>
 <p>Private factors of safety: </p>
 <p><span class="eq"><var>γ</var><sub>M0</sub> = 1.05</span> ,  <span class="eq"><var>γ</var><sub>M2</sub> = 1.25</span></p>
 </td><td> 
+<img alt="I-section.svg" src="./i-section.svg"> 
 <!-- SVG drawing macros included by the steel I-section worksheets to render the cross-section with its flange widths, web thickness and root radius. --><svg width="171pt" height="260pt" viewBox="-95.5 -50 191 280" style="font-size:9pt;" xmlns="http://www.w3.org/2000/svg"><path d="M-45.5,0H45.5V8H11.65A9,9 0 0 0 2.65,17V163A9,9 0 0 0 11.65,172H45.5V180H-45.5V172H-11.65A9,9 0 0 0 -2.65,163V17A9,9 0 0 0 -11.65,8H-45.5Z" fill="LightSkyBlue" fill-opacity="0.6" stroke="#4ac" stroke-width="1.5" /><line x1="-80.5" y1="90" x2="80.5" y2="90" stroke-dasharray="14.4,4.8,1.6,4.8" style="stroke:limegreen; stroke-width:0.8"/><text x="-85.5" y="90" text-anchor="middle">y</text><text x="85.5" y="90" text-anchor="middle">y</text><line x1="0" y1="-35" x2="0" y2="215" stroke-dasharray="14.4,4.8,1.6,4.8" style="stroke:limegreen; stroke-width:0.8"/><text x="0" y="-40" text-anchor="middle">z</text><text x="0" y="225" text-anchor="middle">z</text><line x1="-66.5" y1="0" x2="-54.5" y2="0" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="-66.5" y1="180" x2="-54.5" y2="180" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="-60.5" y1="-6" x2="-60.5" y2="186" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><circle cx="-60.5" cy="0" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><circle cx="-60.5" cy="180" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><text x="-65" y="90" text-anchor="middle" transform="rotate(-90,-65,90)">180</text><line x1="64.5" y1="0" x2="76.5" y2="0" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="64.5" y1="8" x2="76.5" y2="8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="70.5" y1="-6" x2="70.5" y2="14" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><circle cx="70.5" cy="0" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><circle cx="70.5" cy="8" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><text x="66" y="4" text-anchor="middle" transform="rotate(-90,66,4)">8</text><line x1="64.5" y1="172" x2="76.5" y2="172" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="64.5" y1="180" x2="76.5" y2="180" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="70.5" y1="166" x2="70.5" y2="186" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><circle cx="70.5" cy="172" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><circle cx="70.5" cy="180" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><text x="66" y="176" text-anchor="middle" transform="rotate(-90,66,176)">8</text><line x1="-45.5" y1="199" x2="-45.5" y2="211" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="45.5" y1="199" x2="45.5" y2="211" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="-51.5" y1="205" x2="51.5" y2="205" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><circle cx="45.5" cy="205" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><circle cx="-45.5" cy="205" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><text x="0" y="200.5" text-anchor="middle">91</text><line x1="-45.5" y1="-21" x2="-45.5" y2="-9" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="45.5" y1="-21" x2="45.5" y2="-9" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="-51.5" y1="-15" x2="51.5" y2="-15" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><circle cx="45.5" cy="-15" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><circle cx="-45.5" cy="-15" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><text x="0" y="-19.5" text-anchor="middle">91</text><line x1="-2.65" y1="69" x2="-2.65" y2="81" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="2.65" y1="69" x2="2.65" y2="81" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="-8.65" y1="75" x2="8.65" y2="75" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><circle cx="2.65" cy="75" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><circle cx="-2.65" cy="75" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><text x="0" y="70.5" text-anchor="middle"></text><text x="17.65" y="70" text-anchor="middle">5.3</text><line x1="5.29" y1="169.36" x2="36.65" y2="138" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><line x1="36.65" y1="138" x2="46.65" y2="138" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod"/><text x="56.65" y="143" text-anchor="middle">9</text></svg></td></tr></table> 
 <p></p>
 <p></p>
