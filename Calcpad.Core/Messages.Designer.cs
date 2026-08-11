@@ -439,6 +439,15 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
+        // /   Looks up a localized string similar to Error in &quot;{0}&quot;: {1}.
+        // / </summary>
+        public static string Error_in_0_1 {
+            get {
+                return ResourceManager.GetString("Error_in_0_1", resourceCulture);
+            }
+        }
+
+        // / <summary>
         // /   Looks up a localized string similar to Error parsing &quot;{0}&quot; as number..
         // / </summary>
         public static string Error_parsing_0_as_number {
@@ -709,11 +718,11 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to Invalid settings JSON: {0}..
+        // /   Looks up a localized string similar to Invalid JSON in {0}..
         // / </summary>
-        public static string Invalid_settings_0 {
+        public static string Invalid_JSON_in_0 {
             get {
-                return ResourceManager.GetString("Invalid_settings_0", resourceCulture);
+                return ResourceManager.GetString("Invalid_JSON_in_0", resourceCulture);
             }
         }
 
@@ -1632,6 +1641,132 @@ namespace Calcpad.Core {
         public static string Vectors_and_matrices_are_not_supported_in_complex_mode {
             get {
                 return ResourceManager.GetString("Vectors_and_matrices_are_not_supported_in_complex_mode", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to Improper format for #UI keyword. Missing closing brace &apos;}&apos;..
+        // / </summary>
+        public static string Improper_format_for_UI_keyword_Missing_closing_brace {
+            get {
+                return ResourceManager.GetString("Improper_format_for_UI_keyword_Missing_closing_brace", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to The #UI keyword requires a variable assignment..
+        // / </summary>
+        public static string The_UI_keyword_requires_a_variable_assignment {
+            get {
+                return ResourceManager.GetString("The_UI_keyword_requires_a_variable_assignment", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to #UI directives do not support expressions..
+        // / </summary>
+        public static string UI_directives_do_not_support_expressions {
+            get {
+                return ResourceManager.GetString("UI_directives_do_not_support_expressions", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to Only numbers are supported by the #UI keyword..
+        // / </summary>
+        public static string Only_numbers_are_supported_by_the_UI_keyword {
+            get {
+                return ResourceManager.GetString("Only_numbers_are_supported_by_the_UI_keyword", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to #UI {0} requires both &apos;keys&apos; and &apos;values&apos; arrays..
+        // / </summary>
+        public static string The_UI_0_requires_both_keys_and_values_arrays {
+            get {
+                return ResourceManager.GetString("The_UI_0_requires_both_keys_and_values_arrays", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to #UI {0} has {1} keys but {2} values, the &apos;keys&apos; and &apos;values&apos; arrays must have the same length..
+        // / </summary>
+        public static string The_UI_0_keys_and_values_arrays_must_have_the_same_length {
+            get {
+                return ResourceManager.GetString("The_UI_0_keys_and_values_arrays_must_have_the_same_length", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to &apos;{0}&apos; is not a recognized #UI type, expected one of {1}..
+        // / </summary>
+        public static string The_UI_type_0_is_not_recognized_expected_one_of_1 {
+            get {
+                return ResourceManager.GetString("The_UI_type_0_is_not_recognized_expected_one_of_1", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to #UI &apos;{0}&apos; must not be negative..
+        // / </summary>
+        public static string The_UI_0_must_not_be_negative {
+            get {
+                return ResourceManager.GetString("The_UI_0_must_not_be_negative", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to #UI &apos;{0}&apos; has {1} entries but the grid has {2} {3}..
+        // / </summary>
+        public static string The_UI_0_has_1_entries_but_the_grid_has_2_3 {
+            get {
+                return ResourceManager.GetString("The_UI_0_has_1_entries_but_the_grid_has_2_3", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to A #UI value has the wrong type..
+        // / </summary>
+        public static string A_UI_value_has_the_wrong_type {
+            get {
+                return ResourceManager.GetString("A_UI_value_has_the_wrong_type", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to {0} requires a path..
+        // / </summary>
+        public static string Missing_path_value_0 {
+            get {
+                return ResourceManager.GetString("Missing_path_value_0", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to {0} is already declared in this document..
+        // / </summary>
+        public static string Duplicate_path_declaration_0 {
+            get {
+                return ResourceManager.GetString("Duplicate_path_declaration_0", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to {0} is not declared. Add {1} before this line..
+        // / </summary>
+        public static string Path_root_not_declared_0_1 {
+            get {
+                return ResourceManager.GetString("Path_root_not_declared_0_1", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to {0} folder not found: {1}..
+        // / </summary>
+        public static string Path_root_folder_not_found_0_1 {
+            get {
+                return ResourceManager.GetString("Path_root_folder_not_found_0_1", resourceCulture);
             }
         }
     }

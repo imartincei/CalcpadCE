@@ -374,7 +374,8 @@ namespace Calcpad.Cli
                 var code = CalcpadReader.Read(fileName);
                 var macroParser = new MacroParser
                 {
-                    Include = CalcpadReader.Include
+                    Include = CalcpadReader.Include,
+                    SourceFilePath = fileName
                 };
                 var hasMacroErrors = macroParser.Parse(code, out var unwrappedCode, null, 0, true);
                 string htmlResult;
@@ -387,7 +388,9 @@ namespace Calcpad.Cli
                 }
                 ExpressionParser parser = new()
                 {
-                    Settings = settings
+                    Settings = settings,
+                    SourceFilePath = fileName,
+                    PathRoots = macroParser.PathRoots
                 };
                 parser.Parse(unwrappedCode, true, ext == ".docx");
                 htmlResult = parser.HtmlResult;

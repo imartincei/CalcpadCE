@@ -38,6 +38,21 @@
  </p>
  <p>
   Bolt diameter -
+  <select data-target="bolt">
+   <option value="12">M12</option>
+   <option value="14">M14</option>
+   <option value="16">M16</option>
+   <option value="18">M18</option>
+   <option value="20">M20</option>
+   <option value="22">M22</option>
+   <option value="24">M24</option>
+   <option value="27">M27</option>
+   <option value="30">M30</option>
+   <option value="36">M36</option>
+  </select>
+ </p>
+ <p>
+  Bolt diameter -
   <span class="eq">
    <var>d</var>
    = 12
@@ -103,6 +118,18 @@
    =
    <u class="input-54">10.9</u>
   </span>
+ </p>
+ <p>
+  Bolt steel grade -
+  <select data-target="grade">
+   <option value="4.6">4.6</option>
+   <option value="4.8">4.8</option>
+   <option value="5.6">5.6</option>
+   <option value="5.8">5.8</option>
+   <option value="6.8">6.8</option>
+   <option value="8.8">8.8</option>
+   <option value="10.9">10.9</option>
+  </select>
  </p>
  Bolt steel grade - 10.9
  <p>

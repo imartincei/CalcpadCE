@@ -191,6 +191,13 @@
    </span>
    MPa
   </p>
+  <p>
+   Steel class -
+   <select data-target="C">
+    <option value="0">Class B</option>
+    <option value="1">Class C</option>
+   </select>
+  </p>
   Selected steel class
   <b>B500B</b>
   <p>

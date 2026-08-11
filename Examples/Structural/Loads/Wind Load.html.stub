@@ -221,6 +221,24 @@
     = 1
    </span>
   </p>
+  <p id="C" style="display:none;">
+   <span class="eq">
+    <var>C</var>
+    =
+    <u class="input-39">4</u>
+   </span>
+  </p>
+  <p class="ref">[EN 1991-1-4, Table 4.1]</p>
+  <p>Terrain categories</p>
+  <p>
+   <select data-target="C">
+    <option value="0">0. Sea or coastal area...</option>
+    <option value="1">I. Lakes or flat and horizontal area...</option>
+    <option value="2">II. Area with low vegetation...</option>
+    <option value="3">III. Area with regular cover of vegetation or buildings...</option>
+    <option value="4">IV. Area in which at least 15 % of the surface is covered with buildings with h &gt; 15 m</option>
+   </select>
+  </p>
   <p class="ref">[EN 1991-1-4, Table 4.1]</p>
   <p>
    Terrain category - IV:

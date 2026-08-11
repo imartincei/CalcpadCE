@@ -200,7 +200,7 @@ namespace Calcpad.Core
                 return values;
             }
 
-            private static Expression ParseToken(Token t) =>
+            private Expression ParseToken(Token t) =>
                 t.Type switch
                 {
                     TokenTypes.Unit =>
@@ -361,14 +361,14 @@ namespace Calcpad.Core
                 return Expression.Call(LuDecompositionMethod, a, b);
             }
 
-            private static Expression ParseVariableToken(VariableToken t)
+            private Expression ParseVariableToken(VariableToken t)
             {
                 var v = t.Variable;
                 if (v.IsInitialized || t.Type == TokenTypes.Vector || t.Type == TokenTypes.Matrix)
                     return Expression.Property(Expression.Constant(v), typeof(Variable), nameof(Variable.Value));
                 try
                 {
-                    var u = Unit.Get(t.Content);
+                    var u = Unit.Get(t.Content, _parser.IsUs);
                     t.Type = TokenTypes.Unit;
                     v.SetValue(u);
                     return Expression.Constant(v.Value, typeof(IValue));

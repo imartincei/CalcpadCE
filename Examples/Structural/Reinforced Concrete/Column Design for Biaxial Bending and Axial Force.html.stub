@@ -1644,6 +1644,44 @@ circle.Series1 {fill:Tomato;}
    <span class="eq">
     <var>M</var>
     <sub>Edy</sub>
+    =
+    <u class="input-192">50</u>
+   </span>
+   kN·m
+  </p>
+  <p>
+   Bending resistance -
+   <span class="eq">
+    <var>M</var>
+    <sub>Rdy</sub>
+    =
+    <u class="input-193">100</u>
+   </span>
+   kN·m
+  </p>
+  <p>
+   Effective length -
+   <span class="eq">
+    <var>L</var>
+    <sub>oy</sub>
+    =
+    <u class="input-194">1</u>
+    ·
+    <var>L</var>
+    =
+    <u class="input-194">1</u>
+    · 4000 = 4000
+   </span>
+   mm
+  </p>
+  <img alt="column-biaxial.png" class="side" src="Images/structures/rc/design/column-biaxial.png" style="width:190pt;"/>
+  <h4>Biaxial bending design</h4>
+  <p>For the other direction:</p>
+  <p>
+   Design moment -
+   <span class="eq">
+    <var>M</var>
+    <sub>Edy</sub>
     = 50
    </span>
    kN.m

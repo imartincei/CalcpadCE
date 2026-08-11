@@ -16,6 +16,14 @@
     <u class="input-8">0</u>
    </span>
   </p>
+  <p>
+   <select class="flip_trigger" data-target="type">
+    <option value="1">Cantilever with concentrated load</option>
+    <option value="2">Cantilever with uniformly distributed load</option>
+    <option value="3">Simply supported beam with concentrated load</option>
+    <option value="0">Simply supported beam with uniformly distributed load</option>
+   </select>
+  </p>
   <img alt="deflection-beam-uniform.png" class="side flip flip_0" src="Images/structures/rc/design/deflection-beam-uniform.png" style="width:150pt;"/>
   <p>Simply supported beam with uniformly distributed load</p>
   <p>
@@ -35,6 +43,12 @@
     =
     <u class="input-45">0.4</u>
    </span>
+  </p>
+  <p>
+   <select data-target="w_max">
+    <option value="0.4">X0 or XC1</option>
+    <option value="0.3">XC2, XC3, XC4, XD1, XD2, XS2 or XS3</option>
+   </select>
   </p>
   <p>X0 or XC1</p>
   <p>
@@ -2269,4 +2283,5 @@
    mm - The condition is satisfied!
   </p>
  </div>
+ <script>if(window.jQuery){$(".flip_trigger").change(function(){$(".flip").hide();$(".flip_"+$(this).val()).show();});$(".flip").hide();$(".flip_"+$(".flip_base input").val()).show();}</script>
 </div>
