@@ -9,570 +9,587 @@
    : EN 1993-1-1
   </small>
  </h3>
- <p>
- </p>
- <table>
-  <tr>
-   <td>
-    <h4>Dimensions</h4>
-    <p>
-     Section type -
-     <select data-target="section" style="font-weight:bold; border:none; background: none; color: black; box-shadow:none; appearance: none;">
-      <option value="100;4.1;55;5.7;55;5.7;7;0">IPE 100</option>
-      <option value="120;4.4;64;6.3;64;6.3;7;0">IPE 120</option>
-      <option value="137.4;3.8;73;5.6;73;5.6;7;0">IPE 140 A</option>
-      <option value="140;4.7;73;6.9;73;6.9;7;0">IPE 140</option>
-      <option value="142;5.3;72;7.8;72;7.8;7;0">IPE 140 R</option>
-      <option value="157;4;82;5.9;82;5.9;9;0">IPE 160 A</option>
-      <option value="160;5;82;7.4;82;7.4;9;0">IPE 160</option>
-      <option value="162;5.6;81;8.5;81;8.5;9;0">IPE 160 R</option>
-      <option value="177;4.3;91;6.5;91;6.5;9;0">IPE 180 A</option>
-      <option value="180;5.3;91;8;91;8;9;0">IPE 180</option>
-      <option value="182;6;92;9;92;9;9;0">IPE 180 O</option>
-      <option value="183;6.4;89;9.5;89;9.5;9;0">IPE 180 R</option>
-      <option value="197;4.5;100;7;100;7;12;0">IPE 200 A</option>
-      <option value="200;5.6;100;8.5;100;8.5;12;0">IPE 200</option>
-      <option value="202;6.2;102;9.5;102;9.5;12;0">IPE 200 O</option>
-      <option value="204;6.6;98;10.5;98;10.5;12;0">IPE 200 R</option>
-      <option value="217;5;110;7.7;110;7.7;12;0">IPE 220 A</option>
-      <option value="220;5.9;110;9.2;110;9.2;12;0">IPE 220</option>
-      <option value="222;6.6;112;10.2;112;10.2;12;0">IPE 220 O</option>
-      <option value="225;6.7;108;11.8;108;11.8;12;0">IPE 220 R</option>
-      <option value="237;5.2;120;8.3;120;8.3;15;0">IPE 240 A</option>
-      <option value="240;6.2;120;9.8;120;9.8;15;0">IPE 240</option>
-      <option value="242;7;122;10.8;122;10.8;15;0">IPE 240 O</option>
-      <option value="245;7.5;118;12.3;118;12.3;15;0">IPE 240 R</option>
-      <option value="267;5.5;135;8.7;135;8.7;15;0">IPE 270 A</option>
-      <option value="270;6.6;135;10.2;135;10.2;15;0">IPE 270</option>
-      <option value="274;7.5;136;12.2;136;12.2;15;0">IPE 270 O</option>
-      <option value="276;7.7;133;13.1;133;13.1;15;0">IPE 270 R</option>
-      <option value="297;6.1;150;9.2;150;9.2;15;0">IPE 300 A</option>
-      <option value="300;7.1;150;10.7;150;10.7;15;0">IPE 300</option>
-      <option value="304;8;152;12.7;152;12.7;15;0">IPE 300 O</option>
-      <option value="306;8.5;147;13.7;147;13.7;15;0">IPE 300 R</option>
-      <option value="327;6.5;160;10;160;10;18;0">IPE 330 A</option>
-      <option value="330;7.5;160;11.5;160;11.5;18;0">IPE 330</option>
-      <option value="334;8.5;162;13.5;162;13.5;18;0">IPE 330 O</option>
-      <option value="336;9.2;158;14.5;158;14.5;18;0">IPE 330 R</option>
-      <option value="357.6;6.6;170;11.5;170;11.5;18;0">IPE 360 A</option>
-      <option value="360;8;170;12.7;170;12.7;18;0">IPE 360</option>
-      <option value="364;9.2;172;14.7;172;14.7;18;0">IPE 360 O</option>
-      <option value="366;9.9;168;16;168;16;18;0">IPE 360 R</option>
-      <option value="397;7;180;12;180;12;21;0">IPE 400 A</option>
-      <option value="400;8.6;180;13.5;180;13.5;21;0">IPE 400</option>
-      <option value="404;9.7;182;15.5;182;15.5;21;0">IPE 400 O</option>
-      <option value="407;10.6;178;17;178;17;21;0">IPE 400 R</option>
-      <option value="408;10.6;182;17.5;182;17.5;21;0">IPE 400 V</option>
-      <option value="447;7.6;190;13.1;190;13.1;21;0">IPE 450 A</option>
-      <option value="450;9.4;190;14.6;190;14.6;21;0">IPE 450</option>
-      <option value="456;11;192;17.6;192;17.6;21;0">IPE 450 O</option>
-      <option value="458;11.3;188;18.6;188;18.6;21;0">IPE 450 R</option>
-      <option value="460;12.4;194;19.6;194;19.6;21;0">IPE 450 V</option>
-      <option value="497;8.4;200;14.5;200;14.5;21;0">IPE 500 A</option>
-      <option value="500;10.2;200;16;200;16;21;0">IPE 500</option>
-      <option value="506;12;202;19;202;19;21;0">IPE 500 O</option>
-      <option value="508;12.6;198;20;198;20;21;0">IPE 500 R</option>
-      <option value="514;14.2;204;23;204;23;21;0">IPE 500 V</option>
-      <option value="547;9;210;15.7;210;15.7;24;0">IPE 550 A</option>
-      <option value="550;11.1;210;17.2;210;17.2;24;0">IPE 550</option>
-      <option value="556;12.7;212;20.2;212;20.2;24;0">IPE 550 O</option>
-      <option value="560;14;210;22.2;210;22.2;24;0">IPE 550 R</option>
-      <option value="566;17.1;216;25.2;216;25.2;24;0">IPE 550 V</option>
-      <option value="597;9.8;220;17.5;220;17.5;24;0">IPE 600 A</option>
-      <option value="600;12;220;19;220;19;24;0">IPE 600</option>
-      <option value="610;15;224;24;224;24;24;0">IPE 600 O</option>
-      <option value="608;14;218;23;218;23;24;0">IPE 600 R</option>
-      <option value="618;18;228;28;228;28;24;0">IPE 600 V</option>
-      <option value="753;11.5;263;17;263;17;17;0">IPE 750 x 137</option>
-      <option value="753;13.2;265;17;265;17;17;0">IPE 750 x 147</option>
-      <option value="758;13.8;266;19.3;266;19.3;17;0">IPE 750 x 161</option>
-      <option value="762;14.4;267;21.6;267;21.6;17;0">IPE 750 x 174</option>
-      <option value="766;14.9;267;23.6;267;23.6;17;0">IPE 750 x185</option>
-      <option value="770;15.6;268;25.4;268;25.4;17;0">IPE 750 x 197</option>
-      <option value="775;16;268;28;268;28;17;0">IPE 750 x 210</option>
-      <option value="778;17;269;29.5;269;29.5;17;0">IPE 750 x 223</option>
-      <option value="96;5;100;8;100;8;12;0">HE 100 A</option>
-      <option value="96;5;100;8;100;8;12;0">HE 100 A</option>
-      <option value="100;6;100;10;100;10;12;0">HE 100 B</option>
-      <option value="109;4.2;120;5.5;120;5.5;12;0">HE 120 AA</option>
-      <option value="114;5;120;8;120;8;12;0">HE 120 A</option>
-      <option value="120;6.5;120;11;120;11;12;0">HE 120 B</option>
-      <option value="128;4.3;140;6;140;6;12;0">HE 140 AA</option>
-      <option value="133;5.5;140;8.5;140;8.5;12;0">HE 140 A</option>
-      <option value="140;7;140;12;140;12;12;0">HE 140 B</option>
-      <option value="148;4.5;160;7;160;7;15;0">HE 160 AA</option>
-      <option value="152;6;160;9;160;9;15;0">HE 160 A</option>
-      <option value="160;8;160;13;160;13;15;0">HE 160 B</option>
-      <option value="180;14;166;23;166;23;15;0">HE 160 M</option>
-      <option value="167;5;180;7.5;180;7.5;15;0">HE 180 AA</option>
-      <option value="171;6;180;9.5;180;9.5;15;0">HE 180 A</option>
-      <option value="180;8.5;180;14;180;14;15;0">HE 180 B</option>
-      <option value="200;14.5;186;24;186;24;15;0">HE 180 M</option>
-      <option value="186;5.5;200;8;200;8;18;0">HE 200 AA</option>
-      <option value="190;6.5;200;10;200;10;18;0">HE 200 A</option>
-      <option value="200;9;200;15;200;15;18;0">HE 200 B</option>
-      <option value="220;15;206;25;206;25;18;0">HE 200 M</option>
-      <option value="205;6;220;8.5;220;8.5;18;0">HE 220 AA</option>
-      <option value="210;7;220;11;220;11;18;0">HE 220 A</option>
-      <option value="220;9.5;220;16;220;16;18;0">HE 220 B</option>
-      <option value="240;15.5;226;26;226;26;18;0">HE 220 M</option>
-      <option value="224;6.5;240;9;240;9;21;0">HE 240 AA</option>
-      <option value="230;7.5;240;12;240;12;21;0">HE 240 A</option>
-      <option value="240;10;240;17;240;17;21;0">HE 240 B</option>
-      <option value="270;18;248;32;248;32;21;0">HE 240 M</option>
-      <option value="244;6.5;260;9.5;260;9.5;24;0">HE 260 AA</option>
-      <option value="250;7.5;260;12.5;260;12.5;24;0">HE 260 A</option>
-      <option value="260;10;260;17.5;260;17.5;24;0">HE 260 B</option>
-      <option value="290;18;268;32.5;268;32.5;24;0">HE 260 M</option>
-      <option value="264;7;280;10;280;10;24;0">HE 280 AA</option>
-      <option value="270;8;280;13;280;13;24;0">HE 280 A</option>
-      <option value="280;10.5;280;18;280;18;24;0">HE 280 B</option>
-      <option value="310;18.5;288;33;288;33;24;0">HE 280 M</option>
-      <option value="283;7.5;300;10.5;300;10.5;27;0">HE 300 AA</option>
-      <option value="290;8.5;300;14;300;14;27;0">HE 300 A</option>
-      <option value="300;11;300;19;300;19;27;0">HE 300 B</option>
-      <option value="320;16;305;29;305;29;27;0">HE 300 C</option>
-      <option value="340;21;310;39;310;39;27;0">HE 300 M</option>
-      <option value="301;8;300;11;300;11;27;0">HE 320 AA</option>
-      <option value="310;9;300;15.5;300;15.5;27;0">HE 320 A</option>
-      <option value="320;11.5;300;20.5;300;20.5;27;0">HE 320 B</option>
-      <option value="359;21;309;40;309;40;27;0">HE 320 M</option>
-      <option value="320;8.5;300;11.5;300;11.5;27;0">HE 340 AA</option>
-      <option value="330;9.5;300;16.5;300;16.5;27;0">HE 340 A</option>
-      <option value="340;12;300;21.5;300;21.5;27;0">HE 340 B</option>
-      <option value="377;21;309;40;309;40;27;0">HE 340 M</option>
-      <option value="339;9;300;12;300;12;27;0">HE 360 AA</option>
-      <option value="350;10;300;17.5;300;17.5;27;0">HE 360 A</option>
-      <option value="360;12.5;300;22.5;300;22.5;27;0">HE 360 B</option>
-      <option value="395;21;308;40;308;40;27;0">HE 360 M</option>
-      <option value="378;9.5;300;13;300;13;27;0">HE 400 AA</option>
-      <option value="384;10;297;16;297;16;27;0">HE 400 x 107</option>
-      <option value="390;11;300;19;300;19;27;0">HE 400 A</option>
-      <option value="400;13.5;300;24;300;24;27;0">HE 400 B</option>
-      <option value="432;21;307;40;307;40;27;0">HE 400 M</option>
-      <option value="425;10;300;13.5;300;13.5;27;0">HE 450 AA</option>
-      <option value="435;10.2;300;18.5;300;18.5;27;0">HE 450 x 124</option>
-      <option value="440;11.5;300;21;300;21;27;0">HE 450 A</option>
-      <option value="450;14;300;26;300;26;27;0">HE 450 B</option>
-      <option value="478;21;307;40;307;40;27;0">HE 450 M</option>
-      <option value="472;10.5;300;14;300;14;27;0">HE 500 AA</option>
-      <option value="490;12;300;23;300;23;27;0">HE 500 A</option>
-      <option value="500;14.5;300;28;300;28;27;0">HE 500 B</option>
-      <option value="524;21;306;40;306;40;27;0">HE 500 M</option>
-      <option value="522;11.5;300;15;300;15;27;0">HE 550 AA</option>
-      <option value="540;12.5;300;24;300;24;27;0">HE 550 A</option>
-      <option value="550;15;300;29;300;29;27;0">HE 550 B</option>
-      <option value="572;21;306;40;306;40;27;0">HE 550 M</option>
-      <option value="571;12;300;15.5;300;15.5;27;0">HE 600 AA</option>
-      <option value="575;11.8;300;17.5;300;17.5;27;0">HE 600 x 137</option>
-      <option value="582;11.6;300;20.6;300;20.6;27;0">HE 600 x 151</option>
-      <option value="588;13.6;300;23.9;300;23.9;27;0">HE 600 x 175</option>
-      <option value="590;13;300;25;300;25;27;0">HE 600 A</option>
-      <option value="600;15.5;300;30;300;30;27;0">HE 600 B</option>
-      <option value="620;21;305;40;305;40;27;0">HE 600 M</option>
-      <option value="620;12.5;300;16;300;16;27;0">HE 650 AA</option>
-      <option value="640;13.5;300;26;300;26;27;0">HE 650 A</option>
-      <option value="650;16;300;31;300;31;27;0">HE 650 B</option>
-      <option value="668;21;305;40;305;40;27;0">HE 650 M</option>
-      <option value="670;13;300;17;300;17;27;0">HE 700 AA</option>
-      <option value="678;12.5;300;21;300;21;27;0">HE 700 x 166</option>
-      <option value="690;14.5;300;27;300;27;27;0">HE 700 A</option>
-      <option value="700;17;300;32;300;32;27;0">HE 700 B</option>
-      <option value="716;21;304;40;304;40;27;0">HE 700 M</option>
-      <option value="770;14;300;18;300;18;30;0">HE 800 AA</option>
-      <option value="790;15;300;28;300;28;30;0">HE 800 A</option>
-      <option value="800;17.5;300;33;300;33;30;0">HE 800 B</option>
-      <option value="814;21;303;40;303;40;30;0">HE 800 M</option>
-      <option value="870;15;300;20;300;20;30;0">HE 900 AA</option>
-      <option value="890;16;300;30;300;30;30;0">HE 900 A</option>
-      <option value="900;18.5;300;35;300;35;30;0">HE 900 B</option>
-      <option value="910;21;302;40;302;40;30;0">HE 900 M</option>
-      <option value="970;16;300;21;300;21;30;0">HE 1000 A</option>
-      <option value="990;16.5;300;31;300;31;30;0">HE 1000 A</option>
-      <option value="1000;19;300;36;300;36;30;0">HE 1000 B</option>
-      <option value="1008;21;302;40;302;40;30;0">HE 1000 M</option>
-     </select>
-    </p>
-    <table id="section">
-     <tr>
-      <td style="padding-right: 10px;">
-       <span class="eq">
-        <var>h</var>
-        =
-        <u class="input-192">180</u>
-       </span>
-       mm,
-      </td>
-      <td>
-       <span class="eq">
-        <var>t</var>
-        <sub>w</sub>
-        =
-        <u class="input-192">5.3</u>
-       </span>
-       mm
-      </td>
-     </tr>
-     <tr>
-      <td style="padding-right: 10px;">
-       <span class="eq">
-        <var>b</var>
-        <sub>f1</sub>
-        =
-        <u class="input-193">91</u>
-       </span>
-       mm,
-      </td>
-      <td>
-       <span class="eq">
-        <var>t</var>
-        <sub>f1</sub>
-        =
-        <u class="input-193">8</u>
-       </span>
-       mm
-      </td>
-     </tr>
-     <tr>
-      <td style="padding-right: 10px;">
-       <span class="eq">
-        <var>b</var>
-        <sub>f2</sub>
-        =
-        <u class="input-194">91</u>
-       </span>
-       mm,
-      </td>
-      <td>
-       <span class="eq">
-        <var>t</var>
-        <sub>f2</sub>
-        =
-        <u class="input-194">8</u>
-       </span>
-       mm
-      </td>
-     </tr>
-     <tr>
-      <td style="padding-right: 10px;">
-       <span class="eq">
-        <var>r</var>
-        =
-        <u class="input-195">9</u>
-       </span>
-       mm,
-      </td>
-      <td style="display:none">
-       <span class="eq">
-        <var>r</var>
-        <sub>2</sub>
-        =
-        <u class="input-195">0</u>
-       </span>
-       mm
-      </td>
-     </tr>
-    </table>
-    <p>
+ <div style="max-width:150mm; padding-left:5mm; background:#f0f0ee; border: solid 1pt #e4e4e0; border-radius:6pt; box-shadow: 3pt 3pt 6pt rgba(0, 0, 0, 0.4)">
+  <p>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <h4>Dimensions</h4>
+     <p>
+      Select section -
+      <select data-target="section">
+       <p>
+        Section type -
+        <select data-target="section" style="font-weight:bold; border:none; background: none; color: black; box-shadow:none; appearance: none;">
+         <option value="100;4.1;55;5.7;55;5.7;7;0">IPE 100</option>
+         <option value="120;4.4;64;6.3;64;6.3;7;0">IPE 120</option>
+         <option value="137.4;3.8;73;5.6;73;5.6;7;0">IPE 140 A</option>
+         <option value="140;4.7;73;6.9;73;6.9;7;0">IPE 140</option>
+         <option value="142;5.3;72;7.8;72;7.8;7;0">IPE 140 R</option>
+         <option value="157;4;82;5.9;82;5.9;9;0">IPE 160 A</option>
+         <option value="160;5;82;7.4;82;7.4;9;0">IPE 160</option>
+         <option value="162;5.6;81;8.5;81;8.5;9;0">IPE 160 R</option>
+         <option value="177;4.3;91;6.5;91;6.5;9;0">IPE 180 A</option>
+         <option value="180;5.3;91;8;91;8;9;0">IPE 180</option>
+         <option value="182;6;92;9;92;9;9;0">IPE 180 O</option>
+         <option value="183;6.4;89;9.5;89;9.5;9;0">IPE 180 R</option>
+         <option value="197;4.5;100;7;100;7;12;0">IPE 200 A</option>
+         <option value="200;5.6;100;8.5;100;8.5;12;0">IPE 200</option>
+         <option value="202;6.2;102;9.5;102;9.5;12;0">IPE 200 O</option>
+         <option value="204;6.6;98;10.5;98;10.5;12;0">IPE 200 R</option>
+         <option value="217;5;110;7.7;110;7.7;12;0">IPE 220 A</option>
+         <option value="220;5.9;110;9.2;110;9.2;12;0">IPE 220</option>
+         <option value="222;6.6;112;10.2;112;10.2;12;0">IPE 220 O</option>
+         <option value="225;6.7;108;11.8;108;11.8;12;0">IPE 220 R</option>
+         <option value="237;5.2;120;8.3;120;8.3;15;0">IPE 240 A</option>
+         <option value="240;6.2;120;9.8;120;9.8;15;0">IPE 240</option>
+         <option value="242;7;122;10.8;122;10.8;15;0">IPE 240 O</option>
+         <option value="245;7.5;118;12.3;118;12.3;15;0">IPE 240 R</option>
+         <option value="267;5.5;135;8.7;135;8.7;15;0">IPE 270 A</option>
+         <option value="270;6.6;135;10.2;135;10.2;15;0">IPE 270</option>
+         <option value="274;7.5;136;12.2;136;12.2;15;0">IPE 270 O</option>
+         <option value="276;7.7;133;13.1;133;13.1;15;0">IPE 270 R</option>
+         <option value="297;6.1;150;9.2;150;9.2;15;0">IPE 300 A</option>
+         <option value="300;7.1;150;10.7;150;10.7;15;0">IPE 300</option>
+         <option value="304;8;152;12.7;152;12.7;15;0">IPE 300 O</option>
+         <option value="306;8.5;147;13.7;147;13.7;15;0">IPE 300 R</option>
+         <option value="327;6.5;160;10;160;10;18;0">IPE 330 A</option>
+         <option value="330;7.5;160;11.5;160;11.5;18;0">IPE 330</option>
+         <option value="334;8.5;162;13.5;162;13.5;18;0">IPE 330 O</option>
+         <option value="336;9.2;158;14.5;158;14.5;18;0">IPE 330 R</option>
+         <option value="357.6;6.6;170;11.5;170;11.5;18;0">IPE 360 A</option>
+         <option value="360;8;170;12.7;170;12.7;18;0">IPE 360</option>
+         <option value="364;9.2;172;14.7;172;14.7;18;0">IPE 360 O</option>
+         <option value="366;9.9;168;16;168;16;18;0">IPE 360 R</option>
+         <option value="397;7;180;12;180;12;21;0">IPE 400 A</option>
+         <option value="400;8.6;180;13.5;180;13.5;21;0">IPE 400</option>
+         <option value="404;9.7;182;15.5;182;15.5;21;0">IPE 400 O</option>
+         <option value="407;10.6;178;17;178;17;21;0">IPE 400 R</option>
+         <option value="408;10.6;182;17.5;182;17.5;21;0">IPE 400 V</option>
+         <option value="447;7.6;190;13.1;190;13.1;21;0">IPE 450 A</option>
+         <option value="450;9.4;190;14.6;190;14.6;21;0">IPE 450</option>
+         <option value="456;11;192;17.6;192;17.6;21;0">IPE 450 O</option>
+         <option value="458;11.3;188;18.6;188;18.6;21;0">IPE 450 R</option>
+         <option value="460;12.4;194;19.6;194;19.6;21;0">IPE 450 V</option>
+         <option value="497;8.4;200;14.5;200;14.5;21;0">IPE 500 A</option>
+         <option value="500;10.2;200;16;200;16;21;0">IPE 500</option>
+         <option value="506;12;202;19;202;19;21;0">IPE 500 O</option>
+         <option value="508;12.6;198;20;198;20;21;0">IPE 500 R</option>
+         <option value="514;14.2;204;23;204;23;21;0">IPE 500 V</option>
+         <option value="547;9;210;15.7;210;15.7;24;0">IPE 550 A</option>
+         <option value="550;11.1;210;17.2;210;17.2;24;0">IPE 550</option>
+         <option value="556;12.7;212;20.2;212;20.2;24;0">IPE 550 O</option>
+         <option value="560;14;210;22.2;210;22.2;24;0">IPE 550 R</option>
+         <option value="566;17.1;216;25.2;216;25.2;24;0">IPE 550 V</option>
+         <option value="597;9.8;220;17.5;220;17.5;24;0">IPE 600 A</option>
+         <option value="600;12;220;19;220;19;24;0">IPE 600</option>
+         <option value="610;15;224;24;224;24;24;0">IPE 600 O</option>
+         <option value="608;14;218;23;218;23;24;0">IPE 600 R</option>
+         <option value="618;18;228;28;228;28;24;0">IPE 600 V</option>
+         <option value="753;11.5;263;17;263;17;17;0">IPE 750 x 137</option>
+         <option value="753;13.2;265;17;265;17;17;0">IPE 750 x 147</option>
+         <option value="758;13.8;266;19.3;266;19.3;17;0">IPE 750 x 161</option>
+         <option value="762;14.4;267;21.6;267;21.6;17;0">IPE 750 x 174</option>
+         <option value="766;14.9;267;23.6;267;23.6;17;0">IPE 750 x185</option>
+         <option value="770;15.6;268;25.4;268;25.4;17;0">IPE 750 x 197</option>
+         <option value="775;16;268;28;268;28;17;0">IPE 750 x 210</option>
+         <option value="778;17;269;29.5;269;29.5;17;0">IPE 750 x 223</option>
+         <option value="96;5;100;8;100;8;12;0">HE 100 A</option>
+         <option value="96;5;100;8;100;8;12;0">HE 100 A</option>
+         <option value="100;6;100;10;100;10;12;0">HE 100 B</option>
+         <option value="109;4.2;120;5.5;120;5.5;12;0">HE 120 AA</option>
+         <option value="114;5;120;8;120;8;12;0">HE 120 A</option>
+         <option value="120;6.5;120;11;120;11;12;0">HE 120 B</option>
+         <option value="128;4.3;140;6;140;6;12;0">HE 140 AA</option>
+         <option value="133;5.5;140;8.5;140;8.5;12;0">HE 140 A</option>
+         <option value="140;7;140;12;140;12;12;0">HE 140 B</option>
+         <option value="148;4.5;160;7;160;7;15;0">HE 160 AA</option>
+         <option value="152;6;160;9;160;9;15;0">HE 160 A</option>
+         <option value="160;8;160;13;160;13;15;0">HE 160 B</option>
+         <option value="180;14;166;23;166;23;15;0">HE 160 M</option>
+         <option value="167;5;180;7.5;180;7.5;15;0">HE 180 AA</option>
+         <option value="171;6;180;9.5;180;9.5;15;0">HE 180 A</option>
+         <option value="180;8.5;180;14;180;14;15;0">HE 180 B</option>
+         <option value="200;14.5;186;24;186;24;15;0">HE 180 M</option>
+         <option value="186;5.5;200;8;200;8;18;0">HE 200 AA</option>
+         <option value="190;6.5;200;10;200;10;18;0">HE 200 A</option>
+         <option value="200;9;200;15;200;15;18;0">HE 200 B</option>
+         <option value="220;15;206;25;206;25;18;0">HE 200 M</option>
+         <option value="205;6;220;8.5;220;8.5;18;0">HE 220 AA</option>
+         <option value="210;7;220;11;220;11;18;0">HE 220 A</option>
+         <option value="220;9.5;220;16;220;16;18;0">HE 220 B</option>
+         <option value="240;15.5;226;26;226;26;18;0">HE 220 M</option>
+         <option value="224;6.5;240;9;240;9;21;0">HE 240 AA</option>
+         <option value="230;7.5;240;12;240;12;21;0">HE 240 A</option>
+         <option value="240;10;240;17;240;17;21;0">HE 240 B</option>
+         <option value="270;18;248;32;248;32;21;0">HE 240 M</option>
+         <option value="244;6.5;260;9.5;260;9.5;24;0">HE 260 AA</option>
+         <option value="250;7.5;260;12.5;260;12.5;24;0">HE 260 A</option>
+         <option value="260;10;260;17.5;260;17.5;24;0">HE 260 B</option>
+         <option value="290;18;268;32.5;268;32.5;24;0">HE 260 M</option>
+         <option value="264;7;280;10;280;10;24;0">HE 280 AA</option>
+         <option value="270;8;280;13;280;13;24;0">HE 280 A</option>
+         <option value="280;10.5;280;18;280;18;24;0">HE 280 B</option>
+         <option value="310;18.5;288;33;288;33;24;0">HE 280 M</option>
+         <option value="283;7.5;300;10.5;300;10.5;27;0">HE 300 AA</option>
+         <option value="290;8.5;300;14;300;14;27;0">HE 300 A</option>
+         <option value="300;11;300;19;300;19;27;0">HE 300 B</option>
+         <option value="320;16;305;29;305;29;27;0">HE 300 C</option>
+         <option value="340;21;310;39;310;39;27;0">HE 300 M</option>
+         <option value="301;8;300;11;300;11;27;0">HE 320 AA</option>
+         <option value="310;9;300;15.5;300;15.5;27;0">HE 320 A</option>
+         <option value="320;11.5;300;20.5;300;20.5;27;0">HE 320 B</option>
+         <option value="359;21;309;40;309;40;27;0">HE 320 M</option>
+         <option value="320;8.5;300;11.5;300;11.5;27;0">HE 340 AA</option>
+         <option value="330;9.5;300;16.5;300;16.5;27;0">HE 340 A</option>
+         <option value="340;12;300;21.5;300;21.5;27;0">HE 340 B</option>
+         <option value="377;21;309;40;309;40;27;0">HE 340 M</option>
+         <option value="339;9;300;12;300;12;27;0">HE 360 AA</option>
+         <option value="350;10;300;17.5;300;17.5;27;0">HE 360 A</option>
+         <option value="360;12.5;300;22.5;300;22.5;27;0">HE 360 B</option>
+         <option value="395;21;308;40;308;40;27;0">HE 360 M</option>
+         <option value="378;9.5;300;13;300;13;27;0">HE 400 AA</option>
+         <option value="384;10;297;16;297;16;27;0">HE 400 x 107</option>
+         <option value="390;11;300;19;300;19;27;0">HE 400 A</option>
+         <option value="400;13.5;300;24;300;24;27;0">HE 400 B</option>
+         <option value="432;21;307;40;307;40;27;0">HE 400 M</option>
+         <option value="425;10;300;13.5;300;13.5;27;0">HE 450 AA</option>
+         <option value="435;10.2;300;18.5;300;18.5;27;0">HE 450 x 124</option>
+         <option value="440;11.5;300;21;300;21;27;0">HE 450 A</option>
+         <option value="450;14;300;26;300;26;27;0">HE 450 B</option>
+         <option value="478;21;307;40;307;40;27;0">HE 450 M</option>
+         <option value="472;10.5;300;14;300;14;27;0">HE 500 AA</option>
+         <option value="490;12;300;23;300;23;27;0">HE 500 A</option>
+         <option value="500;14.5;300;28;300;28;27;0">HE 500 B</option>
+         <option value="524;21;306;40;306;40;27;0">HE 500 M</option>
+         <option value="522;11.5;300;15;300;15;27;0">HE 550 AA</option>
+         <option value="540;12.5;300;24;300;24;27;0">HE 550 A</option>
+         <option value="550;15;300;29;300;29;27;0">HE 550 B</option>
+         <option value="572;21;306;40;306;40;27;0">HE 550 M</option>
+         <option value="571;12;300;15.5;300;15.5;27;0">HE 600 AA</option>
+         <option value="575;11.8;300;17.5;300;17.5;27;0">HE 600 x 137</option>
+         <option value="582;11.6;300;20.6;300;20.6;27;0">HE 600 x 151</option>
+         <option value="588;13.6;300;23.9;300;23.9;27;0">HE 600 x 175</option>
+         <option value="590;13;300;25;300;25;27;0">HE 600 A</option>
+         <option value="600;15.5;300;30;300;30;27;0">HE 600 B</option>
+         <option value="620;21;305;40;305;40;27;0">HE 600 M</option>
+         <option value="620;12.5;300;16;300;16;27;0">HE 650 AA</option>
+         <option value="640;13.5;300;26;300;26;27;0">HE 650 A</option>
+         <option value="650;16;300;31;300;31;27;0">HE 650 B</option>
+         <option value="668;21;305;40;305;40;27;0">HE 650 M</option>
+         <option value="670;13;300;17;300;17;27;0">HE 700 AA</option>
+         <option value="678;12.5;300;21;300;21;27;0">HE 700 x 166</option>
+         <option value="690;14.5;300;27;300;27;27;0">HE 700 A</option>
+         <option value="700;17;300;32;300;32;27;0">HE 700 B</option>
+         <option value="716;21;304;40;304;40;27;0">HE 700 M</option>
+         <option value="770;14;300;18;300;18;30;0">HE 800 AA</option>
+         <option value="790;15;300;28;300;28;30;0">HE 800 A</option>
+         <option value="800;17.5;300;33;300;33;30;0">HE 800 B</option>
+         <option value="814;21;303;40;303;40;30;0">HE 800 M</option>
+         <option value="870;15;300;20;300;20;30;0">HE 900 AA</option>
+         <option value="890;16;300;30;300;30;30;0">HE 900 A</option>
+         <option value="900;18.5;300;35;300;35;30;0">HE 900 B</option>
+         <option value="910;21;302;40;302;40;30;0">HE 900 M</option>
+         <option value="970;16;300;21;300;21;30;0">HE 1000 A</option>
+         <option value="990;16.5;300;31;300;31;30;0">HE 1000 A</option>
+         <option value="1000;19;300;36;300;36;30;0">HE 1000 B</option>
+         <option value="1008;21;302;40;302;40;30;0">HE 1000 M</option>
+        </select>
+       </p>
+       <table id="section">
+        <tr>
+         <td style="padding-right: 10px;">
+          <span class="eq">
+           <var>h</var>
+           =
+           <u class="input-192">180</u>
+          </span>
+          mm,
+         </td>
+         <td>
+          <span class="eq">
+           <var>t</var>
+           <sub>w</sub>
+           =
+           <u class="input-192">5.3</u>
+          </span>
+          mm
+         </td>
+        </tr>
+        <tr>
+         <td style="padding-right: 10px;">
+          <span class="eq">
+           <var>b</var>
+           <sub>f1</sub>
+           =
+           <u class="input-193">91</u>
+          </span>
+          mm,
+         </td>
+         <td>
+          <span class="eq">
+           <var>t</var>
+           <sub>f1</sub>
+           =
+           <u class="input-193">8</u>
+          </span>
+          mm
+         </td>
+        </tr>
+        <tr>
+         <td style="padding-right: 10px;">
+          <span class="eq">
+           <var>b</var>
+           <sub>f2</sub>
+           =
+           <u class="input-194">91</u>
+          </span>
+          mm,
+         </td>
+         <td>
+          <span class="eq">
+           <var>t</var>
+           <sub>f2</sub>
+           =
+           <u class="input-194">8</u>
+          </span>
+          mm
+         </td>
+        </tr>
+        <tr>
+         <td style="padding-right: 10px;">
+          <span class="eq">
+           <var>r</var>
+           =
+           <u class="input-195">9</u>
+          </span>
+          mm,
+         </td>
+         <td style="display:none">
+          <span class="eq">
+           <var>r</var>
+           <sub>2</sub>
+           =
+           <u class="input-195">0</u>
+          </span>
+          mm
+         </td>
+        </tr>
+       </table>
+       <p>
+        <span class="eq">
+         <var>h</var>
+         <sub>w</sub>
+         =
+         <var>h</var>
+         −
+         <var>t</var>
+         <sub>f1</sub>
+         −
+         <var>t</var>
+         <sub>f2</sub>
+         = 180 − 8 − 8 = 164
+        </span>
+        mm
+       </p>
+       <p>
+        Section type -
+        <select data-target="rolled">
+         <option value="1">Rolled</option>
+         <option value="0">Welded</option>
+        </select>
+       </p>
+       <p id="rolled" style="display:none;">
+        <span class="eq">
+         <var>rolled</var>
+         =
+         <u class="input-205">1</u>
+        </span>
+       </p>
+       <p>Section type - Rolled</p>
+       <p>
+       </p>
+       <p>
+       </p>
+       <h4>Steel properties</h4>
+       <p>
+        Yield strength -
+        <span class="eq">
+         <var>f</var>
+         <sub>y</sub>
+         =
+         <u class="input-216">235</u>
+        </span>
+        MPa
+       </p>
+       <p>
+        Tensile strength -
+        <span class="eq">
+         <var>f</var>
+         <sub>u</sub>
+         =
+         <u class="input-217">360</u>
+        </span>
+        MPa
+       </p>
+       <p>
+       </p>
+       <p>
+        Modulus of elasticity -
+        <span class="eq">
+         <var>E</var>
+         = 210000
+        </span>
+        MPa
+       </p>
+       <p>Private factors of safety:</p>
+       <p>
+        <span class="eq">
+         <var>γ</var>
+         <sub>M0</sub>
+         = 1.05
+        </span>
+        ,
+        <span class="eq">
+         <var>γ</var>
+         <sub>M2</sub>
+         = 1.25
+        </span>
+       </p>
+      </select>
+     </p>
+    </td>
+    <td>
+     <img alt="I-section.svg" src="./i-section.svg"/>
+     <!-- SVG drawing macros included by the steel I-section worksheets to render the cross-section with its flange widths, web thickness and root radius. -->
+     <svg height="260pt" style="font-size:9pt;" viewbox="-95.5 -50 191 280" width="171pt" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-45.5,0H45.5V8H11.65A9,9 0 0 0 2.65,17V163A9,9 0 0 0 11.65,172H45.5V180H-45.5V172H-11.65A9,9 0 0 0 -2.65,163V17A9,9 0 0 0 -11.65,8H-45.5Z" fill="LightSkyBlue" fill-opacity="0.6" stroke="#4ac" stroke-width="1.5">
+      </path>
+      <line stroke-dasharray="14.4,4.8,1.6,4.8" style="stroke:limegreen; stroke-width:0.8" x1="-80.5" x2="80.5" y1="90" y2="90">
+      </line>
+      <text text-anchor="middle" x="-85.5" y="90">y</text>
+      <text text-anchor="middle" x="85.5" y="90">y</text>
+      <line stroke-dasharray="14.4,4.8,1.6,4.8" style="stroke:limegreen; stroke-width:0.8" x1="0" x2="0" y1="-35" y2="215">
+      </line>
+      <text text-anchor="middle" x="0" y="-40">z</text>
+      <text text-anchor="middle" x="0" y="225">z</text>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-66.5" x2="-54.5" y1="0" y2="0">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-66.5" x2="-54.5" y1="180" y2="180">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-60.5" x2="-60.5" y1="-6" y2="186">
+      </line>
+      <circle cx="-60.5" cy="0" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
+      </circle>
+      <circle cx="-60.5" cy="180" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
+      </circle>
+      <text text-anchor="middle" transform="rotate(-90,-65,90)" x="-65" y="90">180</text>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="64.5" x2="76.5" y1="0" y2="0">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="64.5" x2="76.5" y1="8" y2="8">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="70.5" x2="70.5" y1="-6" y2="14">
+      </line>
+      <circle cx="70.5" cy="0" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
+      </circle>
+      <circle cx="70.5" cy="8" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
+      </circle>
+      <text text-anchor="middle" transform="rotate(-90,66,4)" x="66" y="4">8</text>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="64.5" x2="76.5" y1="172" y2="172">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="64.5" x2="76.5" y1="180" y2="180">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="70.5" x2="70.5" y1="166" y2="186">
+      </line>
+      <circle cx="70.5" cy="172" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
+      </circle>
+      <circle cx="70.5" cy="180" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
+      </circle>
+      <text text-anchor="middle" transform="rotate(-90,66,176)" x="66" y="176">8</text>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-45.5" x2="-45.5" y1="199" y2="211">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="45.5" x2="45.5" y1="199" y2="211">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-51.5" x2="51.5" y1="205" y2="205">
+      </line>
+      <circle cx="45.5" cy="205" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
+      </circle>
+      <circle cx="-45.5" cy="205" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
+      </circle>
+      <text text-anchor="middle" x="0" y="200.5">91</text>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-45.5" x2="-45.5" y1="-21" y2="-9">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="45.5" x2="45.5" y1="-21" y2="-9">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-51.5" x2="51.5" y1="-15" y2="-15">
+      </line>
+      <circle cx="45.5" cy="-15" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
+      </circle>
+      <circle cx="-45.5" cy="-15" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
+      </circle>
+      <text text-anchor="middle" x="0" y="-19.5">91</text>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-2.65" x2="-2.65" y1="69" y2="81">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="2.65" x2="2.65" y1="69" y2="81">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-8.65" x2="8.65" y1="75" y2="75">
+      </line>
+      <circle cx="2.65" cy="75" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
+      </circle>
+      <circle cx="-2.65" cy="75" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
+      </circle>
+      <text text-anchor="middle" x="0" y="70.5">
+      </text>
+      <text text-anchor="middle" x="17.65" y="70">5.3</text>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="5.29" x2="36.65" y1="169.36" y2="138">
+      </line>
+      <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="36.65" x2="46.65" y1="138" y2="138">
+      </line>
+      <text text-anchor="middle" x="56.65" y="143">9</text>
+     </svg>
+    </td>
+   </tr>
+  </table>
+  <p>
+  </p>
+  <p>
+  </p>
+  <h4>Section properties</h4>
+  <table style="width:100%">
+   <tr>
+    <td>
      <span class="eq">
-      <var>h</var>
-      <sub>w</sub>
-      =
-      <var>h</var>
-      −
-      <var>t</var>
-      <sub>f1</sub>
-      −
-      <var>t</var>
-      <sub>f2</sub>
-      = 180 − 8 − 8 = 164
+      <var>A</var>
+      = 2394.73
      </span>
      mm
-    </p>
-    <p id="rolled" style="display:none;">
+     <sup>2</sup>
+    </td>
+    <td>
      <span class="eq">
-      <var>rolled</var>
-      =
-      <u class="input-205">1</u>
+      <var>y</var>
+      <sub>c</sub>
+      = 45.5
      </span>
-    </p>
-    <p>Section type - Rolled</p>
-    <p>
-    </p>
-    <p>
-    </p>
-    <h4>Steel properties</h4>
-    <p>
-     Yield strength -
+     mm
+    </td>
+    <td>
      <span class="eq">
-      <var>f</var>
+      <var>z</var>
+      <sub>c</sub>
+      = 90
+     </span>
+     mm
+    </td>
+    <td>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <span class="eq">
+      <var>I</var>
       <sub>y</sub>
-      =
-      <u class="input-216">235</u>
+      = 13169590
      </span>
-     MPa
-    </p>
-    <p>
-     Tensile strength -
+     mm
+     <sup>4</sup>
+    </td>
+    <td>
      <span class="eq">
-      <var>f</var>
-      <sub>u</sub>
-      =
-      <u class="input-217">360</u>
+      <var>r</var>
+      <sub>y</sub>
+      = 74.16
      </span>
-     MPa
-    </p>
-    <p>
-     Modulus of elasticity -
+     mm
+    </td>
+    <td>
      <span class="eq">
-      <var>E</var>
-      = 210000
+      <var>W</var>
+      <sub>el_y</sub>
+      = 146329
      </span>
-     MPa
-    </p>
-    <p>Private factors of safety:</p>
-    <p>
+     mm
+     <sup>3</sup>
+    </td>
+    <td>
      <span class="eq">
-      <var>γ</var>
-      <sub>M0</sub>
-      = 1.05
+      <var>W</var>
+      <sub>pl_y</sub>
+      = 166415
      </span>
-     ,
+     mm
+     <sup>3</sup>
+    </td>
+   </tr>
+   <tr>
+    <td>
      <span class="eq">
-      <var>γ</var>
-      <sub>M2</sub>
-      = 1.25
+      <var>I</var>
+      <sub>z</sub>
+      = 1008504
      </span>
-    </p>
-   </td>
-   <td>
-    <!-- SVG drawing macros included by the steel I-section worksheets to render the cross-section with its flange widths, web thickness and root radius. -->
-    <svg height="260pt" style="font-size:9pt;" viewbox="-95.5 -50 191 280" width="171pt" xmlns="http://www.w3.org/2000/svg">
-     <path d="M-45.5,0H45.5V8H11.65A9,9 0 0 0 2.65,17V163A9,9 0 0 0 11.65,172H45.5V180H-45.5V172H-11.65A9,9 0 0 0 -2.65,163V17A9,9 0 0 0 -11.65,8H-45.5Z" fill="LightSkyBlue" fill-opacity="0.6" stroke="#4ac" stroke-width="1.5">
-     </path>
-     <line stroke-dasharray="14.4,4.8,1.6,4.8" style="stroke:limegreen; stroke-width:0.8" x1="-80.5" x2="80.5" y1="90" y2="90">
-     </line>
-     <text text-anchor="middle" x="-85.5" y="90">y</text>
-     <text text-anchor="middle" x="85.5" y="90">y</text>
-     <line stroke-dasharray="14.4,4.8,1.6,4.8" style="stroke:limegreen; stroke-width:0.8" x1="0" x2="0" y1="-35" y2="215">
-     </line>
-     <text text-anchor="middle" x="0" y="-40">z</text>
-     <text text-anchor="middle" x="0" y="225">z</text>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-66.5" x2="-54.5" y1="0" y2="0">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-66.5" x2="-54.5" y1="180" y2="180">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-60.5" x2="-60.5" y1="-6" y2="186">
-     </line>
-     <circle cx="-60.5" cy="0" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
-     </circle>
-     <circle cx="-60.5" cy="180" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
-     </circle>
-     <text text-anchor="middle" transform="rotate(-90,-65,90)" x="-65" y="90">180</text>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="64.5" x2="76.5" y1="0" y2="0">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="64.5" x2="76.5" y1="8" y2="8">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="70.5" x2="70.5" y1="-6" y2="14">
-     </line>
-     <circle cx="70.5" cy="0" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
-     </circle>
-     <circle cx="70.5" cy="8" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
-     </circle>
-     <text text-anchor="middle" transform="rotate(-90,66,4)" x="66" y="4">8</text>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="64.5" x2="76.5" y1="172" y2="172">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="64.5" x2="76.5" y1="180" y2="180">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="70.5" x2="70.5" y1="166" y2="186">
-     </line>
-     <circle cx="70.5" cy="172" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
-     </circle>
-     <circle cx="70.5" cy="180" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
-     </circle>
-     <text text-anchor="middle" transform="rotate(-90,66,176)" x="66" y="176">8</text>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-45.5" x2="-45.5" y1="199" y2="211">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="45.5" x2="45.5" y1="199" y2="211">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-51.5" x2="51.5" y1="205" y2="205">
-     </line>
-     <circle cx="45.5" cy="205" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
-     </circle>
-     <circle cx="-45.5" cy="205" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
-     </circle>
-     <text text-anchor="middle" x="0" y="200.5">91</text>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-45.5" x2="-45.5" y1="-21" y2="-9">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="45.5" x2="45.5" y1="-21" y2="-9">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-51.5" x2="51.5" y1="-15" y2="-15">
-     </line>
-     <circle cx="45.5" cy="-15" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
-     </circle>
-     <circle cx="-45.5" cy="-15" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
-     </circle>
-     <text text-anchor="middle" x="0" y="-19.5">91</text>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-2.65" x2="-2.65" y1="69" y2="81">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="2.65" x2="2.65" y1="69" y2="81">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="-8.65" x2="8.65" y1="75" y2="75">
-     </line>
-     <circle cx="2.65" cy="75" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
-     </circle>
-     <circle cx="-2.65" cy="75" r="1.8" style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod">
-     </circle>
-     <text text-anchor="middle" x="0" y="70.5">
-     </text>
-     <text text-anchor="middle" x="17.65" y="70">5.3</text>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="5.29" x2="36.65" y1="169.36" y2="138">
-     </line>
-     <line style="stroke:goldenrod; stroke-width:0.6; fill:goldenrod" x1="36.65" x2="46.65" y1="138" y2="138">
-     </line>
-     <text text-anchor="middle" x="56.65" y="143">9</text>
-    </svg>
-   </td>
-  </tr>
- </table>
- <p>
- </p>
- <p>
- </p>
- <h4>Section properties</h4>
- <table style="width:100%">
-  <tr>
-   <td>
-    <span class="eq">
-     <var>A</var>
-     = 2394.73
-    </span>
-    mm
-    <sup>2</sup>
-   </td>
-   <td>
-    <span class="eq">
-     <var>y</var>
-     <sub>c</sub>
-     = 45.5
-    </span>
-    mm
-   </td>
-   <td>
-    <span class="eq">
-     <var>z</var>
-     <sub>c</sub>
-     = 90
-    </span>
-    mm
-   </td>
-   <td>
-   </td>
-  </tr>
-  <tr>
-   <td>
-    <span class="eq">
-     <var>I</var>
-     <sub>y</sub>
-     = 13169590
-    </span>
-    mm
-    <sup>4</sup>
-   </td>
-   <td>
-    <span class="eq">
-     <var>r</var>
-     <sub>y</sub>
-     = 74.16
-    </span>
-    mm
-   </td>
-   <td>
-    <span class="eq">
-     <var>W</var>
-     <sub>el_y</sub>
-     = 146329
-    </span>
-    mm
-    <sup>3</sup>
-   </td>
-   <td>
-    <span class="eq">
-     <var>W</var>
-     <sub>pl_y</sub>
-     = 166415
-    </span>
-    mm
-    <sup>3</sup>
-   </td>
-  </tr>
-  <tr>
-   <td>
-    <span class="eq">
-     <var>I</var>
-     <sub>z</sub>
-     = 1008504
-    </span>
-    mm
-    <sup>4</sup>
-   </td>
-   <td>
-    <span class="eq">
-     <var>r</var>
-     <sub>z</sub>
-     = 20.52
-    </span>
-    mm
-   </td>
-   <td>
-    <span class="eq">
-     <var>W</var>
-     <sub>el_z</sub>
-     = 22164.9
-    </span>
-    mm
-    <sup>3</sup>
-   </td>
-   <td>
-    <span class="eq">
-     <var>W</var>
-     <sub>pl_z</sub>
-     = 34599.7
-    </span>
-    mm
-    <sup>3</sup>
-   </td>
-  </tr>
-  <tr>
-   <td>
-    <span class="eq">
-     <var>I</var>
-     <sub>t</sub>
-     = 48103.5
-    </span>
-    mm
-    <sup>4</sup>
-   </td>
-   <td>
-    <span class="eq">
-     <var>I</var>
-     <sub>w</sub>
-     = 7431214821
-    </span>
-    mm
-    <sup>6</sup>
-   </td>
-   <td>
-    <span class="eq">
-     <var>W</var>
-     <sub>t</sub>
-     = 3086.9
-    </span>
-    mm
-    <sup>3</sup>
-   </td>
-   <td>
-   </td>
-  </tr>
- </table>
+     mm
+     <sup>4</sup>
+    </td>
+    <td>
+     <span class="eq">
+      <var>r</var>
+      <sub>z</sub>
+      = 20.52
+     </span>
+     mm
+    </td>
+    <td>
+     <span class="eq">
+      <var>W</var>
+      <sub>el_z</sub>
+      = 22164.9
+     </span>
+     mm
+     <sup>3</sup>
+    </td>
+    <td>
+     <span class="eq">
+      <var>W</var>
+      <sub>pl_z</sub>
+      = 34599.7
+     </span>
+     mm
+     <sup>3</sup>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <span class="eq">
+      <var>I</var>
+      <sub>t</sub>
+      = 48103.5
+     </span>
+     mm
+     <sup>4</sup>
+    </td>
+    <td>
+     <span class="eq">
+      <var>I</var>
+      <sub>w</sub>
+      = 7431214821
+     </span>
+     mm
+     <sup>6</sup>
+    </td>
+    <td>
+     <span class="eq">
+      <var>W</var>
+      <sub>t</sub>
+      = 3086.9
+     </span>
+     mm
+     <sup>3</sup>
+    </td>
+    <td>
+    </td>
+   </tr>
+  </table>
+ </div>
 </div>

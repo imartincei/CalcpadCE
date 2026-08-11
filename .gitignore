@@ -386,3 +386,6 @@ wkhtmltopdf.exe
 
 # Claude
 **.claude/settings.local.json
+
+# VSCode C# Plugin
+*.csproj.lscache

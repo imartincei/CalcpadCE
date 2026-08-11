@@ -227,6 +227,13 @@
     </td>
    </tr>
   </table>
+  <p>
+   All input values for M
+   <sub>Ed</sub>
+   and N
+   <sub>Ed</sub>
+   must be positive!
+  </p>
   <p>Positive axial force is compressive!</p>
   <h4>Material properties</h4>
   <p class="ref" style="float:right">[EN 1992-1-1, Table 3.1]</p>
