@@ -332,10 +332,14 @@ async function bootstrap(): Promise<void> {
         editorBridge.definitions.refreshDefinitions(content, docKeyFor(group), ctx.sourceFilePath, `defs:${group.id}`);
     }
 
+    // Also hands the result to App.vue, which themes the loading overlay with it.
     function resolvePreviewTheme(): 'light' | 'dark' {
         const stored = editorBridge.getExtraSetting('previewTheme') ?? 'system';
-        if (stored === 'light' || stored === 'dark') return stored;
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const resolved = stored === 'light' || stored === 'dark'
+            ? stored
+            : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        appInstance.setPreviewTheme(resolved);
+        return resolved;
     }
 
     // Output line the next unwrapped refresh should scroll to, per group. Set
@@ -522,6 +526,36 @@ async function bootstrap(): Promise<void> {
     }
 
     const PREVIEW_LOADING_DELAY_MS = 400;
+    const PREVIEW_LOADING_MIN_MS = 300;
+    const previewLoadingSeq = new Map<string, number>();
+
+    /**
+     * Delayed "Calculating…" overlay, returning the call that takes it back down.
+     * Shown only if the round-trip runs long, so fast renders never flash it, and held
+     * for a minimum once shown so one finishing just past the delay does not strobe it.
+     */
+    function showPreviewLoading(group: EditorGroup): () => Promise<void> {
+        // Held past the response, so a superseded render is still holding the overlay
+        // when its replacement starts and would otherwise hide it on the way out.
+        const seq = (previewLoadingSeq.get(group.id) ?? 0) + 1;
+        previewLoadingSeq.set(group.id, seq);
+        let shownAt = 0;
+        const timer = window.setTimeout(() => {
+            if (previewLoadingSeq.get(group.id) !== seq) return;
+            shownAt = performance.now();
+            appInstance.setPreviewLoading(group.id, true);
+        }, PREVIEW_LOADING_DELAY_MS);
+        return async () => {
+            window.clearTimeout(timer);
+            if (shownAt) {
+                const held = performance.now() - shownAt;
+                if (held < PREVIEW_LOADING_MIN_MS)
+                    await new Promise(r => setTimeout(r, PREVIEW_LOADING_MIN_MS - held));
+            }
+            if (previewLoadingSeq.get(group.id) !== seq) return;
+            appInstance.setPreviewLoading(group.id, false);
+        };
+    }
 
     async function refreshPreviewFor(group: EditorGroup): Promise<void> {
         if (!appInstance.isPreviewVisible()) return;
@@ -534,18 +568,13 @@ async function bootstrap(): Promise<void> {
         const theme = resolvePreviewTheme();
 
         if (!content.trim()) {
-            appInstance.setPreviewHtml(group.id, getEmptyPreviewHtml(theme));
+            void appInstance.setPreviewHtml(group.id, getEmptyPreviewHtml(theme));
             return;
         }
 
         const fileContext = getFileContext ? await getFileContext(content) : {};
 
-        // Show the "Calculating…" overlay only if the round-trip runs long, so
-        // fast renders never flash it (mirrors Calcpad.Wpf's delayed spinner).
-        const loadingTimer = window.setTimeout(
-            () => appInstance.setPreviewLoading(group.id, true),
-            PREVIEW_LOADING_DELAY_MS,
-        );
+        const hideLoading = showPreviewLoading(group);
         let result;
         try {
             // The report applies entered values just as the input form does, so both need
@@ -566,9 +595,9 @@ async function bootstrap(): Promise<void> {
                 : await activeBridge.api.convert(
                     content, apiSettings, 'html', mode === 'report', fileContext.sourceFilePath, theme, ui,
                     mode === 'report' ? true : undefined, { key: `preview:${group.id}` });
-        } finally {
-            window.clearTimeout(loadingTimer);
-            appInstance.setPreviewLoading(group.id, false);
+        } catch (err) {
+            void hideLoading();
+            throw err;
         }
 
         // Consume any pending two-step scroll target for this group: only the
@@ -585,12 +614,14 @@ async function bootstrap(): Promise<void> {
             const finalHtml = tauriBridge
                 ? await tauriBridge.inlineDocumentImages(result.html)
                 : result.html;
-            appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine, uiDocKeyFor(group));
+            const committed = appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine, uiDocKeyFor(group));
             if (mode === 'ui') uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
             window.dispatchEvent(new MessageEvent('message', {
                 data: { type: 'updateConvertErrors', errors: result.errors },
             }));
+            await committed;
         }
+        await hideLoading();
 
         if (mode === 'ui' && appInstance.isUiPrintVisible())
             await refreshUiPrintFor(group, content, apiSettings, fileContext.sourceFilePath, theme);
@@ -617,7 +648,7 @@ async function bootstrap(): Promise<void> {
         const html = tauriBridge
             ? await tauriBridge.inlineDocumentImages(result.html)
             : result.html;
-        appInstance.setUiPrintHtml(group.id, html, uiDocKeyFor(group));
+        await appInstance.setUiPrintHtml(group.id, html, uiDocKeyFor(group));
     }
 
     function refreshAllPreviews(): void {

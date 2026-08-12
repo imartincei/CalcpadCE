@@ -215,12 +215,9 @@ select option {
     flex-direction: column;
     position: relative;
 }
-.preview-frame.active-group {
-    outline: 1px solid var(--vscode-focusBorder, #007acc);
-    outline-offset: -1px;
-}
 
-/* "Calculating…" overlay shown over the preview during long server renders. */
+/* "Calculating…" overlay shown over the preview during long server renders. It washes
+   the document underneath, so it follows the preview theme rather than the app's. */
 .preview-loading-overlay {
     position: absolute;
     inset: 0;
@@ -235,6 +232,10 @@ select option {
     font-size: 14px;
     pointer-events: none;
 }
+.preview-loading-overlay.preview-dark {
+    background: rgba(30, 30, 30, 0.7);
+    color: #d4d4d4;
+}
 .preview-spinner {
     width: 36px;
     height: 36px;
@@ -242,6 +243,10 @@ select option {
     border-top-color: var(--vscode-progressBar-background, #0078d4);
     border-radius: 50%;
     animation: preview-spin 0.8s linear infinite;
+}
+.preview-loading-overlay.preview-dark .preview-spinner {
+    border-color: rgba(255, 255, 255, 0.18);
+    border-top-color: var(--vscode-progressBar-background, #0078d4);
 }
 @keyframes preview-spin {
     to { transform: rotate(360deg); }
@@ -602,12 +607,30 @@ select option {
     min-height: 32px;
 }
 
-/* Backdrop shown only until the rendered document paints its own background,
-   so it follows the app theme rather than flashing white in dark mode. */
+/* Double-buffered preview: both frames stay visible and painted, one occluding the
+   other, so bringing a finished render forward is a z-index flip with nothing left to
+   rasterize. That relies on the front frame being opaque across its whole box, which
+   is what the background below is for. */
+.preview-buffers {
+    position: relative;
+    min-height: 0;
+}
+.preview-buffers.active-group {
+    outline: 1px solid var(--vscode-focusBorder, #007acc);
+    outline-offset: -1px;
+}
 .preview-frame {
-    flex: 1;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     border: none;
     background: var(--vscode-editor-background, #1e1e1e);
+    z-index: 1;
+}
+.preview-frame.preview-frame-back {
+    z-index: 0;
+    pointer-events: none;
 }
 
 /* Bottom panel (Problems / Output) */

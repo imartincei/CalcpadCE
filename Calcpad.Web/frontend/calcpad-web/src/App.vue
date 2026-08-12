@@ -406,13 +406,21 @@
 
       <div class="preview-frames">
         <template v-for="(group, gi) in visibleGroups" :key="'pv-' + group.id">
-          <iframe
-            class="preview-frame"
+          <div
+            class="preview-buffers"
             :class="{ 'active-group': group.id === activeGroupId && isSplit && !uiModeFullscreen }"
             :style="previewGroupStyle(gi)"
-            :ref="el => setPreviewRef(group.id, el)"
-            sandbox="allow-scripts"
-          ></iframe>
+          >
+            <iframe
+              v-for="slot in [0, 1]"
+              :key="slot"
+              class="preview-frame"
+              :class="{ 'preview-frame-back': slot !== frontIndex(group.id) }"
+              :inert="bufferInert(group.id, slot)"
+              :ref="el => setPreviewRef(group.id, slot, el)"
+              sandbox="allow-scripts"
+            ></iframe>
+          </div>
           <div
             v-if="gi === 0 && isSplit && !uiModeFullscreen"
             class="group-divider"
@@ -422,7 +430,11 @@
             aria-orientation="horizontal"
           ></div>
         </template>
-        <div v-if="previewLoading" class="preview-loading-overlay">
+        <div
+          v-if="previewLoading"
+          class="preview-loading-overlay"
+          :class="{ 'preview-dark': previewTheme === 'dark' }"
+        >
           <div class="preview-spinner"></div>
           <span>Calculating…</span>
         </div>
@@ -450,13 +462,17 @@
         <button class="toolbar-btn" @click="toggleUiPrint" title="Hide the report">✕</button>
       </div>
       <div class="preview-frames">
-        <iframe
-          v-if="activeGroup"
-          class="preview-frame"
-          :style="{ flex: '1 1 0', minHeight: '0' }"
-          :ref="el => setUiPrintRef(activeGroup.id, el)"
-          sandbox="allow-scripts"
-        ></iframe>
+        <div v-if="activeGroup" class="preview-buffers" :style="{ flex: '1 1 0', minHeight: '0' }">
+          <iframe
+            v-for="slot in [0, 1]"
+            :key="slot"
+            class="preview-frame"
+            :class="{ 'preview-frame-back': slot !== frontIndex(UI_PRINT_FRAME + activeGroup.id) }"
+            :inert="bufferInert(UI_PRINT_FRAME + activeGroup.id, slot)"
+            :ref="el => setUiPrintRef(activeGroup.id, slot, el)"
+            sandbox="allow-scripts"
+          ></iframe>
+        </div>
       </div>
     </div>
     </div><!-- /.preview-area -->
@@ -639,9 +655,14 @@ const activeGroupLabel = computed(() => {
 // DOM element registries (function refs). main.ts reads these to create the
 // Monaco editor / write preview HTML for each group.
 const editorEls = new Map<string, HTMLElement>()
-const previewEls = new Map<string, HTMLIFrameElement>()
+// Two stacked iframes per preview: a render goes into whichever is behind and is
+// brought forward once it has painted, so the visible frame is never mid-replacement.
+type FramePair = [HTMLIFrameElement | null, HTMLIFrameElement | null]
+const previewEls = new Map<string, FramePair>()
 // Iframes of the report pane shown beside the input form in UI mode.
-const uiPrintEls = new Map<string, HTMLIFrameElement>()
+const uiPrintEls = new Map<string, FramePair>()
+const frontBuffer = ref<Record<string, 0 | 1>>({})
+const loadingBuffer = ref<Record<string, 0 | 1>>({})
 // Last full (unstripped) HTML rendered per group, kept for "Open Full HTML".
 const previewHtmlByGroup = new Map<string, string>()
 // Where the user was in each frame's #UI form — focused control, caret, datagrid
@@ -707,13 +728,36 @@ function setTabStripRef(id: string, el: unknown): void {
     setTabStripOverflow(id, false)
   }
 }
-function setPreviewRef(id: string, el: unknown): void {
-  if (el instanceof HTMLIFrameElement) previewEls.set(id, el)
-  else previewEls.delete(id)
+function setFrameRef(map: Map<string, FramePair>, id: string, slot: number, el: unknown): void {
+  const pair = map.get(id) ?? [null, null] as FramePair
+  pair[slot === 0 ? 0 : 1] = el instanceof HTMLIFrameElement ? el : null
+  if (pair[0] || pair[1]) map.set(id, pair)
+  else map.delete(id)
 }
-function setUiPrintRef(id: string, el: unknown): void {
-  if (el instanceof HTMLIFrameElement) uiPrintEls.set(id, el)
-  else uiPrintEls.delete(id)
+function setPreviewRef(id: string, slot: number, el: unknown): void {
+  setFrameRef(previewEls, id, slot, el)
+}
+function setUiPrintRef(id: string, slot: number, el: unknown): void {
+  setFrameRef(uiPrintEls, id, slot, el)
+}
+
+function framePair(frameId: string): FramePair | undefined {
+  return frameId.startsWith(UI_PRINT_FRAME)
+    ? uiPrintEls.get(frameId.slice(UI_PRINT_FRAME.length))
+    : previewEls.get(frameId)
+}
+function frontIndex(frameId: string): 0 | 1 {
+  return frontBuffer.value[frameId] ?? 0
+}
+function frontFrame(frameId: string): HTMLIFrameElement | null {
+  return framePair(frameId)?.[frontIndex(frameId)] ?? null
+}
+// A buffer that is neither in front nor mid-render holds a document the user has
+// already been moved off; taking it out of the focus order keeps Tab from reaching it.
+// The one being rendered into is left alone: the backend's #UI script restores focus
+// and caret as it loads, which inert would silently swallow.
+function bufferInert(frameId: string, slot: number): boolean {
+  return slot !== frontIndex(frameId) && slot !== loadingBuffer.value[frameId]
 }
 function getEditorContainer(id: string): HTMLElement | null {
   return editorEls.get(id) ?? null
@@ -864,6 +908,10 @@ function removeGroup(id: string): void {
   groups.value.splice(idx, 1)
   editorEls.delete(id)
   previewEls.delete(id)
+  delete frontBuffer.value[id]
+  delete frontBuffer.value[UI_PRINT_FRAME + id]
+  delete loadingBuffer.value[id]
+  delete loadingBuffer.value[UI_PRINT_FRAME + id]
   uiPositionByFrame.delete(id)
   uiPositionByFrame.delete(UI_PRINT_FRAME + id)
   docKeyByFrame.delete(id)
@@ -1109,9 +1157,7 @@ type PreviewClipboardAction = 'cut' | 'copy' | 'paste'
 const UI_PRINT_FRAME = 'ui-print:'
 
 function clipboardFrame(frameId: string): HTMLIFrameElement | null {
-  return frameId.startsWith(UI_PRINT_FRAME)
-    ? uiPrintEls.get(frameId.slice(UI_PRINT_FRAME.length)) ?? null
-    : previewEls.get(frameId) ?? null
+  return frontFrame(frameId)
 }
 
 async function readClipboardText(): Promise<string> {
@@ -1181,14 +1227,15 @@ function isRepeatedPreviewClipboard(action: PreviewClipboardAction): boolean {
  */
 function runFocusedPreviewClipboardAction(action: PreviewClipboardAction): boolean {
   const focused = document.activeElement
-  for (const [groupId, el] of previewEls) {
-    if (el !== focused) continue
+  for (const groupId of previewEls.keys()) {
+    if (frontFrame(groupId) !== focused) continue
     if (!isRepeatedPreviewClipboard(action)) void runPreviewClipboardAction(groupId, action)
     return true
   }
-  for (const [groupId, el] of uiPrintEls) {
-    if (el !== focused) continue
-    if (!isRepeatedPreviewClipboard(action)) void runPreviewClipboardAction(UI_PRINT_FRAME + groupId, action)
+  for (const groupId of uiPrintEls.keys()) {
+    const frameId = UI_PRINT_FRAME + groupId
+    if (frontFrame(frameId) !== focused) continue
+    if (!isRepeatedPreviewClipboard(action)) void runPreviewClipboardAction(frameId, action)
     return true
   }
   return false
@@ -1285,14 +1332,17 @@ function onDocumentInteractionForTabMenu(e: MouseEvent | KeyboardEvent): void {
  * window identity is the check that means something. Anything else reaching this
  * listener (an ad frame in an embedded page, a popup that kept a handle on this
  * window) is dropped before it can drive the clipboard or the context menu.
+ *
+ * Both buffers of a pair count: the one behind is loading the render about to be shown,
+ * and its console output, scroll state and readiness ping all arrive from there.
  */
 function senderFrameId(source: MessageEventSource | null): string | null {
   if (!source) return null
-  for (const [groupId, el] of previewEls) {
-    if (el.contentWindow === source) return groupId
+  for (const [groupId, pair] of previewEls) {
+    if (pair.some(el => el?.contentWindow === source)) return groupId
   }
-  for (const [groupId, el] of uiPrintEls) {
-    if (el.contentWindow === source) return UI_PRINT_FRAME + groupId
+  for (const [groupId, pair] of uiPrintEls) {
+    if (pair.some(el => el?.contentWindow === source)) return UI_PRINT_FRAME + groupId
   }
   return null
 }
@@ -1318,6 +1368,10 @@ function onPreviewWindowMessage(e: MessageEvent): void {
     ? frameId.slice(UI_PRINT_FRAME.length)
     : frameId
 
+  if (data.type === 'cpdFrameReady') {
+    resolveFrameReady(e.source)
+    return
+  }
   if (data.type === 'previewContextMenuDismiss') {
     closePreviewContextMenu()
     return
@@ -1382,6 +1436,10 @@ const previewVisible = ref(false)
 // Groups with an in-flight preview render; drives the "Calculating…" overlay.
 const previewLoadingGroups = ref(new Set<string>())
 const previewLoading = computed(() => previewLoadingGroups.value.size > 0)
+// Theme the rendered document uses, which is its own setting rather than the app's
+// (main.ts:resolvePreviewTheme). The overlay follows it so it does not wash a dark
+// report with white.
+const previewTheme = ref<'light' | 'dark'>('light')
 const bottomPanelOpen = ref(false)
 const activeBottomTab = ref<'problems' | 'output'>('problems')
 
@@ -1591,15 +1649,68 @@ function setPreviewLoading(groupId: string, loading: boolean): void {
   else previewLoadingGroups.value.delete(groupId)
 }
 
+function setPreviewTheme(theme: 'light' | 'dark'): void {
+  previewTheme.value = theme
+}
+
+const PREVIEW_READY_TIMEOUT_MS = 30000
+const frameReadyWaiters = new Map<HTMLIFrameElement, () => void>()
+
+/**
+ * Resolves when the document written into `frame` reports itself loaded, via the ping
+ * injectPreviewAgent posts. The element's own load event is not usable here: a fresh
+ * iframe fires one for its initial about:blank, and swapping the buffer forward on that
+ * would show a blank pane. Timed out rather than left pending, so a document that never
+ * finishes loading still ends up on screen.
+ */
+function awaitFrameReady(frame: HTMLIFrameElement): Promise<void> {
+  frameReadyWaiters.get(frame)?.()
+  return new Promise(resolve => {
+    const finish = () => {
+      if (frameReadyWaiters.get(frame) !== finish) return
+      frameReadyWaiters.delete(frame)
+      window.clearTimeout(timer)
+      resolve()
+    }
+    const timer = window.setTimeout(finish, PREVIEW_READY_TIMEOUT_MS)
+    frameReadyWaiters.set(frame, finish)
+  })
+}
+
+function resolveFrameReady(source: MessageEventSource | null): void {
+  for (const [frame, done] of frameReadyWaiters) {
+    if (frame.contentWindow === source) {
+      done()
+      return
+    }
+  }
+}
+
+/**
+ * Writes a document into the pair's back buffer and brings it forward once it has
+ * painted. The front index is set to the slot written rather than toggled, so two
+ * renders racing on the same pair cannot flip it back to the stale one.
+ */
+function commitToBuffer(frameId: string, html: string): Promise<void> {
+  const slot: 0 | 1 = frontIndex(frameId) === 0 ? 1 : 0
+  const frame = framePair(frameId)?.[slot]
+  if (!frame) return Promise.resolve()
+  loadingBuffer.value = { ...loadingBuffer.value, [frameId]: slot }
+  const ready = awaitFrameReady(frame)
+  frame.srcdoc = html
+  return ready.then(() => {
+    frontBuffer.value = { ...frontBuffer.value, [frameId]: slot }
+  })
+}
+
 // Assigning srcdoc forces a real navigation (a fresh browsing context) rather than
 // rewriting the existing document in place. Reusing the same document via
 // doc.open()/write()/close() on every render left WebKit's per-frame scrolling state
 // prone to desync after certain content swaps (e.g. a resultMode change) -- once that
 // happened, the preview's scrollbar was gone for good until the iframe itself was
 // recreated. A fresh navigation each render sidesteps that entirely.
-function setPreviewHtml(groupId: string, html: string, scrollToLine?: number, docKey = ''): void {
-  const frame = previewEls.get(groupId)
-  if (!frame) return
+function setPreviewHtml(groupId: string, html: string, scrollToLine?: number, docKey = ''): Promise<void> {
+  if (!previewEls.has(groupId)) return Promise.resolve()
   // In input mode the backend's #UI script owns the position, restoring the focused
   // control and caret along with the offset; elsewhere it is not injected at all,
   // so the agent carries the scroll.
@@ -1616,9 +1727,9 @@ function setPreviewHtml(groupId: string, html: string, scrollToLine?: number, do
   // An explicit line target is a navigation the user asked for, and outranks
   // returning them to where they were.
   if (!isUi && scrollToLine === undefined) out = injectSavedScroll(out, groupId, docKey)
-  frame.srcdoc = out
   previewHtmlByGroup.set(groupId, html)
   setPreviewHtmlOutput(groupId, html)
+  return commitToBuffer(groupId, out)
 }
 
 /**
@@ -1628,12 +1739,11 @@ function setPreviewHtml(groupId: string, html: string, scrollToLine?: number, do
  * hover line links: input mode hides the editor they would navigate to. The report shown
  * in report mode, where the editor is on screen, keeps them.
  */
-function setUiPrintHtml(groupId: string, html: string, docKey = ''): void {
-  const frame = uiPrintEls.get(groupId)
-  if (!frame) return
+function setUiPrintHtml(groupId: string, html: string, docKey = ''): Promise<void> {
+  if (!uiPrintEls.has(groupId)) return Promise.resolve()
   const frameId = UI_PRINT_FRAME + groupId
   docKeyByFrame.set(frameId, docKey)
-  frame.srcdoc = injectSavedScroll(
+  const out = injectSavedScroll(
     injectPreviewAgent(
       injectLineLinks(html, undefined, groupId, frameId, false),
       frameId,
@@ -1643,6 +1753,7 @@ function setUiPrintHtml(groupId: string, html: string, docKey = ''): void {
     frameId,
     docKey,
   )
+  return commitToBuffer(frameId, out)
 }
 
 function isUiPrintVisible(): boolean {
@@ -1672,8 +1783,8 @@ function setPreviewHtmlOutput(groupId: string, html: string): void {
 // an unrelated line, so TOC navigation should do nothing rather than land somewhere odd.
 function scrollPreviewToSourceLine(groupId: string, line: number, exact = false): void {
   const msg = { type: 'scrollPreviewToLine', line, exact }
-  previewEls.get(groupId)?.contentWindow?.postMessage(msg, '*')
-  uiPrintEls.get(groupId)?.contentWindow?.postMessage(msg, '*')
+  frontFrame(groupId)?.contentWindow?.postMessage(msg, '*')
+  frontFrame(UI_PRINT_FRAME + groupId)?.contentWindow?.postMessage(msg, '*')
 }
 
 // Inject the line-link behaviour ported from vscode-calcpad. Posted messages
@@ -2045,10 +2156,20 @@ function injectPreviewAgent(
     '  var startAt = window.__calcpadScrollPosition || null;',
     '  window.__calcpadScrollPosition = null;',
     '  if (startAt) {',
-    '    var scrollBack = function() { window.scrollTo(startAt.x || 0, startAt.y || 0); };',
+    '    var wantX = startAt.x || 0, wantY = startAt.y || 0;',
+    '    var userMoved = false;',
+    "    ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(function(t) {",
+    '      window.addEventListener(t, function() { userMoved = true; }, { passive: true, once: true });',
+    '    });',
+    '    var scrollBack = function() {',
+    '      if (userMoved) return;',
+    '      if (window.scrollX === wantX && window.scrollY === wantY) return;',
+    '      window.scrollTo(wantX, wantY);',
+    '    };',
     "    document.addEventListener('DOMContentLoaded', scrollBack);",
-    // Late-loading images reflow the page and clamp the offset, so the position is
-    // only final once everything has laid out.
+    // Late-loading images reflow the page, so the offset above can clamp short of the
+    // target and only becomes reachable here. The guards make this a no-op when the
+    // first restore already landed, rather than a second visible jump.
     "    window.addEventListener('load', scrollBack);",
     '  }',
     '  var scrollQueued = false;',
@@ -2061,6 +2182,12 @@ function injectPreviewAgent(
     '    });',
     '  });',
     ] : []),
+    '',
+    // ---- readiness ----
+    // Tells the host to bring this document's buffer forward. Sent from inside the
+    // document because the host cannot tell an iframe's load event for the render it
+    // just wrote from the one fired for its initial about:blank.
+    "  window.addEventListener('load', function() { send({ type: 'cpdFrameReady' }); });",
     '',
     // ---- command channel ----
     // Only the host embeds this document, so window.parent is the one sender that
@@ -2265,6 +2392,7 @@ defineExpose({
   isPreviewVisible,
   setPreviewHtml,
   setPreviewLoading,
+  setPreviewTheme,
   scrollPreviewToSourceLine,
   isPreviewFrameSource,
   setProblems,
