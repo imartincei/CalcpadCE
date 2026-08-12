@@ -54,8 +54,9 @@
 
       <!-- Editor groups, stacked top/bottom. One group normally; two when split. -->
       <div class="editor-groups">
-        <template v-for="(group, gi) in visibleGroups" :key="group.id">
+        <template v-for="(group, gi) in groups" :key="group.id">
           <div
+            v-show="!uiModeFullscreen || group.id === activeGroupId"
             class="editor-group"
             :class="{ 'active-group': group.id === activeGroupId && isSplit && !uiModeFullscreen }"
             :style="editorGroupStyle(gi)"

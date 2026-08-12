@@ -1125,9 +1125,25 @@ fn build_menu(app: &AppHandle, source_result_modes: bool) -> tauri::Result<Menu<
         .build()
 }
 
+// WebView2 runs our sandboxed preview iframes out-of-process (IsolateSandboxedIframes),
+// which has a wheel-routing bug: scroll does nothing until the frame's native scrollbar
+// is dragged. Disabling the feature trades away that process-isolation boundary for
+// correct scrolling. Must be set before the webview is created, so this runs first in run().
+#[cfg(windows)]
+fn disable_sandboxed_iframe_isolation() {
+    const FLAG: &str = "--disable-features=IsolateSandboxedIframes";
+    let combined = match std::env::var("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS") {
+        Ok(existing) if !existing.is_empty() => format!("{existing} {FLAG}"),
+        _ => FLAG.to_string(),
+    };
+    std::env::set_var("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", combined);
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     install_panic_hook();
+    #[cfg(windows)]
+    disable_sandboxed_iframe_isolation();
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             if let Some(w) = app.get_webview_window("main") {
