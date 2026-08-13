@@ -222,7 +222,8 @@ namespace Calcpad.Core
             catch (Exception ex)
             {
                 var msg = string.Format(Messages.Unexpected_error_0_Please_check_the_expression_consistency, ex.Message);
-                _sb.Append(ErrHtml(msg, _currentLine));
+                if (_isVisible)
+                    _sb.Append(ErrHtml(msg, _currentLine));
                 RecordError(_currentLine, msg, Debug);
             }
             finally
@@ -423,8 +424,16 @@ namespace Calcpad.Core
                             foreach (var ui in _lineUiControls)
                                 if (ui.Type == "datagrid")
                                 {
-                                    ResolveDatagridShape(ui);
-                                    _sb.AppendLine(BuildUiDatagrid(ui));
+                                    try
+                                    {
+                                        ResolveDatagridShape(ui);
+                                        _sb.AppendLine(BuildUiDatagrid(ui));
+                                    }
+                                    catch (MathParserException ex)
+                                    {
+                                        _sb.Append(ErrHtml(ex.Message, _currentLine));
+                                        RecordError(_currentLine, ex.Message, Debug);
+                                    }
                                 }
                         }
                     }
@@ -630,7 +639,8 @@ namespace Calcpad.Core
                         else
                             errText = HttpUtility.HtmlEncode(token.Value);
                         errText = FormatError(errText, ex.Message, _currentLine);
-                        _sb.Append($"<span class=\"err\"{Id(_currentLine)}>{errText}</span>");
+                        if (isOutput)
+                            _sb.Append($"<span class=\"err\"{Id(_currentLine)}>{errText}</span>");
                         RecordError(_currentLine, ex.Message, Debug);
 
                         if (++_errorCount == 40)
@@ -645,14 +655,16 @@ namespace Calcpad.Core
         void AppendError(string lineContent, string text, int line)
         {
             string s = lineContent.Replace("<", "&lt;").Replace(">", "&gt;");
-            _sb.Append(ErrHtml(FormatError(s, text, line), line));
+            if (_isVisible)
+                _sb.Append(ErrHtml(FormatError(s, text, line), line));
             RecordError(line, text, Debug);
         }
 
         private void RecordError(int line, string message, bool enabled)
         {
             if (!enabled) return;
-            _errors.Enqueue(line);
+            if (_isVisible)
+                _errors.Enqueue(line);
             var sourceLine = _parser?.Line > 0 ? _parser.Line : line + 1;
             _errorList.Add(new CalcpadError
             {

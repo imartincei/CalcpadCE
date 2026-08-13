@@ -613,6 +613,9 @@
   <data name="The_UI_0_has_1_entries_but_the_grid_has_2_3" xml:space="preserve">
     <value>#UI '{0}' has {1} entries but the grid has {2} {3}.</value>
   </data>
+  <data name="Datagrid_size_cannot_exceed_0_cells" xml:space="preserve">
+    <value>#UI datagrid size cannot exceed {0} cells. Use #Read to import larger data sets from a file instead.</value>
+  </data>
   <data name="A_UI_value_has_the_wrong_type" xml:space="preserve">
     <value>A #UI value has the wrong type.</value>
   </data>
