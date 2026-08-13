@@ -139,5 +139,16 @@ namespace Calcpad.Tests
             Assert.Contains("err", parser.HtmlResult);
             Assert.Contains("aaa1", parser.HtmlResult);
         }
+
+        [Fact]
+        public void Hide_ExpressionError_DoesNotLeakToHtml_ButIsRecorded()
+        {
+            var parser = new ExpressionParser { Settings = new Settings(), Debug = true };
+            parser.Parse("#hide\nbad\n#end hide\naaa1 = 1", true, false);
+            Assert.DoesNotContain("err", parser.HtmlResult);
+            Assert.Contains("aaa1", parser.HtmlResult);
+            Assert.Single(parser.Errors);
+            Assert.Contains("bad", parser.Errors[0].Message);
+        }
     }
 }

@@ -38,6 +38,9 @@ namespace Calcpad.Core
         public static readonly IReadOnlyList<string> KnownTypes =
             ["entry", "datagrid", "dropdown", "radio", "checkbox"];
 
+        /// <summary>Maximum number of cells (rows × columns) in a datagrid before rejecting as too large for UI interaction.</summary>
+        internal const int MaxSize = 100_000;
+
         /// <summary>True for the types whose choices come from the paired keys and values arrays.</summary>
         public bool HasOptions => Type is "dropdown" or "radio";
 

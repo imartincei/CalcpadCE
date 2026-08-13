@@ -619,5 +619,50 @@ namespace Calcpad.Tests
             Assert.Contains("on line", reportHtml);
             Assert.Contains("data-text=", reportHtml);
         }
+
+        [Fact]
+        public void Datagrid_SizeLimit_ExplicitlyDeclaredSizeTooLarge()
+        {
+            var html = Render("#UI {\"type\": \"datagrid\", \"rows\": 100001, \"columns\": 1} x = vector(100001)", enableUi: true);
+            Assert.Contains("Error", html);
+            Assert.Contains("datagrid size cannot exceed", html);
+            Assert.Contains("100000", html);
+            Assert.DoesNotContain("calcpad-ui-datagrid", html);
+        }
+
+        [Fact]
+        public void Datagrid_SizeLimit_AutoDetectedLiteralTooLarge()
+        {
+            var html = Render("#UI M = matrix(1000; 1000)", enableUi: true);
+            Assert.Contains("Error", html);
+            Assert.Contains("datagrid size cannot exceed", html);
+            Assert.Contains("#Read", html);
+            Assert.DoesNotContain("calcpad-ui-datagrid", html);
+        }
+
+        [Fact]
+        public void Datagrid_SizeLimit_ComputedSizeTooLarge()
+        {
+            var html = Render("#UI M = matrix(500; 300)", enableUi: true);
+            Assert.Contains("Error", html);
+            Assert.Contains("datagrid size cannot exceed", html);
+            Assert.DoesNotContain("calcpad-ui-datagrid", html);
+        }
+
+        [Fact]
+        public void Datagrid_SizeLimit_ExactLimitIsAllowed()
+        {
+            var html = Render("#UI M = matrix(316; 316)", enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("data-ui-rows=\"316\" data-ui-columns=\"316\"", html);
+        }
+
+        [Fact]
+        public void Datagrid_SizeLimit_UnderLimitIsAllowed()
+        {
+            var html = Render("#UI M = matrix(300; 300)", enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("data-ui-rows=\"300\" data-ui-columns=\"300\"", html);
+        }
     }
 }
