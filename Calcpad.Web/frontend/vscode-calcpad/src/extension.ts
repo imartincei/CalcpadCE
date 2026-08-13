@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION } from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -27,6 +27,7 @@ import { DotnetRuntimeManager } from './dotnetRuntimeManager';
 import { VSCodeLogger, VSCodeFileSystem } from './adapters';
 import { expandEnvVars } from './calcpadLocationResolver';
 import { installJuliaMonoCommand, maybePromptInstall } from './installFont';
+import { buildPreviewShell, getFrameAgentScript, frameStateFor, handleFrameStateMessage } from './previewFrame';
 
 // The wrapped ("regular") and unwrapped previews are independent panels that can
 // coexist: the unwrapped one is stacked directly below the regular one so the
@@ -51,6 +52,12 @@ const uiControls = new Map<string, UiControl[]>();
 // Document the input form is currently showing, so its values can be prompted
 // about and dropped when the form closes.
 let uiPanelDocKey: string | undefined = undefined;
+
+// The document each panel last rendered, before it was escaped into the shell's
+// srcdoc. What "View Webview Source" is for is reading the rendered worksheet, and
+// that is unreadable once it is an attribute value.
+const lastFrameHtml = new WeakMap<vscode.WebviewPanel, string>();
+
 
 // The compiled-worksheet editor, which holds the decoded source of every open `.cpdz`:
 // they never become text documents, so it is the only way to the content.
@@ -231,6 +238,14 @@ let vueUiProvider: CalcpadVueUIProvider | undefined;
 // Set in activate(); the module-level export commands need it outside that scope.
 let sharedApiClient: CalcpadApiClient | undefined;
 
+/**
+ * Auth headers for the handful of requests that bypass the shared client and
+ * call `fetch` directly. The local server answers 401 without them.
+ */
+function apiAuthHeaders(): Record<string, string> {
+    return sharedApiClient?.authHeaders() ?? {};
+}
+
 const PREVIEW_BUSY_DELAY_MS = 400;
 
 /**
@@ -256,6 +271,14 @@ function updateMetadataContext(editor: vscode.TextEditor | undefined): void {
     vueUiProvider?.updateUiControls(editor ? uiControls.get(editor.document.uri.toString()) ?? null : null);
 }
 
+function escapeHtml(text: string): string {
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
 /**
  * A "Calculating…" page shown in the preview webview during long renders,
  * mirroring the spinner overlay in calcpad-web.
@@ -265,6 +288,7 @@ function getPreviewLoadingHtml(): string {
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline';">
     <title>Calculating</title>
     <style>
         html, body { height: 100%; margin: 0; }
@@ -492,7 +516,12 @@ function getThemeOverrideScript(previewTheme: 'light' | 'dark'): string {
 // Escape stray '<' that aren't part of complete HTML tags to prevent
 // malformed user content (e.g. '<h' from Calcpad notes) from breaking the DOM.
 // A complete tag is <...> where the content between < and > contains no nested <.
-function sanitizeServerHtml(html: string): string {
+//
+// This is a rendering repair, not a security control: <script>, <iframe> and event
+// handler attributes are all complete tags and pass through untouched, by design —
+// author HTML and JS are a Calcpad feature. What contains them is the sandboxed
+// frame in previewFrame.ts.
+function repairStrayAngleBrackets(html: string): string {
     const bodyOpen = html.indexOf('<body');
     const bodyClose = html.lastIndexOf('</body>');
     if (bodyOpen === -1 || bodyClose === -1) return html;
@@ -505,17 +534,14 @@ function sanitizeServerHtml(html: string): string {
     return html.substring(0, bodyStart) + sanitized + html.substring(bodyClose);
 }
 
-function getVsCodeApiInitScript(): string {
-    // acquireVsCodeApi may only be called once per webview, so publish the handle
-    // for the backend's #UI event script rather than letting it acquire its own.
-    return `<script>const vscode = acquireVsCodeApi(); window.__calcpadVsCode = vscode;</script>`;
-}
-
 function getErrorNavigationScript(): string {
     return `
         <script>
 
-            // Intercept console methods and send to VS Code
+            // Intercept console methods and relay to VS Code. The document runs a frame
+            // deeper than the webview now, on an opaque origin with no acquireVsCodeApi
+            // of its own, so everything leaves through the shell's relay
+            // (window.__calcpadSend, published by the frame agent).
             (function() {
                 const originalConsole = {
                     log: console.log,
@@ -537,7 +563,7 @@ function getErrorNavigationScript(): string {
                         return String(arg);
                     }).join(' ');
 
-                    vscode.postMessage({
+                    window.__calcpadSend({
                         type: 'consoleMessage',
                         level: level,
                         message: message
@@ -573,12 +599,12 @@ function getErrorNavigationScript(): string {
             // Catch uncaught errors and unhandled promise rejections
             window.onerror = function(message, source, lineno, colno, error) {
                 const detail = error ? (error.message || String(error)) : message;
-                vscode.postMessage({ type: 'consoleMessage', level: 'error', message: '[Uncaught] ' + detail + ' (' + lineno + ':' + colno + ')' });
+                window.__calcpadSend({ type: 'consoleMessage', level: 'error', message: '[Uncaught] ' + detail + ' (' + lineno + ':' + colno + ')' });
             };
             window.onunhandledrejection = function(event) {
                 const reason = event.reason;
                 const detail = reason ? (reason.message || String(reason)) : String(reason);
-                vscode.postMessage({ type: 'consoleMessage', level: 'error', message: '[Unhandled Rejection] ' + detail });
+                window.__calcpadSend({ type: 'consoleMessage', level: 'error', message: '[Unhandled Rejection] ' + detail });
             };
 
             // Test console interception
@@ -602,7 +628,7 @@ function getErrorNavigationScript(): string {
                         const lineNumber = this.getAttribute('data-text');
                         if (lineNumber) {
                             const lineType = (this.classList.contains('line-num') || isCodeView) ? 'source' : 'output';
-                            vscode.postMessage({
+                            window.__calcpadSend({
                                 type: 'navigateToLine',
                                 line: parseInt(lineNumber, 10),
                                 lineType: lineType
@@ -707,7 +733,7 @@ function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true):
                     link.style.display = 'none';
                     link.addEventListener('click', function(e) {
                         e.preventDefault();
-                        vscode.postMessage({ type: 'navigateToLine', line: parseInt(src, 10), lineType: 'source' });
+                        window.__calcpadSend({ type: 'navigateToLine', line: parseInt(src, 10), lineType: 'source' });
                     });
                     el.appendChild(link);
                     el.addEventListener('mouseenter', function() {
@@ -828,6 +854,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             <html>
             <head>
                 <meta charset="UTF-8">
+                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline';">
                 <title>CalcpadCE Preview${unwrapped ? ' Unwrapped' : ''}</title>
                 <style>
                     body { color: ${c.fg}; background: ${c.bg}; padding: 20px; font-family: var(--vscode-font-family); }
@@ -911,7 +938,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             try {
                 return await fetch(`${apiBaseUrl}${endpoint}`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
                     body: requestBody,
                     signal: combineSignals(AbortSignal.timeout(10000), signal),
                 });
@@ -980,36 +1007,59 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // Override VS Code's injected theme to match the selected preview theme
         const themeOverrideScript = getThemeOverrideScript(theme);
 
-        // Sanitize server HTML to escape stray '<' that aren't part of valid tags
-        const sanitizedResponse = sanitizeServerHtml(apiResponse);
+        // Repair stray '<' that aren't part of valid tags. Not a security control —
+        // see the function's own comment; containment is the sandboxed frame below.
+        const repairedResponse = repairStrayAngleBrackets(apiResponse);
 
-        // Inject console interception + error nav + scrollbar style at end of <head> so it runs before any user scripts in body
-        const vsCodeApiInit = getVsCodeApiInitScript();
-        let htmlWithScript = sanitizedResponse.replace('</head>', vsCodeApiInit + errorNavigationScript + scrollbarStyleScript + '</head>');
+        // Where this panel's frame was before the render that is replacing it. The
+        // input form is the exception: its own #UI script restores scroll along with
+        // the focused control and caret, from the position seeded beside it.
+        const frameState = frameStateFor(panel, docKey);
+        const agentScript = getFrameAgentScript({
+            scroll: enableUi ? undefined : frameState.scroll,
+            uiPosition: frameState.uiPosition,
+        });
+        // Consumed once, matching the #UI script's own semantics: a stale position must
+        // not steal focus when a document is opened fresh rather than re-rendered.
+        frameState.uiPosition = undefined;
+
+        // The agent goes first so window.__calcpadSend exists before anything that
+        // relays through it, user scripts in <body> included.
+        let frameHtml = repairedResponse.replace('</head>',
+            agentScript + errorNavigationScript + scrollbarStyleScript + '</head>');
         // Inject image cache + theme override + line links before closing body tag
-        htmlWithScript = htmlWithScript.replace('</body>', imageCacheScript + themeOverrideScript + lineLinkScript + '</body>');
+        frameHtml = frameHtml.replace('</body>', imageCacheScript + themeOverrideScript + lineLinkScript + '</body>');
 
-        panel.webview.html = htmlWithScript;
+        // The rendered document is never the webview's own document: it is sandboxed
+        // to an opaque origin inside the shell, which holds the only handle to VS Code.
+        lastFrameHtml.set(panel, frameHtml);
+        panel.webview.html = buildPreviewShell(frameHtml, {
+            background: theme === 'light' ? '#ffffff'
+                : settingsManager.getExtra('darkBackground', '#1e1e1e'),
+        });
 
-        outputChannel.appendLine('Webview HTML set directly');
+        outputChannel.appendLine('Webview HTML set (sandboxed preview frame)');
 
     } catch (error) {
         outputChannel.appendLine(`ERROR in updatePreviewContent: ${error instanceof Error ? error.message : 'Unknown error'}`);
         const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
         const errorApiBaseUrl = settingsManager.getServerUrl();
         const endpoint = unwrapped ? 'convert?unwrap=true' : 'convert';
+        // Escaped: the message can carry server text, and this page — unlike the
+        // rendered document — is the webview's own document, outside the frame.
         const errorHtml = `
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
+                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline';">
                 <title>CalcpadCE Preview Error</title>
             </head>
             <body>
                 <div style="color: #d32f2f; background: #ffebee; padding: 15px; border-radius: 4px; margin: 20px;">
                     <h3>Preview Error${unwrapped ? ' (Unwrapped)' : ''}</h3>
-                    <p>${error instanceof Error ? error.message : 'Unknown error'}</p>
-                    <p>Server URL: ${errorApiBaseUrl}/api/calcpad/${endpoint}</p>
+                    <p>${escapeHtml(error instanceof Error ? error.message : 'Unknown error')}</p>
+                    <p>Server URL: ${escapeHtml(`${errorApiBaseUrl}/api/calcpad/${endpoint}`)}</p>
                 </div>
             </body>
             </html>
@@ -1048,7 +1098,7 @@ async function renderForExport(
     // path. Unkeyed: an export is an explicit one-off action, never superseded by a later one.
     const runRequest = (signal: AbortSignal) => fetch(`${apiBaseUrl}${endpoint}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
         body: JSON.stringify({
             content: documentContent,
             settings: settings,
@@ -1102,7 +1152,7 @@ async function generatePdfToFile(
     // Step 2: Generate PDF from HTML
     const pdfResponse = await fetch(`${apiBaseUrl}/api/calcpad/pdf`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
         body: JSON.stringify({
             html: html,
             options: getPdfSettings(documentContent)
@@ -1110,7 +1160,7 @@ async function generatePdfToFile(
         signal: AbortSignal.timeout(60000)
     });
     if (!pdfResponse.ok) {
-        throw new Error(`PDF generation failed: ${pdfResponse.status}`);
+        throw await pdfResponseError(pdfResponse);
     }
 
     progress?.report({ increment: 80, message: 'Saving PDF file...' });
@@ -1150,33 +1200,96 @@ async function runPdfExportCommand(variant: ExportVariant = 'report'): Promise<v
     });
     if (!saveUri) return;
 
-    try {
-        await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: 'Generating PDF...',
-            cancellable: false
-        }, async progress => {
-            progress.report({ increment: 0, message: 'Starting PDF generation...' });
-            await generatePdfToFile(
-                source.text,
-                source.uri,
-                saveUri,
-                variant,
-                progress
-            );
-        });
-
-        const openChoice = await vscode.window.showInformationMessage(
-            `PDF saved to ${saveUri.fsPath}`,
-            'Open PDF'
+    const runExport = () => vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: 'Generating PDF...',
+        cancellable: false
+    }, async progress => {
+        progress.report({ increment: 0, message: 'Starting PDF generation...' });
+        await generatePdfToFile(
+            source.text,
+            source.uri,
+            saveUri,
+            variant,
+            progress
         );
-        if (openChoice === 'Open PDF') {
-            vscode.env.openExternal(saveUri);
+    });
+
+    // Two attempts at most: the second only runs after the user accepted the
+    // Chromium download, so it starts from a state where a browser exists.
+    for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+            await runExport();
+
+            const openChoice = await vscode.window.showInformationMessage(
+                `PDF saved to ${saveUri.fsPath}`,
+                'Open PDF'
+            );
+            if (openChoice === 'Open PDF') {
+                vscode.env.openExternal(saveUri);
+            }
+            return;
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : String(error);
+            outputChannel.appendLine(`[PDF] ${msg}`);
+
+            if (attempt === 0 && isBrowserNotFound(error) && await offerChromiumDownload(error.downloadSizeMb)) {
+                continue;
+            }
+            if (!isBrowserNotFound(error)) {
+                vscode.window.showErrorMessage(`Failed to generate PDF: ${msg}`);
+            }
+            return;
         }
+    }
+}
+
+/**
+ * Offers the bundled headless Chromium download after PDF export found no usable
+ * browser. Declining is a first-class outcome — installing Chrome/Edge/Chromium
+ * themselves stays the recommended path, so that advice goes to the Output panel
+ * either way. Resolves true when a browser is now installed.
+ */
+async function offerChromiumDownload(downloadSizeMb: number): Promise<boolean> {
+    const size = downloadSizeMb > 0 ? `~${downloadSizeMb} MB` : 'a few hundred MB';
+    const advice = 'PDF export needs a Chromium-family browser (Chrome, Edge or Chromium). '
+        + 'Install one and it is picked up automatically, or point the '
+        + '"BrowserPath" setting in the bundled server\'s appsettings.json at an existing install.';
+
+    const choice = await vscode.window.showWarningMessage(
+        'No Chromium-family browser was found for PDF export.',
+        {
+            modal: true,
+            detail: `${advice}\n\nAlternatively, CalcpadCE can download a private headless Chromium (${size}) used only for exports.`,
+        },
+        `Download Chromium (${size})`,
+    );
+
+    if (choice === undefined) {
+        outputChannel.appendLine(`[PDF] Export cancelled — no browser available. ${advice}`);
+        return false;
+    }
+
+    const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
+    const apiBaseUrl = settingsManager.getServerUrl();
+    if (!apiBaseUrl) {
+        vscode.window.showErrorMessage('Server URL not configured');
+        return false;
+    }
+
+    try {
+        const installedPath = await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: 'Downloading headless Chromium (one time)...',
+            cancellable: false
+        }, () => installPdfBrowser(apiBaseUrl, apiAuthHeaders()));
+        outputChannel.appendLine(`[PDF] Chromium installed: ${installedPath}`);
+        return true;
     } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        outputChannel.appendLine(`[PDF] ${msg}`);
-        vscode.window.showErrorMessage(`Failed to generate PDF: ${msg}`);
+        outputChannel.appendLine(`[PDF] Chromium download failed: ${msg}`);
+        vscode.window.showErrorMessage(`Chromium download failed: ${msg}. ${advice}`);
+        return false;
     }
 }
 
@@ -1517,7 +1630,13 @@ async function showPreview(kind: PreviewKind, scrollToLine?: number, preserveFoc
         },
         {
             enableScripts: true,
-            enableFindWidget: true
+            // No enableFindWidget: the workbench's find reaches the webview's own
+            // document, and the report it would search is a sandboxed frame deeper.
+            // previewFrame.ts carries a find widget that talks to the frame instead.
+            //
+            // Nothing local is loaded either — images arrive as data URIs — so the
+            // default roots (every workspace folder) are given up rather than left open.
+            localResourceRoots: []
         }
     );
 
@@ -1562,7 +1681,10 @@ async function showPreview(kind: PreviewKind, scrollToLine?: number, preserveFoc
         }
     });
 
-    panel.webview.onDidReceiveMessage(message => handlePreviewMessage(message, kind));
+    panel.webview.onDidReceiveMessage(message => {
+        if (handleFrameStateMessage(panel, message)) return;
+        handlePreviewMessage(message, kind);
+    });
 
     await updatePreviewContent(panel, activeEditor.document.getText(), activeEditor.document.uri, unwrapped, scrollToLine, enableUi, forPrint);
 }
@@ -1681,6 +1803,7 @@ export async function activate(context: vscode.ExtensionContext) {
                         const serverUrl = serverManager!.getBaseUrl();
                         settingsManager.setLocalServerUrl(serverUrl);
                         apiClient.setBaseUrl(serverUrl);
+                        apiClient.setAuthToken(serverManager!.getAuthToken());
                         outputChannel.appendLine(`Local server started at ${serverUrl}`);
                         void refreshAllComponents();
                     }).catch((err) => {
@@ -2178,7 +2301,7 @@ export async function activate(context: vscode.ExtensionContext) {
             vscode.window.showWarningMessage('No active CalcpadCE preview to inspect.');
             return;
         }
-        webviewSourceHtml = inspectPanel.webview.html;
+        webviewSourceHtml = lastFrameHtml.get(inspectPanel) ?? inspectPanel.webview.html;
         webviewSourceProvider.onDidChangeEmitter.fire(webviewSourceUri);
         const doc = await vscode.workspace.openTextDocument(webviewSourceUri);
         await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside, true);
@@ -2241,6 +2364,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 const serverUrl = serverManager.getBaseUrl();
                 settingsManager.setLocalServerUrl(serverUrl);
                 apiClient.setBaseUrl(serverUrl);
+                apiClient.setAuthToken(serverManager.getAuthToken());
                 outputChannel.appendLine(`[Refresh] Server restarted at ${serverUrl}`);
             } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
@@ -2268,6 +2392,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     const serverUrl = serverManager.getBaseUrl();
                     settingsManager.setLocalServerUrl(serverUrl);
                     apiClient.setBaseUrl(serverUrl);
+                    apiClient.setAuthToken(serverManager.getAuthToken());
                     outputChannel.appendLine(`[Refresh] Server restarted at ${serverUrl}`);
                 } catch (err) {
                     const msg = err instanceof Error ? err.message : String(err);

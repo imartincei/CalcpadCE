@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Caching.Memory;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Calcpad.Server.Services
 {
@@ -54,6 +56,73 @@ namespace Calcpad.Server.Services
         }
 
         internal const string CorsPolicyName = "CalcpadHosts";
+
+        /// <summary>
+        /// Header carrying the per-launch token that <see cref="RequireApiToken"/> checks.
+        /// </summary>
+        internal const string ApiTokenHeader = "X-Calcpad-Token";
+
+        /// <summary>
+        /// Per-launch shared secret, handed to us by the host that spawned this process.
+        /// </summary>
+        /// <remarks>
+        /// Read from the environment rather than argv: argv is world-readable through
+        /// <c>/proc/{pid}/cmdline</c> on Linux and through WMI on Windows, which would hand
+        /// the token to exactly the local processes it exists to keep out. The environment
+        /// block is readable only by the same user (and root), which is the boundary this
+        /// server already lives inside.
+        /// <para>
+        /// Absent when nobody set it — <c>dotnet run</c> during development, the test
+        /// harness, a shell launch. Auth is then off and the CORS + Host-header policy in
+        /// <see cref="IsAllowedOrigin"/> is the only control, which is the behavior that
+        /// predates this. Both shipped hosts (the Tauri desktop shell and the VS Code
+        /// extension) always set it, so a user-facing launch is always authenticated.
+        /// </para>
+        /// </remarks>
+        private static readonly byte[]? ApiTokenBytes =
+            Environment.GetEnvironmentVariable("CALCPAD_API_TOKEN") is { Length: > 0 } token
+                ? Encoding.UTF8.GetBytes(token)
+                : null;
+
+        /// <summary>
+        /// Rejects any <c>/api</c> request that does not present the launch token.
+        /// </summary>
+        /// <remarks>
+        /// Registered after <c>UseCors</c> so a browser preflight is answered by the CORS
+        /// middleware and never reaches this — the preflight itself carries no custom
+        /// headers, so checking it would fail every cross-origin request before the real
+        /// one was ever sent. <c>OPTIONS</c> is skipped for the same reason.
+        /// </remarks>
+        private static void RequireApiToken(WebApplication app)
+        {
+            var expected = ApiTokenBytes;
+            if (expected is null)
+            {
+                FileLogger.LogWarning(
+                    "CALCPAD_API_TOKEN not set — /api is unauthenticated",
+                    "Any local process can reach this server. Expected only for development launches.");
+                return;
+            }
+
+            app.Use(async (context, next) =>
+            {
+                if (!context.Request.Path.StartsWithSegments("/api")
+                    || HttpMethods.IsOptions(context.Request.Method))
+                {
+                    await next();
+                    return;
+                }
+
+                var presented = Encoding.UTF8.GetBytes(context.Request.Headers[ApiTokenHeader].ToString());
+                if (!CryptographicOperations.FixedTimeEquals(presented, expected))
+                {
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync("Unauthorized");
+                    return;
+                }
+                await next();
+            });
+        }
 
         /// <summary>
         /// Origins permitted to call the API from a browsing context.
@@ -166,6 +235,7 @@ namespace Calcpad.Server.Services
 
             app.UseHttpsRedirection();
             app.UseCors(CorsPolicyName);
+            RequireApiToken(app);
 
             app.MapControllers();
 

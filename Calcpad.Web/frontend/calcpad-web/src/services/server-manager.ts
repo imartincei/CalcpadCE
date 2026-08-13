@@ -40,6 +40,7 @@ interface ServerLogPayload {
 
 export class TauriServerManager {
     private url = '';
+    private token: string | null = null;
     private _isRunning = false;
     private _crashCount = 0;
     private _stableTimer: ReturnType<typeof setTimeout> | null = null;
@@ -65,6 +66,15 @@ export class TauriServerManager {
     get isRunning(): boolean { return this._isRunning; }
     getBaseUrl(): string { return this.url; }
 
+    /**
+     * Per-launch token the sidecar requires on every `/api` route. Rust owns it and
+     * keeps it across sidecar restarts, so this is fetched once and never refreshed.
+     * Null only if the command is missing, which means an older shell — the request
+     * then goes out unauthenticated and the server answers 401 rather than serving
+     * anyone who asks.
+     */
+    getAuthToken(): string | null { return this.token; }
+
     async start(): Promise<void> {
         // Callers block on start() so the API bridge sees a real URL from
         // its first request. Resolve as soon as we learn the URL from either
@@ -78,6 +88,12 @@ export class TauriServerManager {
             resolveReady = resolve;
             rejectReady = reject;
         });
+
+        try {
+            this.token = await invoke<string>('server_token');
+        } catch (err) {
+            this.log(`server_token invoke failed — API calls will be rejected: ${err instanceof Error ? err.message : String(err)}`);
+        }
 
         try {
             this.unlistenUrl = await listen<string>('server-url', (evt) => {

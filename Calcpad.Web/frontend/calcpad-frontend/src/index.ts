@@ -80,7 +80,16 @@ export type {
 } from './types/snippets';
 
 // --- API Client --------------------------------------------------------------
-export { CalcpadApiClient, parseConvertErrorHeader, combineSignals } from './api/client';
+export { CalcpadApiClient, API_TOKEN_HEADER, parseConvertErrorHeader, combineSignals } from './api/client';
+export {
+    BROWSER_NOT_FOUND,
+    BrowserNotFoundError,
+    isBrowserNotFound,
+    pdfResponseError,
+    fetchPdfBrowserStatus,
+    installPdfBrowser,
+} from './api/pdf-browser';
+export type { PdfBrowserStatus } from './api/pdf-browser';
 
 // --- Services ----------------------------------------------------------------
 export { CalcpadLintService } from './services/linter';
@@ -108,6 +117,7 @@ export type { ImageStorageMode, PickedImage } from './services/image-utils';
 
 // --- HTML Body Extraction ------------------------------------------------------
 export { extractBodyHtml } from './services/html-body';
+export { previewDiagnosticsScript } from './services/preview-diagnostics';
 
 // --- Plot Extraction + ZIP ---------------------------------------------------
 export { extractPlotsFromHtml } from './services/plot-extract';

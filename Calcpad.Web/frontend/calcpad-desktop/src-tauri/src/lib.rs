@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use tauri::menu::{IsMenuItem, Menu, MenuBuilder, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Emitter, Manager, RunEvent, State, WindowEvent};
+use tauri_plugin_fs::FsExt;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
 
@@ -18,6 +19,8 @@ static DRAFTS_DIR: OnceLock<PathBuf> = OnceLock::new();
 // Shared with spawn_sidecar so the panic hook can attach the last few KB
 // of the child's combined stdio to the dump — same trick the C# server uses.
 static SIDECAR_TAIL: OnceLock<Arc<Mutex<String>>> = OnceLock::new();
+// Per-launch bearer for the sidecar's /api routes. See api_token().
+static API_TOKEN: OnceLock<String> = OnceLock::new();
 
 // Name of the .NET apphost inside the resource dir. All ~200 sibling
 // DLLs / native libs / deps.json / runtimeconfig.json land next to it so
@@ -113,6 +116,28 @@ fn extract_launch_files<I: IntoIterator<Item = String>>(args: I) -> Vec<PathBuf>
         })
         .filter(|p| p.exists())
         .collect()
+}
+
+/// Per-launch shared secret the sidecar requires on every `/api` request.
+///
+/// Loopback binding keeps remote machines out but not other processes on this
+/// one, and `#include` resolution reads any path it is handed — so without this
+/// any local program (or any page the user's browser loads from loopback) has
+/// arbitrary file read as the user. Generated once and reused across sidecar
+/// restarts, so a restart doesn't invalidate the token the webview already holds.
+///
+/// Handed to the child through its environment, never argv: `/proc/{pid}/cmdline`
+/// is world-readable on Linux, and Win32_Process.CommandLine is readable through
+/// WMI on Windows. The environment block is same-user only.
+fn api_token() -> &'static str {
+    API_TOKEN.get_or_init(|| {
+        let mut bytes = [0u8; 32];
+        // A failure here would mean the OS entropy source is unavailable, which is
+        // unrecoverable — an all-zero or predictable token would be worse than no
+        // server at all, so panic rather than degrade.
+        getrandom::getrandom(&mut bytes).expect("OS entropy source unavailable");
+        bytes.iter().map(|b| format!("{b:02x}")).collect()
+    })
 }
 
 fn unix_millis() -> u64 {
@@ -331,9 +356,53 @@ fn server_url(state: State<'_, ServerState>) -> Option<String> {
     state.url.lock().ok().and_then(|g| g.clone())
 }
 
+/// Hands the webview the token it must send as `X-Calcpad-Token` on every API call.
+///
+/// Safe to expose: the webview is the app's own trusted frontend, served from
+/// `tauri://`. Worksheet content renders inside a sandboxed opaque-origin frame
+/// that has no IPC access, so it cannot reach this command.
+#[tauri::command]
+fn server_token() -> &'static str {
+    api_token()
+}
+
 #[tauri::command]
 fn take_pending_launch_files(state: State<'_, PendingLaunchFiles>) -> Vec<String> {
     state.0.lock().map(|mut g| std::mem::take(&mut *g)).unwrap_or_default()
+}
+
+/// Grants read access to `path` and the directory holding it.
+///
+/// The sibling grant is what worksheets need: image `src`s resolve relative to
+/// the document's own folder, and the dialog plugin grants only the file the
+/// user actually clicked. Non-recursive, so picking a file in a large tree does
+/// not hand over the whole subtree.
+fn allow_file_and_parent(app: &AppHandle, path: &Path) {
+    let scope = app.fs_scope();
+    let _ = scope.allow_file(path);
+    if let Some(parent) = path.parent() {
+        let _ = scope.allow_directory(parent, false);
+    }
+}
+
+/// Extends the read scope to the folder of a document the webview may already read.
+///
+/// Gated on the runtime scope already allowing `path`, which is only true once the
+/// user has picked it through a dialog — so webview script cannot call this to grant
+/// itself a directory it was never given. The capability's `fs:deny-default` entries
+/// are unaffected: the fs plugin checks the ACL denies separately from this scope.
+#[tauri::command]
+fn allow_document_dir(app: AppHandle, path: String) -> Result<(), String> {
+    let path = PathBuf::from(&path);
+    if !app.fs_scope().is_allowed(&path) {
+        return Err(format!("outside the current read scope: {}", path.display()));
+    }
+    let parent = path
+        .parent()
+        .ok_or_else(|| format!("no parent directory: {}", path.display()))?;
+    app.fs_scope()
+        .allow_directory(parent, false)
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -348,8 +417,30 @@ async fn stop_server(app: AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+/// True for the handful of variables the frontend legitimately expands.
+///
+/// `expandEnvVars` in the JS bridge feeds this names lifted straight out of
+/// worksheet text (`#include $HOME/lib.cpd`), so an unrestricted `get_env`
+/// turns any `$AWS_SECRET_ACCESS_KEY` in a document into a value the webview —
+/// and anything it renders — can see. Only the names that name a location are
+/// answered; everything else reads as unset.
+fn is_readable_env(name: &str) -> bool {
+    // Only ever set on the sidecar's own env block, so this process should never
+    // hold it — denied anyway so an inherited one can't be expanded out of a
+    // worksheet and into the rendered preview, which has network egress.
+    if name == "CALCPAD_API_TOKEN" {
+        return false;
+    }
+    matches!(name, "HOME" | "USERPROFILE" | "APPDATA")
+        || name.starts_with("XDG_")
+        || name.starts_with("CALCPAD_")
+}
+
 #[tauri::command]
 fn get_env(name: String) -> Option<String> {
+    if !is_readable_env(&name) {
+        return None;
+    }
     std::env::var(name).ok()
 }
 
@@ -363,6 +454,39 @@ fn set_source_result_modes_visible(app: AppHandle, visible: bool) -> Result<(), 
     Ok(())
 }
 
+/// Directories `open_path_native` will hand to `xdg-open`.
+///
+/// Mirrors the `opener:allow-open-path` scope in `capabilities/default.json`.
+/// The plugin's own `open_path` enforces that scope; this command bypasses the
+/// plugin entirely, so on Linux — the platform it exists for — the scope would
+/// otherwise simply not apply. Keep the two lists in step.
+#[cfg(target_os = "linux")]
+fn openable_roots(app: &AppHandle) -> Vec<PathBuf> {
+    let p = app.path();
+    [p.app_data_dir(), p.app_config_dir(), p.app_log_dir()]
+        .into_iter()
+        .flatten()
+        .collect()
+}
+
+/// True when `path` resolves inside one of `openable_roots`.
+///
+/// Canonicalized on both sides so `..` and symlinks can't walk out. `xdg-open`
+/// has no `--` end-of-options marker — passing one would make it try to open a
+/// file literally named `--` — so containment is the control here, with the
+/// leading-dash check as a second line in case a future root is ever relative.
+#[cfg(target_os = "linux")]
+fn is_openable(app: &AppHandle, path: &Path) -> bool {
+    if path.to_string_lossy().starts_with('-') {
+        return false;
+    }
+    let Ok(target) = path.canonicalize() else { return false };
+    openable_roots(app)
+        .iter()
+        .filter_map(|root| root.canonicalize().ok())
+        .any(|root| target.starts_with(&root))
+}
+
 // Inside a linuxdeploy-generated AppImage, AppRun exports LD_LIBRARY_PATH so
 // the bundled binary can find its libs. If we spawn xdg-open through the
 // opener plugin, the child inherits that env, and any glib/dbus tools it
@@ -370,11 +494,15 @@ fn set_source_result_modes_visible(app: AppHandle, visible: bool) -> Result<(), 
 // the host system. Strip those vars (plus the archived originals AppRun
 // stashes) so xdg-open sees a pristine environment.
 #[tauri::command]
-fn open_path_native(path: String) -> Result<(), String> {
+fn open_path_native(app: AppHandle, path: String) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
+        let target = PathBuf::from(&path);
+        if !is_openable(&app, &target) {
+            return Err(format!("outside the openable scope: {path}"));
+        }
         let mut cmd = std::process::Command::new("xdg-open");
-        cmd.arg(&path);
+        cmd.arg(&target);
         for key in [
             "LD_LIBRARY_PATH",
             "LD_PRELOAD",
@@ -404,7 +532,7 @@ fn open_path_native(path: String) -> Result<(), String> {
     }
     #[cfg(not(target_os = "linux"))]
     {
-        let _ = path;
+        let _ = (app, path);
         Err("open_path_native is Linux-only".to_string())
     }
 }
@@ -510,6 +638,13 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     if let Some(dir) = &log_dir {
         command.env("CALCPAD_LOG_DIR", dir);
     }
+    // Every /api route on the child requires this header value. Env, not argv —
+    // see api_token(). ASPNETCORE_ENVIRONMENT is pinned because the child
+    // inherits our whole environment: a developer with Development exported
+    // would otherwise get Swagger and the debug-crash endpoint on a shipped app.
+    command
+        .env("CALCPAD_API_TOKEN", api_token())
+        .env("ASPNETCORE_ENVIRONMENT", "Production");
 
     // Enable the .NET runtime's on-crash minidump (createdump). StackOverflow,
     // FailFast and access violations bypass AppDomain.UnhandledException, so the
@@ -1152,11 +1287,17 @@ pub fn run() {
                 let _ = w.unminimize();
             }
             for path in extract_launch_files(argv) {
+                // The OS handing us this path is the user's consent; no dialog ran.
+                allow_file_and_parent(app, &path);
                 let _ = app.emit("open-file-request", path.to_string_lossy().to_string());
             }
         }))
-        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
+        // Must follow the fs plugin: it reaches for that plugin's scope at setup
+        // and silently no-ops if it isn't managed yet. Persists the per-pick grants
+        // the dialog adds at runtime, so a recent file or restored folder outside
+        // $HOME still opens after a restart.
+        .plugin(tauri_plugin_persisted_scope::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_store::Builder::default().build())
@@ -1164,11 +1305,11 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_log::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(ServerState::default())
         .manage(PendingLaunchFiles::default())
         .invoke_handler(tauri::generate_handler![
             server_url,
+            server_token,
             restart_server,
             stop_server,
             get_env,
@@ -1180,6 +1321,7 @@ pub fn run() {
             open_path_native,
             log_dir,
             take_pending_launch_files,
+            allow_document_dir,
             set_source_result_modes_visible,
         ])
         .setup(|app| {
@@ -1250,6 +1392,7 @@ pub fn run() {
                 let pending: State<'_, PendingLaunchFiles> = app.state();
                 let mut guard = pending.0.lock().expect("pending launch files mutex poisoned");
                 for path in launch_files {
+                    allow_file_and_parent(app.handle(), &path);
                     guard.push(path.to_string_lossy().to_string());
                 }
             }

@@ -414,7 +414,8 @@ export abstract class BaseMessageBridge {
 
     protected buildSettingsResponseExtras(): Record<string, unknown> | Promise<Record<string, unknown>> { return {}; }
     protected async runPdfPreflight(): Promise<boolean> { return true; }
-    protected async onPdfError(_err: unknown): Promise<void> { /* default no-op */ }
+    /** Return `true` to have the export retried once — hosts use this after installing a browser. */
+    protected async onPdfError(_err: unknown): Promise<boolean> { return false; }
     /** Called after a PDF is successfully written, with the saved path (platforms that have one). */
     protected async onPdfSaved(_filePath: string): Promise<void> { /* default no-op */ }
     /**
@@ -838,19 +839,25 @@ export abstract class BaseMessageBridge {
         const apiSettings = buildApiSettings(this.settings);
         const { sourceFilePath } = await this.buildFileContext(content);
 
-        try {
-            const pdfBytes = await this.generatePdfBytes(content, apiSettings, sourceFilePath, variant);
-            if (!pdfBytes) return;
-            const savedPath = await this.saveExportedFile({
-                defaultName: 'calcpad-output.pdf',
-                data: pdfBytes,
-                mime: 'application/pdf',
-                extensions: ['pdf'],
-                dialogTitle: exportDialogTitle('Export', 'PDF', variant),
-            });
-            if (savedPath) await this.onPdfSaved(savedPath);
-        } catch (err) {
-            await this.onPdfError(err);
+        // Two attempts at most: onPdfError asks for a retry only when it resolved the
+        // cause (installing a browser), so the second attempt either works or reports.
+        for (let attempt = 0; attempt < 2; attempt++) {
+            try {
+                const pdfBytes = await this.generatePdfBytes(content, apiSettings, sourceFilePath, variant);
+                if (!pdfBytes) return;
+                const savedPath = await this.saveExportedFile({
+                    defaultName: 'calcpad-output.pdf',
+                    data: pdfBytes,
+                    mime: 'application/pdf',
+                    extensions: ['pdf'],
+                    dialogTitle: exportDialogTitle('Export', 'PDF', variant),
+                });
+                if (savedPath) await this.onPdfSaved(savedPath);
+                return;
+            } catch (err) {
+                const retry = await this.onPdfError(err);
+                if (!retry || attempt === 1) return;
+            }
         }
     }
 

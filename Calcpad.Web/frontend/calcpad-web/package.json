@@ -20,9 +20,7 @@
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-os": "^2",
     "@tauri-apps/plugin-process": "^2",
-    "@tauri-apps/plugin-shell": "^2",
     "@tauri-apps/plugin-store": "^2",
-    "@tauri-apps/plugin-updater": "^2",
     "calcpad-frontend": "file:../calcpad-frontend",
     "monaco-editor": "^0.52.0",
     "vue": "^3.5.39"

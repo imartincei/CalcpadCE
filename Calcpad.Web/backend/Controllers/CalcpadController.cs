@@ -24,6 +24,9 @@ namespace Calcpad.Server.Controllers
         private readonly IWebHostEnvironment _environment;
         private static readonly LintIgnoreRegionParser _lintIgnoreRegionParser = new();
 
+        /// <summary>Error code clients match on to offer the bundled-Chromium download.</summary>
+        private const string BrowserNotFoundCode = "BROWSER_NOT_FOUND";
+
         public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService, ContentResolutionCache contentResolutionCache, IWebHostEnvironment environment)
         {
             _calcpadService = calcpadService;
@@ -286,11 +289,24 @@ namespace Calcpad.Server.Controllers
 
                 FileLogger.LogInfo("PDF generation request received", $"HTML length: {request.Html.Length}");
 
-                var pdfBytes = await _pdfService.GeneratePdfAsync(request.Html, request.Options, request.BrowserPath);
+                var pdfBytes = await _pdfService.GeneratePdfAsync(request.Html, request.Options);
 
                 FileLogger.LogInfo("PDF generated successfully", $"Size: {pdfBytes.Length} bytes");
 
                 return File(pdfBytes, "application/pdf", "document.pdf");
+            }
+            catch (BrowserUnavailableException ex)
+            {
+                FileLogger.LogWarning("PDF generation blocked: no usable browser", ex.Message);
+                var status = _pdfService.GetBrowserStatus();
+                return StatusCode(503, new
+                {
+                    error = "No usable browser",
+                    code = BrowserNotFoundCode,
+                    message = ex.Message,
+                    canDownload = true,
+                    downloadSizeMb = status.DownloadSizeMb
+                });
             }
             catch (Exception ex)
             {
@@ -303,6 +319,44 @@ namespace Calcpad.Server.Controllers
         public IActionResult PdfHealth()
         {
             return Ok(new { status = "ok", service = "calcpad-pdf", version = "2.0.0" });
+        }
+
+        /// <summary>
+        /// Which browser PDF export would use, so a client can warn before an export
+        /// rather than after one fails.
+        /// </summary>
+        [HttpGet("pdf/browser")]
+        public IActionResult GetPdfBrowser()
+        {
+            var status = _pdfService.GetBrowserStatus();
+            return Ok(new
+            {
+                available = status.Available,
+                source = status.Source,
+                path = status.Path,
+                downloadAllowed = status.DownloadAllowed,
+                downloadSizeMb = status.DownloadSizeMb
+            });
+        }
+
+        /// <summary>
+        /// Downloads the bundled headless Chromium. Called only after the client has asked
+        /// the user — the render path never downloads on its own unless the host set
+        /// <c>AllowChromiumDownload</c>.
+        /// </summary>
+        [HttpPost("pdf/browser/install")]
+        public async Task<IActionResult> InstallPdfBrowser()
+        {
+            try
+            {
+                var path = await _pdfService.InstallBrowserAsync();
+                return Ok(new { installed = true, path });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("Chromium download failed", ex);
+                return StatusCode(500, new { error = "Chromium download failed", message = ex.Message });
+            }
         }
 
         /// <summary>

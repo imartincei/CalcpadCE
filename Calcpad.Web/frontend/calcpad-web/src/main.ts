@@ -205,6 +205,7 @@ async function bootstrap(): Promise<void> {
 
         const { TauriMessageBridge } = await import('./services/tauri-bridge');
         tauriBridge = new TauriMessageBridge(serverUrl);
+        tauriBridge.api.setAuthToken(serverManager.getAuthToken());
         (window as any).calcpadBridge = tauriBridge;
     } else {
         // Pure web: use in-process web bridge
@@ -2245,6 +2246,8 @@ async function bootstrap(): Promise<void> {
                 appInstance.appendOutput('info', '--- end server log ---');
             } else if (data.type === 'pdfError') {
                 appInstance.appendOutput('error', String(data.message || 'PDF export failed'));
+            } else if (data.type === 'pdfInfo') {
+                appInstance.appendOutput('info', String(data.message || ''));
             }
         });
 

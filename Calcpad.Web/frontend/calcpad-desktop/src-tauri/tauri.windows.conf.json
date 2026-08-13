@@ -7,7 +7,10 @@
     "targets": ["msi", "nsis"],
     "resources": {
       "binaries/*.dll": "./",
-      "binaries/*.json": "./",
+      "binaries/Calcpad.Server.deps.json": "./",
+      "binaries/Calcpad.Server.runtimeconfig.json": "./",
+      "binaries/Calcpad.Server.staticwebassets.endpoints.json": "./",
+      "binaries/appsettings.json": "./",
       "binaries/Calcpad.Server.exe": "./",
       "binaries/template.html": "./",
       "binaries/Fonts/*": "./Fonts/",

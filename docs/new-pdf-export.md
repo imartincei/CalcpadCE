@@ -20,7 +20,18 @@ Then export:
 ## Browser requirement
 
 PDF export renders the report using a **Chromium-based browser** (Google Chrome, Microsoft Edge, or Chromium).
-The app looks for one already installed on your system; if it can't find one, it downloads a minimal headless build automatically the first time you export.
+The app looks for one already installed on your system and uses it if it finds one.
+
+If it can't find one — or the one it finds won't launch — the desktop app and the VS Code
+extension **ask you first**, rather than downloading anything on their own. You can either
+install a browser yourself (recommended, and the dialog shows the exact command for your
+system) or accept a one-time download of a private headless Chromium (~180 MB) that
+CalcpadCE uses only for exports. Once downloaded it is reused, so you are asked only once.
+Declining just cancels that export.
+
+Server deployments with no one at the keyboard can opt into the automatic download by
+setting `AllowChromiumDownload: true` in `appsettings.json` or `ALLOW_CHROMIUM_DOWNLOAD=true`
+in the environment.
 
 On Linux, if no browser is found the app shows you the exact package to install for your distribution:
 

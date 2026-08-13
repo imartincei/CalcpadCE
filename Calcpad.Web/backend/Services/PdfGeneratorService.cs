@@ -37,10 +37,28 @@ namespace Calcpad.Server.Services
         }
     }
 
+    /// <summary>
+    /// No Chromium-family browser could be used for rendering. Carries the
+    /// <c>BROWSER_NOT_FOUND</c> contract to the controller so clients can offer the
+    /// bundled-Chromium download instead of failing with a generic 500.
+    /// </summary>
+    public class BrowserUnavailableException : Exception
+    {
+        public BrowserUnavailableException(string message, Exception? innerException = null)
+            : base(message, innerException) { }
+    }
+
+    /// <summary>Which browser the PDF pipeline would use right now, and whether a download is possible.</summary>
+    public record BrowserStatus(bool Available, string Source, string? Path, bool DownloadAllowed, int DownloadSizeMb);
+
     public class PdfGeneratorService : IAsyncDisposable
     {
+        // ChromeHeadlessShell unpacked; used only to size the confirmation prompt clients show.
+        private const int ChromiumDownloadSizeMb = 180;
+
         private IBrowser? _browser;
         private readonly SemaphoreSlim _browserLock = new(1, 1);
+        private readonly SemaphoreSlim _downloadLock = new(1, 1);
         // Caps concurrent Chromium pages against the one shared browser, independent of
         // _browserLock (which only guards lazy browser creation) — a burst of PDF/DOCX
         // requests would otherwise open one page per request with no upper bound.
@@ -59,20 +77,20 @@ namespace Calcpad.Server.Services
             _config = config;
         }
 
-        public async Task<byte[]> GeneratePdfAsync(string html, PdfSettingsDto? options = null, string? browserPath = null)
+        public async Task<byte[]> GeneratePdfAsync(string html, PdfSettingsDto? options = null)
         {
             options ??= new PdfSettingsDto();
 
             // Step 1: Generate basic PDF with PuppeteerSharp
-            var basicPdf = await GenerateBasicPdfAsync(html, options, browserPath).ConfigureAwait(false);
+            var basicPdf = await GenerateBasicPdfAsync(html, options).ConfigureAwait(false);
 
             // Step 2: Enhance with PDFsharp (headers, footers, backgrounds)
             return EnhancePdf(basicPdf, options);
         }
 
-        private async Task<byte[]> GenerateBasicPdfAsync(string html, PdfSettingsDto options, string? browserPath)
+        private async Task<byte[]> GenerateBasicPdfAsync(string html, PdfSettingsDto options)
         {
-            var browser = await GetOrCreateBrowserAsync(browserPath).ConfigureAwait(false);
+            var browser = await GetOrCreateBrowserAsync().ConfigureAwait(false);
 
             await _pageLock.WaitAsync().ConfigureAwait(false);
             IPage page;
@@ -254,7 +272,7 @@ namespace Calcpad.Server.Services
             }
         }
 
-        private async Task<IBrowser> GetOrCreateBrowserAsync(string? browserPath)
+        private async Task<IBrowser> GetOrCreateBrowserAsync()
         {
             if (_browser is { IsClosed: false })
                 return _browser;
@@ -272,7 +290,7 @@ namespace Calcpad.Server.Services
                     _browser = null;
                 }
 
-                var executablePath = await ResolveBrowserPathAsync(browserPath).ConfigureAwait(false);
+                var executablePath = await ResolveBrowserPathAsync().ConfigureAwait(false);
                 FileLogger.LogInfo("Launching browser", executablePath);
 
                 try
@@ -286,8 +304,20 @@ namespace Calcpad.Server.Services
                 }
                 catch (Exception ex)
                 {
-                    FileLogger.LogWarning("Browser launch failed, falling back to ChromeHeadlessShell download", ex.Message);
-                    var fallbackPath = await DownloadChromiumAsync().ConfigureAwait(false);
+                    FileLogger.LogWarning("Browser launch failed", ex.Message);
+
+                    // Only fall back to a ChromeHeadlessShell that is already on disk, or
+                    // download one when the host has pre-approved it. An unattended download
+                    // here is what the desktop/VS Code clients now prompt for instead.
+                    var fallbackPath = FindDownloadedChromium();
+                    if (fallbackPath == null && IsDownloadAllowed())
+                        fallbackPath = await DownloadChromiumAsync().ConfigureAwait(false);
+
+                    if (fallbackPath == null || string.Equals(fallbackPath, executablePath, StringComparison.OrdinalIgnoreCase))
+                        throw new BrowserUnavailableException(
+                            $"Failed to launch the browser at '{executablePath}'. Install a Chromium-family browser or download the bundled Chromium.", ex);
+
+                    FileLogger.LogInfo("Falling back to downloaded ChromeHeadlessShell", fallbackPath);
                     _browser = await Puppeteer.LaunchAsync(new LaunchOptions
                     {
                         Headless = true,
@@ -306,19 +336,33 @@ namespace Calcpad.Server.Services
 
         /// <summary>
         /// Resolves a Chromium-based browser executable. Checks (in order):
-        /// 1. Explicitly configured path (parameter, appsettings, env var)
+        /// 1. Host-configured path (<c>BrowserPath</c> in appsettings, or the
+        ///    <c>BROWSER_PATH</c> environment variable). Never request-supplied — an
+        ///    executable path off the wire is an arbitrary-process-launch primitive.
         /// 2. Well-known system browser locations (Edge, Chrome)
-        /// 3. BrowserFetcher download of ChromeHeadlessShell
+        /// 3. A ChromeHeadlessShell already downloaded by <see cref="InstallBrowserAsync"/>
+        /// 4. A fresh download, but only when <c>AllowChromiumDownload</c> is set
         /// </summary>
-        private async Task<string> ResolveBrowserPathAsync(string? browserPath)
+        /// <exception cref="BrowserUnavailableException">
+        /// Nothing usable was found and downloading was not pre-approved. Clients turn this into
+        /// a prompt offering the download rather than performing one silently.
+        /// </exception>
+        private async Task<string> ResolveBrowserPathAsync()
         {
-            // 1. Try configured/detected browser path
-            var path = NullIfEmpty(browserPath)
-                ?? NullIfEmpty(_config["BrowserPath"])
+            // 1. Try the host-configured browser path
+            var path = NullIfEmpty(_config["BrowserPath"])
                 ?? Environment.GetEnvironmentVariable("BROWSER_PATH");
 
             if (!string.IsNullOrEmpty(path))
-                return path;
+            {
+                if (File.Exists(path))
+                    return path;
+
+                // A stale BrowserPath (a Linux path in a config used on Windows, an
+                // uninstalled browser) shouldn't strand the user — auto-detection below
+                // usually finds a working browser.
+                FileLogger.LogWarning("Configured browser path does not exist; falling back to auto-detection", path);
+            }
 
             // 2. Try well-known system browser locations
             var systemBrowser = FindSystemBrowser();
@@ -328,8 +372,117 @@ namespace Calcpad.Server.Services
                 return systemBrowser;
             }
 
-            // 3. Fallback: download ChromeHeadlessShell
-            return await DownloadChromiumAsync().ConfigureAwait(false);
+            // 3. A ChromeHeadlessShell downloaded earlier — the user already consented once
+            var downloaded = FindDownloadedChromium();
+            if (downloaded != null)
+            {
+                FileLogger.LogInfo("Using downloaded ChromeHeadlessShell", downloaded);
+                return downloaded;
+            }
+
+            // 4. Only download unattended when the host opted in
+            if (IsDownloadAllowed())
+                return await DownloadChromiumAsync().ConfigureAwait(false);
+
+            FileLogger.LogWarning("WARNING: no Chromium-family browser found for PDF export", null);
+            throw new BrowserUnavailableException(
+                "No Chromium-family browser was found. Install Chrome, Edge or Chromium, set BrowserPath, or download the bundled Chromium.");
+        }
+
+        /// <summary>Current browser resolution, without launching or downloading anything.</summary>
+        public BrowserStatus GetBrowserStatus()
+        {
+            var configured = NullIfEmpty(_config["BrowserPath"])
+                ?? Environment.GetEnvironmentVariable("BROWSER_PATH");
+            if (!string.IsNullOrEmpty(configured) && File.Exists(configured))
+                return new BrowserStatus(true, "configured", configured, IsDownloadAllowed(), ChromiumDownloadSizeMb);
+
+            var systemBrowser = FindSystemBrowser();
+            if (systemBrowser != null)
+                return new BrowserStatus(true, "system", systemBrowser, IsDownloadAllowed(), ChromiumDownloadSizeMb);
+
+            var downloaded = FindDownloadedChromium();
+            if (downloaded != null)
+                return new BrowserStatus(true, "downloaded", downloaded, IsDownloadAllowed(), ChromiumDownloadSizeMb);
+
+            return new BrowserStatus(false, "none", null, IsDownloadAllowed(), ChromiumDownloadSizeMb);
+        }
+
+        /// <summary>
+        /// Downloads ChromeHeadlessShell on explicit request. This is the only path that
+        /// downloads without the <c>AllowChromiumDownload</c> opt-in, because the caller is
+        /// relaying a user's confirmation. Drops any stale browser so the next render picks
+        /// up the new executable.
+        /// </summary>
+        public async Task<string> InstallBrowserAsync()
+        {
+            await _downloadLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                var existing = FindDownloadedChromium();
+                if (existing != null)
+                    return existing;
+
+                var path = await DownloadChromiumAsync().ConfigureAwait(false);
+
+                await _browserLock.WaitAsync().ConfigureAwait(false);
+                try
+                {
+                    if (_browser != null)
+                    {
+                        try { await _browser.CloseAsync().ConfigureAwait(false); } catch { }
+                        _browser = null;
+                    }
+                }
+                finally
+                {
+                    _browserLock.Release();
+                }
+
+                return path;
+            }
+            finally
+            {
+                _downloadLock.Release();
+            }
+        }
+
+        private bool IsDownloadAllowed()
+        {
+            if (bool.TryParse(Environment.GetEnvironmentVariable("ALLOW_CHROMIUM_DOWNLOAD"), out var fromEnv))
+                return fromEnv;
+            return _config.GetValue("AllowChromiumDownload", false);
+        }
+
+        private static string? FindDownloadedChromium()
+        {
+            if (_cachedChromiumPath != null && File.Exists(_cachedChromiumPath))
+                return _cachedChromiumPath;
+
+            try
+            {
+                var fetcher = new BrowserFetcher(new BrowserFetcherOptions
+                {
+                    Path = Path.Combine(AppContext.BaseDirectory, "chromium"),
+                    Browser = SupportedBrowser.ChromeHeadlessShell
+                });
+
+                foreach (var installed in fetcher.GetInstalledBrowsers())
+                {
+                    var executable = installed.GetExecutablePath();
+                    if (File.Exists(executable))
+                    {
+                        _cachedChromiumPath = executable;
+                        return executable;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogWarning("Could not enumerate downloaded browsers", ex.Message);
+            }
+
+            return null;
         }
 
         private static string? FindSystemBrowser()
@@ -386,13 +539,13 @@ namespace Calcpad.Server.Services
             return null;
         }
 
-        private async Task<string> DownloadChromiumAsync()
+        private static async Task<string> DownloadChromiumAsync()
         {
-            if (_cachedChromiumPath != null && File.Exists(_cachedChromiumPath))
-                return _cachedChromiumPath;
+            var existing = FindDownloadedChromium();
+            if (existing != null)
+                return existing;
 
-            var baseDir = AppContext.BaseDirectory;
-            var downloadDir = Path.Combine(baseDir, "chromium");
+            var downloadDir = Path.Combine(AppContext.BaseDirectory, "chromium");
 
             FileLogger.LogInfo("Downloading ChromeHeadlessShell", downloadDir);
 
@@ -402,14 +555,9 @@ namespace Calcpad.Server.Services
                 Browser = SupportedBrowser.ChromeHeadlessShell
             });
 
-            var installed = fetcher.GetInstalledBrowsers().FirstOrDefault();
-            if (installed == null)
-            {
-                installed = await fetcher.DownloadAsync().ConfigureAwait(false);
-                FileLogger.LogInfo("ChromeHeadlessShell download complete", installed.GetExecutablePath());
-            }
-
+            var installed = await fetcher.DownloadAsync().ConfigureAwait(false);
             _cachedChromiumPath = installed.GetExecutablePath();
+            FileLogger.LogInfo("ChromeHeadlessShell download complete", _cachedChromiumPath);
             return _cachedChromiumPath;
         }
 

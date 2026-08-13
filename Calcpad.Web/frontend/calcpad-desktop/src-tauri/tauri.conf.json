@@ -30,7 +30,10 @@
   "bundle": {
     "active": true,
     "resources": {
-      "binaries/*.json": "./",
+      "binaries/Calcpad.Server.deps.json": "./",
+      "binaries/Calcpad.Server.runtimeconfig.json": "./",
+      "binaries/Calcpad.Server.staticwebassets.endpoints.json": "./",
+      "binaries/appsettings.json": "./",
       "binaries/*.html": "./",
       "binaries/Fonts/**/*": "./Fonts/",
       "binaries/bg/**/*": "./bg/",
@@ -70,13 +73,6 @@
     "longDescription": "CalcpadCE is a Vue-based editor for CalcpadCE calculation files, backed by an embedded ASP.NET Core server.",
     "macOS": {
       "minimumSystemVersion": "11.0"
-    }
-  },
-  "plugins": {
-    "updater": {
-      "active": false,
-      "endpoints": [],
-      "pubkey": ""
     }
   }
 }

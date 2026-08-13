@@ -12,6 +12,14 @@ Default port is `9420` (override with `CALCPAD_PORT` when running the backend).
 
 ---
 
+## Authentication
+
+When the backend is launched with `CALCPAD_API_TOKEN` set, every `/api/**` request must carry that value in an `X-Calcpad-Token` header, or it gets `401 Unauthorized`. `CalcpadApiClient` sends it on every request once `setAuthToken` has been called, and exposes `authHeaders()` for the few call sites that use `fetch` directly. The header is withheld for a non-loopback base URL, so pointing the client at a configured remote server never hands that host the local token.
+
+Hosts obtain the token from whichever process spawned the server: the Tauri shell's `server_token` command, or `BaseServerManager.getAuthToken()` in the VS Code extension. A backend launched without the variable stays unauthenticated and `authHeaders()` is simply empty.
+
+---
+
 ## Syntax Highlighter Endpoints
 
 ### POST /highlight
@@ -360,9 +368,22 @@ Generate a PDF from HTML content using Playwright + PDFsharp. The standard flow 
 
 See [../backend/API_SCHEMA.md](../backend/API_SCHEMA.md) for the full `PdfGenerateRequest` / `PdfOptions` shape.
 
+Answers **503** with `code: "BROWSER_NOT_FOUND"` when no Chromium-family browser is usable.
+The server never downloads one behind the user's back, so the host prompts and then calls
+`/pdf/browser/install`. `calcpad-frontend` ships the client half of this
+(`pdfResponseError`, `isBrowserNotFound`, `fetchPdfBrowserStatus`, `installPdfBrowser`).
+
 ### GET /pdf/health
 
 Health check for the PDF generation service.
+
+### GET /pdf/browser
+
+Which browser PDF export would use: `{ available, source, path, downloadAllowed, downloadSizeMb }`.
+
+### POST /pdf/browser/install
+
+Downloads the bundled headless Chromium. Call only after the user has agreed.
 
 ---
 

@@ -30,7 +30,6 @@ public class HighlightRequest
 public class PdfGenerateRequest
 {
     public string Html { get; set; }
-    public string? BrowserPath { get; set; }
     public PdfOptions? Options { get; set; }
 }
 

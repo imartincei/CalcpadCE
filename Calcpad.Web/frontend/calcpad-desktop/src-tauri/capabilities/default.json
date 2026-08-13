@@ -17,17 +17,15 @@
     "core:event:default",
     "core:path:default",
     "core:app:default",
-    "shell:allow-open",
     {
       "identifier": "opener:allow-open-path",
       "allow": [
         { "path": "$APPDATA/**" },
         { "path": "$APPCONFIG/**" },
-        { "path": "$APPLOG/**" },
-        { "path": "$RESOURCE/**" },
-        { "path": "$HOME/**" }
+        { "path": "$APPLOG/**" }
       ]
     },
+    "opener:allow-reveal-item-in-dir",
     {
       "identifier": "opener:allow-open-url",
       "allow": [{ "url": "https://imartincei.github.io/CalcpadCE/*" }]
@@ -54,7 +52,7 @@
     "os:allow-exe-extension",
     "log:default",
     "store:default",
-    "updater:default",
+    "fs:deny-default",
     {
       "identifier": "fs:allow-read-text-file",
       "allow": [
@@ -62,7 +60,7 @@
         { "path": "$APPCONFIG/**" },
         { "path": "$APPLOG/**" },
         { "path": "$HOME/**" },
-        { "path": "**" }
+        { "path": "/etc/*-release" }
       ]
     },
     {
@@ -80,8 +78,7 @@
         { "path": "$APPDATA/**" },
         { "path": "$APPCONFIG/**" },
         { "path": "$APPLOG/**" },
-        { "path": "$HOME/**" },
-        { "path": "**" }
+        { "path": "$HOME/**" }
       ]
     },
     {
@@ -99,8 +96,7 @@
         { "path": "$APPDATA/**" },
         { "path": "$APPCONFIG/**" },
         { "path": "$APPLOG/**" },
-        { "path": "$HOME/**" },
-        { "path": "**" }
+        { "path": "$HOME/**" }
       ]
     },
     {

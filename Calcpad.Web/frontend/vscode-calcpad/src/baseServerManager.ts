@@ -1,14 +1,31 @@
 import * as net from 'net';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as crypto from 'crypto';
 import { spawn, execSync, ChildProcess } from 'child_process';
 import type { ILogger } from 'calcpad-frontend';
-import { decodeExitCode, buildCrashRecord } from 'calcpad-frontend';
+import { decodeExitCode, buildCrashRecord, API_TOKEN_HEADER } from 'calcpad-frontend';
 
 interface LockFileContents {
     pid: number;
     port: number;
     startedAt: number;
+    /** Per-launch token the server requires on `/api` routes. Absent in a pre-token lock. */
+    token?: string;
+}
+
+/** Lock files carry the API token, so nobody but this user may read one. */
+const LOCK_FILE_MODE = 0o600;
+
+/**
+ * True for a plausible OS process id.
+ *
+ * A poisoned lock file reaching `process.kill` unchecked is the problem: on POSIX
+ * a negative pid signals a whole process group, and `kill(-1, ...)` signals every
+ * process the user owns.
+ */
+function isValidPid(pid: unknown): pid is number {
+    return typeof pid === 'number' && Number.isInteger(pid) && pid > 0 && pid <= 0xffffffff;
 }
 
 /**
@@ -27,6 +44,7 @@ export class BaseServerManager {
 
     private serverProcess: ChildProcess | null = null;
     private port: number = 0;
+    private authToken: string | null = null;
     private logger: ILogger;
     private mainLogger: ILogger;
     private basePath: string;
@@ -99,18 +117,9 @@ export class BaseServerManager {
      * Returns the lock contents if reusable, or null if the lock is missing/stale.
      */
     private async tryReuseExistingServer(): Promise<LockFileContents | null> {
-        let lock: LockFileContents;
-        try {
-            if (!fs.existsSync(this.lockFilePath)) {
-                return null;
-            }
-            lock = JSON.parse(fs.readFileSync(this.lockFilePath, 'utf-8'));
-            if (typeof lock.pid !== 'number' || typeof lock.port !== 'number') {
-                this.removeLockFile();
-                return null;
-            }
-        } catch {
-            this.removeLockFile();
+        const lock = this.readLockFile();
+        if (!lock) {
+            if (fs.existsSync(this.lockFilePath)) this.removeLockFile();
             return null;
         }
 
@@ -124,6 +133,7 @@ export class BaseServerManager {
 
         try {
             const response = await fetch(`http://localhost:${lock.port}/api/calcpad/snippets`, {
+                headers: lock.token ? { [API_TOKEN_HEADER]: lock.token } : {},
                 signal: AbortSignal.timeout(2000)
             });
             if (!response.ok) {
@@ -152,6 +162,7 @@ export class BaseServerManager {
         const existing = await this.tryReuseExistingServer();
         if (existing) {
             this.port = existing.port;
+            this.authToken = existing.token ?? null;
             this._owned = false;
             this._isRunning = true;
             this.log(`Reusing existing server (PID ${existing.pid}) at port ${existing.port}`);
@@ -164,6 +175,12 @@ export class BaseServerManager {
         }
 
         const candidatePort = await this.findFreePort();
+        // Per-launch bearer for the server's /api routes. Loopback binding keeps
+        // remote machines out but not other local processes, and `#include`
+        // resolution reads any path it is handed — so without this any program on
+        // the box has arbitrary file read as the user. Published only in the
+        // 0600 lock file, which is how peer windows adopt an existing server.
+        const token = crypto.randomBytes(32).toString('hex');
 
         // Race guard: atomically claim the lock file before spawning. If another
         // window claimed it in the window between our reuse-check and this line,
@@ -179,6 +196,7 @@ export class BaseServerManager {
             const adopted = await this.waitForPeerServer(20000);
             if (adopted) {
                 this.port = adopted.port;
+                this.authToken = adopted.token ?? null;
                 this._owned = false;
                 this._isRunning = true;
                 this.log(`Adopted peer-spawned server (PID ${adopted.pid}) at port ${adopted.port}`);
@@ -190,6 +208,7 @@ export class BaseServerManager {
         }
 
         this.port = candidatePort;
+        this.authToken = token;
         this.log(`Starting server on port ${this.port}...`);
 
         const serverUrl = `http://localhost:${this.port}`;
@@ -258,6 +277,14 @@ export class BaseServerManager {
             // closing the spawning window would kill the server even if
             // other VS Code windows are still using it.
             CALCPAD_DETACHED: '1',
+            // Env, not argv: argv is world-readable through /proc/{pid}/cmdline on
+            // Linux and through WMI on Windows, which would hand the token to
+            // exactly the local processes it exists to keep out.
+            CALCPAD_API_TOKEN: token,
+            // The child inherits our whole environment, so a developer with
+            // ASPNETCORE_ENVIRONMENT=Development exported would otherwise get
+            // Swagger and the debug-crash endpoint on a shipped extension.
+            ASPNETCORE_ENVIRONMENT: 'Production',
         };
 
         // When the user installs the .NET runtime via the extension's local
@@ -302,7 +329,8 @@ export class BaseServerManager {
             this.writeLockFile({
                 pid: this.serverProcess.pid,
                 port: this.port,
-                startedAt: Date.now()
+                startedAt: Date.now(),
+                token
             });
         }
 
@@ -443,6 +471,11 @@ export class BaseServerManager {
                     this.killByPid(lock.pid);
                 }
                 this.removeLockFile();
+            } else if (fs.existsSync(this.lockFilePath)) {
+                // Present but unreadable or out of range — nothing safe to kill,
+                // and leaving it would make every peer wait on a phantom server.
+                this.log('Discarding unusable lock file');
+                this.removeLockFile();
             }
             this._isRunning = false;
             return;
@@ -526,6 +559,15 @@ export class BaseServerManager {
         return `http://localhost:${this.port}`;
     }
 
+    /**
+     * Token this server requires on `/api` routes — ours if we spawned it, the
+     * adopted one from the lock file if a peer window did. Null before `start()`,
+     * and for a server that predates the token (an older extension's orphan).
+     */
+    public getAuthToken(): string | null {
+        return this.authToken;
+    }
+
     public get isRunning(): boolean {
         return this._isRunning;
     }
@@ -564,7 +606,7 @@ export class BaseServerManager {
 
     private writeLockFile(lock: LockFileContents): void {
         try {
-            fs.writeFileSync(this.lockFilePath, JSON.stringify(lock), 'utf-8');
+            fs.writeFileSync(this.lockFilePath, JSON.stringify(lock), { encoding: 'utf-8', mode: LOCK_FILE_MODE });
         } catch (err) {
             this.log(`Warning: Could not write lock file: ${err instanceof Error ? err.message : String(err)}`);
         }
@@ -576,7 +618,7 @@ export class BaseServerManager {
      */
     private tryClaimLockExclusive(lock: LockFileContents): boolean {
         try {
-            fs.writeFileSync(this.lockFilePath, JSON.stringify(lock), { encoding: 'utf-8', flag: 'wx' });
+            fs.writeFileSync(this.lockFilePath, JSON.stringify(lock), { encoding: 'utf-8', flag: 'wx', mode: LOCK_FILE_MODE });
             return true;
         } catch (err: unknown) {
             if (err && typeof err === 'object' && 'code' in err && (err as { code: string }).code === 'EEXIST') {
@@ -614,7 +656,11 @@ export class BaseServerManager {
                 return null;
             }
             const lock = JSON.parse(fs.readFileSync(this.lockFilePath, 'utf-8'));
-            if (typeof lock.pid !== 'number' || typeof lock.port !== 'number') {
+            if (!isValidPid(lock.pid) || typeof lock.port !== 'number'
+                || !Number.isInteger(lock.port) || lock.port < 1 || lock.port > 65535) {
+                return null;
+            }
+            if (lock.token !== undefined && typeof lock.token !== 'string') {
                 return null;
             }
             return lock;
@@ -675,7 +721,9 @@ export class BaseServerManager {
             }
 
             try {
-                const response = await fetch(healthUrl);
+                const response = await fetch(healthUrl, {
+                    headers: this.authToken ? { [API_TOKEN_HEADER]: this.authToken } : {},
+                });
                 if (response.ok) {
                     return;
                 }

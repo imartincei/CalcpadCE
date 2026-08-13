@@ -550,7 +550,7 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
-import { extractBodyHtml, isCompiledPath } from 'calcpad-frontend'
+import { extractBodyHtml, isCompiledPath, previewDiagnosticsScript } from 'calcpad-frontend'
 
 export interface ProblemItem {
   severity: number
@@ -2239,6 +2239,10 @@ function injectPreviewConsole(html: string, groupId: string): string {
     '    var r = e.reason; var d = r && (r.stack || r.message) || String(r);',
     "    post('error', ['[Unhandled Rejection] ' + d]);",
     '  });',
+    // CSP violations and resource load failures, which the interception above cannot
+    // see: a refused fetch never throws, and a resource error does not bubble to the
+    // window listener. Shared with vscode-calcpad so both report alike.
+    previewDiagnosticsScript('function(level, message) { post(level, [message]); }'),
     "  console.log('CalcpadCE preview console interception initialized');",
     '})();',
   ].join('\n')

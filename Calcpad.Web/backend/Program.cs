@@ -264,6 +264,12 @@ try
                 // wildcard/random binding to a concrete one by this point.
                 var addresses = app.Urls.ToList();
                 var bound = addresses.FirstOrDefault() ?? serverUrl;
+                // The default port-file location on Linux is the 1777 temp dir, where
+                // any local user can read it. Tighten the mode while the file is still
+                // empty, so the URL is never briefly world-readable.
+                using (File.Create(portFile)) { }
+                if (!OperatingSystem.IsWindows())
+                    File.SetUnixFileMode(portFile, UnixFileMode.UserRead | UnixFileMode.UserWrite);
                 File.WriteAllText(portFile, bound);
                 FileLogger.LogInfo("Wrote port file", $"{portFile} -> {bound}");
             }

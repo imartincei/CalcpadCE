@@ -21,6 +21,19 @@ import type {
 } from '../types/api';
 import type { SnippetsResponse } from '../types/snippets';
 
+/** Request header carrying the server's per-launch token. Must match the backend's constant. */
+export const API_TOKEN_HEADER = 'X-Calcpad-Token';
+
+/** Mirrors the backend's own loopback test (`Program.IsLoopbackHost`). */
+function isLoopbackUrl(url: string): boolean {
+    try {
+        const host = new URL(url).hostname.replace(/^\[|\]$/g, '');
+        return host === 'localhost' || host === '::1' || /^127\./.test(host);
+    } catch {
+        return false;
+    }
+}
+
 /**
  * Unified fetch-based API client for the CalcPad server.
  * Replaces scattered axios calls across the extension codebase.
@@ -29,6 +42,7 @@ import type { SnippetsResponse } from '../types/snippets';
 export class CalcpadApiClient {
     private baseUrl: string;
     private logger?: ILogger;
+    private authToken: string | null = null;
 
     // Per-key "latest wins" bookkeeping. A caller passes `key` (e.g. an editor
     // group id) to mean "only the newest request for this key still matters"
@@ -49,6 +63,33 @@ export class CalcpadApiClient {
 
     public getBaseUrl(): string {
         return this.baseUrl;
+    }
+
+    /**
+     * Sets the per-launch token the local server requires on every `/api` route.
+     * Pass `null` for a server that runs without one (a remote URL, or a
+     * development launch that never had `CALCPAD_API_TOKEN` set).
+     */
+    public setAuthToken(token: string | null): void {
+        this.authToken = token || null;
+    }
+
+    /**
+     * Auth headers for a request this client doesn't make itself. Spread into
+     * the `headers` of any direct `fetch` against the same server — a bare
+     * request now comes back 401.
+     *
+     * Withheld for a non-loopback base URL. The token belongs to a server this
+     * machine launched; `setBaseUrl` can be pointed at a configured remote one
+     * (a preset carrying `server.url`), and that host has no business seeing it.
+     */
+    public authHeaders(): Record<string, string> {
+        if (!this.authToken || !isLoopbackUrl(this.baseUrl)) return {};
+        return { [API_TOKEN_HEADER]: this.authToken };
+    }
+
+    private jsonHeaders(): Record<string, string> {
+        return { 'Content-Type': 'application/json', ...this.authHeaders() };
     }
 
     /**
@@ -144,7 +185,7 @@ export class CalcpadApiClient {
             try {
                 const response = await fetch(`${this.baseUrl}/api/calcpad/portable/bundle`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: this.jsonHeaders(),
                     body: JSON.stringify({ content, sourceFilePath }),
                     signal: AbortSignal.timeout(30000),
                 });
@@ -179,7 +220,7 @@ export class CalcpadApiClient {
             try {
                 const response = await fetch(`${this.baseUrl}/api/calcpad/portable/package`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: this.jsonHeaders(),
                     body: JSON.stringify({ content, sourceFilePath }),
                     signal: AbortSignal.timeout(60000),
                 });
@@ -245,7 +286,7 @@ export class CalcpadApiClient {
             try {
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: this.jsonHeaders(),
                     body: JSON.stringify({
                         content, settings, outputFormat, forPrint, sourceFilePath, theme,
                         enableUi: ui?.enableUi ?? false,
@@ -288,7 +329,7 @@ export class CalcpadApiClient {
             try {
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: this.jsonHeaders(),
                     body: JSON.stringify({
                         content,
                         settings,
@@ -323,7 +364,7 @@ export class CalcpadApiClient {
             try {
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: this.jsonHeaders(),
                     body: JSON.stringify({ content, settings, sourceFilePath, theme }),
                     signal: combineSignals(AbortSignal.timeout(60000), signal),
                 });
@@ -353,6 +394,7 @@ export class CalcpadApiClient {
     public async checkHealth(): Promise<boolean> {
         try {
             const response = await fetch(this.baseUrl + '/api/calcpad/snippets', {
+                headers: this.authHeaders(),
                 signal: AbortSignal.timeout(5000),
             });
             return response.ok;
@@ -368,7 +410,7 @@ export class CalcpadApiClient {
                 this.logger?.appendLine(`[${tag}] Sending request to server...`);
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: this.jsonHeaders(),
                     body: JSON.stringify(body),
                     signal: combineSignals(AbortSignal.timeout(30000), signal),
                 });
@@ -390,6 +432,7 @@ export class CalcpadApiClient {
         try {
             this.logger?.appendLine(`[${tag}] Sending request to server...`);
             const response = await fetch(url, {
+                headers: this.authHeaders(),
                 signal: AbortSignal.timeout(30000),
             });
             if (!response.ok) {

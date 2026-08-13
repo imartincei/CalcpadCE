@@ -12,7 +12,7 @@ import {
     exists,
 } from '@tauri-apps/plugin-fs';
 import { open as dialogOpen, save as dialogSave, message as dialogMessage, ask as dialogAsk } from '@tauri-apps/plugin-dialog';
-import { openPath } from '@tauri-apps/plugin-opener';
+import { openPath, revealItemInDir } from '@tauri-apps/plugin-opener';
 import { Store } from '@tauri-apps/plugin-store';
 import { platform } from '@tauri-apps/plugin-os';
 import { BaseMessageBridge, type ExportRequest } from 'calcpad-frontend/services/message-bridge/base';
@@ -39,6 +39,10 @@ import {
     pathExtension,
     pathRelative,
     pathResolve,
+    fetchPdfBrowserStatus,
+    installPdfBrowser,
+    isBrowserNotFound,
+    pdfResponseError,
     type PickedImage,
 } from 'calcpad-frontend';
 import { setAppTheme, coerceAppTheme } from '../editor/app-theme';
@@ -308,14 +312,19 @@ export class TauriMessageBridge extends BaseMessageBridge {
         return filePath;
     }
 
+    // Reveals rather than opens: a saved file lands wherever the user pointed the
+    // dialog, so handing it to ShellExecute would mean an open-path grant over the
+    // whole home directory — the other half of a write-then-execute chain, since
+    // the webview can also write there. Revealing hands the path to the file
+    // manager, which selects it and never runs it.
     protected async onPdfSaved(filePath: string): Promise<void> {
-        const open = await dialogAsk(`PDF saved to ${filePath}`, {
+        const reveal = await dialogAsk(`PDF saved to ${filePath}`, {
             title: 'PDF export complete',
             kind: 'info',
-            okLabel: 'Open PDF',
+            okLabel: 'Show in Folder',
             cancelLabel: 'Close',
         });
-        if (open) await this.openPathSafe(filePath);
+        if (reveal) await revealItemInDir(filePath);
     }
 
     protected async buildFileContext(_content: string): Promise<{ sourceFilePath?: string }> {
@@ -340,11 +349,11 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     protected async runPdfPreflight(): Promise<boolean> {
-        if (await this.browserMissing()) {
-            await this.warnBrowserMissing();
-            return false;
-        }
-        return true;
+        const status = await fetchPdfBrowserStatus(this.apiClient.getBaseUrl(), this.apiClient.authHeaders());
+        // A null status means the endpoint is unreachable or predates this contract —
+        // let the export run and report whatever it actually hits.
+        if (!status || status.available) return true;
+        return await this.offerBrowserDownload(status.downloadSizeMb);
     }
 
     protected async generatePdfBytes(
@@ -362,27 +371,30 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
         const pdfResp = await fetch(`${this.apiClient.getBaseUrl()}/api/calcpad/pdf`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...this.apiClient.authHeaders() },
             body: JSON.stringify({ html, options: this.getEffectivePdfOptions(content) }),
             signal: AbortSignal.timeout(60000),
         });
-        if (!pdfResp.ok) throw new Error(`PDF endpoint returned ${pdfResp.status}`);
+        if (!pdfResp.ok) throw await pdfResponseError(pdfResp);
         return await pdfResp.arrayBuffer();
     }
 
-    protected async onPdfError(err: unknown): Promise<void> {
+    protected async onPdfError(err: unknown): Promise<boolean> {
         const msg = err instanceof Error ? err.message : String(err);
         this.postToVue({ type: 'pdfError', message: `PDF export failed: ${msg}` });
         this.handleGetServerLog();
-        if (await this.browserMissing()) {
-            await this.warnBrowserMissing();
-            return;
-        }
+
+        // The export is retried only if the user accepts the download, so the retry
+        // starts from a state where a browser actually exists.
+        if (isBrowserNotFound(err))
+            return await this.offerBrowserDownload(err.downloadSizeMb);
+
         try {
             await dialogMessage(msg, { title: 'Failed to generate PDF', kind: 'error', okLabel: 'OK' });
         } catch {
             /* output panel already carries the error */
         }
+        return false;
     }
 
     protected async onExportError(message: string): Promise<void> {
@@ -501,6 +513,20 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     // ---- File operations (exposed for menu actions) ----
 
+    /**
+     * Widens the fs read scope to the picked document's folder. The dialog grants
+     * only the file itself, but `inlineImageSources` reads image paths resolved
+     * against its directory. Rust rejects any path the scope doesn't already cover,
+     * so a failure here just leaves images uninlined.
+     */
+    private async allowDocumentDir(filePath: string): Promise<void> {
+        try {
+            await invoke('allow_document_dir', { path: filePath });
+        } catch {
+            /* stays scoped to the picked file */
+        }
+    }
+
     async openFile(): Promise<{ path: string; content: string } | null> {
         const selected = await dialogOpen({
             title: 'Open File',
@@ -514,6 +540,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
         });
         if (!selected || Array.isArray(selected)) return null;
         this.rememberDialogDir(selected);
+        await this.allowDocumentDir(selected);
         const content = await this.readFile(selected);
         return { path: selected, content };
     }
@@ -587,6 +614,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
         });
         if (!filePath) return null;
         this.rememberDialogDir(filePath);
+        await this.allowDocumentDir(filePath);
         await this.saveFile(filePath, content);
         return filePath;
     }
@@ -631,6 +659,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
             title: 'Open Folder',
             directory: true,
             multiple: false,
+            recursive: true,
             defaultPath: this.getDialogDefaultPath(),
         });
         if (!folder || Array.isArray(folder)) return;
@@ -846,9 +875,10 @@ export class TauriMessageBridge extends BaseMessageBridge {
         }
     }
 
+    // No fall back to the resource dir: it sits outside the opener scope (and is
+    // read-only inside an AppImage anyway), so an open there would only fail.
     private getServerLogDir(): string | null {
-        if (this._serverLogDir) return this._serverLogDir;
-        return this._serverDir ? `${this._serverDir}/logs` : null;
+        return this._serverLogDir || null;
     }
 
     private async handleOpenLogsFolder(): Promise<void> {
@@ -867,32 +897,62 @@ export class TauriMessageBridge extends BaseMessageBridge {
         }
     }
 
-    private async browserMissing(): Promise<boolean> {
-        const path = await this.getServerLogPath();
-        if (!path) return false;
-        try {
-            const raw = await readTextFile(path);
-            return /WARNING: no Chromium-family browser/i.test(raw)
-                || /Could not find browser revision|Failed to launch the browser/i.test(raw);
-        } catch {
-            return false;
-        }
-    }
-
-    private async warnBrowserMissing(): Promise<void> {
+    /**
+     * Asks whether to download the bundled headless Chromium, and does it if the user
+     * agrees. Declining leaves the install advice for their platform on screen, so
+     * using their own browser stays the first-class option.
+     *
+     * Returns true when a browser is now available and the export should proceed.
+     */
+    private async offerBrowserDownload(downloadSizeMb: number): Promise<boolean> {
         const advice = await this.browserInstallAdvice();
-        const message =
-            'PDF export needs a Chromium-family browser, but none was found on PATH.\n\n'
+        const size = downloadSizeMb > 0 ? `about ${downloadSizeMb} MB` : 'a few hundred MB';
+        const question =
+            'PDF export needs a Chromium-family browser, but none was found.\n\n'
+            + `CalcpadCE can download a private headless Chromium (${size}) just for exports, `
+            + 'or you can install a browser yourself:\n\n'
             + advice
-            + '\n\nAfter installing, restart CalcpadCE (Server → Restart App) and try again.';
+            + '\n\nDownload the bundled Chromium now?';
+
+        let accepted = false;
         try {
-            await dialogMessage(message, {
+            accepted = await dialogAsk(question, {
                 title: 'Chromium browser required for PDF export',
                 kind: 'warning',
-                okLabel: 'OK',
+                okLabel: 'Download Chromium',
+                cancelLabel: 'Not now',
             });
         } catch {
-            this.postToVue({ type: 'pdfError', message });
+            this.postToVue({ type: 'pdfError', message: question });
+            return false;
+        }
+
+        if (!accepted) {
+            this.postToVue({
+                type: 'pdfError',
+                message: 'PDF export cancelled — no Chromium-family browser available.\n\n' + advice
+                    + '\n\nAfter installing one, restart CalcpadCE (Server → Restart App) and try again.',
+            });
+            return false;
+        }
+
+        this.postToVue({ type: 'pdfInfo', message: 'Downloading headless Chromium — this can take a few minutes…' });
+        try {
+            const path = await installPdfBrowser(this.apiClient.getBaseUrl(), this.apiClient.authHeaders());
+            this.postToVue({ type: 'pdfInfo', message: `Chromium ready: ${path}` });
+            return true;
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            this.postToVue({ type: 'pdfError', message: `Chromium download failed: ${msg}` });
+            try {
+                await dialogMessage(
+                    `The download failed: ${msg}\n\nInstall a browser instead:\n\n${advice}`,
+                    { title: 'Chromium download failed', kind: 'error', okLabel: 'OK' },
+                );
+            } catch {
+                /* output panel already carries the error */
+            }
+            return false;
         }
     }
 

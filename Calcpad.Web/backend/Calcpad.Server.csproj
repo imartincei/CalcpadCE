@@ -76,4 +76,13 @@
     <None Remove="testing\**" />
   </ItemGroup>
 
+  <!-- Development-only settings stay in the local build output but must never
+       reach a published bundle: vscode-calcpad and calcpad-desktop mirror the
+       publish directory verbatim into their shipped payloads. -->
+  <ItemGroup>
+    <Content Update="appsettings.Development.json">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

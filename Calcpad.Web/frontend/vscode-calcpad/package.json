@@ -14,6 +14,12 @@
   ],
   "activationEvents": [],
   "main": "./dist/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "Opening a worksheet spawns a local calculation server and renders author-supplied HTML, and #include resolves paths the document names. Neither is safe against a repository you have not vetted."
+    }
+  },
   "contributes": {
     "languages": [
       {

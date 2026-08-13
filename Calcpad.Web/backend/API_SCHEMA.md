@@ -12,6 +12,20 @@ Default port is `9420` (override with `CALCPAD_PORT`).
 
 ---
 
+## Authentication
+
+When the server is launched with `CALCPAD_API_TOKEN` set, every `/api/**` request must carry that value in an `X-Calcpad-Token` header. Anything else gets `401 Unauthorized`. CORS preflights (`OPTIONS`) are exempt — a preflight carries no custom headers, so checking it would fail the real request before it was sent.
+
+```
+X-Calcpad-Token: <per-launch token>
+```
+
+Both shipped hosts set the variable when they spawn the server and never put it on the command line — argv is readable by any local process through `/proc/{pid}/cmdline` and WMI. The Tauri shell generates it in Rust and hands it to the webview via the `server_token` command; the VS Code extension generates it in the extension host and publishes it in the mode-`0600` lock file so other windows sharing the server can adopt it.
+
+Launches that do not set the variable (a `dotnet run` during development, the sample client, the test harness) stay unauthenticated, and the server logs a warning saying so. Loopback binding, the CORS origin policy, and the `Host`-header check are then the only controls.
+
+---
+
 ## Table of Contents
 
 - [POST /convert](#post-convert)
@@ -20,6 +34,8 @@ Default port is `9420` (override with `CALCPAD_PORT`).
 - [GET /debug-crash](#get-debug-crash)
 - [POST /pdf](#post-pdf)
 - [GET /pdf/health](#get-pdfhealth)
+- [GET /pdf/browser](#get-pdfbrowser)
+- [POST /pdf/browser/install](#post-pdfbrowserinstall)
 - [POST /docx](#post-docx)
 - [POST /highlight](#post-highlight)
 - [POST /highlight-line](#post-highlight-line)
@@ -122,9 +138,16 @@ Generate a PDF from HTML content using Playwright browser automation and PDFshar
 ```typescript
 interface PdfGenerateRequest {
   html: string;              // HTML content to convert to PDF (required)
-  browserPath?: string;      // Custom browser executable path
   options?: PdfOptions;      // PDF generation settings
 }
+```
+
+The browser executable is never taken from the request — an executable path off the wire
+is an arbitrary-process-launch primitive. It comes from `BrowserPath` in `appsettings.json`
+or the `BROWSER_PATH` environment variable, else auto-detection. See
+[GET /pdf/browser](#get-pdfbrowser).
+
+```typescript
 
 interface PdfOptions {
   // Page settings
@@ -151,6 +174,21 @@ is still accepted.
 
 **Response:** PDF binary (`application/pdf`, filename: `document.pdf`)
 
+**503 — no usable browser:** rendering needs a Chromium-family browser and none was found.
+The server does **not** download one on its own unless `AllowChromiumDownload` is set
+(`appsettings.json`, or the `ALLOW_CHROMIUM_DOWNLOAD` environment variable). Clients are
+expected to ask the user and then call `POST /pdf/browser/install`.
+
+```json
+{
+  "error": "No usable browser",
+  "code": "BROWSER_NOT_FOUND",
+  "message": "No Chromium-family browser was found. …",
+  "canDownload": true,
+  "downloadSizeMb": 180
+}
+```
+
 ---
 
 ## GET /pdf/health
@@ -164,6 +202,41 @@ Health check for the PDF generation service.
   "service": "calcpad-pdf",
   "version": "2.0.0"
 }
+```
+
+---
+
+## GET /pdf/browser
+
+Which browser PDF export would use. Resolves without launching or downloading anything,
+so a client can warn before an export rather than after one fails.
+
+**Response:**
+```json
+{
+  "available": true,
+  "source": "system",
+  "path": "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
+  "downloadAllowed": false,
+  "downloadSizeMb": 180
+}
+```
+
+`source` is `configured` (`BrowserPath`/`BROWSER_PATH`), `system` (auto-detected Chrome/Edge/Chromium),
+`downloaded` (a previously installed headless Chromium), or `none`.
+
+---
+
+## POST /pdf/browser/install
+
+Downloads the bundled headless Chromium (ChromeHeadlessShell) into `chromium/` beside the
+server binary and returns immediately if one is already there. Call this **only after the
+user has agreed** — it is a multi-hundred-megabyte download, and it is the one path that
+downloads regardless of `AllowChromiumDownload` because the caller is relaying consent.
+
+**Response:**
+```json
+{ "installed": true, "path": "…/chromium/chrome-headless-shell-win64/chrome-headless-shell.exe" }
 ```
 
 ---

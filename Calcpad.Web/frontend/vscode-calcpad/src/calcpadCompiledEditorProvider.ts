@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { writeUiOverrides } from 'calcpad-frontend';
 import type { CalcpadApiClient, UiOverrideStore } from 'calcpad-frontend';
+import { handleFrameStateMessage } from './previewFrame';
 
 /**
  * A `.cpdz` opened in the workbench. The decoded source is held in memory — it is
@@ -116,9 +117,15 @@ export class CalcpadCompiledEditorProvider
             CalcpadCompiledEditorProvider.reportViewType,
             `CalcpadCE Report - ${path.basename(uri.fsPath)}`,
             vscode.ViewColumn.Beside,
-            { enableScripts: true, enableFindWidget: true, retainContextWhenHidden: true },
+            // The rendered worksheet is sandboxed a frame deeper (see previewFrame.ts),
+            // which the workbench's find widget cannot reach and which needs no local
+            // resources — a compiled worksheet carries its images inline.
+            { enableScripts: true, retainContextWhenHidden: true, localResourceRoots: [] },
         );
         this._reports.set(key, panel);
+        // The report carries no controls, so the frame's own state — where it was
+        // scrolled to, links clicked in it — is all it has to send.
+        panel.webview.onDidReceiveMessage(message => { handleFrameStateMessage(panel, message); });
         panel.onDidDispose(() => {
             if (this._reports.get(key) === panel) this._reports.delete(key);
         });
@@ -141,10 +148,13 @@ export class CalcpadCompiledEditorProvider
         document: CompiledWorksheetDocument,
         panel: vscode.WebviewPanel,
     ): Promise<void> {
-        panel.webview.options = { enableScripts: true };
+        panel.webview.options = { enableScripts: true, localResourceRoots: [] };
         this._track(document, panel);
 
         panel.webview.onDidReceiveMessage(message => {
+            // Scroll offset, #UI position and outbound links belong to the frame the
+            // worksheet renders in, and are the same for every panel that hosts one.
+            if (handleFrameStateMessage(panel, message)) return;
             // The form posts every edited control; anything else the preview scripts
             // send (line links, console relay) has no meaning without a text editor.
             if (message?.type !== 'uiValueChange') return;

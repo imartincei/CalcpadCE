@@ -208,7 +208,7 @@ export class CalcpadSettingsManager {
         if (name.toLowerCase() === DEFAULT_PRESET_NAME) {
             return { ok: false, message: 'The "default" preset is protected and cannot be overridden.' };
         }
-        if (/[\\/:*?"<>|\x00-\x1f]/.test(name)) {
+        if (!this.isValidPresetName(name)) {
             return { ok: false, message: 'Config name contains invalid characters.' };
         }
         const presetPath = this.getPresetPath(name);
@@ -232,7 +232,10 @@ export class CalcpadSettingsManager {
      * untouched.
      */
     public async loadPreset(name: string): Promise<void> {
-        if (!name) return;
+        if (!this.isValidPresetName(name)) {
+            getOutputChannel().appendLine(`[Settings] loadPreset refused invalid name "${name}"`);
+            return;
+        }
         getOutputChannel().appendLine(`[Settings] loadPreset("${name}") — was active="${this._activePresetName}"`);
         await this.readPresetInto(name);
         await this.setActivePresetName(name);
@@ -260,7 +263,22 @@ export class CalcpadSettingsManager {
         return path.join(this._context.globalStorageUri.fsPath, SETTINGS_DIR_NAME);
     }
 
+    /**
+     * A preset name is a filename component, so it may not contain a path
+     * separator, a drive letter, a `..`, or anything Windows rejects outright.
+     * Applied on read as well as write: `savePreset` validated already, but the
+     * `switchConfig` webview message reaches `loadPreset` with a name that never
+     * passed through it, and that name is joined straight onto the settings dir.
+     */
+    private isValidPresetName(name: string): boolean {
+        return name.length > 0
+            && name.length <= 128
+            && name !== '.' && name !== '..'
+            && !/[\\/:*?"<>|\x00-\x1f]/.test(name);
+    }
+
     private getPresetPath(name: string): string | null {
+        if (!this.isValidPresetName(name)) return null;
         const dir = this.getSettingsDir();
         return dir ? path.join(dir, `${name}.json`) : null;
     }
