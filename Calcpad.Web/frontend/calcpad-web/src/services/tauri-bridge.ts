@@ -704,14 +704,16 @@ export class TauriMessageBridge extends BaseMessageBridge {
         }
     }
 
+    // Reveals rather than opening the parent: the item is an arbitrary workspace
+    // path, which sits outside the narrowed `opener:allow-open-path` scope on
+    // every platform. `reveal_item_in_dir` takes no scope and only selects the
+    // item in the file manager, so it never executes what it is handed.
     private async handleOpenContainingFolder(itemPath: string): Promise<void> {
         if (!itemPath || typeof itemPath !== 'string') return;
-        const parent = pathDirname(itemPath);
-        const target = parent || itemPath;
         try {
-            await this.openPathSafe(target);
+            await revealItemInDir(itemPath);
         } catch (err) {
-            console.error(`Failed to open containing folder for ${itemPath}:`, err);
+            console.error(`Failed to reveal ${itemPath}:`, err);
         }
     }
 
