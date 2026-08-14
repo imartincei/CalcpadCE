@@ -160,7 +160,7 @@ The **Export** tab also has a **Plots** section that lists every plot the docume
 
 The menu bar drives the whole app:
 
-- **File** — New Tab · Open… · Save · Save As… · Save As Compiled Worksheet… · Export Portable Package… · Close Tab · Export ▸ · Quit — see [Working with Files](working-with-files.md) for what the two compiled/portable commands produce
+- **File** — New Tab · Open… · Save · Save As… · Save As Compiled Worksheet… · Export Portable Package… · Close Tab · Export ▸ · Quit — see [Portable Export Options](new-portable-export-options.md) for what the two compiled/portable commands produce
 - **Edit** — Undo · Redo · Cut · Copy · Paste · Select All · Find · Replace
 - **View** — Toggle Sidebar · Toggle Preview · Toggle Word Wrap · Split Editor · Result Mode: Preview / Unwrapped / Input / Report
 - **Server** — Refresh (**Ctrl+Alt+X**) · Show Server Log · Stop Server · Restart Server

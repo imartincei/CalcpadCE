@@ -63,6 +63,7 @@ nav:
     - Settings: new-settings.md
     - PDF Export: new-pdf-export.md
     - Includes and File Reads: new-includes.md
+    - Portable Export Options: new-portable-export-options.md
     - Linter and Diagnostics: new-linter.md
     - UI Mode: new-ui-mode.md
     - Table of Contents: new-table-of-contents.md

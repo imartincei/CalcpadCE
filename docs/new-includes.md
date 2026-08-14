@@ -126,7 +126,7 @@ It can also appear inside a `#ProjectPath`/`#LibraryPath` value itself:
 
 ### Path root tokens and portable export
 
-Neither export form keeps a token. An [exported portable package](working-with-files.md#export-portable-package) and a [compiled `.cpdz` worksheet](working-with-files.md#save-as-compiled-worksheet) both resolve `{project}`, `{library}` and `{user}` against *your* declared roots — the package bundling what it finds beside the document, the compiled worksheet writing it in.
+Neither export form keeps a token. An [exported portable package](new-portable-export-options.md#export-portable-package) and a [compiled `.cpdz` worksheet](new-portable-export-options.md#save-as-compiled-worksheet) both resolve `{project}`, `{library}` and `{user}` against *your* declared roots — the package bundling what it finds beside the document, the compiled worksheet writing it in.
 
 The reason is the same for all three tokens: each names a folder on the machine that wrote the document, and there is no reason to expect the recipient's machine has the same file in the same place. An export that left the token in would only run where the recipient happened to have declared a matching root, which is the opposite of what either format is for. So the root has to be declared here, and its folder has to exist, or the export is refused naming the directive.
 
@@ -142,5 +142,5 @@ Even after several layers of includes and macro expansion, error messages and di
 
 ## See also
 
-- [Working with Files](working-with-files.md) · [Programming](programming.md)
+- [Portable Export Options](new-portable-export-options.md) · [Working with Files](working-with-files.md) · [Programming](programming.md)
 - [Using the VS Code Extension](new-vscode-extension.md) — path completion for `#include` and `#read`

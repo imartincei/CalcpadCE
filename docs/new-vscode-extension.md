@@ -26,7 +26,7 @@ Alternatively, from a terminal: `code --install-extension vscode-calcpad-<versio
 
 ## Your first document
 
-1. Create a new file and save it with a **`.cpd`** extension (for example `beam.cpd`). VS Code detects the `calcpad` language automatically. Compiled **`.cpdz`** worksheets are binary, so they are not edited as text — opening one gives you its input form in a dedicated editor, and **Save** writes the values you entered back into the file. To produce one from a document you are editing, run **CalcpadCE: Save As Compiled Worksheet…**.
+1. Create a new file and save it with a **`.cpd`** extension (for example `beam.cpd`). VS Code detects the `calcpad` language automatically. Compiled **`.cpdz`** worksheets are binary, so they are not edited as text — opening one gives you its input form in a dedicated editor, and **Save** writes the values you entered back into the file. To produce one from a document you are editing, run **CalcpadCE: Save As Compiled Worksheet…** (see [Portable Export Options](new-portable-export-options.md)).
 2. Type a calculation, for example:
 
    ```calcpad

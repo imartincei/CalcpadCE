@@ -392,7 +392,7 @@ Two things to know about the exported files:
 
 ## Compiled (`.cpdz`) worksheets
 
-A [compiled worksheet](working-with-files.md#save-as-compiled-worksheet) is a `.cpdz` file with
+A [compiled worksheet](new-portable-export-options.md#save-as-compiled-worksheet) is a `.cpdz` file with
 its source locked and only the `#UI` form left editable. It changes a few things from the
 ordinary-file behaviour described above:
 
