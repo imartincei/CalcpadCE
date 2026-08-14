@@ -81,6 +81,19 @@ namespace Calcpad.Highlighter.HtmlComment
             int lastLine  = -1;
             Token opener  = default;
 
+            // One buffer entry per source line: entries are later joined with "\n", so
+            // several HtmlComment tokens on the same line (a macro parameter or a '>' in
+            // the payload can split one) must be concatenated, not newline-separated.
+            void AddFragment(int line, string text)
+            {
+                if (buffer.Count > 0 && line == lastLine)
+                    buffer[^1] += text;
+                else
+                    buffer.Add(text);
+
+                lastLine = line;
+            }
+
             foreach (var token in tokens)
             {
                 if (token.Type != TokenType.HtmlComment)
@@ -108,9 +121,8 @@ namespace Calcpad.Highlighter.HtmlComment
                     {
                         // Start of multi-line block
                         buffer.Clear();
-                        buffer.Add(afterOpen);
+                        AddFragment(token.Line, afterOpen);
                         opener    = token;
-                        lastLine  = token.Line;
                         state     = ParseState.InHtmlComment;
                     }
                 }
@@ -137,9 +149,8 @@ namespace Calcpad.Highlighter.HtmlComment
                         }
                         else
                         {
-                            buffer.Add(afterOpen);
+                            AddFragment(token.Line, afterOpen);
                             opener    = token;
-                            lastLine  = token.Line;
                             state     = ParseState.InHtmlComment;
                         }
 
@@ -149,7 +160,7 @@ namespace Calcpad.Highlighter.HtmlComment
                     int closingIdx = content.IndexOf(CloseMarker, StringComparison.Ordinal);
                     if (closingIdx >= 0)
                     {
-                        buffer.Add(content[..closingIdx]);
+                        AddFragment(token.Line, content[..closingIdx]);
                         var block = BuildBlock(opener, token.Line, string.Join("\n", buffer));
                         if (block != null)
                             results.Add(block);
@@ -158,8 +169,7 @@ namespace Calcpad.Highlighter.HtmlComment
                     }
                     else
                     {
-                        buffer.Add(content);
-                        lastLine = token.Line;
+                        AddFragment(token.Line, content);
                     }
                 }
             }

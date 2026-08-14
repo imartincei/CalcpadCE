@@ -3,6 +3,7 @@ using System.Linq;
 using Calcpad.Highlighter.HtmlComment;
 using Calcpad.Highlighter.Linter.Models;
 using Calcpad.Highlighter.Tokenizer;
+using Calcpad.Highlighter.Tokenizer.Models;
 
 namespace Calcpad.Tests.Highlighter
 {
@@ -78,6 +79,42 @@ namespace Calcpad.Tests.Highlighter
             Assert.Equal("k", data.GetProperty("desc").GetString());
             Assert.Equal("value", data.GetProperty("paramTypes")[0].GetString());
             Assert.Equal("ndfdf", data.GetProperty("paramDesc")[0].GetString());
+        }
+
+        [Fact]
+        public void ArrowInJsonString_DoesNotEndTheHtmlComment()
+        {
+            // Regression: every '>' inside a quoted comment used to end the token, so a
+            // payload containing "1->W" was emitted as several HtmlComment tokens on one
+            // line and the parser joined them with newlines, corrupting the JSON string.
+            var source =
+                "'<!--{\"desc\":\"Base plate\",\"paramDesc\":[\"Shape of Column: 1->W Section, 2->Rect HSS\"]}-->";
+
+            var tokens = new CalcpadTokenizer().Tokenize(source);
+            var htmlComments = tokens.Tokens.Where(t => t.Type == TokenType.HtmlComment).ToList();
+            var token = Assert.Single(htmlComments);
+            Assert.StartsWith("<!--", token.Text);
+            Assert.EndsWith("-->", token.Text);
+
+            var block = Assert.Single(new HtmlCommentParser().Parse(tokens));
+            Assert.Equal(HtmlCommentParseStatus.Success, block.Status);
+            Assert.Equal(
+                "Shape of Column: 1->W Section, 2->Rect HSS",
+                block.Data.Value.GetProperty("paramDesc")[0].GetString());
+        }
+
+        [Fact]
+        public void TagInJsonString_DoesNotEndTheHtmlComment()
+        {
+            // The body of an HTML comment is not markup, so a '<' in the payload must not
+            // open a tag token and split the block.
+            var source = "'<!--{\"desc\":\"use <b>bold</b> here\"}-->";
+
+            var tokens = new CalcpadTokenizer().Tokenize(source);
+            var block = Assert.Single(new HtmlCommentParser().Parse(tokens));
+
+            Assert.Equal(HtmlCommentParseStatus.Success, block.Status);
+            Assert.Equal("use <b>bold</b> here", block.Data.Value.GetProperty("desc").GetString());
         }
 
         [Fact]

@@ -123,6 +123,9 @@ export class TauriMessageBridge extends BaseMessageBridge {
             this._serverLogDir = '';
         }
         this._store = await Store.load(STORE_FILE);
+        // The menu Rust built at setup() has no recents in it yet — this session's
+        // first sync carries the list persisted by earlier ones.
+        await this.syncRecentFilesMenu(await this.getRecentFiles());
         await this.loadSettingsFromStorage();
         await this.loadUserFonts();
         await listen<string>('open-file-request', (evt) => {
@@ -584,6 +587,19 @@ export class TauriMessageBridge extends BaseMessageBridge {
         }
     }
 
+    /**
+     * Mirrors the recent list into the native File → Open Recent submenu, which
+     * Rust has to rebuild to change. Failing to redraw a menu is not worth failing
+     * the save or open that triggered it, so errors are swallowed.
+     */
+    private async syncRecentFilesMenu(paths: string[]): Promise<void> {
+        try {
+            await invoke('set_recent_files', { paths });
+        } catch {
+            /* menu keeps its previous entries */
+        }
+    }
+
     async addRecentFile(path: string): Promise<void> {
         const list = await this.getRecentFiles();
         const filtered = list.filter(p => p !== path);
@@ -593,6 +609,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
             await this._store.set(RECENT_FILES_KEY, trimmed);
             await this._store.save();
         }
+        await this.syncRecentFilesMenu(trimmed);
     }
 
     async clearRecentFiles(): Promise<void> {
@@ -600,6 +617,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
             await this._store.set(RECENT_FILES_KEY, []);
             await this._store.save();
         }
+        await this.syncRecentFilesMenu([]);
     }
 
     async saveFileAs(content: string): Promise<string | null> {

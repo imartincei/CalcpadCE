@@ -1616,11 +1616,6 @@ async function bootstrap(): Promise<void> {
             // 'cancel' leaves the drafts on disk — surfaced again on next launch.
         });
 
-        // Menu is built in Rust (src-tauri/src/lib.rs:build_menu). The frontend
-        // just tracks recents in the plugin-store; there is no dynamic menu
-        // rebuild. Recent files remain accessible via the sidebar's Files tab.
-        void tauriBridge.getRecentFiles();
-
         /**
          * Open `path` in a tab. If the active group already holds that file,
          * just focuses it. If another group has it open, opens a second,
@@ -2071,6 +2066,13 @@ async function bootstrap(): Promise<void> {
                 return;
             }
 
+            // File → Open Recent. The id carries the path itself, so the click opens
+            // the file whose label was clicked even if the list has moved on since.
+            if (id.startsWith('open-recent:')) {
+                await loadFile(id.slice('open-recent:'.length));
+                return;
+            }
+
             // File → Export. A bare `export-pdf` is the report (the default variant);
             // `export-pdf:preview` and friends name one explicitly.
             if (id.startsWith('export-')) {
@@ -2101,6 +2103,10 @@ async function bootstrap(): Promise<void> {
                     if (result) await loadFile(result.path);
                     break;
                 }
+
+                case 'clear-recent':
+                    await tauriBridge.clearRecentFiles();
+                    break;
 
                 case 'save':
                     await saveActive();

@@ -16,11 +16,12 @@
         "minHeight": 600,
         "center": true,
         "resizable": true,
-        "visible": true
+        "visible": true,
+        "additionalBrowserArgs": "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection,IsolateSandboxedIframes"
       }
     ],
     "security": {
-      "csp": "default-src 'self' https:; connect-src 'self' ipc: http://127.0.0.1:* https:; img-src 'self' data: blob: asset: http://asset.localhost https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; font-src 'self' data: https:",
+      "csp": "default-src 'self' https:; connect-src 'self' ipc: http://127.0.0.1:* https: blob: data:; img-src 'self' data: blob: asset: http://asset.localhost https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; font-src 'self' data: https:; worker-src 'self' blob: https:; media-src 'self' data: blob: https:; object-src 'none'; base-uri 'none'; form-action 'none'",
       "dangerousDisableAssetCspModification": [
         "script-src",
         "style-src"

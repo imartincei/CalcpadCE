@@ -37,6 +37,17 @@ namespace Calcpad.Highlighter.Tokenizer
         private bool _inHtmlComment;
 
         /// <summary>
+        /// True while inside an unclosed &lt;!-- block — either carried over from a previous
+        /// line, or opened by the current buffer, which starts at the '&lt;' of the opener.
+        /// The body of an HTML comment is not markup, so '&lt;' and '&gt;' inside it must not
+        /// start a tag or end the token; only "--&gt;" closes it.
+        /// </summary>
+        private bool InOpenHtmlComment =>
+            _inHtmlComment ||
+            (_builder.Length >= 4 && _builder[0] == '<' && _builder[1] == '!'
+                                  && _builder[2] == '-' && _builder[3] == '-');
+
+        /// <summary>
         /// Resets all comment/tag state for a new tokenization pass.
         /// </summary>
         private void ResetCommentState()
@@ -226,7 +237,11 @@ namespace Calcpad.Highlighter.Tokenizer
                     }
                 }
                 else
+                {
                     CheckHtmlComment();
+                    if (_inHtmlComment)
+                        return;
+                }
 
                 Append(_state.CurrentType);
 
@@ -245,6 +260,12 @@ namespace Calcpad.Highlighter.Tokenizer
             }
             else if (c == '<')
             {
+                if (InOpenHtmlComment)
+                {
+                    _builder.Append(c);
+                    return;
+                }
+
                 _tagState = TagState.None;
                 Append(_state.CurrentType);
                 _builder.Append(c);

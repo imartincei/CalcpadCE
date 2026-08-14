@@ -268,5 +268,17 @@ namespace Calcpad.Tests.Highlighter
             Assert.DoesNotContain(result.Diagnostics, d =>
                 d.Code == "CPD-3411" || d.Code == "CPD-3412" || d.Code == "CPD-3414");
         }
+
+        [Fact]
+        public void MetadataComment_ArrowInParamDesc_ReportsNothing()
+        {
+            // "1->W" is ordinary prose, not a comment terminator; only "-->" closes.
+            var result = Lint(
+                "'<!--{\"desc\":\"Base plate\",\"paramTypes\":[\"value\"], _\n" +
+                "\"paramDesc\":[\"Shape: 1->W Section, 2->Rect HSS, 3->Round HSS\"]}-->\nA(b) = b");
+
+            Assert.DoesNotContain(result.Diagnostics, d =>
+                d.Code == "CPD-3411" || d.Code == "CPD-3412");
+        }
     }
 }

@@ -36,6 +36,23 @@ const PORT_READY_TIMEOUT_MS: u64 = 30_000;
 #[derive(Default)]
 struct PendingLaunchFiles(Mutex<Vec<String>>);
 
+/// What the menu shows that the frontend owns. A menu item carries no mutable
+/// state of its own, so every change rebuilds the whole menu — which means each
+/// setter has to be able to read back the parts it isn't changing.
+struct MenuState {
+    source_result_modes: Mutex<bool>,
+    recent_files: Mutex<Vec<String>>,
+}
+
+impl Default for MenuState {
+    fn default() -> Self {
+        Self {
+            source_result_modes: Mutex::new(true),
+            recent_files: Mutex::new(Vec::new()),
+        }
+    }
+}
+
 #[derive(Default)]
 struct ServerState {
     // Send () to signal the running sidecar to shut down. Owned here so the
@@ -444,14 +461,33 @@ fn get_env(name: String) -> Option<String> {
     std::env::var(name).ok()
 }
 
-/// Shows or hides the result-mode entries that need a document with readable source —
-/// dropped while a compiled worksheet is open, since the results toolbar drops their
-/// buttons too. A menu item has no visibility of its own, so the menu is rebuilt.
-#[tauri::command]
-fn set_source_result_modes_visible(app: AppHandle, visible: bool) -> Result<(), String> {
-    let menu = build_menu(&app, visible).map_err(|e| e.to_string())?;
+fn refresh_menu(app: &AppHandle) -> Result<(), String> {
+    let menu = build_menu(app).map_err(|e| e.to_string())?;
     app.set_menu(menu).map_err(|e| e.to_string())?;
     Ok(())
+}
+
+/// Shows or hides the result-mode entries that need a document with readable source —
+/// dropped while a compiled worksheet is open, since the results toolbar drops their
+/// buttons too.
+#[tauri::command]
+fn set_source_result_modes_visible(app: AppHandle, visible: bool) -> Result<(), String> {
+    *app.state::<MenuState>()
+        .source_result_modes
+        .lock()
+        .expect("menu state mutex poisoned") = visible;
+    refresh_menu(&app)
+}
+
+/// Replaces the File → Open Recent entries, most recent first. The list itself is
+/// owned by the frontend's plugin-store; this only mirrors it into the native menu.
+#[tauri::command]
+fn set_recent_files(app: AppHandle, paths: Vec<String>) -> Result<(), String> {
+    *app.state::<MenuState>()
+        .recent_files
+        .lock()
+        .expect("menu state mutex poisoned") = paths;
+    refresh_menu(&app)
 }
 
 /// Directories `open_path_native` will hand to `xdg-open`.
@@ -1012,9 +1048,31 @@ fn assign_to_job_object(pid: u32) {
     }
 }
 
-/// Builds the app menu. `source_result_modes` drops the View entries that only make
-/// sense for a document with readable source (see the View submenu below).
-fn build_menu(app: &AppHandle, source_result_modes: bool) -> tauri::Result<Menu<tauri::Wry>> {
+/// Label for a recent entry: the full path with the user's home collapsed to `~`.
+/// The file name on its own repeats across folders too often to identify one.
+fn recent_label(app: &AppHandle, path: &str) -> String {
+    let Ok(home) = app.path().home_dir() else {
+        return path.to_string();
+    };
+    match path.strip_prefix(home.to_string_lossy().as_ref()) {
+        Some(rest) => format!("~{rest}"),
+        None => path.to_string(),
+    }
+}
+
+/// Builds the app menu from `MenuState`: the recent-file list, and whether to keep
+/// the View entries that only make sense for a document with readable source.
+fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
+    let state = app.state::<MenuState>();
+    let source_result_modes = *state
+        .source_result_modes
+        .lock()
+        .expect("menu state mutex poisoned");
+    let recent = state
+        .recent_files
+        .lock()
+        .expect("menu state mutex poisoned")
+        .clone();
     let sep = || PredefinedMenuItem::separator(app);
 
     // Grouped by what gets rendered. The unsuffixed ids are the report — the default
@@ -1078,6 +1136,34 @@ fn build_menu(app: &AppHandle, source_result_modes: bool) -> tauri::Result<Menu<
         ],
     )?;
 
+    // Each entry carries its own path in the id rather than a list index, so a click
+    // can never land on a different file than the one whose label was read. The
+    // frontend strips the `open-recent:` prefix and opens the rest.
+    let recent_items = recent
+        .iter()
+        .map(|path| {
+            MenuItem::with_id(
+                app,
+                format!("open-recent:{path}"),
+                recent_label(app, path),
+                true,
+                None::<&str>,
+            )
+        })
+        .collect::<tauri::Result<Vec<_>>>()?;
+    let no_recent = MenuItem::with_id(app, "no-recent", "No Recent Files", false, None::<&str>)?;
+    let clear_recent = MenuItem::with_id(app, "clear-recent", "Clear Recent", true, None::<&str>)?;
+    let recent_sep = sep()?;
+    let mut recent_refs: Vec<&dyn IsMenuItem<tauri::Wry>> = Vec::new();
+    if recent_items.is_empty() {
+        recent_refs.push(&no_recent);
+    } else {
+        recent_refs.extend(recent_items.iter().map(|i| i as &dyn IsMenuItem<tauri::Wry>));
+        recent_refs.push(&recent_sep);
+        recent_refs.push(&clear_recent);
+    }
+    let open_recent = Submenu::with_items(app, "Open Recent", true, &recent_refs)?;
+
     let file = Submenu::with_items(
         app,
         "File",
@@ -1085,6 +1171,7 @@ fn build_menu(app: &AppHandle, source_result_modes: bool) -> tauri::Result<Menu<
         &[
             &MenuItem::with_id(app, "new", "New Tab", true, Some("CmdOrCtrl+N"))?,
             &MenuItem::with_id(app, "open", "Open...", true, Some("CmdOrCtrl+O"))?,
+            &open_recent,
             &sep()?,
             &MenuItem::with_id(app, "save", "Save", true, Some("CmdOrCtrl+S"))?,
             &MenuItem::with_id(
@@ -1260,25 +1347,9 @@ fn build_menu(app: &AppHandle, source_result_modes: bool) -> tauri::Result<Menu<
         .build()
 }
 
-// WebView2 runs our sandboxed preview iframes out-of-process (IsolateSandboxedIframes),
-// which has a wheel-routing bug: scroll does nothing until the frame's native scrollbar
-// is dragged. Disabling the feature trades away that process-isolation boundary for
-// correct scrolling. Must be set before the webview is created, so this runs first in run().
-#[cfg(windows)]
-fn disable_sandboxed_iframe_isolation() {
-    const FLAG: &str = "--disable-features=IsolateSandboxedIframes";
-    let combined = match std::env::var("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS") {
-        Ok(existing) if !existing.is_empty() => format!("{existing} {FLAG}"),
-        _ => FLAG.to_string(),
-    };
-    std::env::set_var("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", combined);
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     install_panic_hook();
-    #[cfg(windows)]
-    disable_sandboxed_iframe_isolation();
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             if let Some(w) = app.get_webview_window("main") {
@@ -1307,6 +1378,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .manage(ServerState::default())
         .manage(PendingLaunchFiles::default())
+        .manage(MenuState::default())
         .invoke_handler(tauri::generate_handler![
             server_url,
             server_token,
@@ -1323,6 +1395,7 @@ pub fn run() {
             take_pending_launch_files,
             allow_document_dir,
             set_source_result_modes_visible,
+            set_recent_files,
         ])
         .setup(|app| {
             // Pin the on-disk locations the panic hook + draft commands need.
@@ -1339,7 +1412,7 @@ pub fn run() {
                 let _ = DRAFTS_DIR.set(drafts);
             }
 
-            let menu = build_menu(app.handle(), true)?;
+            let menu = build_menu(app.handle())?;
             app.set_menu(menu)?;
             let handle_for_menu = app.handle().clone();
             app.on_menu_event(move |_app, event| {
