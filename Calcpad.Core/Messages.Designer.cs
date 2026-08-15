@@ -1726,6 +1726,15 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
+        // /   Looks up a localized string similar to #UI datagrid size cannot exceed {0} cells. Use #Read to import larger data sets from a file instead..
+        // / </summary>
+        public static string Datagrid_size_cannot_exceed_0_cells {
+            get {
+                return ResourceManager.GetString("Datagrid_size_cannot_exceed_0_cells", resourceCulture);
+            }
+        }
+
+        // / <summary>
         // /   Looks up a localized string similar to A #UI value has the wrong type..
         // / </summary>
         public static string A_UI_value_has_the_wrong_type {

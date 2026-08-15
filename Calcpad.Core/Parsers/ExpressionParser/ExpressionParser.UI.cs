@@ -106,6 +106,8 @@ namespace Calcpad.Core
                     else
                         AutoDetectGridSizeFromFunction(assignment.Rhs, ref rows, ref columns);
                 }
+                if (type == "datagrid")
+                    CheckGridSize(rows, columns);
 
                 var (declarationKey, key) = GetUiKey(assignment.Name);
                 _lineUiControls.Add(new UiPropertyMetadata
@@ -226,6 +228,12 @@ namespace Calcpad.Core
             return rest.Length > 0 && rest[0] == '(';
         }
 
+        private static void CheckGridSize(int rows, int columns)
+        {
+            if ((long)rows * columns > UiDto.MaxSize)
+                throw Exceptions.DatagridSizeLimit();
+        }
+
         private static void AutoDetectGridSize(ReadOnlySpan<char> rhs, ref int rows, ref int columns)
         {
             var bracketStart = rhs.IndexOf('[');
@@ -272,7 +280,10 @@ namespace Calcpad.Core
         private void ResolveDatagridShape(UiPropertyMetadata ui)
         {
             if (ui.Rows > 0 && ui.Columns > 0)
+            {
+                CheckGridSize(ui.Rows, ui.Columns);
                 return;
+            }
 
             var (rows, columns) = _parser.GetVariableShape(ui.VariableName);
             if (ui.Rows == 0)
@@ -280,6 +291,8 @@ namespace Calcpad.Core
 
             if (ui.Columns == 0)
                 ui.Columns = columns;
+
+            CheckGridSize(ui.Rows, ui.Columns);
         }
 
         private void ResolveShapeFromSizingCall(UiPropertyMetadata ui, string expression)
@@ -312,6 +325,8 @@ namespace Calcpad.Core
 
                     if (ui.Columns == 0)
                         ui.Columns = n;
+
+                    CheckGridSize(ui.Rows, ui.Columns);
                 }
                 return;
             }
@@ -328,6 +343,8 @@ namespace Calcpad.Core
 
                 if (ui.Columns == 0)
                     ui.Columns = k;
+
+                CheckGridSize(ui.Rows, ui.Columns);
             }
         }
 
