@@ -452,6 +452,7 @@ Results will appear in the "**Output**" box on the right as a professionally for
       - `#append M to filename.xlsx@Sheet1!A1:B2 TYPE=N` - append matrix *M* to an Excel file
     - Sheet, range, TYPE and SEP can be omitted.  
     - For `#read` command, TYPE can be any of \[R\|D\|C\|S\|U\|L\|V\]. For hp matrices add \_HP to the type.  
+    - A `#read` can carry its data instead of naming a file: `#read M from data:text/csv;base64,MSwzCjIsNAo=`. This is what compiling to a `*.cpdz` writes.  
     - For `#write` and `#append` commands, TYPE can be Y or N.
 
 ??? info "Output Control"

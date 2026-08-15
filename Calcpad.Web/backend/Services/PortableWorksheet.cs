@@ -6,8 +6,8 @@ namespace Calcpad.Server.Services
     /// <summary>
     /// Rewrites a worksheet into the self-contained form a compiled <c>.cpdz</c> needs. It is
     /// handed out to be filled in, so nothing it depends on can be left behind: macros and
-    /// <c>#include</c>d files are expanded in place, every <c>#read</c> becomes the data it
-    /// imports, and a <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> reference is resolved to the
+    /// <c>#include</c>d files are expanded in place, every <c>#read</c> is given the data it
+    /// imports to carry, and a <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> reference is resolved to the
     /// author's local path rather than left for a <c>#ProjectPath</c>/<c>#LibraryPath</c> the
     /// recipient has no way to add — a compiled worksheet's source is locked. Images are the
     /// exception to "expanded in place" — they stay as <c>src</c> paths for the host to embed,
@@ -83,13 +83,12 @@ namespace Calcpad.Server.Services
         }
 
         /// <summary>
-        /// Replaces every <c>#read</c> with the data it imports, rewrites every
+        /// Gives every <c>#read</c> the data it imports to carry, rewrites every
         /// <c>#write</c>/<c>#append</c> target <paramref name="outputs"/> asks for, and resolves
         /// any <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> image reference left unresolved by
-        /// <see cref="AbsoluteImagePaths"/>. The read assignment goes between <c>#hide</c> and
-        /// <c>#end hide</c>, which leaves the surrounding visibility as it was and keeps a
-        /// bundled data set out of the report — where the directive itself only ever printed a
-        /// line naming the file.
+        /// <see cref="AbsoluteImagePaths"/>. A read stays a read, on its own line, so it prints
+        /// and hides as it did before compiling. What the reads carry is capped in total, not
+        /// only per file, since it all has to be held in memory to be run.
         /// </summary>
         /// <remarks>
         /// <paramref name="pathRoots"/> arrives already declared, by the macro parser that
@@ -103,6 +102,7 @@ namespace Calcpad.Server.Services
         {
             var sb = new StringBuilder(text.Length);
             var lineNumber = 0;
+            var embedded = 0;
             foreach (var rawLine in text.Split('\n'))
             {
                 ++lineNumber;
@@ -116,14 +116,21 @@ namespace Calcpad.Server.Services
                 {
                     try
                     {
-                        var assignment = ExpressionParser.InlineReadDirective(code, sourceFilePath, pathRoots);
-                        if (assignment is null)
+                        // Nothing more is read once the budget is gone: the export fails either way.
+                        if (embedded > ExpressionParser.MaxEmbeddedDataSize)
                             continue;
 
-                        var indent = line[..(line.Length - code.Length)];
-                        sb.Append(indent).Append("#hide").Append('\n')
-                          .Append(indent).Append(assignment).Append('\n')
-                          .Append(indent).Append("#end hide").Append('\n');
+                        var directive = ExpressionParser.EmbedReadDirective(code, sourceFilePath, pathRoots, out var size);
+                        if (directive is null)
+                            continue;
+
+                        embedded += size;
+                        if (embedded > ExpressionParser.MaxEmbeddedDataSize)
+                            errors.Add($"Line {lineNumber}: the worksheet reads more than " +
+                                $"{ExpressionParser.MaxEmbeddedDataSize / (1024 * 1024)} MB in total, " +
+                                "which is more than a compiled worksheet can carry.");
+                        else
+                            sb.Append(line[..(line.Length - code.Length)]).Append(directive).Append('\n');
                     }
                     catch (Exception ex)
                     {

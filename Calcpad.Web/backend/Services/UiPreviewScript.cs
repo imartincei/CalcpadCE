@@ -12,8 +12,10 @@ namespace Calcpad.Server.Services
     /// message channel at runtime instead of being built per host.
     ///
     /// Each edit makes the host re-render and rewrite the whole document, so the script
-    /// also stashes where the user was - the focused control, the datagrid's selected
-    /// cell, the scroll position - and reapplies it once the replacement has hydrated.
+    /// also stashes where the user was - the focused control and its caret, the datagrid's
+    /// selected cell - and reapplies it once the replacement has hydrated. Scroll is not
+    /// its business: the frontends' preview agent anchors that against content the page
+    /// lays out asynchronously, which nothing here can see.
     /// </summary>
     internal static class UiPreviewScript
     {
@@ -96,7 +98,7 @@ namespace Calcpad.Server.Services
     var pending = readState();
 
     function saveState() {
-        var state = { scrollX: window.scrollX, scrollY: window.scrollY };
+        var state = {};
         var active = document.activeElement;
         var control = active && active.closest ? active.closest(CONTROLS) : null;
         var sheet = typeof jspreadsheet !== 'undefined' ? jspreadsheet.current : null;
@@ -119,15 +121,6 @@ namespace Calcpad.Server.Services
             restoreCell(sheetsByKey[pending.key], pending.cell);
         else if (pending.key)
             restoreFocus(pending.key, pending.caret);
-
-        scrollBack();
-        // Late-loading images reflow the page after this runs, which clamps the
-        // scroll; the position is only final once everything has laid out.
-        window.addEventListener('load', scrollBack);
-    }
-
-    function scrollBack() {
-        window.scrollTo(pending.scrollX || 0, pending.scrollY || 0);
     }
 
     function restoreCell(sheet, cell) {
@@ -168,16 +161,6 @@ namespace Calcpad.Server.Services
 
     document.addEventListener('focusin', trackPosition);
     document.addEventListener('mouseup', trackPosition);
-
-    var scrollQueued = false;
-    window.addEventListener('scroll', function () {
-        if (!armed || scrollQueued) return;
-        scrollQueued = true;
-        requestAnimationFrame(function () {
-            scrollQueued = false;
-            saveState();
-        });
-    });
 
     // What a control may produce. The entered text replaces the right hand side of the
     // assignment in the source, and #UI only annotates values, so anything that is not a

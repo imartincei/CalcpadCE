@@ -550,7 +550,14 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
-import { extractBodyHtml, isCompiledPath, previewDiagnosticsScript } from 'calcpad-frontend'
+import {
+  extractBodyHtml,
+  isCompiledPath,
+  parseScrollState,
+  previewDiagnosticsScript,
+  scrollAnchorScript,
+  type PreviewScrollState,
+} from 'calcpad-frontend'
 
 export interface ProblemItem {
   severity: number
@@ -667,17 +674,16 @@ const loadingBuffer = ref<Record<string, 0 | 1>>({})
 // Last full (unstripped) HTML rendered per group, kept for "Open Full HTML".
 const previewHtmlByGroup = new Map<string, string>()
 // Where the user was in each frame's #UI form — focused control, caret, datagrid
-// cell, scroll offsets. Held here because the frame cannot keep it itself: a
-// re-render assigns srcdoc, and the fresh browsing context that creates has
-// neither the previous window nor, on an opaque origin, sessionStorage. Posted by
-// the backend's #UI script and seeded back into the next render.
+// cell. Held here because the frame cannot keep it itself: a re-render assigns
+// srcdoc, and the fresh browsing context that creates has neither the previous
+// window nor, on an opaque origin, sessionStorage. Posted by the backend's #UI
+// script and seeded back into the next render.
 const uiPositionByFrame = new Map<string, unknown>()
-// Scroll offsets per frame *and* document, so re-rendering a document lands back
-// where the user was while switching tabs still starts at the top. Covers the
-// frames the backend's #UI script does not: preview, unwrapped and report modes,
-// plus the report companion beside the input form. The input form itself keeps
-// using that script, which restores the focused control and caret as well.
-const scrollByFrameDoc = new Map<string, { x: number; y: number }>()
+// Where each frame was looking, per frame *and* document, so re-rendering a
+// document lands back there while switching tabs still starts at the top. An
+// offset alone cannot express it — see scroll-anchor.ts — so this is the anchor
+// the frame reported along with it.
+const scrollByFrameDoc = new Map<string, PreviewScrollState>()
 const docKeyByFrame = new Map<string, string>()
 
 function scrollKey(frameId: string, docKey: string): string {
@@ -1416,10 +1422,8 @@ function onPreviewWindowMessage(e: MessageEvent): void {
   if (data.type === 'cpdScrollState') {
     const docKey = docKeyByFrame.get(frameId)
     if (docKey === undefined) return
-    scrollByFrameDoc.set(scrollKey(frameId, docKey), {
-      x: Number(data.x) || 0,
-      y: Number(data.y) || 0,
-    })
+    const state = parseScrollState(data)
+    if (state) scrollByFrameDoc.set(scrollKey(frameId, docKey), state)
     return
   }
   if (data.type === 'previewFindOpen') {
@@ -1712,22 +1716,19 @@ function commitToBuffer(frameId: string, html: string): Promise<void> {
 // recreated. A fresh navigation each render sidesteps that entirely.
 function setPreviewHtml(groupId: string, html: string, scrollToLine?: number, docKey = ''): Promise<void> {
   if (!previewEls.has(groupId)) return Promise.resolve()
-  // In input mode the backend's #UI script owns the position, restoring the focused
-  // control and caret along with the offset; elsewhere it is not injected at all,
-  // so the agent carries the scroll.
   const isUi = resultMode.value === 'ui'
   docKeyByFrame.set(groupId, docKey)
+  // An explicit line target is a navigation the user asked for, and outranks
+  // returning them to where they were.
+  const seed = scrollToLine === undefined ? scrollByFrameDoc.get(scrollKey(groupId, docKey)) : undefined
   let out = injectPreviewAgent(
     injectLineLinks(html, scrollToLine, groupId, undefined, !isUi),
     groupId,
     !!onClipboardReadRequest.value,
-    !isUi,
+    seed,
   )
   out = injectPreviewConsole(out, groupId)
   out = injectUiPosition(out, groupId)
-  // An explicit line target is a navigation the user asked for, and outranks
-  // returning them to where they were.
-  if (!isUi && scrollToLine === undefined) out = injectSavedScroll(out, groupId, docKey)
   previewHtmlByGroup.set(groupId, html)
   setPreviewHtmlOutput(groupId, html)
   return commitToBuffer(groupId, out)
@@ -1744,15 +1745,11 @@ function setUiPrintHtml(groupId: string, html: string, docKey = ''): Promise<voi
   if (!uiPrintEls.has(groupId)) return Promise.resolve()
   const frameId = UI_PRINT_FRAME + groupId
   docKeyByFrame.set(frameId, docKey)
-  const out = injectSavedScroll(
-    injectPreviewAgent(
-      injectLineLinks(html, undefined, groupId, frameId, false),
-      frameId,
-      !!onClipboardReadRequest.value,
-      true,
-    ),
+  const out = injectPreviewAgent(
+    injectLineLinks(html, undefined, groupId, frameId, false),
     frameId,
-    docKey,
+    !!onClipboardReadRequest.value,
+    scrollByFrameDoc.get(scrollKey(frameId, docKey)),
   )
   return commitToBuffer(frameId, out)
 }
@@ -1881,6 +1878,13 @@ function injectLineLinks(
     "  });",
     "  window.addEventListener('scroll', hideAllLineLinks);",
     ] : []),
+    // Anything that moves the page on purpose has to take it off the scroll agent
+    // first, or the restore in progress pulls the user straight back.
+    "  function goTo(target, block) {",
+    "    if (!target) return;",
+    '    if (window.__calcpadReleaseScroll) window.__calcpadReleaseScroll();',
+    "    target.scrollIntoView({ block: block });",
+    "  }",
     "  document.querySelectorAll('.roundBox').forEach(function(box) {",
     "    box.addEventListener('click', function() {",
     "      var errId = box.getAttribute('data-error');",
@@ -1889,14 +1893,11 @@ function injectLineLinks(
     "        var line = box.getAttribute('data-line');",
     "        target = line ? document.getElementById('line-' + line) : null;",
     "      }",
-    "      if (target) target.scrollIntoView({ block: 'start' });",
+    "      goTo(target, 'start');",
     "    });",
     "  });",
     "  var scrollToLine = " + scrollTarget + ";",
-    "  if (scrollToLine !== null) {",
-    "    var target = document.getElementById('line-' + scrollToLine);",
-    "    if (target) target.scrollIntoView({ block: 'center' });",
-    "  }",
+    "  if (scrollToLine !== null) goTo(document.getElementById('line-' + scrollToLine), 'center');",
     "  var focusTimer = null;",
     "  function focusPreviewLine(line, exact) {",
     "    if (typeof line !== 'number' || isNaN(line)) return;",
@@ -1914,7 +1915,7 @@ function injectLineLinks(
     "      target = best;",
     "    }",
     "    if (!target) return;",
-    "    target.scrollIntoView({ block: 'center' });",
+    "    goTo(target, 'center');",
     "    document.querySelectorAll('.cpd-line-focus').forEach(function(el) { el.classList.remove('cpd-line-focus'); });",
     "    target.classList.add('cpd-line-focus');",
     "    if (focusTimer) clearTimeout(focusTimer);",
@@ -1944,18 +1945,6 @@ function injectUiPosition(html: string, frameId: string): string {
   // serialization could otherwise open.
   const json = JSON.stringify(state).replace(/</g, '\\u003c')
   return insertHeadScript(html, 'window.__calcpadUiPosition = ' + json + ';')
-}
-
-/**
- * Seeds the offset this frame last reported for this document, so the agent can
- * scroll back once the replacement has laid out. Unlike the #UI position this is
- * not consumed on read: a render that follows one the user did not scroll through
- * should still land where they were.
- */
-function injectSavedScroll(html: string, frameId: string, docKey: string): string {
-  const pos = scrollByFrameDoc.get(scrollKey(frameId, docKey))
-  if (!pos || (pos.x === 0 && pos.y === 0)) return html
-  return insertHeadScript(html, 'window.__calcpadScrollPosition = ' + JSON.stringify(pos) + ';')
 }
 
 function insertHeadScript(html: string, body: string): string {
@@ -1989,7 +1978,7 @@ function injectPreviewAgent(
   html: string,
   frameId: string,
   interceptClipboard: boolean,
-  ownScroll: boolean,
+  scroll: PreviewScrollState | undefined,
 ): string {
   const id = JSON.stringify(frameId)
   const body = [
@@ -2099,6 +2088,7 @@ function injectPreviewAgent(
     '    var target = matches[current];',
     '    if (!target) return;',
     "    target.classList.add('cpd-find-current');",
+    '    if (window.__calcpadReleaseScroll) window.__calcpadReleaseScroll();',
     "    target.scrollIntoView({ block: 'center' });",
     '  }',
     '  function applyFind(query) {',
@@ -2150,39 +2140,15 @@ function injectPreviewAgent(
     '  }',
     '',
     // ---- scroll ----
-    // Every render replaces the document (srcdoc forces a fresh browsing context),
-    // so the offset has to be handed to the host and seeded back. Skipped for the
-    // input form, whose #UI script restores scroll along with focus and caret.
-    ...(ownScroll ? [
-    '  var startAt = window.__calcpadScrollPosition || null;',
-    '  window.__calcpadScrollPosition = null;',
-    '  if (startAt) {',
-    '    var wantX = startAt.x || 0, wantY = startAt.y || 0;',
-    '    var userMoved = false;',
-    "    ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(function(t) {",
-    '      window.addEventListener(t, function() { userMoved = true; }, { passive: true, once: true });',
-    '    });',
-    '    var scrollBack = function() {',
-    '      if (userMoved) return;',
-    '      if (window.scrollX === wantX && window.scrollY === wantY) return;',
-    '      window.scrollTo(wantX, wantY);',
-    '    };',
-    "    document.addEventListener('DOMContentLoaded', scrollBack);",
-    // Late-loading images reflow the page, so the offset above can clamp short of the
-    // target and only becomes reachable here. The guards make this a no-op when the
-    // first restore already landed, rather than a second visible jump.
-    "    window.addEventListener('load', scrollBack);",
-    '  }',
-    '  var scrollQueued = false;',
-    "  window.addEventListener('scroll', function() {",
-    '    if (scrollQueued) return;',
-    '    scrollQueued = true;',
-    '    requestAnimationFrame(function() {',
-    '      scrollQueued = false;',
-    "      send({ type: 'cpdScrollState', x: window.scrollX, y: window.scrollY });",
-    '    });',
-    '  });',
-    ] : []),
+    // Every render replaces the document (srcdoc forces a fresh browsing context), so
+    // where the user was has to be handed to the host and seeded back. Shared with
+    // vscode-calcpad, and used in every mode including the input form: the backend's
+    // #UI script restores the focused control and caret, but not the position, which
+    // has to survive content the page lays out long after load.
+    scrollAnchorScript(
+      "function(s) { send({ type: 'cpdScrollState', x: s.x, y: s.y, anchor: s.anchor }); }",
+      scroll,
+    ),
     '',
     // ---- readiness ----
     // Tells the host to bring this document's buffer forward. Sent from inside the

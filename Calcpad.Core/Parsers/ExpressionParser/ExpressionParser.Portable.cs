@@ -1,22 +1,38 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Calcpad.Core
 {
     public partial class ExpressionParser
     {
-        public static string InlineReadDirective(ReadOnlySpan<char> line, string sourceFilePath, PathRoots pathRoots = null)
+        /// <summary>How much data a compiled worksheet may carry, per source and in total.</summary>
+        public const int MaxEmbeddedDataSize = 10 * 1024 * 1024;
+
+        /// <summary>
+        /// The same <c>#read</c>, carrying the file it names instead of pointing at it. Only the
+        /// source is rewritten, so the recipient's read takes the path the author's did. The file
+        /// is read here too, so one that cannot be read stops the compile. <paramref name="size"/>
+        /// returns the bytes embedded, for the caller to total against the same limit.
+        /// </summary>
+        public static string EmbedReadDirective(ReadOnlySpan<char> line, string sourceFilePath, PathRoots pathRoots, out int size)
         {
+            size = 0;
+            var s = line.Trim();
             var sourceDir = string.IsNullOrEmpty(sourceFilePath)
                 ? null
                 : System.IO.Path.GetDirectoryName(sourceFilePath);
-            var options = new ReadWriteOptions(line.Trim(), 0, sourceDir, pathRoots);
-            if (options.Name.IsEmpty)
+            var options = new ReadWriteOptions(s, 0, sourceDir, pathRoots);
+            if (options.Name.IsEmpty || !options.Data.IsEmpty || !TryGetDataPath(s, out var start, out var length))
                 return null;
 
-            var literal = DataLiteral(DataExchange.Read(options), options.Type);
-            return literal is null ? null : $"{options.Name} = {literal}";
+            var file = new System.IO.FileInfo(options.FullPath);
+            if (file.Exists && file.Length > MaxEmbeddedDataSize)
+                throw Exceptions.EmbeddedDataSizeLimit();
+
+            DataExchange.Read(options);
+            var bytes = System.IO.File.ReadAllBytes(options.FullPath);
+            size = bytes.Length;
+            var uri = $"{DataUri}{ExtensionMime(options.Ext)};base64,{Convert.ToBase64String(bytes)}";
+            return $"{s[..start]}{uri}{s[(start + length)..]}";
         }
 
         public static bool TryGetDataPath(ReadOnlySpan<char> line, out int start, out int length)
@@ -45,6 +61,10 @@ namespace Calcpad.Core
                     return false;
             }
 
+            // An embedded source is not a path, and the dots in its MIME type would read as one.
+            if (line[i..].StartsWith(DataUri, StringComparison.OrdinalIgnoreCase))
+                return false;
+
             var dot = line.LastIndexOf('.');
             if (dot < i)
                 return false;
@@ -62,110 +82,6 @@ namespace Calcpad.Core
             start = i;
             length = end - i;
             return length > 0;
-        }
-
-        private static string DataLiteral(string[][] data, char type)
-        {
-            var rows = data?.Length ?? 0;
-            if (rows == 0 || (data[0]?.Length ?? 0) == 0)
-                return null;
-
-            if (type == 'V')
-                return Brackets(Flatten(data));
-
-            var cols = 0;
-            for (var i = 0; i < rows; ++i)
-                cols = Math.Max(cols, data[i]?.Length ?? 0);
-
-            if ((type == 'C' || type == 'D') && cols != 1 && rows != 1)
-                throw Exceptions.IndexOutOfRange($"{rows}, {cols}");
-
-            return type switch
-            {
-                'R' => Rows(data),
-                'C' => $"vec2col({Brackets(Axis(data))})",
-                'D' => $"vec2diag({Brackets(Axis(data))})",
-                'L' => $"copy({Rows(data)}; ltriang({rows}); 1; 1)",
-                'U' => $"copy({Rows(Skyline(data))}; utriang({rows}); 1; 1)",
-                'S' => $"copy({Rows(Skyline(data))}; symmetric({rows}); 1; 1)",
-                _ => throw Exceptions.InvalidType(type),
-            };
-        }
-
-        private static string Rows(string[][] data)
-        {
-            var sb = new StringBuilder("[");
-            for (int i = 0, n = data.Length; i < n; ++i)
-            {
-                if (i > 0)
-                    sb.Append('|');
-
-                var row = data[i];
-                // An empty row still has to hold something to keep the brackets valid;
-                // zero is what the missing cells are read as anyway.
-                if (row is null || row.Length == 0)
-                    sb.Append('0');
-                else
-                    AppendCells(sb, row);
-            }
-            return sb.Append(']').ToString();
-        }
-
-        private static string Brackets(string[] values)
-        {
-            var sb = new StringBuilder("[");
-            AppendCells(sb, values);
-            return sb.Append(']').ToString();
-        }
-
-        private static void AppendCells(StringBuilder sb, string[] cells)
-        {
-            for (int j = 0, m = cells.Length; j < m; ++j)
-            {
-                if (j > 0)
-                    sb.Append("; ");
-
-                var cell = cells[j];
-                sb.Append(string.IsNullOrWhiteSpace(cell) ? "0" : cell.Trim());
-            }
-        }
-
-        /// <summary>Every cell, row by row — how a <c>type=V</c> read fills its vector.</summary>
-        private static string[] Flatten(string[][] data)
-        {
-            var cells = new List<string>();
-            foreach (var row in data)
-                if (row is not null)
-                    cells.AddRange(row);
-
-            return [.. cells];
-        }
-
-        private static string[] Axis(string[][] data)
-        {
-            if (data.Length == 1)
-                return data[0];
-
-            var values = new string[data.Length];
-            for (var i = 0; i < data.Length; ++i)
-                values[i] = data[i] is { Length: > 0 } row ? row[0] : null;
-
-            return values;
-        }
-
-        private static string[][] Skyline(string[][] data)
-        {
-            var n = data.Length;
-            var shifted = new string[n][];
-            for (var i = 0; i < n; ++i)
-            {
-                var row = data[i];
-                var m = Math.Min(row?.Length ?? 0, n - i);
-                shifted[i] = new string[i + m];
-                for (var j = 0; j < m; ++j)
-                    shifted[i][i + j] = row[j];
-            }
-            return shifted;
         }
     }
 }

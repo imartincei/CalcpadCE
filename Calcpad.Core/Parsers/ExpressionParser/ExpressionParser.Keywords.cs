@@ -935,10 +935,19 @@ namespace Calcpad.Core
 
         private void ReportDataExchageResult(ReadWriteOptions options, string command)
         {
-            var url = $"file:///{options.FullPath.Replace('\\', '/')}";
             _sb.Append($"<p{HtmlId}>")
                .Append($"Matrix <span class=\"eq\">{new HtmlWriter(Settings.Math, false).FormatVariable(options.Name.ToString(), string.Empty, true)}</span>")
-               .Append($" was successfully {command} <a href=\"{url}\">{options.Path}.{options.Ext}</a>");
+               .Append($" was successfully {command} ");
+
+            // Embedded data has no file to name, and no link to it that would lead anywhere.
+            if (options.Data.IsEmpty)
+            {
+                var url = $"file:///{options.FullPath.Replace('\\', '/')}";
+                _sb.Append($"<a href=\"{url}\">{options.Path}.{options.Ext}</a>");
+            }
+            else
+                _sb.Append("embedded data");
+
             if (options.IsExcel)
             {
                 if (!options.Sheet.IsEmpty)

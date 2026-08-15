@@ -1,0 +1,184 @@
+"Scroll Anchoring Test - #UI with an asynchronously rendered drawing
+'<p>Every #UI edit re-renders the whole document. The drawing below is not part of that
+'render: its script imports a viewer from a CDN, draws to a canvas and only makes the
+'image visible once all of that has finished - seconds after the page has loaded. Until
+'then the image occupies no height at all.</p>
+'<p><b>What to check.</b> Scroll so a line of the filler text sits exactly at the top of
+'the preview, then change one of the inputs. That line must stay where it is, both
+'through the re-render and at the moment the drawing appears. Changing <b>Height</b>
+'changes the drawing aspect ratio, so the image comes back a different height - the
+'case a remembered scroll offset can never get right.</p>
+
+'<h3>Inputs above the drawing</h3>
+
+#UI {"type": "entry"} 'Width'width = 10
+#UI {"type": "entry"} 'Height'height = 8
+#UI {"type": "entry"} 'Image width (px)'imgWidth = 800
+#UI {"type": "dropdown", "keys": ["Red", "Blue", "Green"], "values": ["1", "5", "3"]} 'Border colour'border = 1
+
+'<h3>Filler</h3>
+'<p>Enough text above the drawing that the top of the viewport lands in the middle of it,
+'and enough below that the page can be scrolled past the drawing entirely.</p>
+
+#repeat 40
+	'<p>Filler line - the anchor the restore has to land back on.</p>
+#loop
+
+'<h3>Drawing</h3>
+
+#def initDXF$(unit$; id$)
+	#val
+	'<script type="module">
+	'import Drawing from "https://cdn.jsdelivr.net/npm/dxf-writer@1.18.4/+esm";
+	'window.dxfDrawings = window.dxfDrawings || {};
+	'window.dxfDrawings["id$"] = new Drawing();
+	'window.dxfDrawings["id$"].setUnits("unit$");
+	'window.dxfDrawings["id$"].addLineType("DASHED", "---- ", [0.5, -0.5]);
+	'window.dxfCurrentDrawingId = "id$";
+	'</script>
+#end def
+'
+#def addLayer$(name$; aciColor$; lineType$)
+	'<script type="module">
+	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.addLayer("name$", 'aciColor$', "lineType$"); } }
+	'</script>
+#end def
+'
+#def setLayer$(name$)
+	'<script type="module">
+	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.setActiveLayer("name$"); } }
+	'</script>
+#end def
+'
+#def drawLine$(x1$; y1$; x2$; y2$)
+	'<script type="module">
+	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine('x1$', 'y1$', 'x2$', 'y2$'); } }
+	'</script>
+#end def
+'
+#def drawCircle$(cx$; cy$; radius$)
+	'<script type="module">
+	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawCircle('cx$', 'cy$', 'radius$'); } }
+	'</script>
+#end def
+'
+#def renderDXF$(imgWidth$; id$)
+	'<div id="dxf-render-container-id$" style="position:fixed; left:-9999px; top:0; width:1px; height:1px; overflow:hidden;"></div>
+	'<img id="dxf-output-img-id$" style="display:none; width:'imgWidth$'px; max-width:100%; height:auto; margin-top:30px; border:2px solid #ddd; border-radius:8px; background:#fff;" />
+	'<div style="margin-top:20px; padding:15px; background:#f8d7da; border-radius:4px; color:#721c24; display:none;" id="dxf-error-message-id$">
+	'  <strong>Error:</strong> <span id="dxf-error-text-id$"></span>
+	'</div>
+	'<script type="module">
+	'import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/+esm";
+	'import * as DxfViewerModule from "https://cdn.jsdelivr.net/npm/dxf-viewer@1.0.46/+esm";
+	'const DxfViewer = DxfViewerModule.default || DxfViewerModule.DxfViewer;
+	'
+	'const dxfId = "id$";
+	'const drawing = window.dxfDrawings && window.dxfDrawings[dxfId];
+	'
+	'function showError(msg) {
+	'  document.getElementById("dxf-error-text-" + dxfId).textContent = msg;
+	'  document.getElementById("dxf-error-message-" + dxfId).style.display = "block";
+	'}
+	'
+	'async function renderToImage() {
+	'  if (!DxfViewer) { throw new Error("DxfViewer library not loaded"); }
+	'  if (!drawing) { throw new Error("DXF drawing '" + dxfId + "' not initialized. Call initDXF first"); }
+	'
+	'  const container = document.getElementById("dxf-render-container-" + dxfId);
+	'  if (!container) { throw new Error("Render container '" + dxfId + "' not found"); }
+	'
+	'  const iw = 'imgWidth$';
+	'  const cw = iw * 2;
+	'  const viewer = new DxfViewer(container, {
+	'    autoResize: false,
+	'    canvasWidth: cw,
+	'    canvasHeight: cw,
+	'    clearColor: new THREE.Color("#fff"),
+	'    colorCorrection: true,
+	'    preserveDrawingBuffer: true
+	'  });
+	'
+	'  const blob = new Blob([drawing.toDxfString()], { type: "application/dxf" });
+	'  const url = URL.createObjectURL(blob);
+	'  await viewer.Load({ url: url });
+	'  URL.revokeObjectURL(url);
+	'
+	'  const bounds = viewer.GetBounds();
+	'  const origin = viewer.GetOrigin();
+	'  if (bounds) {
+	'    const bw = bounds.maxX - bounds.minX;
+	'    const bh = bounds.maxY - bounds.minY;
+	'    const ch = Math.max(Math.round(cw * bh / Math.max(bw, 0.001)), 1);
+	'    viewer.SetSize(cw, ch);
+	'    viewer.FitView(
+	'      bounds.minX - origin.x, bounds.maxX - origin.x,
+	'      bounds.minY - origin.y, bounds.maxY - origin.y
+	'    );
+	'  }
+	'  viewer.Render();
+	'
+	'  const dataUrl = viewer.GetCanvas().toDataURL("image/png");
+	'  const img = document.getElementById("dxf-output-img-" + dxfId);
+	'  await new Promise(function(resolve) {
+	'    img.onload = resolve;
+	'    img.onerror = resolve;
+	'    img.src = dataUrl;
+	'  });
+	'  img.style.display = "block";
+	'  img.dataset.dxfReady = "ok";
+	'
+	'  viewer.Destroy();
+	'  container.remove();
+	'  console.log("DXF " + dxfId + " rendered to image successfully");
+	'}
+	'
+	'setTimeout(async function() {
+	'  try {
+	'    await renderToImage();
+	'  } catch(err) {
+	'    console.error("Failed to render DXF " + dxfId + ":", err);
+	'    showError(err.message);
+	'  }
+	'}, 100);
+	'</script>
+	#equ
+#end def
+#local
+
+initDXF$(Inches; scrolltest)
+
+addLayer$(BORDER; border; CONTINUOUS)
+setLayer$(BORDER)
+
+drawLine$(0; 0; width; 0)
+drawLine$(width; 0; width; height)
+drawLine$(width; height; 0; height)
+drawLine$(0; height; 0; 0)
+
+addLayer$(DIAGONAL; 5; DASHED)
+setLayer$(DIAGONAL)
+
+drawLine$(0; 0; width; height)
+drawLine$(width; 0; 0; height)
+
+drawCircle$(width/2; height/2; min(width; height)/4)
+
+renderDXF$(imgWidth; scrolltest)
+
+'<h3>Inputs below the drawing</h3>
+'<p>Editing these is the harder case: the drawing above them is still re-rendering when
+'the replacement document loads, so everything here starts life at the wrong offset.</p>
+
+#UI {"type": "entry"} 'Scale'scale = 1
+#UI {"type": "checkbox"} 'Include diagonals'diagonals = 1
+#UI {"type": "datagrid", "columnHeaders": ["x", "y"], "rowHeaders": ["A", "B", "C"]} points = [0; 0 | 5; 4 | 10; 8]
+
+area = width*height*scale^2
+perimeter = 2*(width + height)*scale
+
+'<h3>Trailing filler</h3>
+
+#repeat 30
+	'<p>Trailing filler line.</p>
+#loop

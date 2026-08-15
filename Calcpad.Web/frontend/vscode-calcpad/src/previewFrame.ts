@@ -16,7 +16,12 @@
  */
 
 import * as vscode from 'vscode';
-import { previewDiagnosticsScript } from 'calcpad-frontend';
+import {
+    parseScrollState,
+    previewDiagnosticsScript,
+    scrollAnchorScript,
+    type PreviewScrollState,
+} from 'calcpad-frontend';
 
 /**
  * What a panel's preview frame reported before the render that replaced it. Every
@@ -26,9 +31,9 @@ import { previewDiagnosticsScript } from 'calcpad-frontend';
  * this the preview would snap to the top on every keystroke.
  */
 interface PreviewFrameState {
-    /** Reset when the panel changes document: neither offset means anything then. */
+    /** Reset when the panel changes document: neither position means anything then. */
     docKey: string;
-    scroll?: { x: number; y: number };
+    scroll?: PreviewScrollState;
     /** The `#UI` script's focus/caret state, which it posts as `cpdUiState`. */
     uiPosition?: unknown;
 }
@@ -52,8 +57,9 @@ export function frameStateFor(panel: vscode.WebviewPanel, docKey: string): Previ
 export function handleFrameStateMessage(panel: vscode.WebviewPanel, message: any): boolean {
     switch (message?.type) {
         case 'cpdScrollState': {
-            const state = frameStates.get(panel);
-            if (state) state.scroll = { x: Number(message.x) || 0, y: Number(message.y) || 0 };
+            const held = frameStates.get(panel);
+            const state = parseScrollState(message);
+            if (held && state) held.scroll = state;
             return true;
         }
         case 'cpdUiState': {
@@ -307,7 +313,7 @@ export function buildPreviewShell(documentHtml: string, options: ShellOptions): 
 
 export interface AgentOptions {
     /** Seeded back into the fresh document so a re-render lands where the user was. */
-    scroll?: { x: number; y: number };
+    scroll?: PreviewScrollState;
     /** The `#UI` script's focus/caret state, which only survives via the host. */
     uiPosition?: unknown;
 }
@@ -320,14 +326,14 @@ export interface AgentOptions {
  * Scroll is the notable one. VS Code restores a webview's scroll offset across an
  * `html` assignment, but only for the top-level document — with the report a frame
  * deeper, every keystroke's re-render would otherwise snap the preview back to the
- * top. The offset is reported to the host and seeded into the replacement instead.
+ * top. The position is reported to the host and seeded into the replacement instead,
+ * as a DOM anchor rather than an offset so late-rendering content cannot shift it.
  *
  * External links are intercepted rather than left to the webview's navigation
  * handling, which does not reach inside a sandboxed frame.
  */
 export function getFrameAgentScript(options: AgentOptions = {}): string {
     const { scroll, uiPosition } = options;
-    const seedScroll = scroll ? `window.__calcpadScrollPosition = ${JSON.stringify(scroll)};` : '';
     // Carries a control key taken from the document, so close any tag it could open.
     const seedUi = uiPosition !== undefined
         ? `window.__calcpadUiPosition = ${JSON.stringify(uiPosition).replace(/</g, '\\u003c')};`
@@ -339,7 +345,6 @@ export function getFrameAgentScript(options: AgentOptions = {}): string {
             mark.cpd-find.cpd-find-current { background: rgba(249,115,22,0.95); color: #000; }
         </style>
         <script>
-            ${seedScroll}
             ${seedUi}
             (function () {
                 if (window.__calcpadAgentReady) return;
@@ -378,33 +383,11 @@ export function getFrameAgentScript(options: AgentOptions = {}): string {
                     send({ type: 'openExternal', url: href });
                 });
 
-                var startAt = window.__calcpadScrollPosition || null;
-                window.__calcpadScrollPosition = null;
-                if (startAt) {
-                    var wantX = startAt.x || 0, wantY = startAt.y || 0;
-                    var userMoved = false;
-                    ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(function (t) {
-                        window.addEventListener(t, function () { userMoved = true; }, { passive: true, once: true });
-                    });
-                    var scrollBack = function () {
-                        if (userMoved) return;
-                        if (window.scrollX === wantX && window.scrollY === wantY) return;
-                        window.scrollTo(wantX, wantY);
-                    };
-                    document.addEventListener('DOMContentLoaded', scrollBack);
-                    // Late-loading images reflow the page, so the offset above can clamp
-                    // short of the target and only becomes reachable here.
-                    window.addEventListener('load', scrollBack);
-                }
-                var scrollQueued = false;
-                window.addEventListener('scroll', function () {
-                    if (scrollQueued) return;
-                    scrollQueued = true;
-                    requestAnimationFrame(function () {
-                        scrollQueued = false;
-                        send({ type: 'cpdScrollState', x: window.scrollX, y: window.scrollY });
-                    });
-                });
+                // An offset alone cannot survive content the worksheet lays out
+                // asynchronously, so what is carried across is a DOM anchor. Shared with
+                // calcpad-web; see scroll-anchor.ts.
+                ${scrollAnchorScript(
+        "function (s) { send({ type: 'cpdScrollState', x: s.x, y: s.y, anchor: s.anchor }); }", scroll)}
 
                 // Find runs in here rather than in the shell: the marking walk needs the
                 // document, and an opaque origin denies the shell any reach into it.
@@ -427,6 +410,7 @@ export function getFrameAgentScript(options: AgentOptions = {}): string {
                     var target = matches[current];
                     if (!target) return;
                     target.classList.add('cpd-find-current');
+                    if (window.__calcpadReleaseScroll) window.__calcpadReleaseScroll();
                     target.scrollIntoView({ block: 'center' });
                 }
                 function applyFind(query) {

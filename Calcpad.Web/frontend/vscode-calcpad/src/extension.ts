@@ -748,6 +748,14 @@ function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true):
             document.addEventListener('DOMContentLoaded', function() {
                 ${arrows}
 
+                // Anything that moves the page on purpose has to take it off the scroll
+                // agent first, or the restore in progress pulls the user straight back.
+                function goTo(target, block) {
+                    if (!target) return;
+                    if (window.__calcpadReleaseScroll) window.__calcpadReleaseScroll();
+                    target.scrollIntoView({ block: block });
+                }
+
                 // Error-summary chips: scroll the preview to the referenced output line.
                 // Prefer data-error's err-N id, since an error paragraph has no line-N id
                 // of its own; fall back to data-line's line-N for a non-error output line.
@@ -759,15 +767,12 @@ function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true):
                             var line = box.getAttribute('data-line');
                             target = line ? document.getElementById('line-' + line) : null;
                         }
-                        if (target) target.scrollIntoView({ block: 'start' });
+                        goTo(target, 'start');
                     });
                 });
 
                 var scrollToLine = ${scrollTarget};
-                if (scrollToLine !== null) {
-                    var target = document.getElementById('line-' + scrollToLine);
-                    if (target) target.scrollIntoView({ block: 'center' });
-                }
+                if (scrollToLine !== null) goTo(document.getElementById('line-' + scrollToLine), 'center');
 
                 // Editor -> preview sync. The extension posts
                 // { type: 'scrollToSourceLine', line } (a source line) on cursor
@@ -795,7 +800,7 @@ function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true):
                         target = best;
                     }
                     if (!target) return;
-                    target.scrollIntoView({ block: 'center' });
+                    goTo(target, 'center');
                     document.querySelectorAll('.cpd-line-focus').forEach(function(el) { el.classList.remove('cpd-line-focus'); });
                     target.classList.add('cpd-line-focus');
                     if (focusTimer) clearTimeout(focusTimer);
@@ -1011,12 +1016,12 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // see the function's own comment; containment is the sandboxed frame below.
         const repairedResponse = repairStrayAngleBrackets(apiResponse);
 
-        // Where this panel's frame was before the render that is replacing it. The
-        // input form is the exception: its own #UI script restores scroll along with
-        // the focused control and caret, from the position seeded beside it.
+        // Where this panel's frame was before the render that is replacing it. An
+        // explicit line target is a navigation the user asked for, and outranks
+        // returning them to where they were.
         const frameState = frameStateFor(panel, docKey);
         const agentScript = getFrameAgentScript({
-            scroll: enableUi ? undefined : frameState.scroll,
+            scroll: scrollToLine === undefined ? frameState.scroll : undefined,
             uiPosition: frameState.uiPosition,
         });
         // Consumed once, matching the #UI script's own semantics: a stale position must

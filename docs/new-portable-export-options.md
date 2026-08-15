@@ -10,7 +10,7 @@ It is a separate output rather than a rename: the file you have open keeps its o
 A compiled worksheet is fully portable: everything the document depends on is written into it, so it runs with nothing beside it.
 
 * "**#include**"d files are expanded in place, and macros defined with "**#def**" are applied — the compiled file has neither.
-* Every "**#read**" is replaced by the data it imports. `#read M from table.csv` becomes the assignment `M = [1; 3|2; 4]`, hidden so it does not appear in the report, and the matrix keeps the shape the directive asked for (`type=C`, `type=S` and the rest). A read declared as high performance ("**type=R_hp**") becomes an ordinary matrix.
+* Every "**#read**" is given the file it names to carry, in place of the path: `#read M from table.csv` becomes `#read M from data:text/csv;base64,MSwzCjIsNAo=`. It stays a read, so everything else about it stays too — the type, the separator, the sheet and the range are untouched, and the compiled worksheet reads them exactly as the original did. An Excel workbook is carried the same way, as its own bytes. What a compiled worksheet may carry is capped at 10 MB, per file and in total, since it is all held in memory to be run; past that the compile stops and says so.
 * Images referenced by a relative path are embedded as data, including those referenced by an included file.
 * A `{project}`/`{library}` reference (see [Path root tokens](new-includes.md#path-root-tokens-project-and-library)) is resolved to your own local path, for every reference kind — a compiled worksheet's source is locked, so there is no way for whoever opens it to add a `#ProjectPath`/`#LibraryPath` of their own.
 

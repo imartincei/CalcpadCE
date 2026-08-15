@@ -169,25 +169,25 @@ public class PathRootsTests
     }
 
     [Fact]
-    public void InlineReadDirective_WithADeclaredToken_ReadsTheFile()
+    public void EmbedReadDirective_WithADeclaredToken_ReadsTheFile()
     {
         using var temp = new TempDir();
         temp.Write("data/loads.csv", "1,2\n");
         var roots = new PathRoots();
         roots.TryDeclare(true, temp.Path + "/data", temp.Path, out _);
 
-        var assignment = ExpressionParser.InlineReadDirective(
-            "#read M from {project}/loads.csv", temp.At("main.cpd"), roots);
+        var directive = ExpressionParser.EmbedReadDirective(
+            "#read M from {project}/loads.csv", temp.At("main.cpd"), roots, out _);
 
-        Assert.Equal("M = [1; 2]", assignment);
+        Assert.Equal("#read M from data:text/csv;base64,MSwyCg==", directive);
     }
 
     [Fact]
-    public void InlineReadDirective_WithAnUndeclaredToken_Throws()
+    public void EmbedReadDirective_WithAnUndeclaredToken_Throws()
     {
         using var temp = new TempDir();
         Assert.Throws<MathParserException>(() =>
-            ExpressionParser.InlineReadDirective("#read M from {project}/loads.csv", temp.At("main.cpd"), new PathRoots()));
+            ExpressionParser.EmbedReadDirective("#read M from {project}/loads.csv", temp.At("main.cpd"), new PathRoots(), out _));
     }
 
     [Fact]

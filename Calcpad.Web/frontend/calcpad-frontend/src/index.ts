@@ -119,6 +119,9 @@ export type { ImageStorageMode, PickedImage } from './services/image-utils';
 export { extractBodyHtml } from './services/html-body';
 export { previewDiagnosticsScript } from './services/preview-diagnostics';
 
+export type { ScrollAnchor, PreviewScrollState } from './services/scroll-anchor';
+export { scrollAnchorScript, parseScrollState } from './services/scroll-anchor';
+
 // --- Plot Extraction + ZIP ---------------------------------------------------
 export { extractPlotsFromHtml } from './services/plot-extract';
 export type { ExtractedPlot } from './services/plot-extract';
