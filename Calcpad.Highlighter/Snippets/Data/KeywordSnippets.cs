@@ -481,21 +481,45 @@ namespace Calcpad.Highlighter.Snippets.Data
             new SnippetItem
             {
                 Insert = "#varsub",
-                Description = "Show equations with both variable names and their substituted values (default). Applies to the rest of the document; takes no condition and has no #end form - switch back with #nosub or #novar.",
+                Description = "Show equations with both variable names and their substituted values (default). Optionally takes a condition. Applies to the rest of the document, or up to a matching #end varsub.",
+                Example = "x = 5\n'Conditional - names and values from here on if x > 3\n#varsub x > 3\ny = 2*x\n\n'Bounded - #end varsub restores the previous substitution mode\n#varsub x > 3\nz = 3*x\n#end varsub\n'Previous substitution mode restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#nosub",
-                Description = "Show equations with variable names only, without substituted values. Applies to the rest of the document; takes no condition and has no #end form - switch back with #varsub.",
+                Description = "Show equations with variable names only, without substituted values. Optionally takes a condition. Applies to the rest of the document, or up to a matching #end nosub.",
+                Example = "x = 5\n'Conditional - names only from here on if x > 3\n#nosub x > 3\ny = 2*x\n\n'Bounded - #end nosub restores the previous substitution mode\n#nosub x > 3\nz = 3*x\n#end nosub\n'Previous substitution mode restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#novar",
-                Description = "Show equations with substituted values only, without variable names. Applies to the rest of the document; takes no condition and has no #end form - switch back with #varsub.",
+                Description = "Show equations with substituted values only, without variable names. Optionally takes a condition. Applies to the rest of the document, or up to a matching #end novar.",
+                Example = "x = 5\n'Conditional - values only from here on if x > 3\n#novar x > 3\ny = 2*x\n\n'Bounded - #end novar restores the previous substitution mode\n#novar x > 3\nz = 3*x\n#end novar\n'Previous substitution mode restored",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end varsub",
+                Description = "Restore the substitution mode in effect before the matching #varsub",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end nosub",
+                Description = "Restore the substitution mode in effect before the matching #nosub",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end novar",
+                Description = "Restore the substitution mode in effect before the matching #novar",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },

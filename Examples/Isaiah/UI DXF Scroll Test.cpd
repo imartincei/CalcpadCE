@@ -64,7 +64,7 @@
 '
 #def renderDXF$(imgWidth$; id$)
 	'<div id="dxf-render-container-id$" style="position:fixed; left:-9999px; top:0; width:1px; height:1px; overflow:hidden;"></div>
-	'<img id="dxf-output-img-id$" style="display:none; width:'imgWidth$'px; max-width:100%; height:auto; margin-top:30px; border:2px solid #ddd; border-radius:8px; background:#fff;" />
+	'<img id="dxf-output-img-id$" style="visibility:hidden; aspect-ratio:1/1; width:'imgWidth$'px; max-width:100%; margin-top:30px; border:2px solid #ddd; border-radius:8px; background:#fff;" />
 	'<div style="margin-top:20px; padding:15px; background:#f8d7da; border-radius:4px; color:#721c24; display:none;" id="dxf-error-message-id$">
 	'  <strong>Error:</strong> <span id="dxf-error-text-id$"></span>
 	'</div>
@@ -125,7 +125,7 @@
 	'    img.onerror = resolve;
 	'    img.src = dataUrl;
 	'  });
-	'  img.style.display = "block";
+	'  img.style.visibility = "visible";
 	'  img.dataset.dxfReady = "ok";
 	'
 	'  viewer.Destroy();

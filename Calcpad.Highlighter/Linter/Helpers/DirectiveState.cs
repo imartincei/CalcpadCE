@@ -44,7 +44,7 @@ namespace Calcpad.Highlighter.Linter.Helpers
     ///   - output value:  #equ / #val / #noc (and #end equ / #end val / #end noc)
     ///   - scope:          #global / #local
     ///   - markdown:       #md [on] / #md off
-    ///   - substitution:   #varsub / #nosub / #novar
+    ///   - substitution:   #varsub / #nosub / #novar (and #end varsub / #end nosub / #end novar)
     ///   - angle:          #rad / #deg / #gra
     ///   - line breaking:  #wrap / #split
     ///   - number type:    #complex / #phasor

@@ -48,6 +48,9 @@ namespace Calcpad.Tests.Highlighter
         [InlineData("#val zzzMissing > 0\n#end val")]
         [InlineData("#equ zzzMissing > 0\n#end equ")]
         [InlineData("#noc zzzMissing > 0\n#end noc")]
+        [InlineData("#varsub zzzMissing > 0\n#end varsub")]
+        [InlineData("#nosub zzzMissing > 0\n#end nosub")]
+        [InlineData("#novar zzzMissing > 0\n#end novar")]
         [InlineData("#for i = 1 : zzzMissing\n#loop")]
         [InlineData("#UI q = zzzMissing")]
         public void ExpressionDirective_ResolvesItsIdentifiers(string source, string overrideSource = null) =>

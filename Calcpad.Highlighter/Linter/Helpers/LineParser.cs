@@ -200,8 +200,8 @@ namespace Calcpad.Highlighter.Linter.Helpers
         /// </summary>
         private static readonly string[] ExpressionDirectives =
         [
-            "#else if", "#while", "#repeat", "#round", "#post", "#hide", "#show",
-            "#pre", "#val", "#equ", "#noc", "#for", "#if", "#ui"
+            "#else if", "#varsub", "#nosub", "#novar", "#while", "#repeat", "#round",
+            "#post", "#hide", "#show", "#pre", "#val", "#equ", "#noc", "#for", "#if", "#ui"
         ];
 
         /// <summary>

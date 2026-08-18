@@ -36,8 +36,8 @@ The web backend sets this via the request's existing `forPrint` flag, which now 
 
 ## Optional condition argument
 
-`#hide`, `#show`, `#pre`, `#post`, `#val`, `#equ`, and `#noc` each optionally take a trailing
-condition, evaluated the same way `#if` evaluates one:
+`#hide`, `#show`, `#pre`, `#post`, `#val`, `#equ`, `#noc`, `#varsub`, `#nosub`, and `#novar` each
+optionally take a trailing condition, evaluated the same way `#if` evaluates one:
 
 ```text
 #hide x == 5
@@ -53,12 +53,13 @@ condition, evaluated the same way `#if` evaluates one:
 
 ## `#end` forms restore prior state
 
-Every directive in these two groups can be closed with `#end <directive>`, which pops back to
+Every directive in these three groups can be closed with `#end <directive>`, which pops back to
 whatever state was in effect before the matching opener (or the default state if there was none)
 — rather than setting a fixed value the way the bare directive does:
 
 - Visibility: `#end hide`, `#end show`, `#end pre`, `#end post`
 - Output mode: `#end val`, `#end equ`, `#end noc`
+- Substitution: `#end varsub`, `#end nosub`, `#end novar`
 
 This lets a macro change state temporarily without leaking it to the caller:
 
@@ -73,4 +74,5 @@ This lets a macro change state temporarily without leaking it to the caller:
 'Back to the default (shown everywhere).
 ```
 
-`#end hide` (etc.) with nothing open falls back to the default state (visible / equations).
+`#end hide` (etc.) with nothing open falls back to the default state — visible, equations, and
+both variable names and substituted values.

@@ -11,8 +11,15 @@
  * the shell is the only way out, and the shell forwards a fixed set of message types
  * and nothing else.
  *
+ * There are two such frames, not one, and the shell holding them is installed once per
+ * panel rather than rebuilt per render: a render goes into whichever is behind and is
+ * brought forward only once it reports itself loaded, so the visible frame is never mid-
+ * replacement. Rebuilding the webview each render — which is what assigning
+ * `webview.html` does — would leave nothing to hold the last good document behind.
+ *
  * This mirrors what calcpad-web already does with its preview frames (App.vue), so
- * all three front ends draw the untrusted-content boundary in the same place.
+ * all three front ends draw the untrusted-content boundary in the same place and repaint
+ * the same way.
  */
 
 import * as vscode from 'vscode';
@@ -49,6 +56,77 @@ export function frameStateFor(panel: vscode.WebviewPanel, docKey: string): Previ
 }
 
 /**
+ * A panel's shell, which outlives the documents rendered into it. Assigning
+ * `webview.html` per render would defeat the double buffering the shell exists to do —
+ * there is no frame to hold a finished render behind if the whole webview is rebuilt —
+ * so the shell is installed once and documents are pushed in by message.
+ */
+interface ShellSession {
+    /** Until the shell script has run, a posted message has nowhere to land. */
+    ready: boolean;
+    html: string | null;
+    background: string;
+    loading: boolean;
+}
+
+const shellSessions = new WeakMap<vscode.WebviewPanel, ShellSession>();
+
+function postShellState(panel: vscode.WebviewPanel, session: ShellSession): void {
+    if (!session.ready) return;
+    void panel.webview.postMessage({ type: 'cpdLoading', on: session.loading });
+    if (session.html !== null) {
+        void panel.webview.postMessage({
+            type: 'cpdRender',
+            html: session.html,
+            background: session.background,
+        });
+    }
+}
+
+function shellFor(panel: vscode.WebviewPanel, background: string): ShellSession {
+    const held = shellSessions.get(panel);
+    if (held) {
+        held.background = background;
+        return held;
+    }
+    const fresh: ShellSession = { ready: false, html: null, background, loading: false };
+    shellSessions.set(panel, fresh);
+    // The shell posts cpdShellReady once its script runs; everything queued until then is
+    // sent from there. Assigning html is what starts that.
+    panel.webview.html = buildPreviewShell({ background });
+    return fresh;
+}
+
+/**
+ * Shows a document in a panel, installing the shell first if this is the panel's first
+ * render. The document goes into whichever buffer is behind and is brought forward once
+ * it reports itself loaded, so the visible frame is never mid-replacement.
+ */
+export function renderIntoShell(
+    panel: vscode.WebviewPanel,
+    documentHtml: string,
+    options: ShellOptions,
+): void {
+    const session = shellFor(panel, options.background);
+    session.html = documentHtml;
+    // A render arriving is what ends the wait, not the request that asked for it
+    // finishing: a superseded request finishes without one, and the newer render it was
+    // superseded by is still coming.
+    session.loading = false;
+    postShellState(panel, session);
+}
+
+/**
+ * Raises or drops the "Calculating…" overlay. An overlay rather than a page of its own:
+ * the page would have to be the webview's document, which is the shell.
+ */
+export function setShellLoading(panel: vscode.WebviewPanel, background: string, on: boolean): void {
+    const session = shellFor(panel, background);
+    session.loading = on;
+    if (session.ready) void panel.webview.postMessage({ type: 'cpdLoading', on });
+}
+
+/**
  * The messages a preview frame sends about itself rather than about the document.
  * Handled for every panel that hosts one — the previews and the compiled-worksheet
  * editor alike — so each keeps its own position. Returns whether the message was one
@@ -56,6 +134,18 @@ export function frameStateFor(panel: vscode.WebviewPanel, docKey: string): Previ
  */
 export function handleFrameStateMessage(panel: vscode.WebviewPanel, message: any): boolean {
     switch (message?.type) {
+        // The shell script has started. Also fires when VS Code reloads a webview it had
+        // torn down (a panel hidden without retainContextWhenHidden), which is why the
+        // last render is held here rather than left to live only in the shell: the
+        // document is no longer part of `webview.html` and would come back empty.
+        case 'cpdShellReady': {
+            const session = shellSessions.get(panel);
+            if (session) {
+                session.ready = true;
+                postShellState(panel, session);
+            }
+            return true;
+        }
         case 'cpdScrollState': {
             const held = frameStates.get(panel);
             const state = parseScrollState(message);
@@ -131,15 +221,6 @@ export function previewCsp(): string {
     ].join('; ') + ';';
 }
 
-/**
- * Escape a document for use as a `srcdoc` attribute value. Only `&` and the `"`
- * delimiter can end the value or start an entity, so escaping both is complete —
- * no sequence in the document can break back out into the shell's markup.
- */
-function escapeSrcdoc(html: string): string {
-    return html.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-}
-
 /** Message types the shell relays out of the frame. Anything else is dropped. */
 const RELAYED = [
     'navigateToLine',
@@ -150,17 +231,28 @@ const RELAYED = [
     'cpdUiState',
 ];
 
+/**
+ * Types only the frame the user is looking at may send. The demoted buffer still holds a
+ * live document whose scroll restore re-anchors once when it settles — up to MAX_MS after
+ * the render that replaced it (see scroll-anchor.ts) — and that report would overwrite
+ * the position the new front frame has already sent.
+ */
+const FRONT_ONLY = ['cpdScrollState'];
+
+/** How long a document gets to report itself loaded before it is shown regardless. */
+const FRAME_READY_TIMEOUT_MS = 30000;
+
 export interface ShellOptions {
-    /** Background behind the frame, so the shell does not flash grey on load. */
+    /** Background behind the frames, so the shell does not flash grey on load. */
     background: string;
 }
 
 /**
- * Wraps a rendered document in the shell that is actually assigned to
- * `panel.webview.html`. The shell holds the only `acquireVsCodeApi` handle, the find
- * widget, and the relay; the document itself only ever exists inside the frame.
+ * The shell that is assigned to `panel.webview.html`, once per panel. It holds the only
+ * `acquireVsCodeApi` handle, the find widget, and the relay; a rendered document only
+ * ever exists inside one of its two frames, pushed in by `renderIntoShell`.
  */
-export function buildPreviewShell(documentHtml: string, options: ShellOptions): string {
+function buildPreviewShell(options: ShellOptions): string {
     const { background } = options;
 
     return `<!DOCTYPE html>
@@ -170,8 +262,51 @@ export function buildPreviewShell(documentHtml: string, options: ShellOptions): 
     <meta http-equiv="Content-Security-Policy" content="${previewCsp().replace(/"/g, '&quot;')}">
     <title>CalcpadCE Preview</title>
     <style>
-        html, body { height: 100%; margin: 0; padding: 0; background: ${background}; }
-        #cpd-doc { display: block; border: 0; width: 100%; height: 100%; background: ${background}; }
+        :root { --cpd-bg: ${background}; }
+        html, body { height: 100%; margin: 0; padding: 0; background: var(--cpd-bg); }
+        /* Double-buffered preview, matching calcpad-web: both frames stay laid out and
+           painted, one occluding the other, so bringing a finished render forward is a
+           z-index flip with nothing left to rasterize. Keeping the frame behind at full
+           size is load-bearing rather than incidental — the scroll restore running in it
+           measures with elementFromPoint and getBoundingClientRect, which need a real
+           viewport, so display:none would leave it landing at the top on the swap. */
+        .cpd-frame {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: var(--cpd-bg);
+            z-index: 1;
+        }
+        .cpd-frame.cpd-back { z-index: 0; pointer-events: none; }
+        /* Veils the render already on screen rather than replacing it, matching
+           calcpad-web: with a buffer holding the last good document there is something
+           worth leaving visible underneath. */
+        .cpd-loading {
+            position: fixed;
+            inset: 0;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            background: color-mix(in srgb, var(--cpd-bg) 70%, transparent);
+            color: var(--vscode-foreground, #333);
+            font: 14px/1.4 var(--vscode-font-family, 'Segoe UI', sans-serif);
+            pointer-events: none;
+        }
+        .cpd-loading[hidden] { display: none; }
+        .cpd-spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(128, 128, 128, 0.25);
+            border-top-color: #0078d4;
+            border-radius: 50%;
+            animation: cpd-spin 0.8s linear infinite;
+        }
+        @keyframes cpd-spin { to { transform: rotate(360deg); } }
         .cpd-find-bar {
             position: fixed;
             top: 0;
@@ -221,37 +356,103 @@ export function buildPreviewShell(documentHtml: string, options: ShellOptions): 
         <button id="cpd-find-next" title="Next match (Enter)">&#8595;</button>
         <button id="cpd-find-close" title="Close (Esc)">&#10005;</button>
     </div>
-    <iframe id="cpd-doc" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads" srcdoc="${escapeSrcdoc(documentHtml)}"></iframe>
+    <div id="cpd-loading" class="cpd-loading" hidden>
+        <div class="cpd-spinner"></div>
+        <span>Calculating…</span>
+    </div>
+    <iframe id="cpd-doc-0" class="cpd-frame" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads"></iframe>
+    <iframe id="cpd-doc-1" class="cpd-frame cpd-back" inert sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads"></iframe>
     <script>
         (function () {
             var vscode = acquireVsCodeApi();
-            var frame = document.getElementById('cpd-doc');
             var RELAYED = ${JSON.stringify(RELAYED)};
+            var FRONT_ONLY = ${JSON.stringify(FRONT_ONLY)};
+            var READY_TIMEOUT_MS = ${FRAME_READY_TIMEOUT_MS};
+            var frames = [document.getElementById('cpd-doc-0'), document.getElementById('cpd-doc-1')];
+            var loading = document.getElementById('cpd-loading');
             var find = document.getElementById('cpd-find');
             var input = document.getElementById('cpd-find-input');
             var count = document.getElementById('cpd-find-count');
 
+            var front = 0;
+            var pending = -1;
+            var readyTimer = 0;
+
             function toFrame(msg) {
-                if (frame.contentWindow) frame.contentWindow.postMessage(msg, '*');
+                var w = frames[front].contentWindow;
+                if (w) w.postMessage(msg, '*');
             }
 
-            // The frame is the one window that can reach here, and identity is the only
-            // usable test: an opaque origin reports itself as "null", so checking the
-            // origin string would admit any other sandboxed frame just the same.
+            function applyBuffers() {
+                for (var i = 0; i < 2; i++) {
+                    frames[i].classList.toggle('cpd-back', i !== front);
+                    // The buffer being rendered into is left reachable: the #UI script
+                    // restores focus and caret as it loads, which inert would swallow.
+                    if (i === front || i === pending) frames[i].removeAttribute('inert');
+                    else frames[i].setAttribute('inert', '');
+                }
+            }
+
+            // Writes a document into whichever buffer is behind and brings it forward once
+            // it reports itself loaded. The front index is set to the slot written rather
+            // than toggled, so two renders racing cannot flip back to the stale one.
+            function render(html, background) {
+                if (background) document.documentElement.style.setProperty('--cpd-bg', background);
+                var slot = front === 0 ? 1 : 0;
+                pending = slot;
+                applyBuffers();
+                clearTimeout(readyTimer);
+                readyTimer = setTimeout(function () { swap(slot); }, READY_TIMEOUT_MS);
+                frames[slot].srcdoc = html;
+            }
+
+            function swap(slot) {
+                if (slot !== pending) return;
+                clearTimeout(readyTimer);
+                pending = -1;
+                front = slot;
+                applyBuffers();
+            }
+
+            // Identity is the only usable test for which window sent something: an opaque
+            // origin reports itself as "null", so checking the origin string would admit
+            // any other sandboxed frame just the same. Anything that is neither buffer is
+            // taken as the host, whose messages arrive through the same event. A frame the
+            // worksheet nested inside a buffer also lands there, which buys it nothing:
+            // fromHost only paints a buffer, and painting one is what a worksheet already
+            // does by being the document in it. The relay out to VS Code is fromFrame's,
+            // and that is reached by window identity alone.
             window.addEventListener('message', function (e) {
-                if (e.source !== frame.contentWindow) return;
                 var d = e.data;
                 if (!d || typeof d.type !== 'string') return;
+                if (e.source === frames[0].contentWindow) fromFrame(0, d);
+                else if (e.source === frames[1].contentWindow) fromFrame(1, d);
+                else fromHost(d);
+            });
+
+            function fromFrame(slot, d) {
+                if (d.type === 'cpdFrameReady') { swap(slot); return; }
+                // A buffer the user has already been moved off may still report — its own
+                // load is unfinished — but only the one in front speaks for the document.
+                if (slot !== front && FRONT_ONLY.indexOf(d.type) !== -1) return;
                 if (d.type === 'cpdFindResult') { renderCount(d.total, d.current); return; }
                 if (d.type === 'previewFindOpen') { openFind(); return; }
                 if (d.type === 'previewContextMenu') { raiseContextMenu(d.x, d.y); return; }
                 if (RELAYED.indexOf(d.type) !== -1) vscode.postMessage(d);
-            });
+            }
+
+            // The extension posts editor->preview sync and the renders themselves here;
+            // the document that has to act on a sync is a frame deeper.
+            function fromHost(d) {
+                if (d.type === 'cpdRender') render(String(d.html || ''), d.background);
+                else if (d.type === 'cpdLoading') loading.hidden = !d.on;
+                else if (d.type === 'scrollToSourceLine') toFrame(d);
+            }
 
             // Re-raise the frame's right-click as one on this document, which is the
             // only one VS Code watches for its webview/context contributions.
             function raiseContextMenu(x, y) {
-                frame.dispatchEvent(new MouseEvent('contextmenu', {
+                frames[front].dispatchEvent(new MouseEvent('contextmenu', {
                     bubbles: true,
                     cancelable: true,
                     button: 2,
@@ -259,14 +460,6 @@ export function buildPreviewShell(documentHtml: string, options: ShellOptions): 
                     clientY: Number(y) || 0,
                 }));
             }
-
-            // Host -> frame. The extension posts editor->preview sync here; the document
-            // that has to act on it is a frame deeper.
-            window.addEventListener('message', function (e) {
-                if (e.source === frame.contentWindow) return;
-                var d = e.data;
-                if (d && d.type === 'scrollToSourceLine') toFrame(d);
-            });
 
             var prev = document.getElementById('cpd-find-prev');
             var next = document.getElementById('cpd-find-next');
@@ -286,7 +479,7 @@ export function buildPreviewShell(documentHtml: string, options: ShellOptions): 
                 find.hidden = true;
                 toFrame({ type: 'cpdFindClear' });
                 renderCount(0, 0);
-                frame.focus();
+                frames[front].focus();
             }
 
             input.addEventListener('input', function () {
@@ -305,6 +498,11 @@ export function buildPreviewShell(documentHtml: string, options: ShellOptions): 
                 if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === 'F')) { e.preventDefault(); openFind(); }
                 else if (e.key === 'Escape' && !find.hidden) { e.preventDefault(); closeFind(); }
             });
+
+            // Nothing can be pushed in until this runs, and it runs again whenever VS Code
+            // reloads a webview it had torn down — so the host answers by re-sending the
+            // render rather than assuming the frames still hold one.
+            vscode.postMessage({ type: 'cpdShellReady' });
         })();
     </script>
 </body>
@@ -354,6 +552,19 @@ export function getFrameAgentScript(options: AgentOptions = {}): string {
                 };
                 window.__calcpadSend = send;
 
+                // Tells the shell to bring this document's buffer forward. Sent from
+                // inside the document because the shell cannot tell an iframe's load event
+                // for the render it just wrote from the one fired for its initial
+                // about:blank — swapping on that would show a blank pane. Held until the
+                // scroll agent has applied the position it was seeded with, so the buffer
+                // comes forward already where the user was rather than scrolling there in
+                // front of them; that wait is capped inside the agent.
+                window.addEventListener('load', function () {
+                    var ready = function () { send({ type: 'cpdFrameReady' }); };
+                    if (window.__calcpadScrollSettled) window.__calcpadScrollSettled(ready);
+                    else ready();
+                });
+
                 // CSP violations and resource load failures, which no console relay can
                 // see. Shared with calcpad-web so all three front ends report alike.
                 ${previewDiagnosticsScript(
@@ -387,7 +598,7 @@ export function getFrameAgentScript(options: AgentOptions = {}): string {
                 // asynchronously, so what is carried across is a DOM anchor. Shared with
                 // calcpad-web; see scroll-anchor.ts.
                 ${scrollAnchorScript(
-        "function (s) { send({ type: 'cpdScrollState', x: s.x, y: s.y, anchor: s.anchor }); }", scroll)}
+        "function (s) { send({ type: 'cpdScrollState', x: s.x, y: s.y, atEnd: s.atEnd, anchor: s.anchor }); }", scroll)}
 
                 // Find runs in here rather than in the shell: the marking walk needs the
                 // document, and an opaque origin denies the shell any reach into it.

@@ -27,7 +27,7 @@ import { DotnetRuntimeManager } from './dotnetRuntimeManager';
 import { VSCodeLogger, VSCodeFileSystem } from './adapters';
 import { expandEnvVars } from './calcpadLocationResolver';
 import { installJuliaMonoCommand, maybePromptInstall } from './installFont';
-import { buildPreviewShell, getFrameAgentScript, frameStateFor, handleFrameStateMessage } from './previewFrame';
+import { renderIntoShell, setShellLoading, getFrameAgentScript, frameStateFor, handleFrameStateMessage } from './previewFrame';
 
 // The wrapped ("regular") and unwrapped previews are independent panels that can
 // coexist: the unwrapped one is stacked directly below the regular one so the
@@ -53,9 +53,9 @@ const uiControls = new Map<string, UiControl[]>();
 // about and dropped when the form closes.
 let uiPanelDocKey: string | undefined = undefined;
 
-// The document each panel last rendered, before it was escaped into the shell's
-// srcdoc. What "View Webview Source" is for is reading the rendered worksheet, and
-// that is unreadable once it is an attribute value.
+// The document each panel last rendered. What "View Webview Source" is for is reading
+// the rendered worksheet, and the shell's own html no longer contains it — the document
+// lives in a frame the shell was handed by message.
 const lastFrameHtml = new WeakMap<vscode.WebviewPanel, string>();
 
 
@@ -279,62 +279,32 @@ function escapeHtml(text: string): string {
         .replace(/"/g, '&quot;');
 }
 
-/**
- * A "Calculating…" page shown in the preview webview during long renders,
- * mirroring the spinner overlay in calcpad-web.
- */
-function getPreviewLoadingHtml(): string {
-    return `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline';">
-    <title>Calculating</title>
-    <style>
-        html, body { height: 100%; margin: 0; }
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            background: #fff;
-            color: #333;
-            font: 14px/1.4 var(--vscode-font-family, 'Segoe UI', sans-serif);
-        }
-        .preview-spinner {
-            width: 36px;
-            height: 36px;
-            border: 3px solid rgba(0, 0, 0, 0.15);
-            border-top-color: #0078d4;
-            border-radius: 50%;
-            animation: preview-spin 0.8s linear infinite;
-        }
-        @keyframes preview-spin { to { transform: rotate(360deg); } }
-    </style>
-</head>
-<body>
-    <div class="preview-spinner"></div>
-    <span>Calculating…</span>
-</body>
-</html>`;
+/** The colour behind a preview's frames, which is also what it fades to while loading. */
+function previewBackground(): string {
+    return getEffectivePreviewTheme() === 'light'
+        ? '#ffffff'
+        : CalcpadSettingsManager.getInstance().getExtra('darkBackground', '#1e1e1e');
 }
 
 /**
- * Shows the loading page in the preview webview only if the render outlasts
+ * Raises the preview's "Calculating…" overlay only if the render outlasts
  * PREVIEW_BUSY_DELAY_MS, so fast renders never flash it (mirrors Calcpad.Wpf's
  * delayed spinner). Returns a function that must be called when the render ends.
+ *
+ * An overlay in the shell rather than a page of its own: a page would have to be the
+ * webview's document, and replacing that would throw away the buffer holding the render
+ * the user is still looking at.
+ *
+ * The returned function only stops the overlay being raised. Lowering it belongs to the
+ * render that replaces it — a request that ends by being superseded has not finished
+ * calculating, it has handed that off.
  */
 function showPreviewLoading(panel: vscode.WebviewPanel): () => void {
+    const background = previewBackground();
     const timer = setTimeout(() => {
-        panel.webview.html = getPreviewLoadingHtml();
+        setShellLoading(panel, background, true);
     }, PREVIEW_BUSY_DELAY_MS);
-    let ended = false;
-    return () => {
-        if (ended) return;
-        ended = true;
-        clearTimeout(timer);
-    };
+    return () => clearTimeout(timer);
 }
 
 /**
@@ -1038,27 +1008,25 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // The rendered document is never the webview's own document: it is sandboxed
         // to an opaque origin inside the shell, which holds the only handle to VS Code.
         lastFrameHtml.set(panel, frameHtml);
-        panel.webview.html = buildPreviewShell(frameHtml, {
-            background: theme === 'light' ? '#ffffff'
-                : settingsManager.getExtra('darkBackground', '#1e1e1e'),
-        });
+        renderIntoShell(panel, frameHtml, { background: previewBackground() });
 
-        outputChannel.appendLine('Webview HTML set (sandboxed preview frame)');
+        outputChannel.appendLine('Preview document pushed to the shell (sandboxed frame)');
 
     } catch (error) {
         outputChannel.appendLine(`ERROR in updatePreviewContent: ${error instanceof Error ? error.message : 'Unknown error'}`);
         const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
         const errorApiBaseUrl = settingsManager.getServerUrl();
         const endpoint = unwrapped ? 'convert?unwrap=true' : 'convert';
-        // Escaped: the message can carry server text, and this page — unlike the
-        // rendered document — is the webview's own document, outside the frame.
+        // Escaped because the message can carry server text. It goes into the frame like
+        // any other document rather than replacing the shell, which would discard the
+        // buffers along with the render still on screen.
         const errorHtml = `
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
-                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline';">
                 <title>CalcpadCE Preview Error</title>
+                ${getFrameAgentScript()}
             </head>
             <body>
                 <div style="color: #d32f2f; background: #ffebee; padding: 15px; border-radius: 4px; margin: 20px;">
@@ -1070,7 +1038,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             </html>
         `;
 
-        panel.webview.html = errorHtml;
+        renderIntoShell(panel, errorHtml, { background: previewBackground() });
     } finally {
         endPreviewLoading();
     }
@@ -1635,6 +1603,12 @@ async function showPreview(kind: PreviewKind, scrollToLine?: number, preserveFoc
         },
         {
             enableScripts: true,
+            // The rendered document lives in a frame the shell is handed by message, not
+            // in `webview.html` (see previewFrame.ts). Letting VS Code tear the webview
+            // down on hide would therefore restore an empty shell and make every reveal
+            // pay for a fresh render — visible as a blank frame, then content. Holding the
+            // context costs memory for at most four panels and keeps a tab switch free.
+            retainContextWhenHidden: true,
             // No enableFindWidget: the workbench's find reaches the webview's own
             // document, and the report it would search is a sandboxed frame deeper.
             // previewFrame.ts carries a find widget that talks to the frame instead.

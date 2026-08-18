@@ -16,6 +16,7 @@ export const calcpadLanguage: monaco.languages.IMonarchLanguage = {
         '#local', '#global', '#round', '#pause',
         '#val', '#equ', '#noc', '#show', '#hide', '#pre', '#post',
         '#end val', '#end equ', '#end noc', '#end show', '#end hide', '#end pre', '#end post',
+        '#end nosub', '#end novar', '#end varsub',
         '#deg', '#rad', '#gra',
         '#md on', '#md off',
         '#const', '#break', '#continue', '#append', '#format', '#settings', '#split',

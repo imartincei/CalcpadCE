@@ -1341,7 +1341,8 @@ function onDocumentInteractionForTabMenu(e: MouseEvent | KeyboardEvent): void {
  * window) is dropped before it can drive the clipboard or the context menu.
  *
  * Both buffers of a pair count: the one behind is loading the render about to be shown,
- * and its console output, scroll state and readiness ping all arrive from there.
+ * and its console output and readiness ping arrive from there. Which of the two sent a
+ * message still matters for scroll state — see onPreviewWindowMessage.
  */
 function senderFrameId(source: MessageEventSource | null): string | null {
   if (!source) return null
@@ -1420,6 +1421,11 @@ function onPreviewWindowMessage(e: MessageEvent): void {
     return
   }
   if (data.type === 'cpdScrollState') {
+    // Only the buffer in front speaks for where the user is. The demoted one still holds
+    // a live document, and its restore re-anchors once when it settles — up to MAX_MS
+    // after the render that replaced it, which on slow async content lands well after the
+    // new front frame has reported and would overwrite it with the old position.
+    if (frontFrame(frameId)?.contentWindow !== e.source) return
     const docKey = docKeyByFrame.get(frameId)
     if (docKey === undefined) return
     const state = parseScrollState(data)
@@ -2146,15 +2152,22 @@ function injectPreviewAgent(
     // #UI script restores the focused control and caret, but not the position, which
     // has to survive content the page lays out long after load.
     scrollAnchorScript(
-      "function(s) { send({ type: 'cpdScrollState', x: s.x, y: s.y, anchor: s.anchor }); }",
+      "function(s) { send({ type: 'cpdScrollState', x: s.x, y: s.y, atEnd: s.atEnd, anchor: s.anchor }); }",
       scroll,
     ),
     '',
     // ---- readiness ----
     // Tells the host to bring this document's buffer forward. Sent from inside the
     // document because the host cannot tell an iframe's load event for the render it
-    // just wrote from the one fired for its initial about:blank.
-    "  window.addEventListener('load', function() { send({ type: 'cpdFrameReady' }); });",
+    // just wrote from the one fired for its initial about:blank. Held until the scroll
+    // agent has applied the position it was seeded with, so the buffer comes forward
+    // already where the user was instead of scrolling there in front of them; that wait
+    // is capped inside the agent.
+    "  window.addEventListener('load', function() {",
+    "    var ready = function() { send({ type: 'cpdFrameReady' }); };",
+    '    if (window.__calcpadScrollSettled) window.__calcpadScrollSettled(ready);',
+    '    else ready();',
+    '  });',
     '',
     // ---- command channel ----
     // Only the host embeds this document, so window.parent is the one sender that

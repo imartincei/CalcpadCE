@@ -219,8 +219,8 @@ namespace Calcpad.Highlighter.Linter.Constants
             "#else", "#end if", "#end def", "#loop", "#break", "#continue",
             "#local", "#global", "#pause", "#input",
             "#end hide", "#end show", "#end pre", "#end post",
-            "#nosub", "#novar", "#varsub",
             "#end val", "#end equ", "#end noc",
+            "#end nosub", "#end novar", "#end varsub",
             "#split", "#wrap", "#phasor", "#complex",
             "#rad", "#deg", "#gra"
         }.ToFrozenSet(System.StringComparer.OrdinalIgnoreCase);
