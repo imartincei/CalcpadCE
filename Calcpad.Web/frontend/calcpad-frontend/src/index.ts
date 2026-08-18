@@ -119,6 +119,22 @@ export type { ImageStorageMode, PickedImage } from './services/image-utils';
 export { extractBodyHtml } from './services/html-body';
 export { previewDiagnosticsScript } from './services/preview-diagnostics';
 
+// --- Preview Memory Limits ---------------------------------------------------
+export {
+    DEFAULT_PREVIEW_SIZE_MB,
+    MIN_PREVIEW_SIZE_MB,
+    MAX_PREVIEW_SIZE_MB,
+    MAX_INLINE_IMAGE_TOTAL_BYTES,
+    MAX_HTML_MIRROR_CHARS,
+    BACK_BUFFER_CLEAR_CHARS,
+    previewSizeLimitChars,
+    formatSize,
+    truncateForOutput,
+    previewLimitNoticeHtml,
+    consoleRelayGuardScript,
+} from './services/preview-limits';
+export type { PreviewLimitNotice } from './services/preview-limits';
+
 export type { ScrollAnchor, PreviewScrollState } from './services/scroll-anchor';
 export { scrollAnchorScript, parseScrollState } from './services/scroll-anchor';
 
@@ -129,6 +145,7 @@ export { buildZip } from './services/zip-writer';
 export type { ZipEntry } from './services/zip-writer';
 export { UiOverrideStore, readUiOverrides, writeUiOverrides, extractUiControls, classifyUiOverrides } from './services/ui-overrides';
 export { isCompiledPath, inlineImageSources, COMPILED_EXTENSION, COMPILED_MIME } from './services/cpdz';
+export type { InlineImageBudget } from './services/cpdz';
 export {
     pathDirname,
     pathBasename,

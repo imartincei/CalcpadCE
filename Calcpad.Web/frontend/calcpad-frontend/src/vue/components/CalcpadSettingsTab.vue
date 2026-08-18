@@ -529,6 +529,22 @@
               @change="updateMaxOutputLines"
             />
           </div>
+
+          <div v-show="rowVisible('diagnostics', 'maxPreviewSize')" class="setting-group">
+            <label for="maxPreviewSize">
+              Max Preview Size (MB):
+              <span class="setting-info" title="A worksheet that renders to more HTML than this is not shown in the preview — showing it risks running the app out of memory. Exporting to PDF, HTML or DOCX is unaffected. Raise it only if you need very large documents on screen.">ⓘ</span>
+            </label>
+            <input
+              id="maxPreviewSize"
+              v-model.number="maxPreviewSizeMB"
+              type="number"
+              :min="MIN_PREVIEW_SIZE_MB"
+              :max="MAX_PREVIEW_SIZE_MB"
+              step="8"
+              @change="updateMaxPreviewSize"
+            />
+          </div>
         </div>
       </section>
 
@@ -604,6 +620,7 @@ import { DEFAULT_PDF_SETTINGS, DEFAULT_VERSION_CONFIG } from '../types'
 import { getDefaultSettings, METADATA_SETTINGS_KEYS, validateSettingValue, SETTINGS_PATH } from '../../types/settings'
 import { PDF_SETTING_KEYS, validatePdfValue } from '../../types/pdf-settings'
 import { specForKey } from '../../types/catalog'
+import { DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB, MAX_PREVIEW_SIZE_MB } from '../../services/preview-limits'
 
 // Props
 interface Props {
@@ -621,6 +638,7 @@ interface Props {
   initialDarkBackground?: string
   initialLinterMinSeverity?: string
   initialMaxOutputLines?: number
+  initialMaxPreviewSize?: number
   versionConfig?: VersionConfig
   initialActiveConfig?: string
   initialAvailableConfigs?: string[]
@@ -645,6 +663,7 @@ const props = withDefaults(defineProps<Props>(), {
   initialDarkBackground: '#1a1a2e',
   initialLinterMinSeverity: 'information',
   initialMaxOutputLines: 1000,
+  initialMaxPreviewSize: DEFAULT_PREVIEW_SIZE_MB,
   versionConfig: () => ({ ...DEFAULT_VERSION_CONFIG }),
   initialActiveConfig: 'default',
   initialAvailableConfigs: () => ['default'],
@@ -669,6 +688,7 @@ const emit = defineEmits<{
   updateDarkBackground: [color: string]
   updateLinterMinSeverity: [severity: string]
   updateMaxOutputLines: [value: number]
+  updateMaxPreviewSize: [value: number]
   resetSettings: []
   saveNamedConfig: [name: string]
   switchConfig: [name: string]
@@ -752,6 +772,7 @@ const enablePreviewUiOverrides = ref(props.initialEnablePreviewUiOverrides)
 const darkBackground = ref(props.initialDarkBackground)
 const linterMinSeverity = ref(props.initialLinterMinSeverity)
 const maxOutputLines = ref(props.initialMaxOutputLines)
+const maxPreviewSizeMB = ref(props.initialMaxPreviewSize)
 const activeConfig = ref(props.initialActiveConfig)
 const availableConfigs = ref<string[]>(props.initialAvailableConfigs)
 const editorFontFamily = ref(props.initialEditorFontFamily)
@@ -847,7 +868,8 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
     title: 'Diagnostics',
     rows: {
       logsFolder: 'open logs folder crash dump',
-      maxOutputLines: 'max output lines channel'
+      maxOutputLines: 'max output lines channel',
+      maxPreviewSize: 'max preview size memory limit mb blocked too large'
     }
   },
   configuration: {
@@ -995,6 +1017,14 @@ const updateMaxOutputLines = () => {
   emit('updateMaxOutputLines', Math.floor(n))
 }
 
+const updateMaxPreviewSize = () => {
+  const n = Number(maxPreviewSizeMB.value)
+  if (!Number.isFinite(n)) return
+  const clamped = Math.min(MAX_PREVIEW_SIZE_MB, Math.max(MIN_PREVIEW_SIZE_MB, Math.floor(n)))
+  maxPreviewSizeMB.value = clamped
+  emit('updateMaxPreviewSize', clamped)
+}
+
 const resetSettings = () => {
   emit('resetSettings')
 }
@@ -1135,6 +1165,13 @@ watch(
   () => props.initialMaxOutputLines,
   (newValue) => {
     maxOutputLines.value = newValue
+  }
+)
+
+watch(
+  () => props.initialMaxPreviewSize,
+  (newValue) => {
+    maxPreviewSizeMB.value = newValue
   }
 )
 

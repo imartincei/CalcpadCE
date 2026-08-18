@@ -44,6 +44,7 @@ import {
     isBrowserNotFound,
     pdfResponseError,
     type PickedImage,
+    type InlineImageBudget,
 } from 'calcpad-frontend';
 import { setAppTheme, coerceAppTheme } from '../editor/app-theme';
 
@@ -220,10 +221,15 @@ export class TauriMessageBridge extends BaseMessageBridge {
      * absolute path, so all that is left here is a relative `src`, which needs
      * the active tab's folder — an untitled document therefore resolves only the
      * absolute ones.
+     *
+     * `budget` bounds the total inlined bytes, which the preview passes: a document
+     * referencing a folder of photographs would otherwise pull all of them into a string
+     * the preview pipeline then copies several times. An export passes none — a written
+     * file keeps every image.
      */
-    async inlineDocumentImages(html: string): Promise<string> {
+    async inlineDocumentImages(html: string, budget?: InlineImageBudget): Promise<string> {
         const documentDir = this.activeTabDirectory();
-        return inlineImageSources(html, tauriReader, (src) => pathResolve(documentDir, src));
+        return inlineImageSources(html, tauriReader, (src) => pathResolve(documentDir, src), budget);
     }
 
     /**

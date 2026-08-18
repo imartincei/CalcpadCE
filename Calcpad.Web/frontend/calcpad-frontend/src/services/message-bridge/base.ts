@@ -17,6 +17,7 @@ import { extractPlotsFromHtml, type ExtractedPlot } from '../plot-extract';
 import { extractUiControls } from '../ui-overrides';
 import type { UiControl } from '../ui-overrides';
 import { COMPILED_MIME } from '../cpdz';
+import { DEFAULT_PREVIEW_SIZE_MB } from '../preview-limits';
 import { buildZip } from '../zip-writer';
 import type { ILogger } from '../../types/interfaces';
 
@@ -299,6 +300,10 @@ export abstract class BaseMessageBridge {
                 this.setExtraSetting('maxOutputLines', String(message.value));
                 this.postToVue({ type: 'maxOutputLinesChanged', value: message.value });
                 break;
+            case 'updateMaxPreviewSize':
+                this.setExtraSetting('maxPreviewSizeMB', String(message.value));
+                this.postToVue({ type: 'maxPreviewSizeChanged', value: message.value });
+                break;
             case 'getPdfSettings':
                 this.handleGetPdfSettings();
                 break;
@@ -482,6 +487,7 @@ export abstract class BaseMessageBridge {
             enablePreviewUiOverrides: this.getExtraSetting('previewUiOverrides') === 'true',
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
+            maxPreviewSizeMB: Number(this.getExtraSetting('maxPreviewSizeMB')) || DEFAULT_PREVIEW_SIZE_MB,
             editorFontFamily: this.getExtraSetting('editorFontFamily') ?? 'JuliaMono',
             ...extras,
         });

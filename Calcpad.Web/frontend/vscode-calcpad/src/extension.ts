@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { pdfResponseError, isBrowserNotFound, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION } from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, DEFAULT_PREVIEW_SIZE_MB, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -27,7 +27,7 @@ import { DotnetRuntimeManager } from './dotnetRuntimeManager';
 import { VSCodeLogger, VSCodeFileSystem } from './adapters';
 import { expandEnvVars } from './calcpadLocationResolver';
 import { installJuliaMonoCommand, maybePromptInstall } from './installFont';
-import { renderIntoShell, setShellLoading, getFrameAgentScript, frameStateFor, handleFrameStateMessage } from './previewFrame';
+import { renderIntoShell, setShellLoading, getFrameAgentScript, frameStateFor, handleFrameStateMessage, lastRenderedHtml } from './previewFrame';
 
 // The wrapped ("regular") and unwrapped previews are independent panels that can
 // coexist: the unwrapped one is stacked directly below the regular one so the
@@ -52,11 +52,6 @@ const uiControls = new Map<string, UiControl[]>();
 // Document the input form is currently showing, so its values can be prompted
 // about and dropped when the form closes.
 let uiPanelDocKey: string | undefined = undefined;
-
-// The document each panel last rendered. What "View Webview Source" is for is reading
-// the rendered worksheet, and the shell's own html no longer contains it — the document
-// lives in a frame the shell was handed by message.
-const lastFrameHtml = new WeakMap<vscode.WebviewPanel, string>();
 
 
 // The compiled-worksheet editor, which holds the decoded source of every open `.cpdz`:
@@ -357,15 +352,24 @@ const IMAGE_MIME_MAP: Record<string, string> = {
  * `Calcpad.Core.ImageReferences` has already expanded any `{project}`/`{library}`/`{user}`
  * token and env var (`%VAR%`/`$VAR`) into an absolute path, so only a relative src is left
  * to join against `documentDir`.
+ *
+ * `maxTotalBytes` bounds what a single render will read: a worksheet referencing a folder
+ * of photographs would otherwise pull all of them into memory as base64, which costs a
+ * third again on top of the files themselves. Images past the budget keep their original
+ * src, which the sandboxed frame cannot load, so they show as broken rather than silently
+ * looking fine. The export/PDF path passes no budget — a written file keeps every image.
  */
 async function buildImageCache(
     html: string,
     documentDir: string,
+    maxTotalBytes?: number,
 ): Promise<Record<string, string>> {
     const cache: Record<string, string> = {};
     const resolve = (src: string) => path.resolve(documentDir, src);
     const imgSrcRegex = /<img\s[^>]*?src\s*=\s*["']([^"']+)["'][^>]*>/gi;
     let match;
+    let inlined = 0;
+    let skipped = 0;
 
     while ((match = imgSrcRegex.exec(html)) !== null) {
         const src = match[1];
@@ -377,6 +381,11 @@ async function buildImageCache(
 
         // Skip if already cached (same src used multiple times)
         if (cache[src]) {
+            continue;
+        }
+
+        if (maxTotalBytes !== undefined && inlined >= maxTotalBytes) {
+            skipped++;
             continue;
         }
 
@@ -394,11 +403,17 @@ async function buildImageCache(
             const imageData = await vscode.workspace.fs.readFile(fileUri);
             const b64 = Buffer.from(imageData).toString('base64');
             cache[src] = `data:${mimeType};base64,${b64}`;
+            inlined += imageData.length;
 
             outputChannel.appendLine(`[IMAGE CACHE] Cached: ${src} (${imageData.length} bytes)`);
         } catch (error) {
             outputChannel.appendLine(`[IMAGE CACHE] Could not read image: ${src} (${error instanceof Error ? error.message : 'Unknown error'})`);
         }
+    }
+
+    if (skipped) {
+        outputChannel.appendLine(
+            `[IMAGE CACHE] Budget of ${formatSize(maxTotalBytes ?? 0)} reached — ${skipped} image(s) left unembedded`);
     }
 
     return cache;
@@ -422,34 +437,6 @@ function applyImageCache(html: string, imageCache: Record<string, string>): stri
             }
             return match;
         });
-}
-
-/**
- * Generate a <script> block that replaces local image src attributes
- * with cached base64 data URIs on DOMContentLoaded.
- */
-function getImageCacheScript(imageCache: Record<string, string>): string {
-    if (Object.keys(imageCache).length === 0) {
-        return '';
-    }
-
-    const cacheJson = JSON.stringify(imageCache);
-    return `
-        <script>
-            (function() {
-                const imageCache = ${cacheJson};
-                document.addEventListener('DOMContentLoaded', function() {
-                    const images = document.querySelectorAll('img');
-                    images.forEach(function(img) {
-                        const src = img.getAttribute('src');
-                        if (src && imageCache[src]) {
-                            img.src = imageCache[src];
-                        }
-                    });
-                });
-            })();
-        </script>
-    `;
 }
 
 /**
@@ -507,6 +494,16 @@ function repairStrayAngleBrackets(html: string): string {
 function getErrorNavigationScript(): string {
     return `
         <script>
+            // Every relayed line goes through __calcpadRelayLine first: a worksheet script
+            // logging a parsed data set, or logging in a loop, would otherwise push its whole
+            // heap across the boundary and into an output channel that holds it. Clipping in
+            // here is the point — the oversized string never crosses.
+            ${consoleRelayGuardScript()}
+
+            function relayConsole(level, text) {
+                const line = window.__calcpadRelayLine(text);
+                if (line !== null) window.__calcpadSend({ type: 'consoleMessage', level: level, message: line });
+            }
 
             // Intercept console methods and relay to VS Code. The document runs a frame
             // deeper than the webview now, on an opaque origin with no acquireVsCodeApi
@@ -533,11 +530,7 @@ function getErrorNavigationScript(): string {
                         return String(arg);
                     }).join(' ');
 
-                    window.__calcpadSend({
-                        type: 'consoleMessage',
-                        level: level,
-                        message: message
-                    });
+                    relayConsole(level, message);
                 }
 
                 console.log = function() {
@@ -569,12 +562,12 @@ function getErrorNavigationScript(): string {
             // Catch uncaught errors and unhandled promise rejections
             window.onerror = function(message, source, lineno, colno, error) {
                 const detail = error ? (error.message || String(error)) : message;
-                window.__calcpadSend({ type: 'consoleMessage', level: 'error', message: '[Uncaught] ' + detail + ' (' + lineno + ':' + colno + ')' });
+                relayConsole('error', '[Uncaught] ' + detail + ' (' + lineno + ':' + colno + ')');
             };
             window.onunhandledrejection = function(event) {
                 const reason = event.reason;
                 const detail = reason ? (reason.message || String(reason)) : String(reason);
-                window.__calcpadSend({ type: 'consoleMessage', level: 'error', message: '[Unhandled Rejection] ' + detail });
+                relayConsole('error', '[Unhandled Rejection] ' + detail);
             };
 
             // Test console interception
@@ -940,6 +933,25 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // Use the entire API response as the webview HTML
         const apiResponse = await response.text();
 
+        // Before anything copies it. Showing a render costs several times its own size —
+        // the image inlining, the injection passes, the message into the webview, and the
+        // live documents built from it — so the one check that can hold the line is the one
+        // in front of all of them. Everything below is bounded by having passed here.
+        const sizeLimit = previewSizeLimitChars(
+            CalcpadSettingsManager.getInstance(extensionContext)
+                .getExtraNumber('maxPreviewSizeMB', DEFAULT_PREVIEW_SIZE_MB));
+        if (apiResponse.length > sizeLimit) {
+            outputChannel.appendLine(
+                `Preview blocked: render is ${formatSize(apiResponse.length)}, limit is ${formatSize(sizeLimit)}`);
+            const notice = previewLimitNoticeHtml({
+                chars: apiResponse.length,
+                limitChars: sizeLimit,
+                theme: getEffectivePreviewTheme(),
+            }).replace('</head>', getFrameAgentScript() + '</head>');
+            renderIntoShell(panel, notice, { background: previewBackground() });
+            return;
+        }
+
         // Share the freshly-converted HTML with the Vue side panel so the
         // Export tab can extract plot bytes without another server round-trip.
         vueUiProvider?.setCachedHtml(apiResponse);
@@ -951,9 +963,10 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             vueUiProvider?.updateUiControls(uiControls.get(docKey) ?? null);
         }
 
-        // Log to dedicated HTML output channel (without stealing focus)
+        // Log to dedicated HTML output channel (without stealing focus). Clipped: the channel
+        // is for reading a render, and holding a whole one doubles what this panel costs.
         calcpadOutputHtmlChannel.clear();
-        calcpadOutputHtmlChannel.appendLine(extractBodyHtml(apiResponse));
+        calcpadOutputHtmlChannel.appendLine(truncateForOutput(extractBodyHtml(apiResponse), MAX_HTML_MIRROR_CHARS));
 
         outputChannel.appendLine(`HTML Length: ${apiResponse.length} characters`);
 
@@ -962,7 +975,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // resolved every token to an absolute path, so those still render.
         const documentDir = activeEditor && !activeEditor.document.isUntitled
             ? path.dirname(activeEditor.document.uri.fsPath) : '';
-        const imageCacheScript = getImageCacheScript(await buildImageCache(apiResponse, documentDir));
+        const imageCache = await buildImageCache(apiResponse, documentDir, MAX_INLINE_IMAGE_TOTAL_BYTES);
 
         // Inject JavaScript for error link navigation and console interception
         const errorNavigationScript = getErrorNavigationScript();
@@ -984,7 +997,11 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
 
         // Repair stray '<' that aren't part of valid tags. Not a security control —
         // see the function's own comment; containment is the sandboxed frame below.
-        const repairedResponse = repairStrayAngleBrackets(apiResponse);
+        // The image cache is applied in the same pass rather than shipped as a script the
+        // frame runs: a script would carry every data URI as source text *and* as a parsed
+        // object, so the images would cost twice over inside the webview. This matches what
+        // calcpad-web and the PDF path already do.
+        const repairedResponse = applyImageCache(repairStrayAngleBrackets(apiResponse), imageCache);
 
         // Where this panel's frame was before the render that is replacing it. An
         // explicit line target is a navigation the user asked for, and outranks
@@ -1002,12 +1019,11 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // relays through it, user scripts in <body> included.
         let frameHtml = repairedResponse.replace('</head>',
             agentScript + errorNavigationScript + scrollbarStyleScript + '</head>');
-        // Inject image cache + theme override + line links before closing body tag
-        frameHtml = frameHtml.replace('</body>', imageCacheScript + themeOverrideScript + lineLinkScript + '</body>');
+        // Inject theme override + line links before closing body tag
+        frameHtml = frameHtml.replace('</body>', themeOverrideScript + lineLinkScript + '</body>');
 
         // The rendered document is never the webview's own document: it is sandboxed
         // to an opaque origin inside the shell, which holds the only handle to VS Code.
-        lastFrameHtml.set(panel, frameHtml);
         renderIntoShell(panel, frameHtml, { background: previewBackground() });
 
         outputChannel.appendLine('Preview document pushed to the shell (sandboxed frame)');
@@ -2045,15 +2061,19 @@ export async function activate(context: vscode.ExtensionContext) {
     vueUiProvider = new CalcpadVueUIProvider(context.extensionUri, context, settingsManager, insertManager);
     vueUiProvider.getSourceEditor = () => vscode.window.activeTextEditor ?? previewSourceEditor;
     vueUiProvider.getDefinitions = (uri: string) => definitionsService.getCachedDefinitions(uri);
+    // Both fall back to previewSourceEditor: a setting is usually changed with the sidebar
+    // focused while a *preview panel* holds the editor area, and a webview panel being active
+    // means there is no activeTextEditor at all. Without the fallback the re-render these
+    // hooks exist for silently does nothing.
     vueUiProvider.onPreviewThemeChanged = async () => {
-        const activeEditor = vscode.window.activeTextEditor;
-        if (!activeEditor) return;
-        await refreshPreviewPanels(activeEditor.document);
+        const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
+        if (!editor) return;
+        await refreshPreviewPanels(editor.document);
     };
     vueUiProvider.onSettingsChanged = async () => {
-        const activeEditor = vscode.window.activeTextEditor;
-        if (!activeEditor) return;
-        await refreshPreviewPanels(activeEditor.document);
+        const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
+        if (!editor) return;
+        await refreshPreviewPanels(editor.document);
     };
     // Rendered on demand rather than served from the cache: this is what the Properties
     // tab asks when it has no answer or wants a fresh one, and the cache is only as new
@@ -2280,7 +2300,7 @@ export async function activate(context: vscode.ExtensionContext) {
             vscode.window.showWarningMessage('No active CalcpadCE preview to inspect.');
             return;
         }
-        webviewSourceHtml = lastFrameHtml.get(inspectPanel) ?? inspectPanel.webview.html;
+        webviewSourceHtml = lastRenderedHtml(inspectPanel) ?? inspectPanel.webview.html;
         webviewSourceProvider.onDidChangeEmitter.fire(webviewSourceUri);
         const doc = await vscode.workspace.openTextDocument(webviewSourceUri);
         await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside, true);

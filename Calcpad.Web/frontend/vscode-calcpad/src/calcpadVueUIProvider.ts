@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB } from 'calcpad-frontend';
 import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse, SettingsValues, UiDirectiveData, UiControl } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
@@ -174,6 +174,14 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 
                 case 'updateLinterMinSeverity':
                     this._settingsManager.setExtra('linterMinSeverity', data.severity);
+                    break;
+
+                // Decides whether an open preview is shown at all, so raising it has to
+                // re-render — a document blocked under the old value is showing the notice
+                // rather than a render, and nothing else would replace it.
+                case 'updateMaxPreviewSize':
+                    this._settingsManager.setExtra('maxPreviewSizeMB', data.value);
+                    void this.onSettingsChanged?.();
                     break;
 
                 case 'updatePdfSettings': {
@@ -443,6 +451,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             enablePreviewUiOverrides: sm.getExtraBool('previewUiOverrides', false),
             darkBackground: sm.getExtra('darkBackground', '#1e1e1e'),
             linterMinSeverity: sm.getExtra('linterMinSeverity', 'information'),
+            maxPreviewSizeMB: sm.getExtraNumber('maxPreviewSizeMB', DEFAULT_PREVIEW_SIZE_MB),
             activeConfig: sm.getActivePresetName(),
             availableConfigs: await sm.listPresets(),
         };

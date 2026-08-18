@@ -86,6 +86,7 @@
         :initial-dark-background="darkBackground"
         :initial-linter-min-severity="linterMinSeverity"
         :initial-max-output-lines="maxOutputLines"
+        :initial-max-preview-size="maxPreviewSizeMB"
         :version-config="versionConfig"
         :initial-active-config="activeConfig"
         :initial-available-configs="availableConfigs"
@@ -108,6 +109,7 @@
         @update-dark-background="handleUpdateDarkBackground"
         @update-linter-min-severity="handleUpdateLinterMinSeverity"
         @update-max-output-lines="handleUpdateMaxOutputLines"
+        @update-max-preview-size="handleUpdateMaxPreviewSize"
         @reset-settings="handleResetSettings"
         @save-named-config="handleSaveNamedConfig"
         @switch-config="handleSwitchConfig"
@@ -186,6 +188,7 @@ import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading,
 import { DEFAULT_VERSION_CONFIG } from '../types'
 import type { CalcpadError, ExportVariant } from '../../types/api'
 import { DEFAULT_PDF_SETTINGS } from '../types'
+import { DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB } from '../../services/preview-limits'
 
 // Props
 interface Props {
@@ -241,6 +244,7 @@ const enablePreviewUiOverrides = ref(false)
 const darkBackground = ref('#1e1e1e')
 const linterMinSeverity = ref('information')
 const maxOutputLines = ref(1000)
+const maxPreviewSizeMB = ref(DEFAULT_PREVIEW_SIZE_MB)
 const activeConfig = ref('default')
 const availableConfigs = ref<string[]>(['default'])
 const editorFontFamily = ref('JuliaMono')
@@ -521,6 +525,11 @@ const handleUpdateMaxOutputLines = (value: number) => {
   postMessage({ type: 'updateMaxOutputLines', value })
 }
 
+const handleUpdateMaxPreviewSize = (value: number) => {
+  maxPreviewSizeMB.value = value
+  postMessage({ type: 'updateMaxPreviewSize', value })
+}
+
 const handleResetSettings = () => {
   postMessage({
     type: 'resetSettings'
@@ -667,6 +676,9 @@ const handleMessage = (event: MessageEvent) => {
       linterMinSeverity.value = message.linterMinSeverity || 'information'
       if (typeof message.maxOutputLines === 'number' && message.maxOutputLines >= 10) {
         maxOutputLines.value = message.maxOutputLines
+      }
+      if (typeof message.maxPreviewSizeMB === 'number' && message.maxPreviewSizeMB >= MIN_PREVIEW_SIZE_MB) {
+        maxPreviewSizeMB.value = message.maxPreviewSizeMB
       }
       if (message.activeConfig) activeConfig.value = message.activeConfig
       if (Array.isArray(message.availableConfigs)) availableConfigs.value = message.availableConfigs

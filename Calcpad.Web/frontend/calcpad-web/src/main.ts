@@ -15,6 +15,13 @@ import {
     extractUiControls,
     isCompiledPath,
     documentHasUiDirectives,
+    DEFAULT_PREVIEW_SIZE_MB,
+    MIN_PREVIEW_SIZE_MB,
+    MAX_INLINE_IMAGE_TOTAL_BYTES,
+    previewSizeLimitChars,
+    previewLimitNoticeHtml,
+    formatSize,
+    type InlineImageBudget,
 } from 'calcpad-frontend';
 import { registerCalcpadLanguage, registerCalcpadTheme, remeasureEditorFontsWhenReady, resolveEditorFontFamily } from './editor/setup';
 import { setAppTheme, coerceAppTheme } from './editor/app-theme';
@@ -356,6 +363,44 @@ async function bootstrap(): Promise<void> {
     // Properties tab whether a saved value still applies to anything.
     const uiControls = new Map<string, UiControl[]>();
 
+    /** Caps what a preview render will inline, and says so rather than dropping images silently. */
+    function previewImageBudget(group: EditorGroup): InlineImageBudget {
+        return {
+            maxTotalBytes: MAX_INLINE_IMAGE_TOTAL_BYTES,
+            onSkip: (skipped) => appInstance.appendOutput('warn',
+                `Image budget of ${formatSize(MAX_INLINE_IMAGE_TOTAL_BYTES)} reached — ${skipped} image(s) left unembedded in the preview.`,
+                'preview', group.id),
+        };
+    }
+
+    function previewSizeLimit(): number {
+        const stored = Number(editorBridge.getExtraSetting('maxPreviewSizeMB'));
+        return previewSizeLimitChars(Number.isFinite(stored) && stored > 0 ? stored : DEFAULT_PREVIEW_SIZE_MB);
+    }
+
+    /**
+     * Whether this render is too big to show, and if so shows the notice in its place.
+     * Called before anything copies the HTML: the pipeline below multiplies it several
+     * times over, so passing here is what bounds every one of those copies.
+     */
+    function previewTooLarge(group: EditorGroup, html: string, uiPrint = false): boolean {
+        const docKey = uiDocKeyFor(group);
+        const limit = previewSizeLimit();
+        if (html.length <= limit) return false;
+
+        appInstance.appendOutput('warn',
+            `Preview blocked: this document rendered to ${formatSize(html.length)}, over the ${formatSize(limit)} limit.`,
+            'preview', group.id);
+        const notice = previewLimitNoticeHtml({
+            chars: html.length,
+            limitChars: limit,
+            theme: resolvePreviewTheme(),
+        });
+        if (uiPrint) void appInstance.setUiPrintHtml(group.id, notice, docKey);
+        else void appInstance.setPreviewHtml(group.id, notice, undefined, docKey);
+        return true;
+    }
+
     // Tauri's `invoke`, once the desktop-only block below has imported it. Null in the
     // web build, where there is no native menu to keep in step.
     let invokeTauri: (<T>(cmd: string, args?: Record<string, unknown>) => Promise<T>) | null = null;
@@ -609,11 +654,18 @@ async function bootstrap(): Promise<void> {
         pendingPreviewScrollLine.delete(group.id);
 
         if (result && !(result instanceof ArrayBuffer)) {
+            // Before the image inlining and the injection passes each copy it. Showing a
+            // render costs several times its own size, so the check that can hold the line
+            // is the one in front of all of them.
+            if (previewTooLarge(group, result.html)) {
+                await hideLoading();
+                return;
+            }
             // Desktop: inline on-disk images so relative <img src> paths (from
             // the images-folder / custom-path insert options) render in the
             // sandboxed preview iframe, matching PDF export.
             const finalHtml = tauriBridge
-                ? await tauriBridge.inlineDocumentImages(result.html)
+                ? await tauriBridge.inlineDocumentImages(result.html, previewImageBudget(group))
                 : result.html;
             const committed = appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine, uiDocKeyFor(group));
             if (mode === 'ui') uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
@@ -645,9 +697,10 @@ async function bootstrap(): Promise<void> {
             { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)), hideErrorLines: true },
             true, { key: `preview:${group.id}` });
         if (!result || result instanceof ArrayBuffer) return;
+        if (previewTooLarge(group, result.html, true)) return;
 
         const html = tauriBridge
-            ? await tauriBridge.inlineDocumentImages(result.html)
+            ? await tauriBridge.inlineDocumentImages(result.html, previewImageBudget(group))
             : result.html;
         await appInstance.setUiPrintHtml(group.id, html, uiDocKeyFor(group));
     }
@@ -1081,6 +1134,12 @@ async function bootstrap(): Promise<void> {
         if (e.data?.type === 'maxOutputLinesChanged') {
             const n = Number(e.data.value);
             if (Number.isFinite(n)) appInstance.setMaxOutputLines(n);
+        }
+        // A raised limit should take effect on what is already on screen, and a document
+        // blocked under the old one is showing the notice rather than a render.
+        if (e.data?.type === 'maxPreviewSizeChanged') {
+            const n = Number(e.data.value);
+            if (Number.isFinite(n) && n >= MIN_PREVIEW_SIZE_MB) refreshAllPreviews();
         }
         if (e.data?.type === 'exportError') {
             appInstance.appendOutput('error', String(e.data.message ?? 'Export failed'));

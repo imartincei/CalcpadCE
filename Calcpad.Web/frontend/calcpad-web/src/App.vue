@@ -556,6 +556,10 @@ import {
   parseScrollState,
   previewDiagnosticsScript,
   scrollAnchorScript,
+  consoleRelayGuardScript,
+  truncateForOutput,
+  BACK_BUFFER_CLEAR_CHARS,
+  MAX_HTML_MIRROR_CHARS,
   type PreviewScrollState,
 } from 'calcpad-frontend'
 
@@ -1704,13 +1708,19 @@ function resolveFrameReady(source: MessageEventSource | null): void {
  */
 function commitToBuffer(frameId: string, html: string): Promise<void> {
   const slot: 0 | 1 = frontIndex(frameId) === 0 ? 1 : 0
-  const frame = framePair(frameId)?.[slot]
+  const pair = framePair(frameId)
+  const frame = pair?.[slot]
   if (!frame) return Promise.resolve()
+  const demoted = pair?.[frontIndex(frameId)]
   loadingBuffer.value = { ...loadingBuffer.value, [frameId]: slot }
   const ready = awaitFrameReady(frame)
   frame.srcdoc = html
   return ready.then(() => {
     frontBuffer.value = { ...frontBuffer.value, [frameId]: slot }
+    // Two live documents is the cost of never showing a half-replaced frame. For a large
+    // render that doubles what the pane holds, and the demoted buffer is only ever
+    // overwritten by the next render, so it is emptied rather than kept.
+    if (demoted && demoted !== frame && html.length > BACK_BUFFER_CLEAR_CHARS) demoted.srcdoc = ''
   })
 }
 
@@ -1772,10 +1782,12 @@ function toggleUiPrint(): void {
 // Mirrors the last rendered preview into the 'html' output channel (body only,
 // so it matches what the print/export path also strips out) for debugging.
 // Each render replaces the group's prior line rather than appending, since old
-// output is immediately stale.
+// output is immediately stale. Clipped, because maxOutputLines caps lines and not
+// their length: a whole render in one line is a second copy of the document, held
+// for as long as the tab is open and rendered into the DOM whenever it is shown.
 function setPreviewHtmlOutput(groupId: string, html: string): void {
   outputLines.value = outputLines.value.filter(l => !(l.channel === 'html' && l.groupId === groupId))
-  appendOutput('info', extractBodyHtml(html), 'html', groupId)
+  appendOutput('info', truncateForOutput(extractBodyHtml(html), MAX_HTML_MIRROR_CHARS), 'html', groupId)
 }
 
 // Scroll a group's results to a source line (editor/TOC -> preview sync). Posts to
@@ -2192,6 +2204,10 @@ function injectPreviewAgent(
 function injectPreviewConsole(html: string, groupId: string): string {
   const gid = JSON.stringify(groupId)
   const body = [
+    // Every relayed line is clipped and counted here, inside the frame: a worksheet script
+    // logging a parsed data set, or logging in a loop, would otherwise push its whole heap
+    // across the boundary and into an Output channel that holds it.
+    consoleRelayGuardScript(),
     '(function() {',
     // Published before the patch guard so it is always set: the backend's #UI
     // event script reads it to tag its messages with the owning group.
@@ -2205,7 +2221,9 @@ function injectPreviewConsole(html: string, groupId: string): string {
     "      if (typeof a === 'object') { try { return JSON.stringify(a); } catch (e) { return String(a); } }",
     '      return String(a);',
     "    }).join(' ');",
-    "    try { window.parent.postMessage({ type: 'previewConsole', level: level, message: msg, groupId: GROUP_ID }, '*'); } catch (e) {}",
+    '    var line = window.__calcpadRelayLine(msg);',
+    '    if (line === null) return;',
+    "    try { window.parent.postMessage({ type: 'previewConsole', level: level, message: line, groupId: GROUP_ID }, '*'); } catch (e) {}",
     '  };',
     "  ['log','info','debug','warn','error'].forEach(function(level) {",
     '    var orig = console[level];',

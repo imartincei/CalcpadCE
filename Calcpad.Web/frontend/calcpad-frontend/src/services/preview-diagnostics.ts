@@ -22,6 +22,8 @@
  * transport does not, because each host addresses its own log differently.
  */
 
+import { consoleRelayGuardScript } from './preview-limits';
+
 /**
  * Builds a `<script>` body (no tag) that relays both failure classes.
  *
@@ -36,8 +38,15 @@
  */
 export function previewDiagnosticsScript(emit: string): string {
     return [
+        consoleRelayGuardScript(),
         '(function () {',
-        '  var emit = ' + emit + ';',
+        '  var raw = ' + emit + ';',
+        // Both classes report a URL the document controls, so both are clipped and counted
+        // like any other relayed line. A suppressed one is dropped rather than emitted.
+        '  var emit = function (level, message) {',
+        '    var line = window.__calcpadRelayLine(message);',
+        '    if (line !== null) raw(level, line);',
+        '  };',
         // Guard: a document may be handed several injected blocks, and reporting the
         // same violation twice reads as two separate failures.
         '  if (window.__calcpadDiagnosticsReady) return;',

@@ -27,6 +27,7 @@ import {
     parseScrollState,
     previewDiagnosticsScript,
     scrollAnchorScript,
+    BACK_BUFFER_CLEAR_CHARS,
     type PreviewScrollState,
 } from 'calcpad-frontend';
 
@@ -70,6 +71,15 @@ interface ShellSession {
 }
 
 const shellSessions = new WeakMap<vscode.WebviewPanel, ShellSession>();
+
+/**
+ * The document last pushed into this panel, which the shell has to be able to re-send
+ * anyway (see `cpdShellReady`). Read by the "inspect webview source" command rather than
+ * having the extension keep a second copy of every render.
+ */
+export function lastRenderedHtml(panel: vscode.WebviewPanel): string | undefined {
+    return shellSessions.get(panel)?.html ?? undefined;
+}
 
 function postShellState(panel: vscode.WebviewPanel, session: ShellSession): void {
     if (!session.ready) return;
@@ -368,6 +378,7 @@ function buildPreviewShell(options: ShellOptions): string {
             var RELAYED = ${JSON.stringify(RELAYED)};
             var FRONT_ONLY = ${JSON.stringify(FRONT_ONLY)};
             var READY_TIMEOUT_MS = ${FRAME_READY_TIMEOUT_MS};
+            var BACK_BUFFER_CLEAR_CHARS = ${BACK_BUFFER_CLEAR_CHARS};
             var frames = [document.getElementById('cpd-doc-0'), document.getElementById('cpd-doc-1')];
             var loading = document.getElementById('cpd-loading');
             var find = document.getElementById('cpd-find');
@@ -377,6 +388,9 @@ function buildPreviewShell(options: ShellOptions): string {
             var front = 0;
             var pending = -1;
             var readyTimer = 0;
+            // Whether the render now being brought forward was big enough that holding the
+            // previous one behind it is not worth the memory.
+            var releaseBack = false;
 
             function toFrame(msg) {
                 var w = frames[front].contentWindow;
@@ -400,6 +414,7 @@ function buildPreviewShell(options: ShellOptions): string {
                 if (background) document.documentElement.style.setProperty('--cpd-bg', background);
                 var slot = front === 0 ? 1 : 0;
                 pending = slot;
+                releaseBack = html.length > BACK_BUFFER_CLEAR_CHARS;
                 applyBuffers();
                 clearTimeout(readyTimer);
                 readyTimer = setTimeout(function () { swap(slot); }, READY_TIMEOUT_MS);
@@ -410,8 +425,13 @@ function buildPreviewShell(options: ShellOptions): string {
                 if (slot !== pending) return;
                 clearTimeout(readyTimer);
                 pending = -1;
+                var demoted = front;
                 front = slot;
                 applyBuffers();
+                // Two live documents is the cost of never showing a half-replaced frame. For a
+                // large render that cost doubles what the panel holds, and the demoted buffer is
+                // only ever overwritten by the next render, so it is emptied instead of kept.
+                if (releaseBack && demoted !== slot) frames[demoted].srcdoc = '';
             }
 
             // Identity is the only usable test for which window sent something: an opaque

@@ -33,14 +33,27 @@ export function isCompiledPath(filePath: string): boolean {
  * worksheet, which is deflated before Core ever sees it — still needs the full
  * {@link createReferenceResolver}. Both accept the same input because the
  * CalcPad source carries images as `'<img src="…">` comment lines.
+ *
+ * `budget` caps the total inlined bytes, for the preview — where a document that
+ * inlines gigabytes of images is a crash rather than a render. It is left off when
+ * writing a file: a saved worksheet must not silently lose an image.
  */
+export interface InlineImageBudget {
+    maxTotalBytes: number;
+    /** Called once, with how many sources were left as-is, if the budget ran out. */
+    onSkip?: (skipped: number) => void;
+}
+
 export async function inlineImageSources(
     text: string,
     fs: Pick<IFileSystem, 'readFile'>,
     resolve: (src: string) => string | Promise<string>,
+    budget?: InlineImageBudget,
 ): Promise<string> {
     const cache: Record<string, string> = {};
     const seen = new Set<string>();
+    let inlined = 0;
+    let skipped = 0;
     // Built per call: `exec` state is stateful, and this loop awaits between matches.
     const imgTag = /<img\s[^>]*?src\s*=\s*["']([^"']+)["'][^>]*>/gi;
     let m: RegExpExecArray | null;
@@ -53,13 +66,20 @@ export async function inlineImageSources(
         const ext = (src.split('.').pop() ?? '').toLowerCase();
         if (!isImageExtension(ext)) continue;
 
+        if (budget && inlined >= budget.maxTotalBytes) {
+            skipped++;
+            continue;
+        }
+
         try {
             const bytes = await fs.readFile(await resolve(src));
             cache[src] = `data:${mimeFromExtension(ext)};base64,${bytesToBase64(bytes)}`;
+            inlined += bytes.length;
         } catch {
             // missing file, permission error, or undeclared token root → leave src untouched
         }
     }
+    if (skipped) budget?.onSkip?.(skipped);
 
     if (Object.keys(cache).length === 0) return text;
     return text.replace(
