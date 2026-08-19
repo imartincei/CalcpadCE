@@ -4,11 +4,7 @@ namespace Calcpad.Core
 {
     public partial class ExpressionParser
     {
-        /// <summary>
-        /// Marks a source that carries its own data instead of naming a file:
-        /// <c>#read M from data:text/csv;base64,MSwyCjMsNAo= type=R_hp</c>. A compiled worksheet
-        /// is written this way, so it reads what it was compiled with and needs nothing beside it.
-        /// </summary>
+        /// <summary>Marks a source that carries base64 data instead of naming a file</summary>
         internal const string DataUri = "data:";
         /// <summary>How much of a malformed source an error quotes, so a payload is not printed whole.</summary>
         private const int DataUriErrorLength = 32;
@@ -71,7 +67,6 @@ namespace Calcpad.Core
             {
                 if (command > 0)
                     Type = 'N';
-
                 var ts = new TextSpan(s);
                 var i0 = 0;
                 var len = s.Length;
@@ -103,9 +98,8 @@ namespace Calcpad.Core
                 {
                     // Base64 holds none of the characters that delimit what follows the source,
                     // so a sheet and a range are written after a payload as after a file name.
-                    i1 = i0;
-                    while (i1 < len && s[i1] is not ' ' and not '@' and not '!')
-                        ++i1;
+                    var end = s[i0..].IndexOfAny(' ', '@', '!');
+                    i1 = end < 0 ? len : i0 + end;
 
                     var uri = s[i0..i1];
                     var comma = uri.IndexOf(',');
