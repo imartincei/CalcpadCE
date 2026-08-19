@@ -33,6 +33,7 @@ import {
     bytesToBase64,
     isCompiledPath,
     inlineImageSources,
+    MAX_COMPILED_IMAGE_TOTAL_BYTES,
     createReferenceResolver,
     pathBasename,
     pathDirname,
@@ -241,7 +242,10 @@ export class TauriMessageBridge extends BaseMessageBridge {
         const documentDir = this.activeTabDirectory();
         const resolve = createReferenceResolver(
             content, documentDir, (raw) => this.expandEnvVars(raw), pathResolve, () => this.getHomeDir());
-        return inlineImageSources(content, tauriReader, resolve);
+        return inlineImageSources(content, tauriReader, resolve, {
+            maxTotalBytes: MAX_COMPILED_IMAGE_TOTAL_BYTES,
+            onExceeded: 'fail',
+        });
     }
 
     /**

@@ -217,7 +217,6 @@
               :title="uiControlsResolved ? undefined : 'Waiting for the document to be rendered'"
               @click="purgeUnused"
             >Purge unused</button>
-            <button class="add-button" @click="emit('refresh-ui-controls')">Refresh</button>
           </div>
         </div>
 
@@ -690,9 +689,10 @@ watch(
 )
 
 // Resolving the controls means rendering the document, so it waits until a comment
-// carrying values is actually under the cursor.
-watch(showUiOverrides, (shown) => {
-  if (shown && !uiControlsResolved.value) emit('refresh-ui-controls')
+// carrying values is actually under the cursor. The host retires the list when the
+// document is edited, which is what re-checks the values against a renamed #UI line.
+watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
+  if (shown && !resolved) emit('refresh-ui-controls')
 }, { immediate: true })
 </script>
 

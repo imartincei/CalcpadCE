@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { pdfResponseError, isBrowserNotFound, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, DEFAULT_PREVIEW_SIZE_MB, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript } from 'calcpad-frontend';
-import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl } from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript } from 'calcpad-frontend';
+import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
 import { CalcpadVueUIProvider } from './calcpadVueUIProvider';
@@ -119,6 +119,16 @@ function activeCalcpadSource(): CalcpadSource | undefined {
     return previewSourceEditor
         ? { text: previewSourceEditor.document.getText(), uri: previewSourceEditor.document.uri }
         : undefined;
+}
+
+/**
+ * The values a render should apply, with the document's saved uiOverrides comment
+ * re-read first: an edit to that comment is what the document now says its values are,
+ * so it replaces the entered ones rather than being shadowed by them.
+ */
+function uiOverridesFor(docKey: string, content: string): UiOverrides | undefined {
+    if (uiOverrides.syncFromSource(docKey, content)) uiOverridesDirty.delete(docKey);
+    return uiOverrides.toRecord(docKey);
 }
 
 /**
@@ -264,6 +274,16 @@ function updateMetadataContext(editor: vscode.TextEditor | undefined): void {
     // Sent with the block so the panel's saved-values list follows the document the
     // cursor is actually in, rather than keeping the last one it asked about.
     vueUiProvider?.updateUiControls(editor ? uiControls.get(editor.document.uri.toString()) ?? null : null);
+}
+
+/**
+ * Retires the controls cached for a document, so an edit that renames or removes a `#UI`
+ * line is not judged against the list a render found before it. The panel asks for a fresh
+ * one while it is showing saved values; anywhere else the next form render fills it.
+ */
+function invalidateUiControls(document: vscode.TextDocument): void {
+    if (!uiControls.delete(document.uri.toString())) return;
+    if (vscode.window.activeTextEditor?.document === document) vueUiProvider?.updateUiControls(null);
 }
 
 function escapeHtml(text: string): string {
@@ -491,14 +511,14 @@ function repairStrayAngleBrackets(html: string): string {
     return html.substring(0, bodyStart) + sanitized + html.substring(bodyClose);
 }
 
-function getErrorNavigationScript(): string {
+function getErrorNavigationScript(maxConsoleMessages: number): string {
     return `
         <script>
             // Every relayed line goes through __calcpadRelayLine first: a worksheet script
             // logging a parsed data set, or logging in a loop, would otherwise push its whole
             // heap across the boundary and into an output channel that holds it. Clipping in
             // here is the point — the oversized string never crosses.
-            ${consoleRelayGuardScript()}
+            ${consoleRelayGuardScript(maxConsoleMessages)}
 
             function relayConsole(level, text) {
                 const line = window.__calcpadRelayLine(text);
@@ -792,8 +812,6 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
     const applyOverrides = enableUi || forPrint
         || (!unwrapped && CalcpadSettingsManager.getInstance(extensionContext)
             .getExtraBool('previewUiOverrides', false));
-    if (applyOverrides && !uiOverrides.has(docKey) && !uiOverridesDirty.has(docKey))
-        uiOverrides.readFromSource(docKey, content);
     if (enableUi && !standalone) uiPanelDocKey = docKey;
 
     const mode = enableUi ? 'ui' : forPrint ? 'report' : unwrapped ? 'unwrapped' : 'wrapped';
@@ -890,7 +908,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             sourceFilePath: sourceFileUri.fsPath,
             enableUi: enableUi,
             forPrint: forPrint,
-            uiOverrides: applyOverrides ? uiOverrides.toRecord(docKey) : undefined,
+            uiOverrides: applyOverrides ? uiOverridesFor(docKey, content) : undefined,
             // The report is a print layout, but on screen beside the editor, so it
             // keeps the line links that forPrint would otherwise suppress.
             includeLineAnchors: forPrint ? true : undefined,
@@ -977,8 +995,11 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             ? path.dirname(activeEditor.document.uri.fsPath) : '';
         const imageCache = await buildImageCache(apiResponse, documentDir, MAX_INLINE_IMAGE_TOTAL_BYTES);
 
-        // Inject JavaScript for error link navigation and console interception
-        const errorNavigationScript = getErrorNavigationScript();
+        // Inject JavaScript for error link navigation and console interception. The relay cap
+        // goes to both blocks that install the guard, since only the first to run sets it.
+        const maxConsoleMessages = settingsManager.getExtraNumber(
+            'maxPreviewConsoleMessages', DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT);
+        const errorNavigationScript = getErrorNavigationScript(maxConsoleMessages);
 
         // Visible, styled vertical scrollbar for the preview
         const scrollbarStyleScript = getScrollbarStyleScript();
@@ -1010,6 +1031,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         const agentScript = getFrameAgentScript({
             scroll: scrollToLine === undefined ? frameState.scroll : undefined,
             uiPosition: frameState.uiPosition,
+            maxConsoleMessages,
         });
         // Consumed once, matching the #UI script's own semantics: a stale position must
         // not steal focus when a document is opened fresh rather than re-rendered.
@@ -1094,7 +1116,7 @@ async function renderForExport(
             sourceFilePath: sourceFileUri.fsPath,
             forPrint: render.forPrint,
             enableUi: render.enableUi,
-            uiOverrides: render.useOverrides ? uiOverrides.toRecord(sourceFileUri.toString()) : undefined,
+            uiOverrides: render.useOverrides ? uiOverridesFor(sourceFileUri.toString(), documentContent) : undefined,
             includeLineAnchors: false,
         }),
         signal: combineSignals(AbortSignal.timeout(30000), signal),
@@ -1359,7 +1381,7 @@ async function saveDocx(variant: ExportVariant = 'report') {
 
             const buf = await sharedApiClient?.convertDocx(source.text, settings, source.uri.fsPath, {
                 forPrint: render.forPrint,
-                uiOverrides: render.useOverrides ? uiOverrides.toRecord(source.uri.toString()) : undefined,
+                uiOverrides: render.useOverrides ? uiOverridesFor(source.uri.toString(), source.text) : undefined,
             });
             if (!buf) {
                 throw new Error('Word document generation failed');
@@ -1419,7 +1441,13 @@ async function saveAsCompiled() {
         // {library} reference to an absolute path — so this resolver only needs to expand
         // env vars in whatever plain relative/absolute src the author wrote directly.
         const resolve = createReferenceResolver(bundled.content, documentDir, expandEnvVars, path.resolve, os.homedir);
-        const compiled = await inlineImageSources(bundled.content, new VSCodeFileSystem(), resolve);
+        // Refused rather than trimmed: the images become the file, so a compiled worksheet
+        // that quietly dropped them would be a lossy save. Mirrors the server's own limit on
+        // embedded `#read` data. The catch below turns it into the failure message.
+        const compiled = await inlineImageSources(bundled.content, new VSCodeFileSystem(), resolve, {
+            maxTotalBytes: MAX_COMPILED_IMAGE_TOTAL_BYTES,
+            onExceeded: 'fail',
+        });
         const bytes = await sharedApiClient?.encodeCpdz(compiled);
         if (!bytes) throw new Error('The server could not encode the worksheet');
         await vscode.workspace.fs.writeFile(saveUri, bytes);
@@ -2476,6 +2504,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 clearTimeout(lintTimeout as NodeJS.Timeout);
             }
             lintTimeout = setTimeout(() => {
+                invalidateUiControls(event.document);
                 processDocument(event.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e));
             }, 500);
             // Only schedule preview update when auto-run is on. Otherwise the

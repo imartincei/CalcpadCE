@@ -47,6 +47,7 @@
         "linterMinSeverity": "information",
         "maxOutputLines": 1000,
         "maxPreviewSizeMB": 24,
+        "maxPreviewConsoleMessages": 500,
         "prettifyIndentStyle": "tab",
         "prettifyIndentSize": 4,
         "prettifyTrimTrailingWhitespace": true,

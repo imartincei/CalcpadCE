@@ -35,10 +35,14 @@ import { consoleRelayGuardScript } from './preview-limits';
  * // A frame that posts to its embedder
  * previewDiagnosticsScript("function (l, m) { send({ type: 'consoleMessage', level: l, message: m }); }")
  * ```
+ *
+ * `maxMessages` is the per-render relay cap this document runs under, from the host's
+ * setting. It has to match whatever the console patch in the same document passes: the
+ * guard installs once, and the first block to run is the one that sets the cap.
  */
-export function previewDiagnosticsScript(emit: string): string {
+export function previewDiagnosticsScript(emit: string, maxMessages?: number): string {
     return [
-        consoleRelayGuardScript(),
+        consoleRelayGuardScript(maxMessages),
         '(function () {',
         '  var raw = ' + emit + ';',
         // Both classes report a URL the document controls, so both are clipped and counted

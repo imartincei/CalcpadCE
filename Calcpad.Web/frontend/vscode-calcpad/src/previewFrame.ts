@@ -534,6 +534,11 @@ export interface AgentOptions {
     scroll?: PreviewScrollState;
     /** The `#UI` script's focus/caret state, which only survives via the host. */
     uiPosition?: unknown;
+    /**
+     * The per-render console relay cap, from the user's setting. Must match what the console
+     * patch injected into the same document passes — the guard installs once.
+     */
+    maxConsoleMessages?: number;
 }
 
 /**
@@ -551,7 +556,7 @@ export interface AgentOptions {
  * handling, which does not reach inside a sandboxed frame.
  */
 export function getFrameAgentScript(options: AgentOptions = {}): string {
-    const { scroll, uiPosition } = options;
+    const { scroll, uiPosition, maxConsoleMessages } = options;
     // Carries a control key taken from the document, so close any tag it could open.
     const seedUi = uiPosition !== undefined
         ? `window.__calcpadUiPosition = ${JSON.stringify(uiPosition).replace(/</g, '\\u003c')};`
@@ -588,7 +593,8 @@ export function getFrameAgentScript(options: AgentOptions = {}): string {
                 // CSP violations and resource load failures, which no console relay can
                 // see. Shared with calcpad-web so all three front ends report alike.
                 ${previewDiagnosticsScript(
-        "function (level, message) { send({ type: 'consoleMessage', level: level, message: message }); }")}
+        "function (level, message) { send({ type: 'consoleMessage', level: level, message: message }); }",
+        maxConsoleMessages)}
 
                 // VS Code raises its webview/context menu from a contextmenu event on the
                 // shell's document, and the real one lands here instead — a document it

@@ -560,6 +560,8 @@ import {
   truncateForOutput,
   BACK_BUFFER_CLEAR_CHARS,
   MAX_HTML_MIRROR_CHARS,
+  DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT,
+  MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
   type PreviewScrollState,
 } from 'calcpad-frontend'
 
@@ -1516,6 +1518,14 @@ function trimChannel(channel: OutputChannel): void {
     return true
   })
 }
+// Per-render console relay cap, baked into the script each render injects, so a change
+// only takes effect on the next one. Held here because App.vue builds those scripts.
+const maxPreviewConsoleMessages = ref<number>(DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT)
+function setMaxPreviewConsoleMessages(n: number): void {
+  if (!Number.isFinite(n) || n < MIN_CONSOLE_MESSAGES_PER_DOCUMENT) return
+  maxPreviewConsoleMessages.value = Math.floor(n)
+}
+
 function setMaxOutputLines(n: number): void {
   if (!Number.isFinite(n) || n < 10) return
   maxOutputLinesPerChannel.value = Math.floor(n)
@@ -2202,12 +2212,13 @@ function injectPreviewAgent(
 // postMessage, tagged with groupId so the Output panel's "Preview Console"
 // channel can be split by the active editor group.
 function injectPreviewConsole(html: string, groupId: string): string {
+  const maxMessages = maxPreviewConsoleMessages.value
   const gid = JSON.stringify(groupId)
   const body = [
     // Every relayed line is clipped and counted here, inside the frame: a worksheet script
     // logging a parsed data set, or logging in a loop, would otherwise push its whole heap
     // across the boundary and into an Output channel that holds it.
-    consoleRelayGuardScript(),
+    consoleRelayGuardScript(maxMessages),
     '(function() {',
     // Published before the patch guard so it is always set: the backend's #UI
     // event script reads it to tag its messages with the owning group.
@@ -2239,7 +2250,7 @@ function injectPreviewConsole(html: string, groupId: string): string {
     // CSP violations and resource load failures, which the interception above cannot
     // see: a refused fetch never throws, and a resource error does not bubble to the
     // window listener. Shared with vscode-calcpad so both report alike.
-    previewDiagnosticsScript('function(level, message) { post(level, [message]); }'),
+    previewDiagnosticsScript('function(level, message) { post(level, [message]); }', maxMessages),
     "  console.log('CalcpadCE preview console interception initialized');",
     '})();',
   ].join('\n')
@@ -2415,6 +2426,7 @@ defineExpose({
   clearOutput,
   showOutput,
   setMaxOutputLines,
+  setMaxPreviewConsoleMessages,
   showConfirm,
   showQuickPick,
   // tabs

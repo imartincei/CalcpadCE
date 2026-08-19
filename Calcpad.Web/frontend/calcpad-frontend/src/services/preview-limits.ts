@@ -26,9 +26,24 @@ export const MAX_INLINE_IMAGE_TOTAL_BYTES = 24 * 1024 * 1024;
 /** How much of a render's body the `html` debug channel keeps. It is for reading, not archiving. */
 export const MAX_HTML_MIRROR_CHARS = 256 * 1024;
 
-/** Per-message and per-document ceilings on what a frame may relay to the host's log. */
+/** Ceiling on the length of any one line a frame relays to the host's log. */
 export const MAX_CONSOLE_MESSAGE_CHARS = 4000;
-export const MAX_CONSOLE_MESSAGES_PER_DOCUMENT = 500;
+
+/**
+ * Default for the `maxPreviewConsoleMessages` setting: how many lines one render may relay
+ * before the rest are dropped. Configurable because the right value depends on the
+ * worksheet — a script being debugged wants more, a chatty CDN library wants fewer.
+ */
+export const DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT = 500;
+export const MIN_CONSOLE_MESSAGES_PER_DOCUMENT = 10;
+export const MAX_CONSOLE_MESSAGES_PER_DOCUMENT = 100_000;
+
+/** The per-render message cap a setting's value resolves to, clamped to what is sane. */
+export function consoleMessageLimit(value: number): number {
+    if (!Number.isFinite(value)) return DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT;
+    return Math.min(MAX_CONSOLE_MESSAGES_PER_DOCUMENT,
+        Math.max(MIN_CONSOLE_MESSAGES_PER_DOCUMENT, Math.floor(value)));
+}
 
 /**
  * Above this, a buffer demoted to the back is emptied rather than left holding its
@@ -132,23 +147,29 @@ export function previewLimitNoticeHtml(o: PreviewLimitNotice): string {
 /**
  * A `<script>` body (no tag) declaring the relay guard the console patches share:
  * `__calcpadRelayLine(text)` clips a message to the per-message ceiling, counts what has
- * been sent for this document, and returns null once the per-document ceiling is reached —
- * after handing back one final line saying so. Clipping happens here, inside the frame,
- * so an oversized string is never posted across the boundary in the first place.
+ * been sent for this document, and returns null once `maxMessages` is reached — after
+ * handing back one final line saying so. Clipping happens here, inside the frame, so an
+ * oversized string is never posted across the boundary in the first place.
  *
  * The counter needs no reset: every render is a fresh document.
+ *
+ * The guard installs once per document, so every injected block that relays has to pass the
+ * same `maxMessages` — whichever runs first sets it.
  */
-export function consoleRelayGuardScript(): string {
+export function consoleRelayGuardScript(
+    maxMessages: number = DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT,
+): string {
+    const limit = consoleMessageLimit(maxMessages);
     return [
         '(function () {',
         '  if (window.__calcpadRelayLine) return;',
         '  var sent = 0;',
         '  window.__calcpadRelayLine = function (text) {',
         '    var s = String(text == null ? "" : text);',
-        `    if (sent > ${MAX_CONSOLE_MESSAGES_PER_DOCUMENT}) return null;`,
+        `    if (sent > ${limit}) return null;`,
         '    sent++;',
-        `    if (sent > ${MAX_CONSOLE_MESSAGES_PER_DOCUMENT})`,
-        `      return '[Calcpad] further console output from this render suppressed (over ${MAX_CONSOLE_MESSAGES_PER_DOCUMENT} messages).';`,
+        `    if (sent > ${limit})`,
+        `      return '[Calcpad] further console output from this render suppressed (over ${limit} messages).';`,
         `    if (s.length > ${MAX_CONSOLE_MESSAGE_CHARS})`,
         `      s = s.slice(0, ${MAX_CONSOLE_MESSAGE_CHARS}) + ' … [' + s.length + ' chars, truncated]';`,
         '    return s;',

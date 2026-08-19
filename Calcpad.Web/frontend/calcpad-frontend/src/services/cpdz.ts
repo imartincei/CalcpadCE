@@ -34,15 +34,44 @@ export function isCompiledPath(filePath: string): boolean {
  * {@link createReferenceResolver}. Both accept the same input because the
  * CalcPad source carries images as `'<img src="…">` comment lines.
  *
- * `budget` caps the total inlined bytes, for the preview — where a document that
- * inlines gigabytes of images is a crash rather than a render. It is left off when
- * writing a file: a saved worksheet must not silently lose an image.
+ * `budget` caps the total inlined bytes, and what happens at the cap differs by caller.
+ * A preview skips the rest: it is a view, and a partly-illustrated one beats an app that
+ * runs out of memory. A compiled worksheet fails instead — the images become the file, so
+ * one that quietly dropped them would be a lossy save, and the recipient has no original
+ * to compare against.
  */
 export interface InlineImageBudget {
     maxTotalBytes: number;
-    /** Called once, with how many sources were left as-is, if the budget ran out. */
+    /**
+     * `skip` leaves the sources past the cap as they were written. `fail` throws
+     * {@link ImageBudgetError}, for a caller writing a file that has to be whole.
+     */
+    onExceeded: 'skip' | 'fail';
+    /** Called once with how many sources were left as-is, when skipping. */
     onSkip?: (skipped: number) => void;
 }
+
+/**
+ * The images a compiled worksheet is asked to carry exceed what one may hold. Thrown
+ * rather than reported, matching the server's own limit on embedded `#read` data
+ * (`ExpressionParser.MaxEmbeddedDataSize`, whose message this deliberately echoes) — both
+ * end up in the same "this worksheet cannot be compiled" report.
+ */
+export class ImageBudgetError extends Error {
+    constructor(readonly limitBytes: number, readonly src: string) {
+        super(`Images embedded in a compiled worksheet cannot exceed ${Math.round(limitBytes / (1024 * 1024))} MB. `
+            + `Reduce or remove images, starting with "${src}".`);
+        this.name = 'ImageBudgetError';
+    }
+}
+
+/**
+ * How many bytes of images a compiled worksheet may carry. The parallel to the server's
+ * `ExpressionParser.MaxEmbeddedDataSize` for `#read` data, and the same reasoning: a
+ * `.cpdz` is decoded whole and run from memory, so what it carries is what a recipient
+ * pays for. Kept in step with that constant by hand — there is no shared source.
+ */
+export const MAX_COMPILED_IMAGE_TOTAL_BYTES = 10 * 1024 * 1024;
 
 export async function inlineImageSources(
     text: string,
@@ -67,6 +96,7 @@ export async function inlineImageSources(
         if (!isImageExtension(ext)) continue;
 
         if (budget && inlined >= budget.maxTotalBytes) {
+            if (budget.onExceeded === 'fail') throw new ImageBudgetError(budget.maxTotalBytes, src);
             skipped++;
             continue;
         }
@@ -78,6 +108,10 @@ export async function inlineImageSources(
         } catch {
             // missing file, permission error, or undeclared token root → leave src untouched
         }
+        // Checked after adding as well, so a single image over the cap fails on itself
+        // rather than only being noticed by whatever came next.
+        if (budget?.onExceeded === 'fail' && inlined > budget.maxTotalBytes)
+            throw new ImageBudgetError(budget.maxTotalBytes, src);
     }
     if (skipped) budget?.onSkip?.(skipped);
 

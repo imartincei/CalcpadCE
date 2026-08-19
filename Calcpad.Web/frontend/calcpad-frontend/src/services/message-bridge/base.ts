@@ -17,7 +17,7 @@ import { extractPlotsFromHtml, type ExtractedPlot } from '../plot-extract';
 import { extractUiControls } from '../ui-overrides';
 import type { UiControl } from '../ui-overrides';
 import { COMPILED_MIME } from '../cpdz';
-import { DEFAULT_PREVIEW_SIZE_MB } from '../preview-limits';
+import { DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT } from '../preview-limits';
 import { buildZip } from '../zip-writer';
 import type { ILogger } from '../../types/interfaces';
 
@@ -192,7 +192,7 @@ export abstract class BaseMessageBridge {
     }
 
     /** Pushes the cached controls, so the panel follows document and cursor changes. */
-    protected refreshUiControls(): void {
+    refreshUiControls(): void {
         this.postToVue({ type: 'uiControls', controls: this._uiControlsProvider?.() ?? null });
     }
 
@@ -303,6 +303,10 @@ export abstract class BaseMessageBridge {
             case 'updateMaxPreviewSize':
                 this.setExtraSetting('maxPreviewSizeMB', String(message.value));
                 this.postToVue({ type: 'maxPreviewSizeChanged', value: message.value });
+                break;
+            case 'updateMaxPreviewConsoleMessages':
+                this.setExtraSetting('maxPreviewConsoleMessages', String(message.value));
+                this.postToVue({ type: 'maxPreviewConsoleMessagesChanged', value: message.value });
                 break;
             case 'getPdfSettings':
                 this.handleGetPdfSettings();
@@ -488,6 +492,8 @@ export abstract class BaseMessageBridge {
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
             maxPreviewSizeMB: Number(this.getExtraSetting('maxPreviewSizeMB')) || DEFAULT_PREVIEW_SIZE_MB,
+            maxPreviewConsoleMessages: Number(this.getExtraSetting('maxPreviewConsoleMessages'))
+                || DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT,
             editorFontFamily: this.getExtraSetting('editorFontFamily') ?? 'JuliaMono',
             ...extras,
         });
@@ -727,7 +733,17 @@ export abstract class BaseMessageBridge {
             await this.onExportError(`This worksheet cannot be compiled:\n${bundled.errors.join('\n')}`);
             return null;
         }
-        const compiled = await this.buildCompiledSource(bundled.content);
+        // Embedding the images can refuse the whole export, the same way the server refuses
+        // one carrying too much `#read` data, so it is reported like that refusal rather
+        // than thrown at whatever invoked the save.
+        let compiled: string;
+        try {
+            compiled = await this.buildCompiledSource(bundled.content);
+        } catch (error) {
+            await this.onExportError(
+                `This worksheet cannot be compiled:\n${error instanceof Error ? error.message : String(error)}`);
+            return null;
+        }
         const bytes = await this.apiClient.encodeCpdz(compiled);
         if (!bytes) return null;
         return this.saveExportedFile({

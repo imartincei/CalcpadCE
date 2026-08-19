@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT } from 'calcpad-frontend';
 import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse, SettingsValues, UiDirectiveData, UiControl } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
@@ -181,6 +181,13 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                 // rather than a render, and nothing else would replace it.
                 case 'updateMaxPreviewSize':
                     this._settingsManager.setExtra('maxPreviewSizeMB', data.value);
+                    void this.onSettingsChanged?.();
+                    break;
+
+                // Baked into the scripts a render injects, so it only takes effect on the
+                // next one.
+                case 'updateMaxPreviewConsoleMessages':
+                    this._settingsManager.setExtra('maxPreviewConsoleMessages', data.value);
                     void this.onSettingsChanged?.();
                     break;
 
@@ -452,6 +459,8 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             darkBackground: sm.getExtra('darkBackground', '#1e1e1e'),
             linterMinSeverity: sm.getExtra('linterMinSeverity', 'information'),
             maxPreviewSizeMB: sm.getExtraNumber('maxPreviewSizeMB', DEFAULT_PREVIEW_SIZE_MB),
+            maxPreviewConsoleMessages: sm.getExtraNumber(
+                'maxPreviewConsoleMessages', DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT),
             activeConfig: sm.getActivePresetName(),
             availableConfigs: await sm.listPresets(),
         };

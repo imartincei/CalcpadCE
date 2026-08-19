@@ -545,6 +545,22 @@
               @change="updateMaxPreviewSize"
             />
           </div>
+
+          <div v-show="rowVisible('diagnostics', 'maxPreviewConsoleMessages')" class="setting-group">
+            <label for="maxPreviewConsoleMessages">
+              Max Preview Console Messages:
+              <span class="setting-info" title="How many console lines one preview render may relay before the rest are dropped. A worksheet whose scripts log in a loop can otherwise flood the console channel. Raise it when debugging a script, lower it when a library is noisy. Each line is clipped to 4 KB regardless.">ⓘ</span>
+            </label>
+            <input
+              id="maxPreviewConsoleMessages"
+              v-model.number="maxPreviewConsoleMessages"
+              type="number"
+              :min="MIN_CONSOLE_MESSAGES_PER_DOCUMENT"
+              :max="MAX_CONSOLE_MESSAGES_PER_DOCUMENT"
+              step="100"
+              @change="updateMaxPreviewConsoleMessages"
+            />
+          </div>
         </div>
       </section>
 
@@ -620,7 +636,11 @@ import { DEFAULT_PDF_SETTINGS, DEFAULT_VERSION_CONFIG } from '../types'
 import { getDefaultSettings, METADATA_SETTINGS_KEYS, validateSettingValue, SETTINGS_PATH } from '../../types/settings'
 import { PDF_SETTING_KEYS, validatePdfValue } from '../../types/pdf-settings'
 import { specForKey } from '../../types/catalog'
-import { DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB, MAX_PREVIEW_SIZE_MB } from '../../services/preview-limits'
+import {
+  DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB, MAX_PREVIEW_SIZE_MB,
+  DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
+  MAX_CONSOLE_MESSAGES_PER_DOCUMENT,
+} from '../../services/preview-limits'
 
 // Props
 interface Props {
@@ -639,6 +659,7 @@ interface Props {
   initialLinterMinSeverity?: string
   initialMaxOutputLines?: number
   initialMaxPreviewSize?: number
+  initialMaxPreviewConsoleMessages?: number
   versionConfig?: VersionConfig
   initialActiveConfig?: string
   initialAvailableConfigs?: string[]
@@ -664,6 +685,7 @@ const props = withDefaults(defineProps<Props>(), {
   initialLinterMinSeverity: 'information',
   initialMaxOutputLines: 1000,
   initialMaxPreviewSize: DEFAULT_PREVIEW_SIZE_MB,
+  initialMaxPreviewConsoleMessages: DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT,
   versionConfig: () => ({ ...DEFAULT_VERSION_CONFIG }),
   initialActiveConfig: 'default',
   initialAvailableConfigs: () => ['default'],
@@ -689,6 +711,7 @@ const emit = defineEmits<{
   updateLinterMinSeverity: [severity: string]
   updateMaxOutputLines: [value: number]
   updateMaxPreviewSize: [value: number]
+  updateMaxPreviewConsoleMessages: [value: number]
   resetSettings: []
   saveNamedConfig: [name: string]
   switchConfig: [name: string]
@@ -773,6 +796,7 @@ const darkBackground = ref(props.initialDarkBackground)
 const linterMinSeverity = ref(props.initialLinterMinSeverity)
 const maxOutputLines = ref(props.initialMaxOutputLines)
 const maxPreviewSizeMB = ref(props.initialMaxPreviewSize)
+const maxPreviewConsoleMessages = ref(props.initialMaxPreviewConsoleMessages)
 const activeConfig = ref(props.initialActiveConfig)
 const availableConfigs = ref<string[]>(props.initialAvailableConfigs)
 const editorFontFamily = ref(props.initialEditorFontFamily)
@@ -869,7 +893,8 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
     rows: {
       logsFolder: 'open logs folder crash dump',
       maxOutputLines: 'max output lines channel',
-      maxPreviewSize: 'max preview size memory limit mb blocked too large'
+      maxPreviewSize: 'max preview size memory limit mb blocked too large',
+      maxPreviewConsoleMessages: 'max preview console messages javascript js log flood suppressed'
     }
   },
   configuration: {
@@ -1025,6 +1050,15 @@ const updateMaxPreviewSize = () => {
   emit('updateMaxPreviewSize', clamped)
 }
 
+const updateMaxPreviewConsoleMessages = () => {
+  const n = Number(maxPreviewConsoleMessages.value)
+  if (!Number.isFinite(n)) return
+  const clamped = Math.min(MAX_CONSOLE_MESSAGES_PER_DOCUMENT,
+    Math.max(MIN_CONSOLE_MESSAGES_PER_DOCUMENT, Math.floor(n)))
+  maxPreviewConsoleMessages.value = clamped
+  emit('updateMaxPreviewConsoleMessages', clamped)
+}
+
 const resetSettings = () => {
   emit('resetSettings')
 }
@@ -1172,6 +1206,13 @@ watch(
   () => props.initialMaxPreviewSize,
   (newValue) => {
     maxPreviewSizeMB.value = newValue
+  }
+)
+
+watch(
+  () => props.initialMaxPreviewConsoleMessages,
+  (newValue) => {
+    maxPreviewConsoleMessages.value = newValue
   }
 )
 

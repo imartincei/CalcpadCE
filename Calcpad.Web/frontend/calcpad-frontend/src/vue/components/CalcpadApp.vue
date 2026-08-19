@@ -87,6 +87,7 @@
         :initial-linter-min-severity="linterMinSeverity"
         :initial-max-output-lines="maxOutputLines"
         :initial-max-preview-size="maxPreviewSizeMB"
+        :initial-max-preview-console-messages="maxPreviewConsoleMessages"
         :version-config="versionConfig"
         :initial-active-config="activeConfig"
         :initial-available-configs="availableConfigs"
@@ -110,6 +111,7 @@
         @update-linter-min-severity="handleUpdateLinterMinSeverity"
         @update-max-output-lines="handleUpdateMaxOutputLines"
         @update-max-preview-size="handleUpdateMaxPreviewSize"
+        @update-max-preview-console-messages="handleUpdateMaxPreviewConsoleMessages"
         @reset-settings="handleResetSettings"
         @save-named-config="handleSaveNamedConfig"
         @switch-config="handleSwitchConfig"
@@ -188,7 +190,10 @@ import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading,
 import { DEFAULT_VERSION_CONFIG } from '../types'
 import type { CalcpadError, ExportVariant } from '../../types/api'
 import { DEFAULT_PDF_SETTINGS } from '../types'
-import { DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB } from '../../services/preview-limits'
+import {
+  DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB,
+  DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
+} from '../../services/preview-limits'
 
 // Props
 interface Props {
@@ -245,6 +250,7 @@ const darkBackground = ref('#1e1e1e')
 const linterMinSeverity = ref('information')
 const maxOutputLines = ref(1000)
 const maxPreviewSizeMB = ref(DEFAULT_PREVIEW_SIZE_MB)
+const maxPreviewConsoleMessages = ref(DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT)
 const activeConfig = ref('default')
 const availableConfigs = ref<string[]>(['default'])
 const editorFontFamily = ref('JuliaMono')
@@ -530,6 +536,11 @@ const handleUpdateMaxPreviewSize = (value: number) => {
   postMessage({ type: 'updateMaxPreviewSize', value })
 }
 
+const handleUpdateMaxPreviewConsoleMessages = (value: number) => {
+  maxPreviewConsoleMessages.value = value
+  postMessage({ type: 'updateMaxPreviewConsoleMessages', value })
+}
+
 const handleResetSettings = () => {
   postMessage({
     type: 'resetSettings'
@@ -679,6 +690,10 @@ const handleMessage = (event: MessageEvent) => {
       }
       if (typeof message.maxPreviewSizeMB === 'number' && message.maxPreviewSizeMB >= MIN_PREVIEW_SIZE_MB) {
         maxPreviewSizeMB.value = message.maxPreviewSizeMB
+      }
+      if (typeof message.maxPreviewConsoleMessages === 'number'
+        && message.maxPreviewConsoleMessages >= MIN_CONSOLE_MESSAGES_PER_DOCUMENT) {
+        maxPreviewConsoleMessages.value = message.maxPreviewConsoleMessages
       }
       if (message.activeConfig) activeConfig.value = message.activeConfig
       if (Array.isArray(message.availableConfigs)) availableConfigs.value = message.availableConfigs

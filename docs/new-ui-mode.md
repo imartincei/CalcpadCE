@@ -361,6 +361,8 @@ adding or removing one of those declarations later will still shift the rest.
 
 If a document's values do end up scrambled, the metadata comment is plain text: fix the keys by
 hand, or clear the `uiOverrides` entry to start the form from the document's own values again.
+Editing the comment takes effect on the next render, and what it says replaces what is currently
+entered — including values typed into the form but not yet saved.
 
 The [Properties tab](new-metadata-comments.md#the-properties-tab) does this without hand-editing:
 its **Saved #UI values** list shows every entry, lets you edit one in place or jump to its

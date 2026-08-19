@@ -1,2 +1,4 @@
-- Do not use code comments unless you are doing something abnormal. You can use shorter comments as needed, but only include them where it actually explains something that is hard to determine from just reading the code.
-- You can use summary around functions in C# or similar for other languages.
+- Do not use code comments unless you are doing something abnormal.
+- Do not write long comments.
+- Writing long comments wastes my time because I'm just going to remove them anyways.
+- Do you see a pattern? Don't write long comments in the codebase. One sentence to describe an abnormal workaround or describe a complex function and that is it.

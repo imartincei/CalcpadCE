@@ -42,10 +42,14 @@ const OVERRIDES_KEY = 'uiOverrides';
  * Edits stay in memory so typing in a form never dirties the file; the
  * document is only touched when the user explicitly saves, which writes the
  * current map into a `'<!--{"uiOverrides":{...}}-->` comment at the top. That
- * comment is what {@link readFromSource} restores on the next open.
+ * comment is what {@link syncFromSource} restores on the next open, and what it
+ * keeps the in-memory map in step with while the document is edited.
  */
 export class UiOverrideStore {
     private readonly byDocument = new Map<string, Map<string, string>>();
+    // Serialized form of each document's saved comment as the store last saw it, so a
+    // hand-edit to that comment can be told apart from a comment that has not moved.
+    private readonly lastSeenSaved = new Map<string, string>();
 
     private mapFor(docKey: string): Map<string, string> {
         let map = this.byDocument.get(docKey);
@@ -75,17 +79,15 @@ export class UiOverrideStore {
         return Object.fromEntries(map);
     }
 
-    public has(docKey: string): boolean {
-        return (this.byDocument.get(docKey)?.size ?? 0) > 0;
-    }
-
     public clear(docKey: string): void {
         this.byDocument.delete(docKey);
+        this.lastSeenSaved.delete(docKey);
     }
 
     /** Discards every document's overrides (e.g. on workspace close). */
     public clearAll(): void {
         this.byDocument.clear();
+        this.lastSeenSaved.clear();
     }
 
     public replace(docKey: string, overrides: UiOverrides): void {
@@ -93,15 +95,32 @@ export class UiOverrideStore {
     }
 
     /**
-     * Seeds the store from a saved `uiOverrides` metadata comment, replacing
-     * whatever the document held. No comment leaves the store untouched, so
-     * reloading a file that was never saved with values keeps the session's.
+     * Adopts the document's saved `uiOverrides` comment whenever it has changed since the
+     * store last read or wrote it, so a hand-edited key reaches the next render rather than
+     * being shadowed by the cached map. Returns true when the stored values changed, which
+     * is when the render that asked has to be redone. An unmoved comment leaves entered
+     * values alone.
      */
-    public readFromSource(docKey: string, source: string): boolean {
+    public syncFromSource(docKey: string, source: string): boolean {
         const saved = readUiOverrides(source);
-        if (!saved) return false;
-        this.replace(docKey, saved);
-        return true;
+        const seen = this.lastSeenSaved.get(docKey);
+        const fingerprint = saved ? JSON.stringify(saved) : '';
+        if (seen === fingerprint) return false;
+        this.lastSeenSaved.set(docKey, fingerprint);
+        // First look at a document without the comment: the state an unsaved form starts
+        // from, not a comment that was removed.
+        if (!saved && seen === undefined) return false;
+
+        const overrides = saved ?? {};
+        const changed = !this.matches(docKey, overrides);
+        this.replace(docKey, overrides);
+        return changed;
+    }
+
+    private matches(docKey: string, overrides: UiOverrides): boolean {
+        const map = this.byDocument.get(docKey);
+        const entries = Object.entries(overrides);
+        return (map?.size ?? 0) === entries.length && entries.every(([k, v]) => map?.get(k) === v);
     }
 }
 

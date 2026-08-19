@@ -17,6 +17,7 @@ import {
     documentHasUiDirectives,
     DEFAULT_PREVIEW_SIZE_MB,
     MIN_PREVIEW_SIZE_MB,
+    MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
     MAX_INLINE_IMAGE_TOTAL_BYTES,
     previewSizeLimitChars,
     previewLimitNoticeHtml,
@@ -367,6 +368,9 @@ async function bootstrap(): Promise<void> {
     function previewImageBudget(group: EditorGroup): InlineImageBudget {
         return {
             maxTotalBytes: MAX_INLINE_IMAGE_TOTAL_BYTES,
+            // A view, so it degrades: refusing the render would be worse than an
+            // under-illustrated one. The compiled export fails instead.
+            onExceeded: 'skip',
             onSkip: (skipped) => appInstance.appendOutput('warn',
                 `Image budget of ${formatSize(MAX_INLINE_IMAGE_TOTAL_BYTES)} reached — ${skipped} image(s) left unembedded in the preview.`,
                 'preview', group.id),
@@ -525,7 +529,10 @@ async function bootstrap(): Promise<void> {
 
     // The store is keyed per document and owned here, so the bridge is handed a lookup
     // rather than the store: report and input-form exports render the entered values.
-    activeBridge.setUiOverridesProvider(() => uiOverrides.toRecord(activeUiDocKey()));
+    activeBridge.setUiOverridesProvider(() => {
+        syncUiOverrides(activeGroup, activeGroup.editor.getValue());
+        return uiOverrides.toRecord(activeUiDocKey());
+    });
     activeBridge.setUiControlsProvider(() => uiControls.get(activeUiDocKey()) ?? null);
     activeBridge.setUiControlsSink((controls) => uiControls.set(activeUiDocKey(), controls));
     // An edit made in the Properties tab is an edit to the entered values, so the store
@@ -562,13 +569,24 @@ async function bootstrap(): Promise<void> {
     }
 
     /**
-     * Seeds a document's overrides from a saved uiOverrides comment the first time
-     * it is rendered in UI mode, so entered values survive reopening the file.
+     * Keeps a document's overrides in step with its saved uiOverrides comment, so entered
+     * values survive reopening the file and an edit to that comment — a key renamed by hand
+     * to follow a renamed variable — reaches the render instead of being shadowed by them.
      */
-    function seedUiOverrides(group: EditorGroup, content: string): void {
-        const docKey = uiDocKeyFor(group);
-        if (uiOverrides.has(docKey) || uiOverridesDirty.has(docKey)) return;
-        uiOverrides.readFromSource(docKey, content);
+    function syncUiOverrides(group: EditorGroup, content: string): void {
+        if (!uiOverrides.syncFromSource(uiDocKeyFor(group), content)) return;
+        uiOverridesDirty.delete(uiDocKeyFor(group));
+        refreshUiDirtyIndicator();
+    }
+
+    /**
+     * Retires the controls cached for a document, so an edit that renames or removes a #UI
+     * line is not judged against the list a render found before it. The panel asks for a
+     * fresh one while it is showing saved values; anywhere else the next form render fills it.
+     */
+    function invalidateUiControls(group: EditorGroup): void {
+        if (!uiControls.delete(uiDocKeyFor(group))) return;
+        if (group === activeGroup) activeBridge.refreshUiControls();
     }
 
     const PREVIEW_LOADING_DELAY_MS = 400;
@@ -629,7 +647,7 @@ async function bootstrap(): Promise<void> {
             // in gets looked at against the source.
             const overrideMode = mode === 'ui' || mode === 'report'
                 || (mode === 'preview' && previewAppliesUiOverrides());
-            if (overrideMode) seedUiOverrides(group, content);
+            if (overrideMode) syncUiOverrides(group, content);
             // Unwrapped always shows the document as written.
             const ui = overrideMode
                 ? { enableUi: mode === 'ui', uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }
@@ -867,14 +885,18 @@ async function bootstrap(): Promise<void> {
         });
 
         // Content changes: refresh this group's definitions cache + preview,
-        // and (only when this is the active group) the sidebar TOC.
+        // retire its cached #UI controls, and (only when this is the active group) the
+        // sidebar TOC.
         let definitionsTimer: ReturnType<typeof setTimeout> | null = null;
         let previewTimer: ReturnType<typeof setTimeout> | null = null;
         let tocTimer: ReturnType<typeof setTimeout> | null = null;
         group.disposables.push(
             ed.onDidChangeModelContent(() => {
                 if (definitionsTimer) clearTimeout(definitionsTimer);
-                definitionsTimer = setTimeout(() => void refreshDefinitionsFor(group), 800);
+                definitionsTimer = setTimeout(() => {
+                    invalidateUiControls(group);
+                    void refreshDefinitionsFor(group);
+                }, 800);
                 if (appInstance.isPreviewVisible() && editorBridge.getExtraSetting('autoRun') !== 'false') {
                     if (previewTimer) clearTimeout(previewTimer);
                     previewTimer = setTimeout(() => void refreshPreviewFor(group), 800);
@@ -1141,6 +1163,15 @@ async function bootstrap(): Promise<void> {
             const n = Number(e.data.value);
             if (Number.isFinite(n) && n >= MIN_PREVIEW_SIZE_MB) refreshAllPreviews();
         }
+        // Baked into the scripts a render injects, so the previews are re-run to pick it up
+        // rather than left relaying under the old cap.
+        if (e.data?.type === 'maxPreviewConsoleMessagesChanged') {
+            const n = Number(e.data.value);
+            if (Number.isFinite(n) && n >= MIN_CONSOLE_MESSAGES_PER_DOCUMENT) {
+                appInstance.setMaxPreviewConsoleMessages(n);
+                refreshAllPreviews();
+            }
+        }
         if (e.data?.type === 'exportError') {
             appInstance.appendOutput('error', String(e.data.message ?? 'Export failed'));
         }
@@ -1151,6 +1182,9 @@ async function bootstrap(): Promise<void> {
     {
         const stored = Number(editorBridge.getExtraSetting('maxOutputLines'));
         if (Number.isFinite(stored) && stored >= 10) appInstance.setMaxOutputLines(stored);
+        const messages = Number(editorBridge.getExtraSetting('maxPreviewConsoleMessages'));
+        if (Number.isFinite(messages) && messages >= MIN_CONSOLE_MESSAGES_PER_DOCUMENT)
+            appInstance.setMaxPreviewConsoleMessages(messages);
     }
 
     // Wire the bridge's insertText handler to the active editor.

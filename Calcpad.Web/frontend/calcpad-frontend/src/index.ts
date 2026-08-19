@@ -127,6 +127,11 @@ export {
     MAX_INLINE_IMAGE_TOTAL_BYTES,
     MAX_HTML_MIRROR_CHARS,
     BACK_BUFFER_CLEAR_CHARS,
+    DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT,
+    MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
+    MAX_CONSOLE_MESSAGES_PER_DOCUMENT,
+    MAX_CONSOLE_MESSAGE_CHARS,
+    consoleMessageLimit,
     previewSizeLimitChars,
     formatSize,
     truncateForOutput,
@@ -144,7 +149,14 @@ export type { ExtractedPlot } from './services/plot-extract';
 export { buildZip } from './services/zip-writer';
 export type { ZipEntry } from './services/zip-writer';
 export { UiOverrideStore, readUiOverrides, writeUiOverrides, extractUiControls, classifyUiOverrides } from './services/ui-overrides';
-export { isCompiledPath, inlineImageSources, COMPILED_EXTENSION, COMPILED_MIME } from './services/cpdz';
+export {
+    isCompiledPath,
+    inlineImageSources,
+    ImageBudgetError,
+    MAX_COMPILED_IMAGE_TOTAL_BYTES,
+    COMPILED_EXTENSION,
+    COMPILED_MIME,
+} from './services/cpdz';
 export type { InlineImageBudget } from './services/cpdz';
 export {
     pathDirname,
