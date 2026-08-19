@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Calcpad.OpenXml;
 
 namespace Calcpad.Core
@@ -11,6 +12,9 @@ namespace Calcpad.Core
         {
             internal static string[][] Read(ReadWriteOptions options)
             {
+                if (!options.Data.IsEmpty)
+                    return ReadEmbedded(options);
+
                 var fileName = $"{options.Path}.{options.Ext}";
                 if (fileName == ".")
                     throw Exceptions.MissingFileName();
@@ -23,7 +27,7 @@ namespace Calcpad.Core
                 {
                     if (options.IsExcel)
                     {
-                        if (!options.Ext.Equals("xlsx", StringComparison.OrdinalIgnoreCase) && !options.Ext.Equals("xlsm", StringComparison.OrdinalIgnoreCase))
+                        if (!ExcelData.IsExcelFile(options.Ext.ToString()))
                             throw Exceptions.FileFormatNotSupported(options.Ext.ToString());
 
                         return ReadExcel(options);
@@ -34,6 +38,50 @@ namespace Calcpad.Core
                 {
                     throw new MathParserException(e.Message);
                 }
+            }
+
+            /// <summary>
+            /// Reads the data the directive carries itself, taking the same sheet and range as a
+            /// file would. Everything past this point is what a read off the disk does.
+            /// </summary>
+            private static string[][] ReadEmbedded(ReadWriteOptions options)
+            {
+                var bytes = new byte[options.Data.Length / 4 * 3];
+                if (!Convert.TryFromBase64Chars(options.Data, bytes, out var length))
+                    throw Exceptions.InvalidSyntax(DataUri);
+
+                try
+                {
+                    if (options.IsExcel)
+                        return ExcelData.ReadFromMemory(bytes[..length], options.Sheet.ToString(),
+                            options.Start.ToString(), options.End.ToString());
+
+                    return ReadCSVFromString(options, Encoding.UTF8.GetString(bytes, 0, length));
+                }
+                catch (Exception e)
+                {
+                    throw new MathParserException(e.Message);
+                }
+            }
+
+            private static string[][] ReadCSVFromString(ReadWriteOptions options, string content)
+            {
+                int i = 0;
+                var (start, end) = ParseBounds(options.Start, options.End);
+                var lines = new List<string>();
+                using var reader = new StringReader(content);
+                while (reader.ReadLine() is string line)
+                {
+                    ++i;
+                    if (i >= start.row)
+                    {
+                        if (end.row > 0 && i > end.row)
+                            break;
+
+                        lines.Add(line);
+                    }
+                }
+                return FormatCSVData(options, lines, start, end);
             }
 
             private static string[][] ReadCSV(ReadWriteOptions options)
@@ -54,10 +102,15 @@ namespace Calcpad.Core
                         lines.Add(line);
                     }
                 }
+                return FormatCSVData(options, lines, start, end);
+            }
+
+            private static string[][] FormatCSVData(ReadWriteOptions options, List<string> lines, (int row, int col) start, (int row, int col) end)
+            {
                 string[][] data = new string[lines.Count][];
                 var j0 = Math.Max(0, start.col - 1);
                 var n = lines.Count;
-                for (i = 0; i < n; ++i)
+                for (int i = 0; i < n; ++i)
                 {
                     if (start.col == 0 && end.col == 0)
                         data[i] = lines[i].Split(options.Separator, StringSplitOptions.TrimEntries);

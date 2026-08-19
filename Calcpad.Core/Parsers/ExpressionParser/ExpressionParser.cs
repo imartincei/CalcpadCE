@@ -22,6 +22,7 @@ namespace Calcpad.Core
         private bool _isVisible;
         private readonly Stack<bool> _visibilityStack = new();
         private readonly Stack<int> _outputModeStack = new();
+        private readonly Stack<MathParser.VariableSubstitutionOptions> _substitutionStack = new();
         private bool _isPausedByUser;
         private int _pauseCharCount;
         private bool _isMarkdownOn;
@@ -409,13 +410,20 @@ namespace Calcpad.Core
 
                             AppendHtmlLineStart(lineType, isIndent, htmlId);
                         }
-                        if (lineType == TokenTypes.Html && !string.IsNullOrEmpty(htmlId))
-                            tokens[0] = new Token(InsertAttribute(tokens[0].Value, htmlId), TokenTypes.Html);
+                        var htmlToken = lineType == TokenTypes.Html && !string.IsNullOrEmpty(htmlId)
+                            ? tokens[0]
+                            : null;
+                        if (htmlToken is not null)
+                            tokens[0] = new Token(InsertAttribute(htmlToken.Value, htmlId), TokenTypes.Html);
 
                         if (kwdLength > 0)
                             _sb.Append(_condition.ToHtml());
 
                         ParseTokens(tokens, true, getXml);
+                        // The list is the line's cache and a loop parses it again on every
+                        // pass, so the attributes have to come back out
+                        if (htmlToken is not null)
+                            tokens[0] = htmlToken;
                         if (_isVal != 1)
                             AppendHtmlLineEnd(lineType, keyword == Keyword.If);
 
@@ -501,6 +509,7 @@ namespace Calcpad.Core
                 _loops.Clear();
                 _isVal = 0;
                 _outputModeStack.Clear();
+                _substitutionStack.Clear();
                 _parser.SetVariable("Units", new RealValue(UnitsFactor()));
                 _previousKeyword = Keyword.None;
                 _isMarkdownOn = false;

@@ -29,6 +29,9 @@ namespace Calcpad.Core
             NoSub,
             NoVar,
             VarSub,
+            End_NoSub,
+            End_NoVar,
+            End_VarSub,
             Const,
             Split,
             Wrap,
@@ -160,14 +163,15 @@ namespace Calcpad.Core
                 case Keyword.End_Noc:
                     _isVal = _outputModeStack.Count > 0 ? _outputModeStack.Pop() : 0;
                     break;
-                case Keyword.NoSub:
-                    _parser.VariableSubstitution = MathParser.VariableSubstitutionOptions.VariablesOnly;
-                    break;
-                case Keyword.NoVar:
-                    _parser.VariableSubstitution = MathParser.VariableSubstitutionOptions.SubstitutionsOnly;
-                    break;
-                case Keyword.VarSub:
-                    _parser.VariableSubstitution = MathParser.VariableSubstitutionOptions.VariablesAndSubstitutions;
+                case Keyword.NoSub: SetSubstitution(s, keyword, MathParser.VariableSubstitutionOptions.VariablesOnly); break;
+                case Keyword.NoVar: SetSubstitution(s, keyword, MathParser.VariableSubstitutionOptions.SubstitutionsOnly); break;
+                case Keyword.VarSub: SetSubstitution(s, keyword, MathParser.VariableSubstitutionOptions.VariablesAndSubstitutions); break;
+                case Keyword.End_NoSub:
+                case Keyword.End_NoVar:
+                case Keyword.End_VarSub:
+                    _parser.VariableSubstitution = _substitutionStack.Count > 0 ?
+                        _substitutionStack.Pop() :
+                        MathParser.VariableSubstitutionOptions.VariablesAndSubstitutions;
                     break;
                 case Keyword.Const:
                     _parser.IsConst = true;
@@ -257,6 +261,13 @@ namespace Calcpad.Core
             _outputModeStack.Push(_isVal);
             if (IsDirectiveConditionMet(s, keyword))
                 _isVal = value;
+        }
+
+        private void SetSubstitution(ReadOnlySpan<char> s, Keyword keyword, MathParser.VariableSubstitutionOptions value)
+        {
+            _substitutionStack.Push(_parser.VariableSubstitution);
+            if (IsDirectiveConditionMet(s, keyword))
+                _parser.VariableSubstitution = value;
         }
 
         private bool IsDirectiveConditionMet(ReadOnlySpan<char> s, Keyword keyword)
@@ -935,10 +946,19 @@ namespace Calcpad.Core
 
         private void ReportDataExchageResult(ReadWriteOptions options, string command)
         {
-            var url = $"file:///{options.FullPath.Replace('\\', '/')}";
             _sb.Append($"<p{HtmlId}>")
                .Append($"Matrix <span class=\"eq\">{new HtmlWriter(Settings.Math, false).FormatVariable(options.Name.ToString(), string.Empty, true)}</span>")
-               .Append($" was successfully {command} <a href=\"{url}\">{options.Path}.{options.Ext}</a>");
+               .Append($" was successfully {command} ");
+
+            // Embedded data has no file to name, and no link to it that would lead anywhere.
+            if (options.Data.IsEmpty)
+            {
+                var url = $"file:///{options.FullPath.Replace('\\', '/')}";
+                _sb.Append($"<a href=\"{url}\">{options.Path}.{options.Ext}</a>");
+            }
+            else
+                _sb.Append("embedded data");
+
             if (options.IsExcel)
             {
                 if (!options.Sheet.IsEmpty)

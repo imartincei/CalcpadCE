@@ -376,6 +376,9 @@ namespace Calcpad.Core
         internal static MathParserException MatirixSizeLimit() =>
             new(string.Format(Messages.Matrix_size_cannot_exceed_0, Matrix.MaxSize));
 
+        internal static MathParserException EmbeddedDataSizeLimit() =>
+            new(string.Format(Messages.Embedded_data_cannot_exceed_0_MB, ExpressionParser.MaxEmbeddedDataSize / (1024 * 1024)));
+
         internal static MathParserException DatagridSizeLimit() =>
             new(string.Format(Messages.Datagrid_size_cannot_exceed_0_cells, UiDto.MaxSize));
 

@@ -1735,6 +1735,15 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
+        // /   Looks up a localized string similar to Data embedded in a compiled worksheet cannot exceed {0} MB..
+        // / </summary>
+        public static string Embedded_data_cannot_exceed_0_MB {
+            get {
+                return ResourceManager.GetString("Embedded_data_cannot_exceed_0_MB", resourceCulture);
+            }
+        }
+
+        // / <summary>
         // /   Looks up a localized string similar to A #UI value has the wrong type..
         // / </summary>
         public static string A_UI_value_has_the_wrong_type {
