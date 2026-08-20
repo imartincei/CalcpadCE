@@ -106,9 +106,26 @@ namespace Calcpad.OpenXml
 
         }
 
+        public static bool IsExcelFile(string ext) =>
+            ext.Equals("xlsx", StringComparison.OrdinalIgnoreCase) ||
+            ext.Equals("xlsm", StringComparison.OrdinalIgnoreCase);
+
         public static string[][] Read(string filepath, string sheetName, string rangeStart, string rangeEnd)
         {
             using SpreadsheetDocument document = SpreadsheetDocument.Open(filepath, false); // Open in read-only mode
+            return ReadFromDocument(document, sheetName, rangeStart, rangeEnd);
+        }
+
+        /// <summary>Reads a workbook that is held in memory rather than on disk — an embedded one.</summary>
+        public static string[][] ReadFromMemory(byte[] contentBytes, string sheetName, string rangeStart, string rangeEnd)
+        {
+            using var stream = new MemoryStream(contentBytes);
+            using SpreadsheetDocument document = SpreadsheetDocument.Open(stream, false);
+            return ReadFromDocument(document, sheetName, rangeStart, rangeEnd);
+        }
+
+        private static string[][] ReadFromDocument(SpreadsheetDocument document, string sheetName, string rangeStart, string rangeEnd)
+        {
             WorkbookPart wbPart = document.WorkbookPart ??
                 throw new InvalidOperationException("The Excel workbook is missing or not initialized.");
 
