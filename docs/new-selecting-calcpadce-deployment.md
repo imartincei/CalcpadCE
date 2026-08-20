@@ -35,9 +35,9 @@
 - Window management is more complex, UI mode is less streamlined.
 
 ## Shared Features
-- Shared CalcpadCE side panel with identical functionality. See **[The CalcpadCE Panel & Settings](new-calcpad-panel.md)**
+- Shared CalcpadCE side panel with identical functionality. See [CalcpadCE Panel & Settings](new-calcpad-panel.md).
 - Same PDF, Word, and HTML export processes.
-- Same code editor, symbol navigation, and linting. See **[The CalcpadCE Editor](new-calcpadce-editor.md)**
+- Same code editor, symbol navigation, and linting. See [CalcpadCE Editor](new-calcpadce-editor.md).
 - Same preview options and functionality
-- Both run the same CalcpadCE backend
+- Both run the same CalcpadCE calculation engine.
 - Both allow offline usage and local filesystem access.

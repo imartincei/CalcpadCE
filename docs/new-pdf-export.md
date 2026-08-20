@@ -1,21 +1,15 @@
 # PDF Export
 
-> Calcpad.Web only (web editor, desktop app, and VS Code extension). Not available in the standalone WPF desktop application for Windows.
+CalcpadCE can export your report to a print-ready PDF that matches the on-screen preview, with configurable page size, margins, and header/footer content.
 
-Calcpad.Web can export your report to a print-ready PDF that matches the on-screen preview, with configurable page size, margins, and header/footer content.
+Options come from two places, and the document takes priority:
 
-Options come from two places, and the document wins:
-
-- **Your defaults** live in the **PDF Export** section of the sidebar's [**Settings** tab](new-settings.md). They apply to every document you export.
-- **A document can override any of them for itself** with a `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings), written for you by the **Properties** tab. This is how a report that has to print A4 landscape says so, once, and prints that way on every machine.
+- **Your defaults** live in the **PDF Export** section of the sidebar's [Settings tab](new-calcpad-panel.md#settings). They apply to every document you export.
+- **A document can override any of them for itself** with a `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings), written for you by the [Properties tab](new-calcpad-panel.md#properties). This is how a report that has to print A4 landscape says so, once, and prints that way on every machine.
 
 The two are merged key by key: a document that sets only `marginTop` keeps your usual paper size and title.
 
-Then export:
-
-- **Desktop app** — **File → Export PDF…**
-- **VS Code** — *CalcpadCE: Export to PDF*
-- **Web editor** — **Report → Save PDF…** on the sidebar's **Export** tab
+See [Exporting](new-desktop-app.md#Exporting) for the CalcpadCE desktop app and [Exporting](new-vscode-extension.md#Exporting) for VS Code extension.
 
 ## Browser requirement
 
@@ -33,7 +27,7 @@ On Linux, if no browser is found the app shows you the exact package to install 
 
 | Distribution | Install command |
 |--------------|-----------------|
-| Arch / CachyOS / Manjaro / EndeavourOS / Garuda | `sudo pacman -S chromium` or `yay -S ungoogled-chromium-bin` |
+| Arch / CachyOS / Manjaro / EndeavourOS / Garuda | `sudo pacman -S chromium` |
 | Debian / Ubuntu / Mint | `sudo apt install chromium` |
 | Fedora / RHEL / Rocky / Alma | `sudo dnf install chromium` |
 | openSUSE | `sudo zypper install chromium` |
@@ -52,36 +46,24 @@ Background colors and images are always printed.
 
 ## Excluding sections from the PDF
 
-Wrap sections you want visible on screen but omitted from the PDF in `#pre` … `#end pre`:
+Wrap sections you want visible on screen but omitted from the report PDF in `#pre` … `#end pre`:
 
 ```text
 #pre
-'These lines are visible in the preview but excluded from the PDF.
-debug_x = 5
-debug_y = debug_x + 1
+'These lines are visible in the preview but excluded from the report PDF.
+x = 5
+y = x + 1
 #end pre
 'This prints!'
 ```
 
-This is part of Calcpad's [visibility directive system](new-syntax.md), so it also takes an optional condition and nests properly.
-The older `NoPrintStart` / `NoPrintEnd` comment markers no longer exist.
+This is part of CalcpadCE's [visibility directive system](new-visibility-directives.md), so it also takes an optional condition and nests properly.
 
-## Options reference
+## Options
 
 Every option you can set for a PDF export, on the **Settings** tab or in a document's `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings):
 
-| Option | Default | Purpose |
-|--------|---------|---------|
-| `format` | `Letter` | Paper size — Letter, Legal, Tabloid, Ledger, A0–A6 |
-| `orientation` | `portrait` | `portrait` or `landscape` |
-| `marginTop` | `0.75in` | Top margin |
-| `marginRight` | `0.5in` | Right margin |
-| `marginBottom` | `0.75in` | Bottom margin |
-| `marginLeft` | `0.5in` | Left margin |
-| `showPageNumbers` | `true` | "Page *n* of *m*" in the footer |
-| `showDate` | `true` | The timestamp in the header |
-| `documentTitle` | file name | Title (header, bold) |
-| `dateTimeFormat` | `M/d/yyyy h:mm tt` | [.NET date/time format string](https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings) for the timestamp |
+See [Settings](new-settings.md#pdf-export) for a full list of options.
 
 ## Troubleshooting
 
@@ -96,4 +78,4 @@ Every option you can set for a PDF export, on the **Settings** tab or in a docum
 
 - [Using the Desktop App](new-desktop-app.md) · [Using the VS Code Extension](new-vscode-extension.md)
 - [The CalcpadCE Panel & Settings](new-calcpad-panel.md)
-- [Metadata Comments](new-metadata-comments.md#pdf-export-settings) — per-document page setup
+- [Metadata Comments](new-metadata-comments.md#pdf-export-settings)

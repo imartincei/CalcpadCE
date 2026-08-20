@@ -1,31 +1,29 @@
 # UI Mode
 
-> Calcpad.Web only (web editor, desktop app, and VS Code extension). Not available in the standalone WPF desktop application for Windows.
-
 UI mode turns a worksheet into a **fill-in form**.
 Mark the inputs of your calculation with the `#UI` keyword, switch the results pane to input mode, and those lines are rendered as text boxes, drop-downs, radio buttons, checkboxes or editable grids instead of plain results.
 Type a new value and the whole document recalculates.
 
 The same file is still an ordinary worksheet.
-Anywhere the document is rendered as a document — the preview, a report, a PDF, a Word export — the `#UI` keyword changes nothing about how the line looks.
+In the preview, report, and PDF/Word exports — the `#UI` keyword changes nothing about how the line looks unless this is explicitly set.
 What it does carry across is the *values*: a report renders the numbers that were entered into the form.
 You write one document, and it doubles as its own input form.
 
 ```text
 #UI L = 6m
-#UI q = 25kN/m
-M = q*L^2/8
+#UI w = 25kN/m
+M = w*L^2/8
 ```
 
 Preview and Report show three ordinary lines.
-In Input mode `L` and `q` become text boxes and `M` follows whatever you type into them.
+In Input mode `L` and `w` become text boxes, and `M` follows whatever you type into them.
 
 ## Turning it on
 
 A document that declares `#UI` controls exists to be filled in, so the first time you open one it comes up as its input form — in the desktop app the results pane switches to **Input**, and in **VS Code** the form panel opens beside the editor without taking the caret out of it.
 That happens once per document per session: switch to **Preview** or **Report** and the mode you chose sticks, however often you come back to the tab.
 `#UI` lines reached only through an `#include` are not detected, since finding them would mean reading files on every open.
-Turn the whole behaviour off with **Open #UI Documents in Input Mode** on the panel's **Settings** tab.
+Turn the whole behaviour off with **Open `#UI` Documents in Input Mode** on the panel's **Settings** tab.
 
 **VS Code**
 
@@ -63,7 +61,7 @@ The two directives split a document into the part that is filled in and the part
 
 | | `#pre` shown | `#post` shown | Entered `#UI` values applied |
 |---|---|---|---|
-| **Preview** | yes | yes | no, unless the setting below says so |
+| **Preview** | yes | yes | no, unless a setting is changed |
 | **Input** | yes | no | yes |
 | **Report** | no | yes | yes |
 
@@ -90,7 +88,7 @@ Turn it back off to see the document's own values again.
 ## Writing a `#UI` line
 
 ```text
-#UI [{ JSON properties }] name = value
+#UI { JSON properties } name = value
 ```
 
 The JSON block is optional.
@@ -104,13 +102,9 @@ Without it the control type and, for grids, the number of rows and columns are w
 | Vector or matrix literal | ✔ | `#UI v = [1; 2; 3]`, `#UI M = [1; 2 \| 3; 4]` |
 | `vector()` / `matrix()` constructor | ✔ | `#UI Z = vector(5)`, `#UI G = matrix(r; c)` |
 | An expression | ✘ | `#UI k = 2*E`, `#UI k = max(v)`, `#UI v = [1; sqrt(4)]` |
-| A string variable (`name$`) | ✘ | `#UI s$ = ...` |
+| Text | ✘ | `#UI text = 'text'` |
 
-An expression is rejected because a control **overwrites** the right-hand side with whatever was entered — the expression would be gone the moment someone used the form.
-Compute from the inputs on a following, unannotated line instead.
-
-Exponent notation is not a value here either: `2.5e6` reads as `2.5` with a unit `e6`.
-Write `2500000` or `2.5*10^6` on a separate line.
+Exponent notation is not valid: write the full number instead.
 
 Saved values are matched to controls by variable name, so give each input a name of its own rather than re-assigning one — see [Editing a document that has saved values](#editing-a-document-that-has-saved-values).
 

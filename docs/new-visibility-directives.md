@@ -1,10 +1,5 @@
 # Visibility & Output-Mode Directives
 
-> Staging doc for the directive-conditions / `#end` / `#pre`+`#post` print-semantics change. Fold
-> this into `quick-reference.md`, `Setup/AI/Work/CALCPAD_LANGUAGE_REFERENCE_FOR_CLAUDE.md`,
-> `.claude/skills/calcpad-generator/reference/syntax-reference.md`, `new-pdf-export.md`, and
-> `new-metadata-comments.md` when those get their next real update.
-
 Print visibility used to be a separate, web-only mechanism: wrapping content in `'<!--{"NoPrintStart": true}-->` / `'<!--{"NoPrintEnd": true}-->` HTML comments, stripped from the source before conversion when exporting to PDF.
 That mechanism is gone.
 Visibility is now handled entirely by Core's directive system (`#hide`/`#show`/`#pre`/`#post`), which also gained an optional condition argument and matching `#end` forms.
