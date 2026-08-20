@@ -98,6 +98,10 @@ The lowest severity surfaced as a diagnostic.
 
 - **Open Logs Folder** — opens the folder holding server logs and the most recent crash dump.
 - **Max Output Lines (per channel)** *(web/desktop)* — 10–100000, default 1000. Number of lines retained in each Output panel channel before older lines are dropped. Lower values reduce memory use and keep the UI responsive when logs are noisy.
+- **Max Preview Size (MB)** — 1–256, default 24. A document that renders to more HTML than this is not shown; the preview shows a **Preview blocked** page giving the render's size and the limit instead. Showing it risks running the app out of memory, since the rendered HTML is held several times over and the DOM built from it costs more again. PDF, HTML, and Word export are unaffected — they don't go through the preview. Raise it to preview a very large document anyway; the preview re-renders as soon as you change it.
+- **Max Preview Console Messages** — 10–100000, default 500. How many console lines one preview render may relay before the rest are dropped, with a final line saying output was suppressed. Lines go to the **Preview Console** output channel in the desktop app and to the **CalcpadCE Webview Console** channel in VS Code. A worksheet whose scripts log in a loop can otherwise flood the channel. Raise it while debugging a script, lower it when a library is noisy. Each line is clipped to 4 KB regardless of this setting, and the count resets on every render.
+
+Two related ceilings are fixed rather than settings: a single render inlines at most 24 MB of image data — past that the remaining images are left as paths and a warning is logged — and the HTML-output channel (**HTML Preview Output** in the desktop app, **CalcpadCE Output HTML** in VS Code) keeps the first 256 KB of a render's body, saying how much it left out.
 
 ## Named configurations
 

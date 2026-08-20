@@ -2,15 +2,14 @@
 
 > Calcpad.Web only (web editor, desktop app, and VS Code extension). Not available in the standalone WPF desktop application for Windows.
 
-UI mode turns a worksheet into a **fill-in form**. Mark the inputs of your calculation with the
-`#UI` keyword, switch the results pane to input mode, and those lines are rendered as text
-boxes, drop-downs, radio buttons, checkboxes or editable grids instead of plain results. Type a
-new value and the whole document recalculates.
+UI mode turns a worksheet into a **fill-in form**.
+Mark the inputs of your calculation with the `#UI` keyword, switch the results pane to input mode, and those lines are rendered as text boxes, drop-downs, radio buttons, checkboxes or editable grids instead of plain results.
+Type a new value and the whole document recalculates.
 
-The same file is still an ordinary worksheet. Anywhere the document is rendered as a document —
-the preview, a report, a PDF, a Word export — the `#UI` keyword changes nothing about how the
-line looks. What it does carry across is the *values*: a report renders the numbers that were
-entered into the form. You write one document, and it doubles as its own input form.
+The same file is still an ordinary worksheet.
+Anywhere the document is rendered as a document — the preview, a report, a PDF, a Word export — the `#UI` keyword changes nothing about how the line looks.
+What it does carry across is the *values*: a report renders the numbers that were entered into the form.
+You write one document, and it doubles as its own input form.
 
 ```text
 #UI L = 6m
@@ -18,18 +17,15 @@ entered into the form. You write one document, and it doubles as its own input f
 M = q*L^2/8
 ```
 
-Preview and Report show three ordinary lines. In Input mode `L` and `q` become text boxes and
-`M` follows whatever you type into them.
+Preview and Report show three ordinary lines.
+In Input mode `L` and `q` become text boxes and `M` follows whatever you type into them.
 
 ## Turning it on
 
-A document that declares `#UI` controls exists to be filled in, so the first time you open one
-it comes up as its input form — in the desktop app the results pane switches to **Input**, and in
-**VS Code** the form panel opens beside the editor without taking the caret out of it. That
-happens once per document per session: switch to **Preview** or **Report** and the mode you chose
-sticks, however often you come back to the tab. `#UI` lines reached only through an `#include`
-are not detected, since finding them would mean reading files on every open. Turn the whole
-behaviour off with **Open #UI Documents in Input Mode** on the panel's **Settings** tab.
+A document that declares `#UI` controls exists to be filled in, so the first time you open one it comes up as its input form — in the desktop app the results pane switches to **Input**, and in **VS Code** the form panel opens beside the editor without taking the caret out of it.
+That happens once per document per session: switch to **Preview** or **Report** and the mode you chose sticks, however often you come back to the tab.
+`#UI` lines reached only through an `#include` are not detected, since finding them would mean reading files on every open.
+Turn the whole behaviour off with **Open #UI Documents in Input Mode** on the panel's **Settings** tab.
 
 **VS Code**
 
@@ -41,10 +37,9 @@ behaviour off with **Open #UI Documents in Input Mode** on the panel's **Setting
 | `CalcpadCE: Save #UI Values to Document` | Writes the values you entered into the file |
 | `CalcpadCE: Save Values to Compiled Worksheet` | The `.cpdz` equivalent of the command above |
 
-Closing the form asks whether to save the values first; declining discards them. The report
-preview is not tied to the form: open it on its own to read the print layout beside the editor,
-and it stays open when the form closes. While the form or the report has focus, both the
-**Print Report to PDF** and the report toggle appear as buttons in the panel's title bar.
+Closing the form asks whether to save the values first; declining discards them.
+The report preview is not tied to the form: open it on its own to read the print layout beside the editor, and it stays open when the form closes.
+While the form or the report has focus, both the **Print Report to PDF** and the report toggle appear as buttons in the panel's title bar.
 
 **Web editor and desktop app**
 
@@ -57,15 +52,14 @@ The results toolbar — labelled **Results** — has four modes:
 | **Input** | The `#UI` form. Takes over the window and hides the editor |
 | **Report** | The print layout: `#pre` hidden, entered `#UI` values applied |
 
-The same modes are in the native menu under **View → Result Mode**. In **Input** the toolbar
-also offers **Report** (the report beside the form), **Save values** (once you have changed
-something) and **Exit input mode**, which leaves you in **Report**. In **Input** and **Report**
-a **Print PDF** button exports the report.
+The same modes are in the native menu under **View → Result Mode**.
+In **Input** the toolbar also offers **Report** (the report beside the form), **Save values** (once you have changed something) and **Exit input mode**, which leaves you in **Report**.
+In **Input** and **Report** a **Print PDF** button exports the report.
 
 ## `#pre` and `#post`
 
-The two directives split a document into the part that is filled in and the part that is read
-back. `#pre` is hidden in a report; `#post` is hidden while the form is on screen:
+The two directives split a document into the part that is filled in and the part that is read back.
+`#pre` is hidden in a report; `#post` is hidden while the form is on screen:
 
 | | `#pre` shown | `#post` shown | Entered `#UI` values applied |
 |---|---|---|---|
@@ -73,9 +67,8 @@ back. `#pre` is hidden in a report; `#post` is hidden while the form is on scree
 | **Input** | yes | no | yes |
 | **Report** | no | yes | yes |
 
-So put the parts of the document that are output — result tables, conclusions, long derivations
-— inside a `#post` block, and the form stays a short list of inputs. Put instructions for
-whoever fills the form in inside `#pre`, and they stay out of the report.
+So put the parts of the document that are output — result tables, conclusions, long derivations — inside a `#post` block, and the form stays a short list of inputs.
+Put instructions for whoever fills the form in inside `#pre`, and they stay out of the report.
 
 ```text
 #pre
@@ -87,16 +80,12 @@ whoever fills the form in inside `#pre`, and they stay out of the report.
 #end post
 ```
 
-**Preview** is the mode to write in: it shows everything at once, and it deliberately ignores
-entered values so you always see what the document itself says.
+**Preview** is the mode to write in: it shows everything at once, and it deliberately ignores entered values so you always see what the document itself says.
 
-The exception is **Apply #UI Values in Preview** on the panel's **Settings** tab, off by
-default. Turn it on and Preview renders with the entered values applied, exactly as the form
-and the report do, while still showing `#pre` and `#post` together. That combination is what
-makes it a debugging view: when a document calculates cleanly as written but errors once the
-form is filled in, Preview with this on shows the failing values against the whole document —
-the `#pre` instructions, the `#post` results and the source lines the form leaves out. Turn it
-back off to see the document's own values again.
+The exception is **Apply #UI Values in Preview** on the panel's **Settings** tab, off by default.
+Turn it on and Preview renders with the entered values applied, exactly as the form and the report do, while still showing `#pre` and `#post` together.
+That combination is what makes it a debugging view: when a document calculates cleanly as written but errors once the form is filled in, Preview with this on shows the failing values against the whole document — the `#pre` instructions, the `#post` results and the source lines the form leaves out.
+Turn it back off to see the document's own values again.
 
 ## Writing a `#UI` line
 
@@ -104,8 +93,8 @@ back off to see the document's own values again.
 #UI [{ JSON properties }] name = value
 ```
 
-The JSON block is optional. Without it the control type and, for grids, the number of rows and
-columns are worked out from the right-hand side.
+The JSON block is optional.
+Without it the control type and, for grids, the number of rows and columns are worked out from the right-hand side.
 
 `#UI` annotates an **assignment**, and only one whose right-hand side is a plain value:
 
@@ -117,21 +106,18 @@ columns are worked out from the right-hand side.
 | An expression | ✘ | `#UI k = 2*E`, `#UI k = max(v)`, `#UI v = [1; sqrt(4)]` |
 | A string variable (`name$`) | ✘ | `#UI s$ = ...` |
 
-An expression is rejected because a control **overwrites** the right-hand side with whatever was
-entered — the expression would be gone the moment someone used the form. Compute from the
-inputs on a following, unannotated line instead.
+An expression is rejected because a control **overwrites** the right-hand side with whatever was entered — the expression would be gone the moment someone used the form.
+Compute from the inputs on a following, unannotated line instead.
 
-Exponent notation is not a value here either: `2.5e6` reads as `2.5` with a unit `e6`. Write
-`2500000` or `2.5*10^6` on a separate line.
+Exponent notation is not a value here either: `2.5e6` reads as `2.5` with a unit `e6`.
+Write `2500000` or `2.5*10^6` on a separate line.
 
-Saved values are matched to controls by variable name, so give each input a name of its own
-rather than re-assigning one — see [Editing a document that has saved
-values](#editing-a-document-that-has-saved-values).
+Saved values are matched to controls by variable name, so give each input a name of its own rather than re-assigning one — see [Editing a document that has saved values](#editing-a-document-that-has-saved-values).
 
 ### Labels
 
-An inline comment on the line labels the control. The comment is display text, so it may
-contain its own `=`:
+An inline comment on the line labels the control.
+The comment is display text, so it may contain its own `=`:
 
 ```text
 #UI 'Span, 'L = 6m
@@ -149,8 +135,7 @@ They share the line's JSON properties but are saved and overridden separately.
 
 ## JSON properties
 
-You don't have to write this `{...}` block by hand — the [Properties tab](new-metadata-comments.md#the-properties-tab)
-has a form for it that fills in the fields that apply to the control type it detects.
+You don't have to write this `{...}` block by hand — the [Properties tab](new-metadata-comments.md#the-properties-tab) has a form for it that fills in the fields that apply to the control type it detects.
 
 | Property | Type | Applies to | Meaning |
 |----------|------|-----------|---------|
@@ -165,16 +150,15 @@ has a form for it that fills in the fields that apply to the control type it det
 | `keys` | array | dropdown, radio | The labels shown to the user |
 | `values` | array | dropdown, radio | The values substituted into the calculation, one per key |
 
-`keys` and `values` are both required for a drop-down or radio group, and must be the same
-length. Header arrays must not be longer than the grid dimension they label.
+`keys` and `values` are both required for a drop-down or radio group, and must be the same length.
+Header arrays must not be longer than the grid dimension they label.
 
 ## The control types
 
 ### `entry` — a text box
 
-The default for a numeric right-hand side. The unit stays in the document beside the box, so
-only the number is editable; the box accepts digits, a decimal point and a sign, and rejects
-anything else as you type.
+The default for a numeric right-hand side.
+The unit stays in the document beside the box, so only the number is editable; the box accepts digits, a decimal point and a sign, and rejects anything else as you type.
 
 ```text
 #UI L = 10m
@@ -183,8 +167,8 @@ anything else as you type.
 
 ### `dropdown` — a list
 
-`keys` are shown, `values` are substituted. A value may carry its own unit, so a drop-down can
-switch units as well as magnitudes.
+`keys` are shown, `values` are substituted.
+A value may carry its own unit, so a drop-down can switch units as well as magnitudes.
 
 ```text
 #UI {"type": "dropdown", "keys": ["Low", "Medium", "High"], "values": ["1", "2", "3"]} grade = 1
@@ -200,7 +184,8 @@ Same `keys`/`values` pairing as a drop-down, laid out as radio buttons.
 
 ### `checkbox` — a 1/0 toggle
 
-Checked is `1`, unchecked is `0`. Pairs naturally with `#if`.
+Checked is `1`, unchecked is `0`.
+Pairs naturally with `#if`.
 
 ```text
 #UI {"type": "checkbox"} useSteel = 1
@@ -208,8 +193,8 @@ Checked is `1`, unchecked is `0`. Pairs naturally with `#if`.
 
 ### `datagrid` — an editable grid
 
-The default whenever the right-hand side is a vector/matrix literal or a `vector()`/`matrix()`
-call. `|` separates rows and `;` separates cells, so `[1; 2; 3]` is one row of three.
+The default whenever the right-hand side is a vector/matrix literal or a `vector()`/`matrix()` call.
+`|` separates rows and `;` separates cells, so `[1; 2; 3]` is one row of three.
 
 ```text
 #UI v = [1; 2; 3]
@@ -218,19 +203,16 @@ call. `|` separates rows and `;` separates cells, so `[1; 2; 3]` is one row of t
 #UI G = matrix(3; 4)
 ```
 
-Sizes computed at run time work too — `matrix(r; c)`, `matrix(len(x); len(y))` — the grid is
-sized from the value the line produced.
+Sizes computed at run time work too — `matrix(r; c)`, `matrix(len(x); len(y))` — the grid is sized from the value the line produced.
 
-Declaring `rows` and `columns` explicitly fits the literal to that shape: missing cells become
-`0`, extra ones are dropped.
+Declaring `rows` and `columns` explicitly fits the literal to that shape: missing cells become `0`, extra ones are dropped.
 
 ```text
 #UI {"type": "datagrid", "rows": 2, "columns": 3, "columnHeaders": ["a", "b", "c"], "rowHeaders": ["r1", "r2"]} T = [0; 0; 0 | 0; 0; 0]
 ```
 
-The grid's size comes from the directive, so rows and columns cannot be inserted or deleted in
-the form. Every cell becomes an element of a matrix literal, so a cell holding text — typed or
-pasted in — is put back to `0`.
+The grid's size comes from the directive, so rows and columns cannot be inserted or deleted in the form.
+Every cell becomes an element of a matrix literal, so a cell holding text — typed or pasted in — is put back to `0`.
 
 ## Styling with CSS
 
@@ -240,8 +222,7 @@ Two properties attach classes, and they never both apply at once:
 - **`reportStyle`** — added to the element wrapping the line, everywhere the line is *not* a
   control: Preview, Report, and every export but the input form.
 
-So `style` is how the form looks, `reportStyle` is how the plain line looks, and you can set
-both on one directive to style each independently.
+So `style` is how the form looks, `reportStyle` is how the plain line looks, and you can set both on one directive to style each independently.
 
 ### The base classes
 
@@ -255,15 +236,12 @@ Every control also carries a class of its own, which is what your class combines
 | `checkbox` | `<input type="checkbox">` | `calcpad-ui-checkbox` |
 | `datagrid` | `<div>` holding the grid | `calcpad-ui-datagrid` |
 
-Write your selector as the base class plus your own class, so it only hits the controls you
-marked: `.calcpad-ui-input.highlight`, not `.highlight`. A `reportStyle` class lands on the
-line's element, which is a paragraph, so target it as `p.boxed`.
+Write your selector as the base class plus your own class, so it only hits the controls you marked: `.calcpad-ui-input.highlight`, not `.highlight`.
+A `reportStyle` class lands on the line's element, which is a paragraph, so target it as `p.boxed`.
 
 ### Where to put the style sheet
 
-Put the CSS in a comment block, and wrap that block in `#val` … `#end val` so the lines are
-emitted as written instead of each being wrapped in a paragraph — a `<p>` tag inserted into the
-middle of a `<style>` element breaks the rules around it.
+Put the CSS in a comment block, and wrap that block in `#val` … `#end val` so the lines are emitted as written instead of each being wrapped in a paragraph — a `<p>` tag inserted into the middle of a `<style>` element breaks the rules around it.
 
 ```text
 #val
@@ -290,56 +268,42 @@ Then name the classes on the directives:
 #UI {"type": "datagrid", "style": "bordered"} T = [1; 2 | 3; 4]
 ```
 
-`depth` is highlighted in the form and unremarkable in the report; `P` is boxed in the report
-and an ordinary text box in the form; `q` gets both.
+`depth` is highlighted in the form and unremarkable in the report; `P` is boxed in the report and an ordinary text box in the form; `q` gets both.
 
-Several classes can be listed at once — `"style": "highlight wide"` — and the usual document
-style sheet applies too, so anything you can select with CSS you can style here.
+Several classes can be listed at once — `"style": "highlight wide"` — and the usual document style sheet applies too, so anything you can select with CSS you can style here.
 
 ### Inside a datagrid
 
-A grid is a third-party widget, so a `style` class reaches its outer container but not the cells,
-headers or context menu inside it. Those are styled by a stylesheet that ships with the
-application, not from the document — see *Customizing the `#UI` Datagrid* in `DEVELOPER.md`.
-Column widths and the grid's overall size are set by the preview script and are not adjustable
-from CSS at all.
+A grid is a third-party widget, so a `style` class reaches its outer container but not the cells, headers or context menu inside it.
+Those are styled by a stylesheet that ships with the application, not from the document — see *Customizing the `#UI` Datagrid* in `DEVELOPER.md`.
+Column widths and the grid's overall size are set by the preview script and are not adjustable from CSS at all.
 
 ## Saving what was entered
 
-Values you type live in memory: filling in a form never dirties the file on its own. Saving
-them writes them into a metadata comment at the top of the document, which is what restores
-them the next time you open it:
+Values you type live in memory: filling in a form never dirties the file on its own.
+Saving them writes them into a metadata comment at the top of the document, which is what restores them the next time you open it:
 
 ```text
 '<!--{"uiOverrides":{"L:1":"8","q:1":"30"}}-->
 ```
 
-The keys are control identities: the variable name, then which declaration of that name it is
-(`L:1` is the first `L`), and inside a loop the pass numbers as well (`y:1:2`). A saved value
-replaces the right-hand side of its assignment in the form and in the report, so the report
-shows the numbers that were entered. Hand-writing an entry works too, and a broader key covers
-more controls — `L:1` covers every pass of that declaration, a bare `L` covers every declaration
-of the name.
+The keys are control identities: the variable name, then which declaration of that name it is (`L:1` is the first `L`), and inside a loop the pass numbers as well (`y:1:2`).
+A saved value replaces the right-hand side of its assignment in the form and in the report, so the report shows the numbers that were entered.
+Hand-writing an entry works too, and a broader key covers more controls — `L:1` covers every pass of that declaration, a bare `L` covers every declaration of the name.
 
-See [Metadata Comments](new-metadata-comments.md) for the comment format itself. The comment has
-to be the **first line of the file** to take effect — including a file reached through
-`#include`, whose own saved values are invisible to whatever includes it. See [`#UI` overrides
-and includes](new-includes.md#ui-overrides-and-includes) for the reasoning and a workaround for
-sharing values across files.
+See [Metadata Comments](new-metadata-comments.md) for the comment format itself.
+The comment has to be the **first line of the file** to take effect — including a file reached through `#include`, whose own saved values are invisible to whatever includes it.
+See [`#UI` overrides and includes](new-includes.md#ui-overrides-and-includes) for the reasoning and a workaround for sharing values across files.
 
-Values do not have to be saved to be exported: an export made while the form is filled in uses
-what is currently entered. Saving is what makes them survive closing the document.
+Values do not have to be saved to be exported: an export made while the form is filled in uses what is currently entered.
+Saving is what makes them survive closing the document.
 
 ### Editing a document that has saved values
 
-Because a saved value is tied to a variable name and to which declaration of that name it is,
-**editing the source of a document can move or orphan the values already saved in it**. The
-document still calculates correctly — the risk is that a filled-in form comes back with a value
-on the wrong control, or with a control reset to what the document itself says.
+Because a saved value is tied to a variable name and to which declaration of that name it is, **editing the source of a document can move or orphan the values already saved in it**.
+The document still calculates correctly — the risk is that a filled-in form comes back with a value on the wrong control, or with a control reset to what the document itself says.
 
-The ordinal counts the `#UI` declarations of that name in the order the document runs them, so
-what matters is not where a line sits in the file but how many declarations of the same name
-come before it:
+The ordinal counts the `#UI` declarations of that name in the order the document runs them, so what matters is not where a line sits in the file but how many declarations of the same name come before it:
 
 - **Renaming a variable** orphans its value. `L:1` no longer matches anything, the control comes
   up with the document's own value, and the stale entry stays in the metadata comment until it
@@ -352,27 +316,18 @@ come before it:
 - **Moving, editing or deleting lines that declare *other* names** is safe. So is reordering, as
   long as the declarations of one name keep their relative order.
 
-The stable arrangement is therefore **one `#UI` declaration per variable name**. Give each input
-its own name instead of re-assigning one, and every key is `name:1`: it cannot be renumbered by
-anything you do elsewhere in the document, and only renaming or removing that input affects it.
-Where a name genuinely must be declared more than once — the two branches of an `#if`, a control
-inside a `#repeat` — the numbering is already stable against branch flips and loop passes, but
-adding or removing one of those declarations later will still shift the rest.
+The stable arrangement is therefore **one `#UI` declaration per variable name**.
+Give each input its own name instead of re-assigning one, and every key is `name:1`: it cannot be renumbered by anything you do elsewhere in the document, and only renaming or removing that input affects it.
+Where a name genuinely must be declared more than once — the two branches of an `#if`, a control inside a `#repeat` — the numbering is already stable against branch flips and loop passes, but adding or removing one of those declarations later will still shift the rest.
 
-If a document's values do end up scrambled, the metadata comment is plain text: fix the keys by
-hand, or clear the `uiOverrides` entry to start the form from the document's own values again.
-Editing the comment takes effect on the next render, and what it says replaces what is currently
-entered — including values typed into the form but not yet saved.
+If a document's values do end up scrambled, the metadata comment is plain text: fix the keys by hand, or clear the `uiOverrides` entry to start the form from the document's own values again.
+Editing the comment takes effect on the next render, and what it says replaces what is currently entered — including values typed into the form but not yet saved.
 
-The [Properties tab](new-metadata-comments.md#the-properties-tab) does this without hand-editing:
-its **Saved #UI values** list shows every entry, lets you edit one in place or jump to its
-control, flags entries that no longer match a control still in the document, and has a
-**Purge unused** button to drop them.
+The [Properties tab](new-metadata-comments.md#the-properties-tab) does this without hand-editing: its **Saved #UI values** list shows every entry, lets you edit one in place or jump to its control, flags entries that no longer match a control still in the document, and has a **Purge unused** button to drop them.
 
 ## Exporting
 
-Exports come in variants, one per rendering, and **report is the default** — a plain "Export
-PDF" from the menu, the toolbar, or a command gives you the report:
+Exports come in variants, one per rendering, and **report is the default** — a plain "Export PDF" from the menu, the toolbar, or a command gives you the report:
 
 | Variant | Contents | Formats |
 |---------|----------|---------|
@@ -381,9 +336,8 @@ PDF" from the menu, the toolbar, or a command gives you the report:
 | **Input form** | The form itself, `#post` hidden, entered values in the controls | PDF, HTML |
 | **Unwrapped** | The source listing, macros and includes resolved | PDF, HTML |
 
-The non-default variants live in the **Export** tab of the sidebar, which groups its buttons by
-variant, and in the desktop app's **File → Export** submenu. The input form and the unwrapped
-listing have no Word form.
+The non-default variants live in the **Export** tab of the sidebar, which groups its buttons by variant, and in the desktop app's **File → Export** submenu.
+The input form and the unwrapped listing have no Word form.
 
 Two things to know about the exported files:
 
@@ -394,9 +348,8 @@ Two things to know about the exported files:
 
 ## Compiled (`.cpdz`) worksheets
 
-A [compiled worksheet](new-portable-export-options.md#save-as-compiled-worksheet) is a `.cpdz` file with
-its source locked and only the `#UI` form left editable. It changes a few things from the
-ordinary-file behaviour described above:
+A [compiled worksheet](new-portable-export-options.md#save-as-compiled-worksheet) is a `.cpdz` file with its source locked and only the `#UI` form left editable.
+It changes a few things from the ordinary-file behaviour described above:
 
 - It always opens as its input form — the "first time you open it" auto-detection under
   [Turning it on](#turning-it-on) doesn't apply, since there is no other mode to default to.
@@ -418,8 +371,7 @@ The keyword works anywhere a normal assignment does.
 Beam$(6m)
 ```
 
-Inside `#if` only the taken branch renders a control, and flipping the branch does not renumber
-the controls that follow:
+Inside `#if` only the taken branch renders a control, and flipping the branch does not renumber the controls that follow:
 
 ```text
 #UI {"type": "checkbox"} useSteel = 1
@@ -441,8 +393,7 @@ Inside a loop each pass renders its own control, and each is entered separately:
 
 ## Diagnostics
 
-`#UI` problems are reported under `CPD-3415`, by the linter as you type and by the calculation
-engine when you run the document:
+`#UI` problems are reported under `CPD-3415`, by the linter as you type and by the calculation engine when you run the document:
 
 | Message | Cause |
 |---------|-------|

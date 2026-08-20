@@ -31,7 +31,8 @@ The **CalcpadCE** view is organized into tabs:
 | **Export** | PDF / HTML / Word save actions, grouped by which rendering they capture, plus per-plot and ZIP image exports from any plots produced by the document. See [Export](#export). |
 | **Errors** | Full list of calculation errors from the engine, each linking to its source line. |
 
-While a [`#UI` input form](new-ui-mode.md) (or a compiled `.cpdz` worksheet) is the active document, **Insert**, **Variables**, **Formatting**, **Errors**, and **Properties** go inactive — they act on the document source, which the form doesn't edit. **TOC**, **Settings**, and **Export** stay available.
+While a [`#UI` input form](new-ui-mode.md) (or a compiled `.cpdz` worksheet) is the active document, **Insert**, **Variables**, **Formatting**, **Errors**, and **Properties** go inactive — they act on the document source, which the form doesn't edit.
+**TOC**, **Settings**, and **Export** stay available.
 
 ### Insert
 
@@ -55,14 +56,14 @@ Click any entry to insert its name at the cursor.
 
 ### Properties
 
-A form-based editor for the [metadata comment](new-metadata-comments.md), `#settings` directive JSON, and `#UI` directive JSON.   
+A form-based editor for the [metadata comment](new-metadata-comments.md), `#settings` directive JSON, and `#UI` directive JSON.  
 Put the cursor on JSON field, and the tab shows exactly the fields that apply: a description for any definition, parameter/return types for functions and macros, and per-file settings, lint-ignore, and [PDF export settings](new-metadata-comments.md#pdf-export-settings) on generic lines.  
 **Apply** writes the comment (creating one above the definition if none exists); **Reset** re-reads the current one.  
 See [Metadata Comments](new-metadata-comments.md), [Settings](new-settings.md), and [UI Mode](new-ui-mode.md) for the full format.
 
 ### TOC
 
-A live outline of the headings in your document.  
+A live outline of the headings in your document. Define headings with \<h1\>, \<h2\>, etc. HTML or #, ## in Markdown.
 Selecting a heading scrolls the editor to that line.
 While a [`#UI` input form](new-ui-mode.md) is open and there is no editor to scroll, it scrolls the form and the report.  
 
@@ -87,15 +88,13 @@ Allows saving results from the CalcpadCE file into various formats.
 | **Input form** | Save PDF… · Save HTML… | The `#UI` form itself, `#post` hidden. Applies UI Overrides instead of using the default values. |
 | **Unwrapped** | Save PDF… · Save HTML… | The source .cpd code with macros and includes expanded. |
 
-Word is offered for the report and the preview only. 
-PDF uses the page setup from the **Settings** tab's **PDF Export** section, overridden by the  
-document's own `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings) where it sets one.
+Word is offered for the report and the preview only.
+PDF uses the page setup from the **Settings** tab's **PDF Export** section, overridden by the document's own `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings) where it sets one.
 
 There are two portable export options for .cpd files.
 - **Save Compiled…** writes the document out as a `.cpdz` compiled worksheet. 
 - **Export Portable…** bundles it with everything it reads into a `.zip`  
-See [Portable Export Options](new-portable-export-options.md)  
-for what each one produces.
+See [Portable Export Options](new-portable-export-options.md) for what each one produces.
 
 Below those, the **Plots** section lists every plot the document emits, each with a thumbnail, filename, and size:
 

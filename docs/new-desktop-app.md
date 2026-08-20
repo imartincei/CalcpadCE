@@ -1,9 +1,10 @@
 # CalcpadCE Desktop App
 
-The **CalcpadCE Desktop App** is a native application for Windows and Linux that wraps the same editor you get in the browser and bundles the calculation engine inside it.
-You get the full editor — multi-tab editing, syntax highlighting, autocomplete, live preview, and the CalcpadCE sidebar — plus native file dialogs, a native menu bar, and drag-and-drop, with no browser to open and no server to set up.
+The **CalcpadCE Desktop App** is a native application for Windows.
+You get the full editor — multi-tab editing, syntax highlighting, autocomplete, live preview, and the CalcpadCE sidebar.
+It uses native file dialogs and menu bar and has offline capabilities.
 
-For the CalcpadCE language itself, start with **[Writing Math](writing-math.md)** and the **[Quick Reference](quick-reference.md)**.
+See [Selecting a CalcpadCE Deployment](new-selecting-calcpadce-deployment.md) to help decide if this is the right CalcpadCE deployment for you.
 
 ## Installing
 
@@ -13,12 +14,16 @@ The app ships as a per-platform download:
 |----------|--------|
 | Windows | Portable `.zip` build (no install for beta) |
 | Linux | AppImage (run directly, no install for beta) |
+| Linux | Debian `.deb` |
+| Linux | Fedora `.rpm` |
+| Linux | Arch (compressed package with PKGBUILD) |
 
-The calculation engine and its fonts and templates are bundled inside the app — you do **not** need .NET installed separately.
-On Linux, the `.AppImage` includes what it needs to run; the `.deb` package expects WebKitGTK to already be present on the system.
+The calculation engine and its dependencies are bundled inside the app — you do **not** need .NET installed separately.
+The Linux `.AppImage` and Windows Portable builds include what they need to run.
+The other Linux options expect WebKitGTK to already be present on the system and may require installing a few other common dependencies.
 
 For PDF export you need a **Chromium-based browser** (Chrome, Edge, or Chromium) installed on the system.
-On Linux the app will tell you which package to install if none is found — see [PDF Export](new-pdf-export.md).
+On Linux, the app will tell you which package to install if none is found — see [PDF Export](new-pdf-export.md).
 
 ## Your first document
 
@@ -44,11 +49,9 @@ The app uses tabs so you can keep several `.cpd` documents open at once.
 | Action | Shortcut |
 |--------|----------|
 | New tab | **Ctrl+T** or **Ctrl+N**, or the **`+`** button on the tab strip |
-| Open a file | **File → Open…**, or drag a file onto the window |
+| Open a file | **Ctrl+O**, or **File → Open…**, or drag a file onto the window |
 | Close tab | **Ctrl+W**, the **✕** on the tab, or middle-click the tab |
-| Next / previous tab | **Ctrl+Tab** / **Ctrl+Shift+Tab** |
-| Jump to tab 1–8 | **Ctrl+1** … **Ctrl+8** |
-| Jump to last tab | **Ctrl+9** |
+| Next  tab | **Ctrl+Tab** |
 
 How tabs behave:
 
@@ -68,23 +71,17 @@ There are several ways to open documents:
 - **Files tab** in the sidebar — open a folder and browse its tree.
 - **Recent files** — tracked automatically and available from the File menu.
 
-Compiled **`.cpdz`** worksheets open the same way and are registered as their own file type — double-clicking one opens the app straight to its `#UI` input form, source locked. See [UI Mode](new-ui-mode.md#compiled-cpdz-worksheets).
+Compiled **`.cpdz`** worksheets open the same way and are registered as their own file type — double-clicking one opens the app straight to its `#UI` input form, source locked.
+See [UI Mode](new-ui-mode.md#compiled-cpdz-worksheets).
 
 ## The editor
 
-- **Syntax highlighting** for numbers, units, operators, variables, functions, macros, keywords, commands, and embedded HTML/Markdown in comments.
-- **Autocomplete** that prioritizes your own symbols over built-ins, with snippet placeholders for function arguments.
-- **Quick-type symbols** — `~a` + space → `α`, `~p` + space → `π`, etc.
-- **Operator replacement** — `<=` → `≤`, `>=` → `≥`, `!=` → `≠`.
-- **Auto-indentation** for `#if` / `#for` / `#def` blocks.
-- **Go to Definition**, **Find All References**, **Rename**, and **hover** for symbols, including across `#include` files.
+The editor is the same across every CalcpadCE front end — see **[The CalcpadCE Editor](new-calcpadce-editor.md)** for syntax highlighting, autocomplete, quick-type symbols, operator replacement, formatting hotkeys, symbol navigation, and path completion for `#include`/`#read` paths.
 
-Two key behaviors worth knowing:
+Desktop specifics:
 
-- **Enter always inserts a newline** — it never accepts a suggestion. Press **Tab** to accept a completion.
-- **Tab accepts suggestions** and triggers completion on a partial word.
-
-These are the same editor features as the [VS Code extension](new-vscode-extension.md), so anything you learn in one carries over to the other.
+- Path completion draws on the folder opened in the **Files** tab as well as the document's `#ProjectPath`/`#LibraryPath` roots.
+- JuliaMono is bundled with the app, so math glyphs render without installing a font.
 
 ## The CalcpadCE sidebar
 
@@ -130,16 +127,16 @@ The active group — the one you most recently clicked into — drives the sideb
 
 **Linter** — CalcpadCE checks your document as you write and flags problems before they're converted to HTML.
 Issues are marked in red, yellow, or blue at the spot with the problem, based on severity, and appear in the **Problems** panel with a link to the offending line.
-See **[Linter and Diagnostics](new-linter.md)** for the full list of codes.
 
 **Preview errors** — errors from the calculation engine (including inside hidden code) are listed in the **Errors** tab of the sidebar, each with a link to its source line.
+
+See **[The CalcpadCE Editor → Linting](new-calcpadce-editor.md#linting)** and **[Linter and Diagnostics](new-linter.md)** for the full list of codes.
 
 ## Exporting
 
 Every export uses the app's built-in engine, so the output matches what you see on screen.
 
-Exports come in one variant per result mode, and **the report is the default** — that is what a
-plain **File → Export → Report PDF…** gives you:
+Exports come in one variant per result mode, and **the report is the default** — that is what a plain **File → Export → Report PDF…** gives you:
 
 | Variant | Contents | Formats |
 |---------|----------|---------|
@@ -148,10 +145,10 @@ plain **File → Export → Report PDF…** gives you:
 | **Input form** | The `#UI` form itself | PDF, HTML |
 | **Unwrapped** | The expanded source listing | PDF, HTML |
 
-Every one is in **File → Export** and in the **Export** tab of the sidebar, which groups its
-buttons the same way. Each opens a native save dialog. PDF requires a Chromium browser — see
-[PDF Export](new-pdf-export.md). No exported file carries the line numbers or error boxes the
-on-screen views use for navigation.
+Every one is in **File → Export** and in the **Export** tab of the sidebar, which groups its buttons the same way.
+Each opens a native save dialog.
+PDF requires a Chromium browser — see [PDF Export](new-pdf-export.md).
+No exported file carries the line numbers or error boxes the on-screen views use for navigation.
 
 Set the document title, timestamp format, page size, and header/footer in the **PDF Export** section of the sidebar's **Settings** tab, or pin them to one document from the **Properties** tab — see [PDF Export](new-pdf-export.md).
 The **Export** tab also has a **Plots** section that lists every plot the document produces, so you can save each one individually or all at once as a ZIP — see [The CalcpadCE Panel & Settings → Export](new-calcpad-panel.md#export).
@@ -194,6 +191,7 @@ If calculations stop responding, use the **Server** menu:
 
 ## See also
 
+- [The CalcpadCE Editor](new-calcpadce-editor.md) — the shared editor, navigation, and linting
 - [The CalcpadCE Panel & Settings](new-calcpad-panel.md) — the shared sidebar and all settings
 - [Using the VS Code Extension](new-vscode-extension.md)
 - [PDF Export](new-pdf-export.md) · [Includes and File Reads](new-includes.md) · [Linter and Diagnostics](new-linter.md) · [Table of Contents](new-table-of-contents.md)

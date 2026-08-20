@@ -83,7 +83,7 @@
 	'<!-- Hidden but still in flow, with the canvas's square ratio, so the box is the right
 	'     size from first layout. display:none would take no space and everything below
 	'     would jump when the drawing arrives, seconds after load. -->
-	'<img id="dxf-output-img-id$" style="visibility:hidden; aspect-ratio:1/1; width:'imgWidth$'px; max-width:100%; margin-top:30px; border:2px solid #ddd; border-radius:8px; background:#fff;" />
+	'<img id="dxf-output-img-id$" style="visibility:hidden; width:'imgWidth$'px; max-width:100%; margin-top:30px; border:2px solid #ddd; border-radius:8px; background:#fff;" />
 	'<div style="margin-top:20px; padding:15px; background:#f8d7da; border-radius:4px; color:#721c24; display:none;" id="dxf-error-message-id$">
 	'  <strong>Error:</strong> <span id="dxf-error-text-id$"></span>
 	'</div>

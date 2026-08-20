@@ -4,11 +4,14 @@
 
 Sometimes you want to tell Calcpad something about your document without that note showing up in the printed report — what a function's inputs mean, that a section is a work-in-progress the linter should leave alone, or which page size this particular report has to print at.
 
-A **metadata comment** does exactly that. It looks like an ordinary comment, so it never clutters your output, but Calcpad reads the extra information inside it. You don't have to write these by hand: the **Properties** tab in the CalcPad panel fills them in for you.
+A **metadata comment** does exactly that.
+It looks like an ordinary comment, so it never clutters your output, but Calcpad reads the extra information inside it.
+You don't have to write these by hand: the **Properties** tab in the CalcPad panel fills them in for you.
 
 ## The Properties tab
 
-Open the [CalcPad panel](new-calcpad-panel.md) and switch to the **Properties** tab. Then click a line in your document, and the tab shows a small form for that line:
+Open the [CalcPad panel](new-calcpad-panel.md) and switch to the **Properties** tab.
+Then click a line in your document, and the tab shows a small form for that line:
 
 - **On a definition** (a variable, function, macro, or custom unit) you can add a **description**, and for functions and macros, a **type and description for each parameter** and the **return type**. The parameter rows are filled in to match the definition automatically.
 - **On a `#UI` line** you get a form for its JSON properties — control type, style, options, grid size, and so on — instead of hand-writing the `{...}` block, plus a **Saved #UI values** list of every entry already saved for the document. Click an entry to jump to its control, edit its value inline, or **Purge unused** to drop entries that no longer match a control still in the document. See [UI Mode](new-ui-mode.md).
@@ -58,13 +61,17 @@ Filling in parameter and return types also helps the [linter](new-linter.md) cat
 
 ## Document settings
 
-You can pin settings — decimals, angle units, and so on — to a document so it always renders the same way, no matter how the app is configured. Use the `#settings` directive with a JSON object:
+You can pin settings — decimals, angle units, and so on — to a document so it always renders the same way, no matter how the app is configured.
+Use the `#settings` directive with a JSON object:
 
 ```text
 #settings {"decimals": 2, "degrees": 1, "units": "cm"}
 ```
 
-Unlike the other properties on this tab, `#settings` is a real Calcpad directive, not a metadata comment — the engine reads it while calculating. It applies to **every line after it**, so you can change settings partway through a document by adding another `#settings` directive. If you keep one near the top, it configures the whole file; the **Properties** tab writes it there for you. The settings you can set are the ones on the [Settings tab](new-calcpad-panel.md#settings), except **Screen Scale Factor** and **Light Direction**, which are app-level display settings only:
+Unlike the other properties on this tab, `#settings` is a real Calcpad directive, not a metadata comment — the engine reads it while calculating.
+It applies to **every line after it**, so you can change settings partway through a document by adding another `#settings` directive.
+If you keep one near the top, it configures the whole file; the **Properties** tab writes it there for you.
+The settings you can set are the ones on the [Settings tab](new-calcpad-panel.md#settings), except **Screen Scale Factor** and **Light Direction**, which are app-level display settings only:
 
 | Setting | Values |
 |---------|--------|
@@ -91,7 +98,8 @@ Unlike the other properties on this tab, `#settings` is a real Calcpad directive
 `colorScale` can be `None`, `Gray`, `Rainbow`, `Terrain`, `VioletToYellow`, `GreenToYellow`, `Blues`, `BlueToYellow`, `BlueToRed`, or `PurpleToYellow`.
 Anything the app doesn't recognize is ignored.
 
-The plot and solver settings above can also still be set with the older dedicated variables (`PlotWidth`, `PlotHeight`, `PlotStep`, `Precision`, `Tol`, `PlotSVG`, `PlotAdaptive`, `PlotPalette`, `PlotShadows`, `PlotSmooth`) for backwards compatibility. Whichever one — the `#settings` key or the variable assignment — appears later in the file wins.
+The plot and solver settings above can also still be set with the older dedicated variables (`PlotWidth`, `PlotHeight`, `PlotStep`, `Precision`, `Tol`, `PlotSVG`, `PlotAdaptive`, `PlotPalette`, `PlotShadows`, `PlotSmooth`) for backwards compatibility.
+Whichever one — the `#settings` key or the variable assignment — appears later in the file wins.
 
 ## PDF export settings
 
@@ -130,11 +138,13 @@ prototype_var = 5
 '<!--{"EndLintIgnore": []}-->
 ```
 
-The **Properties** tab has a picker for the codes, so you don't have to memorize them. See [Suppressing diagnostics](new-linter.md#suppressing-diagnostics-lint-ignore) for the details.
+The **Properties** tab has a picker for the codes, so you don't have to memorize them.
+See [Suppressing diagnostics](new-linter.md#suppressing-diagnostics-lint-ignore) for the details.
 
 ## Leaving sections out of the PDF
 
-This is no longer a metadata comment. Wrap the section in `#pre` … `#end pre` instead:
+This is no longer a metadata comment.
+Wrap the section in `#pre` … `#end pre` instead:
 
 ```text
 #pre

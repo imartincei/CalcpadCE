@@ -685,7 +685,8 @@
         "editor.unicodeHighlight.ambiguousCharacters": false,
         "editor.unicodeHighlight.nonBasicASCII": false,
         "editor.acceptSuggestionOnEnter": "off",
-        "editor.lightbulb.enabled": "off"
+        "editor.lightbulb.enabled": "off",
+        "editor.colorDecorators": false
       },
       "editor.semanticTokenColorCustomizations": {
         "enabled": true,

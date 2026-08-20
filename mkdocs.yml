@@ -57,8 +57,10 @@ nav:
     - Matrices: matrices.md
     - High Performance Functions: high-performance-vectors-and-matrices.md
   - New Apps and Features (beta):
+    - Selecting a CalcpadCE Deployment: new-selecting-calcpadce-deployment.md
     - VS Code Extension: new-vscode-extension.md
     - Desktop App: new-desktop-app.md
+    - The CalcpadCE Editor: new-calcpadce-editor.md
     - The CalcpadCE Panel: new-calcpad-panel.md
     - Settings: new-settings.md
     - PDF Export: new-pdf-export.md
@@ -67,8 +69,8 @@ nav:
     - Linter and Diagnostics: new-linter.md
     - UI Mode: new-ui-mode.md
     - Table of Contents: new-table-of-contents.md
-    - Running the Server: new-web-deployment.md
     - Metadata Comments: new-metadata-comments.md
+    - Running the Server: new-web-deployment.md
   - Quick Reference:
     - quick-reference.md
 
