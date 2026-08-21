@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode } from 'calcpad-frontend';
 import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse, SettingsValues, UiDirectiveData, UiControl } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
@@ -15,6 +15,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     private _cachedPlots: ExtractedPlot[] = [];
     private _cachedHtml: string = '';
     private _inputMode = false;
+    private _sourceless = false;
     /**
      * Extension supplies a getter that combines `activeTextEditor` with the
      * remembered preview-source editor so plot fetching still works when the
@@ -174,6 +175,14 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 
                 case 'updateLinterMinSeverity':
                     this._settingsManager.setExtra('linterMinSeverity', data.severity);
+                    break;
+
+                case 'updateWriteMode':
+                    this._settingsManager.setExtra('writeMode', coerceWriteMode(data.mode));
+                    break;
+
+                case 'writeFilesNow':
+                    vscode.commands.executeCommand('vscode-calcpad.writeDataFiles');
                     break;
 
                 // Decides whether an open preview is shown at all, so raising it has to
@@ -458,6 +467,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             enablePreviewUiOverrides: sm.getExtraBool('previewUiOverrides', false),
             darkBackground: sm.getExtra('darkBackground', '#1e1e1e'),
             linterMinSeverity: sm.getExtra('linterMinSeverity', 'information'),
+            writeMode: sm.getWriteMode(),
             maxPreviewSizeMB: sm.getExtraNumber('maxPreviewSizeMB', DEFAULT_PREVIEW_SIZE_MB),
             maxPreviewConsoleMessages: sm.getExtraNumber(
                 'maxPreviewConsoleMessages', DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT),
@@ -603,18 +613,21 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 
     /**
      * Tells the panel whether the user is filling a worksheet in rather than editing it —
-     * the input form is open, or a compiled worksheet is the active editor. The tabs that
-     * act on source grey themselves out for it. Remembered so a view that is resolved
-     * again (the sidebar reloads its webview when re-expanded) comes back in step.
+     * the input form is open, or a compiled worksheet is the active editor — and whether
+     * that worksheet has any source behind it. Only `sourceless` greys the tabs that act
+     * on source: a `.cpd` behind an input form is still an open, editable document in VS
+     * Code, so they keep working. Remembered so a view that is resolved again (the sidebar
+     * reloads its webview when re-expanded) comes back in step.
      */
-    public setInputMode(active: boolean) {
-        if (active === this._inputMode) return;
+    public setInputMode(active: boolean, sourceless: boolean) {
+        if (active === this._inputMode && sourceless === this._sourceless) return;
         this._inputMode = active;
+        this._sourceless = sourceless;
         this._postInputMode();
     }
 
     private _postInputMode() {
-        this._view?.webview.postMessage({ type: 'inputModeChanged', active: this._inputMode });
+        this._view?.webview.postMessage({ type: 'inputModeChanged', active: this._sourceless });
     }
 
     /**

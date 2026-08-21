@@ -931,10 +931,15 @@ namespace Calcpad.Core
                     if (options.Name.IsEmpty)
                         return;
 
+                    // Built and evaluated whether or not the write runs, so a bad range or an
+                    // undefined variable errors the same in every mode.
                     var m = _parser.GetMatrix(options.Name.ToString(), options.Type);
-                    DataExchange.Write(options, m);
+                    if (AllowDataWrite)
+                        DataExchange.Write(options, m);
+
                     if (_isVisible)
-                        ReportDataExchageResult(options, keyword == Keyword.Write ? "written to" : "appended to");
+                        ReportDataExchageResult(options, keyword == Keyword.Write ? "written to" : "appended to",
+                            AllowDataWrite);
                 }
             }
             else if (_isVisible)
@@ -944,17 +949,21 @@ namespace Calcpad.Core
             }
         }
 
-        private void ReportDataExchageResult(ReadWriteOptions options, string command)
+        private void ReportDataExchageResult(ReadWriteOptions options, string command, bool done = true)
         {
             _sb.Append($"<p{HtmlId}>")
                .Append($"Matrix <span class=\"eq\">{new HtmlWriter(Settings.Math, false).FormatVariable(options.Name.ToString(), string.Empty, true)}</span>")
-               .Append($" was successfully {command} ");
+               .Append(done ? $" was successfully {command} " : $" will be {command} ");
 
             // Embedded data has no file to name, and no link to it that would lead anywhere.
+            // Neither does a deferred write: the file may not exist yet.
             if (options.Data.IsEmpty)
             {
-                var url = $"file:///{options.FullPath.Replace('\\', '/')}";
-                _sb.Append($"<a href=\"{url}\">{options.Path}.{options.Ext}</a>");
+                var name = $"{options.Path}.{options.Ext}";
+                if (done)
+                    _sb.Append($"<a href=\"file:///{options.FullPath.Replace('\\', '/')}\">{name}</a>");
+                else
+                    _sb.Append(name);
             }
             else
                 _sb.Append("embedded data");

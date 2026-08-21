@@ -48,6 +48,7 @@ namespace Calcpad.Server.Services
             Dictionary<string, string>? uiOverrides = null,
             bool? debug = null,
             bool? hideErrorLines = null,
+            bool write = false,
             CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(calcpadContent))
@@ -105,7 +106,9 @@ namespace Calcpad.Server.Services
                     {
                         try
                         {
-                            var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, PathRoots = macroParser.PathRoots, Debug = true };
+                            // Hard-coded rather than threaded from `write`: this pass exists only to
+                            // collect error lines, so it must never repeat the document's writes.
+                            var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, PathRoots = macroParser.PathRoots, Debug = true, AllowDataWrite = false };
                             silent.Parse(outputText, true, false);
                             errors.AddRange(silent.Errors);
                         }
@@ -134,7 +137,8 @@ namespace Calcpad.Server.Services
                             ForPrint = forPrint,
                             EnableUi = enableUi,
                             UiOverrides = uiOverrides,
-                            ShowErrorLines = showErrorLines
+                            ShowErrorLines = showErrorLines,
+                            AllowDataWrite = write
                         };
                         parser.Parse(outputText, true, captureOpenXml);
                         htmlResult = RemoveEmptyParagraphs(parser.HtmlResult);

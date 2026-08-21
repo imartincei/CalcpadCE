@@ -50,7 +50,8 @@ namespace Calcpad.Server.Controllers
                 var (htmlResult, _, errors) = _calcpadService.Convert(
                     request.Content, request.Settings, forceUnwrapped, request.Theme, request.SourceFilePath,
                     request.ForPrint, captureOpenXml: false, request.EnableUi, request.UiOverrides,
-                    request.IncludeLineAnchors, request.HideErrorLines, cancellationToken);
+                    debug: request.IncludeLineAnchors, hideErrorLines: request.HideErrorLines,
+                    write: request.Write, cancellationToken: cancellationToken);
                 if (unwrap)
                 {
                     htmlResult = ProcessDataTextLinks(htmlResult);
@@ -379,7 +380,7 @@ namespace Calcpad.Server.Controllers
                 var (html, openXmlExpressions, _) = _calcpadService.Convert(
                     request.Content, request.Settings, request.ForceUnwrappedCode, request.Theme, request.SourceFilePath,
                     forPrint: request.ForPrint, captureOpenXml: true, enableUi: false, uiOverrides: request.UiOverrides,
-                    debug: false, cancellationToken: cancellationToken);
+                    debug: false, write: request.Write, cancellationToken: cancellationToken);
 
                 using var ms = new MemoryStream();
                 var writer = new OpenXmlWriter(openXmlExpressions.ToList());
@@ -901,6 +902,12 @@ namespace Calcpad.Server.Controllers
         /// mode has no source editor for it to point at. Defaults to <see cref="EnableUi"/>.
         /// </summary>
         public bool? HideErrorLines { get; set; }
+
+        /// <summary>
+        /// Whether this request may run <c>#write</c>/<c>#append</c>. False by default, so a
+        /// preview refresh does not rewrite the document's output on every keystroke.
+        /// </summary>
+        public bool Write { get; set; }
     }
 
     public class CpdzDecodeRequest

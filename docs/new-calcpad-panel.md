@@ -79,7 +79,7 @@ Set your options, then click **Prettify Document**.
 
 ### Export
 
-Allows saving results from the CalcpadCE file into various formats.
+Allows saving results from the CalcpadCE file into various formats. The tab is four collapsible sections — **HTML / PDF / Word**, **Write / Append**, **Plots** and **Portable Exports** — and remembers which ones you left open.
 
 | Group | Buttons | What it captures |
 | --- | --- | --- |
@@ -91,12 +91,19 @@ Allows saving results from the CalcpadCE file into various formats.
 Word is offered for the report and the preview only.
 PDF uses the page setup from the **Settings** tab's **PDF Export** section, overridden by the document's own `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings) where it sets one.
 
-There are two portable export options for .cpd files.
+The **Write / Append** section controls the document's own file output:
+
+| Control | Result |
+| --- | --- |
+| **Write files** | When `#write`/`#append` run: *Preview and Report*, *Report Only* (default), or *Manual*. The input form and Unwrapped never write, and which `#UI` values reach the file depends on the render — see [Settings](new-settings.md#data-output). |
+| **Write to Disk** | Runs the document as a report and writes its `#write`/`#append` files, whatever the setting above says. Being a report, it writes the values entered into the input form. |
+
+Under **Portable Exports** there are two options for .cpd files.
 - **Save Compiled…** writes the document out as a `.cpdz` compiled worksheet. 
 - **Export Portable…** bundles it with everything it reads into a `.zip`  
 See [Portable Export Options](new-portable-export-options.md) for what each one produces.
 
-Below those, the **Plots** section lists every plot the document emits, each with a thumbnail, filename, and size:
+The **Plots** section lists every plot the document emits, each with a thumbnail, filename, and size:
 
 | Button | Result |
 | --- | --- |

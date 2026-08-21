@@ -14,7 +14,10 @@ import {
     getExtraBool,
     getExtraNumber,
     getExtraObject,
+    coerceWriteMode,
+    writesAllowed,
 } from 'calcpad-frontend';
+import type { WriteMode } from 'calcpad-frontend';
 
 export type { CalcpadSettings, CalcpadExtras };
 
@@ -99,6 +102,20 @@ export class CalcpadSettingsManager {
 
     public getExtraBool(key: string, defaultValue: boolean): boolean {
         return getExtraBool(this._extras, key, defaultValue);
+    }
+
+    public getWriteMode(): WriteMode {
+        return coerceWriteMode(this.getExtra('writeMode'));
+    }
+
+    /** Whether a render with these flags may run `#write`/`#append`. */
+    public mayWrite(forPrint: boolean, enableUi = false): boolean {
+        return writesAllowed(this.getWriteMode(), forPrint, enableUi);
+    }
+
+    /** The "Apply #UI Values in Preview" setting: Preview renders entered values, not declared ones. */
+    public previewAppliesUiOverrides(): boolean {
+        return this.getExtraBool('previewUiOverrides', false);
     }
 
     public getExtraNumber(key: string, defaultValue: number): number {

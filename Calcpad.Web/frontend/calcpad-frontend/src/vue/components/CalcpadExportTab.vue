@@ -1,58 +1,69 @@
 <template>
   <div class="export-tab">
     <div class="export-container p-3">
-      <div v-for="group in visibleExportGroups" :key="group.variant" class="export-group">
-        <h3 class="export-group-title" :title="group.detail">{{ group.label }}</h3>
-        <div class="header-actions">
-          <button class="btn" @click="$emit('savePdf', group.variant)" :title="`Save this document's ${group.label.toLowerCase()} as a PDF`">
-            Save PDF…
-          </button>
-          <button
-            v-if="group.word"
-            class="btn"
-            @click="$emit('saveDocx', group.variant)"
-            :title="`Save this document's ${group.label.toLowerCase()} as a Word .docx file`"
-          >
-            Save Word…
-          </button>
-          <button class="btn" @click="$emit('saveHtml', group.variant)" :title="`Save this document's ${group.label.toLowerCase()} as standalone HTML`">
-            Save HTML…
-          </button>
+      <section class="export-section">
+        <h3 class="section-header" @click="toggle('documents')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('documents') }">&#x25BC;</span>
+          HTML / PDF / Word
+        </h3>
+        <div v-show="!isCollapsed('documents')" class="section-body">
+          <div v-for="group in visibleExportGroups" :key="group.variant" class="export-group">
+            <h4 class="export-group-title" :title="group.detail">{{ group.label }}</h4>
+            <div class="header-actions">
+              <button class="btn" @click="$emit('savePdf', group.variant)" :title="`Save this document's ${group.label.toLowerCase()} as a PDF`">
+                Save PDF…
+              </button>
+              <button
+                v-if="group.word"
+                class="btn"
+                @click="$emit('saveDocx', group.variant)"
+                :title="`Save this document's ${group.label.toLowerCase()} as a Word .docx file`"
+              >
+                Save Word…
+              </button>
+              <button class="btn" @click="$emit('saveHtml', group.variant)" :title="`Save this document's ${group.label.toLowerCase()} as standalone HTML`">
+                Save HTML…
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div v-if="!isCompiled" class="export-group">
-        <h3 class="export-group-title" :title="COMPILED_DETAIL">Compiled worksheet</h3>
-        <div class="header-actions">
-          <button
-            class="btn"
-            @click="$emit('saveCompiled')"
-            title="Save this document as a compiled .cpdz worksheet"
-          >
-            Save Compiled…
-          </button>
+      <section class="export-section">
+        <h3 class="section-header" @click="toggle('write')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('write') }">&#x25BC;</span>
+          Write / Append
+        </h3>
+        <div v-show="!isCollapsed('write')" class="section-body">
+          <div class="setting-group">
+            <label for="writeMode">
+              Write files:
+              <span class="setting-info" :title="writeModeDetail">ⓘ</span>
+            </label>
+            <select id="writeMode" v-model="localWriteMode" @change="$emit('updateWriteMode', localWriteMode)">
+              <option v-for="opt in WRITE_MODE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+          <div class="header-actions">
+            <button
+              class="btn"
+              @click="$emit('writeFilesNow')"
+              title="Run this document now and write its #write/#append files to disk"
+            >
+              Write to Disk
+            </button>
+          </div>
+          <p v-if="writeResult" class="write-result" :class="{ bad: !writeResult.ok }">{{ writeResult.message }}</p>
         </div>
-      </div>
+      </section>
 
-      <!-- Not in the browser: the references are read from the folder the document is saved
-           in, and there is neither in a browser tab. -->
-      <div v-if="!versionConfig.isWeb && !isCompiled" class="export-group">
-        <h3 class="export-group-title" :title="PORTABLE_DETAIL">Portable package</h3>
-        <div class="header-actions">
-          <button
-            class="btn"
-            @click="$emit('savePortable')"
-            title="Save this document and everything it references as a ZIP that runs anywhere"
-          >
-            Export Portable…
-          </button>
-        </div>
-      </div>
-
-      <div class="plots-section">
-        <div class="plots-header">
-          <h3>Plots</h3>
-          <div class="plots-actions">
+      <section class="export-section">
+        <h3 class="section-header" @click="toggle('plots')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('plots') }">&#x25BC;</span>
+          Plots
+        </h3>
+        <div v-show="!isCollapsed('plots')" class="section-body">
+          <div class="header-actions">
             <button
               class="btn"
               :disabled="loading"
@@ -70,36 +81,74 @@
               Download all (ZIP)
             </button>
           </div>
+
+          <p v-if="!loading && plots.length === 0" class="empty">
+            No plots in the current document.
+          </p>
+
+          <ul v-if="plots.length > 0" class="plots-list">
+            <li v-for="p in plots" :key="p.index" class="plot-item">
+              <img class="thumb" :src="p.dataUri" :alt="`Plot ${p.index + 1}`" />
+              <div class="plot-meta">
+                <div class="plot-name">Plot {{ p.index + 1 }}.{{ p.ext }}</div>
+                <div class="plot-size">{{ formatSize(p.sizeBytes) }}</div>
+              </div>
+              <button
+                class="btn"
+                @click="$emit('savePlot', p.index)"
+                title="Download this plot as an image file"
+              >
+                Save…
+              </button>
+            </li>
+          </ul>
         </div>
+      </section>
 
-        <p v-if="!loading && plots.length === 0" class="empty">
-          No plots in the current document.
-        </p>
-
-        <ul v-if="plots.length > 0" class="plots-list">
-          <li v-for="p in plots" :key="p.index" class="plot-item">
-            <img class="thumb" :src="p.dataUri" :alt="`Plot ${p.index + 1}`" />
-            <div class="plot-meta">
-              <div class="plot-name">Plot {{ p.index + 1 }}.{{ p.ext }}</div>
-              <div class="plot-size">{{ formatSize(p.sizeBytes) }}</div>
+      <section v-if="showPortable" class="export-section">
+        <h3 class="section-header" @click="toggle('portable')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('portable') }">&#x25BC;</span>
+          Portable Exports
+        </h3>
+        <div v-show="!isCollapsed('portable')" class="section-body">
+          <div v-if="!isCompiled" class="export-group">
+            <h4 class="export-group-title" :title="COMPILED_DETAIL">Compiled worksheet</h4>
+            <div class="header-actions">
+              <button
+                class="btn"
+                @click="$emit('saveCompiled')"
+                title="Save this document as a compiled .cpdz worksheet"
+              >
+                Save Compiled…
+              </button>
             </div>
-            <button
-              class="btn"
-              @click="$emit('savePlot', p.index)"
-              title="Download this plot as an image file"
-            >
-              Save…
-            </button>
-          </li>
-        </ul>
-      </div>
+          </div>
+
+          <!-- Not in the browser: the references are read from the folder the document is saved
+               in, and there is neither in a browser tab. -->
+          <div v-if="!versionConfig.isWeb && !isCompiled" class="export-group">
+            <h4 class="export-group-title" :title="PORTABLE_DETAIL">Portable package</h4>
+            <div class="header-actions">
+              <button
+                class="btn"
+                @click="$emit('savePortable')"
+                title="Save this document and everything it references as a ZIP that runs anywhere"
+              >
+                Export Portable…
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import type { ExportVariant } from '../../types/api'
+import type { WriteMode } from '../../types/settings'
+import { WRITE_MODE_OPTIONS } from '../../types/settings'
 import type { VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
 
@@ -135,7 +184,7 @@ const EXPORT_GROUPS: { variant: ExportVariant; label: string; detail: string; wo
   {
     variant: 'preview',
     label: 'Preview',
-    detail: 'What the results pane shows: #pre and #post, document values.',
+    detail: 'What the results pane shows: #pre and #post, and the same #UI values it renders.',
     word: true,
   },
   {
@@ -157,9 +206,13 @@ const props = withDefaults(defineProps<{
   loading: boolean
   versionConfig?: VersionConfig
   isCompiled?: boolean
+  writeMode?: WriteMode
+  writeResult?: { ok: boolean; message: string } | null
 }>(), {
   versionConfig: () => ({ ...DEFAULT_VERSION_CONFIG }),
   isCompiled: false,
+  writeMode: 'reportOnly',
+  writeResult: null,
 })
 
 // A compiled worksheet has no source: Preview and Unwrapped both render from it.
@@ -168,6 +221,17 @@ const visibleExportGroups = computed(() =>
   props.isCompiled
     ? EXPORT_GROUPS.filter(g => !SOURCE_EXPORT_VARIANTS.includes(g.variant))
     : EXPORT_GROUPS
+)
+
+// Both entries are hidden for a compiled worksheet, and the portable package also in the
+// browser, so the whole section goes when nothing would be left in it.
+const showPortable = computed(() => !props.isCompiled)
+
+const localWriteMode = ref<WriteMode>(props.writeMode)
+watch(() => props.writeMode, v => { localWriteMode.value = v })
+
+const writeModeDetail = computed(() =>
+  WRITE_MODE_OPTIONS.map(o => `${o.label} — ${o.detail}`).join('\n')
 )
 
 defineEmits<{
@@ -179,7 +243,29 @@ defineEmits<{
   refreshPlots: []
   savePlot: [index: number]
   savePlotsZip: []
+  updateWriteMode: [mode: WriteMode]
+  writeFilesNow: []
 }>()
+
+// In localStorage rather than component state because CalcpadApp renders this tab with
+// v-if: the component is destroyed on every tab switch, so a ref would reset each time.
+const STORAGE_KEY = 'calcpad.export.collapsed'
+const collapsed = reactive<Record<string, boolean>>({})
+try {
+  Object.assign(collapsed, JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'))
+} catch {
+  // ignore unavailable/corrupt storage
+}
+watch(collapsed, () => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(collapsed))
+  } catch {
+    // ignore unavailable storage
+  }
+}, { deep: true })
+
+const isCollapsed = (id: string) => !!collapsed[id]
+const toggle = (id: string) => { collapsed[id] = !collapsed[id] }
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -200,6 +286,36 @@ function formatSize(bytes: number): string {
   flex: 1;
 }
 
+.export-section + .export-section {
+  margin-top: 12px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.85;
+  cursor: pointer;
+  user-select: none;
+}
+
+.expand-icon {
+  transition: transform 0.2s;
+  font-size: 10px;
+}
+
+.expand-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+.section-body {
+  padding-left: 4px;
+}
+
 .header-actions {
   display: flex;
   gap: 6px;
@@ -215,40 +331,50 @@ function formatSize(bytes: number): string {
 .export-group-title {
   display: inline-block;
   margin: 0 0 6px;
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   opacity: 0.8;
   cursor: help;
 }
 
-.plots-section {
-  margin-top: 16px;
+.setting-group {
+  margin-bottom: 10px;
 }
 
-.plots-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
+.setting-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
 }
 
-.plots-header h3 {
-  margin: 0;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  opacity: 0.8;
+.setting-info {
+  cursor: help;
+  opacity: 0.7;
 }
 
-.plots-actions {
-  display: flex;
-  gap: 6px;
+.setting-group select {
+  width: 100%;
+  padding: 3px 4px;
+  font-size: 11px;
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, rgba(128, 128, 128, 0.3));
+  border-radius: 2px;
+}
+
+.write-result {
+  margin: 8px 0 0;
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.write-result.bad {
+  color: var(--vscode-editorError-foreground, #f14c4c);
 }
 
 .empty {
-  margin: 4px 0;
+  margin: 8px 0 0;
   font-size: 11px;
   opacity: 0.7;
 }
@@ -256,7 +382,7 @@ function formatSize(bytes: number): string {
 .plots-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 8px 0 0;
   display: flex;
   flex-direction: column;
   gap: 6px;

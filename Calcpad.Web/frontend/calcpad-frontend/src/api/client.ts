@@ -269,6 +269,8 @@ export class CalcpadApiClient {
      * @param includeLineAnchors Per-line anchors and error boxes for in-preview line links.
      *   Defaults server-side to `!forPrint`; pass it to break that pairing — `true` for the
      *   on-screen report, `false` for anything being written to a file.
+     * @param opts `write` lets this render run `#write`/`#append`. Off unless asked for, so a
+     *   preview refresh never rewrites the document's output.
      */
     public async convert(
         content: string,
@@ -279,7 +281,7 @@ export class CalcpadApiClient {
         theme?: 'light' | 'dark',
         ui?: UiConvertOptions,
         includeLineAnchors?: boolean,
-        opts?: { key?: string },
+        opts?: { key?: string; write?: boolean },
     ): Promise<ArrayBuffer | ConvertResult | null> {
         return this.withSupersession(opts?.key, async (signal) => {
             const url = this.baseUrl + '/api/calcpad/convert';
@@ -293,6 +295,7 @@ export class CalcpadApiClient {
                         uiOverrides: ui?.uiOverrides,
                         includeLineAnchors,
                         hideErrorLines: ui?.hideErrorLines,
+                        write: opts?.write ?? false,
                     }),
                     signal: combineSignals(AbortSignal.timeout(60000), signal),
                 });
@@ -322,7 +325,7 @@ export class CalcpadApiClient {
         content: string,
         settings: unknown,
         sourceFilePath?: string,
-        opts?: { forPrint?: boolean; uiOverrides?: Record<string, string> },
+        opts?: { forPrint?: boolean; uiOverrides?: Record<string, string>; write?: boolean },
     ): Promise<ArrayBuffer | null> {
         return (async () => {
             const url = this.baseUrl + '/api/calcpad/docx';
@@ -336,6 +339,7 @@ export class CalcpadApiClient {
                         sourceFilePath,
                         forPrint: opts?.forPrint ?? true,
                         uiOverrides: opts?.uiOverrides,
+                        write: opts?.write ?? false,
                     }),
                     signal: AbortSignal.timeout(60000),
                 });
@@ -357,7 +361,7 @@ export class CalcpadApiClient {
         settings: unknown,
         sourceFilePath?: string,
         theme?: 'light' | 'dark',
-        opts?: { key?: string },
+        opts?: { key?: string; write?: boolean },
     ): Promise<ConvertResult | null> {
         return this.withSupersession(opts?.key, async (signal) => {
             const url = this.baseUrl + '/api/calcpad/convert?unwrap=true';
@@ -365,7 +369,7 @@ export class CalcpadApiClient {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: this.jsonHeaders(),
-                    body: JSON.stringify({ content, settings, sourceFilePath, theme }),
+                    body: JSON.stringify({ content, settings, sourceFilePath, theme, write: opts?.write ?? false }),
                     signal: combineSignals(AbortSignal.timeout(60000), signal),
                 });
                 if (!response.ok) return null;

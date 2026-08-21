@@ -326,7 +326,7 @@ Exports come in variants, one per rendering, and **report is the default** — a
 | Variant | Contents | Formats |
 |---------|----------|---------|
 | **Report** (default) | `#pre` hidden, `#post` shown, entered `#UI` values applied | PDF, HTML, Word |
-| **Preview** | `#pre` and `#post` both shown, the document's own values | PDF, HTML, Word |
+| **Preview** | `#pre` and `#post` both shown, matching what the Preview pane shows — the document's own values, or the entered ones if **Apply `#UI` Values in Preview** is on | PDF, HTML, Word |
 | **Input form** | The form itself, `#post` hidden, entered values in the controls | PDF, HTML |
 | **Unwrapped** | The source listing, macros and includes resolved | PDF, HTML |
 

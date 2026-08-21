@@ -7,8 +7,8 @@ import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, Definit
 import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
 import type { UiDirectiveData } from '../../text/ui-directive';
 import type { DefinitionsResponse, ExportVariant } from '../../types/api';
-import { getDefaultSettings, buildApiSettings } from '../../types/settings';
-import type { CalcpadSettings } from '../../types/settings';
+import { getDefaultSettings, buildApiSettings, coerceWriteMode, writesAllowed } from '../../types/settings';
+import type { CalcpadSettings, WriteMode } from '../../types/settings';
 import { resolveStoredPdfSettings, resolveEffectivePdfSettings } from '../../types/pdf-settings';
 import type { PdfSettings } from '../../types/pdf-settings';
 import { buildImageCommentLine, bytesToBase64 } from '../image-utils';
@@ -67,11 +67,15 @@ export interface VariantRender {
  * `report` is the default: the print layout, with `#pre` hidden and the entered `#UI` values
  * applied. `preview` is what the results pane shows. `input` is the form itself — `enableUi`
  * needs `forPrint` false, since the server drops UI mode for print output.
+ *
+ * `previewAppliesUiOverrides` is the "Apply `#UI` Values in Preview" setting, and is the whole
+ * of what Preview's `#UI` handling depends on: an exported Preview shows what the Preview pane
+ * shows, so the setting has to reach both or the two disagree.
  */
-export function variantRender(variant: ExportVariant): VariantRender {
+export function variantRender(variant: ExportVariant, previewAppliesUiOverrides = false): VariantRender {
     switch (variant) {
         case 'preview':
-            return { forPrint: false, enableUi: false, unwrap: false, useOverrides: false, label: 'Preview' };
+            return { forPrint: false, enableUi: false, unwrap: false, useOverrides: previewAppliesUiOverrides, label: 'Preview' };
         case 'input':
             return { forPrint: false, enableUi: true, unwrap: false, useOverrides: true, label: 'Input Form' };
         case 'unwrapped':
@@ -134,6 +138,15 @@ export abstract class BaseMessageBridge {
     get definitions(): CalcpadDefinitionsService { return this.definitionsService; }
 
     getSettings(): CalcpadSettings { return this.settings; }
+
+    writeMode(): WriteMode {
+        return coerceWriteMode(this.getExtraSetting('writeMode'));
+    }
+
+    /** Whether a render with these flags may run `#write`/`#append`. */
+    mayWrite(forPrint: boolean, enableUi = false): boolean {
+        return writesAllowed(this.writeMode(), forPrint, enableUi);
+    }
 
     /** Read an "extra" (non-CalcpadSettings) preference. */
     abstract getExtraSetting(key: string): string | undefined;
@@ -215,8 +228,13 @@ export abstract class BaseMessageBridge {
     }
 
     /** The `#UI` options an export of `variant` should render with. */
+    /** The "Apply `#UI` Values in Preview" setting: Preview renders entered values, not declared ones. */
+    protected previewAppliesUiOverrides(): boolean {
+        return this.getExtraSetting('previewUiOverrides') === 'true';
+    }
+
     protected uiOptionsFor(variant: ExportVariant): { enableUi: boolean; uiOverrides?: Record<string, string> } {
-        const render = variantRender(variant);
+        const render = variantRender(variant, this.previewAppliesUiOverrides());
         return {
             enableUi: render.enableUi,
             uiOverrides: render.useOverrides ? this.activeUiOverrides() : undefined,
@@ -341,6 +359,13 @@ export abstract class BaseMessageBridge {
                 break;
             case 'savePlotsZip':
                 this.handleSavePlotsZip();
+                break;
+            case 'updateWriteMode':
+                this.setExtraSetting('writeMode', coerceWriteMode(message.mode));
+                this.postToVue({ type: 'writeModeChanged', mode: this.writeMode() });
+                break;
+            case 'writeFilesNow':
+                this.handleWriteFilesNow();
                 break;
             case 'getHeadings':
                 this.refreshHeadings();
@@ -488,13 +513,14 @@ export abstract class BaseMessageBridge {
             enablePreviewCursorSync: this.getExtraSetting('previewCursorSync') === 'true',
             enableAutoRun: this.getExtraSetting('autoRun') !== 'false',
             enableAutoInputMode: this.getExtraSetting('autoInputMode') !== 'false',
-            enablePreviewUiOverrides: this.getExtraSetting('previewUiOverrides') === 'true',
+            enablePreviewUiOverrides: this.previewAppliesUiOverrides(),
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
             maxPreviewSizeMB: Number(this.getExtraSetting('maxPreviewSizeMB')) || DEFAULT_PREVIEW_SIZE_MB,
             maxPreviewConsoleMessages: Number(this.getExtraSetting('maxPreviewConsoleMessages'))
                 || DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT,
             editorFontFamily: this.getExtraSetting('editorFontFamily') ?? 'JuliaMono',
+            writeMode: this.writeMode(),
             ...extras,
         });
     }
@@ -695,7 +721,7 @@ export abstract class BaseMessageBridge {
     }
 
     private async handleSaveDocx(variant: ExportVariant = 'report'): Promise<void> {
-        const render = variantRender(variant);
+        const render = variantRender(variant, this.previewAppliesUiOverrides());
         // A form and a code listing have no meaningful Word rendering, so the Export tab
         // doesn't offer them; guard anyway rather than emit a nonsense document.
         if (render.enableUi || render.unwrap) return;
@@ -705,6 +731,7 @@ export abstract class BaseMessageBridge {
         const buf = await this.apiClient.convertDocx(content, apiSettings, sourceFilePath, {
             forPrint: render.forPrint,
             uiOverrides: render.useOverrides ? this.activeUiOverrides() : undefined,
+            write: this.mayWrite(render.forPrint, render.enableUi),
         });
         if (!buf) return;
         await this.saveExportedFile({
@@ -793,12 +820,39 @@ export abstract class BaseMessageBridge {
         variant: ExportVariant,
     ): Promise<string | null> {
         const render = variantRender(variant);
+        const write = this.mayWrite(render.forPrint, render.enableUi);
         const result = render.unwrap
-            ? await this.apiClient.convertUnwrapped(content, apiSettings, sourceFilePath)
+            ? await this.apiClient.convertUnwrapped(content, apiSettings, sourceFilePath, undefined, { write })
             : await this.apiClient.convert(
                 content, apiSettings, 'html', render.forPrint, sourceFilePath, undefined,
-                this.uiOptionsFor(variant), false);
+                this.uiOptionsFor(variant), false, { write });
         return result && !(result instanceof ArrayBuffer) ? result.html : null;
+    }
+
+    /**
+     * Runs the document's `#write`/`#append` directives now, whatever the write-mode setting
+     * says. The report render is the one used: it is the authoritative output, so `#post`
+     * blocks and entered `#UI` values are included exactly as a saved report would have them.
+     */
+    private async handleWriteFilesNow(): Promise<void> {
+        const content = this.getActiveEditorContent();
+        if (!content.trim()) return;
+        const { sourceFilePath } = await this.buildFileContext(content);
+        const result = await this.apiClient.convert(
+            content, buildApiSettings(this.settings), 'html', true, sourceFilePath, undefined,
+            this.uiOptionsFor('report'), false, { write: true });
+        if (result == null || result instanceof ArrayBuffer) {
+            await this.onExportError('The document could not be run, so nothing was written.');
+            return;
+        }
+        const errors = result.errors ?? [];
+        this.postToVue({
+            type: 'writeFilesResult',
+            ok: errors.length === 0,
+            message: errors.length === 0
+                ? 'Ran the document; #write and #append are up to date.'
+                : `Ran with ${errors.length} error${errors.length === 1 ? '' : 's'} — some output may be missing.`,
+        });
     }
 
     private async handleGetPlots(): Promise<void> {

@@ -141,7 +141,7 @@ Exports come in one variant per result mode, and **the report is the default** â
 | Variant | Contents | Formats |
 |---------|----------|---------|
 | **Report** (default) | `#pre` hidden, `#post` shown, entered `#UI` values applied | PDF, HTML, Word |
-| **Preview** | `#pre` and `#post` both shown, the document's own values | PDF, HTML, Word |
+| **Preview** | `#pre` and `#post` both shown, matching what the Preview pane shows â€” the document's own values, or the entered ones if **Apply `#UI` Values in Preview** is on | PDF, HTML, Word |
 | **Input form** | The `#UI` form itself | PDF, HTML |
 | **Unwrapped** | The expanded source listing | PDF, HTML |
 

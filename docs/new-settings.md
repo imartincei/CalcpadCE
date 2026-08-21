@@ -85,7 +85,41 @@ Pick the Monaco editor's font family from:
 - **Sync Preview to Cursor Line** — scroll the preview to follow the line the cursor is on.
 - **Auto-Run Preview** *(default on)* — when off, the preview only re-renders when the preview panel is first opened or a manual **Run Preview** is triggered (**Ctrl+Alt+X**, the ▶ Run button, the editor context menu, or the Server → Refresh menu in the desktop app). Turn this off for large documents where every keystroke re-render is too costly.
 - **Open `#UI` Documents in Input Mode** *(default on)* — a document declaring `#UI` controls opens as its input form the first time you open it. The mode you switch to afterwards sticks; a later tab switch never brings the form back. See [UI Mode](new-ui-mode.md).
-- **Apply `#UI` Values in Preview** *(default off)* — Preview normally renders the document's own values; turn this on and it renders the values entered into the input form instead, while still showing `#pre` and `#post` together. For tracking down an error that only appears once a form is filled in. Exports of the Preview variant are unaffected — they always use the document's own values. See [UI Mode](new-ui-mode.md).
+- **Apply `#UI` Values in Preview** *(default off)* — Preview normally renders the document's own values; turn this on and it renders the values entered into the input form instead, while still showing `#pre` and `#post` together. For tracking down an error that only appears once a form is filled in. It applies to the Preview *export* as well, so a saved Preview PDF, HTML or Word file shows what the Preview pane showed. It also decides which values a Preview render writes when **Write files** lets it write at all — see [Data output](#data-output). See [UI Mode](new-ui-mode.md).
+
+## Data output
+
+**Write files** — when `#write` and `#append` are allowed to run. Lives in the **Export** tab beside the **Write to Disk** button, not here.
+
+"Report" here means the report layout wherever it is rendered — the preview pane switched to **Report** as much as a PDF, Word or HTML report export. Both are the same render, so both write.
+
+| Value | When the files are written |
+| --- | --- |
+| Preview and Report | On a **Preview** or **Report** render — so the files are rewritten as you type. |
+| Report Only *(default)* | On a report render only: the preview pane on **Report**, and a report export. The **Preview** view leaves the files alone. |
+| Manual | On no render at all. Only when you press **Write to Disk**. |
+
+The default exists because the preview re-renders as you type, and every render used to truncate and rewrite the document's output files. A suppressed directive still reports itself in the preview, reading *"will be written to"* rather than *"was successfully written to"*, and still reports any error in the directive or the matrix it names — so nothing is hidden until the write runs.
+
+Two views never write, whatever the setting says. The **input form** is for filling in — the report shown beside it is the half of [input mode](new-ui-mode.md) that produces output, and it writes as any other report render does. **Unwrapped** is a code listing, so the document is not calculated for it at all.
+
+### Which `#UI` values get written
+
+A render that writes writes *its own* numbers, and not every render uses the same ones. A report applies the values entered into the input form; Preview normally uses the document's own values instead.
+
+| Render | Writes on | `#UI` values it writes |
+| --- | --- | --- |
+| **Report** view, on screen | Report Only · Preview and Report | Entered |
+| **Report** export (PDF / Word / HTML) | Report Only · Preview and Report | Entered |
+| **Preview** view, on screen | Preview and Report | Document's own — unless **Apply `#UI` Values in Preview** is on, then entered |
+| **Preview** export (PDF / Word / HTML) | Preview and Report | The same as the Preview view: it follows that setting too |
+| **Input form** | never | — |
+| **Unwrapped** | never | — |
+| **Write to Disk** | on demand | Entered — it runs the report |
+
+This is why **Report Only** is the default rather than *Preview and Report*. On a worksheet with `#UI` controls, a Preview render that writes would overwrite the output file with results computed from the document's declared values, discarding what the report had just written from the entered ones — and it would do it on every keystroke, so the report's numbers would rarely be the ones left on disk. Restricting writes to a report render keeps one answer to "what is in that file": whatever the form was filled in with.
+
+If you do want *Preview and Report* on a worksheet with a form, turn on **Apply `#UI` Values in Preview** ([Editor features](#editor-features)). Preview then computes the entered values, on screen and in an export alike, so every render that writes writes the same numbers.
 
 ## Linter
 

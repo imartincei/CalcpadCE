@@ -82,7 +82,9 @@ function activeCompiledUri(): vscode.Uri | undefined {
 /**
  * Tells the side panel when the user is filling a worksheet in rather than editing it:
  * the input form is open, or the active editor is a compiled worksheet — which has no
- * text document behind it at all. The panel's source-editing tabs grey out for it.
+ * text document behind it at all. Only the second case greys the panel's source-editing
+ * tabs out; unlike the desktop app, the `.cpd` behind an input form stays open and
+ * editable here, so those tabs still have something to act on.
  */
 function syncInputMode(): void {
     const compiled = activeCompiledUri();
@@ -93,7 +95,8 @@ function syncInputMode(): void {
     const input = vscode.window.tabGroups.activeTabGroup.activeTab?.input;
     const compiledReport = input instanceof vscode.TabInputWebview
         && input.viewType.endsWith(CalcpadCompiledEditorProvider.reportViewType);
-    vueUiProvider?.setInputMode(!!uiPanel || !!compiled || compiledReport);
+    const sourceless = !!compiled || compiledReport;
+    vueUiProvider?.setInputMode(!!uiPanel || sourceless, sourceless);
 }
 
 /** The content and identity of a document the preview and export paths work from. */
@@ -914,7 +917,8 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             includeLineAnchors: forPrint ? true : undefined,
             // The input form has no source editor for "on line [N]" to point at, and
             // neither does the report while it's shown behind that form.
-            hideErrorLines: forPrint && uiPanel !== undefined ? true : undefined
+            hideErrorLines: forPrint && uiPanel !== undefined ? true : undefined,
+            write: settingsManager.mayWrite(forPrint, enableUi)
         });
         // Routed through the shared client (rather than a bare fetch) so a newer preview
         // request for the same document aborts this one via the `key` below — that's not
@@ -1092,6 +1096,7 @@ async function renderForExport(
     documentContent: string,
     sourceFileUri: vscode.Uri,
     variant: ExportVariant,
+    forceWrite = false,
 ): Promise<string> {
     const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
     const apiBaseUrl = settingsManager.getServerUrl();
@@ -1102,7 +1107,7 @@ async function renderForExport(
     }
 
     const settings = await settingsManager.getApiSettings();
-    const render = variantRender(variant);
+    const render = variantRender(variant, settingsManager.previewAppliesUiOverrides());
     const endpoint = render.unwrap ? '/api/calcpad/convert?unwrap=true' : '/api/calcpad/convert';
 
     // Routed through the shared client (rather than a bare fetch) for a consistent request
@@ -1118,6 +1123,7 @@ async function renderForExport(
             enableUi: render.enableUi,
             uiOverrides: render.useOverrides ? uiOverridesFor(sourceFileUri.toString(), documentContent) : undefined,
             includeLineAnchors: false,
+            write: forceWrite || settingsManager.mayWrite(render.forPrint, render.enableUi),
         }),
         signal: combineSignals(AbortSignal.timeout(30000), signal),
     });
@@ -1305,6 +1311,31 @@ async function offerChromiumDownload(downloadSizeMb: number): Promise<boolean> {
 }
 
 /**
+ * Runs the active document's `#write`/`#append` directives now, whatever the write-mode
+ * setting says. The report render is the one used: it is the authoritative output, so `#post`
+ * blocks and entered `#UI` values are included exactly as a saved report would have them.
+ */
+async function writeDataFiles() {
+    const source = activeCalcpadSource();
+    if (!source) {
+        vscode.window.showErrorMessage('No active CalcpadCE document found');
+        return;
+    }
+    try {
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: 'Writing #write/#append files…',
+            cancellable: false,
+        }, () => renderForExport(source.text, source.uri, 'report', true));
+        vscode.window.showInformationMessage('Ran the document; #write and #append are up to date.');
+    } catch (error) {
+        const msg = error instanceof Error ? error.message : 'Unknown error';
+        outputChannel.appendLine(`ERROR in writeDataFiles: ${msg}`);
+        vscode.window.showErrorMessage(`Failed to write the document's output: ${msg}`);
+    }
+}
+
+/**
  * Convert the active CalcPad document to HTML on the server, then save
  * the result via a native Save dialog. Used by the Export tab's
  * "Save HTML…" buttons, which pick the variant.
@@ -1351,7 +1382,8 @@ async function saveSourceHtml(variant: ExportVariant = 'report') {
  * only — a form and a code listing have no meaningful Word rendering.
  */
 async function saveDocx(variant: ExportVariant = 'report') {
-    const render = variantRender(variant);
+    const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
+    const render = variantRender(variant, settingsManager.previewAppliesUiOverrides());
     if (render.enableUi || render.unwrap) return;
     const source = activeCalcpadSource();
     if (!source) {
@@ -1359,7 +1391,6 @@ async function saveDocx(variant: ExportVariant = 'report') {
         return;
     }
     try {
-        const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
         const apiBaseUrl = settingsManager.getServerUrl();
         if (!apiBaseUrl) {
             vscode.window.showErrorMessage('Server URL not configured');
@@ -1382,6 +1413,7 @@ async function saveDocx(variant: ExportVariant = 'report') {
             const buf = await sharedApiClient?.convertDocx(source.text, settings, source.uri.fsPath, {
                 forPrint: render.forPrint,
                 uiOverrides: render.useOverrides ? uiOverridesFor(source.uri.toString(), source.text) : undefined,
+                write: settingsManager.mayWrite(render.forPrint, render.enableUi),
             });
             if (!buf) {
                 throw new Error('Word document generation failed');
@@ -2294,6 +2326,10 @@ export async function activate(context: vscode.ExtensionContext) {
         saveSourceHtml(variant ?? 'report');
     });
 
+    const writeDataFilesCommand = vscode.commands.registerCommand('vscode-calcpad.writeDataFiles', () => {
+        writeDataFiles();
+    });
+
     const saveDocxCommand = vscode.commands.registerCommand('vscode-calcpad.saveDocx', (variant?: ExportVariant) => {
         saveDocx(variant ?? 'report');
     });
@@ -2615,6 +2651,7 @@ export async function activate(context: vscode.ExtensionContext) {
             printToPdfCommand,
             saveSourceHtmlCommand,
             saveDocxCommand,
+            writeDataFilesCommand,
             saveAsCompiledCommand,
             exportPortableCommand,
             saveCompiledUiValuesCommand,

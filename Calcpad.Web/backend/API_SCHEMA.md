@@ -80,6 +80,12 @@ interface CalcpadRequest {
                                 //   input mode has no source editor for it to point at. Defaults
                                 //   to enableUi; the report pane shown beside the form overrides
                                 //   it to true even though enableUi is false there.
+
+  // Whether this request may run #write/#append. False by default, so a preview refresh does
+  // not rewrite the document's output on every keystroke. The front ends resolve their
+  // three-way "when to write" setting into this per request: always, only when forPrint, or
+  // never until the Export tab's "Write to Disk" asks for it.
+  write?: boolean;              // Run #write/#append (default: false)
 }
 ```
 

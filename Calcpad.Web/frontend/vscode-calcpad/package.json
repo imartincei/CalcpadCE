@@ -300,6 +300,11 @@
         "icon": "$(file)"
       },
       {
+        "command": "vscode-calcpad.writeDataFiles",
+        "title": "CalcpadCE: Write #write/#append Files to Disk",
+        "icon": "$(save)"
+      },
+      {
         "command": "vscode-calcpad.saveAsCompiled",
         "title": "CalcpadCE: Save As Compiled Worksheet…",
         "icon": "$(file-binary)"

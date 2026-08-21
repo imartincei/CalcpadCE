@@ -49,8 +49,11 @@ export {
     validatePdfValue,
 } from './types/pdf-settings';
 
-export type { CalcpadSettings, CalcpadExtras, CalcpadSettingsBlob } from './types/settings';
+export type { CalcpadSettings, CalcpadExtras, CalcpadSettingsBlob, WriteMode } from './types/settings';
 export {
+    WRITE_MODE_OPTIONS,
+    coerceWriteMode,
+    writesAllowed,
     getDefaultSettings,
     getDefaultExtras,
     getDefaultSettingsBlob,

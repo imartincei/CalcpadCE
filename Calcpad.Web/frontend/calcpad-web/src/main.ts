@@ -652,13 +652,14 @@ async function bootstrap(): Promise<void> {
             const ui = overrideMode
                 ? { enableUi: mode === 'ui', uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }
                 : undefined;
+            const write = activeBridge.mayWrite(mode === 'report', mode === 'ui');
             result = mode === 'unwrapped'
-                ? await activeBridge.api.convertUnwrapped(content, apiSettings, fileContext.sourceFilePath, theme, { key: `preview:${group.id}` })
+                ? await activeBridge.api.convertUnwrapped(content, apiSettings, fileContext.sourceFilePath, theme, { key: `preview:${group.id}`, write })
                 // The report is a print layout, but on screen, so it keeps the line
                 // anchors that forPrint would otherwise suppress.
                 : await activeBridge.api.convert(
                     content, apiSettings, 'html', mode === 'report', fileContext.sourceFilePath, theme, ui,
-                    mode === 'report' ? true : undefined, { key: `preview:${group.id}` });
+                    mode === 'report' ? true : undefined, { key: `preview:${group.id}`, write });
         } catch (err) {
             void hideLoading();
             throw err;
@@ -713,7 +714,8 @@ async function bootstrap(): Promise<void> {
         const result = await activeBridge.api.convert(
             content, apiSettings, 'html', true, sourceFilePath, theme,
             { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)), hideErrorLines: true },
-            true, { key: `preview:${group.id}` });
+            // A report even though a form is open, so this is the half of input mode that writes.
+            true, { key: `preview:${group.id}`, write: activeBridge.mayWrite(true) });
         if (!result || result instanceof ArrayBuffer) return;
         if (previewTooLarge(group, result.html, true)) return;
 

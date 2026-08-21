@@ -143,6 +143,8 @@
         :loading="plotsLoading"
         :version-config="versionConfig"
         :is-compiled="activeIsCompiled"
+        :write-mode="writeMode"
+        :write-result="writeResult"
         @save-pdf="handleSavePdf"
         @save-html="handleSaveSourceHtml"
         @save-docx="handleSaveDocx"
@@ -151,6 +153,8 @@
         @refresh-plots="handleRefreshPlots"
         @save-plot="handleSavePlot"
         @save-plots-zip="handleSavePlotsZip"
+        @update-write-mode="handleUpdateWriteMode"
+        @write-files-now="handleWriteFilesNow"
       />
       <CalcpadErrorsTab
         v-else-if="pane.activeTab === 'errors'"
@@ -189,6 +193,8 @@ import type { UiControl } from '../../services/ui-overrides'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
 import type { CalcpadError, ExportVariant } from '../../types/api'
+import type { WriteMode } from '../../types/settings'
+import { coerceWriteMode } from '../../types/settings'
 import { DEFAULT_PDF_SETTINGS } from '../types'
 import {
   DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB,
@@ -310,6 +316,9 @@ const convertErrors = ref<CalcpadError[]>([])
 interface PlotSummary { index: number; ext: 'png' | 'svg'; dataUri: string; sizeBytes: number }
 const plots = ref<PlotSummary[]>([])
 const plotsLoading = ref(false)
+
+const writeMode = ref<WriteMode>('reportOnly')
+const writeResult = ref<{ ok: boolean; message: string } | null>(null)
 
 // Methods
 const switchView = (viewId: string) => {
@@ -450,6 +459,17 @@ const handleSavePlot = (index: number) => {
 
 const handleSavePlotsZip = () => {
   postMessage({ type: 'savePlotsZip' })
+}
+
+const handleUpdateWriteMode = (mode: WriteMode) => {
+  writeMode.value = mode
+  writeResult.value = null
+  postMessage({ type: 'updateWriteMode', mode })
+}
+
+const handleWriteFilesNow = () => {
+  writeResult.value = null
+  postMessage({ type: 'writeFilesNow' })
 }
 
 const handleInsertText = (text: string) => {
@@ -685,6 +705,7 @@ const handleMessage = (event: MessageEvent) => {
       if (typeof message.enablePreviewUiOverrides === 'boolean') enablePreviewUiOverrides.value = message.enablePreviewUiOverrides
       darkBackground.value = message.darkBackground || '#1e1e1e'
       linterMinSeverity.value = message.linterMinSeverity || 'information'
+      writeMode.value = coerceWriteMode(message.writeMode)
       if (typeof message.maxOutputLines === 'number' && message.maxOutputLines >= 10) {
         maxOutputLines.value = message.maxOutputLines
       }
@@ -744,6 +765,12 @@ const handleMessage = (event: MessageEvent) => {
     case 'plotsResponse':
       plots.value = Array.isArray(message.plots) ? message.plots : []
       plotsLoading.value = false
+      break
+    case 'writeModeChanged':
+      writeMode.value = coerceWriteMode(message.mode)
+      break
+    case 'writeFilesResult':
+      writeResult.value = { ok: message.ok !== false, message: String(message.message ?? '') }
       break
     case 'metadataContext':
       metadataBlock.value = message.block ?? null

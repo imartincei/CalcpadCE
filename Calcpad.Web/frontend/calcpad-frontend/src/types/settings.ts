@@ -53,6 +53,56 @@ const COLOR_SCALE_OPTIONS: SettingOption[] = [
 ];
 
 /**
+ * Which renders are allowed to run `#write`/`#append`. A host setting, not a `#settings` key:
+ * the backend takes a plain `write` boolean per request and this decides what to send.
+ *
+ * "Report" is the report layout wherever it is rendered — the preview pane's Report view as
+ * much as a PDF, Word or HTML report export. Both are the same render, so both write.
+ *
+ * The input form never writes, in any mode: it is for filling in, and the report shown beside
+ * it is the render that produces output. Unwrapped never writes either — it is a code listing,
+ * so the document is not calculated for it.
+ */
+export type WriteMode = 'previewAndReport' | 'reportOnly' | 'manual';
+
+export const WRITE_MODE_OPTIONS: { value: WriteMode; label: string; detail: string }[] = [
+    {
+        value: 'previewAndReport',
+        label: 'Preview and Report',
+        detail: 'The Preview and Report views both write, so the files are rewritten as you type. The input form does not.',
+    },
+    {
+        value: 'reportOnly',
+        label: 'Report Only',
+        detail: 'Only a report render writes: the preview pane switched to Report, and a report export. The Preview view leaves the files alone, so typing does not rewrite them.',
+    },
+    {
+        value: 'manual',
+        label: 'Manual',
+        detail: 'Nothing writes until you press Write to Disk.',
+    },
+];
+
+export function coerceWriteMode(raw: string | undefined | null): WriteMode {
+    return WRITE_MODE_OPTIONS.some(o => o.value === raw) ? raw as WriteMode : 'reportOnly';
+}
+
+/**
+ * Whether a render may run `#write`/`#append`. The two flags are the API's own: `forPrint` is
+ * the report layout, which the preview pane's Report view and a report export share, and
+ * `enableUi` is the input form. They never both hold — the server clears `enableUi` for a
+ * report — so the three cases below are exhaustive.
+ */
+export function writesAllowed(mode: WriteMode, forPrint: boolean, enableUi = false): boolean {
+    if (mode === 'manual') return false;
+    // A report is a report wherever it renders, form open or not.
+    if (forPrint) return true;
+    // The form is for filling in. Producing output is what its report half is for.
+    if (enableUi) return false;
+    return mode === 'previewAndReport';
+}
+
+/**
  * Recognized keys for the `settings` overrides object (the `#settings` directive).
  * Types and ranges mirror `Calcpad.Core`'s `SettingsDto` so the panel rejects the
  * same values the engine would reject. Keep in sync with `Settings.cs`.

@@ -338,6 +338,7 @@ interface CalcpadRequest {
   includeLineAnchors?: boolean; // Line anchors + error boxes. Defaults to !forPrint; set true for an
                                 //   on-screen report, false for anything written to a file.
   hideErrorLines?: boolean;    // Drops "on line [N]" from error messages. Defaults to enableUi.
+  write?: boolean;             // Run #write/#append for this render (default: false).
 }
 ```
 

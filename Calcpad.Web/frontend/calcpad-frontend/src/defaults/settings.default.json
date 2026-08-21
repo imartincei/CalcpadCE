@@ -51,7 +51,7 @@
         "prettifyIndentStyle": "tab",
         "prettifyIndentSize": 4,
         "prettifyTrimTrailingWhitespace": true,
-        "writeMode": "localFile",
+        "writeMode": "reportOnly",
         "dotnetPath": "dotnet",
         "editorFontFamily": "JuliaMono",
         "pdfSettings": {
