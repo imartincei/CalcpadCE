@@ -328,19 +328,20 @@ function showPreviewLoading(panel: vscode.WebviewPanel): () => void {
 /**
  * The PDF options for an export: the stored host defaults, overridden per key by
  * the document's own `pdf` metadata comment. `documentContent` is optional so
- * callers with no document in hand still get the host defaults.
+ * callers with no document in hand still get the host defaults. The header title
+ * falls back to `sourceFileUri`'s base name — the document being exported, not
+ * whichever editor happens to be focused — matching the desktop app.
  */
-function getPdfSettings(documentContent?: string): FrontendPdfSettings {
+function getPdfSettings(documentContent?: string, sourceFileUri?: vscode.Uri): FrontendPdfSettings {
     const settingsManager = CalcpadSettingsManager.getInstance();
     const stored = settingsManager.getExtraObject('pdfSettings', {} as Partial<FrontendPdfSettings>);
     const fromDocument = documentContent
         ? pdfSettingsFromDocument(documentContent.split('\n'))
         : {};
-    const activeEditor = vscode.window.activeTextEditor;
-
-    const fileName = activeEditor
-        ? path.basename(activeEditor.document.fileName, path.extname(activeEditor.document.fileName))
-        : 'CalcpadCE Document';
+    const source = sourceFileUri ?? vscode.window.activeTextEditor?.document.uri;
+    const fileName = source
+        ? path.basename(source.fsPath, path.extname(source.fsPath))
+        : '';
 
     return resolveEffectivePdfSettings(stored, fromDocument, fileName);
 }
@@ -1174,7 +1175,7 @@ async function generatePdfToFile(
         headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
         body: JSON.stringify({
             html: html,
-            options: getPdfSettings(documentContent)
+            options: getPdfSettings(documentContent, sourceFileUri)
         }),
         signal: AbortSignal.timeout(60000)
     });

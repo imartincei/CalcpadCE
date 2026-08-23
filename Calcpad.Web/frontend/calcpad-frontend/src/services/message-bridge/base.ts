@@ -612,13 +612,29 @@ export abstract class BaseMessageBridge {
     }
 
     /**
+     * The active document's base name, used as the PDF header title when neither the
+     * stored settings nor the document's `pdf` metadata comment set one. Derived the
+     * same way the export Save dialog prefills its filename, so the two always agree.
+     */
+    protected getExportFallbackTitle(): string {
+        const tabs = (window as { calcpadTabs?: { activeTab?: { filePath?: string; title?: string } } }).calcpadTabs;
+        const source = tabs?.activeTab?.filePath || tabs?.activeTab?.title || '';
+        const base = source.slice(Math.max(source.lastIndexOf('/'), source.lastIndexOf('\\')) + 1);
+        return base.replace(/\.[^./\\]+$/, '');
+    }
+
+    /**
      * The PDF options an export should actually use: the stored defaults with the
      * document's own `pdf` metadata comment layered over them, key by key. The
      * Settings tab keeps editing the stored set alone — this merge is only for the
      * request that generates a PDF.
      */
     protected getEffectivePdfOptions(content: string): PdfSettings {
-        return resolveEffectivePdfSettings(this.getStoredPdfOptions(), pdfSettingsFromDocument(content.split('\n')));
+        return resolveEffectivePdfSettings(
+            this.getStoredPdfOptions(),
+            pdfSettingsFromDocument(content.split('\n')),
+            this.getExportFallbackTitle(),
+        );
     }
 
     private async handleInsertImage(): Promise<void> {

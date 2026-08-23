@@ -325,19 +325,14 @@ export class TauriMessageBridge extends BaseMessageBridge {
         return filePath;
     }
 
-    // Reveals rather than opens: a saved file lands wherever the user pointed the
-    // dialog, so handing it to ShellExecute would mean an open-path grant over the
-    // whole home directory — the other half of a write-then-execute chain, since
-    // the webview can also write there. Revealing hands the path to the file
-    // manager, which selects it and never runs it.
     protected async onPdfSaved(filePath: string): Promise<void> {
-        const reveal = await dialogAsk(`PDF saved to ${filePath}`, {
+        const open = await dialogAsk(`PDF saved to ${filePath}`, {
             title: 'PDF export complete',
             kind: 'info',
-            okLabel: 'Show in Folder',
+            okLabel: 'Open PDF',
             cancelLabel: 'Close',
         });
-        if (reveal) await revealItemInDir(filePath);
+        if (open) await this.openPathSafe(filePath);
     }
 
     protected async buildFileContext(_content: string): Promise<{ sourceFilePath?: string }> {
@@ -732,10 +727,8 @@ export class TauriMessageBridge extends BaseMessageBridge {
         }
     }
 
-    // Reveals rather than opening the parent: the item is an arbitrary workspace
-    // path, which sits outside the narrowed `opener:allow-open-path` scope on
-    // every platform. `reveal_item_in_dir` takes no scope and only selects the
-    // item in the file manager, so it never executes what it is handed.
+    // Reveals rather than opening the parent, so the file manager lands with the
+    // item already selected.
     private async handleOpenContainingFolder(itemPath: string): Promise<void> {
         if (!itemPath || typeof itemPath !== 'string') return;
         try {
