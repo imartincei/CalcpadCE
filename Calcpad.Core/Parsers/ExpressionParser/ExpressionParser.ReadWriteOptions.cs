@@ -11,6 +11,7 @@ namespace Calcpad.Core
         private const string CsvMime = "text/csv";
         private const string XlsxMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private const string XlsmMime = "application/vnd.ms-excel.sheet.macroEnabled.12";
+        public bool AllowDataWrite { get; set; } = true;
 
         /// <summary>The extension an embedded source stands for, read from its MIME type.</summary>
         private static ReadOnlySpan<char> MimeExtension(ReadOnlySpan<char> mime) =>

@@ -833,6 +833,9 @@ export abstract class BaseMessageBridge {
      * Runs the document's `#write`/`#append` directives now, whatever the write-mode setting
      * says. The report render is the one used: it is the authoritative output, so `#post`
      * blocks and entered `#UI` values are included exactly as a saved report would have them.
+     *
+     * Rendered with line anchors on, since that is what makes the parser record its errors —
+     * the HTML is discarded, only the errors are read.
      */
     private async handleWriteFilesNow(): Promise<void> {
         const content = this.getActiveEditorContent();
@@ -840,17 +843,18 @@ export abstract class BaseMessageBridge {
         const { sourceFilePath } = await this.buildFileContext(content);
         const result = await this.apiClient.convert(
             content, buildApiSettings(this.settings), 'html', true, sourceFilePath, undefined,
-            this.uiOptionsFor('report'), false, { write: true });
+            this.uiOptionsFor('report'), true, { write: true });
         if (result == null || result instanceof ArrayBuffer) {
             await this.onExportError('The document could not be run, so nothing was written.');
             return;
         }
         const errors = result.errors ?? [];
+        this.postToVue({ type: 'updateConvertErrors', errors });
         this.postToVue({
             type: 'writeFilesResult',
             ok: errors.length === 0,
             message: errors.length === 0
-                ? 'Ran the document; #write and #append are up to date.'
+                ? 'Data written successfully'
                 : `Ran with ${errors.length} error${errors.length === 1 ? '' : 's'} — some output may be missing.`,
         });
     }

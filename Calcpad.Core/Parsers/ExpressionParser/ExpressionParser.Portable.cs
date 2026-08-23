@@ -4,15 +4,8 @@ namespace Calcpad.Core
 {
     public partial class ExpressionParser
     {
-        /// <summary>How much data a compiled worksheet may carry, per source and in total.</summary>
         public const int MaxEmbeddedDataSize = 10 * 1024 * 1024;
 
-        /// <summary>
-        /// The same <c>#read</c>, carrying the file it names instead of pointing at it. Only the
-        /// source is rewritten, so the recipient's read takes the path the author's did. The file
-        /// is read here too, so one that cannot be read stops the compile. <paramref name="size"/>
-        /// returns the bytes embedded, for the caller to total against the same limit.
-        /// </summary>
         public static string EmbedReadDirective(ReadOnlySpan<char> line, string sourceFilePath, PathRoots pathRoots, out int size)
         {
             size = 0;
@@ -46,8 +39,6 @@ namespace Calcpad.Core
             if (connector is null)
                 return false;
 
-            // The keyword, the variable name and the connector: one space-delimited token each,
-            // consumed exactly as ReadWriteOptions consumes them.
             var len = line.Length;
             var i = 0;
             for (var token = 0; token < 3; ++token)

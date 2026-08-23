@@ -575,6 +575,11 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         this._view?.webview.postMessage({ type: 'updateConvertErrors', errors });
     }
 
+    /** Report the outcome of a "Write to Disk" run to the Export tab. */
+    public writeFilesResult(ok: boolean, message: string) {
+        this._view?.webview.postMessage({ type: 'writeFilesResult', ok, message });
+    }
+
     /** Push the metadata comment (or null) the cursor currently sits in to the panel. */
     public updateMetadataContext(block: MetadataCommentBlock | null) {
         this._view?.webview.postMessage({ type: 'metadataContext', block });
