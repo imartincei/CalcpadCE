@@ -364,7 +364,7 @@ Everything else is written as it always is — the range, the type and the separ
 ```
 
 The media type must be one of `text/csv`, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` (**\*.xlsx**) or `application/vnd.ms-excel.sheet.macroEnabled.12` (**\*.xlsm**).
-This is what [saving a compiled worksheet](new-portable-export-options.md#save-as-compiled-worksheet) writes, so that it runs with no data files beside it — there is rarely a reason to write one yourself.
+This is what [saving a compiled worksheet](new-exports.md#save-as-compiled-worksheet) writes, so that it runs with no data files beside it.
 
 Writes data from matrix/vector *M* to the specified text/CSV file.
 If the file exists, it is entirely overwritten.

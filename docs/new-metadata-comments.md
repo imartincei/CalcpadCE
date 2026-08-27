@@ -54,7 +54,7 @@ Each key you set overrides the matching option on the [Settings tab](new-setting
 
 The **Properties** tab has a picker for these, so you don't have to remember the names, and the linter flags an unknown key or a margin without a unit.
 If more than one comment sets the same key, the last one wins.
-See [PDF Export](new-pdf-export.md) for additional information.
+See [Exports → PDF export](new-exports.md#pdf-export) for additional information.
 
 ## Quieting the linter
 
@@ -74,5 +74,5 @@ See [Suppressing diagnostics](new-linter.md#suppressing-diagnostics-lint-ignore)
 
 - [The CalcpadCE Panel & Settings](new-calcpad-panel.md)
 - [Linter and Diagnostics](new-linter.md) — the lint-ignore markers
-- [PDF Export](new-pdf-export.md) — page setup and print visibility
+- [Exports](new-exports.md#pdf-export) — page setup and print visibility
 - [Using the VS Code Extension](new-vscode-extension.md)

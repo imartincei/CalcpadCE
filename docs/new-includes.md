@@ -79,6 +79,7 @@ This is deliberate behavior, as resolving an included module's own saved values 
 **module.cpd:**
 ```text
 #local
+#ProjectPath C:/path-to-my-project
 #UI sharedData = [1; 2|3; 4]
 #write sharedData to {project}/shared-inputs.csv
 #global
@@ -86,7 +87,7 @@ This is deliberate behavior, as resolving an included module's own saved values 
 #read M from {project}/shared-inputs.csv
 ```
 
-`#write` sits inside `#local` so it only runs when `shared/inputs.cpd` is opened by itself — [`#local` content is stripped out of an `#include`](#path-root-tokens-project-and-library), so including this file elsewhere never re-triggers the write.
+`#write` sits inside `#local` so it only runs when `shared/inputs.cpd` is opened by itself, so including this file elsewhere never re-triggers the write.
 
 **calculation.cpd:**
 
@@ -111,13 +112,7 @@ It can also appear inside a `#ProjectPath`/`#LibraryPath` value itself:
 #LibraryPath {user}/calcpad/lib
 ```
 
-## Errors point to the right place
-
-> Calcpad.Web only (web editor, desktop app, and VS Code extension). Not available in the standalone WPF desktop application for Windows.
-
-Even after several layers of includes and macro expansion, error messages and diagnostics point back to the original file and line number — so a problem in a shared file is reported where it actually lives, not at the `#include` line.
-
 ## See also
 
-- [Portable Export Options](new-portable-export-options.md) · [Working with Files](working-with-files.md) · [Programming](programming.md)
+- [Exports](new-exports.md#portable-exports) · [Working with Files](working-with-files.md) · [Programming](programming.md)
 - [Using the VS Code Extension](new-vscode-extension.md) — path completion for `#include` and `#read`

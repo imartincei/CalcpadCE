@@ -6,8 +6,6 @@ Type a new value and the whole document recalculates.
 
 The same file is still an ordinary worksheet.
 In the preview, report, and PDF/Word exports — the `#UI` keyword changes nothing about how the line looks unless this is explicitly set.
-What it does carry across is the *values*: a report renders the numbers that were entered into the form.
-You write one document, and it doubles as its own input form.
 
 ```text
 #UI L = 6m
@@ -20,39 +18,24 @@ In Input mode `L` and `w` become text boxes, and `M` follows whatever you type i
 
 ## Turning it on
 
-A document that declares `#UI` controls exists to be filled in, so the first time you open one it comes up as its input form — in the desktop app the results pane switches to **Input**, and in **VS Code** the form panel opens beside the editor without taking the caret out of it.
-That happens once per document per session: switch to **Preview** or **Report** and the mode you chose sticks, however often you come back to the tab.
-`#UI` lines reached only through an `#include` are not detected, since finding them would mean reading files on every open.
-Turn the whole behaviour off with **Open `#UI` Documents in Input Mode** on the panel's **Settings** tab.
+A document that declares `#UI` controls exists to be filled in, so the first time you open one it comes up as its input form — in the desktop app the results pane switches to **Input**, and in **VS Code** the form panel opens beside the editor.
+You can turn this behavior off with **Open `#UI` Documents in Input Mode** on the panel's **Settings** tab.
 
-**VS Code**
+### VS Code
 
-| Command | What it does |
-|---------|--------------|
-| `CalcpadCE: Toggle #UI Input Mode` | Opens (or closes) the input form panel |
-| `CalcpadCE: Toggle Report Preview` | Opens the report — beside the form, or on its own |
-| `CalcpadCE: Print Report to PDF` | Exports the report as a PDF |
-| `CalcpadCE: Save #UI Values to Document` | Writes the values you entered into the file |
-| `CalcpadCE: Save Values to Compiled Worksheet` | The `.cpdz` equivalent of the command above |
+The input form and the report each open as their own panel — see [Live preview](new-vscode-extension.md#live-preview) for the buttons and commands that open them, and [Exports](new-exports.md) for **Print Report to PDF**.
 
-Closing the form asks whether to save the values first; declining discards them.
+Closing the form asks whether to save first; declining discards them.
 The report preview is not tied to the form: open it on its own to read the print layout beside the editor, and it stays open when the form closes.
-While the form or the report has focus, both the **Print Report to PDF** and the report toggle appear as buttons in the panel's title bar.
 
-**Web editor and desktop app**
+### Desktop App
 
-The results toolbar — labelled **Results** — has four modes:
+The results pane has four modes: **Preview**, **Unwrapped**, **Input**, and **Report**, also in the native menu under **View → Result Mode**.
+See [Live results](new-desktop-app.md#live-results) for the pane itself and [Exports → Export variants](new-exports.md#export-variants) for a breakdown of each mode.
 
-| Mode | What it shows |
-|------|---------------|
-| **Preview** | The document as written: `#pre` and `#post` both rendered, source values |
-| **Unwrapped** | The source listing, with macros and includes resolved |
-| **Input** | The `#UI` form. Takes over the window and hides the editor |
-| **Report** | The print layout: `#pre` hidden, entered `#UI` values applied |
-
-The same modes are in the native menu under **View → Result Mode**.
-In **Input** the toolbar also offers **Report** (the report beside the form), **Save values** (once you have changed something) and **Exit input mode**, which leaves you in **Report**.
-In **Input** and **Report** a **Print PDF** button exports the report.
+**Input** takes over the window and hides the editor.
+Its toolbar also offers **Report** (the report beside the form), **Save values** (once you have changed something) and **Exit input mode**, which leaves you in **Report**.
+In **Input** and **Report**, a **Print PDF** button exports the report.
 
 ## `#pre` and `#post`
 
@@ -65,9 +48,6 @@ The two directives split a document into the part that is filled in and the part
 | **Input** | yes | no | yes |
 | **Report** | no | yes | yes |
 
-So put the parts of the document that are output — result tables, conclusions, long derivations — inside a `#post` block, and the form stays a short list of inputs.
-Put instructions for whoever fills the form in inside `#pre`, and they stay out of the report.
-
 ```text
 #pre
 '<p>Enter the span below.</p>
@@ -78,12 +58,10 @@ Put instructions for whoever fills the form in inside `#pre`, and they stay out 
 #end post
 ```
 
-**Preview** is the mode to write in: it shows everything at once, and it deliberately ignores entered values so you always see what the document itself says.
+**Preview** is the suggested mode to write CalcpadCE code in: it shows everything at once, and it ignores input values so you see the default values of the document.
 
-The exception is **Apply #UI Values in Preview** on the panel's **Settings** tab, off by default.
-Turn it on and Preview renders with the entered values applied, exactly as the form and the report do, while still showing `#pre` and `#post` together.
-That combination is what makes it a debugging view: when a document calculates cleanly as written but errors once the form is filled in, Preview with this on shows the failing values against the whole document — the `#pre` instructions, the `#post` results and the source lines the form leaves out.
-Turn it back off to see the document's own values again.
+Turning on the **Apply #UI Values in Preview** setting will render the preview with the input values applied.
+This can make debugging issues from values input into the form easier.
 
 ## Writing a `#UI` line
 
@@ -91,10 +69,10 @@ Turn it back off to see the document's own values again.
 #UI { JSON properties } name = value
 ```
 
-The JSON block is optional.
-Without it the control type and, for grids, the number of rows and columns are worked out from the right-hand side.
+The JSON properties are optional.
+Without it, the input properties are derived from the right-hand side.
 
-`#UI` annotates an **assignment**, and only one whose right-hand side is a plain value:
+`#UI` is only allowed where the right-hand side is a plain value or a vector/matrix function by itself:
 
 | Right-hand side | Accepted | Example |
 |-----------------|----------|---------|
@@ -129,14 +107,14 @@ They share the line's JSON properties but are saved and overridden separately.
 
 ## JSON properties
 
-You don't have to write this `{...}` block by hand — the [Properties tab](new-metadata-comments.md#the-properties-tab) has a form for it that fills in the fields that apply to the control type it detects.
+You don't have to write this `{...}` block by hand — the [Properties tab](new-calcpad-panel.md#properties) has a form for it that fills in the fields that apply to the control type it detects.
 
 | Property | Type | Applies to | Meaning |
 |----------|------|-----------|---------|
 | `type` | string | all | `entry`, `datagrid`, `dropdown`, `radio`, `checkbox`. Auto-detected when omitted |
-| `mode` | string | all | Only `number` is accepted; string inputs are not supported |
-| `style` | string | all | CSS class(es) added to the control, **in Input mode only** |
-| `reportStyle` | string | all | CSS class(es) added to the line **wherever it is not a control** |
+| `mode` | string | all | Only `number` is currently accepted; string inputs are planned but not yet supported |
+| `style` | string | all | CSS class applied to the input element |
+| `reportStyle` | string | all | CSS class applied to the line in the report |
 | `rows` | number | datagrid | Grid rows. Auto-detected when omitted |
 | `columns` | number | datagrid | Grid columns. Auto-detected when omitted |
 | `rowHeaders` | array | datagrid | Row header labels |
@@ -149,7 +127,7 @@ Header arrays must not be longer than the grid dimension they label.
 
 ## The control types
 
-### `entry` — a text box
+### `entry`: an input box
 
 The default for a numeric right-hand side.
 The unit stays in the document beside the box, so only the number is editable; the box accepts digits, a decimal point and a sign, and rejects anything else as you type.
@@ -159,7 +137,7 @@ The unit stays in the document beside the box, so only the number is editable; t
 #UI {"type": "entry"} W = 5m
 ```
 
-### `dropdown` — a list
+### `dropdown`: a list
 
 `keys` are shown, `values` are substituted.
 A value may carry its own unit, so a drop-down can switch units as well as magnitudes.
@@ -168,7 +146,7 @@ A value may carry its own unit, so a drop-down can switch units as well as magni
 #UI {"type": "dropdown", "keys": ["Low", "Medium", "High"], "values": ["1", "2", "3"]} grade = 1
 ```
 
-### `radio` — a button group
+### `radio`: a button group
 
 Same `keys`/`values` pairing as a drop-down, laid out as radio buttons.
 
@@ -176,7 +154,7 @@ Same `keys`/`values` pairing as a drop-down, laid out as radio buttons.
 #UI {"type": "radio", "keys": ["Steel", "Concrete"], "values": ["200GPa", "25GPa"]} E = 200GPa
 ```
 
-### `checkbox` — a 1/0 toggle
+### `checkbox`: a toggle
 
 Checked is `1`, unchecked is `0`.
 Pairs naturally with `#if`.
@@ -185,7 +163,7 @@ Pairs naturally with `#if`.
 #UI {"type": "checkbox"} useSteel = 1
 ```
 
-### `datagrid` — an editable grid
+### `datagrid`: an editable grid
 
 The default whenever the right-hand side is a vector/matrix literal or a `vector()`/`matrix()` call.
 `|` separates rows and `;` separates cells, so `[1; 2; 3]` is one row of three.
@@ -317,32 +295,20 @@ Where a name genuinely must be declared more than once — the two branches of a
 If a document's values do end up scrambled, the metadata comment is plain text: fix the keys by hand, or clear the `uiOverrides` entry to start the form from the document's own values again.
 Editing the comment takes effect on the next render, and what it says replaces what is currently entered — including values typed into the form but not yet saved.
 
-The [Properties tab](new-metadata-comments.md#the-properties-tab) does this without hand-editing: its **Saved #UI values** list shows every entry, lets you edit one in place or jump to its control, flags entries that no longer match a control still in the document, and has a **Purge unused** button to drop them.
+The [Properties tab](new-calcpad-panel.md#properties) does this without hand-editing: its **Saved #UI values** list shows every entry, lets you edit one in place or jump to its control, flags entries that no longer match a control still in the document, and has a **Purge unused** button to drop them.
 
 ## Exporting
 
-Exports come in variants, one per rendering, and **report is the default** — a plain "Export PDF" from the menu, the toolbar, or a command gives you the report:
+A document with `#UI` controls exports like any other — see [Exports](new-exports.md) for the
+variants, the formats, and where each one lives.
 
-| Variant | Contents | Formats |
-|---------|----------|---------|
-| **Report** (default) | `#pre` hidden, `#post` shown, entered `#UI` values applied | PDF, HTML, Word |
-| **Preview** | `#pre` and `#post` both shown, matching what the Preview pane shows — the document's own values, or the entered ones if **Apply `#UI` Values in Preview** is on | PDF, HTML, Word |
-| **Input form** | The form itself, `#post` hidden, entered values in the controls | PDF, HTML |
-| **Unwrapped** | The source listing, macros and includes resolved | PDF, HTML |
-
-The non-default variants live in the **Export** tab of the sidebar, which groups its buttons by variant, and in the desktop app's **File → Export** submenu.
-The input form and the unwrapped listing have no Word form.
-
-Two things to know about the exported files:
-
-- None of them carry line numbers or the error-summary boxes the on-screen views use for
-  navigation. Those belong to the screen; a file is read, not clicked through.
-- An exported **input form** is static. Its controls render, but nothing is behind them to
-  recalculate — it is a picture of the form, useful for printing a blank or filled-in sheet.
+One thing is specific to input mode: an exported **input form** is static. Its controls render, but
+nothing is behind them to recalculate — it is a picture of the form, useful for printing a blank or
+filled-in sheet.
 
 ## Compiled (`.cpdz`) worksheets
 
-A [compiled worksheet](new-portable-export-options.md#save-as-compiled-worksheet) is a `.cpdz` file with its source locked and only the `#UI` form left editable.
+A [compiled worksheet](new-exports.md#save-as-compiled-worksheet) is a `.cpdz` file with its source locked and only the `#UI` form left editable.
 It changes a few things from the ordinary-file behaviour described above:
 
 - It always opens as its input form — the "first time you open it" auto-detection under

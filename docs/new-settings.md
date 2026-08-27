@@ -40,7 +40,7 @@ Editing settings here keeps them in sync with the host and the server — in VS 
 
 ## PDF Export
 
-Your default page setup for [PDF export](new-pdf-export.md).
+Your default page setup for [PDF export](new-exports.md#pdf-export).
 
 | Setting | Values | Meaning |
 |---------|--------|---------|
@@ -150,4 +150,4 @@ Configurations persist between sessions.
 ## See also
 
 - [The CalcpadCE Panel](new-calcpad-panel.md)
-- [Linter](new-linter.md) · [PDF Export](new-pdf-export.md)
+- [Linter](new-linter.md) · [Exports](new-exports.md)

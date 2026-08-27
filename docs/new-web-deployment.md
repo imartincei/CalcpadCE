@@ -4,7 +4,7 @@ The desktop app and the VS Code extension start the CalcpadCE calculation server
 However, people who are familiar with coding can also run it directly — for example, to point several tools at one shared instance, or to script conversions and calls against its API.
 This page covers running the server and the API it exposes.
 
-> **Localhost only.** This build runs the server bound to your own machine (`localhost`, `127.0.0.1`, or `::1`) only. If you point it at any other address, it refuses to start. There is no multi-user hosting, authentication, or shared file storage in this build.
+> **Localhost only.** This build runs the server bound to your own machine (`localhost`, `127.0.0.1`, or `::1`) only. If you point it at any other address, it refuses to start. There is no multi-user hosting, user-based authentication, or shared file storage in this build.
 
 ## Running
 
@@ -35,7 +35,7 @@ To change the port, set `CALCPAD_PORT`, or pass a full bind URL with `--urls` �
 | `/api/calcpad/snippets` | GET | Snippets, optionally filtered by category |
 | `/api/calcpad/debug-crash` | GET | Record a client-side crash in the server log |
 
-The full request/response schema lives at [Calcpad.Web/backend/API_SCHEMA.md](../Calcpad.Web/backend/API_SCHEMA.md); the common shapes are summarized below.
+The full request/response schema lives at [Calcpad.Web/backend/API_SCHEMA.md](https://github.com/imartincei/CalcpadCE/blob/main/Calcpad.Web/backend/API_SCHEMA.md); the common shapes are summarized below.
 
 ## Common request fields
 
@@ -114,5 +114,5 @@ Filter with a query string, e.g. `?category=Functions/Trigonometric`.
 
 ## See also
 
-- [Includes and File Reads](new-includes.md) · [Linter and Diagnostics](new-linter.md) · [PDF Export](new-pdf-export.md)
+- [Includes and File Reads](new-includes.md) · [Linter and Diagnostics](new-linter.md) · [Exports](new-exports.md)
 - [Using the Desktop App](new-desktop-app.md) · [Using the VS Code Extension](new-vscode-extension.md)

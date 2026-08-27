@@ -28,7 +28,7 @@ The **CalcpadCE** view is organized into tabs:
 | **Variables** | Everything defined in the document — macros, variables, functions, and custom units — with types and signatures. Click an entry to insert it; each is searchable. |
 | **Properties** | Form-based editor for the [metadata comment](new-metadata-comments.md) at the cursor — descriptions, parameter/return types, per-file settings, lint-ignore, and per-document PDF export settings. |
 | **Formatting** | Prettify options and the **Prettify Document** button. See [Formatting](#formatting-prettify). |
-| **Export** | PDF / HTML / Word save actions, grouped by which rendering they capture, plus per-plot and ZIP image exports from any plots produced by the document. See [Export](#export). |
+| **Export** | PDF / HTML / Word save actions, grouped by which rendering they capture, plus per-plot and ZIP image exports and the portable formats. See [Export](#export) and [Exports](new-exports.md). |
 | **Errors** | Full list of calculation errors from the engine, each linking to its source line. |
 
 While a [`#UI` input form](new-ui-mode.md) (or a compiled `.cpdz` worksheet) is the active document, **Insert**, **Variables**, **Formatting**, **Errors**, and **Properties** go inactive — they act on the document source, which the form doesn't edit.
@@ -81,35 +81,14 @@ Set your options, then click **Prettify Document**.
 
 Allows saving results from the CalcpadCE file into various formats. The tab is four collapsible sections — **HTML / PDF / Word**, **Write / Append**, **Plots** and **Portable Exports** — and remembers which ones you left open.
 
-| Group | Buttons | What it captures |
-| --- | --- | --- |
-| **Report** | Save PDF… · Save Word… · Save HTML… | `#pre` hidden, `#post` shown, entered `#UI` values applied |
-| **Preview** | Save PDF… · Save Word… · Save HTML… | `#pre` and `#post` are shown, uses the default \#UI values unless this is changed with the **Apply \#UI Values in Preview** setting. |
-| **Input form** | Save PDF… · Save HTML… | The `#UI` form itself, `#post` hidden. Applies UI Overrides instead of using the default values. |
-| **Unwrapped** | Save PDF… · Save HTML… | The source .cpd code with macros and includes expanded. |
-
-Word is offered for the report and the preview only.
-PDF uses the page setup from the **Settings** tab's **PDF Export** section, overridden by the document's own `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings) where it sets one.
-
-The **Write / Append** section controls the document's own file output:
-
-| Control | Result |
+| Section | Buttons |
 | --- | --- |
-| **Write files** | When `#write`/`#append` run: *Preview and Report*, *Report Only* (default), or *Manual*. The input form and Unwrapped never write, and which `#UI` values reach the file depends on the render — see [Settings](new-settings.md#data-output). |
-| **Write to Disk** | Runs the document as a report and writes its `#write`/`#append` files, whatever the setting above says. Being a report, it writes the values entered into the input form. |
+| **HTML / PDF / Word** | Save PDF… · Save Word… · Save HTML…, grouped by which rendering they capture — **Report**, **Preview**, **Input form**, **Unwrapped** |
+| **Write / Append** | **Write files** (when `#write`/`#append` run) and **Write to Disk** |
+| **Plots** | **Refresh**, a **Save…** per plot, and **Download all (ZIP)** |
+| **Portable Exports** | **Save Compiled…** (a `.cpdz` compiled worksheet) and **Export Portable…** (a `.zip` bundled with everything it reads) |
 
-Under **Portable Exports** there are two options for .cpd files.
-- **Save Compiled…** writes the document out as a `.cpdz` compiled worksheet. 
-- **Export Portable…** bundles it with everything it reads into a `.zip`  
-See [Portable Export Options](new-portable-export-options.md) for what each one produces.
-
-The **Plots** section lists every plot the document emits, each with a thumbnail, filename, and size:
-
-| Button | Result |
-| --- | --- |
-| **Refresh** | Re-runs the document and re-lists plots. Triggered automatically by a manual **Run Preview**. |
-| **Save…** (per plot) | Writes that plot to disk in its native format (PNG or SVG, depending on the **Vector Graphics** setting). |
-| **Download all (ZIP)** | Bundles every plot in one archive. |
+See [Exports](new-exports.md) for what each rendering captures, which formats it offers, how PDF page setup is resolved, and what the two portable formats produce.
 
 ### Errors
 
@@ -126,4 +105,4 @@ See [Settings](new-settings.md) for the full reference.
 *   [Settings](new-settings.md)
 *   [Using the VS Code Extension](new-vscode-extension.md)
 *   [Using the Desktop App](new-desktop-app.md)
-*   [PDF Export](new-pdf-export.md) · [Linter](new-linter.md) · [Table of Contents](new-table-of-contents.md)
+*   [Exports](new-exports.md) · [Linter](new-linter.md) · [Metadata Comments](new-metadata-comments.md)

@@ -63,12 +63,11 @@ nav:
     - The CalcpadCE Editor: new-calcpadce-editor.md
     - The CalcpadCE Panel: new-calcpad-panel.md
     - Settings: new-settings.md
-    - PDF Export: new-pdf-export.md
+    - Exports: new-exports.md
     - Includes and File Reads: new-includes.md
-    - Portable Export Options: new-portable-export-options.md
     - Linter and Diagnostics: new-linter.md
     - UI Mode: new-ui-mode.md
-    - Table of Contents: new-table-of-contents.md
+    - Visibility Directives: new-visibility-directives.md
     - Metadata Comments: new-metadata-comments.md
     - Running the Server: new-web-deployment.md
   - Quick Reference:

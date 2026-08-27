@@ -23,7 +23,7 @@ The Linux `.AppImage` and Windows Portable builds include what they need to run.
 The other Linux options expect WebKitGTK to already be present on the system and may require installing a few other common dependencies.
 
 For PDF export you need a **Chromium-based browser** (Chrome, Edge, or Chromium) installed on the system.
-On Linux, the app will tell you which package to install if none is found — see [PDF Export](new-pdf-export.md).
+On Linux, the app will tell you which package to install if none is found — see [Exports](new-exports.md#browser-requirement).
 
 ## Your first document
 
@@ -81,7 +81,7 @@ The editor is the same across every CalcpadCE front end — see **[The CalcpadCE
 Desktop specifics:
 
 - Path completion draws on the folder opened in the **Files** tab as well as the document's `#ProjectPath`/`#LibraryPath` roots.
-- JuliaMono is bundled with the app, so math glyphs render without installing a font.
+- JuliaMono is bundled with the app, so math glyphs render consistantly without installing a font.
 
 ## The CalcpadCE sidebar
 
@@ -93,16 +93,12 @@ The sidebar is the same across every CalcpadCE front end — see **[The CalcpadC
 ## Live results
 
 The **Results** pane renders your document live and re-renders as you type.
-Its toolbar (and **View → Result Mode**) offers four modes:
-
-- **Preview** — the document as written: both `#pre` and `#post` shown, using the values in the source. The mode to write in.
-- **Unwrapped** — the fully expanded source, with macros and includes resolved. Useful for debugging what the engine computes.
-- **Input** — the `#UI` fill-in form. Takes over the window and hides the editor.
-- **Report** — the print layout: `#pre` hidden, and the values entered into the form applied. In **Report** and **Input** a **Print PDF** button on the toolbar exports it.
+Its toolbar (and **View → Result Mode**) offers four modes — **Preview**, **Unwrapped**, **Input**, and **Report** — each rendering the same thing its matching export captures.
+See [Exports → Export variants](new-exports.md#export-variants) for a breakdown of each one.
 
 **View → Toggle Preview** shows and hides the pane.
-Drag the border between the editor and the results pane to resize either side — and, in **Input** mode, the border between the form and its **Report** companion — the split is remembered between sessions.
-See **[UI Mode](new-ui-mode.md)** for `#pre`/`#post` and the input form.
+Drag the border between the editor and the results pane to resize either side — and, in **Input** mode, the border between the form and the **Report** panes.
+See **[UI Mode](new-ui-mode.md)** for more information on `#pre`/`#post` and the input form.
 
 ### Running on demand (Auto-Run off)
 
@@ -112,7 +108,7 @@ If you turn **Settings → Auto-Run Preview** off — useful for long-running do
 - Click **▶ Run** on the editor toolbar.
 - Press **Ctrl+Alt+X**.
 - Right-click in the editor → **Run Preview**.
-- Use **Server → Refresh** in the native menu (same shortcut).
+- Use **Server → Refresh** in the menu bar.
 
 A manual run also re-lints the document, refreshes definitions and the table of contents, and rebuilds the Export tab's plot list.
 
@@ -134,30 +130,19 @@ See **[The CalcpadCE Editor → Linting](new-calcpadce-editor.md#linting)** and 
 
 ## Exporting
 
-Every export uses the app's built-in engine, so the output matches what you see on screen.
+Exporting is the same across every CalcpadCE front end — see **[Exports](new-exports.md)** for the four export variants, the formats each one offers, PDF page setup, plot images, `#write`/`#append` output, and the portable formats.
 
-Exports come in one variant per result mode, and **the report is the default** — that is what a plain **File → Export → Report PDF…** gives you:
+Desktop specifics:
 
-| Variant | Contents | Formats |
-|---------|----------|---------|
-| **Report** (default) | `#pre` hidden, `#post` shown, entered `#UI` values applied | PDF, HTML, Word |
-| **Preview** | `#pre` and `#post` both shown, matching what the Preview pane shows — the document's own values, or the entered ones if **Apply `#UI` Values in Preview** is on | PDF, HTML, Word |
-| **Input form** | The `#UI` form itself | PDF, HTML |
-| **Unwrapped** | The expanded source listing | PDF, HTML |
-
-Every one is in **File → Export** and in the **Export** tab of the sidebar, which groups its buttons the same way.
-Each opens a native save dialog.
-PDF requires a Chromium browser — see [PDF Export](new-pdf-export.md).
-No exported file carries the line numbers or error boxes the on-screen views use for navigation.
-
-Set the document title, timestamp format, page size, and header/footer in the **PDF Export** section of the sidebar's **Settings** tab, or pin them to one document from the **Properties** tab — see [PDF Export](new-pdf-export.md).
-The **Export** tab also has a **Plots** section that lists every plot the document produces, so you can save each one individually or all at once as a ZIP — see [The CalcpadCE Panel & Settings → Export](new-calcpad-panel.md#export).
+- Every export is in **File → Export** and in the **Export** tab of the sidebar, which groups its buttons the same way. Each opens a native save dialog.
+- **File → Save As Compiled Worksheet…** and **File → Export Portable Package…** produce the two handoff formats — see [Exports → Portable exports](new-exports.md#portable-exports).
+- PDF requires a Chromium browser — see [Exports → Browser requirement](new-exports.md#browser-requirement).
 
 ## The native menu
 
 The menu bar drives the whole app:
 
-- **File** — New Tab · Open… · Save · Save As… · Save As Compiled Worksheet… · Export Portable Package… · Close Tab · Export ▸ · Quit — see [Portable Export Options](new-portable-export-options.md) for what the two compiled/portable commands produce
+- **File** — New Tab · Open… · Save · Save As… · Save As Compiled Worksheet… · Export Portable Package… · Close Tab · Export ▸ · Quit — see [Exports](new-exports.md) for what each export command produces
 - **Edit** — Undo · Redo · Cut · Copy · Paste · Select All · Find · Replace
 - **View** — Toggle Sidebar · Toggle Preview · Toggle Word Wrap · Split Editor · Result Mode: Preview / Unwrapped / Input / Report
 - **Server** — Refresh (**Ctrl+Alt+X**) · Show Server Log · Stop Server · Restart Server
@@ -186,7 +171,7 @@ If calculations stop responding, use the **Server** menu:
 | Symptom | Fix |
 |---------|-----|
 | Preview blank or not updating | **Server → Refresh**, then **Server → Restart Server** if needed. Check **Server → Show Server Log** to see messages from the calculation engine. Click **Open Log Folder** in the **Settings** tab to submit logs showing an error as a Github Issue. |
-| PDF export fails | Install a Chromium browser. On Linux the app names the package to install — see [PDF Export](new-pdf-export.md). |
+| PDF export fails | Install a Chromium browser. On Linux the app names the package to install — see [Exports → Troubleshooting](new-exports.md#troubleshooting). |
 | Unsaved work after a crash | The app writes backup copies of unsaved files; reopen them from the Files tab. |
 
 ## See also
@@ -194,5 +179,5 @@ If calculations stop responding, use the **Server** menu:
 - [The CalcpadCE Editor](new-calcpadce-editor.md) — the shared editor, navigation, and linting
 - [The CalcpadCE Panel & Settings](new-calcpad-panel.md) — the shared sidebar and all settings
 - [Using the VS Code Extension](new-vscode-extension.md)
-- [PDF Export](new-pdf-export.md) · [Includes and File Reads](new-includes.md) · [Linter and Diagnostics](new-linter.md) · [Table of Contents](new-table-of-contents.md)
+- [Exports](new-exports.md) · [Includes and File Reads](new-includes.md) · [Linter and Diagnostics](new-linter.md) · [Table of Contents](new-calcpad-panel.md#toc)
 - [Writing Math](writing-math.md) · [Quick Reference](quick-reference.md)

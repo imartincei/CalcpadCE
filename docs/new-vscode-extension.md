@@ -11,7 +11,7 @@ See [Selecting a CalcpadCE Deployment](new-selecting-calcpadce-deployment.md) to
 
 - **Visual Studio Code** 1.82 or newer.
 - **.NET runtime 10** (VS Code will offer to install if not installed)
-- A **Chromium-based browser** (Chrome, Edge, Chromium) for PDF export. See [PDF Export](new-pdf-export.md).
+- A **Chromium-based browser** (Chrome, Edge, Chromium) for PDF export. See [Exports → Browser requirement](new-exports.md#browser-requirement).
 
 ## Installing the extension
 
@@ -43,7 +43,7 @@ Alternatively, from a terminal: `code --install-extension <path>/vscode-calcpad-
 The preview opens in a side column and re-renders every time you edit.
 The bundled calculation engine starts automatically the first time you render — the first render may take a moment while it starts up.
 
- Compiled **`.cpdz`** worksheets open in a dedicated editor, and **Save** writes the values you entered back into the file.
+ Compiled **`.cpdz`** worksheets open in a dedicated editor, and **Save** writes the values you entered back into the file — see [Exports → Portable exports](new-exports.md#portable-exports).
 
 ## The editor
 
@@ -65,13 +65,15 @@ The panel is the same across every CalcpadCE front end — see **[The CalcpadCE 
 
 ## Live preview
 
-Three preview panels are available, each opening in its own editor column:
+Four preview panels are available — **HTML Preview**, **Unwrapped Preview**, **Input Form**, and **Report Preview** — each opening in its own editor column and rendering the same thing its matching export captures.
+See [Exports → Export variants](new-exports.md#export-variants) for a breakdown of each one.
 
-| Panel | How to open | What it shows |
-|-------|-------------|---------------|
-| **HTML Preview** | Preview button in the editor toolbar, or *CalcpadCE Preview* in the Command Palette | The document as written — both `#pre` and `#post`, source values |
-| **Unwrapped Preview** | Eye button in the editor toolbar, or *CalcpadCE Preview Unwrapped* | The fully expanded source (macros and includes resolved) — useful for debugging what the engine actually computes |
-| **Report Preview** | Book button in the editor toolbar, or *CalcpadCE: Toggle Report Preview* | The print layout — `#pre` hidden and entered `#UI` values applied |
+| Panel | How to open |
+|-------|-------------|
+| **HTML Preview** | Preview button in the editor toolbar, or *CalcpadCE Preview* in the Command Palette |
+| **Unwrapped Preview** | Eye button in the editor toolbar, or *CalcpadCE Preview Unwrapped* |
+| **Input Form** | Pencil button in the editor toolbar, or *CalcpadCE: Toggle #UI Input Mode* |
+| **Report Preview** | Book button in the editor toolbar, or *CalcpadCE: Toggle Report Preview* |
 
 The Report preview opens on its own beside the editor, or alongside the `#UI` input form when that is open, and it keeps its line links so a result traces back to the line that produced it.
 With it (or the input form) focused, **CalcpadCE: Print Report to PDF** appears as a button in the panel's title bar.
@@ -109,23 +111,17 @@ See **[The CalcpadCE Editor → Linting](new-calcpadce-editor.md#linting)** and 
 
 ## Exporting
 
-All exports run through the same engine as the preview, so what you see is what you get.
+Exporting is the same across every CalcpadCE front end — see **[Exports](new-exports.md)** for the four export variants, the formats each one offers, PDF page setup, plot images, `#write`/`#append` output, and the portable formats.
 
-Every export is a **report** by default: `#pre` hidden, `#post` shown, and the values entered into the `#UI` form applied.
+VS Code specifics — the **Export** tab of the panel holds every export, and these are also reachable from the editor and Command Palette:
 
 | Output | How |
 |--------|-----|
-| **PDF** | **Export CalcpadCE to PDF** button in the editor toolbar, or *Export CalcpadCE to PDF*. Requires a Chromium browser — see [PDF Export](new-pdf-export.md). |
+| **PDF** | **Export CalcpadCE to PDF** button in the editor toolbar, or *Export CalcpadCE to PDF*. Requires a Chromium browser — see [Exports → Browser requirement](new-exports.md#browser-requirement). |
 | **PDF (report)** | **CalcpadCE: Print Report to PDF** — the same export, also a title-bar button on the report and input-form panels |
 | **HTML** | **Save HTML…** on the sidebar's **Export** tab, or *CalcpadCE: Save Source HTML…* |
 | **Word (.docx)** | **Save Word…** on the sidebar's **Export** tab, or *CalcpadCE: Save as Word Document…* |
-
-The sidebar's **Export** tab also offers the other renderings, grouped by variant: **Preview** (PDF, HTML, Word), **Input form** (PDF, HTML) and **Unwrapped** (PDF, HTML).
-No exported file carries the line numbers or error boxes the preview panels use for navigation.
-
-Set the document title, timestamp format, page size, and header/footer in the **PDF Export** section of the panel's **Settings** tab, or pin them to one document from the **Properties** tab — see [PDF Export](new-pdf-export.md).
-The **Export** tab also has a **Plots** section — a thumbnail list of every plot the document emits, each with an individual **Save…** button and a **Download all (ZIP)** button.
-See [The CalcpadCE Panel & Settings → Export](new-calcpad-panel.md#export).
+| **Compiled worksheet / portable package** | *CalcpadCE: Save As Compiled Worksheet…* and *CalcpadCE: Export Portable Package…* (the latter also in the editor's right-click menu) — see [Exports → Portable exports](new-exports.md#portable-exports) |
 
 ## Settings
 
@@ -161,12 +157,12 @@ Four VS Code output channels help diagnose problems (open the Output panel and p
 | Symptom | Fix |
 |---------|-----|
 | Preview never renders / "server not ready" | Click refresh icon in the CalcpadCE panel to try restarting a server that crashed or failed to start. Check the **CalcpadCE Server Debug** output channel. |
-| PDF export fails | Verify the file is not locked and a Chromium browser is installed (Chrome/Edge/Chromium). See [PDF Export](new-pdf-export.md). |
+| PDF export fails | Verify the file is not locked and a Chromium browser is installed (Chrome/Edge/Chromium). See [Exports → Troubleshooting](new-exports.md#troubleshooting). |
 
 ## See also
 
 - [The CalcpadCE Editor](new-calcpadce-editor.md) — the shared editor, navigation, and linting
 - [The CalcpadCE Panel & Settings](new-calcpad-panel.md) — the shared sidebar and all settings
 - [Using the Desktop App](new-desktop-app.md)
-- [PDF Export](new-pdf-export.md) · [Includes and File Reads](new-includes.md) · [Linter and Diagnostics](new-linter.md) · [Table of Contents](new-table-of-contents.md)
+- [Exports](new-exports.md) · [Includes and File Reads](new-includes.md) · [Linter and Diagnostics](new-linter.md) · [Table of Contents](new-calcpad-panel.md#toc)
 - [Writing Math](writing-math.md) · [Quick Reference](quick-reference.md)
