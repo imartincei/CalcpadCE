@@ -490,39 +490,6 @@ fn set_recent_files(app: AppHandle, paths: Vec<String>) -> Result<(), String> {
     refresh_menu(&app)
 }
 
-/// Directories `open_path_native` will hand to `xdg-open`.
-///
-/// Mirrors the `opener:allow-open-path` scope in `capabilities/default.json`.
-/// The plugin's own `open_path` enforces that scope; this command bypasses the
-/// plugin entirely, so on Linux — the platform it exists for — the scope would
-/// otherwise simply not apply. Keep the two lists in step.
-#[cfg(target_os = "linux")]
-fn openable_roots(app: &AppHandle) -> Vec<PathBuf> {
-    let p = app.path();
-    [p.app_data_dir(), p.app_config_dir(), p.app_log_dir()]
-        .into_iter()
-        .flatten()
-        .collect()
-}
-
-/// True when `path` resolves inside one of `openable_roots`.
-///
-/// Canonicalized on both sides so `..` and symlinks can't walk out. `xdg-open`
-/// has no `--` end-of-options marker — passing one would make it try to open a
-/// file literally named `--` — so containment is the control here, with the
-/// leading-dash check as a second line in case a future root is ever relative.
-#[cfg(target_os = "linux")]
-fn is_openable(app: &AppHandle, path: &Path) -> bool {
-    if path.to_string_lossy().starts_with('-') {
-        return false;
-    }
-    let Ok(target) = path.canonicalize() else { return false };
-    openable_roots(app)
-        .iter()
-        .filter_map(|root| root.canonicalize().ok())
-        .any(|root| target.starts_with(&root))
-}
-
 // Inside a linuxdeploy-generated AppImage, AppRun exports LD_LIBRARY_PATH so
 // the bundled binary can find its libs. If we spawn xdg-open through the
 // opener plugin, the child inherits that env, and any glib/dbus tools it
@@ -530,13 +497,16 @@ fn is_openable(app: &AppHandle, path: &Path) -> bool {
 // the host system. Strip those vars (plus the archived originals AppRun
 // stashes) so xdg-open sees a pristine environment.
 #[tauri::command]
-fn open_path_native(app: AppHandle, path: String) -> Result<(), String> {
+fn open_path_native(path: String) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
-        let target = PathBuf::from(&path);
-        if !is_openable(&app, &target) {
-            return Err(format!("outside the openable scope: {path}"));
+        // xdg-open has no `--` end-of-options marker — it is a shell script that would
+        // try to open a file literally named `--` — so a leading dash is rejected
+        // outright rather than escaped.
+        if path.starts_with('-') {
+            return Err(format!("refusing a path that reads as an option: {path}"));
         }
+        let target = PathBuf::from(&path);
         let mut cmd = std::process::Command::new("xdg-open");
         cmd.arg(&target);
         for key in [
@@ -568,7 +538,7 @@ fn open_path_native(app: AppHandle, path: String) -> Result<(), String> {
     }
     #[cfg(not(target_os = "linux"))]
     {
-        let _ = (app, path);
+        let _ = path;
         Err("open_path_native is Linux-only".to_string())
     }
 }

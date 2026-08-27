@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
 import { pdfResponseError, isBrowserNotFound, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript } from 'calcpad-frontend';
-import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides } from 'calcpad-frontend';
+import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
 import { CalcpadVueUIProvider } from './calcpadVueUIProvider';
@@ -328,19 +328,20 @@ function showPreviewLoading(panel: vscode.WebviewPanel): () => void {
 /**
  * The PDF options for an export: the stored host defaults, overridden per key by
  * the document's own `pdf` metadata comment. `documentContent` is optional so
- * callers with no document in hand still get the host defaults.
+ * callers with no document in hand still get the host defaults. The header title
+ * falls back to `sourceFileUri`'s base name — the document being exported, not
+ * whichever editor happens to be focused — matching the desktop app.
  */
-function getPdfSettings(documentContent?: string): FrontendPdfSettings {
+function getPdfSettings(documentContent?: string, sourceFileUri?: vscode.Uri): FrontendPdfSettings {
     const settingsManager = CalcpadSettingsManager.getInstance();
     const stored = settingsManager.getExtraObject('pdfSettings', {} as Partial<FrontendPdfSettings>);
     const fromDocument = documentContent
         ? pdfSettingsFromDocument(documentContent.split('\n'))
         : {};
-    const activeEditor = vscode.window.activeTextEditor;
-
-    const fileName = activeEditor
-        ? path.basename(activeEditor.document.fileName, path.extname(activeEditor.document.fileName))
-        : 'CalcpadCE Document';
+    const source = sourceFileUri ?? vscode.window.activeTextEditor?.document.uri;
+    const fileName = source
+        ? path.basename(source.fsPath, path.extname(source.fsPath))
+        : '';
 
     return resolveEffectivePdfSettings(stored, fromDocument, fileName);
 }
@@ -1089,15 +1090,17 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
 /**
  * Render a document for export. `variant` decides what the file contains — see
  * `variantRender` in calcpad-frontend, which the desktop and web exports share, so all
- * three front ends agree on what "report" or "preview" means. Line anchors are always
- * off: an exported file is read, not navigated.
+ * three front ends agree on what "report" or "preview" means.
+ *
+ * Line anchors are off for an exported file, which is read rather than navigated, but on for
+ * a write run: they are what makes the parser record the errors that run reports back.
  */
 async function renderForExport(
     documentContent: string,
     sourceFileUri: vscode.Uri,
     variant: ExportVariant,
     forceWrite = false,
-): Promise<string> {
+): Promise<{ html: string; errors: CalcpadError[] }> {
     const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
     const apiBaseUrl = settingsManager.getServerUrl();
     if (!apiBaseUrl) throw new Error('Server URL not configured');
@@ -1122,7 +1125,7 @@ async function renderForExport(
             forPrint: render.forPrint,
             enableUi: render.enableUi,
             uiOverrides: render.useOverrides ? uiOverridesFor(sourceFileUri.toString(), documentContent) : undefined,
-            includeLineAnchors: false,
+            includeLineAnchors: forceWrite,
             write: forceWrite || settingsManager.mayWrite(render.forPrint, render.enableUi),
         }),
         signal: combineSignals(AbortSignal.timeout(30000), signal),
@@ -1133,7 +1136,7 @@ async function renderForExport(
     if (!response || !response.ok) {
         throw new Error(`Server returned ${response?.status ?? 'no response'}`);
     }
-    return await response.text();
+    return { html: await response.text(), errors: parseConvertErrorHeader(response) };
 }
 
 /**
@@ -1158,7 +1161,7 @@ async function generatePdfToFile(
     const sourceDir = path.dirname(sourceFileUri.fsPath);
 
     // Step 1: Convert calcpad content to HTML
-    let html = await renderForExport(documentContent, sourceFileUri, variant);
+    let { html } = await renderForExport(documentContent, sourceFileUri, variant);
 
     // Inline local images as base64 data URIs so the headless browser can
     // render them (it has no access to the local filesystem).
@@ -1172,7 +1175,7 @@ async function generatePdfToFile(
         headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
         body: JSON.stringify({
             html: html,
-            options: getPdfSettings(documentContent)
+            options: getPdfSettings(documentContent, sourceFileUri)
         }),
         signal: AbortSignal.timeout(60000)
     });
@@ -1322,15 +1325,25 @@ async function writeDataFiles() {
         return;
     }
     try {
-        await vscode.window.withProgress({
+        const { errors } = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: 'Writing #write/#append files…',
             cancellable: false,
         }, () => renderForExport(source.text, source.uri, 'report', true));
-        vscode.window.showInformationMessage('Ran the document; #write and #append are up to date.');
+        const ok = errors.length === 0;
+        const message = ok
+            ? 'Ran the document; #write and #append are up to date.'
+            : `Ran with ${errors.length} error${errors.length === 1 ? '' : 's'} — some output may be missing.`;
+        vueUiProvider?.writeFilesResult(ok, message);
+        vueUiProvider?.updateConvertErrors(errors);
+        if (ok)
+            vscode.window.showInformationMessage(message);
+        else
+            vscode.window.showWarningMessage(message);
     } catch (error) {
         const msg = error instanceof Error ? error.message : 'Unknown error';
         outputChannel.appendLine(`ERROR in writeDataFiles: ${msg}`);
+        vueUiProvider?.writeFilesResult(false, `Failed to write the document's output: ${msg}`);
         vscode.window.showErrorMessage(`Failed to write the document's output: ${msg}`);
     }
 }
@@ -1358,7 +1371,7 @@ async function saveSourceHtml(variant: ExportVariant = 'report') {
             title: 'Generating HTML…',
             cancellable: false,
         }, async () => {
-            const html = await renderForExport(source.text, source.uri, variant);
+            const { html } = await renderForExport(source.text, source.uri, variant);
             await vscode.workspace.fs.writeFile(saveUri, new TextEncoder().encode(html));
         });
 
@@ -2142,7 +2155,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
         if (!editor) return null;
         try {
-            const html = await renderForExport(editor.document.getText(), editor.document.uri, 'input');
+            const { html } = await renderForExport(editor.document.getText(), editor.document.uri, 'input');
             const controls = extractUiControls(html);
             uiControls.set(editor.document.uri.toString(), controls);
             return controls;

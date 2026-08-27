@@ -86,6 +86,27 @@ public class WriteDirectiveTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
+    public void AMissingFolder_ErrorsEitherWay(bool allowWrite)
+    {
+        using var temp = new WriteDir();
+        var html = temp.Run(allowWrite, "M = [1; 2]", "#write M to no_such_folder/out.csv");
+
+        Assert.Contains("class=\"err\"", html);
+        Assert.DoesNotContain("written to", html);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void AnUnsupportedExcelFormat_ErrorsEitherWay(bool allowWrite)
+    {
+        using var temp = new WriteDir();
+        Assert.Contains("class=\"err\"", temp.Run(allowWrite, "M = [1; 2]", "#write M to out.xls@Sheet1"));
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public void AFalseCondition_SkipsTheDirectiveEitherWay(bool allowWrite)
     {
         using var temp = new WriteDir();

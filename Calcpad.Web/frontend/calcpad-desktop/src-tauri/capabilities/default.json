@@ -19,11 +19,8 @@
     "core:app:default",
     {
       "identifier": "opener:allow-open-path",
-      "allow": [
-        { "path": "$APPDATA/**" },
-        { "path": "$APPCONFIG/**" },
-        { "path": "$APPLOG/**" }
-      ]
+      "allow": [{ "path": "**" }],
+      "deny": [{ "path": "$RESOURCE/**" }]
     },
     "opener:allow-reveal-item-in-dir",
     {

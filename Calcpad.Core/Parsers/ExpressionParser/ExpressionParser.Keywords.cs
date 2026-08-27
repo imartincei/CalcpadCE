@@ -696,8 +696,7 @@ namespace Calcpad.Core
         }
         private void ParseKeywordPathRoot(ReadOnlySpan<char> s)
         {
-            // MacroParser already declared and validated this line against the folder of the file
-            // that wrote it — which this flattened text no longer identifies — so its answer wins.
+            // MacroParser already declared and validated this line against the folder of the file that wrote it.
             if (_hasInheritedPathRoots)
                 return;
 
@@ -931,11 +930,8 @@ namespace Calcpad.Core
                     if (options.Name.IsEmpty)
                         return;
 
-                    // Built and evaluated whether or not the write runs, so a bad range or an
-                    // undefined variable errors the same in every mode.
                     var m = _parser.GetMatrix(options.Name.ToString(), options.Type);
-                    if (AllowDataWrite)
-                        DataExchange.Write(options, m);
+                    DataExchange.Write(options, m, AllowDataWrite);
 
                     if (_isVisible)
                         ReportDataExchageResult(options, keyword == Keyword.Write ? "written to" : "appended to",

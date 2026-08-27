@@ -184,26 +184,31 @@ namespace Calcpad.Core
                 return ExcelData.Read(options.FullPath, sheet, start, end);
             }
 
-            internal static void Write(ReadWriteOptions options, string[][] data)
+            /// <summary>
+            /// The target is checked whether or not <paramref name="allowWrite"/> lets the write run,
+            /// so a deferred one reports what a real one would refuse.
+            /// </summary>
+            internal static void Write(ReadWriteOptions options, string[][] data, bool allowWrite)
             {
-                var fileName = $"{options.Path}.{options.Ext}";
-                if (fileName == ".")
+                if ($"{options.Path}.{options.Ext}" == ".")
                     throw Exceptions.MissingFileName();
 
-                var fullPath = options.FullPath;
-                var dir = Path.GetDirectoryName(fullPath);
+                var dir = Path.GetDirectoryName(options.FullPath);
                 if (!Directory.Exists(dir))
                     throw Exceptions.PathNotFound(dir);
+
+                if (options.IsExcel &&
+                    !options.Ext.Equals("xlsx", StringComparison.OrdinalIgnoreCase) &&
+                    !options.Ext.Equals("xlsm", StringComparison.OrdinalIgnoreCase))
+                    throw Exceptions.FileFormatNotSupported(options.Ext.ToString());
+
+                if (!allowWrite)
+                    return;
 
                 try
                 {
                     if (options.IsExcel)
-                    {
-                        if (!options.Ext.Equals("xlsx", StringComparison.OrdinalIgnoreCase) && !options.Ext.Equals("xlsm", StringComparison.OrdinalIgnoreCase))
-                            throw Exceptions.FileFormatNotSupported(options.Ext.ToString());
-
                         WriteExcel(options, data);
-                    }
                     else
                         WriteCSV(options, data);
                 }
