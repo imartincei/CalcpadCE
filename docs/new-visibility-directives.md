@@ -1,30 +1,21 @@
 # Visibility & Output-Mode Directives
 
-Print visibility used to be a separate, web-only mechanism: wrapping content in `'<!--{"NoPrintStart": true}-->` / `'<!--{"NoPrintEnd": true}-->` HTML comments, stripped from the source before conversion when exporting to PDF.
-That mechanism is gone.
-Visibility is now handled entirely by Core's directive system (`#hide`/`#show`/`#pre`/`#post`), which also gained an optional condition argument and matching `#end` forms.
+## `#pre` / `#post`
 
-## `#pre` / `#post` now mean print, not calculation phase
+`#pre` and `#post` used to be tied to the WPF calculate/don't-calculate phases.
+In Calcpad.Web, changes to the input form calculates the document, so these directives were re-purposed for a similar usage.
 
-`#pre` and `#post` used to be tied to the WPF `#input`/`#pause` calculate/don't-calculate phases.
-In Calcpad.Web every parse always calculates, so that distinction was dead weight.
-They're rebound to print output instead:
-
-- `#pre` — show on screen, hide when printing/exporting to PDF.
-- `#post` — show everywhere for now (preview and PDF alike). It's kept distinct from `#show`
-  because a later `#UI` mode is planned to hide `#post` content in that mode while still printing
-  it — not yet wired up, so today it behaves like `#show`.
+- `#pre` — shows on the input form, hides when printing/exporting to the report PDF.
+- `#post` — shows in the report, but not the input form.
 
 ```text
 #pre
-'These lines are visible in the preview but excluded from the PDF.
+'These lines are visible in the input form but excluded from the report PDF.
 debug_x = 5
 debug_y = debug_x + 1
 #end pre
 'This always prints.
 ```
-
-The web backend sets this via the request's existing `forPrint` flag, which now maps directly to `ExpressionParser.ForPrint` instead of stripping `NoPrintStart`/`NoPrintEnd` regions beforehand.
 
 ## Optional condition argument
 
@@ -35,22 +26,18 @@ The web backend sets this via the request's existing `forPrint` flag, which now 
 'Hidden only when x equals 5.
 ```
 
-- No condition → the directive always applies (same as before).
-- A condition that's true → the directive applies.
-- A condition that's false → the directive is a no-op; the *current* state is left as-is.
+- No condition → the directive always applies.
 - A bad expression records an error and leaves state unchanged.
-- A `#hide`/`#show`/etc. inside a false `#if` branch no longer takes effect (previously it did,
-  regardless of the branch).
 
 ## `#end` forms restore prior state
 
-Every directive in these three groups can be closed with `#end <directive>`, which pops back to whatever state was in effect before the matching opener (or the default state if there was none) — rather than setting a fixed value the way the bare directive does:
+Every directive in these three groups can be closed with `#end <directive>`, which pops back to whatever state was in effect before the matching opener (or the default state if there was none):
 
 - Visibility: `#end hide`, `#end show`, `#end pre`, `#end post`
 - Output mode: `#end val`, `#end equ`, `#end noc`
 - Substitution: `#end varsub`, `#end nosub`, `#end novar`
 
-This lets a macro change state temporarily without leaking it to the caller:
+This lets a macro change a state temporarily without leaking it to the caller:
 
 ```text
 #pre
@@ -58,9 +45,7 @@ This lets a macro change state temporarily without leaking it to the caller:
 #hide
 'Hidden.
 #end hide
-'Back to "on screen only" (#pre's state), not the document default.
+'Back to #pre state.
 #end pre
-'Back to the default (shown everywhere).
+'Back to the default #show state.
 ```
-
-`#end hide` (etc.) with nothing open falls back to the default state — visible, equations, and both variable names and substituted values.

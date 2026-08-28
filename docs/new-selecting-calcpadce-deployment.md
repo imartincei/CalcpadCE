@@ -2,6 +2,12 @@
 
 ## CalcpadCE Desktop App
 
+### Overview
+
+Can be executed and installed like any other desktop application (will be able to be installed on Windows soon). 
+It runs locally by bundling the web application in an OS-native webview using Tauri.
+It runs the CalcpadCE engine as a local server.
+
 ### Pros
 
 - Streamlined for CalcpadCE functionality
@@ -19,6 +25,11 @@
 - Only one app instance can be active at once.
 
 ## CalcpadCE for VS Code
+
+### Overview
+
+Runs CalcpadCE inside VS Code via its extension framework.
+It runs locally by bundling the web application in VS Code webview panes and runs the CalcpadCE engine as a local server.
 
 ### Pros
 - Great for developers who are already familiar with VS Code
