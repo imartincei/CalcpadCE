@@ -4,6 +4,8 @@
 
 A monorepo containing all frontend projects for CalcPad: a VS Code extension, a standalone web editor, a desktop application, and a shared library that powers them all.
 
+This file covers building and packaging. What the editors *do* is documented for users in [docs/](../../docs/) — the [editor](../../docs/new-calcpadce-editor.md), the [VS Code extension](../../docs/new-vscode-extension.md), the [desktop app](../../docs/new-desktop-app.md), and [running the server](../../docs/new-web-deployment.md). The REST API is documented in [../backend/API_SCHEMA.md](../backend/API_SCHEMA.md).
+
 ## Projects
 
 | Directory | Description |
@@ -13,53 +15,36 @@ A monorepo containing all frontend projects for CalcPad: a VS Code extension, a 
 | [calcpad-web/](calcpad-web/) | Standalone web editor built with Monaco Editor + Vue |
 | [calcpad-desktop/](calcpad-desktop/) | Desktop application via Tauri wrapping the web editor |
 
-All projects depend on **Calcpad.Server** (the .NET backend at `../backend/`) for computation, linting, and rendering via REST API.
+All projects depend on **Calcpad.Server** (the .NET backend at [../backend/](../backend/)) for computation, linting, and rendering via REST API. The extension and the desktop app spawn and manage their own copy; the standalone web editor needs one running already — see [../backend/README.md](../backend/README.md).
 
 ---
 
 ## Quick Start
 
-### 1. Install Calcpad.Server
+The shared library builds first; everything else consumes it as a local dependency.
 
-**Calcpad.Server is required** for all frontend projects. Download the latest release from:
-
-[https://github.com/imartincei/CalcpadCE/releases](https://github.com/imartincei/CalcpadCE/releases)
-
-Or build from source:
 ```bash
-cd ../backend
-dotnet publish -c Release
+cd calcpad-frontend && npm install && npm run build
 ```
 
-### 2. Start the Server
-
-Run the Calcpad.Server executable. The default port is **9420** (configurable via the `CALCPAD_PORT` environment variable).
-
-### 3. Choose a Frontend
-
-**VS Code Extension:**
+**VS Code Extension** — builds the extension host and the Vue webview, then install the generated `.vsix`:
 ```bash
-cd vscode-calcpad
-npm install
-npm run package    # Build extension + Vue webview
+cd vscode-calcpad && npm install && npm run package
 ```
-Then install the generated `.vsix` file in VS Code.
 
 **Web Editor:**
 ```bash
-cd calcpad-web
-npm install
-npm run dev        # Start dev server
+cd calcpad-web && npm install && npm run dev
 ```
+
+The editor takes its server URL from a `?server=` query parameter, else `VITE_SERVER_URL`, else the page's own origin.
 
 **Desktop App:**
 ```bash
-cd calcpad-desktop
-npm install
-npm run dev        # Start Tauri dev mode (hot-reloads the Vue frontend, rebuilds the Rust shell on change)
+cd calcpad-desktop && npm install && npm run dev
 ```
 
-> **Note:** Running `tauri dev` requires the Calcpad.Server sidecar to be staged into `src-tauri/binaries/`. Use the `Desktop: Stage Sidecar` VS Code task, or run `stage-sidecar.sh` / `stage-sidecar.ps1` before the first dev launch.
+> **Note:** `tauri dev` requires the Calcpad.Server sidecar staged into `src-tauri/binaries/`. Use the `Desktop: Stage Sidecar` VS Code task, or run `stage-sidecar.sh` / `stage-sidecar.ps1` before the first dev launch.
 
 ---
 
@@ -91,105 +76,7 @@ calcpad-desktop/           Tauri desktop wrapper
     └── packaging/arch/    PKGBUILD that packages the build-desktop.sh output for pacman
 ```
 
-All frontends import `calcpad-frontend` as a local dependency and communicate with Calcpad.Server via the REST API documented in [API_SCHEMA.md](API_SCHEMA.md).
-
----
-
-## Features
-
-### Editor
-
-- **Live HTML Preview** with automatic updates as you type
-- **Syntax Highlighting** with 18 token types (variables, functions, macros, units, keywords, etc.)
-- **Comprehensive Linting** with 40+ error codes covering:
-  - Parentheses, bracket, and brace balancing
-  - Control block matching (`#if`/`#end`, `#for`/`#loop`)
-  - Variable and function naming validation
-  - Unit checking and operator syntax
-  - Keyword argument validation
-- **Go to Definition** (Ctrl+Click / F12) for variables, functions, macros, and custom units
-- **Find All References** (Shift+Alt+F12) across the entire file and includes
-- **Rename Symbol** (F2) with project-wide renaming
-- **Autocomplete** with context-aware snippets and parameter documentation
-- **File Path Completion** for `#include` and `#read` directives
-- **PDF Export** with configurable headers, footers, margins, and background templates
-
-### Language
-
-- **Inline Macros** (`#def`) with parameter substitution
-- **Recursive Includes** with cycle detection
-- **Table of Contents** generated from heading comments
-
-### Editing Aids
-
-- **Operator Replacement** — automatic symbol substitution (e.g., `<=` to `≤`, `sqrt` to `√`)
-- **Quick Typing** — type `~` + shortcut + space for Greek letters and symbols (e.g., `~a` -> `α`, `~theta` -> `θ`)
-- **Auto-Indentation** for control blocks
-- **Comment Formatting** — bold, italic, and other formatting in comment blocks
-
----
-
-## VS Code Extension Details
-
-### Installation
-
-Download the `.vsix` file from the [releases page](https://github.com/imartincei/CalcpadCE/releases) and install in VS Code:
-1. Go to Extensions view (Ctrl+Shift+X)
-2. Click the "..." menu -> "Install from VSIX..."
-3. Choose the downloaded `.vsix` file
-
-### Configuration
-
-Set the Calcpad.Server URL in VS Code settings:
-```json
-{
-  "calcpad.server.url": "http://localhost:9420"
-}
-```
-
-### Usage
-
-1. Ensure Calcpad.Server is running
-2. Open a `.cpd` file
-3. Click the preview button in the editor toolbar or use `Ctrl+Shift+P` -> "CalcPad Preview"
-4. Preview updates automatically as you type
-5. Linting errors appear as you work
-
----
-
-## Web Editor Details
-
-The web editor provides the same features as the VS Code extension in a standalone browser environment using Monaco Editor.
-
-### Configuration
-
-Set the server URL via the `VITE_SERVER_URL` environment variable or through the Settings tab in the sidebar.
-
----
-
-## Desktop App Details
-
-The desktop application wraps the web editor using [Tauri](https://tauri.app/), providing native window management, a native menu bar, and an embedded Calcpad.Server sidecar. Supports macOS, Windows, and Linux.
-
-Calcpad.Server is published as a framework-independent apphost renamed to Tauri's target-triple sidecar format (`calcpad-server-<target-triple>[.exe]`) and staged into `src-tauri/binaries/` before `tauri dev` / `tauri build` runs. `tauri.conf.json`'s `bundle.externalBin` picks it up and includes it in the packaged installer. See [`build-desktop.sh`](calcpad-desktop/build-desktop.sh) / [`build-desktop.ps1`](calcpad-desktop/build-desktop.ps1) and the `stage-sidecar` scripts.
-
----
-
-## API Reference
-
-The backend REST API is documented in [API_SCHEMA.md](API_SCHEMA.md). Key endpoints:
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/calcpad/convert` | POST | Convert to HTML |
-| `/api/calcpad/lint` | POST | Lint and return diagnostics |
-| `/api/calcpad/definitions` | POST | Extract symbols (variables, functions, macros, units) |
-| `/api/calcpad/find-references` | POST | Find all symbol occurrences |
-| `/api/calcpad/highlight` | POST | Syntax tokenization |
-| `/api/calcpad/snippets` | GET | Autocomplete snippets by category |
-| `/api/calcpad/pdf` | POST | Generate PDF from HTML |
-| `/api/calcpad/docx` | POST | Generate DOCX from source |
-| `/api/calcpad/prettify` | POST | Pretty-print Calcpad source |
+`tauri.conf.json`'s `bundle.externalBin` picks the staged sidecar up and includes it in the packaged installer.
 
 ---
 
@@ -330,7 +217,7 @@ end users install, you need a CA-issued (EV) cert or [Azure Trusted Signing](htt
 
 ## Requirements
 
-- **Calcpad.Server** running at configured URL (required)
+- **Calcpad.Server** (bundled with the extension and the desktop app; run separately for the web editor)
 - VS Code 1.82.0+ (for the extension)
 - Modern browser (for the web editor)
 

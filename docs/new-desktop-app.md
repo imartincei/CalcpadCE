@@ -13,7 +13,7 @@ The app ships as a per-platform download:
 | Platform | Format |
 |----------|--------|
 | Windows | Portable `.zip` build (no install for beta) |
-| Linux | AppImage (run directly, no install for beta) |
+| Linux | AppImage (run directly) |
 | Linux | Debian `.deb` |
 | Linux | Fedora `.rpm` |
 | Linux | Arch (compressed package with PKGBUILD) |
@@ -60,23 +60,21 @@ How tabs behave:
 - **Opening an already-open file** activates its existing tab instead of duplicating it.
 - **Opening a file from an empty Untitled tab** replaces it in place rather than stacking a new tab.
 - **Closing a tab with unsaved changes** prompts Save / Don't Save / Cancel. Quitting the app walks through every unsaved tab; cancel any prompt to abort the quit.
-- Hover, definitions, references, the linter, the preview, and the TOC are all scoped to the active tab, so symbols and errors never bleed between unrelated documents.
 
 ## Opening files
 
 There are several ways to open documents:
 
 - **File → Open…** — native file picker.
-- **Drag and drop** — drop one or more files onto the editor; each opens in its own tab. Dropping plain text (e.g. from a browser) opens it as a new untitled tab.
 - **Files tab** in the sidebar — open a folder and browse its tree.
 - **Recent files** — tracked automatically and available from the File menu.
 
-Compiled **`.cpdz`** worksheets open the same way and are registered as their own file type — double-clicking one opens the app straight to its `#UI` input form, source locked.
+Compiled **`.cpdz`** worksheets open the same way and are registered as their own file type.
 See [UI Mode](new-ui-mode.md#compiled-cpdz-worksheets).
 
 ## The editor
 
-The editor is the same across every CalcpadCE front end — see **[The CalcpadCE Editor](new-calcpadce-editor.md)** for syntax highlighting, autocomplete, quick-type symbols, operator replacement, formatting hotkeys, symbol navigation, and path completion for `#include`/`#read` paths.
+The editor is the same across every CalcpadCE frontend — see **[The CalcpadCE Editor](new-calcpadce-editor.md)**.
 
 Desktop specifics:
 
@@ -86,9 +84,9 @@ Desktop specifics:
 ## The CalcpadCE sidebar
 
 Toggle the sidebar with **View → Toggle Sidebar**.
-It has a **Files** view and a **CalcpadCE** view; the CalcpadCE view is split into tabs (Insert, TOC, Settings, Variables, Formatting, Export, Errors, Properties).
+It has a **Files** view and a **CalcpadCE** view.
 
-The sidebar is the same across every CalcpadCE front end — see **[The CalcpadCE Panel & Settings](new-calcpad-panel.md)** for a full walkthrough of each tab, including Prettify options and the Export buttons.
+The sidebar is the same across every CalcpadCE frontend — see **[The CalcpadCE Panel & Settings](new-calcpad-panel.md)** for a full walkthrough of each tab.
 
 ## Live results
 
@@ -97,27 +95,28 @@ Its toolbar (and **View → Result Mode**) offers four modes — **Preview**, **
 See [Exports → Export variants](new-exports.md#export-variants) for a breakdown of each one.
 
 **View → Toggle Preview** shows and hides the pane.
-Drag the border between the editor and the results pane to resize either side — and, in **Input** mode, the border between the form and the **Report** panes.
-See **[UI Mode](new-ui-mode.md)** for more information on `#pre`/`#post` and the input form.
+Drag the border between the editor and the results pane to resize either side.
+
+Right-click a preview → **View Webview Source HTML** to inspect the rendered HTML.
 
 ### Running on demand (Auto-Run off)
 
 By default the preview re-renders continuously as you type.
-If you turn **Settings → Auto-Run Preview** off — useful for long-running documents — the preview only re-renders when you:
+If you turn **Settings → Auto-Run Preview** off, the preview only re-renders when you:
 
 - Click **▶ Run** on the editor toolbar.
 - Press **Ctrl+Alt+X**.
 - Right-click in the editor → **Run Preview**.
 - Use **Server → Refresh** in the menu bar.
 
-A manual run also re-lints the document, refreshes definitions and the table of contents, and rebuilds the Export tab's plot list.
+A manual run also re-lints the document, writes data, refreshes definitions and the table of contents, and rebuilds the Export tab's plot list.
 
 ## Splitting the editor
 
 The **Split ⬓** button in the editor toolbar (also **View → Split Editor**) opens a second editor group stacked below the first.
 Each group has its own tabs, tab strip, preview, and Problems markers.
 Click **Unsplit** (same button) to close the bottom group; any unsaved tabs in it are walked through the save prompt first.
-The active group — the one you most recently clicked into — drives the sidebar (Problems, TOC, Variables).
+The active group drives the sidebar.
 
 ## Errors
 
@@ -130,13 +129,12 @@ See **[The CalcpadCE Editor → Linting](new-calcpadce-editor.md#linting)** and 
 
 ## Exporting
 
-Exporting is the same across every CalcpadCE front end — see **[Exports](new-exports.md)** for the four export variants, the formats each one offers, PDF page setup, plot images, `#write`/`#append` output, and the portable formats.
+Exporting is the same across every CalcpadCE frontend — see **[Exports](new-exports.md)**.
 
 Desktop specifics:
 
-- Every export is in **File → Export** and in the **Export** tab of the sidebar, which groups its buttons the same way. Each opens a native save dialog.
+- Every export is in **File → Export**.
 - **File → Save As Compiled Worksheet…** and **File → Export Portable Package…** produce the two handoff formats — see [Exports → Portable exports](new-exports.md#portable-exports).
-- PDF requires a Chromium browser — see [Exports → Browser requirement](new-exports.md#browser-requirement).
 
 ## The native menu
 
@@ -164,7 +162,9 @@ If calculations stop responding, use the **Server** menu:
 
 - **Refresh** (**Ctrl+Alt+X**) — re-run the active document.
 - **Show Server Log** — open the engine's log file to diagnose a problem.
-- **Stop Server** / **Restart Server** — cycle the engine.
+- **Stop Server** / **Restart Server** — cycle the calculation engine.
+
+If these do not work and the server shows "Disconnected" in the bottom-right corner, restarting the app typically fixes it. Because the calculation engine is separate from the editor, it is normally possible to save and modify files even if the calculation engine crashes.
 
 ## Troubleshooting
 

@@ -1,6 +1,6 @@
 # The CalcpadCE Editor
 
-> The editor described here is the same in the [VS Code extension](new-vscode-extension.md) and the [desktop app](new-desktop-app.md). Both frontends embed the same Monaco editor and the same language tooling.
+> The editor described here is the same in the [VS Code extension](new-vscode-extension.md) and the [desktop app](new-desktop-app.md). Both frontends embed the same Monaco editor and language tooling.
 > Where a host behaves differently, it is called out below.
 
 ## Syntax highlighting
@@ -10,14 +10,13 @@ Highlighting updates per line as you type, for both dark and light themes.
 
 A few editor defaults are set for `.cpd` files so the language behaves predictably:
 
-- The monospace font is **JuliaMono** (falls back to Cascadia Code / Consolas).
+- The default font is **JuliaMono**.
+  - **VS Code** — run **CalcpadCE: Install JuliaMono Font** from the Command Palette if you chose not to install when prompted.
+  - **Desktop app** — JuliaMono is bundled with the app.
 - **Enter always inserts a newline** — it never accepts a suggestion.
   Press **Tab** to accept a completion instead.
 - **Tab accepts suggestions** and triggers completion on a partial word.
-- Bracket matching is always on; bracket-pair colorization is off (CalcpadCE colors brackets itself).
 
-- **VS Code** — run **CalcpadCE: Install JuliaMono Font** from the Command Palette if the glyphs look wrong.
-- **Desktop app** — JuliaMono is bundled with the app.
 
 ## Autocomplete
 

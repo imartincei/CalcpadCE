@@ -279,13 +279,11 @@ export enum CalcpadTypeId {
     Value = 1,
     Vector = 2,
     Matrix = 3,
-    FutureReserved4 = 4,
-    Various = 5,
-    Function = 6,
-    InlineMacro = 7,
-    MultilineMacro = 8,
-    CustomUnit = 9,
-    FutureReserved10 = 10
+    CustomUnit = 4,
+    Function = 5,
+    InlineMacro = 6,
+    MultilineMacro = 7,
+    Various = 8
 }
 
 // ============================================

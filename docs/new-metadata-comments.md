@@ -30,7 +30,7 @@ Put this on the line above a variable, function, macro, or custom unit:
 | Field | What it's for |
 |-------|---------------|
 | **Description** | A sentence explaining what the definition is. |
-| **Parameter types** | The kind of value each input expects. Functions take `value`, `vector`, `matrix`, or `any`; macros use CalcpadCE's token names. |
+| **Parameter types** | The kind of value each input expects. Functions take `value`, `vector`, `matrix`, or `any`; macros use CalcpadCE's token names (this is work-in-progress). |
 | **Parameter descriptions** | A short note for each input, in order. |
 | **Return type** | What a function gives back: `value`, `vector`, `matrix`, or `any`. |
 
@@ -59,16 +59,10 @@ See [Exports → PDF export](new-exports.md#pdf-export) for additional informati
 ## Quieting the linter
 
 If the [linter](new-linter.md) flags something that isn't actually a problem, you can silence it for a stretch of the document.
-Wrap those lines between a `LintIgnore` and an `EndLintIgnore` marker, listing the warning codes to hide (or leave the list empty to hide/unhide everything):
-
-```text
-'<!--{"LintIgnore": ["CPD-3301"]}-->
-prototype_var = 5
-'<!--{"EndLintIgnore": []}-->
-```
+Wrap those lines between a `LintIgnore` and an `EndLintIgnore` marker, listing the warning codes to hide (or leave the list empty to hide/unhide everything).
 
 The **Properties** tab has a picker for the codes, so you don't have to memorize them.
-See [Suppressing diagnostics](new-linter.md#suppressing-diagnostics-lint-ignore) for the details.
+See [Suppressing diagnostics](new-linter.md#suppressing-diagnostics-lint-ignore) for additional details.
 
 ## See also
 

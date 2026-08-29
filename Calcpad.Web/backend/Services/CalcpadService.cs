@@ -6,12 +6,13 @@ namespace Calcpad.Server.Services
     public class CalcpadService
     {
         private readonly string _tempDirectory;
-        private readonly string _htmlTemplate;
+
+        // Scoped service, so this would otherwise re-read the ~200KB template on every request.
+        private static readonly string _htmlTemplate = LoadHtmlTemplate();
 
         public CalcpadService()
         {
             _tempDirectory = Path.GetTempPath();
-            _htmlTemplate = LoadHtmlTemplate();
         }
 
         /// <summary>
@@ -57,8 +58,6 @@ namespace Calcpad.Server.Services
                 throw new ArgumentException("Content cannot be null or empty", nameof(calcpadContent));
             }
 
-            // A request that was already superseded/aborted by the time its turn at the
-            // parser gate came up shouldn't spend it running a stale conversion.
             cancellationToken.ThrowIfCancellationRequested();
 
             try
@@ -465,7 +464,7 @@ tan_angle = tan(angle°)";
             return "!^/÷\\⦼*-+<>≤≥≡≠=∧∨⊕(){}[]|&@:;".Contains(c);
         }
 
-        private string LoadHtmlTemplate()
+        private static string LoadHtmlTemplate()
         {
             try
             {
@@ -500,7 +499,7 @@ tan_angle = tan(angle°)";
             }
         }
 
-        private string GetFallbackTemplate()
+        private static string GetFallbackTemplate()
         {
             return @"<!DOCTYPE html>
 <html>

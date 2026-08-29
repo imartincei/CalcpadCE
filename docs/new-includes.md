@@ -21,7 +21,7 @@ Both bring in outside content, but they do different jobs:
 
 | | `#include` | `#read` |
 |--------|-----------|---------|
-| What it brings in | CalcpadCE source code | Data (CSV, TSV, Excel, JSON) |
+| What it brings in | CalcpadCE source code | Data (CSV, Excel) |
 | When it happens | At parse time — the source is inlined | At run time — the data is loaded into a variable |
 | Result | The included code becomes part of your document | You get a matrix or vector variable to compute with |
 
@@ -39,9 +39,9 @@ Both bring in outside content, but they do different jobs:
 ```
 
 - `#ProjectPath ...` — the job- or document-specific folder, useful for referencing files that may change from project to project.
-- `#LibraryPath ...` — a shared folder of reusable `.cpd`/`.txt` files, e.g. a firm-wide function or materials library. If you want a project specific library to prevent edits from breaking older files, this is easy to change in a single place.
+- `#LibraryPath ...` — a shared folder of reusable `.cpd`/`.txt` files, e.g. a firm-wide function or materials library. If you want a project specific library to prevent edits to a central library from breaking older files, this is easy to change in a single place.
 
-Both directives render nothing, the same as `#include`. A relative value resolves against the folder of the file that declares it — so a module reached through `#include` that declares `#ProjectPath .` means *its own* folder, not the including document's.
+A relative value resolves against the folder of the file that declares it — so a module reached through `#include` that declares `#ProjectPath .` means *its own* folder, not the including document's.
 
 **Environment variables expand in every path, not just these two directives.** `%VAR%` is expanded — on every platform, including macOS/Linux — in `#include`, `#read`/`#write`/`#append`, `<img src="...">`, and a `#ProjectPath`/`#LibraryPath` value itself, whether or not a path-root token is involved:
 
@@ -52,24 +52,15 @@ Both directives render nothing, the same as `#include`. A relative value resolve
 
 **Rules:**
 
-- **One `#ProjectPath` and one `#LibraryPath` per document.** A second declaration of the same root is an error.
+- **One `#ProjectPath` and one `#LibraryPath` per document.** A second declaration of the same root is an error. Make sure to define these in a `#local` scope for .cpd files you intend to `#include` elsewhere.
 - **Declare before first use.** An `#include` whose token is used above its declaration results in an error
 - **The folder has to actually exist.** A value that doesn't resolve to a real folder on disk is an error at the declaration
 
-**Reusable modules should use `#local`.** A file meant to be use elsewhere should wrap its own `#ProjectPath`/`#LibraryPath` in `#local`/`#global`:
-
-```text
-#local
-#LibraryPath ./data
-#global
-#read Fy from {library}/grades.csv
-```
-
 ## `#UI` overrides and includes
 
-A saved `uiOverrides` comment only takes effect on the **first line of the file that carries it**, and only the first such comment counts — a second one anywhere in the same file is ignored.
+A saved `uiOverrides` comment only takes effect on the **first line of the file that carries it** — a second one anywhere in the same file is ignored.
 
-- **A `uiOverrides` comment inside an included file never reaches the document that includes it.** The calculation engine treats any `uiOverrides` comment in an included file's content as if it sat inside that file's own `#local`/`#global` block: it is stripped out before the included text is spliced in.
+- **A `uiOverrides` comment inside an included file never reaches the document that includes it.** The calculation engine treats any `uiOverrides` comment in an included file's content as if it sat inside that file's own `#local` block: it is stripped out.
 - **Only the includer's own `uiOverrides` comment can override it instead**, by targeting the rendered element after the preview is generated.
 
 This is deliberate behavior, as resolving an included module's own saved values automatically would prevent overriding it in the main calculation file.
@@ -87,12 +78,13 @@ This is deliberate behavior, as resolving an included module's own saved values 
 #read M from {project}/shared-inputs.csv
 ```
 
-`#write` sits inside `#local` so it only runs when `shared/inputs.cpd` is opened by itself, so including this file elsewhere never re-triggers the write.
+As `#write` sits inside `#local`, it only runs when `shared/inputs.cpd` is opened by itself, so including this file elsewhere never re-triggers the write or input form.
 
 **calculation.cpd:**
 
 ```text
-'This reads shared data that in input from a module without triggering the UI datagrid.
+'This reads shared data that in input from a module without triggering the datagrid UI.
+#ProjectPath C:/path-to-my-project
 #include module.cpd
 ```
 

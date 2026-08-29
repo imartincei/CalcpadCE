@@ -34,7 +34,8 @@ dotnet build Calcpad.Server.csproj -c Debug -v q
 
 if [ $? -eq 0 ]; then
     echo "Starting server on port $PORT..."
-    ASPNETCORE_ENVIRONMENT=Development dotnet run --project Calcpad.Server.csproj --no-build --no-launch-profile &
+    # Without CALCPAD_PORT the server takes a random free port, which the kill above can't find next time.
+    CALCPAD_PORT=$PORT ASPNETCORE_ENVIRONMENT=Development dotnet run --project Calcpad.Server.csproj --no-build --no-launch-profile &
     sleep 2
     echo "Server started. PID: $!"
 else

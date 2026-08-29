@@ -333,8 +333,8 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     break;
 
                 case 'refreshDocument':
-                    this._outputChannel.appendLine('[Vue UI] Refresh document requested');
-                    vscode.commands.executeCommand('calcpad.refreshDocument');
+                    this._outputChannel.appendLine('[Vue UI] Run preview requested');
+                    vscode.commands.executeCommand('calcpad.runPreview');
                     break;
 
                 case 'prettifyDocument':

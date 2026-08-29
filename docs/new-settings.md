@@ -54,7 +54,7 @@ Your default page setup for [PDF export](new-exports.md#pdf-export).
 
 **Reset PDF Settings** restores just this section, leaving everything else alone.
 
-Any document can override these for itself with a `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings), merged key by key over what you set here — so a report that must print A4 landscape carries that with it, and still follows your defaults for everything it doesn't mention.
+Any document can override these for itself with a `pdf` [metadata comment](new-metadata-comments.md#pdf-export-settings), so a report that must print A4 landscape carries that with it, and still follows your defaults for everything it doesn't mention.
 
 ## Server
 
@@ -84,7 +84,7 @@ Pick the Monaco editor's font family from:
 - **Enable Formatting Hotkeys** — the Ctrl+B / Ctrl+I / Ctrl+1–6 … bindings.
 - **Sync Preview to Cursor Line** — scroll the preview to follow the line the cursor is on.
 - **Auto-Run Preview** *(default on)* — when off, the preview only re-renders when the preview panel is first opened or a manual **Run Preview** is triggered (**Ctrl+Alt+X**, the ▶ Run button, the editor context menu, or the Server → Refresh menu in the desktop app). Turn this off for large documents where every keystroke re-render is too costly.
-- **Open `#UI` Documents in Input Mode** *(default on)* — a document declaring `#UI` controls opens as its input form the first time you open it. The mode you switch to afterwards sticks; a later tab switch never brings the form back. See [UI Mode](new-ui-mode.md).
+- **Open `#UI` Documents in Input Mode** *(default on)* — a document declaring `#UI` controls opens as its input form the first time you open it. See [UI Mode](new-ui-mode.md).
 - **Apply `#UI` Values in Preview** *(default off)* — Preview normally renders the document's own default values; turn this on and it renders the values entered into the input form instead, while still showing `#pre` and `#post` together. Useful for tracking down errors that only appear once a form is filled in. This also affects exporting and #write/#append.
 
 ## Data output
@@ -95,7 +95,7 @@ Pick the Monaco editor's font family from:
 | --- | --- |
 | Report Only *(default)* | On a report render only: the preview pane on **Report**, and a report export. The **Preview** view does not write (default setting because #write would otherwise use default input values in some cases).|
 | Preview and Report | On a **Preview** or **Report** render — so the files are rewritten as you type in with either view active. Best if you don't use input forms or have **Apply `#UI` Values in Preview** on.|
-| Manual | On no render at all. Only when you press **Write to Disk**. |
+| Manual | Does not write on result rendering. Only writes when you press **Write to Disk**. |
 
 ## Linter
 

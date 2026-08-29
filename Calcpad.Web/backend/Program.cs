@@ -208,18 +208,24 @@ try
 
     // Handle SIGINT (Ctrl+C) and SIGTERM (graceful kill from parent) on all platforms.
     // Replaces Console.CancelKeyPress, which only covers SIGINT.
-    using var sigIntReg = PosixSignalRegistration.Create(PosixSignal.SIGINT, ctx =>
+    // An exception escaping one of these runs on the runtime's signal thread, where it
+    // kills the process with no managed handler and no log — so nothing may propagate.
+    void RequestShutdown(PosixSignalContext ctx, string signal)
     {
-        FileLogger.LogInfo("Received SIGINT, shutting down");
-        ctx.Cancel = true;
-        cts.Cancel();
-    });
-    using var sigTermReg = PosixSignalRegistration.Create(PosixSignal.SIGTERM, ctx =>
-    {
-        FileLogger.LogInfo("Received SIGTERM, shutting down");
-        ctx.Cancel = true;
-        cts.Cancel();
-    });
+        try
+        {
+            FileLogger.LogInfo($"Received {signal}, shutting down");
+            ctx.Cancel = true;
+            cts.Cancel();
+        }
+        catch (Exception ex)
+        {
+            FileLogger.LogError($"{signal} handler failed", ex);
+        }
+    }
+
+    using var sigIntReg = PosixSignalRegistration.Create(PosixSignal.SIGINT, ctx => RequestShutdown(ctx, "SIGINT"));
+    using var sigTermReg = PosixSignalRegistration.Create(PosixSignal.SIGTERM, ctx => RequestShutdown(ctx, "SIGTERM"));
 
     // Log ASP.NET Core lifetime transitions so graceful-shutdown progress is visible.
     var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();

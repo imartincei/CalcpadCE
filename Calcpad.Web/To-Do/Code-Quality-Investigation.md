@@ -29,7 +29,7 @@ Findings from an investigation of `Calcpad.Web/frontend` (monorepo: `calcpad-fro
 
 ### Medium severity
 
--   **Shadowed endpoints.** `/convert` and `/convert-unwrapped` in [CalcpadController.cs:31-73](../backend/Controllers/CalcpadController.cs#L31-L73) differ only by one flag; merge with a query param.
+-   ~~**Shadowed endpoints.** `/convert` and `/convert-unwrapped` differ only by one flag; merge with a query param.~~ **[done]** — merged behind `POST /convert?unwrap=true`.
 -   **Fake async.** [CalcpadController.cs:41,62,207](../backend/Controllers/CalcpadController.cs#L41) — `ConvertAsync` wraps sync work in `Task.FromResult`.
 -   **Duplicated response mapping** between `GetHighlightTokens` and `GetHighlightTokensForLine` at [CalcpadController.cs:233-315](../backend/Controllers/CalcpadController.cs#L233-L315).
 -   **Duplicated draw setup** between `DrawHeader`/`DrawFooter` at [PdfGeneratorService.cs:446-545](../backend/Services/PdfGeneratorService.cs#L446-L545).
@@ -71,7 +71,7 @@ Five focused passes; each independently landable.
 
 ### Pass 4 — Backend refactors
 
-1. Merge `/convert` + `/convert-unwrapped` behind an `unwrap=true` query parameter (deprecation note if any external caller depends on the current path).
+1. ~~Merge `/convert` + `/convert-unwrapped` behind an `unwrap=true` query parameter.~~ **Done** — `/convert-unwrapped` is gone.
 2. Extract `MapTokensToResponse(...)` for the two highlight endpoints.
 3. Extract `SetupHeaderFooterContext(...)` for PDF draw code.
 4. Add `ConfigureAwait(false)` to the PDF service awaits.

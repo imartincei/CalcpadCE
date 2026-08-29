@@ -401,8 +401,13 @@
         "icon": "$(symbol-ruler)"
       },
       {
-        "command": "calcpad.refreshDocument",
+        "command": "calcpad.runPreview",
         "title": "CalcpadCE: Run Preview",
+        "icon": "$(play)"
+      },
+      {
+        "command": "calcpad.refreshDocument",
+        "title": "CalcpadCE: Restart Server",
         "icon": "$(refresh)"
       },
       {
@@ -482,19 +487,24 @@
       ],
       "view/title": [
         {
-          "command": "calcpad.stopServer",
+          "command": "calcpad.runPreview",
           "when": "view == calcpadVueUI",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "command": "calcpad.refreshDocument",
           "when": "view == calcpadVueUI",
-          "group": "navigation"
+          "group": "navigation@2"
+        },
+        {
+          "command": "calcpad.stopServer",
+          "when": "view == calcpadVueUI",
+          "group": "navigation@3"
         }
       ],
       "editor/context": [
         {
-          "command": "calcpad.refreshDocument",
+          "command": "calcpad.runPreview",
           "when": "resourceLangId == calcpad || resourceLangId == plaintext",
           "group": "calcpad@0"
         },
@@ -527,7 +537,7 @@
     },
     "keybindings": [
       {
-        "command": "calcpad.refreshDocument",
+        "command": "calcpad.runPreview",
         "key": "ctrl+alt+x",
         "mac": "cmd+alt+x",
         "when": "editorLangId == 'calcpad' || editorLangId == 'plaintext'"

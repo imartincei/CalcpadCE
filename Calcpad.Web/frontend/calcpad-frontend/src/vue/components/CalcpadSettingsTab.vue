@@ -832,7 +832,7 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       adaptivePlot: 'adaptive plotting sample points',
       screenScale: 'screen scale factor resolution',
       vectorGraphics: 'vector graphics svg png raster',
-      colorScale: 'color scale rainbow grayscale hot cool jet parula',
+      colorScale: 'color scale none gray grayscale rainbow terrain violet green blues blue yellow red purple',
       smoothScale: 'smooth scale',
       shadows: 'shadows',
       lightDirection: 'light direction',

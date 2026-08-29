@@ -5,10 +5,12 @@
 ## Base URL
 
 ```
-http://localhost:9420/api/calcpad
+http://127.0.0.1:{port}/api/calcpad
 ```
 
-Default port is `9420` (override with `CALCPAD_PORT`).
+With neither `CALCPAD_PORT` nor `--urls` set, the server binds `http://127.0.0.1:0` and takes a free port from the OS, so instances never collide. The bound URL is on the `Now listening on:` startup line and is written to the port file (`--port-file <path>`, defaulting to `.calcpad-server.port` beside the binary) for clients to discover.
+
+Setting `CALCPAD_PORT` pins the port and restores the legacy `http://127.0.0.1:9420` base. `ASPNETCORE_URLS` is **not** honored — the host calls `UseUrls` explicitly, which overrides it; pass `--urls` on the command line instead.
 
 ---
 
@@ -29,7 +31,6 @@ Launches that do not set the variable (a `dotnet run` during development, the sa
 ## Table of Contents
 
 - [POST /convert](#post-convert)
-- [POST /convert-unwrapped](#post-convert-unwrapped)
 - [GET /sample](#get-sample)
 - [GET /debug-crash](#get-debug-crash)
 - [POST /pdf](#post-pdf)
@@ -41,12 +42,15 @@ Launches that do not set the variable (a `dotnet run` during development, the sa
 - [POST /highlight-line](#post-highlight-line)
 - [POST /lint](#post-lint)
 - [POST /definitions](#post-definitions)
-- [POST /find-references](#post-find-references)
+- [POST /symbol-at-position](#post-symbol-at-position)
 - [POST /prettify](#post-prettify)
+- [POST /cpdz/decode](#post-cpdzdecode)
+- [POST /cpdz/encode](#post-cpdzencode)
 - [POST /portable/bundle](#post-portablebundle)
 - [POST /portable/package](#post-portablepackage)
 - [GET /snippets](#get-snippets)
 - [Usage Notes](#usage-notes)
+- [Environment Variables](#environment-variables)
 
 ---
 
@@ -100,17 +104,28 @@ The four renderings the front ends expose map onto these as:
 
 **Response:** HTML content (`text/html`)
 
+Calculation errors do not change the status code — they come back beside the HTML in an `X-Calcpad-Errors` response header, URL-encoded JSON of:
+
+```typescript
+Array<{
+  sourceLine: number;
+  outputLine: number;
+  message: string;
+  source: "Macro" | "Expression";
+}>
+```
+
+The header is listed in the CORS policy's exposed headers, so a browser client can read it.
+
 Every local `<img src>` comes back with its `{project}`/`{library}`/`{user}` token and any environment variable already expanded to an absolute forward-slash path, resolved against the roots declared anywhere in the `#include` chain. A source with no token is returned as authored, so a relative one still needs joining against `sourceFilePath`'s folder — the only path work left to a client that has to read the file off disk (to base64-inline it for a sandboxed preview, say). An undeclared root is reported as a normal render error and the source is left as written.
 
 ---
 
-## POST /convert-unwrapped
+### Unwrapped output
 
-Convert Calcpad source code to HTML without calculation (raw code with syntax highlighting). Automatically processes `data-text` links so they remain functional.
+`POST /convert?unwrap=true` returns the raw, fully expanded source instead of a calculated report, with its `data-text` links rewritten to the per-line anchors so in-preview navigation keeps working. The body field `forceUnwrappedCode` also produces unwrapped output, but only the query parameter rewrites the links.
 
-**Request:** Same as `/convert` (uses `CalcpadRequest`)
-
-**Response:** HTML content (`text/html`)
+There is no separate `/convert-unwrapped` endpoint.
 
 ---
 
@@ -130,9 +145,14 @@ interface CalcpadRequest {
 
 ## GET /debug-crash
 
-Write a debug crash event from the client to the server's on-disk crash log. Used by the VS Code extension and desktop wrapper to surface client-side failures into the server log stream.
+Deliberately crashes the server, to verify which failure paths `FileLogger` actually catches. **Served only in the Development environment** — anywhere else it returns `404`, since a plain GET needs no preflight and any page the user visits could otherwise kill their local server.
 
-**Response:** `200 OK`
+**Query Parameters:**
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| mode | `background-thread` | `throw`, `background-thread`, `unobserved-task`, `stackoverflow`, `accessviolation`, `failfast`, or `exit` |
+
+**Response:** `202 Accepted` with `{ mode, note }` for the modes that schedule a crash, `400` for an unknown mode, or no response at all for the modes that terminate the process immediately.
 
 ---
 
@@ -291,23 +311,33 @@ interface HighlightToken {
 |----|------|-------------|
 | 0 | None | Whitespace or unknown content |
 | 1 | Const | Numeric constants (e.g., 123, 3.14, 1e-5) |
-| 2 | Units | Unit identifiers (e.g., m, kg, N/m^2) |
-| 3 | Operator | Operators (e.g., +, -, *, /, =) |
-| 4 | Variable | Variable identifiers |
-| 5 | Function | Function names (built-in or user-defined) |
-| 6 | Keyword | Keywords starting with # (e.g., #if, #else, #def) |
-| 7 | Command | Commands starting with $ (e.g., $Plot, $Root, $Sum) |
-| 8 | Bracket | Brackets: (), [], {} |
-| 9 | Comment | Comments enclosed in ' or " |
-| 10 | Tag | HTML tags within comments |
-| 11 | Input | Input markers (? or #{...}) |
-| 12 | Include | Include file paths |
-| 13 | Macro | Macro names and parameters (ending with $) |
-| 14 | HtmlComment | HTML comments |
-| 15 | Format | Format specifiers (e.g., :f2, :e3) |
-| 16 | LocalVariable | Local variables scoped to expressions (function params, #for vars, command scope vars) |
+| 2 | Operator | Operators (e.g., +, -, *, /, =) |
+| 3 | Bracket | Brackets: (), [], {} |
+| 4 | LineContinuation | Line continuation marker (trailing `_`) |
+| 5 | Variable | Variable identifiers |
+| 6 | LocalVariable | Local variables scoped to expressions (function params, #for vars, command scope vars) |
+| 7 | Function | Function names (built-in or user-defined) |
+| 8 | Macro | Macro names (ending with $) |
+| 9 | MacroParameter | Macro parameters in #def statements |
+| 10 | Units | Unit identifiers (e.g., m, kg, N/m^2) |
+| 11 | Setting | Setting variables (PlotHeight, PlotWidth, Precision, Tol, ...) |
+| 12 | Keyword | Keywords starting with # (e.g., #include, #def, #hide) |
+| 13 | ControlBlockKeyword | Control-block keywords (#if, #else, #for, #while, #repeat) |
+| 14 | EndKeyword | Block terminators (#end if, #loop, #end def) |
+| 15 | Command | Commands starting with $ (e.g., $Plot, $Root, $Sum) |
+| 16 | Include | Include file paths |
 | 17 | FilePath | File paths in data exchange keywords (#read, #write, #append) |
 | 18 | DataExchangeKeyword | Sub-keywords in data exchange statements (from, to, sep, type) |
+| 19 | Comment | Comments enclosed in ' or " |
+| 20 | HtmlComment | HTML comments |
+| 21 | Tag | HTML tags within comments |
+| 22 | HtmlContent | Text content inside HTML tags |
+| 23 | JavaScript | Script content |
+| 24 | Css | Style content |
+| 25 | Svg | Inline SVG markup |
+| 26 | Input | Input markers (? or #{...}) |
+| 27 | Format | Format specifiers (e.g., :f2, :e3) |
+| 28 | SettingsJson | Embedded settings JSON in a metadata comment |
 
 **Example Request:**
 ```json
@@ -321,17 +351,17 @@ interface HighlightToken {
 ```json
 {
   "tokens": [
-    { "line": 0, "column": 0, "length": 1, "type": "Variable", "typeId": 4, "text": "a" },
-    { "line": 0, "column": 2, "length": 1, "type": "Operator", "typeId": 3, "text": "=" },
+    { "line": 0, "column": 0, "length": 1, "type": "Variable", "typeId": 5, "text": "a" },
+    { "line": 0, "column": 2, "length": 1, "type": "Operator", "typeId": 2, "text": "=" },
     { "line": 0, "column": 4, "length": 1, "type": "Const", "typeId": 1, "text": "5" },
-    { "line": 0, "column": 5, "length": 1, "type": "Operator", "typeId": 3, "text": "*" },
-    { "line": 0, "column": 6, "length": 1, "type": "Units", "typeId": 2, "text": "m" },
-    { "line": 1, "column": 0, "length": 1, "type": "Variable", "typeId": 4, "text": "b" },
-    { "line": 1, "column": 2, "length": 1, "type": "Operator", "typeId": 3, "text": "=" },
-    { "line": 1, "column": 4, "length": 3, "type": "Function", "typeId": 5, "text": "sin" },
-    { "line": 1, "column": 7, "length": 1, "type": "Bracket", "typeId": 8, "text": "(" },
+    { "line": 0, "column": 5, "length": 1, "type": "Operator", "typeId": 2, "text": "*" },
+    { "line": 0, "column": 6, "length": 1, "type": "Units", "typeId": 10, "text": "m" },
+    { "line": 1, "column": 0, "length": 1, "type": "Variable", "typeId": 5, "text": "b" },
+    { "line": 1, "column": 2, "length": 1, "type": "Operator", "typeId": 2, "text": "=" },
+    { "line": 1, "column": 4, "length": 3, "type": "Function", "typeId": 7, "text": "sin" },
+    { "line": 1, "column": 7, "length": 1, "type": "Bracket", "typeId": 3, "text": "(" },
     { "line": 1, "column": 8, "length": 2, "type": "Const", "typeId": 1, "text": "45" },
-    { "line": 1, "column": 10, "length": 1, "type": "Bracket", "typeId": 8, "text": ")" }
+    { "line": 1, "column": 10, "length": 1, "type": "Bracket", "typeId": 3, "text": ")" }
   ]
 }
 ```
@@ -524,7 +554,6 @@ interface MacroDefinitionDto {
   description?: string;
   paramTypes?: string[];
   paramDescriptions?: string[];
-  defaults?: (string | null)[];
 }
 
 interface FunctionDefinitionDto {
@@ -542,7 +571,6 @@ interface FunctionDefinitionDto {
   description?: string;
   paramTypes?: string[];
   paramDescriptions?: string[];
-  defaults?: (string | null)[];
 }
 
 interface VariableDefinitionDto {
@@ -562,6 +590,7 @@ interface CustomUnitDefinitionDto {
   lineNumber: number;
   source: string;
   sourceFile?: string;
+  description?: string;
 }
 ```
 
@@ -572,11 +601,11 @@ interface CustomUnitDefinitionDto {
 | 1 | Value | Scalar numeric value |
 | 2 | Vector | Vector (1D array) |
 | 3 | Matrix | Matrix (2D array) |
-| 5 | Various | Type varies (assigned different types in different places) |
-| 6 | Function | Function type |
-| 7 | InlineMacro | Inline macro |
-| 8 | MultilineMacro | Multiline macro |
-| 9 | CustomUnit | Custom unit definition |
+| 4 | CustomUnit | Custom unit definition |
+| 5 | Function | Function type |
+| 6 | InlineMacro | Inline macro |
+| 7 | MultilineMacro | Multiline macro |
+| 8 | Various | Type varies (assigned different types in different places) |
 
 **Example Request:**
 ```json
@@ -667,18 +696,26 @@ Response includes:
 
 ---
 
-## POST /find-references
+## POST /symbol-at-position
 
-Get all symbol occurrence locations (definitions, reassignments, and usages) for go-to-definition and find-all-references features. Returns dictionaries mapping symbol names to all their occurrences with original source line positions.
+Resolve a cursor position to the user-defined symbol under it and return every occurrence of that symbol — definition, reassignments, and usages. One round-trip serves go-to-definition, find-all-references, and rename; the matching heuristic lives on the server so clients don't each re-implement it.
 
-**Request:** Same as `/definitions` (uses `DefinitionsRequest`)
+**Request:**
+```typescript
+interface SymbolAtPositionRequest {
+  content: string;
+  line: number;             // Zero-based line of the cursor in the original source
+  column: number;           // Zero-based column of the cursor
+  sourceFilePath?: string;  // Full path of source file on client (resolves #include)
+}
+```
 
 **Response:**
 ```typescript
-interface FindReferencesResponse {
-  variables: Record<string, SymbolLocationDto[]>;
-  functions: Record<string, SymbolLocationDto[]>;
-  macros: Record<string, SymbolLocationDto[]>;
+interface SymbolAtPositionResponse {
+  symbolName: string;
+  kind: "variable" | "function" | "macro";
+  locations: SymbolLocationDto[];
 }
 
 interface SymbolLocationDto {
@@ -691,32 +728,27 @@ interface SymbolLocationDto {
 }
 ```
 
+`null` is returned when no user-defined symbol sits under the position.
+
 **Example Request:**
 ```json
 {
-  "content": "a = 5\nb = a + 1\nc = a * b"
+  "content": "a = 5\nb = a + 1\nc = a * b",
+  "line": 1,
+  "column": 4
 }
 ```
 
 **Example Response:**
 ```json
 {
-  "variables": {
-    "a": [
-      { "line": 0, "column": 0, "length": 1, "source": "local", "isAssignment": true },
-      { "line": 1, "column": 4, "length": 1, "source": "local", "isAssignment": false },
-      { "line": 2, "column": 4, "length": 1, "source": "local", "isAssignment": false }
-    ],
-    "b": [
-      { "line": 1, "column": 0, "length": 1, "source": "local", "isAssignment": true },
-      { "line": 2, "column": 8, "length": 1, "source": "local", "isAssignment": false }
-    ],
-    "c": [
-      { "line": 2, "column": 0, "length": 1, "source": "local", "isAssignment": true }
-    ]
-  },
-  "functions": {},
-  "macros": {}
+  "symbolName": "a",
+  "kind": "variable",
+  "locations": [
+    { "line": 0, "column": 0, "length": 1, "source": "local", "isAssignment": true },
+    { "line": 1, "column": 4, "length": 1, "source": "local", "isAssignment": false },
+    { "line": 2, "column": 4, "length": 1, "source": "local", "isAssignment": false }
+  ]
 }
 ```
 
@@ -724,16 +756,71 @@ interface SymbolLocationDto {
 
 ## POST /prettify
 
-Pretty-print Calcpad source code (consistent spacing, indentation for control blocks, etc.).
+Re-indent Calcpad source by tracking control-block depth across `#if`/`#else`/`#end if`, `#for`/`#while`/`#repeat`/`#loop`, and multiline `#def`/`#end def`. Only leading whitespace is adjusted; line endings and content are preserved.
 
 **Request:**
 ```typescript
 interface PrettifyRequest {
   content: string;
+  indentUnit?: string;            // Emitted per indent level (default: a single tab)
+  trimTrailingWhitespace?: boolean; // Default: true
 }
 ```
 
-**Response:** Plain text (`text/plain`) — the prettified source code.
+**Response:**
+```typescript
+interface PrettifyResponse {
+  content: string;   // The re-indented source
+}
+```
+
+---
+
+## POST /cpdz/decode
+
+Decode a compiled `.cpdz` worksheet to its source text. Accepts both the plain deflate form and the composite archive that bundles images.
+
+**Request:**
+```typescript
+interface CpdzDecodeRequest {
+  data: string;              // base64 of the file's raw bytes
+}
+```
+
+**Response:**
+```typescript
+interface CpdzDecodeResponse {
+  content: string;           // the decoded Calcpad source
+  composite: boolean;        // true when the archive bundles images
+}
+```
+
+A composite file's original bytes must be passed back as `original` on encode, or those images are lost.
+
+**400** when the bytes are not a valid `.cpdz`: `{ error, message }`.
+
+---
+
+## POST /cpdz/encode
+
+Encode source text as a `.cpdz` worksheet. Run [`/portable/bundle`](#post-portablebundle) first — this endpoint compresses whatever it is handed and does not make a worksheet self-contained.
+
+**Request:**
+```typescript
+interface CpdzEncodeRequest {
+  content: string;
+  original?: string;         // base64 of the file being overwritten, when there is one
+}
+```
+
+Passing `original` for a composite archive keeps every entry but the code, so bundled images survive the save.
+
+**Response:**
+```typescript
+interface CpdzEncodeResponse {
+  data: string;              // base64 of the encoded file's bytes
+}
+```
 
 ---
 
@@ -810,16 +897,29 @@ interface SnippetsResponse {
 
 interface SnippetDto {
   insert: string;                     // Use '§' as cursor placeholder
-  description: string;
-  label?: string;
+  description: string;                // Short label for tooltips and completion detail
+  documentation?: string;             // Long-form Markdown description for hover docs
+  example?: string;                   // Calcpad usage example, rendered as a fenced code block
+  label?: string;                     // Display label (defaults to description)
   category: string;                   // e.g. "Functions/Trigonometric"
   quickType?: string;                 // Shortcut without ~ prefix (e.g., "a" means ~a -> insert)
+  keywordType?: string;               // "Function", "Keyword", "Command", "Constant", "Unit",
+                                      //   "Operator", "Setting", "ControlBlockKeyword", "EndKeyword".
+                                      //   Null for UI-only snippets.
+  returnType?: string;                // CalcpadType name (null for non-functions)
+  returnTypeDescription?: string;     // e.g. "Angle in radians"
+  isElementWise: boolean;             // Operates element-wise on vectors/matrices
+  acceptsAnyCount: boolean;           // Parameter-count validation is skipped (switch, gcd, lcm, ...)
   parameters?: SnippetParameterDto[]; // Parameter info for functions (null for non-functions)
 }
 
 interface SnippetParameterDto {
   name: string;
   description?: string;
+  type?: string;                      // ParameterType name ("Scalar", "Vector", "Matrix", "Any", ...)
+  typeDescription?: string;           // Falls back to type when null
+  isOptional: boolean;
+  isVariadic: boolean;                // The type applies to all remaining arguments
 }
 ```
 
@@ -900,5 +1000,15 @@ GET /api/calcpad/snippets?category=Functions/Trigonometric
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CALCPAD_PORT` | `9420` | Server port (host always loopback) |
-| `ASPNETCORE_URLS` / `--urls` | `http://localhost:9420` | Full bind URL (must resolve to loopback) |
+| `CALCPAD_PORT` | *(unset — OS-assigned port)* | Pins the server port. When set but empty of a value, falls back to `9420` |
+| `CALCPAD_HOST` | `127.0.0.1` | Host part of the bind URL. Must resolve to loopback |
+| `CALCPAD_ENABLE_HTTPS` | `false` | Serves `https` instead of `http`. Only applies on the `CALCPAD_PORT` path |
+| `CALCPAD_API_TOKEN` | *(unset — unauthenticated)* | Per-launch token required in `X-Calcpad-Token` |
+| `CALCPAD_DETACHED` | *(unset)* | `1` disables the stdin-EOF watchdog and the default port file, so the server outlives its parent |
+| `CALCPAD_CONTENT_CACHE_SIZE_LIMIT` | `100` | Entries kept in the resolved-content cache shared by lint/highlight/definitions |
+| `BROWSER_PATH` | *(auto-detect)* | Chromium-family executable for PDF export. Also `BrowserPath` in `appsettings.json` |
+| `ALLOW_CHROMIUM_DOWNLOAD` | `false` | Lets the render path download Chromium on its own. Also `AllowChromiumDownload` in `appsettings.json` |
+
+`ASPNETCORE_URLS` is ignored: the host always calls `UseUrls`, which overrides it. Use `--urls` on the command line.
+
+**CLI flags:** `--urls <url>`, `--port-file <path>` (write the bound URL once Kestrel is listening), `--parent-pid <pid>` (self-exit when that process disappears), `--exit-on-stdin-close` / `--no-exit-on-stdin-close`.

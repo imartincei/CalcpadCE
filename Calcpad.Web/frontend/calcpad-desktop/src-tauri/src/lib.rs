@@ -8,7 +8,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use serde::{Deserialize, Serialize};
 use tauri::menu::{IsMenuItem, Menu, MenuBuilder, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::path::BaseDirectory;
-use tauri::{AppHandle, Emitter, Manager, RunEvent, State, WindowEvent};
+use tauri::{AppHandle, Emitter, Manager, RunEvent, State};
 use tauri_plugin_fs::FsExt;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
@@ -1447,11 +1447,8 @@ pub fn run() {
             // See tauri-apps/tauri#11856 and #13440.
             Ok(())
         })
-        .on_window_event(|window, event| {
-            if let WindowEvent::CloseRequested { .. } = event {
-                stop_sidecar(&window.app_handle().clone());
-            }
-        })
+        // No CloseRequested handler: the frontend preventDefaults it, so killing there
+        // leaves an open window with a dead server.
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app, event| {

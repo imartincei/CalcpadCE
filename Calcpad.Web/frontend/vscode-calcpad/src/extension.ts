@@ -2429,67 +2429,66 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    const refreshDocumentCommand = vscode.commands.registerCommand('calcpad.refreshDocument', async () => {
-        outputChannel.appendLine('[Refresh] Manual document refresh triggered');
-
-        // Check server health and restart if down
-        if (serverManager && !serverManager.isRunning) {
-            outputChannel.appendLine('[Refresh] Server is down, attempting restart...');
-            try {
-                await serverManager.restart();
-                const serverUrl = serverManager.getBaseUrl();
-                settingsManager.setLocalServerUrl(serverUrl);
-                apiClient.setBaseUrl(serverUrl);
-                apiClient.setAuthToken(serverManager.getAuthToken());
-                outputChannel.appendLine(`[Refresh] Server restarted at ${serverUrl}`);
-            } catch (err) {
-                const msg = err instanceof Error ? err.message : String(err);
-                outputChannel.appendLine(`[Refresh] Server restart failed: ${msg}`);
-                const blocked = /Windows blocked the executable|EACCES|EPERM/i.test(msg);
-                if (blocked) {
-                    const exePath = serverManager.getExecutablePath();
-                    vscode.window.showErrorMessage(
-                        `CalcPad: Windows is still blocking Calcpad.Server.exe.\n${exePath}\n` +
-                        'Right-click the file in Windows Explorer → Properties → check "Unblock", ' +
-                        'then click refresh again.'
-                    );
-                } else {
-                    vscode.window.showErrorMessage(`CalcpadCE: Server restart failed: ${msg}`);
-                }
-                return;
+    // Stop and respawn the sidecar, then point the API client at the new
+    // instance. Mirrors the desktop app's Server > Restart Server.
+    const restartServer = async (tag: string): Promise<boolean> => {
+        if (!serverManager) return true;
+        try {
+            await serverManager.restart();
+            const serverUrl = serverManager.getBaseUrl();
+            settingsManager.setLocalServerUrl(serverUrl);
+            apiClient.setBaseUrl(serverUrl);
+            apiClient.setAuthToken(serverManager.getAuthToken());
+            outputChannel.appendLine(`${tag} Server restarted at ${serverUrl}`);
+            return true;
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            outputChannel.appendLine(`${tag} Server restart failed: ${msg}`);
+            if (/Windows blocked the executable|EACCES|EPERM/i.test(msg)) {
+                vscode.window.showErrorMessage(
+                    `CalcPad: Windows is still blocking Calcpad.Server.exe.\n${serverManager.getExecutablePath()}\n` +
+                    'Right-click the file in Windows Explorer → Properties → check "Unblock", ' +
+                    'then click refresh again.'
+                );
+            } else {
+                vscode.window.showErrorMessage(`CalcpadCE: Server restart failed: ${msg}`);
             }
-        } else if (serverManager) {
-            // Server thinks it's running — verify with health check
-            const healthy = await apiClient.checkHealth();
-            if (!healthy) {
-                outputChannel.appendLine('[Refresh] Server health check failed, restarting...');
-                try {
-                    await serverManager.restart();
-                    const serverUrl = serverManager.getBaseUrl();
-                    settingsManager.setLocalServerUrl(serverUrl);
-                    apiClient.setBaseUrl(serverUrl);
-                    apiClient.setAuthToken(serverManager.getAuthToken());
-                    outputChannel.appendLine(`[Refresh] Server restarted at ${serverUrl}`);
-                } catch (err) {
-                    const msg = err instanceof Error ? err.message : String(err);
-                    outputChannel.appendLine(`[Refresh] Server restart failed: ${msg}`);
-                    vscode.window.showErrorMessage(`CalcpadCE: Server restart failed: ${msg}`);
-                    return;
-                }
-            }
+            return false;
         }
+    };
 
+    // Re-lint, re-highlight and re-render. This is the manual "run" path used
+    // when auto-run is off.
+    const runPreview = async (tag: string): Promise<void> => {
         const activeEditor = vscode.window.activeTextEditor;
-        if (activeEditor) {
-            // Re-lint and refresh definitions
-            await processDocument(activeEditor.document);
-            // Re-highlight (semantic tokens)
-            semanticTokensProvider.refresh();
-            // Re-render preview panels. This is the manual "run" path used
-            // when auto-run is off.
-            schedulePreviewUpdate();
-            outputChannel.appendLine('[Refresh] Document re-linted, re-highlighted, and preview re-rendered');
+        if (!activeEditor) return;
+        await processDocument(activeEditor.document);
+        semanticTokensProvider.refresh();
+        schedulePreviewUpdate();
+        outputChannel.appendLine(`${tag} Document re-linted, re-highlighted, and preview re-rendered`);
+    };
+
+    const runPreviewCommand = vscode.commands.registerCommand('calcpad.runPreview', async () => {
+        outputChannel.appendLine('[Run] Run preview triggered');
+
+        // Only restart when the server is actually down — running should not
+        // cost a respawn. Use refresh for an unconditional restart.
+        if (serverManager && (!serverManager.isRunning || !(await apiClient.checkHealth()))) {
+            outputChannel.appendLine('[Run] Server unavailable, attempting restart...');
+            if (!await restartServer('[Run]')) return;
         }
+
+        await runPreview('[Run]');
+    });
+
+    const refreshDocumentCommand = vscode.commands.registerCommand('calcpad.refreshDocument', async () => {
+        outputChannel.appendLine('[Refresh] Manual server restart triggered');
+        if (!serverManager) {
+            vscode.window.showInformationMessage('CalcpadCE server is not configured.');
+            return;
+        }
+        if (!await restartServer('[Refresh]')) return;
+        await runPreview('[Refresh]');
     });
 
     const prettifyDocumentCommand = vscode.commands.registerCommand('vscode-calcpad.prettifyDocument', async () => {
@@ -2558,7 +2557,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }, 500);
             // Only schedule preview update when auto-run is on. Otherwise the
             // preview updates only when the panel is (re)opened or the user
-            // runs `calcpad.refreshDocument`.
+            // runs `calcpad.runPreview`.
             if (CalcpadSettingsManager.getInstance().getExtraBool('autoRun', true)) {
                 schedulePreviewUpdate();
             }
@@ -2670,6 +2669,7 @@ export async function activate(context: vscode.ExtensionContext) {
             saveCompiledUiValuesCommand,
             compiledEditor,
             refreshVariablesCommand,
+            runPreviewCommand,
             refreshDocumentCommand,
             stopServerCommand,
             exportToPdfCommand,

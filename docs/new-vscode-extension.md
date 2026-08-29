@@ -26,7 +26,7 @@ Alternatively, from a terminal: `code --install-extension <path>/vscode-calcpad-
 
 ## Your first document
 
-1. Create a new file and save it with a **`.cpd`** extension (for example `beam.cpd`). VS Code detects the `calcpad` language automatically.
+1. Create a new file and save it with a **`.cpd`** extension (for example `beam.cpd`). VS Code detects the `CalcpadCE` language automatically.
 2. Type a calculation, for example:
 
    ```calcpad
@@ -47,21 +47,18 @@ The bundled calculation engine starts automatically the first time you render �
 
 ## The editor
 
-The editor is the same across every CalcpadCE front end — see **[The CalcpadCE Editor](new-calcpadce-editor.md)** for syntax highlighting, autocomplete, quick-type symbols, operator replacement, formatting hotkeys, symbol navigation, and path completion for `#include`/`#read` paths.
+The editor is the same across every CalcpadCE frontend — see **[The CalcpadCE Editor](new-calcpadce-editor.md)**
 
 VS Code specifics:
 
-- Path completion draws on the files in your **workspace** as well as the document's `#ProjectPath`/`#LibraryPath` roots.
+- Path completion draws on the files in your workspace (via File -> Open Folder) as well as the document's `#ProjectPath`/`#LibraryPath` roots.
 - Run **CalcpadCE: Install JuliaMono Font** from the Command Palette if the math glyphs look wrong.
-- The full **Ctrl+1** … **Ctrl+6** heading hotkeys are available (the desktop app uses those for tabs).
 
 ## The CalcpadCE panel
 
 Click the **CalcpadCE** icon in the activity bar (left edge) to open the panel.
-It has **Files** and **CalcpadCE** views, and the CalcpadCE view is organized into tabs (Insert, TOC, Settings, Variables, Formatting, Export, Errors, Properties).
-The view title bar has **CalcpadCE: Run Preview** (re-renders the active file and refreshes plots) and **Stop Server** buttons.
 
-The panel is the same across every CalcpadCE front end — see **[The CalcpadCE Panel & Settings](new-calcpad-panel.md)** for a full walkthrough of each tab.
+The panel is the same across every CalcpadCE frontend — see **[The CalcpadCE Panel & Settings](new-calcpad-panel.md)** for a full walkthrough of each tab.
 
 ## Live preview
 
@@ -83,9 +80,8 @@ All panels:
 
 - Re-render automatically as you type when **Auto-Run Preview** is on (default).
 - Follow the `previewTheme` setting (`light` / `dark` / `system`), using `darkBackground` for the dark background color.
-- Embed local images so PDF/print output matches the preview.
 
-Right-click a preview → **View Webview Source HTML** to inspect the rendered markup.
+Right-click a preview → **View Webview Source HTML** to inspect the rendered HTML.
 
 ### Running on demand (Auto-Run off)
 
@@ -94,7 +90,7 @@ Trigger the run yourself via any of:
 
 - **Ctrl+Alt+X** (works whenever a `.cpd` or plaintext editor has focus)
 - Right-click in the editor → **CalcpadCE: Run Preview**
-- The **CalcpadCE: Run Preview** button in the CalcpadCE sidebar's view title bar
+- The **CalcpadCE: Run Preview** button in the CalcpadCE sidebar's view title bar (play icon)
 - The *CalcpadCE: Run Preview* command in the Command Palette
 
 Running also re-lints the document, refreshes syntax highlighting, and rebuilds the Export tab's plot list.
@@ -111,9 +107,9 @@ See **[The CalcpadCE Editor → Linting](new-calcpadce-editor.md#linting)** and 
 
 ## Exporting
 
-Exporting is the same across every CalcpadCE front end — see **[Exports](new-exports.md)** for the four export variants, the formats each one offers, PDF page setup, plot images, `#write`/`#append` output, and the portable formats.
+Exporting is the same across every CalcpadCE frontend — see **[Exports](new-exports.md)**
 
-VS Code specifics — the **Export** tab of the panel holds every export, and these are also reachable from the editor and Command Palette:
+The **Export** tab of the panel holds every export, and these are also reachable from the editor and Command Palette:
 
 | Output | How |
 |--------|-----|
@@ -141,6 +137,8 @@ You don't normally need to think about it:
 
 If something goes wrong, use the Stop and Restart buttons on the CalcpadCE panel to stop/restart it.
 
+If these do not work, restarting VS Code typically fixes it. Because the calculation engine is separate from the editor, it is normally possible to save and modify files even if the calculation engine crashes.
+
 ### Output channels for troubleshooting
 
 Four VS Code output channels help diagnose problems (open the Output panel and pick from the dropdown):
@@ -150,7 +148,7 @@ Four VS Code output channels help diagnose problems (open the Output panel and p
 | **CalcpadCE Extension** | Extension lifecycle, commands, errors |
 | **CalcpadCE Output HTML** | Rendered HTML in the preview |
 | **CalcpadCE Webview Console** | Console messages from preview panels |
-| **CalcpadCE Server Debug** | Output from the engine process |
+| **CalcpadCE Server Debug** | Output from the calculation engine |
 
 ## Troubleshooting
 

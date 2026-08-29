@@ -6,15 +6,8 @@ The **CalcpadCE panel** is the tabbed sidebar that sits beside the editor.
 It shows what your document defines, lets you insert symbols and snippets, controls the calculation and plot settings, and drives export.
 Because every CalcpadCE frontend embeds the same panel, the tabs and settings are identical everywhere; only how you open it differs:
 
-*   **VS Code** — click the **CalcpadCE** icon in the activity bar. The view title bar has **CalcpadCE: Run Preview** (re-render) and **Stop Server** buttons.
+*   **VS Code** — click the **CalcpadCE** icon in the activity bar. The view title bar has buttons to refresh and stop the background calculation engine.
 *   **Desktop app** — **View → Toggle Sidebar**.
-
-## Views
-
-The panel has two top-level views, switched from the icons at its top:
-
-*   **CalcpadCE** — the tabbed working view (below). This is the default.
-*   **Files (Desktop App Only)** — opens a folder and shows a file tree so you can browse and open `.cpd` files without leaving the panel. Includes _Open Folder_, _Collapse All_, and a _Show all files_ toggle.
 
 ## Panel tabs
 
@@ -26,7 +19,7 @@ The **CalcpadCE** view is organized into tabs:
 | **TOC** | Live table of contents built from your document headings. Click a heading to jump to that line. |
 | **Settings** | All calculation, plot, unit, PDF export, theme, editor, and linter settings, plus named configurations. See [Settings Documentation](new-settings.md). |
 | **Variables** | Everything defined in the document — macros, variables, functions, and custom units — with types and signatures. Click an entry to insert it; each is searchable. |
-| **Properties** | Form-based editor for the [metadata comment](new-metadata-comments.md) at the cursor — descriptions, parameter/return types, per-file settings, lint-ignore, and per-document PDF export settings. Also allows editing #UI JSON, #settings JSON, and the UI Overrides line |
+| **Properties** | Form-based editor for the [metadata comment](new-metadata-comments.md) at the cursor — descriptions, parameter/return types, per-file settings, lint-ignore, and per-document PDF export settings. Also allows editing #UI JSON, #settings JSON, and the UI Overrides line. |
 | **Formatting** | Prettify options and the **Prettify Document** button.|
 | **Export** | PDF / HTML / Word save actions, grouped by which rendering they capture, plus per-plot and ZIP image exports and the portable formats. See  [Exports Documentation](new-exports.md). |
 | **Errors** | Full list of calculation errors from the engine, each linking to its source line. |
@@ -39,7 +32,7 @@ While a [`#UI` input form](new-ui-mode.md) (or a compiled `.cpdz` worksheet) is 
 A searchable palette grouped by category.
 Typing filters the list; clicking an item inserts it at the cursor.
 Function entries insert with placeholders.
-The **Symbol Palette** section is a condensed 
+The **Symbol Palette** section is a condensed version of the symbols dropdown that allows inserting symbols by how they appear in the text.
 An **Insert Image** button opens a file picker and inserts an `<img>` tag with the selected path.
 
 ### Variables
@@ -57,13 +50,13 @@ Click any entry to insert its name at the cursor.
 ### Properties
 
 A form-based editor for the [metadata comment](new-metadata-comments.md), `#settings` directive JSON, and `#UI` directive JSON.  
-Put the cursor on JSON field, and the tab shows exactly the fields that apply: a description for any definition, parameter/return types for functions and macros, and per-file settings, lint-ignore, and [PDF export settings](new-metadata-comments.md#pdf-export-settings) on generic lines.  
+Put the cursor on a JSON line, and the tab shows exactly the fields that apply.
 **Apply** writes the comment (creating one above the definition if none exists); **Reset** re-reads the current one.  
 See [Metadata Comments](new-metadata-comments.md), [Settings](new-settings.md), and [UI Mode](new-ui-mode.md) for the full format.
 
 ### TOC
 
-A live outline of the headings in your document. Define headings with \<h1\>, \<h2\>, etc. HTML or #, ## in Markdown.
+A live outline of the headings in your document. Define headings with \<h1\>, \<h2\>, etc. HTML or #, ##, etc. in Markdown.
 Selecting a heading scrolls the editor to that line.
 While a [`#UI` input form](new-ui-mode.md) is open and there is no editor to scroll, it scrolls the form and the report.  
 

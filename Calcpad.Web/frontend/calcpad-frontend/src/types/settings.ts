@@ -303,32 +303,26 @@ function deepMerge<T>(base: T, override: Partial<T>): T {
     return out as T;
 }
 
-const COLOR_SCALE_MAP: Record<string, number> = {
-    'Rainbow': 0,
-    'Grayscale': 1,
-    'Hot': 2,
-    'Cool': 3,
-    'Jet': 4,
-    'Parula': 5
-};
+/** Declaration order of `Calcpad.Core.PlotSettings.ColorScales` — the index is the wire value. */
+const COLOR_SCALES = [
+    'None', 'Gray', 'Rainbow', 'Terrain', 'VioletToYellow',
+    'GreenToYellow', 'Blues', 'BlueToYellow', 'BlueToRed', 'PurpleToYellow',
+] as const;
 
-const LIGHT_DIRECTION_MAP: Record<string, number> = {
-    'NorthWest': 0,
-    'North': 1,
-    'NorthEast': 2,
-    'West': 3,
-    'East': 4,
-    'SouthWest': 5,
-    'South': 6,
-    'SouthEast': 7
-};
+/** Declaration order of `Calcpad.Core.PlotSettings.LightDirections`. */
+const LIGHT_DIRECTIONS = [
+    'North', 'NorthEast', 'East', 'SouthEast',
+    'South', 'SouthWest', 'West', 'NorthWest',
+] as const;
 
 export function colorScaleToEnum(colorScale: string): number {
-    return COLOR_SCALE_MAP[colorScale] ?? 0;
+    const i = COLOR_SCALES.indexOf(colorScale as typeof COLOR_SCALES[number]);
+    return i < 0 ? COLOR_SCALES.indexOf('Rainbow') : i;
 }
 
 export function lightDirectionToEnum(direction: string): number {
-    return LIGHT_DIRECTION_MAP[direction] ?? 0;
+    const i = LIGHT_DIRECTIONS.indexOf(direction as typeof LIGHT_DIRECTIONS[number]);
+    return i < 0 ? LIGHT_DIRECTIONS.indexOf('NorthWest') : i;
 }
 
 // ---- Extras runtime accessors ----
