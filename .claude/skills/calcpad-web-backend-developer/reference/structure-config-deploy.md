@@ -29,7 +29,7 @@ Calcpad.Web/backend/
 ├── template.html                   # HTML output template for rendered calculations
 ├── Fonts/, UiAssets/               # Assets inlined by BundledFonts / BundledUiAssets
 ├── appsettings.json                # Browser path, Chromium download policy, logging
-├── Calcpad.Server.csproj           # .NET 10 project (v7.6.1)
+├── Calcpad.Server.csproj           # .NET 10 project (version from root Directory.Build.props)
 ├── Calcpad.Server.sln
 └── scripts/
     ├── restart-dev-server.sh       # Kill + rebuild + start on port 9420

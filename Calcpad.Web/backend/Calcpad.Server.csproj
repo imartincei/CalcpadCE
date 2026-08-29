@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>Exe</OutputType>
-    <Version>7.6.1</Version>
     <AssemblyName>Calcpad.Server</AssemblyName>
     <RootNamespace>Calcpad.Server</RootNamespace>
   </PropertyGroup>
@@ -28,7 +27,6 @@
     <!-- Pin Microsoft.OpenApi to a patched version to resolve GHSA-v5pm-xwqc-g5wc,
          which affects the 2.3.0 pulled in transitively by the two packages above. -->
     <PackageReference Include="Microsoft.OpenApi" Version="2.9.0" />
-    <!-- PDF generation -->
     <PackageReference Include="PuppeteerSharp" Version="21.1.1" />
     <PackageReference Include="PDFsharp" Version="6.2.0" />
   </ItemGroup>
@@ -39,8 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- The services are internal: they are the server's own, not an API. The test project
-         reaches them directly rather than through HTTP, which would need a host per test. -->
     <InternalsVisibleTo Include="Calcpad.Tests" />
   </ItemGroup>
 
@@ -48,17 +44,11 @@
     <Content Include="template.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <!-- Embed template.html as resource for single-file publishing -->
     <EmbeddedResource Include="template.html" />
-    <!-- Bundled fonts inlined by PdfGeneratorService so the headless browser
-         doesn't have to fetch them from a CDN during PDF generation. Drop any
-         .woff/.woff2/.ttf/.otf file into Fonts/ and it gets picked up. -->
     <Content Include="Fonts\**\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="Fonts\**\*.*" />
-    <!-- jspreadsheet-ce + jsuites, inlined by BundledUiAssets so #UI datagrids
-         render offline and inside the sandboxed preview iframe. -->
     <Content Include="UiAssets\**\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -76,9 +66,6 @@
     <None Remove="testing\**" />
   </ItemGroup>
 
-  <!-- Development-only settings stay in the local build output but must never
-       reach a published bundle: vscode-calcpad and calcpad-desktop mirror the
-       publish directory verbatim into their shipped payloads. -->
   <ItemGroup>
     <Content Update="appsettings.Development.json">
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>

@@ -510,7 +510,7 @@ dependencies = [
 
 [[package]]
 name = "calcpad-desktop"
-version = "0.4.2"
+version = "0.5.0"
 dependencies = [
  "getrandom 0.2.17",
  "serde",

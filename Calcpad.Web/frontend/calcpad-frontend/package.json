@@ -1,6 +1,6 @@
 {
   "name": "calcpad-frontend",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Shared CalcpadCE frontend logic for VS Code extension, Tauri desktop app, and web browser app",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

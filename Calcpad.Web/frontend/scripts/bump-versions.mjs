@@ -9,6 +9,7 @@
 //   * calcpad-desktop/src-tauri/Cargo.lock (calcpad-desktop [[package]] entry)
 //   * calcpad-desktop/src-tauri/tauri.conf.json (version)
 //   * calcpad-desktop/packaging/arch/PKGBUILD (pkgver, and pkgrel back to 1)
+//   * Directory.Build.props (<Version>, inherited by every C# project)
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -29,6 +30,7 @@ if (exact !== null) {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const frontendRoot = resolve(here, '..');
+const repoRoot = resolve(frontendRoot, '../..');
 const pkgDirs = ['calcpad-frontend', 'calcpad-desktop', 'vscode-calcpad', 'calcpad-web'];
 
 const parse = v => v.split('.').map(n => parseInt(n, 10));
@@ -114,4 +116,17 @@ if (existsSync(pkgbuild)) {
         })
         .replace(/^pkgrel=.*$/m, 'pkgrel=1');
     writeFileSync(pkgbuild, updated);
+}
+
+const buildProps = resolve(repoRoot, 'Directory.Build.props');
+if (existsSync(buildProps)) {
+    const src = readFileSync(buildProps, 'utf8');
+    const updated = src.replace(
+        /(<Version>)([^<]+)(<\/Version>)/,
+        (_, a, prev, c) => {
+            console.log(`Directory.Build.props: ${prev} -> ${next}`);
+            return a + next + c;
+        },
+    );
+    writeFileSync(buildProps, updated);
 }
