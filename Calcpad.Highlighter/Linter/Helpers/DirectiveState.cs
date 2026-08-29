@@ -38,9 +38,8 @@ namespace Calcpad.Highlighter.Linter.Helpers
     }
 
     /// <summary>
-    /// Tracks the running state of Calcpad's mode directives as lines are visited in order.
-    /// Calcpad has several independent directive categories, and within each the most recent
-    /// directive wins (see ExpressionParser.ParseKeyword):
+    /// Tracks the running state of Calcpad's mode directives as lines are visited in order, where
+    /// within each category the most recent directive wins (see ExpressionParser.ParseKeyword):
     ///   - output value:  #equ / #val / #noc (and #end equ / #end val / #end noc)
     ///   - scope:          #global / #local
     ///   - markdown:       #md [on] / #md off
@@ -48,10 +47,9 @@ namespace Calcpad.Highlighter.Linter.Helpers
     ///   - angle:          #rad / #deg / #gra
     ///   - line breaking:  #wrap / #split
     ///   - number type:    #complex / #phasor
-    ///   - visibility:     #show / #hide / #pre / #post (and #end show / #end hide / #end pre / #end post)
-    /// Only the categories consumed by the tooling are tracked; the rest are ignored. The #end
-    /// forms pop back to the state in effect before the matching opener (default state if there
-    /// is none), mirroring ExpressionParser's _visibilityStack / _outputModeStack.
+    ///   - visibility:     #show / #hide / #pre / #post (and their #end forms)
+    /// Only the categories the tooling consumes are tracked, and an #end form pops back to the
+    /// state in effect before its opener, mirroring ExpressionParser's own stacks.
     /// </summary>
     public sealed class DirectiveState
     {
@@ -64,8 +62,8 @@ namespace Calcpad.Highlighter.Linter.Helpers
         public bool IsMarkdownOn { get; private set; }
 
         /// <summary>
-        /// Updates the tracked state from a trimmed directive line. Non-tracked directives are ignored.
-        /// Prefix matching mirrors Core's Validator.IsKeyword / ExpressionParser.GetKeyword.
+        /// Updates the tracked state from a trimmed directive line, ignoring non-tracked
+        /// directives. Prefix matching mirrors Core's Validator.IsKeyword / GetKeyword.
         /// </summary>
         public void Apply(ReadOnlySpan<char> trimmedLine)
         {

@@ -53,19 +53,10 @@ export interface IncludeCompletionsContext {
 
 /**
  * Register a Monaco completion provider for #include / #read / #write / #append /
- * #ProjectPath / #LibraryPath directives (the latter two, being directory-only
- * declarations, only ever offer folders — never files). Search roots (in priority
- * order):
- *   1. The current file's parent directory.
- *   2. The opened workspace folder (if any and different).
- *   3. The OS user's home directory (if any and different), offered (and drilled
- *      into) as `{user}/…` — needs no declaration, unlike the two roots below.
- *   4. The document's own `#ProjectPath`/`#LibraryPath` declarations, if any —
- *      offered (and drilled into) as `{project}/…`/`{library}/…` so completions
- *      naturally lead an author to write the portable, token-prefixed form
- *      rather than an absolute path that a portable package would bundle.
- * Duplicates (same file reachable via multiple roots) are filtered by absolute
- * path so the same file only appears once in the completion list.
+ * #ProjectPath / #LibraryPath directives, the latter two offering folders only. Search roots in
+ * priority order — the current file's parent directory, the opened workspace folder, the OS home
+ * directory as `{user}/…`, and the document's own root declarations as `{project}/…`/`{library}/…`
+ * — are deduplicated by absolute path, so completions lead an author to the portable form.
  */
 export function registerIncludeCompletionProvider(
     ctx: IncludeCompletionsContext

@@ -1,8 +1,7 @@
-// Regenerates the parts of settings.default.json that duplicate a TS-side
-// default: `core` (from DEFAULT_CALCPAD_SETTINGS) and `extras.pdfSettings`
-// (from DEFAULT_PDF_SETTINGS). Runs as a postbuild step via tsx, so it can
-// import the TS sources directly instead of the compiled dist output. The
-// rest of `extras` has no TS-side duplicate and is left untouched.
+// Regenerates the parts of settings.default.json that duplicate a TS-side default: `core` (from
+// DEFAULT_CALCPAD_SETTINGS) and `extras.pdfSettings` (from DEFAULT_PDF_SETTINGS). Runs as a
+// postbuild step via tsx so it can import the TS sources directly, and leaves the rest of
+// `extras`, which has no TS-side duplicate, untouched.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

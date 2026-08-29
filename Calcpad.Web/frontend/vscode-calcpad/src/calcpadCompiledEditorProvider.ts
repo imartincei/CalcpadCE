@@ -31,16 +31,11 @@ type RenderPanel = (
 ) => Promise<void>;
 
 /**
- * Opens compiled worksheets as an editor in their own right. A `.cpdz` is binary and
- * is meant to be filled in rather than read, so it never becomes a `TextDocument`:
- * the file is decoded, rendered as the `#UI` input form, and the values entered into
- * that form are written back by re-encoding around them. The source is not exposed
- * on the way through.
- *
- * Values mark the document dirty, so `Ctrl+S` and the workbench's save prompts work
- * as they do for any other editor. Edits are content changes rather than undoable
- * edits — a form control's own history is what the user reaches for, not the
- * workbench undo stack.
+ * Opens compiled worksheets as an editor in their own right: a `.cpdz` is binary and meant to be
+ * filled in rather than read, so it never becomes a `TextDocument` — the file is decoded, rendered
+ * as the `#UI` input form, and the values entered into it written back by re-encoding around them
+ * without exposing the source. Values mark the document dirty as content changes rather than
+ * undoable edits, so `Ctrl+S` and the save prompts work normally.
  */
 export class CalcpadCompiledEditorProvider
     implements vscode.CustomEditorProvider<CompiledWorksheetDocument>, vscode.Disposable {
@@ -204,10 +199,9 @@ export class CalcpadCompiledEditorProvider
     }
 
     /**
-     * Re-encodes around the entered values and writes to `target`. The original bytes
-     * are handed to the encoder so a composite archive keeps its bundled images.
-     * Writing in place adopts the result as the document's new baseline; a backup or
-     * Save As leaves the open document alone.
+     * Re-encodes around the entered values and writes to `target`, handing the original bytes
+     * to the encoder so a composite archive keeps its bundled images. Writing in place adopts
+     * the result as the document's new baseline; a backup or Save As leaves it alone.
      */
     private async _write(
         document: CompiledWorksheetDocument,

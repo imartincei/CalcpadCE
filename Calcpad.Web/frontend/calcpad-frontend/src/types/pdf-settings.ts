@@ -38,11 +38,10 @@ const CSS_LENGTH = /^\d*\.?\d+(cm|mm|in|pt|pc|px)$/i;
 const CSS_LENGTH_HINT = 'a length with a unit, e.g. 2cm, 0.5in, or 12mm';
 
 /**
- * Recognized keys for the `pdf` object of a metadata comment — the PDF export
- * settings a document can pin for itself. Curated rather than exhaustive: only
- * options that demonstrably affect the output are offered. Keep in sync with
- * `Calcpad.Highlighter`'s `PdfSettingsDto` (which validates the same payload) and
- * with the backend's `PdfSettingsDto`/`PdfSettingsDefaults`.
+ * Recognized keys for the `pdf` object of a metadata comment — the PDF export settings a
+ * document can pin for itself, curated rather than exhaustive. Keep in sync with
+ * `Calcpad.Highlighter`'s `PdfSettingsDto` and the backend's
+ * `PdfSettingsDto`/`PdfSettingsDefaults`.
  */
 export const PDF_SETTING_KEYS: MetadataSettingKey[] = [
   { key: 'format', label: 'Paper size', detail: 'Page size', type: 'enum', def: 'Letter', options: PAPER_FORMAT_OPTIONS },

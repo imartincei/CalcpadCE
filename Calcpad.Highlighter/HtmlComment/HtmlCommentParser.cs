@@ -51,10 +51,9 @@ namespace Calcpad.Highlighter.HtmlComment
     ///   '&lt;!--{"json": "hello", _                    multi line via " _" continuation
     ///   "more": "world"}--&gt;
     ///
-    /// Requires that the tokenizer has been run with <see cref="CalcpadTokenizer._inHtmlComment"/>
-    /// state tracking enabled, so all lines of a multi-line block are typed as HtmlComment.
-    /// A line gap (non-consecutive line numbers) in the HtmlComment token stream terminates
-    /// an open block without emitting a result.
+    /// Requires the tokenizer to have run with <see cref="CalcpadTokenizer._inHtmlComment"/> state
+    /// tracking enabled, so every line of a multi-line block is typed as HtmlComment. A line gap in
+    /// the HtmlComment token stream terminates an open block without emitting a result.
     /// </summary>
     public sealed class HtmlCommentParser
     {

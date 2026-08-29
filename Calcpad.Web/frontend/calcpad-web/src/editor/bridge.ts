@@ -19,10 +19,9 @@ export interface EditorBridge {
 }
 
 /**
- * Indirection so editor providers (hover, definitions, etc.) can ask "what
- * document am I in?" at call time. With multi-tab editing, the answer
- * changes when the user switches tabs. main.ts installs the resolver after
- * the TabManager is wired up.
+ * Indirection so editor providers can ask "what document am I in?" at call time, since with
+ * multi-tab editing the answer changes on tab switch. main.ts installs the resolver after the
+ * TabManager is wired up.
  */
 let activeDocumentKeyResolver: () => string = () => 'calcpad-editor';
 

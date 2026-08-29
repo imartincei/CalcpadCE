@@ -90,11 +90,9 @@ function detectFormatAtCursor(editor: monaco.editor.IStandaloneCodeEditor): Comm
 }
 
 /**
- * Insert a comment quote on every selected line that needs one, right after
- * its indentation (same rule headings use). A line is skipped when it already
- * opens a comment or when the selection already lands inside a text region
- * mid-line. Returns the 1-based column each quote was inserted at, keyed by
- * line number, for shifting selections.
+ * Insert a comment quote on every selected line that needs one, right after its indentation,
+ * skipping any line that already opens a comment or whose selection lands inside a text region
+ * mid-line. Returns the 1-based column each quote was inserted at, keyed by line number.
  */
 function ensureCommentPrefixes(
     model: monaco.editor.ITextModel,

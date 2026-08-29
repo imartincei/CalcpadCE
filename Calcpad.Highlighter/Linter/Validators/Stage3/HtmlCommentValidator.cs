@@ -139,27 +139,17 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         }
 
         /// <summary>
-        /// Checks the shape of the saved <c>#UI</c> values: an object mapping a control
-        /// identity to the expression entered for it, both written as strings. The keys
-        /// themselves are not checked - a key may deliberately be broader than any single
-        /// control, and one left behind by an edit is not an error.
+        /// Checks the shape of the saved <c>#UI</c> values: an object mapping a control identity to
+        /// the expression entered for it, both written as strings. The keys themselves are not
+        /// checked - a key may deliberately be broader than any single control, and one left behind
+        /// by an edit is not an error.
         /// <para>
-        /// The host (readUiOverrides in ui-overrides.ts) only ever reads the first
-        /// 'uiOverrides' comment it finds, and only when it sits on the file's first line -
-        /// anywhere else, or any comment after the first, is silently inert. Both are flagged
-        /// here rather than left to fail quietly, since either can happen from an edit or a
-        /// merge as easily as from a file reached through #include.
-        /// </para>
-        /// <para>
-        /// Sharing the comment with another key - a 'desc', a 'pdf' block - is flagged too:
-        /// the Properties tab and the host's own save/restore round-trip both rewrite a
-        /// comment in place by its position, so a comment that also carries other keys stops
-        /// being something either side can predict the shape of after an edit.
-        /// </para>
-        /// <para>
-        /// A comment reached through #include is skipped entirely: <c>CalcpadService</c>
-        /// strips 'uiOverrides' out of included content before rendering regardless of where
-        /// it sits, so it is dead weight rather than a mistake worth flagging.
+        /// The host only ever reads the first 'uiOverrides' comment it finds, and only on the
+        /// file's first line, so anything else is flagged here rather than left to fail quietly - as
+        /// is sharing the comment with another key, since both the Properties tab and the host's
+        /// save/restore round-trip rewrite such a comment in place by its position. A comment
+        /// reached through #include is skipped entirely, because <c>CalcpadService</c> strips
+        /// 'uiOverrides' out of included content before rendering.
         /// </para>
         /// </summary>
         private static void ValidateUiOverrides(HtmlCommentBlock block, JsonElement root, Stage3Context stage3, DirectiveJsonReporter reporter, ref bool sawUiOverrides)

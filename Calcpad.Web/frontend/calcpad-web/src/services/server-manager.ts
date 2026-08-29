@@ -67,11 +67,10 @@ export class TauriServerManager {
     getBaseUrl(): string { return this.url; }
 
     /**
-     * Per-launch token the sidecar requires on every `/api` route. Rust owns it and
-     * keeps it across sidecar restarts, so this is fetched once and never refreshed.
-     * Null only if the command is missing, which means an older shell — the request
-     * then goes out unauthenticated and the server answers 401 rather than serving
-     * anyone who asks.
+     * Per-launch token the sidecar requires on every `/api` route. Rust owns it and keeps it
+     * across sidecar restarts, so this is fetched once and never refreshed; null only if the
+     * command is missing, in which case the request goes out unauthenticated and the server
+     * answers 401.
      */
     getAuthToken(): string | null { return this.token; }
 
@@ -202,10 +201,9 @@ export class TauriServerManager {
     }
 
     /**
-     * Auto-restart after a crash. Unlike the manual restart(), this preserves
-     * the crash streak so a crash-loop eventually gives up. If the respawn
-     * itself fails (crash-on-startup), Rust may never re-emit `server-crashed`,
-     * so we reschedule here until the streak is exhausted.
+     * Auto-restart after a crash. Unlike the manual restart(), this preserves the crash streak
+     * so a crash-loop eventually gives up, and reschedules itself because a failed respawn may
+     * mean Rust never re-emits `server-crashed`.
      */
     private async autoRestart(): Promise<void> {
         try {
@@ -248,11 +246,10 @@ export class TauriServerManager {
     }
 
     /**
-     * Render a human-readable `last-crash.txt` beside the .NET minidump, matching
-     * the VS Code extension. The dump's `createdump` crashreport.json carries the
-     * managed exception + traceback for faults (StackOverflow / FailFast) that the
-     * server's own FileLogger never sees. Formatting is shared via calcpad-frontend
-     * so both hosts emit an identical record.
+     * Render a human-readable `last-crash.txt` beside the .NET minidump, matching the VS Code
+     * extension, since the dump's crashreport.json carries the managed traceback for faults the
+     * server's own FileLogger never sees. Formatting is shared via calcpad-frontend so both
+     * hosts emit an identical record.
      */
     private async writeCrashRecord(payload: ServerCrashPayload): Promise<void> {
         try {

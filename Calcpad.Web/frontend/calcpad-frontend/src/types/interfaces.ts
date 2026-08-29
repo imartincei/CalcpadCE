@@ -1,16 +1,14 @@
 /**
- * Logging adapter interface.
- * VS Code extension provides vscode.OutputChannel.
- * Electron app provides console or file logger.
+ * Logging adapter interface: vscode.OutputChannel in the extension, console or a file logger
+ * in the Electron app.
  */
 export interface ILogger {
     appendLine(message: string): void;
 }
 
 /**
- * File system adapter interface.
- * VS Code extension provides vscode.workspace.fs.
- * Electron app provides Node.js fs.
+ * File system adapter interface: vscode.workspace.fs in the extension, Node.js fs in the
+ * Electron app.
  */
 export interface IFileSystem {
     readFile(path: string): Promise<Uint8Array>;

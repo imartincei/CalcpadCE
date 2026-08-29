@@ -116,10 +116,9 @@ struct DraftContent {
     content: String,
 }
 
-/// Pull out any worksheet paths (.cpd or compiled .cpdz — both are registered file
-/// associations) from a launch argv so we can open them once the frontend is ready.
-/// argv[0] is the executable path — skip it. macOS may pass an `-psn_...` process
-/// serial arg for double-click launches.
+/// Pull out any worksheet paths (.cpd or compiled .cpdz) from a launch argv so we can open
+/// them once the frontend is ready. argv[0] is the executable path, and macOS may pass an
+/// `-psn_...` process serial arg for double-click launches.
 fn extract_launch_files<I: IntoIterator<Item = String>>(args: I) -> Vec<PathBuf> {
     args.into_iter()
         .skip(1)
@@ -135,17 +134,11 @@ fn extract_launch_files<I: IntoIterator<Item = String>>(args: I) -> Vec<PathBuf>
         .collect()
 }
 
-/// Per-launch shared secret the sidecar requires on every `/api` request.
-///
-/// Loopback binding keeps remote machines out but not other processes on this
-/// one, and `#include` resolution reads any path it is handed — so without this
-/// any local program (or any page the user's browser loads from loopback) has
-/// arbitrary file read as the user. Generated once and reused across sidecar
-/// restarts, so a restart doesn't invalidate the token the webview already holds.
-///
-/// Handed to the child through its environment, never argv: `/proc/{pid}/cmdline`
-/// is world-readable on Linux, and Win32_Process.CommandLine is readable through
-/// WMI on Windows. The environment block is same-user only.
+/// Per-launch shared secret the sidecar requires on every `/api` request, without which any
+/// local program would have arbitrary file read as the user — loopback binding keeps remote
+/// machines out but not other local processes, and `#include` resolution reads any path it is
+/// handed. Generated once and reused across sidecar restarts, and handed to the child through
+/// its environment rather than argv, which is world-readable via `/proc/{pid}/cmdline` and WMI.
 fn api_token() -> &'static str {
     API_TOKEN.get_or_init(|| {
         let mut bytes = [0u8; 32];
@@ -373,11 +366,9 @@ fn server_url(state: State<'_, ServerState>) -> Option<String> {
     state.url.lock().ok().and_then(|g| g.clone())
 }
 
-/// Hands the webview the token it must send as `X-Calcpad-Token` on every API call.
-///
-/// Safe to expose: the webview is the app's own trusted frontend, served from
-/// `tauri://`. Worksheet content renders inside a sandboxed opaque-origin frame
-/// that has no IPC access, so it cannot reach this command.
+/// Hands the webview the token it must send as `X-Calcpad-Token` on every API call. Safe to
+/// expose: the webview is the app's own frontend served from `tauri://`, while worksheet
+/// content renders inside a sandboxed opaque-origin frame with no IPC access.
 #[tauri::command]
 fn server_token() -> &'static str {
     api_token()
@@ -388,12 +379,10 @@ fn take_pending_launch_files(state: State<'_, PendingLaunchFiles>) -> Vec<String
     state.0.lock().map(|mut g| std::mem::take(&mut *g)).unwrap_or_default()
 }
 
-/// Grants read access to `path` and the directory holding it.
-///
-/// The sibling grant is what worksheets need: image `src`s resolve relative to
-/// the document's own folder, and the dialog plugin grants only the file the
-/// user actually clicked. Non-recursive, so picking a file in a large tree does
-/// not hand over the whole subtree.
+/// Grants read access to `path` and the directory holding it, which is what worksheets need
+/// since image `src`s resolve relative to the document's folder and the dialog plugin grants
+/// only the clicked file. Non-recursive, so picking a file in a large tree does not hand over
+/// the whole subtree.
 fn allow_file_and_parent(app: &AppHandle, path: &Path) {
     let scope = app.fs_scope();
     let _ = scope.allow_file(path);
@@ -402,12 +391,10 @@ fn allow_file_and_parent(app: &AppHandle, path: &Path) {
     }
 }
 
-/// Extends the read scope to the folder of a document the webview may already read.
-///
-/// Gated on the runtime scope already allowing `path`, which is only true once the
-/// user has picked it through a dialog — so webview script cannot call this to grant
-/// itself a directory it was never given. The capability's `fs:deny-default` entries
-/// are unaffected: the fs plugin checks the ACL denies separately from this scope.
+/// Extends the read scope to the folder of a document the webview may already read, gated on
+/// the runtime scope already allowing `path` — only true once the user picked it through a
+/// dialog — so webview script cannot grant itself a directory it was never given. The
+/// capability's `fs:deny-default` entries are unaffected.
 #[tauri::command]
 fn allow_document_dir(app: AppHandle, path: String) -> Result<(), String> {
     let path = PathBuf::from(&path);
@@ -434,13 +421,10 @@ async fn stop_server(app: AppHandle) -> Result<(), String> {
     Ok(())
 }
 
-/// True for the handful of variables the frontend legitimately expands.
-///
-/// `expandEnvVars` in the JS bridge feeds this names lifted straight out of
-/// worksheet text (`#include $HOME/lib.cpd`), so an unrestricted `get_env`
-/// turns any `$AWS_SECRET_ACCESS_KEY` in a document into a value the webview —
-/// and anything it renders — can see. Only the names that name a location are
-/// answered; everything else reads as unset.
+/// True for the handful of variables the frontend legitimately expands: `expandEnvVars` feeds
+/// this names lifted straight out of worksheet text, so an unrestricted `get_env` would turn any
+/// `$AWS_SECRET_ACCESS_KEY` in a document into a value the webview can see. Only names that name
+/// a location are answered; everything else reads as unset.
 fn is_readable_env(name: &str) -> bool {
     // Only ever set on the sidecar's own env block, so this process should never
     // hold it — denied anyway so an inherited one can't be expanded out of a
@@ -490,12 +474,9 @@ fn set_recent_files(app: AppHandle, paths: Vec<String>) -> Result<(), String> {
     refresh_menu(&app)
 }
 
-// Inside a linuxdeploy-generated AppImage, AppRun exports LD_LIBRARY_PATH so
-// the bundled binary can find its libs. If we spawn xdg-open through the
-// opener plugin, the child inherits that env, and any glib/dbus tools it
-// invokes crash trying to load the AppImage's bundled libc/libglib against
-// the host system. Strip those vars (plus the archived originals AppRun
-// stashes) so xdg-open sees a pristine environment.
+// Inside a linuxdeploy-generated AppImage, AppRun exports LD_LIBRARY_PATH so the bundled
+// binary can find its libs, and a spawned xdg-open would inherit it and crash any glib/dbus
+// tools it invokes. Strip those vars (plus the archived originals AppRun stashes).
 #[tauri::command]
 fn open_path_native(path: String) -> Result<(), String> {
     #[cfg(target_os = "linux")]
@@ -554,9 +535,8 @@ fn server_dir(app: AppHandle) -> Result<String, String> {
         .map_err(|e| e.to_string())
 }
 
-// Writable log directory shared with the .NET sidecar. On an AppImage the
-// resource dir is a read-only FUSE mount, so the server can't create logs/
-// beside its apphost. Point both sides at app_data_dir/logs instead.
+// Writable log directory shared with the .NET sidecar. On an AppImage the resource dir is a
+// read-only FUSE mount, so both sides point at app_data_dir/logs instead.
 fn resolve_log_dir(app: &AppHandle) -> Option<PathBuf> {
     let dir = app.path().app_data_dir().ok()?.join("logs");
     let _ = std::fs::create_dir_all(&dir);
@@ -572,27 +552,16 @@ fn log_dir(app: AppHandle) -> Result<String, String> {
 
 /// Launch the .NET calculation server as a background child process.
 ///
-/// **Why not `tauri_plugin_shell::sidecar()`?** Framework-dependent .NET
-/// publishes need ~200 sibling DLLs / native libs / deps.json in the same
-/// directory as the apphost. Tauri's `externalBin` places binaries in
-/// `usr/bin/` on Linux `.deb`, `Contents/MacOS/` on macOS `.app`, and the
-/// install root on Windows — all read-only at runtime — while
-/// `bundle.resources` land in a separate resource dir. There is no config
-/// path that puts both in the same directory, and Tauri v2 has no post-bundle
-/// hook (`beforeBundleCommand` runs before packaging). Spawning directly
-/// from the resource dir via `tokio::process::Command` sidesteps the layout
-/// mismatch entirely — the apphost and its siblings all live under
-/// `BaseDirectory::Resource`.
+/// **Why not `tauri_plugin_shell::sidecar()`?** Framework-dependent .NET publishes need ~200
+/// sibling DLLs / native libs / deps.json in the apphost's own directory, and no Tauri config
+/// puts `externalBin` and `bundle.resources` in the same place (nor is there a post-bundle
+/// hook). Spawning directly from the resource dir via `tokio::process::Command` sidesteps the
+/// layout mismatch entirely.
 ///
-/// **macOS limitation** — dropping `externalBin` also drops Tauri's automatic
-/// codesigning of the child binary and its ~200 `.dylib` siblings. On macOS,
-/// notarization will reject an unsigned bundle. macOS is not a primary
-/// target for this project today, so this is deferred. When it becomes one,
-/// either (a) add a `codesign --deep --force --sign "$IDENTITY" --options
-/// runtime` pass over the publish tree in `beforeBundleCommand`, or (b)
-/// revisit once Tauri v2 supports codesigning resource files directly.
-/// Tracking upstream: tauri-apps/tauri#8501 (per-arch resources), #11992
-/// (macOS notarization + externalBin bugs).
+/// **macOS limitation** — dropping `externalBin` also drops Tauri's automatic codesigning of
+/// the child binary and its `.dylib` siblings, which notarization would reject. Deferred while
+/// macOS is not a primary target; the fix is a `codesign` pass in `beforeBundleCommand` or
+/// upstream support (tauri-apps/tauri#8501, #11992).
 async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     let state: State<'_, ServerState> = app.state();
     let my_gen = state.generation.fetch_add(1, Ordering::SeqCst) + 1;
@@ -644,25 +613,22 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     if let Some(dir) = &log_dir {
         command.env("CALCPAD_LOG_DIR", dir);
     }
-    // Every /api route on the child requires this header value. Env, not argv —
-    // see api_token(). ASPNETCORE_ENVIRONMENT is pinned because the child
-    // inherits our whole environment: a developer with Development exported
-    // would otherwise get Swagger and the debug-crash endpoint on a shipped app.
+    // Every /api route on the child requires this header value, passed via env rather than argv
+    // (see api_token()). ASPNETCORE_ENVIRONMENT is pinned because the child inherits our whole
+    // environment: a developer with Development exported would otherwise get Swagger and the
+    // debug-crash endpoint on a shipped app.
     command
         .env("CALCPAD_API_TOKEN", api_token())
         .env("ASPNETCORE_ENVIRONMENT", "Production");
 
-    // Enable the .NET runtime's on-crash minidump (createdump). StackOverflow,
-    // FailFast and access violations bypass AppDomain.UnhandledException, so the
-    // server's own FileLogger never sees them — the runtime-level dump is the
-    // only trace. These vars must be set before the runtime boots (setting them
-    // from inside the server is too late), which is why this lives here and not
-    // in Program.cs. Mirrors the VS Code extension's spawn config.
+    // Enable the .NET runtime's on-crash minidump (createdump) for StackOverflow, FailFast and
+    // access violations, which bypass AppDomain.UnhandledException so the server's FileLogger
+    // never sees them. These vars must be set before the runtime boots, which is why they live
+    // here rather than in Program.cs.
     //
-    // The dump goes to the writable logs/ dir (CRASH_DIR, falling back to the
-    // locally-resolved log dir or temp) because on an AppImage the resource dir
-    // beside the apphost is read-only. Fixed filename — each crash overwrites the
-    // last, matching the one-server-at-a-time model.
+    // The dump goes to the writable logs/ dir because on an AppImage the resource dir beside
+    // the apphost is read-only. Fixed filename — each crash overwrites the last, matching the
+    // one-server-at-a-time model.
     let dump_dir = crash_dir()
         .map(|p| p.to_path_buf())
         .or_else(|| log_dir.clone())
@@ -771,15 +737,10 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
         });
     }
 
-    // Stdout/stderr line readers — replaces the shell plugin's CommandEvent
-    // stream. Each stream drains on its own task so a chatty stderr doesn't
-    // starve stdout. Both feed the shared tail buffer and scan for Kestrel's
-    // "Now listening on:" marker as a fallback for the port file.
-    //
-    // `stdout` and `stderr` are different concrete types (ChildStdout /
-    // ChildStderr), so we can't share a single non-generic closure. Type-erase
-    // both to `Box<dyn AsyncRead + Send + Unpin>` and hand them to one reader
-    // function; keeps the drain logic in one place.
+    // Stdout/stderr line readers — replaces the shell plugin's CommandEvent stream. Each stream
+    // drains on its own task so a chatty stderr doesn't starve stdout, both feed the shared tail
+    // buffer while scanning for Kestrel's "Now listening on:" marker, and both are type-erased to
+    // `Box<dyn AsyncRead + Send + Unpin>` since they are different concrete types.
     use tokio::io::AsyncRead;
     fn spawn_stream_reader(
         stream: Box<dyn AsyncRead + Send + Unpin>,
@@ -861,13 +822,10 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
         let tail = tail.clone();
         let dump_path = dump_path.clone();
         tauri::async_runtime::spawn(async move {
-            // `killed` distinguishes an explicit stop (kill_rx fired — restart,
-            // menu Stop, window close) from an unexpected exit. We must NOT
-            // infer this from a shared `intentional_stop` flag: a concurrent
-            // spawn during restart resets any such flag before the old process
-            // finishes dying, so its intentional kill gets misreported as a
-            // crash (start_kill exits with code 1 on Windows), which triggers a
-            // JS auto-restart storm. The branch that fired is the ground truth.
+            // `killed` distinguishes an explicit stop (kill_rx fired) from an unexpected exit.
+            // It must NOT be inferred from a shared `intentional_stop` flag: a concurrent
+            // spawn during restart resets any such flag before the old process finishes dying,
+            // misreporting its intentional kill as a crash and triggering a JS restart storm.
             let mut killed = false;
             let exit_code: Option<i32> = tokio::select! {
                 r = child.wait() => r.ok().and_then(|s| s.code()),
@@ -1045,10 +1003,10 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         .clone();
     let sep = || PredefinedMenuItem::separator(app);
 
-    // Grouped by what gets rendered. The unsuffixed ids are the report — the default
-    // variant everywhere — so they stay stable; `:preview`, `:input` and `:unwrapped`
-    // name one explicitly. The frontend parses `export-<format>[:<variant>]`.
-    // A form and a code listing have no meaningful Word form, so neither offers one.
+    // Grouped by what gets rendered: the unsuffixed ids are the report — the default variant
+    // everywhere — while `:preview`, `:input` and `:unwrapped` name one explicitly, and the
+    // frontend parses `export-<format>[:<variant>]`. A form and a code listing have no meaningful
+    // Word form, so neither offers one.
     let export = Submenu::with_items(
         app,
         "Export",

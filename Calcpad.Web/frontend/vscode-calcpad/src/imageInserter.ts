@@ -200,8 +200,8 @@ export class ImageInserter {
     }
 
     /**
-     * Save image to ./images/ subfolder relative to the document.
-     * Creates directory if needed. Handles filename collisions.
+     * Save image to ./images/ subfolder relative to the document, creating the directory if
+     * needed and resolving filename collisions.
      */
     private async saveToImagesFolder(
         imageData: Uint8Array,

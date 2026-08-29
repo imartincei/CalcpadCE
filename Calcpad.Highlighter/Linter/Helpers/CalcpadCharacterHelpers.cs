@@ -110,9 +110,8 @@ namespace Calcpad.Highlighter.Linter.Helpers
         }
 
         /// <summary>
-        /// Extracts an identifier from the start of a string.
-        /// Stops at the first non-identifier character.
-        /// Uses span slicing instead of StringBuilder for zero intermediate allocations.
+        /// Extracts an identifier from the start of a string, stopping at the first non-identifier
+        /// character. Uses span slicing instead of StringBuilder for zero intermediate allocations.
         /// </summary>
         public static string ExtractIdentifier(string text)
         {
@@ -128,9 +127,8 @@ namespace Calcpad.Highlighter.Linter.Helpers
         }
 
         /// <summary>
-        /// Checks if a character is valid in a macro name.
-        /// Macro names can contain letters (a-z, A-Z), underscores, and digits (after first position).
-        /// This matches Calcpad.Core's Validator.IsMacroLetter behavior.
+        /// Checks if a character is valid in a macro name: letters, underscores, and digits after
+        /// the first position. Matches Calcpad.Core's Validator.IsMacroLetter behavior.
         /// </summary>
         public static bool IsMacroLetter(char c, int position)
         {

@@ -2,20 +2,11 @@ namespace Calcpad.Server.Services
 {
     /// <summary>
     /// The client side half of the <c>#UI</c> feature: wires change events on the controls
-    /// that <c>ExpressionParser</c> emitted and hydrates datagrid containers with
-    /// jspreadsheet. Every edit is posted to the host as a <c>uiValueChange</c> message
-    /// carrying the control key from <c>data-ui-var</c>, which the host stores and sends
-    /// back as a <c>uiOverrides</c> entry on the next convert.
-    ///
-    /// Emitted server side rather than per frontend so the web editor, the Tauri desktop
-    /// app and the VS Code webview all share one implementation; the script picks its
-    /// message channel at runtime instead of being built per host.
-    ///
-    /// Each edit makes the host re-render and rewrite the whole document, so the script
-    /// also stashes where the user was - the focused control and its caret, the datagrid's
-    /// selected cell - and reapplies it once the replacement has hydrated. Scroll is not
-    /// its business: the frontends' preview agent anchors that against content the page
-    /// lays out asynchronously, which nothing here can see.
+    /// <c>ExpressionParser</c> emitted and hydrates datagrid containers with jspreadsheet, each
+    /// edit posted to the host as a <c>uiValueChange</c> message carrying the
+    /// <c>data-ui-var</c> key. Emitted server side rather than per frontend so all three hosts
+    /// share one implementation, and it also stashes where the user was — focused control,
+    /// caret, selected cell — to reapply once the replacement document has hydrated.
     /// </summary>
     internal static class UiPreviewScript
     {
@@ -57,13 +48,10 @@ namespace Calcpad.Server.Services
     // the document afresh - rather than having it re-rendered - never moves focus.
     var armed = false;
 
-    // Handing the state to the host is what carries it across a re-render in the web
-    // and desktop editors. They swap the document by assigning srcdoc, which builds a
-    // fresh browsing context, so this window does not survive; and the preview frame is
-    // sandboxed to an opaque origin, where touching sessionStorage throws. The host
-    // seeds __calcpadUiPosition into the next document for readState to pick up.
-    // The VS Code webview is the top window, never posts, and keeps using
-    // sessionStorage, which works there because it has a real origin.
+    // Handing the state to the host is what carries it across a re-render in the web and
+    // desktop editors: they swap the document by assigning srcdoc, so this window does not
+    // survive, and the sandboxed frame's opaque origin makes sessionStorage throw. The VS Code
+    // webview is the top window, never posts, and keeps using sessionStorage.
     function postState(state) {
         if (window.parent === window) return;
         try {
@@ -163,11 +151,10 @@ namespace Calcpad.Server.Services
     document.addEventListener('mouseup', trackPosition);
 
     // What a control may produce. The entered text replaces the right hand side of the
-    // assignment in the source, and #UI only annotates values, so anything that is not a
-    // number would turn the line into an error. There is no exponent form - MathParser
-    // reads the 'e' of 2.5e6 as a unit. PARTIAL additionally passes the states a number
-    // goes through while it is being typed - '-', '1.' - which are filtered on the way in
-    // but never posted.
+    // assignment and #UI only annotates values, so anything that is not a number would turn the
+    // line into an error — with no exponent form, since MathParser reads the 'e' of 2.5e6 as a
+    // unit, and with PARTIAL additionally passing the mid-typing states, which are filtered on
+    // the way in but never posted.
     var NUMBER = /^[-+]?(\d+\.?\d*|\.\d+)$/;
     var PARTIAL = /^[-+]?(\d+\.?\d*|\.\d*)?$/;
 

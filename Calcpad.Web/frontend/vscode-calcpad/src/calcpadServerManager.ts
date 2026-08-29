@@ -33,18 +33,11 @@ interface PlatformNativeInfo {
 }
 
 /**
- * NuGet dependencies stripped from the bundled bin/ and downloaded on first
- * activation. Same shape and lifecycle as SkiaSharp's native libs — fetch the
- * .nupkg from nuget.org, extract the DLLs we need into bin/, never re-download
- * if the files are already present.
- *
- * Pulling these out shaves ~20 MB off the VSIX; the rest of the savings comes
- * from the framework-dependent publish (no bundled .NET runtime) handled by
- * DotnetRuntimeManager.
- *
- * Versions must stay in lock-step with Calcpad.Server.deps.json. The sync
- * script (sync-bundled-server.mjs) strips these same DLLs from the bundled
- * bin/ before packaging — keep both lists in sync when bumping a package.
+ * NuGet dependencies stripped from the bundled bin/ and downloaded on first activation, same
+ * shape and lifecycle as SkiaSharp's native libs: fetch the .nupkg, extract the DLLs we need
+ * into bin/, never re-download if they are already present. Versions must stay in lock-step
+ * with Calcpad.Server.deps.json, and sync-bundled-server.mjs strips these same DLLs before
+ * packaging — keep both lists in sync when bumping a package.
  */
 interface ExternalManagedDep {
     /** NuGet package id, used to build the v2 download URL. */
@@ -240,9 +233,8 @@ export class CalcpadServerManager extends BaseServerManager implements vscode.Di
     }
 
     /**
-     * Download a NuGet package's .nupkg and extract it into a fresh subdir
-     * under `tmpDir`. Returns the extracted directory. Caller is responsible
-     * for cleaning up tmpDir.
+     * Download a NuGet package's .nupkg and extract it into a fresh subdir under `tmpDir`,
+     * returning the extracted directory. The caller is responsible for cleaning up `tmpDir`.
      */
     private async fetchAndUnzipNupkg(packageId: string, version: string, tmpDir: string): Promise<string> {
         this.outputChannel.appendLine(`[ServerManager] Fetching ${packageId} v${version}`);

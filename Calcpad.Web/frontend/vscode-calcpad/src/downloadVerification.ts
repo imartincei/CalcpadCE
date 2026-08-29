@@ -109,24 +109,14 @@ export async function downloadVerified(options: {
 }
 
 /**
- * Cross-platform .nupkg / .zip extractor.
+ * Cross-platform .nupkg / .zip extractor. On Windows it calls
+ * `[System.IO.Compression.ZipFile]::ExtractToDirectory` via PowerShell, because
+ * `Expand-Archive` silently no-ops on signed `.nupkg` files and, unlike it, the .NET API
+ * validates entry paths against the destination so a crafted archive cannot escape it.
  *
- * On Windows we call `[System.IO.Compression.ZipFile]::ExtractToDirectory`
- * directly via PowerShell — `Expand-Archive` has a long-standing habit of
- * silently no-op'ing on signed `.nupkg` files (the `.signature.p7s` member
- * trips up its file iteration), which manifested here as
- * "DocumentFormat.OpenXml.dll not found in lib/…" even though the DLL was
- * sitting in the .nupkg at lib/net8.0/. The underlying .NET API works fine,
- * and unlike `Expand-Archive` it validates entry paths against the destination
- * so a crafted archive cannot escape it.
- *
- * On Linux/macOS we shell out to `unzip`, which is preinstalled in macOS
- * and present on essentially every Linux distro. We surface stderr so a
- * missing `unzip` doesn't degenerate into the same "lib/ not found"
- * mystery — the user sees "unzip: command not found" instead.
- *
- * Paths are passed via env vars on Windows so backslashes / apostrophes /
- * spaces in the user's extension path can't break shell quoting.
+ * On Linux/macOS it shells out to `unzip`, surfacing stderr so a missing `unzip` is reported as
+ * itself. Paths are passed via env vars on Windows so spaces and quotes in the extension path
+ * cannot break shell quoting.
  */
 export function extractZipToDir(zipPath: string, destDir: string): void {
     if (process.platform === 'win32') {

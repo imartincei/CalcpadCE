@@ -46,19 +46,13 @@ namespace Calcpad.Highlighter.HtmlComment
 
     /// <summary>
     /// JSON payload of the <c>pdf</c> key of a metadata comment
-    /// (<c>'&lt;!--{"pdf":{...}}--&gt;</c>) - the PDF export settings a document pins
-    /// for itself. Calcpad.Core never sees these: the comment is HTML, so the engine
-    /// renders past it and only the export path reads it.
+    /// (<c>'&lt;!--{"pdf":{...}}--&gt;</c>) - the PDF export settings a document pins for itself.
+    /// Calcpad.Core never sees these: the comment is HTML, so only the export path reads it, and
+    /// <c>PdfGeneratorService</c> deserializes a <c>/pdf</c> request's <c>options</c> into this
+    /// same type, where a null field means "use the default".
     /// <para>
-    /// This same type is also what <c>PdfGeneratorService</c> deserializes a <c>/pdf</c>
-    /// request's <c>options</c> into - a null field means "use the default," resolved
-    /// at the point each field is used (e.g. <c>options.MarginTop ?? "0.75in"</c>).
-    /// </para>
-    /// <para>
-    /// The recognized keys are curated, not the full set the PDF endpoint accepts -
-    /// only options that demonstrably affect the output are offered. Keep this in step
-    /// with <c>PDF_SETTING_KEYS</c> in <c>metadata-comment.ts</c>, which validates the
-    /// same payload in the editor panel.
+    /// The recognized keys are curated, not the full set the PDF endpoint accepts. Keep in step
+    /// with <c>PDF_SETTING_KEYS</c> in <c>metadata-comment.ts</c>, which validates the same payload.
     /// </para>
     /// </summary>
     public sealed class PdfSettingsDto : DirectiveDto<PdfSettingsDto, PdfSettingKey>

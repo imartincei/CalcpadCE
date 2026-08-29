@@ -309,10 +309,9 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     break;
 
                 // While a worksheet is being filled in, the panel the user is working in is
-                // the input form, not the source editor -- and a focused webview leaves
-                // `activeTextEditor` undefined, so this used to do nothing at all. Scroll the
-                // rendered views to the line as well, and move the cursor without pulling
-                // focus off the form, so leaving input mode lands on the same place.
+                // the input form, not the source editor, and a focused webview leaves
+                // `activeTextEditor` undefined. So the rendered views are scrolled too, and
+                // the cursor moves without pulling focus off the form.
                 case 'goToLine':
                     {
                         const goToEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
@@ -617,12 +616,10 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     }
 
     /**
-     * Tells the panel whether the user is filling a worksheet in rather than editing it —
-     * the input form is open, or a compiled worksheet is the active editor — and whether
-     * that worksheet has any source behind it. Only `sourceless` greys the tabs that act
-     * on source: a `.cpd` behind an input form is still an open, editable document in VS
-     * Code, so they keep working. Remembered so a view that is resolved again (the sidebar
-     * reloads its webview when re-expanded) comes back in step.
+     * Tells the panel whether the user is filling a worksheet in rather than editing it — the
+     * input form is open, or a compiled worksheet is active — and whether that worksheet has
+     * any source behind it. Only `sourceless` greys the tabs that act on source, and the state
+     * is remembered so a re-resolved view comes back in step.
      */
     public setInputMode(active: boolean, sourceless: boolean) {
         if (active === this._inputMode && sourceless === this._sourceless) return;
@@ -787,9 +784,9 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     }
 }
 
-// A CSP nonce is a guessing target: predict it and injected markup runs. Math.random
-// is a seeded PRNG whose stream is recoverable from a few outputs, so this takes OS
-// entropy instead. base64url keeps it valid inside the CSP header without escaping.
+// A CSP nonce is a guessing target, and Math.random is a seeded PRNG whose stream is
+// recoverable from a few outputs, so this takes OS entropy instead. base64url keeps it valid
+// inside the CSP header without escaping.
 function getNonce() {
     return crypto.randomBytes(24).toString('base64url');
 }

@@ -62,9 +62,9 @@ namespace Calcpad.Highlighter.Tokenizer.Models
         public List<DuplicateMacro> DuplicateMacros { get; } = new();
 
         /// <summary>
-        /// User-defined macro info for linting (only populated in Macro mode).
-        /// Key: macro name (case-insensitive), Value: MacroInfo with param counts.
-        /// Built directly during tokenization for single source of truth.
+        /// User-defined macro info for linting (only populated in Macro mode), keyed by macro name
+        /// (case-insensitive) with MacroInfo values carrying param counts. Built directly during
+        /// tokenization for a single source of truth.
         /// </summary>
         public Dictionary<string, MacroInfo> UserDefinedMacros { get; } = new(System.StringComparer.OrdinalIgnoreCase);
 

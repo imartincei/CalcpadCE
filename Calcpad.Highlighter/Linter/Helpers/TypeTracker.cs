@@ -488,12 +488,10 @@ namespace Calcpad.Highlighter.Linter.Helpers
         }
 
         /// <summary>
-        /// Infers type from a complex expression containing operators.
-        /// Scans for top-level variable references and function calls within the expression.
-        /// If any operand is a known vector or matrix, the result type propagates
-        /// (vector op vector = vector, matrix op anything = matrix, etc.).
-        /// Function call arguments are skipped (balanced parens) so that e.g. len(vec)
-        /// uses len's return type (scalar), not vec's type.
+        /// Infers type from a complex expression containing operators, scanning for top-level
+        /// variable references and function calls so a known vector or matrix operand propagates
+        /// (vector op vector = vector, matrix op anything = matrix). Function call arguments are
+        /// skipped over balanced parens, so len(vec) uses len's scalar return type, not vec's.
         /// </summary>
         private CalcpadType InferTypeFromOperandTypes(string expression)
         {

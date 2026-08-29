@@ -16,9 +16,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
         private void ValidateBrackets(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
-            // Check bracket balance per-line. After Stage 1 resolves explicit line
-            // continuations (\) and implicit continuations ({}), each Stage 3 line
-            // should have balanced brackets. Unmatched brackets indicate errors.
+            // Check bracket balance per-line: after Stage 1 resolves explicit and implicit line
+            // continuations, each Stage 3 line should have balanced brackets. Unmatched brackets
+            // indicate errors.
             for (int i = 0; i < stage3.Lines.Count; i++)
             {
                 if (!tokenProvider.IsCpdMode(i)) continue;

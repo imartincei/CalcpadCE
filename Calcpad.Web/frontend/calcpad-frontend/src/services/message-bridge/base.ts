@@ -64,13 +64,12 @@ export interface VariantRender {
 }
 
 /**
- * `report` is the default: the print layout, with `#pre` hidden and the entered `#UI` values
- * applied. `preview` is what the results pane shows. `input` is the form itself — `enableUi`
- * needs `forPrint` false, since the server drops UI mode for print output.
+ * `report` is the default (the print layout, `#pre` hidden and entered `#UI` values applied),
+ * `preview` is what the results pane shows, and `input` is the form itself — which needs
+ * `forPrint` false, since the server drops UI mode for print output.
  *
- * `previewAppliesUiOverrides` is the "Apply `#UI` Values in Preview" setting, and is the whole
- * of what Preview's `#UI` handling depends on: an exported Preview shows what the Preview pane
- * shows, so the setting has to reach both or the two disagree.
+ * `previewAppliesUiOverrides` is the "Apply `#UI` Values in Preview" setting, and has to reach
+ * both the pane and the export or the two disagree.
  */
 export function variantRender(variant: ExportVariant, previewAppliesUiOverrides = false): VariantRender {
     switch (variant) {
@@ -638,9 +637,8 @@ export abstract class BaseMessageBridge {
     }
 
     private async handleInsertImage(): Promise<void> {
-        // File picker: the image already exists on disk, so reference it in
-        // place. The storage-mode prompt is only for pasted in-memory images.
-        // On web (no real file path) this returns a base64 data URI.
+        // File picker: the image already exists on disk, so it is referenced in place and
+        // the storage-mode prompt is skipped. On web this returns a base64 data URI.
         const src = await this.pickImageSrc();
         if (src && this._onInsertText) {
             this._onInsertText(buildImageCommentLine(src));
@@ -678,11 +676,10 @@ export abstract class BaseMessageBridge {
     }
 
     /**
-     * Decide how the image should be stored. On desktop we offer the base64 /
-     * images-folder / custom-path choice (matching the VS Code extension) — the
-     * images-folder option only when the document is saved (it needs a folder
-     * to sit beside). Without disk access (pure web) base64 is the only option.
-     * Large base64 embeds get a follow-up warning with a save-to-file escape hatch.
+     * Decide how the image should be stored: desktop offers the base64 / images-folder /
+     * custom-path choice, the images-folder option only for a saved document, while pure web
+     * has base64 alone. Large base64 embeds get a follow-up warning with a save-to-file
+     * escape hatch.
      */
     private async resolveImageStorageMode(image: PickedImage): Promise<ImageStorageMode | null> {
         if (!this.canSaveImageToDisk() || !this.quickPick) return 'base64';
@@ -760,13 +757,10 @@ export abstract class BaseMessageBridge {
     }
 
     /**
-     * Compiles the active document to a `.cpdz` and prompts for a location. This is an
-     * export, not a Save As: the open document keeps its own path and stays editable.
-     * Returns the saved path where the platform has one.
-     *
-     * The worksheet is bundled first — includes expanded, `#read` data inlined — then its
-     * images are embedded, in that order: an included file's images only resolve once the
-     * server has rewritten their paths.
+     * Compiles the active document to a `.cpdz` and prompts for a location — an export rather
+     * than a Save As, so the open document keeps its own path and stays editable. The worksheet
+     * is bundled before its images are embedded, since an included file's images only resolve
+     * once the server has rewritten their paths.
      */
     async saveCompiled(): Promise<string | null> {
         const content = this.getActiveEditorContent();
@@ -800,11 +794,9 @@ export abstract class BaseMessageBridge {
 
     /**
      * Packs the active document and everything it references into a portable archive, then
-     * prompts for a location. Unlike a compiled worksheet this stays text: what comes out is
-     * the document as written, with only its paths pointing somewhere else — at the folder of
-     * references packed beside it. The recipient can read and edit it.
-     *
-     * The server does the packing, since resolving the references means reading them.
+     * prompts for a location. Unlike a compiled worksheet this stays text — the document as
+     * written, with only its paths pointing at the folder of references packed beside it — and
+     * the server does the packing, since resolving the references means reading them.
      */
     async savePortable(): Promise<string | null> {
         const content = this.getActiveEditorContent();
@@ -847,11 +839,9 @@ export abstract class BaseMessageBridge {
 
     /**
      * Runs the document's `#write`/`#append` directives now, whatever the write-mode setting
-     * says. The report render is the one used: it is the authoritative output, so `#post`
-     * blocks and entered `#UI` values are included exactly as a saved report would have them.
-     *
-     * Rendered with line anchors on, since that is what makes the parser record its errors —
-     * the HTML is discarded, only the errors are read.
+     * says, using the report render so `#post` blocks and entered `#UI` values are included as
+     * a saved report would have them. Line anchors are on, since that is what makes the parser
+     * record the errors — the HTML is discarded and only the errors are read.
      */
     private async handleWriteFilesNow(): Promise<void> {
         const content = this.getActiveEditorContent();

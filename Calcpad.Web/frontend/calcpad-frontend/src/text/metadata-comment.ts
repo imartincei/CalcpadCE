@@ -30,9 +30,9 @@ export type PdfCommentValues = Partial<PdfSettings>;
 export type SettingsValues = Record<string, string | number | boolean>;
 
 /**
- * Location and parsed values of a `#settings` directive. `line`/`endLine` are its
- * 0-based opening/closing lines (equal when single-line), or null when the queried
- * position holds no directive. `layout` is set only for a multi-line directive.
+ * Location and parsed values of a `#settings` directive. `line`/`endLine` are its 0-based
+ * opening/closing lines (equal when single-line, null when the position holds no directive),
+ * and `layout` is set only for a multi-line directive.
  */
 export interface SettingsDirective {
     line: number | null;
@@ -151,8 +151,8 @@ export interface LintCode {
 }
 
 /**
- * Linter diagnostic codes, mirroring Calcpad.Highlighter's ErrorCodes catalog.
- * Used to populate the lint-ignore multi-select. Keep in sync with
+ * Linter diagnostic codes, mirroring Calcpad.Highlighter's ErrorCodes catalog, used to
+ * populate the lint-ignore multi-select. Keep in sync with
  * `Calcpad.Highlighter/Linter/Constants/ErrorCodes.cs`.
  */
 export const LINT_CODES: LintCode[] = [
@@ -301,12 +301,10 @@ function parseMetadataJson(rawJson: string): { data: MetadataCommentData | null;
 }
 
 /**
- * Detect the metadata comment (`'<!--{...}-->`) that contains the cursor's line.
- * Mirrors the tokenizer/linter rules: the block opens with a comment quote
- * (`'` or `"`) followed by `<!--{`, and either closes with `-->` on the same
- * line or continues across `_`-terminated lines until `-->`. The cursor may sit
- * on any physical line of a multi-line block. Returns null when the cursor line
- * holds no such comment.
+ * Detect the metadata comment (`'<!--{...}-->`) that contains the cursor's line, mirroring the
+ * tokenizer/linter rules: it opens with a comment quote followed by `<!--{` and either closes
+ * with `-->` on the same line or continues across `_`-terminated lines. The cursor may sit on
+ * any physical line of a multi-line block; returns null when the line holds no such comment.
  */
 export function findMetadataCommentBlock(lines: string[], cursorLine: number): MetadataCommentBlock | null {
     if (cursorLine < 0 || cursorLine >= lines.length) return null;
@@ -420,11 +418,10 @@ export function hasMetadataContent(data: MetadataCommentData): boolean {
 }
 
 /**
- * Serialize a cleaned key/value object across the physical lines described by
- * {@link layout}, wrapped by {@link opener}`{` … `}`{@link closer}. Existing keys
- * stay on their line, keys not on any line append to the last line, and a line
- * whose keys are all removed collapses away (its `_` continuation dropped).
- * Returns null when no keys remain, so callers can fall back to a single line.
+ * Serialize a cleaned key/value object across the physical lines described by {@link layout},
+ * wrapped by {@link opener}`{` … `}`{@link closer}: existing keys stay on their line, new ones
+ * append to the last, and a line whose keys are all removed collapses away. Returns null when no
+ * keys remain, so callers can fall back to a single line.
  */
 function serializeWithLayout(
     clean: Record<string, unknown>,
@@ -457,12 +454,10 @@ function serializeWithLayout(
 }
 
 /**
- * Build a metadata-comment from a data object, preserving the original
- * indentation and trailing comment quote. When {@link layout} describes an
- * existing multi-line comment, edits round-trip in place: existing keys keep
- * their line, new keys append to the last line, and a line whose keys are all
- * removed collapses away (its `_` continuation dropped). Without a layout — a
- * new or single-line comment — everything serializes onto one line.
+ * Build a metadata-comment from a data object, preserving the original indentation and
+ * trailing comment quote. With {@link layout} an existing multi-line comment round-trips in
+ * place (see {@link serializeWithLayout}); without one, everything serializes onto a single
+ * line.
  */
 export function serializeMetadataComment(
     data: MetadataCommentData,
@@ -479,13 +474,11 @@ export function serializeMetadataComment(
 const SETTINGS_OPEN_RE = /^\s*#settings\b\s*/i;
 
 /**
- * Parse the `#settings` directive containing the 0-based {@link line}, or null
- * when that line isn't part of one. Like a metadata comment, the directive's JSON
- * may span multiple physical lines via `_` continuation, and the cursor can sit
- * on any of them. `#settings` directives are cursor-local: the panel edits the
- * one the cursor sits on and can create new ones elsewhere, so a document may
- * hold several (each applies to the lines below it). A present-but-malformed
- * directive returns its span with empty settings so Apply overwrites it in place.
+ * Parse the `#settings` directive containing the 0-based {@link line}, or null when that line
+ * isn't part of one; like a metadata comment it may span several physical lines via `_`
+ * continuation. Directives are cursor-local, so a document may hold several (each applying to
+ * the lines below it), and a present-but-malformed one returns its span with empty settings so
+ * Apply overwrites it in place.
  */
 export function settingsDirectiveOnLine(lines: string[], line: number): SettingsDirective | null {
     if (line < 0 || line >= lines.length) return null;
@@ -530,12 +523,10 @@ export function serializeSettingsDirective(settings: SettingsValues, layout?: Me
 }
 
 /**
- * Collect the PDF settings the document pins for itself: the `pdf` object of every
- * metadata comment, shallow-merged in document order so a later comment overrides
- * an earlier one key by key. Unlike `#settings` — which applies only to the lines
- * below it — PDF settings configure one export, so position carries no meaning
- * beyond that last-wins ordering. Returns an empty object when the document pins
- * nothing, letting the caller fall back to the host's stored defaults.
+ * Collect the PDF settings the document pins for itself: the `pdf` object of every metadata
+ * comment, shallow-merged in document order so a later comment overrides an earlier one key by
+ * key. Returns an empty object when the document pins nothing, letting the caller fall back to
+ * the host's stored defaults.
  */
 export function pdfSettingsFromDocument(lines: string[]): PdfCommentValues {
     const merged: Record<string, unknown> = {};
@@ -564,9 +555,9 @@ export interface MetadataDefinition {
 export type DefinitionResolver = (lineIndex: number) => MetadataDefinition | null;
 
 /**
- * Build a {@link DefinitionResolver} from the highlighter's definitions response.
- * Only local definitions are indexed (included files live on other lines). Custom
- * units are reported as variables, matching how the metadata panel treats them.
+ * Build a {@link DefinitionResolver} from the highlighter's definitions response. Only local
+ * definitions are indexed, and custom units are reported as variables, matching how the
+ * metadata panel treats them.
  */
 export function buildDefinitionResolver(definitions: {
     functions: { lineNumber: number; parameters?: string[]; source?: string }[];
@@ -626,13 +617,10 @@ export function analyzeMetadataLine(
 }
 
 /**
- * Resolve the metadata comment the panel should edit for the cursor line.
- * Returns the existing comment when the cursor sits on it or on a definition it
- * documents. When the cursor is on a definition with no comment yet, returns a
- * synthetic {@link MetadataCommentBlock} (isNew) describing the comment that
- * Apply would create above that definition, so the panel can surface the
- * relevant fields immediately. Returns null when the cursor is on neither a
- * metadata comment nor a definition.
+ * Resolve the metadata comment the panel should edit for the cursor line: the existing comment
+ * when the cursor sits on it or on a definition it documents, a synthetic (isNew)
+ * {@link MetadataCommentBlock} when the cursor is on a definition with no comment yet, and
+ * null when it is on neither.
  */
 export function computeMetadataBlock(
     lines: string[],
@@ -695,11 +683,9 @@ function computeCommentBlock(
         };
     }
 
-    // Null case: the cursor is on neither a definition nor a comment. Offer the
-    // region markers (settings, lint, no-print) that apply to a bare line, and on
-    // Apply insert a new comment on the line above the cursor. defKind is forced
-    // null so the definition-oriented fields stay hidden; only the region state
-    // (open lint/no-print regions) from the surrounding document is kept.
+    // Null case: the cursor is on neither a definition nor a comment, so offer the region
+    // markers that apply to a bare line and insert a new comment above the cursor on Apply.
+    // defKind is forced null so the definition-oriented fields stay hidden.
     const region = analyzeMetadataLine(lines, cursorLine, resolveDefinition);
     return {
         line: cursorLine,

@@ -4,9 +4,8 @@ import type { ILogger } from '../types/interfaces';
 import { truncateBase64Content } from './base64-truncate';
 
 /**
- * Platform-agnostic linting service.
- * Fetches diagnostics from the server and returns raw LintDiagnostic[].
- * Consumers (VS Code, Monaco) wrap these into their platform-specific diagnostic types.
+ * Platform-agnostic linting service that fetches diagnostics from the server and returns raw
+ * LintDiagnostic[]. Consumers wrap these into their platform-specific diagnostic types.
  */
 export class CalcpadLintService {
     private apiClient: CalcpadApiClient;

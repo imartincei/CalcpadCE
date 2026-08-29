@@ -58,10 +58,7 @@ import './editor/workers';
 /** Runtime check: are we running inside a Tauri webview? */
 const isTauri = typeof (window as any).__TAURI_INTERNALS__ !== 'undefined';
 
-// Determine server URL:
-// 1. ?server= query param
-// 2. VITE_SERVER_URL env var
-// 3. Default to same origin
+// Server URL: the ?server= query param, then VITE_SERVER_URL, then same origin.
 function getServerUrl(): string {
     const params = new URLSearchParams(window.location.search);
     const fromParam = params.get('server');
@@ -440,11 +437,9 @@ async function bootstrap(): Promise<void> {
 
     /**
      * Whether opening this tab should go straight to the input form: a document declaring
-     * `#UI` controls is one to fill in. Decided once per file, and recorded as decided even
-     * when the answer is no, so the answer cannot change under the user later.
-     *
-     * Split from {@link autoEnterUiMode} so the caller can skip its own preview refresh —
-     * switching the result mode triggers one of its own.
+     * `#UI` controls is one to fill in. Decided once per file and recorded as decided even
+     * when the answer is no, and split from {@link autoEnterUiMode} so the caller can skip
+     * its own preview refresh.
      */
     function shouldAutoEnterUiMode(group: EditorGroup): boolean {
         if (!isTauri) return false;
@@ -452,9 +447,9 @@ async function bootstrap(): Promise<void> {
         if (!activeId) return false;
 
         const path = group.tabs.getFilePath(activeId);
-        // Untitled documents are left alone: there is no file yet, so nothing to remember
-        // the decision against, and a #UI line typed into a scratch buffer is being written
-        // rather than filled in. A compiled worksheet is already forced to the form above.
+        // Untitled documents are left alone: there is no file yet to remember the decision
+        // against, and a #UI line typed into a scratch buffer is being written rather than
+        // filled in.
         if (!path || isCompiledPath(path)) return false;
         if (autoUiSeenPaths.has(path)) return false;
         autoUiSeenPaths.add(path);
@@ -478,11 +473,9 @@ async function bootstrap(): Promise<void> {
     }
 
     /**
-     * The result modes a compiled worksheet has nothing to render for. App.vue leaves
-     * their toolbar buttons out entirely, so the native View menu drops the matching
-     * entries rather than greying them: a menu that offers a mode the toolbar doesn't
-     * have reads as a bug. Only the desktop build has a menu — elsewhere `invokeTauri`
-     * stays null and the App.vue guard is the whole story.
+     * The result modes a compiled worksheet has nothing to render for, so the native View
+     * menu drops the matching entries rather than greying them. Only the desktop build has
+     * a menu — elsewhere `invokeTauri` stays null and the App.vue guard is the whole story.
      */
     let sourceModeMenuShown = true;
     function syncSourceModeMenuItems(shown: boolean): void {
@@ -509,10 +502,9 @@ async function bootstrap(): Promise<void> {
     }
 
     /**
-     * Key that #UI values are stored under. The file path, so the same document
-     * open in two tabs or two groups shares one set of entered values rather than
-     * silently diverging. Unsaved documents fall back to the tab key, which is the
-     * only thing that tells them apart.
+     * Key that #UI values are stored under: the file path, so the same document open in two
+     * tabs or two groups shares one set of entered values. Unsaved documents fall back to
+     * the tab key, which is the only thing that tells them apart.
      */
     function uiDocKeyFor(group: EditorGroup): string {
         const activeId = group.tabs.activeId;
@@ -546,10 +538,9 @@ async function bootstrap(): Promise<void> {
     });
 
     /**
-     * Sidebar line navigation (the TOC) while the input form is up. The editor it would
-     * normally reveal is hidden there, so the form and the report beside it are scrolled
-     * instead. The cursor still moves, without taking focus off the form, so leaving
-     * input mode lands on the heading last navigated to.
+     * Sidebar line navigation (the TOC) while the input form is up: the editor it would
+     * normally reveal is hidden, so the form and the report beside it are scrolled instead.
+     * The cursor still moves without taking focus off the form.
      */
     activeBridge.onGoToLine = (line: number) => {
         if (!appInstance.isPreviewVisible() || appInstance.getResultMode() !== 'ui') return false;
@@ -560,9 +551,9 @@ async function bootstrap(): Promise<void> {
     };
 
     /**
-     * Whether the plain preview renders with the entered #UI values applied. Off by
-     * default: preview is where the document itself is read, and seeing its own values
-     * is the point. Turned on it becomes a debugging view of the filled-in form.
+     * Whether the plain preview renders with the entered #UI values applied. Off by default,
+     * since preview is where the document itself is read; turned on it becomes a debugging
+     * view of the filled-in form.
      */
     function previewAppliesUiOverrides(): boolean {
         return editorBridge.getExtraSetting('previewUiOverrides') === 'true';
@@ -812,10 +803,9 @@ async function bootstrap(): Promise<void> {
             run: () => syncPreviewToCursorFor(group, true),
         });
 
-        // Manual "run" — re-renders all previews. Useful when Auto-Run Preview
-        // is off. The Ctrl+Alt+X shortcut is bound both here (works when the
-        // editor has focus) and at the window level (Tauri) so it fires from
-        // anywhere in the app.
+        // Manual "run" — re-renders all previews, for when Auto-Run Preview is off. The
+        // Ctrl+Alt+X shortcut is bound both here and at the window level (Tauri) so it fires
+        // from anywhere in the app.
         ed.addAction({
             id: 'calcpad.runPreview',
             label: 'Run Preview',
@@ -956,10 +946,9 @@ async function bootstrap(): Promise<void> {
     }
 
     /**
-     * Create a group's editor in its App.vue container, wire it, seed a tab.
-     * If `linkFrom` is given, the new group's first tab shares that group's
-     * active tab's model instead of starting blank — used by splitEditor() so
-     * a split defaults to a second, live-synced view of the current file.
+     * Create a group's editor in its App.vue container, wire it, seed a tab. If `linkFrom`
+     * is given the new group's first tab shares that group's active tab's model instead of
+     * starting blank, which is how a split defaults to a live-synced view of the current file.
      */
     async function createAndWireGroup(id: string, seedContent = '', linkFrom?: EditorGroup): Promise<EditorGroup> {
         appInstance.addGroup(id);
@@ -994,9 +983,8 @@ async function bootstrap(): Promise<void> {
 
     // ---- Split / merge / focus wiring ----
     let confirmCloseGroup: (g: EditorGroup) => Promise<boolean> = async () => true;
-    // Monotonic group-id allocator. Never reuse ids: after an unsplit the
-    // surviving group may be the second one (g1), so a fixed 'g1' would collide
-    // on the next split and silently no-op. 'g0' is the primary (seeded above).
+    // Monotonic group-id allocator. Ids are never reused: after an unsplit the surviving
+    // group may be the second one, so a fixed 'g1' would collide on the next split.
     let groupSeq = 0;
 
     async function splitEditor(): Promise<void> {
@@ -1038,10 +1026,9 @@ async function bootstrap(): Promise<void> {
     };
 
     // ---- Include navigation (Go-to-Definition / Find All References) ----
-    // Find All References needs the include files' models registered so the
-    // panel can render their snippets. Only wire this up on Tauri desktop, where
-    // we have filesystem access; in the pure-web build the provider silently
-    // skips include locations. All handlers act on the active group.
+    // Find All References needs the include files' models registered so the panel can render
+    // their snippets, so this is only wired up on Tauri desktop where there is filesystem
+    // access. All handlers act on the active group.
     const openIncludeFile: IncludeFileOpener | undefined = tauriBridge
         ? async (rawFileName: string) => {
             try {
@@ -1064,14 +1051,11 @@ async function bootstrap(): Promise<void> {
         }
         : undefined;
 
-    // Go-to-Definition must stay side-effect free — Monaco calls provideDefinition
-    // on Ctrl+hover just to draw the underline, so opening a file or moving the
-    // cursor there would navigate on hover with no click. The provider gets a
-    // pure URI for the include (below); the real open + cursor move happens in
-    // the editor opener, which Monaco invokes only on an actual click / F12.
-    // We stash the resolved absolute path keyed by the exact URI string we mint
-    // so the opener recovers it verbatim (fsPath would re-case the Windows drive
-    // letter and break the tab lookup's strict path compare).
+    // Go-to-Definition must stay side-effect free — Monaco calls provideDefinition on
+    // Ctrl+hover just to draw the underline, so the provider gets a pure URI and the real
+    // open happens in the editor opener. The resolved absolute path is stashed under the
+    // exact URI string we mint, since fsPath would re-case the Windows drive letter and
+    // break the tab lookup's strict path compare.
     const includeUriToPath = new Map<string, string>();
     const resolveIncludeUri: IncludeUriResolver | undefined = tauriBridge
         ? async (rawFileName: string): Promise<monaco.Uri | null> => {
@@ -1252,14 +1236,12 @@ async function bootstrap(): Promise<void> {
         const data = e.data;
         if (!data) return;
 
-        // Two kinds of sender reach this listener, and they must not be conflated.
-        // The host's own bridge announces settings changes with a synthetic
-        // MessageEvent (base.ts:postToVue), which carries no source. Everything
-        // else here comes from a preview frame rendering untrusted worksheet HTML,
-        // and those messages drive editor navigation and #UI values — so they are
-        // accepted only from a window that really is one of our preview frames.
-        // The frames are sandboxed to an opaque origin, making e.origin the string
-        // "null" for all of them, so window identity is the only usable check.
+        // Two kinds of sender reach this listener. The host's own bridge announces settings
+        // changes with a synthetic MessageEvent carrying no source; everything else comes
+        // from a preview frame rendering untrusted worksheet HTML and drives editor
+        // navigation and #UI values, so it is accepted only from a window that really is one
+        // of our preview frames — they are sandboxed to an opaque origin, so e.origin is
+        // "null" and window identity is the only usable check.
         const fromHost = e.source === null;
         const fromPreview = appInstance.isPreviewFrameSource(e.source);
         if (!fromHost && !fromPreview) return;
@@ -1299,11 +1281,10 @@ async function bootstrap(): Promise<void> {
             return;
         }
 
-        // Results -> editor navigation. An 'output' line comes from a rendered
-        // view; when the document has macros/includes that line only makes
-        // sense in the unwrapped view, so flip the pane to unwrapped scrolled
-        // there (the two-step). A 'source' line navigates Monaco directly. The
-        // message's groupId selects which group to act on.
+        // Results -> editor navigation. An 'output' line only makes sense in the unwrapped
+        // view when the document has macros/includes, so the pane flips there scrolled to it
+        // (the two-step); a 'source' line navigates Monaco directly, and the message's
+        // groupId selects the group.
         if (data.type === 'navigateToLine') {
             if (!fromPreview) return;
             const line = Number(data.line);
@@ -1543,9 +1524,9 @@ async function bootstrap(): Promise<void> {
     appInstance.onExitUiModeRequest = leaveUiDoc;
 
     /**
-     * The input form always shows the active document, so switching documents takes
-     * the form's values with it. Prompt as if the form were closing, since for that
-     * document it is. Returns false when the user cancels the switch.
+     * The input form always shows the active document, so switching documents takes the
+     * form's values with it — prompt as if the form were closing. Returns false when the
+     * user cancels the switch.
      */
     async function confirmLeaveUiDoc(): Promise<boolean> {
         if (!appInstance.isPreviewVisible() || appInstance.getResultMode() !== 'ui') return true;
@@ -1589,9 +1570,9 @@ async function bootstrap(): Promise<void> {
         syncSourceModeMenuItems(sourceModesShown);
 
         // ---- Autosave drafts (10s debounce per tab) ----
-        // Rust owns the on-disk drafts dir (<app_data>/drafts). Each tab is
-        // assigned a stable UUID on first autosave. Tab ids are namespaced per
-        // group (see TabManager), so drafts never collide across groups.
+        // Rust owns the on-disk drafts dir (<app_data>/drafts) and each tab is assigned a
+        // stable UUID on first autosave. Tab ids are namespaced per group, so drafts never
+        // collide across groups.
         const AUTOSAVE_DEBOUNCE_MS = 10_000;
         const draftTimers = new Map<string, ReturnType<typeof setTimeout>>();
         const draftIds = new Map<string, string>();
@@ -1712,12 +1693,9 @@ async function bootstrap(): Promise<void> {
         });
 
         /**
-         * Open `path` in a tab. If the active group already holds that file,
-         * just focuses it. If another group has it open, opens a second,
-         * live-synced tab onto the same model in the active group instead of
-         * jumping away — this is what lets the same file be open in both
-         * split panes at once. Otherwise reads from disk into the active
-         * group.
+         * Open `path` in a tab: focuses it if the active group already holds that file, or
+         * opens a second live-synced tab onto the same model when another group has it, which
+         * is what lets one file be open in both split panes. Otherwise reads from disk.
          */
         async function loadFile(path: string): Promise<void> {
             const inActive = tabs.findByPath(path);
@@ -1771,8 +1749,8 @@ async function bootstrap(): Promise<void> {
         }
 
         /**
-         * Save the active tab. If it has no file path, prompts for one.
-         * Returns true if saved, false if the user cancelled / no active tab.
+         * Save the active tab, prompting for a path when it has none. Returns true if saved,
+         * false if the user cancelled or there is no active tab.
          */
         async function saveActive(): Promise<boolean> {
             const active = tabs.activeTab;
@@ -1809,10 +1787,9 @@ async function bootstrap(): Promise<void> {
         }
 
         /**
-         * Close a tab in a specific group, prompting if dirty. Returns true on
-         * close, false if the user cancelled the prompt. Skips the prompt when
-         * another tab (in this or another group) still references the same
-         * model — the content isn't actually being discarded.
+         * Close a tab in a specific group, prompting if dirty; returns false if the user
+         * cancelled. The prompt is skipped when another tab still references the same model,
+         * since the content isn't actually being discarded.
          */
         async function tryCloseTab(group: EditorGroup, id: string): Promise<boolean> {
             const target = group.tabs.all.find(t => t.id === id);
@@ -2034,18 +2011,13 @@ async function bootstrap(): Promise<void> {
         async function runClipboardAction(
             action: 'cut' | 'copy' | 'paste' | 'select-all' | 'undo' | 'redo' | 'find' | 'replace',
         ): Promise<void> {
-            // A real DOM selection (e.g. text picked inside the hover panel,
-            // parameter hints, or output) takes priority over the editor's own
-            // model selection, since Monaco renders the main text via its own
-            // selection overlay rather than native browser selection.
-            // Copy only, and only when the editor itself doesn't have focus:
-            // Monaco keeps its own selection mirrored into a hidden textarea
-            // for keyboard capture, so window.getSelection() reports non-empty
-            // even while the editor has focus - but for large/multi-line
-            // selections that textarea's value is Monaco's paged screen-reader
-            // representation, truncated with an ellipsis, not the real text.
-            // A cut routed this way also wrote to the clipboard without
-            // touching the document.
+            // A real DOM selection (text picked inside the hover panel, parameter hints or
+            // output) takes priority over the editor's own model selection, since Monaco
+            // renders the main text via its own selection overlay. Copy only, and only when
+            // the editor lacks focus: Monaco mirrors its selection into a hidden textarea
+            // whose value is a truncated screen-reader representation for large selections,
+            // and a cut routed this way also wrote to the clipboard without touching the
+            // document.
             if (action === 'copy' && !editor.hasTextFocus()) {
                 const domText = window.getSelection()?.toString() ?? '';
                 if (domText) {

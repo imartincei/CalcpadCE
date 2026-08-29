@@ -7,11 +7,9 @@ function escapeSnippetText(text: string): string {
 }
 
 /**
- * Build a TextMate-style snippet string from an InsertItem by replacing each
- * `§` placeholder in the tag with a `${N:name}` tab stop. The default text is
- * the corresponding parameter name (or `...` for variadic placeholders beyond
- * the declared parameters). Output is compatible with both Monaco
- * (insertTextRules: InsertAsSnippet) and VS Code (vscode.SnippetString).
+ * Build a TextMate-style snippet string from an InsertItem by replacing each `§` placeholder in
+ * the tag with a `${N:name}` tab stop defaulting to the parameter name (`...` for variadic
+ * placeholders). Output is compatible with both Monaco and VS Code snippet insertion.
  */
 export function buildInsertSnippet(item: InsertItem): string {
     const segments = item.tag.split(SNIPPET_PLACEHOLDER);

@@ -31,9 +31,8 @@ namespace Calcpad.Highlighter.Linter
         /// </summary>
         /// <param name="staged">Staged resolved content from ContentResolver.</param>
         /// <param name="ignoreRegions">
-        /// Optional list of source-level regions in which specific diagnostic codes
-        /// are suppressed. Line numbers are original source line numbers (0-based).
-        /// Applied after all diagnostics are mapped back to original lines.
+        /// Optional source-level regions in which specific diagnostic codes are suppressed, with
+        /// 0-based original source line numbers. Applied after all diagnostics are mapped back.
         /// </param>
         public LinterResult Lint(StagedResolvedContent staged,
             IReadOnlyList<LintIgnoreRegion> ignoreRegions = null)

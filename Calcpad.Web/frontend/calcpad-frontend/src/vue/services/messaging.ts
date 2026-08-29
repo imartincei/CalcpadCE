@@ -48,12 +48,10 @@ export function initMessaging(): IMessaging {
         instance = {
             postMessage: (msg: unknown) => bridge.handleMessage(serializeForPostMessage(msg)),
             onMessage: (handler: (message: unknown) => void) => {
-                // This window also hosts the preview iframes, which render untrusted
-                // worksheet HTML and can post anything they like. The host bridge
-                // announces itself with a synthetic MessageEvent, which carries no
-                // source (see BaseMessageBridge.postToVue), so a null source is what
-                // distinguishes a real host message from a forged one. Without this,
-                // a #HTML block could drive any command the panel understands.
+                // This window also hosts the preview iframes, which render untrusted worksheet
+                // HTML and can post anything they like. The host bridge announces itself with
+                // a synthetic MessageEvent carrying no source, so a null source is what tells
+                // a real host message from a forged one.
                 window.addEventListener('message', (e: MessageEvent) => {
                     if (e.source !== null) return;
                     handler(e.data);

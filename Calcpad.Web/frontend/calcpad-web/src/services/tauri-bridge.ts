@@ -82,10 +82,9 @@ function withExtension(filePath: string, accepted: string[]): string {
 }
 
 /**
- * Message bridge for the Tauri desktop platform. Settings JSON files live
- * under `$APPDATA/settings/`; recent files and the opened folder live in a
- * plugin-store JSON. Native dialogs, filesystem, and clipboard flow through
- * the Tauri JS API plugins.
+ * Message bridge for the Tauri desktop platform. Settings JSON files live under
+ * `$APPDATA/settings/` and recent files in a plugin-store JSON, while native dialogs,
+ * filesystem and clipboard flow through the Tauri JS API plugins.
  */
 export class TauriMessageBridge extends BaseMessageBridge {
     private _extraSettings: CalcpadExtras = getDefaultExtras();
@@ -214,19 +213,13 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     /**
-     * Replace on-disk `<img src>` references in rendered HTML with base64 data
-     * URIs so the sandboxed preview iframe can render them (the VS Code
-     * extension does the same via its image cache). Remote/data URIs are left
-     * untouched. `Calcpad.Core.ImageReferences` has already expanded any
-     * `{project}`/`{library}`/`{user}` token and environment variable into an
-     * absolute path, so all that is left here is a relative `src`, which needs
-     * the active tab's folder — an untitled document therefore resolves only the
-     * absolute ones.
+     * Replace on-disk `<img src>` references in rendered HTML with base64 data URIs so the
+     * sandboxed preview iframe can render them, leaving remote/data URIs untouched.
+     * `Calcpad.Core.ImageReferences` has already resolved every token and environment
+     * variable, so only a relative `src` is left, which needs the active tab's folder.
      *
-     * `budget` bounds the total inlined bytes, which the preview passes: a document
-     * referencing a folder of photographs would otherwise pull all of them into a string
-     * the preview pipeline then copies several times. An export passes none — a written
-     * file keeps every image.
+     * `budget` bounds the total inlined bytes, which the preview passes and an export does
+     * not — a written file keeps every image.
      */
     async inlineDocumentImages(html: string, budget?: InlineImageBudget): Promise<string> {
         const documentDir = this.activeTabDirectory();
@@ -522,10 +515,10 @@ export class TauriMessageBridge extends BaseMessageBridge {
     // ---- File operations (exposed for menu actions) ----
 
     /**
-     * Widens the fs read scope to the picked document's folder. The dialog grants
-     * only the file itself, but `inlineImageSources` reads image paths resolved
-     * against its directory. Rust rejects any path the scope doesn't already cover,
-     * so a failure here just leaves images uninlined.
+     * Widens the fs read scope to the picked document's folder, since the dialog grants only
+     * the file itself while `inlineImageSources` reads paths resolved against its directory.
+     * Rust rejects any path the scope doesn't already cover, so a failure here just leaves
+     * images uninlined.
      */
     private async allowDocumentDir(filePath: string): Promise<void> {
         try {
@@ -921,11 +914,9 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     /**
-     * Asks whether to download the bundled headless Chromium, and does it if the user
-     * agrees. Declining leaves the install advice for their platform on screen, so
-     * using their own browser stays the first-class option.
-     *
-     * Returns true when a browser is now available and the export should proceed.
+     * Asks whether to download the bundled headless Chromium, and does it if the user agrees;
+     * declining leaves the install advice for their platform on screen. Returns true when a
+     * browser is now available and the export should proceed.
      */
     private async offerBrowserDownload(downloadSizeMb: number): Promise<boolean> {
         const advice = await this.browserInstallAdvice();

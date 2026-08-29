@@ -97,8 +97,7 @@ namespace Calcpad.Highlighter.Snippets
         #region Cached Lookups for CalcpadBuiltIns
 
         /// <summary>
-        /// Gets all function names (cached). Used by CalcpadBuiltIns.
-        /// Includes only snippets with KeywordType = "Function".
+        /// Gets all function names (cached), for CalcpadBuiltIns — snippets with KeywordType = "Function".
         /// </summary>
         public static FrozenSet<string> GetFunctionNames()
         {
@@ -131,8 +130,7 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets all keyword names with # prefix (cached). Used by CalcpadBuiltIns.
-        /// Includes only snippets with KeywordType = "Keyword".
+        /// Gets all keyword names with # prefix (cached), for CalcpadBuiltIns — snippets with KeywordType = "Keyword".
         /// </summary>
         public static FrozenSet<string> GetKeywordNames()
         {
@@ -156,8 +154,7 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets all command names with $ prefix (cached). Used by CalcpadBuiltIns.
-        /// Includes only snippets with KeywordType = "Command".
+        /// Gets all command names with $ prefix (cached), for CalcpadBuiltIns — snippets with KeywordType = "Command".
         /// </summary>
         public static FrozenSet<string> GetCommandNames()
         {
@@ -178,8 +175,7 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets all unit names (cached). Used by CalcpadBuiltIns.
-        /// Includes only snippets with KeywordType = "Unit".
+        /// Gets all unit names (cached), for CalcpadBuiltIns — snippets with KeywordType = "Unit".
         /// </summary>
         public static FrozenSet<string> GetUnitNames()
         {
@@ -200,8 +196,7 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets all constant names (cached). Used by CalcpadBuiltIns.
-        /// Includes only snippets with KeywordType = "Constant".
+        /// Gets all constant names (cached), for CalcpadBuiltIns — snippets with KeywordType = "Constant".
         /// </summary>
         public static FrozenSet<string> GetConstantNames()
         {
@@ -226,9 +221,8 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets all setting names (cached). Used by CalcpadBuiltIns.
-        /// Includes only snippets with KeywordType = "Setting".
-        /// Settings are special backend variables like PlotHeight, PlotWidth, Precision, etc.
+        /// Gets all setting names (cached), for CalcpadBuiltIns — snippets with KeywordType =
+        /// "Setting". Settings are special backend variables like PlotHeight, Precision, etc.
         /// </summary>
         public static FrozenSet<string> GetSettingNames()
         {
@@ -249,9 +243,8 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets all control block keyword names (cached). Used by CalcpadBuiltIns.
-        /// Includes only snippets with KeywordType = "ControlBlockKeyword".
-        /// Control block keywords include: #if, #repeat, #for, #while, #def, #else, #else if
+        /// Gets all control block keyword names (cached), for CalcpadBuiltIns — snippets with
+        /// KeywordType = "ControlBlockKeyword", such as #if, #repeat, #for, #while, #def, #else.
         /// </summary>
         public static FrozenSet<string> GetControlBlockKeywordNames()
         {
@@ -275,9 +268,8 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets all end keyword names (cached). Used by CalcpadBuiltIns.
-        /// Includes only snippets with KeywordType = "EndKeyword".
-        /// End keywords include: #end if, #end def, #loop
+        /// Gets all end keyword names (cached), for CalcpadBuiltIns — snippets with KeywordType =
+        /// "EndKeyword", such as #end if, #end def and #loop.
         /// </summary>
         public static FrozenSet<string> GetEndKeywordNames()
         {
@@ -301,8 +293,7 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets all operator characters (cached). Used by CalcpadBuiltIns.
-        /// Includes only snippets with KeywordType = "Operator".
+        /// Gets all operator characters (cached), for CalcpadBuiltIns — snippets with KeywordType = "Operator".
         /// </summary>
         public static FrozenSet<char> GetOperators()
         {
@@ -323,10 +314,9 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets a dictionary of function snippets by name (cached). Used by FunctionSignatures.
-        /// When multiple signatures exist for the same function (overloads), selects the most
-        /// permissive one (lowest MinParams, highest MaxParams) for linting purposes.
-        /// Includes only snippets with KeywordType = "Function".
+        /// Gets a dictionary of function snippets by name (cached), for FunctionSignatures,
+        /// covering snippets with KeywordType = "Function". Where overloads exist, the most
+        /// permissive signature (lowest MinParams, highest MaxParams) is selected for linting.
         /// </summary>
         public static FrozenDictionary<string, SnippetItem> GetFunctionSnippetsByName()
         {
@@ -360,9 +350,9 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets all function overloads grouped by name (cached).
-        /// Returns all signatures for functions that have multiple overloads (like take, line, spline).
-        /// Includes only snippets with KeywordType = "Function".
+        /// Gets all function overloads grouped by name (cached), returning every signature for
+        /// functions that have more than one (take, line, spline). Covers snippets with
+        /// KeywordType = "Function".
         /// </summary>
         public static FrozenDictionary<string, SnippetItem[]> GetFunctionOverloads()
         {
@@ -393,8 +383,8 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets all function names that return vectors (cached). Used by TypeTracker.
-        /// Includes functions with ReturnType = CalcpadType.Vector.
+        /// Gets all function names that return vectors (cached), for TypeTracker — functions with
+        /// ReturnType = CalcpadType.Vector.
         /// </summary>
         public static FrozenSet<string> GetVectorReturningFunctions()
         {
@@ -428,8 +418,8 @@ namespace Calcpad.Highlighter.Snippets
         }
 
         /// <summary>
-        /// Gets all function names that return matrices (cached). Used by TypeTracker.
-        /// Includes functions with ReturnType = CalcpadType.Matrix.
+        /// Gets all function names that return matrices (cached), for TypeTracker — functions with
+        /// ReturnType = CalcpadType.Matrix.
         /// </summary>
         public static FrozenSet<string> GetMatrixReturningFunctions()
         {

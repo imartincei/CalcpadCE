@@ -1,27 +1,13 @@
 /**
- * Keeping the preview where the user left it, across a re-render that replaces the whole
- * document. Every edit re-converts the worksheet into a fresh `srcdoc`, so nothing in the
- * frame survives and the position has to be posted out and seeded back in.
+ * Keeps the preview where the user left it across a re-render that replaces the whole
+ * document. A stored offset cannot do it — content laid out long after `window.load` means
+ * `scrollTo` clamps — so the position is a DOM anchor (the element at the top of the viewport
+ * and how far above it the edge sat) re-aligned until the page stops changing size.
  *
- * A stored offset cannot do it. The DXF module renders WebGL to a data URL seconds after
- * `window.load`, so at restore time the page is short and `scrollTo` clamps, and an edit
- * that changes the drawing's height moves everything below it anyway. So the position is
- * a DOM anchor - the element at the top of the viewport and how far above it the edge sat
- * - re-aligned until the page stops changing size.
- *
- * Which element gets anchored is the other half, and two things in the rendered worksheet
- * make the obvious choice the wrong one:
- *
- *  - A document with errors carries a summary bar the server fixes across the top of the
- *    viewport. Its `rect.top` is zero at every scroll offset, so an offset measured
- *    against it means nothing - and sitting at the top is what makes a probe find it.
- *  - A loop body is one `<div class="indent">` holding every iteration flat, all repeating
- *    the same `data-source-line`, and the first iteration's id is written into the author's
- *    own tag and re-emitted by every pass after it. So the container, the id and the text
- *    all lead back to the loop's first line; only the iteration count tells them apart.
- *
- * The arithmetic lives here so all three front ends behave alike; the transport does not,
- * because each host addresses its own frame differently.
+ * Which element gets anchored is the other half: a pinned error-summary bar has `rect.top` of
+ * zero at every offset, and a loop body repeats one `data-source-line` and id across every
+ * iteration, so only the iteration count tells them apart. The arithmetic lives here so all
+ * three front ends behave alike; the transport does not.
  */
 
 /** Where the viewport's top edge sat, relative to an element that should still exist. */
@@ -103,13 +89,9 @@ export function parseScrollState(message: unknown): PreviewScrollState | null {
 
 /**
  * Builds a `<script>` body (no tag) that reports this frame's position and, when handed a
- * `seed`, restores it. With no seed only the reporting half is emitted.
- *
- * `emit` is inlined verbatim and must be a JavaScript *expression* for a function
- * `(state) => void`, not a statement.
- *
- * Publishes `window.__calcpadScrollSettled(done)`, which the host's frame agent waits on
- * before declaring the document ready, so the first re-align happens in the back buffer.
+ * `seed`, restores it. `emit` is inlined verbatim and must be a JavaScript *expression* for a
+ * function `(state) => void`, and the script publishes `window.__calcpadScrollSettled(done)`,
+ * which the host's frame agent waits on before declaring the document ready.
  */
 export function scrollAnchorScript(emit: string, seed?: PreviewScrollState | null): string {
     const start = seed ? JSON.stringify(seed).replace(/</g, '\\u003c') : 'null';
@@ -168,9 +150,9 @@ export function scrollAnchorScript(emit: string, seed?: PreviewScrollState | nul
         return false;
     }
 
-    // elementsFromPoint answers innermost first and sees through whatever overlaps it, so
-    // the first block that is neither pinned nor host furniture is the line being read.
-    // Innermost matters: stopping at the outermost block would anchor a loop's container.
+    // elementsFromPoint answers innermost first and sees through whatever overlaps it, so the
+    // first block that is neither pinned nor host furniture is the line being read. Innermost
+    // matters: stopping at the outermost block would anchor a loop's container.
     function lineAt(x, y) {
         var stack = document.elementsFromPoint(x, y);
         for (var i = 0; i < stack.length; i++) {
@@ -181,10 +163,9 @@ export function scrollAnchorScript(emit: string, seed?: PreviewScrollState | nul
         return null;
     }
 
-    // How far down the viewport its own content starts. The body is padded clear of the
-    // error bar, so the first row of pixels holds the bar and nothing else. An overlay
-    // paints over what it covers and so opens the stack; stopping at the first thing that
-    // is not one keeps this off the scroll path for a document without one.
+    // How far down the viewport its own content starts: the body is padded clear of the error
+    // bar, so the first row of pixels holds the bar and nothing else. Stopping at the first
+    // thing that is not an overlay keeps this off the scroll path for a document without one.
     function overlayBottom(x) {
         var stack = document.elementsFromPoint(x, 2);
         var bottom = 0;

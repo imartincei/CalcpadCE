@@ -5,12 +5,9 @@ import { resolveSymbolLocation, resolveIncludeDirectiveLocation, resolveDocument
 import type { CalcpadDefinitionsService } from './calcpadDefinitionsService';
 
 /**
- * Provides "Go to Definition" (Ctrl+click / F12) for CalcPad functions,
- * macros, variables, and `#include` directives.
- *
- * For `#include FILEPATH` lines, clicking anywhere on the path jumps straight
- * to that file. Otherwise asks the server which symbol is at the cursor
- * (`symbol-at-position`) and jumps to its first assignment location.
+ * Provides "Go to Definition" (Ctrl+click / F12) for CalcPad functions, macros, variables, and
+ * `#include` directives. Clicking an `#include FILEPATH` path jumps straight to that file;
+ * otherwise the server is asked which symbol is at the cursor and the first assignment wins.
  */
 export class CalcpadDefinitionProvider implements vscode.DefinitionProvider {
     private apiClient: CalcpadApiClient;

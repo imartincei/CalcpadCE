@@ -89,11 +89,10 @@ export function findUiDirectiveBlock(lines: string[], cursorLine: number): UiDir
 }
 
 /**
- * A `#UI` line: the keyword as the line's first token, followed by something for it to
- * describe. The anchoring matches {@link findUiDirectiveBlock} and, through it,
- * `ExpressionParser.ParseKeywordUi` — a `'`- or `"`-commented line therefore never counts,
- * and `#UIx` counts exactly as the engine counts it, since keywords are matched by prefix.
- * A bare `#UI` produces no control, so it does not count either.
+ * A `#UI` line: the keyword as the line's first token, followed by something for it to describe.
+ * The anchoring matches {@link findUiDirectiveBlock} and `ExpressionParser.ParseKeywordUi`, so a
+ * commented line never counts, `#UIx` counts exactly as the engine counts it, and a bare `#UI`
+ * produces no control and does not count either.
  */
 const UI_DIRECTIVE_LINE = /^[﻿ \t]*#ui[ \t]*\S/im;
 
@@ -145,11 +144,9 @@ export interface UiPropertyKey {
 }
 
 /**
- * Scalar `#UI` JSON keys, shaped like `MetadataSettingKey` so the panel can
- * drive them with the same typed-input logic as the `#settings` editor. The
- * array-valued keys (`columnHeaders`, `rowHeaders`, `keys`, `values`) aren't
- * representable here and get bespoke list editors in the panel instead. Keep
- * in sync with `UiValidator.KnownKeys`/`KnownTypes`.
+ * Scalar `#UI` JSON keys, shaped like `MetadataSettingKey` so the panel can drive them with the
+ * same typed-input logic as the `#settings` editor; the array-valued keys get bespoke list
+ * editors instead. Keep in sync with `UiValidator.KnownKeys`/`KnownTypes`.
  */
 export const UI_PROPERTY_KEYS: UiPropertyKey[] = [
     {

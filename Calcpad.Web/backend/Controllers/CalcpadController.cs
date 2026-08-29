@@ -121,9 +121,8 @@ namespace Calcpad.Server.Controllers
         /// <summary>
         /// Rewrites a worksheet into the self-contained form a compiled <c>.cpdz</c> needs:
         /// macros and includes expanded, <c>#read</c> data inlined, an included file's image
-        /// paths made absolute. The caller embeds the images and encodes the result. Reading
-        /// a data file that isn't there is an error, not a warning — the worksheet would
-        /// otherwise be handed out broken.
+        /// paths made absolute. Reading a data file that isn't there is an error, not a
+        /// warning — the worksheet would otherwise be handed out broken.
         /// </summary>
         [HttpPost("portable/bundle")]
         public IActionResult BundlePortable([FromBody] PortableBundleRequest request)
@@ -191,9 +190,8 @@ namespace Calcpad.Server.Controllers
 
         private string ProcessDataTextLinks(string html)
         {
-            // Replace links with data-text attribute to point to actual line anchors
-            // Pattern: <a href="#0" data-text="123">
-            // Replace with: <a href="#line-123" data-text="123">
+            // Point data-text links at real line anchors: <a href="#0" data-text="123">
+            // becomes <a href="#line-123" data-text="123">.
             var pattern = @"<a\s+href=""#0""\s+data-text=""(\d+)""";
             var replacement = @"<a href=""#line-$1"" data-text=""$1""";
             return System.Text.RegularExpressions.Regex.Replace(html, pattern, replacement);
@@ -206,11 +204,10 @@ namespace Calcpad.Server.Controllers
             return Ok(new CalcpadRequest { Content = sampleContent });
         }
 
-        // Debug-only: intentionally crashes the server to verify which crash paths
-        // are picked up by FileLogger / AppDomain.UnhandledException / TaskScheduler.
-        // Different modes exercise different failure paths because not all of them
-        // route through the same handlers (e.g. StackOverflow and FailFast bypass
-        // managed exception handling entirely).
+        // Debug-only: intentionally crashes the server to verify which crash paths are picked
+        // up by FileLogger / AppDomain.UnhandledException / TaskScheduler. Different modes
+        // exercise different failure paths, since StackOverflow and FailFast bypass managed
+        // exception handling entirely.
         [HttpGet("debug-crash")]
         public IActionResult DebugCrash([FromQuery] string mode = "background-thread")
         {
@@ -890,10 +887,10 @@ namespace Calcpad.Server.Controllers
         public Dictionary<string, string>? UiOverrides { get; set; }
 
         /// <summary>
-        /// Emits per-line anchors and the error-summary boxes the preview uses for line
-        /// links. Defaults to the opposite of <see cref="ForPrint"/>. Set it explicitly to
-        /// break that pairing: the on-screen report wants the print layout <em>with</em>
-        /// links, and every export wants a rendering <em>without</em> them.
+        /// Emits per-line anchors and the error-summary boxes the preview uses for line links,
+        /// defaulting to the opposite of <see cref="ForPrint"/>. Set it explicitly to break that
+        /// pairing: the on-screen report wants the print layout <em>with</em> links, and every
+        /// export wants a rendering <em>without</em> them.
         /// </summary>
         public bool? IncludeLineAnchors { get; set; }
 

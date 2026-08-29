@@ -6,17 +6,13 @@ namespace Calcpad.Server.Services
     /// <summary>
     /// Decides what a <c>#write</c>/<c>#append</c> target should be rewritten to when a
     /// worksheet is exported to run somewhere else, renaming one that would otherwise collide
-    /// with another instead of refusing the export. Shared by <see cref="PortablePackage"/> and
+    /// instead of refusing the export. Shared by <see cref="PortablePackage"/> and
     /// <see cref="PortableWorksheet"/>.
     ///
-    /// There is one rule: an absolute target is collapsed to its bare filename, so the output
-    /// lands beside the exported worksheet instead of wherever it was written against on the
-    /// author's machine — a folder there is no reason to expect exists for whoever receives it.
-    /// A relative target already lands beside the worksheet and is left exactly as written.
-    ///
-    /// A <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c>/<c>&lt;user&gt;</c> token target is
-    /// resolved to the author's local absolute path first, exactly as though that had been
-    /// written instead of the token, and then collapsed like any other absolute target.
+    /// There is one rule: an absolute target is collapsed to its bare filename so the output
+    /// lands beside the exported worksheet, while a relative target already does and is left
+    /// exactly as written. A token target is resolved to the author's local absolute path
+    /// first, then collapsed like any other absolute one.
     /// </summary>
     internal sealed class OutputTargets(
         string rootDirectory,
@@ -34,29 +30,17 @@ namespace Calcpad.Server.Services
 
         /// <summary>
         /// Decides, for every <c>#write</c>/<c>#append</c> target in the document, the bare
-        /// filename <see cref="Rewrite"/> will later collapse it to — renaming any that would
-        /// otherwise collide with another the same way <c>PortablePackage</c>'s own bundled-file
-        /// renaming does: <c>name-1.ext</c>, <c>name-2.ext</c> and so on, in occurrence order.
+        /// filename <see cref="Rewrite"/> will later collapse it to, renaming collisions the
+        /// way <c>PortablePackage</c> renames bundled files: <c>name-1.ext</c> onwards, in
+        /// occurrence order. This has to run as one batch before <see cref="Rewrite"/> streams
+        /// through the document, because a rename can affect an <em>earlier</em> occurrence
+        /// whose text would already be final by then.
         ///
-        /// This has to run as one batch, before <see cref="Rewrite"/> streams through the
-        /// document rewriting each line in turn, because a rename can affect an <em>earlier</em>
-        /// occurrence: two targets sharing a name are both renamed once the collision is found,
-        /// even though the first of them looked fine in isolation. By the time <c>Rewrite</c>
-        /// reaches it, that line's text is already final — there is no going back to rename it
-        /// once a later collision surfaces. A relative target is never renamed (it stays exactly
-        /// as written), but still reserves its name: an absolute target that would otherwise
-        /// collapse onto it is renamed away instead. Two occurrences that resolve to the very same
-        /// file — a <c>#write</c> and a later <c>#append</c> to it, say — are not a collision at
-        /// all, and share the name unrenamed.
-        ///
-        /// <paramref name="roots"/> is deliberately a parameter rather than always the instance's
-        /// own <c>pathRoots</c>: a caller whose real, line-by-line pass declares
-        /// <c>#ProjectPath</c>/<c>#LibraryPath</c> progressively (as <see cref="PortableWorksheet"/>
-        /// does) needs this batch to see every declaration in the document regardless of where in
-        /// it a <c>#write</c> happens to sit — unlike the live pass, there is no "declared before
-        /// use" ordering to preserve here, only a final name to compute. A caller that already
-        /// walks the whole tree before rewriting anything (<see cref="PortablePackage"/>) can just
-        /// pass its own, already fully-declared instance.
+        /// A relative target is never renamed but still reserves its name, and two occurrences
+        /// resolving to the very same file are not a collision at all.
+        /// <paramref name="roots"/> is a parameter rather than the instance's own
+        /// <c>pathRoots</c> so a caller whose real pass declares roots progressively (as
+        /// <see cref="PortableWorksheet"/> does) can still hand this every declaration.
         /// </summary>
         internal void Prepare(IEnumerable<(Reference Reference, string Owner, int Line)> outputReferences, PathRoots roots)
         {

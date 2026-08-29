@@ -18,10 +18,9 @@ namespace Calcpad.Highlighter.Snippets.Models
         public required string Insert { get; init; }
 
         /// <summary>
-        /// Specifies the keyword type for linter classification.
-        /// Valid values: "Command", "Macro", "Variable", "Function", "Keyword", "Unit", "Constant", "Operator", "Data"
-        /// When null or empty, the snippet is excluded from linter keyword/function/command sets (UI-only).
-        /// Default: null (snippet is not used by linter).
+        /// Keyword type for linter classification: "Command", "Macro", "Variable", "Function",
+        /// "Keyword", "Unit", "Constant", "Operator" or "Data". Null or empty (the default)
+        /// excludes the snippet from the linter's keyword/function/command sets, making it UI-only.
         /// </summary>
         public string? KeywordType { get; init; }
 
@@ -31,7 +30,7 @@ namespace Calcpad.Highlighter.Snippets.Models
         public required string Description { get; init; }
 
         /// <summary>
-        /// Long-form Markdown description for hover/completion docstrings. May include math
+        /// Long-form Markdown description for hover/completion docstrings, which may include math
         /// (LaTeX in $...$) and links. Falls back to Description when null.
         /// </summary>
         public string? Documentation { get; init; }
@@ -67,9 +66,8 @@ namespace Calcpad.Highlighter.Snippets.Models
         public bool InternalOnly { get; init; }
 
         /// <summary>
-        /// Quick typing shortcut (without the ~ prefix).
-        /// For example, "a" means typing ~a followed by space will insert this symbol.
-        /// Null for snippets without quick typing support.
+        /// Quick typing shortcut without the ~ prefix, so "a" means typing ~a followed by space
+        /// inserts this symbol. Null for snippets without quick typing support.
         /// </summary>
         public string? QuickType { get; init; }
 
@@ -171,9 +169,8 @@ namespace Calcpad.Highlighter.Snippets.Models
         public bool IsOptional { get; init; }
 
         /// <summary>
-        /// For variadic parameters, indicates this is the repeating parameter.
-        /// When true, this parameter type applies to all remaining arguments.
-        /// Functions can accept unlimited arguments of this type.
+        /// For variadic parameters, marks the repeating parameter: its type applies to all
+        /// remaining arguments, of which a function can accept unlimited many.
         /// </summary>
         public bool IsVariadic { get; init; }
     }

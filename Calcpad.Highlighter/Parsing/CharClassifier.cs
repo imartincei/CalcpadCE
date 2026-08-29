@@ -4,9 +4,8 @@ using Calcpad.Highlighter.Linter.Helpers;
 namespace Calcpad.Highlighter.Parsing
 {
     /// <summary>
-    /// Character classification categories for the tokenizer's main parsing loop.
-    /// Provides O(1) lookup for ASCII characters via pre-computed array,
-    /// with pattern matching fallback for Unicode.
+    /// Character classification categories for the tokenizer's main parsing loop, giving O(1)
+    /// lookup for ASCII via a pre-computed array with a pattern-matching fallback for Unicode.
     /// Adapted from Calcpad.Core.MathParser.Input's CharTypes pattern.
     /// </summary>
     public enum CharClass : byte

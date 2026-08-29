@@ -29,15 +29,10 @@ function isValidPid(pid: unknown): pid is number {
 }
 
 /**
- * Manages the lifecycle of the bundled CalcPad server process.
- *
- * Designed for cross-instance reuse: multiple VS Code windows share a single
- * server discovered via a lock file at `{basePath}/bin/.calcpad-server.lock`.
- * Only the first instance to start spawns the server process and becomes the
- * owner. Subsequent instances read the lock file, health-check the existing
- * server, and connect to it. The server is spawned detached so it outlives
- * the spawning process — it only exits via the `calcpad.stopServer` command
- * or an OS-level signal.
+ * Manages the lifecycle of the bundled CalcPad server process, designed for cross-instance
+ * reuse: multiple VS Code windows share one server discovered via a lock file at
+ * `{basePath}/bin/.calcpad-server.lock`, and only the first instance to start spawns it.
+ * The server is spawned detached, so it exits only via `calcpad.stopServer` or an OS signal.
  */
 export class BaseServerManager {
     private static readonly MAX_RESTARTS = 3;
@@ -175,11 +170,10 @@ export class BaseServerManager {
         }
 
         const candidatePort = await this.findFreePort();
-        // Per-launch bearer for the server's /api routes. Loopback binding keeps
-        // remote machines out but not other local processes, and `#include`
-        // resolution reads any path it is handed — so without this any program on
-        // the box has arbitrary file read as the user. Published only in the
-        // 0600 lock file, which is how peer windows adopt an existing server.
+        // Per-launch bearer for the server's /api routes, without which any program on the box
+        // has arbitrary file read as the user: loopback binding keeps remote machines out but not
+        // other local processes, and `#include` resolution reads any path it is handed. Published
+        // only in the 0600 lock file.
         const token = crypto.randomBytes(32).toString('hex');
 
         // Race guard: atomically claim the lock file before spawning. If another
@@ -220,13 +214,9 @@ export class BaseServerManager {
         const exePath = path.join(this.basePath, 'bin', exeName);
         const useAppHost = fs.existsSync(exePath);
 
-        // VSIX packaging strips the executable bit on POSIX, so the bundled
-        // apphost can sit on disk but spawn fails silently with EACCES — the
-        // user sees no server URL and falls back to the (possibly empty)
-        // configured remote URL. Re-set the bit before every spawn so this
-        // self-heals on first launch after an install. Also chmod the
-        // libraries the apphost needs to dlopen at startup so a partially-
-        // restored bundle doesn't half-work.
+        // VSIX packaging strips the executable bit on POSIX, so the bundled apphost can sit
+        // on disk while spawn fails silently with EACCES. Re-set the bit (and that of the
+        // libraries the apphost dlopens) before every spawn so this self-heals.
         if (useAppHost && process.platform !== 'win32') {
             try {
                 fs.chmodSync(exePath, 0o755);
@@ -241,27 +231,16 @@ export class BaseServerManager {
             }
         }
 
-        // On POSIX, `detached: true` starts the child in its own process group /
-        // session so it survives when this VS Code window exits. We still pipe
-        // stdio while we're alive to capture startup logs; once the owner exits,
-        // Node's unref() lets the parent event loop close without waiting.
+        // On POSIX, `detached: true` starts the child in its own process group so it
+        // survives this window exiting; stdio is still piped while we are alive. On Windows
+        // we deliberately do NOT detach: DETACHED_PROCESS leaves the server with no console,
+        // forcing every console-subsystem browser helper it spawns during PDF generation to
+        // allocate its own visible console window, and orphaned children survive anyway.
         //
-        // On Windows we deliberately do NOT detach (see spawnOpts below): DETACHED_PROCESS
-        // leaves the server with no console, which forces every console-subsystem
-        // browser helper it spawns during PDF generation (crashpad_handler.exe, spawned
-        // even by system Edge/Chrome) to allocate its own visible console window. Windows
-        // keeps orphaned children alive after the parent exits anyway, so survival is
-        // preserved without detaching.
-        //
-        // DOTNET_DbgEnableMiniDump tells the runtime to write a minidump on
-        // unrecoverable crashes (StackOverflow, FailFast) — failure modes that
-        // bypass our in-process FileLogger. The .NET 6+ createdump flow handles
-        // this in-runtime, no separate tool required.
-        //
-        // Fixed filename (no %p/%t templating) means each new crash overwrites
-        // the previous dump, so we always keep exactly the most recent. Only
-        // one server runs at a time per project (lock-file enforced) so there's
-        // no race between concurrent dumps.
+        // DOTNET_DbgEnableMiniDump writes a minidump on unrecoverable crashes
+        // (StackOverflow, FailFast) that bypass the in-process FileLogger. The fixed
+        // filename means each crash overwrites the previous dump, and the lock file keeps
+        // one server per project so there is no race between concurrent dumps.
         const dumpDir = path.join(this.basePath, 'bin', 'logs');
         try { fs.mkdirSync(dumpDir, { recursive: true }); } catch { /* best-effort */ }
         const childEnv: NodeJS.ProcessEnv = {
@@ -287,24 +266,18 @@ export class BaseServerManager {
             ASPNETCORE_ENVIRONMENT: 'Production',
         };
 
-        // When the user installs the .NET runtime via the extension's local
-        // download path (DotnetRuntimeManager), `this.dotnetPath` is an
-        // absolute path inside globalStorage. The apphost (Calcpad.Server.exe)
-        // can't find that runtime on its own — it probes the standard install
-        // locations and PATH. Setting DOTNET_ROOT to the runtime's directory
-        // lets the apphost spawn succeed with a locally-installed runtime.
-        // A relative path (e.g. plain "dotnet") means "use PATH", in which
-        // case we leave DOTNET_ROOT alone so the apphost falls back to the
-        // standard probing chain — which is correct for self-contained
-        // bundles (Calcpad-Desktop) and for users with a system .NET install.
+        // The apphost probes the standard install locations and PATH, so it cannot find a
+        // runtime the extension downloaded into globalStorage on its own — point DOTNET_ROOT
+        // at it. A relative `dotnetPath` means "use PATH", where DOTNET_ROOT is left alone so
+        // the apphost falls back to standard probing.
         if (path.isAbsolute(this.dotnetPath)) {
             childEnv.DOTNET_ROOT = path.dirname(this.dotnetPath);
         }
         // windowsHide adds CREATE_NO_WINDOW (libuv only applies it when no stdio is
         // inherited — ours are all 'pipe'), giving the server a hidden console that its
-        // browser grandchildren inherit instead of each opening their own CMD window.
-        // It's a no-op off Windows. detached must stay off on Windows because
-        // DETACHED_PROCESS causes CREATE_NO_WINDOW to be ignored (see comment above).
+        // browser grandchildren inherit instead of each opening their own CMD window. It is a
+        // no-op off Windows, and detached must stay off there because DETACHED_PROCESS makes
+        // CREATE_NO_WINDOW be ignored.
         const spawnOpts = {
             stdio: ['pipe', 'pipe', 'pipe'] as ['pipe', 'pipe', 'pipe'],
             detached: process.platform !== 'win32',
@@ -357,12 +330,10 @@ export class BaseServerManager {
             this._processClosed = true;
         });
 
-        // 'error' fires when spawn itself fails (EACCES from Windows Defender,
-        // ENOENT for missing dotnet runtime, etc.). The process never starts in
-        // this case, so 'exit'/'close' may not fire — we have to flip _processClosed
-        // ourselves so waitForReady stops polling and surfaces the error fast.
-        // We DON'T fall back to another spawn here: the user needs to unblock the
-        // file in Explorer and then click Refresh to retry.
+        // 'error' fires when spawn itself fails (EACCES from Windows Defender, ENOENT for a
+        // missing dotnet runtime), in which case 'exit'/'close' may never fire, so
+        // _processClosed is flipped here to stop waitForReady polling. No fallback spawn: the
+        // user has to unblock the file in Explorer and click Refresh.
         this.serverProcess.on('error', (err: NodeJS.ErrnoException) => {
             const code = err.code ?? '';
             this.log(`[error] Failed to start server: ${err.message}${code ? ` (${code})` : ''}`);
@@ -448,20 +419,18 @@ export class BaseServerManager {
     }
 
     /**
-     * Explicitly kill the server. Used by the `calcpad.stopServer` / refresh
-     * commands. Kills regardless of ownership — if this instance merely connected
-     * to a server spawned by another window, we look the PID up from the lock
-     * file and kill that.
+     * Explicitly kill the server, used by the `calcpad.stopServer` / refresh commands. Kills
+     * regardless of ownership — a server spawned by another window is killed by the PID
+     * recorded in the lock file.
      */
     public async stop(): Promise<void> {
         this._disposed = true;
 
         if (!this.serverProcess) {
-            // We don't own the process — kill whatever PID the lock file records.
-            // SAFETY: when start() fails before the child PID is known (e.g. Windows
-            // blocked the .exe), the placeholder lock still carries our own process.pid.
-            // Killing that would terminate the extension host (and crash VS Code), so
-            // skip the kill in that case and just clean up the stale lock.
+            // We don't own the process — kill whatever PID the lock file records. SAFETY:
+            // when start() failed before the child PID was known, the placeholder lock still
+            // carries our own process.pid, and killing that would take down the extension
+            // host, so skip the kill and just clean up the stale lock.
             const lock = this.readLockFile();
             if (lock) {
                 if (lock.pid === process.pid) {
@@ -521,9 +490,9 @@ export class BaseServerManager {
     public disconnect(): void {
         this._disposed = true;
         if (this.serverProcess) {
-            // We were the owner. The child was spawned detached + unref'd, so
-            // it already survives our exit. Drop our handle so Node doesn't
-            // keep the event loop alive on the stdio pipes.
+            // We were the owner, and the child was spawned detached + unref'd so it already
+            // survives our exit. Drop our handle so Node doesn't keep the event loop alive on
+            // the stdio pipes.
             try {
                 this.serverProcess.stdout?.destroy();
                 this.serverProcess.stderr?.destroy();
@@ -766,33 +735,20 @@ export class BaseServerManager {
     }
 
     /**
-     * Persist a crash record to disk so it survives extension reload / VS Code restart.
-     * The in-process FileLogger can't capture StackOverflow / FailFast paths — this
-     * is the parent-side complement that records what the runtime printed to stderr
-     * along with the decoded exit code.
-     *
-     * Always writes to a fixed `last-crash.txt`, so each crash overwrites the previous
-     * record (matching the dump-file rolling-overwrite policy).
+     * Persist a crash record to disk so it survives extension reload, complementing the
+     * in-process FileLogger which cannot capture StackOverflow / FailFast paths. Always
+     * writes to a fixed `last-crash.txt`, matching the dump-file rolling-overwrite policy.
      */
     private persistCrashRecord(code: number | null, signal: NodeJS.Signals | null): void {
         this.writeCrashTxt(code, signal);
     }
 
     /**
-     * Write `last-crash.txt` with whatever crash info we have at this moment:
-     * exit code/signal (when called from the exit handler), the in-memory stderr
-     * tail, and a parsed traceback from `last-crash.dmp.crashreport.json` if
-     * createdump produced one.
-     *
-     * Called from two paths:
-     *   1. The 'exit' handler — has exit code + signal but the JSON may or may
-     *      not exist yet (and on stack overflow / SIGSEGV this handler often
-     *      doesn't fire reliably).
-     *   2. The crash watcher (5s poll on the JSON mtime) — has no exit info but
-     *      catches dumps the exit handler missed.
-     *
-     * Both paths share this writer so the on-disk format is identical. Last
-     * writer wins, which is fine — they pull from the same sources.
+     * Write `last-crash.txt` with whatever crash info is available: exit code/signal, the
+     * in-memory stderr tail, and a parsed traceback from `last-crash.dmp.crashreport.json`.
+     * Called from both the 'exit' handler (has exit info, may run before the JSON exists)
+     * and the crash watcher (catches dumps the exit handler missed), so the on-disk format
+     * is identical either way and last writer wins.
      */
     private writeCrashTxt(code: number | null, signal: NodeJS.Signals | null): void {
         try {
@@ -822,17 +778,10 @@ export class BaseServerManager {
     }
 
     /**
-     * Poll the dump JSON's mtime every 5 seconds. When it advances past the
-     * last seen value, a fresh crash has happened — regenerate `last-crash.txt`.
-     *
-     * Polling rather than fs.watch because (a) the watcher needs to survive
-     * stop/start cycles and adopted-server scenarios where we never owned the
-     * crashing process, and (b) fs.watch is unreliable across platforms for
-     * file-overwrite semantics — createdump writes a fresh JSON each time, and
-     * inotify/FSEvents don't agree on whether that's a "rename" or a "change".
-     *
-     * Seeded at construction with the current mtime (or 0 if missing) so a
-     * stale dump from a previous extension run doesn't immediately re-fire.
+     * Poll the dump JSON's mtime every 5 seconds and regenerate `last-crash.txt` when it
+     * advances. Polling rather than fs.watch, since the watcher must survive stop/start cycles and
+     * adopted servers and fs.watch disagrees across platforms about createdump's fresh JSON, and
+     * seeded at construction so a stale dump from a previous run doesn't immediately re-fire.
      */
     private startCrashWatcher(): void {
         if (this._crashWatchInterval) return;

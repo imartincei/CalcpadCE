@@ -24,9 +24,9 @@ namespace Calcpad.Highlighter.Linter.Constants
     }
 
     /// <summary>
-    /// Provides access to built-in Calcpad language elements.
-    /// Basic lookups (functions, keywords, units, etc.) are derived from SnippetRegistry.
-    /// Semantic groupings (control blocks, standalone keywords, etc.) are hardcoded.
+    /// Provides access to built-in Calcpad language elements. Basic lookups (functions, keywords,
+    /// units) are derived from SnippetRegistry; semantic groupings (control blocks, standalone
+    /// keywords) are hardcoded.
     /// </summary>
     public static class CalcpadBuiltIns
     {

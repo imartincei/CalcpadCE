@@ -4,22 +4,16 @@ using Calcpad.Core;
 namespace Calcpad.Server.Services
 {
     /// <summary>
-    /// Rewrites a worksheet into the self-contained form a compiled <c>.cpdz</c> needs. It is
-    /// handed out to be filled in, so nothing it depends on can be left behind: macros and
-    /// <c>#include</c>d files are expanded in place, every <c>#read</c> is given the data it
-    /// imports to carry, and a <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> reference is resolved to the
-    /// author's local path rather than left for a <c>#ProjectPath</c>/<c>#LibraryPath</c> the
-    /// recipient has no way to add — a compiled worksheet's source is locked. Images are the
-    /// exception to "expanded in place" — they stay as <c>src</c> paths for the host to embed,
-    /// which is why an included file's relative paths are made absolute on the way through: once
-    /// its text sits in the parent worksheet, the folder they were relative to is gone.
+    /// Rewrites a worksheet into the self-contained form a compiled <c>.cpdz</c> needs, since it
+    /// is handed out to be filled in and nothing it depends on can be left behind: macros and
+    /// <c>#include</c>d files are expanded in place, every <c>#read</c> carries the data it
+    /// imports, and a <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> reference is resolved to the
+    /// author's local path, which a recipient of locked source could never supply.
     ///
-    /// A <c>&lt;user&gt;</c> image reference is resolved here too, on this same author's machine,
-    /// purely to read its bytes for embedding — the embedded data itself carries no path, so
-    /// unlike <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> there is nothing recipient-specific
-    /// baked in. All three resolve the same way as a <c>#write</c>/<c>#append</c> target, and are
-    /// then collapsed to a bare filename like any other absolute one (see
-    /// <see cref="OutputTargets"/>).
+    /// Images are the exception to "expanded in place" — they stay as <c>src</c> paths for the
+    /// host to embed, which is why an included file's relative paths are made absolute on the
+    /// way through. All three token forms resolve the same way as a <c>#write</c>/<c>#append</c>
+    /// target and are then collapsed to a bare filename (see <see cref="OutputTargets"/>).
     /// </summary>
     internal static class PortableWorksheet
     {
@@ -86,9 +80,9 @@ namespace Calcpad.Server.Services
         /// Gives every <c>#read</c> the data it imports to carry, rewrites every
         /// <c>#write</c>/<c>#append</c> target <paramref name="outputs"/> asks for, and resolves
         /// any <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c> image reference left unresolved by
-        /// <see cref="AbsoluteImagePaths"/>. A read stays a read, on its own line, so it prints
-        /// and hides as it did before compiling. What the reads carry is capped in total, not
-        /// only per file, since it all has to be held in memory to be run.
+        /// <see cref="AbsoluteImagePaths"/>. A read stays a read on its own line, and what the
+        /// reads carry is capped in total rather than only per file, since it all has to be held
+        /// in memory to be run.
         /// </summary>
         /// <remarks>
         /// <paramref name="pathRoots"/> arrives already declared, by the macro parser that

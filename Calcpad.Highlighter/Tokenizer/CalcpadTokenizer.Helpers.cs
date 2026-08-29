@@ -10,11 +10,11 @@ namespace Calcpad.Highlighter.Tokenizer
 
         private static bool IsDelimiter(char c) => CharClassifier.IsDelimiter(c);
 
-        // Tokenizer-internal macro-identifier scan: permissive (Unicode letters allowed,
-        // '$' allowed after position 0). Distinct from CalcpadCharacterHelpers.IsMacroLetter,
-        // which matches Calcpad.Core's strict Latin-only macro-name validator and is used
-        // when checking whether a name *is* a valid macro identifier. This one is used by
-        // the tokenizer to find an identifier boundary in the token builder before emitting.
+        // Tokenizer-internal macro-identifier scan: permissive (Unicode letters allowed, '$'
+        // allowed after position 0), used to find an identifier boundary in the token builder
+        // before emitting. Distinct from CalcpadCharacterHelpers.IsMacroLetter, which matches
+        // Core's strict Latin-only validator and answers whether a name *is* a valid macro
+        // identifier.
         private static bool IsMacroIdentChar(char c, int position)
         {
             if (position == 0)

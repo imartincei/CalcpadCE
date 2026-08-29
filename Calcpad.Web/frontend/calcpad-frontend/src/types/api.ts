@@ -344,14 +344,10 @@ export interface PortablePackageResult {
 }
 
 /**
- * Which rendering an export captures.
- *
- * - `report` — hides `#pre` and applies the entered `#UI` values. The default everywhere.
- * - `preview` — the on-screen rendering: `#pre` and `#post` both shown, no overrides.
- * - `input` — the `#UI` form itself, with the entered values in its controls.
- * - `unwrapped` — the macro-expanded source listing.
- *
- * `input` and `unwrapped` have no Word form.
+ * Which rendering an export captures: `report` hides `#pre` and applies the entered `#UI` values
+ * (the default everywhere), `preview` is the on-screen rendering, `input` is the `#UI` form
+ * itself, and `unwrapped` is the macro-expanded source listing. `input` and `unwrapped` have no
+ * Word form.
  */
 export type ExportVariant = 'report' | 'preview' | 'input' | 'unwrapped';
 

@@ -1,12 +1,8 @@
 /**
- * Single-source-of-truth for "what's the user looking at right now?"
- * across the bridges. Returns the content of the model attached to the
- * first registered Monaco editor — which, with multi-tab editing, is
- * the active tab's model (TabManager swaps the model in place).
- *
- * Falls back to the first model in the registry if no editor is mounted
- * yet (e.g. very early bootstrap). Returns '' as a final fallback so
- * callers can stay synchronous.
+ * Single-source-of-truth for what the user is looking at, across the bridges: the content of
+ * the model attached to the first registered Monaco editor, which with multi-tab editing is the
+ * active tab's model. Falls back to the first model in the registry, then to '' so callers can
+ * stay synchronous.
  */
 export function getActiveEditorContent(): string {
     // Preferred: pull from the TabManager exposed by main.ts. Its activeModel

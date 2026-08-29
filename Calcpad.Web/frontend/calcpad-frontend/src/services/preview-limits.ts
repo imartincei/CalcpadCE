@@ -1,18 +1,10 @@
 /**
- * The size ceilings the preview pipeline enforces, shared so all three front ends
- * hold the same line.
- *
- * A rendered worksheet is one string, and showing it duplicates that string many
- * times over: the host keeps it to answer "open full HTML", the debug channel
- * mirrors its body, the injection passes each build a copy, the message that
- * carries it into the webview is cloned, and both buffers of the double-buffered
- * frame hold a live document built from it. A document large enough to matter is
- * therefore large enough several times over, and the DOM built from it costs more
- * again — so the check that matters is the one in front of the whole pipeline,
- * before any of those copies exist. Everything downstream is bounded by it.
- *
- * The three inputs that can grow without a document being large to begin with get
- * their own caps here: inlined image bytes, the debug mirror, and the console relay.
+ * The size ceilings the preview pipeline enforces, shared so all three front ends hold the same
+ * line. A rendered worksheet is one string that showing duplicates many times over — the "open
+ * full HTML" copy, the debug mirror, each injection pass, the message into the webview, and both
+ * frame buffers — so the check that matters is the one in front of the whole pipeline, alongside
+ * the caps here for the three inputs that can grow on their own: image bytes, debug mirror and
+ * console relay.
  */
 
 /** Default for the `maxPreviewSizeMB` setting. The DOM built from it costs several times more. */
@@ -84,13 +76,9 @@ export interface PreviewLimitNotice {
 }
 
 /**
- * The page shown in place of a render that exceeded the limit. A document of its own
- * rather than an overlay, so it goes through the same buffer as any other render and
- * leaves the last good one untouched until it is swapped forward.
- *
- * Static: the way past the limit is the setting, not a button here. A per-render override
- * would have to be honoured by a host the notice cannot see from inside its sandboxed
- * frame, and the setting already says the same thing in one place for every front end.
+ * The page shown in place of a render that exceeded the limit, a document of its own rather than
+ * an overlay so it goes through the same buffer as any other render. Static, because the way past
+ * the limit is the setting rather than a button the sandboxed frame could not act on anyway.
  */
 export function previewLimitNoticeHtml(o: PreviewLimitNotice): string {
     const c = o.theme === 'light'
@@ -146,15 +134,10 @@ export function previewLimitNoticeHtml(o: PreviewLimitNotice): string {
 
 /**
  * A `<script>` body (no tag) declaring the relay guard the console patches share:
- * `__calcpadRelayLine(text)` clips a message to the per-message ceiling, counts what has
- * been sent for this document, and returns null once `maxMessages` is reached — after
- * handing back one final line saying so. Clipping happens here, inside the frame, so an
- * oversized string is never posted across the boundary in the first place.
- *
- * The counter needs no reset: every render is a fresh document.
- *
- * The guard installs once per document, so every injected block that relays has to pass the
- * same `maxMessages` — whichever runs first sets it.
+ * `__calcpadRelayLine(text)` clips a message to the per-message ceiling, counts what has been
+ * sent for this document, and returns null once `maxMessages` is reached, after one final line
+ * saying so. The guard installs once per document — whichever injected block runs first sets the
+ * cap — and needs no counter reset, since every render is a fresh document.
  */
 export function consoleRelayGuardScript(
     maxMessages: number = DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT,

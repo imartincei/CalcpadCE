@@ -79,18 +79,11 @@ export async function resolveIncludeDirectiveLocation(
 }
 
 /**
- * Resolve a `SymbolLocation` (from the symbol-at-position endpoint) into a
- * concrete `vscode.Location` the editor can jump to.
- *
- * Resolution rules for `source: 'include'` locations:
- *   1. Resolve `loc.sourceFile` against the active document's directory.
- *      That matches how the backend's `#include` resolver finds files, so
- *      we land on the same physical file the linter saw.
- *   2. If that file doesn't exist, fall back to a workspace-wide glob —
- *      handles cases where the user opened a loose file outside any folder
- *      that contains its include sibling.
- *   3. If both miss, return null so the caller can drop the location
- *      instead of synthesizing a phantom location in the active document.
+ * Resolve a `SymbolLocation` (from the symbol-at-position endpoint) into a concrete
+ * `vscode.Location` the editor can jump to. For a `source: 'include'` location, `loc.sourceFile`
+ * is resolved against the active document's directory first — matching how the backend's
+ * `#include` resolver finds files — then against a workspace-wide glob, and null if both miss so
+ * the caller can drop the location rather than synthesize a phantom one.
  */
 export async function resolveSymbolLocation(
     document: vscode.TextDocument,

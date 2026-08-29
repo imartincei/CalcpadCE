@@ -80,8 +80,8 @@ export async function fetchPdfBrowserStatus(
 }
 
 /**
- * Downloads the bundled headless Chromium. Only call this after the user has agreed
- * — it is a multi-hundred-megabyte download. No timeout for that reason.
+ * Downloads the bundled headless Chromium. Only call this after the user has agreed — it is a
+ * multi-hundred-megabyte download, which is also why there is no timeout.
  */
 export async function installPdfBrowser(
     baseUrl: string,

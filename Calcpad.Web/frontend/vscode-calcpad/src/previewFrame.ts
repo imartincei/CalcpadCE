@@ -1,25 +1,9 @@
 /**
- * The containment boundary for rendered worksheets.
- *
- * A worksheet legitimately carries author HTML and JavaScript — `#HTML` blocks, CDN
- * `<script src>` tags, inline animation code — so the preview cannot filter scripts
- * without breaking the product. What it can do is deny that script anything worth
- * reaching. The rendered document is therefore never the webview's top-level
- * document: it goes into a `<iframe srcdoc>` sandboxed with `allow-scripts` and
- * deliberately without `allow-same-origin`, which leaves it on an opaque origin with
- * no `acquireVsCodeApi`, no storage, and no reachable parent DOM. `postMessage` to
- * the shell is the only way out, and the shell forwards a fixed set of message types
- * and nothing else.
- *
- * There are two such frames, not one, and the shell holding them is installed once per
- * panel rather than rebuilt per render: a render goes into whichever is behind and is
- * brought forward only once it reports itself loaded, so the visible frame is never mid-
- * replacement. Rebuilding the webview each render — which is what assigning
- * `webview.html` does — would leave nothing to hold the last good document behind.
- *
- * This mirrors what calcpad-web already does with its preview frames (App.vue), so
- * all three front ends draw the untrusted-content boundary in the same place and repaint
- * the same way.
+ * The containment boundary for rendered worksheets. A worksheet legitimately carries author HTML
+ * and JavaScript, so the rendered document is never the webview's top-level document: it goes
+ * into an `<iframe srcdoc>` sandboxed with `allow-scripts` and deliberately without
+ * `allow-same-origin`, leaving it on an opaque origin whose only way out is `postMessage` to the
+ * shell, and there are two such frames so a render is brought forward only once it has loaded.
  */
 
 import * as vscode from 'vscode';
@@ -32,11 +16,9 @@ import {
 } from 'calcpad-frontend';
 
 /**
- * What a panel's preview frame reported before the render that replaced it. Every
- * render builds a fresh document, so anything the old one knew about where the user
- * was has to be carried across by the host. VS Code restores a webview's own scroll
- * offset across an `html` assignment, but only for its top-level document — without
- * this the preview would snap to the top on every keystroke.
+ * What a panel's preview frame reported before the render that replaced it. VS Code restores
+ * a webview's own scroll offset across an `html` assignment but only for its top-level
+ * document, so without this the preview would snap to the top on every keystroke.
  */
 interface PreviewFrameState {
     /** Reset when the panel changes document: neither position means anything then. */
@@ -137,10 +119,9 @@ export function setShellLoading(panel: vscode.WebviewPanel, background: string, 
 }
 
 /**
- * The messages a preview frame sends about itself rather than about the document.
- * Handled for every panel that hosts one — the previews and the compiled-worksheet
- * editor alike — so each keeps its own position. Returns whether the message was one
- * of these.
+ * The messages a preview frame sends about itself rather than about the document, handled for
+ * every panel that hosts one so each keeps its own position. Returns whether the message was
+ * one of these.
  */
 export function handleFrameStateMessage(panel: vscode.WebviewPanel, message: any): boolean {
     switch (message?.type) {
@@ -167,10 +148,10 @@ export function handleFrameStateMessage(panel: vscode.WebviewPanel, message: any
             if (state) state.uiPosition = message.state;
             return true;
         }
-        // A link in the rendered document. The webview host intercepts navigation for
-        // its own document but not for a sandboxed frame, so the frame agent hands the
-        // click here instead. The scheme is re-checked on this side: the frame is
-        // untrusted, and openExternal will launch whatever it is given.
+        // A link in the rendered document: the webview host intercepts navigation for its
+        // own document but not for a sandboxed frame, so the frame agent hands the click
+        // here. The scheme is re-checked on this side, since openExternal will launch
+        // whatever it is given.
         case 'openExternal': {
             const url = String(message.url ?? '');
             if (/^(https?|mailto):/i.test(url)) void vscode.env.openExternal(vscode.Uri.parse(url));
@@ -182,29 +163,19 @@ export function handleFrameStateMessage(panel: vscode.WebviewPanel, message: any
 }
 
 /**
- * The policy for the shell, which a `srcdoc` document inherits — so this is also the
- * policy the worksheet runs under, and it has to stay wide enough for author content
- * to work. `'unsafe-inline'` is required by inline `<script>` in `#HTML` blocks and
- * by the server template's own `<style>`/`<script>`; a nonce would silently revoke it.
- * For the same reason there is no `'strict-dynamic'`: it makes the browser ignore
- * every host- and scheme-source, which would leave all CDN imports dead.
+ * The policy for the shell, which a `srcdoc` document inherits — so it is also the policy the
+ * worksheet runs under, and has to stay wide enough for author content to work.
+ * `'unsafe-inline'` is required by inline `<script>` in `#HTML` blocks and by the server
+ * template's own `<style>`/`<script>`, which is also why there is no `'strict-dynamic'`.
  *
- * Script sources are the bare `https:` scheme rather than a list of known CDNs,
- * matching calcpad-desktop's CSP. A named allowlist cannot work here: a CDN bundle
- * resolves its own dependencies at runtime from hosts that appear nowhere in the
- * worksheet, so the list is unknowable by inspection. The DXF module is the worked
- * example — it imports `dxf-viewer` from jsdelivr, which then pulls `opentype.js`
- * from `cdn.skypack.dev`. An allowlist fails these one dependency at a time, and a
- * refused fetch does not throw, so each failure is silent (see the
- * `securitypolicyviolation` relay in the agent below).
+ * Script sources are the bare `https:` scheme rather than a CDN allowlist, matching
+ * calcpad-desktop: a CDN bundle resolves its own dependencies at runtime from hosts that
+ * appear nowhere in the worksheet, and a refused fetch fails silently.
  *
- * The tradeoff is real and is accepted deliberately: any HTTPS host is both a script
- * origin and an exfiltration sink. Containment here is the sandbox — the opaque
- * origin denying the frame `acquireVsCodeApi`, storage and any reach into the shell —
- * not the source list. What the policy still buys: `object-src 'none'` (no plugin
- * content), `base-uri 'none'` (no rewriting where relative URLs resolve) and
- * `form-action 'none'` (a phishing form in a worksheet has nowhere to post).
- * `frame-ancestors` is omitted deliberately — it is ignored in a `<meta>` policy.
+ * The tradeoff is deliberate — any HTTPS host is both a script origin and an exfiltration
+ * sink, and containment here is the sandbox rather than the source list. The policy still
+ * buys `object-src 'none'`, `base-uri 'none'` and `form-action 'none'`; `frame-ancestors`
+ * is omitted because it is ignored in a `<meta>` policy.
  */
 export function previewCsp(): string {
     return [
@@ -435,13 +406,10 @@ function buildPreviewShell(options: ShellOptions): string {
             }
 
             // Identity is the only usable test for which window sent something: an opaque
-            // origin reports itself as "null", so checking the origin string would admit
-            // any other sandboxed frame just the same. Anything that is neither buffer is
-            // taken as the host, whose messages arrive through the same event. A frame the
-            // worksheet nested inside a buffer also lands there, which buys it nothing:
-            // fromHost only paints a buffer, and painting one is what a worksheet already
-            // does by being the document in it. The relay out to VS Code is fromFrame's,
-            // and that is reached by window identity alone.
+            // origin reports itself as "null", so checking the origin string would admit any
+            // other sandboxed frame just the same. Anything that is neither buffer is taken
+            // as the host, which buys a nested frame nothing — fromHost only paints a buffer,
+            // while the relay out to VS Code is reached by window identity alone.
             window.addEventListener('message', function (e) {
                 var d = e.data;
                 if (!d || typeof d.type !== 'string') return;
@@ -542,18 +510,11 @@ export interface AgentOptions {
 }
 
 /**
- * The frame's own half of the boundary: readiness for the things the shell used to do
- * by reaching into the document, plus the pieces that stopped working once the
- * document left the top level.
- *
- * Scroll is the notable one. VS Code restores a webview's scroll offset across an
- * `html` assignment, but only for the top-level document — with the report a frame
- * deeper, every keystroke's re-render would otherwise snap the preview back to the
- * top. The position is reported to the host and seeded into the replacement instead,
- * as a DOM anchor rather than an offset so late-rendering content cannot shift it.
- *
- * External links are intercepted rather than left to the webview's navigation
- * handling, which does not reach inside a sandboxed frame.
+ * The frame's own half of the boundary: the pieces that stopped working once the document left
+ * the top level. Scroll is the notable one — VS Code restores a webview's scroll offset only for
+ * its top-level document, so the position is reported to the host and seeded into the replacement
+ * as a DOM anchor, and external links are intercepted here too, since the webview's navigation
+ * handling does not reach inside a sandboxed frame.
  */
 export function getFrameAgentScript(options: AgentOptions = {}): string {
     const { scroll, uiPosition, maxConsoleMessages } = options;
@@ -577,13 +538,11 @@ export function getFrameAgentScript(options: AgentOptions = {}): string {
                 };
                 window.__calcpadSend = send;
 
-                // Tells the shell to bring this document's buffer forward. Sent from
-                // inside the document because the shell cannot tell an iframe's load event
-                // for the render it just wrote from the one fired for its initial
-                // about:blank — swapping on that would show a blank pane. Held until the
-                // scroll agent has applied the position it was seeded with, so the buffer
-                // comes forward already where the user was rather than scrolling there in
-                // front of them; that wait is capped inside the agent.
+                // Tells the shell to bring this document's buffer forward, sent from inside
+                // the document because the shell cannot tell an iframe's load event for the
+                // render it just wrote from the one fired for its initial about:blank. Held
+                // (with a cap) until the scroll agent has applied the position it was seeded
+                // with, so the buffer comes forward already where the user was.
                 window.addEventListener('load', function () {
                     var ready = function () { send({ type: 'cpdFrameReady' }); };
                     if (window.__calcpadScrollSettled) window.__calcpadScrollSettled(ready);
@@ -597,10 +556,10 @@ export function getFrameAgentScript(options: AgentOptions = {}): string {
         maxConsoleMessages)}
 
                 // VS Code raises its webview/context menu from a contextmenu event on the
-                // shell's document, and the real one lands here instead — a document it
-                // cannot see. The coordinates are handed out so the shell can raise it;
-                // the frame is full-bleed at the origin, so they need no translation.
-                // Datagrids bring their own menu, so a right-click inside one is left be.
+                // shell's document, and the real one lands here instead, so the coordinates
+                // are handed out for the shell to raise it — the frame is full-bleed at the
+                // origin, so they need no translation. Datagrids bring their own menu, so a
+                // right-click inside one is left be.
                 document.addEventListener('contextmenu', function (e) {
                     var t = e.target;
                     if (t && t.closest && t.closest('.jss_container, .calcpad-ui-datagrid')) return;

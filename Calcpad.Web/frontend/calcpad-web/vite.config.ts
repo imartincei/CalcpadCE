@@ -20,12 +20,10 @@ export default defineConfig(() => ({
         outDir: 'dist',
         emptyOutDir: true,
     },
-    // Monaco pulls in ~100 language files. Without pre-bundling, vite's
-    // dep-optimizer runs esbuild in parallel with browser transform requests,
-    // and esbuild 0.21.5's worker races itself under that load and dies with
-    // "callback is not a function" in main.js. Naming the top-level Monaco
-    // entrypoints forces vite to bundle them once at startup, before the
-    // browser starts requesting anything.
+    // Monaco pulls in ~100 language files, and without pre-bundling vite's dep-optimizer runs
+    // esbuild in parallel with browser transform requests, where esbuild 0.21.5's worker races
+    // itself and dies with "callback is not a function". Naming the top-level Monaco
+    // entrypoints forces vite to bundle them once at startup.
     optimizeDeps: {
         include: [
             'monaco-editor',

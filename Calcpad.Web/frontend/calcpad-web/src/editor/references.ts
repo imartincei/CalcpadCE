@@ -5,30 +5,21 @@ import type { FileContextProvider } from './diagnostics';
 import { parseDirectiveLine } from 'calcpad-frontend';
 
 /**
- * Resolves a `SymbolLocation` whose `source !== 'local'` to a Monaco model URI
- * by opening the referenced include file (reading it from disk and registering
- * a Monaco model) so the Find All References panel can render its snippet.
+ * Resolves a `SymbolLocation` whose `source !== 'local'` to a Monaco model URI by opening the
+ * referenced include file, so the Find All References panel can render its snippet. Only
+ * available on platforms with disk access (Tauri desktop, VS Code); returns null otherwise.
  *
- * Only available on platforms with disk access (Tauri desktop, VS Code).
- * Returns null if the file cannot be opened.
- *
- * TODO(web/remote): When running in a browser tab or against a remote server,
- * disk access is not available — we need a story for fetching include content
- * from the server (or from the in-memory `includeFiles` map the linter already
- * accepts) and creating a read-only Monaco model from it so cross-file
- * navigation works there too. Until then, navigation into includes is a
- * desktop-only feature.
+ * TODO(web/remote): in a browser tab or against a remote server there is no disk access, so
+ * include content would have to come from the server or the linter's in-memory `includeFiles`
+ * map. Until then, navigation into includes is desktop-only.
  */
 export type IncludeFileOpener = (rawFileName: string) => Promise<monaco.Uri | null>;
 
 /**
- * Resolves an include's raw file name to a Monaco URI for go-to-definition,
- * registering a detached (tab-less) Monaco model for it so Monaco can render
- * the Ctrl+hover underline + preview *without* opening or activating a tab.
- * Used instead of `IncludeFileOpener` because Monaco calls `provideDefinition`
- * on Ctrl+hover, so navigation must not happen here — the real tab open +
- * cursor move happen later in an editor opener that Monaco only invokes on a
- * real click / F12. Desktop-only. Returns null when the path can't be resolved.
+ * Resolves an include's raw file name to a Monaco URI for go-to-definition, registering a
+ * detached (tab-less) model so Monaco can draw the Ctrl+hover underline without opening a tab.
+ * Navigation must not happen here — the real open and cursor move belong to the editor opener
+ * Monaco invokes on a real click / F12, and this is desktop-only.
  */
 export type IncludeUriResolver = (rawFileName: string) => Promise<monaco.Uri | null>;
 
@@ -59,10 +50,9 @@ function locationToRange(loc: SymbolLocation): monaco.IRange {
 }
 
 /**
- * Resolve a SymbolLocation to a Monaco URI for the find-references panel. Local
- * locations stay in the active model; include locations are opened on disk via
- * the opener (desktop only) so the panel can render their content. This path
- * never repositions the cursor — the panel just lists the results.
+ * Resolve a SymbolLocation to a Monaco URI for the find-references panel: local locations stay
+ * in the active model, while include locations are opened on disk via the opener (desktop only).
+ * This path never repositions the cursor.
  */
 async function resolveReferenceUri(
     loc: SymbolLocation,
@@ -135,14 +125,10 @@ export function registerIncludeLinkProvider(resolveIncludeUri?: IncludeUriResolv
 }
 
 /**
- * Go-to-Definition (F12 / Ctrl+click). On an `#include FILEPATH` line, jumps
- * straight to that file. Otherwise asks the server for the symbol under the
- * cursor and points at the first assignment location. Kept SIDE-EFFECT FREE:
- * Monaco invokes this on Ctrl+hover just to draw the definition underline, so
- * it must not switch tabs or move the cursor. When the definition lives in an
- * `#include` file, `resolveIncludeUri` returns a pure URI for it; the actual
- * file open + navigation is handled by the editor opener registered in main.ts,
- * which Monaco calls only on a real click / F12.
+ * Go-to-Definition (F12 / Ctrl+click): on an `#include FILEPATH` line it jumps straight to that
+ * file, otherwise it asks the server for the symbol under the cursor. Kept SIDE-EFFECT FREE,
+ * since Monaco invokes this on Ctrl+hover just to draw the underline — `resolveIncludeUri`
+ * returns a pure URI, and the actual open is handled by the editor opener in main.ts.
  */
 export function registerDefinitionProvider(
     bridge: EditorBridge,
@@ -207,9 +193,8 @@ export function registerReferenceProvider(
 }
 
 /**
- * Rename Symbol (F2). Renames all local occurrences in the active document.
- * Cross-file rename is not supported — the user is told to rename in-place
- * if the definition lives in an include.
+ * Rename Symbol (F2), renaming all local occurrences in the active document. Cross-file rename is
+ * not supported — the user is told to rename in-place if the definition lives in an include.
  */
 export function registerRenameProvider(
     bridge: EditorBridge,

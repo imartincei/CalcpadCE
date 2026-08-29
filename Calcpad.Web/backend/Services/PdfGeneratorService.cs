@@ -230,17 +230,12 @@ namespace Calcpad.Server.Services
         }
 
         /// <summary>
-        /// Waits for all client-side rendered images (DXF plots, charts, anything
-        /// async that ends up as an <c>&lt;img&gt;</c>) to finish before capturing
-        /// the PDF. <c>Networkidle0</c> isn't enough on its own because the work
-        /// that fills <c>img.src</c> happens after the last network request returns
-        /// (canvas-to-dataURL, font parsing, WebGL rendering, etc.).
-        ///
-        /// Strategy: poll every <c>&lt;img&gt;</c> in the document — any that have
-        /// a <c>src</c> set must report <c>complete</c> with a non-zero
-        /// <c>naturalWidth</c>. Then do a double <c>requestAnimationFrame</c>
-        /// flush so layout/paint commit before serialization. A 30 s timeout
-        /// prevents one stuck render from blocking the whole PDF.
+        /// Waits for all client-side rendered images (DXF plots, charts, anything async that
+        /// ends up as an <c>&lt;img&gt;</c>) to finish before capturing the PDF, since
+        /// <c>Networkidle0</c> misses work that happens after the last network request returns.
+        /// Every <c>&lt;img&gt;</c> with a <c>src</c> must report <c>complete</c> with a
+        /// non-zero <c>naturalWidth</c>, followed by a double <c>requestAnimationFrame</c>
+        /// flush and bounded by a 30 s timeout.
         /// </summary>
         private static async Task WaitForAsyncContentAsync(IPage page)
         {
@@ -409,10 +404,10 @@ namespace Calcpad.Server.Services
         }
 
         /// <summary>
-        /// Downloads ChromeHeadlessShell on explicit request. This is the only path that
-        /// downloads without the <c>AllowChromiumDownload</c> opt-in, because the caller is
-        /// relaying a user's confirmation. Drops any stale browser so the next render picks
-        /// up the new executable.
+        /// Downloads ChromeHeadlessShell on explicit request — the only path that downloads
+        /// without the <c>AllowChromiumDownload</c> opt-in, because the caller is relaying a
+        /// user's confirmation. Drops any stale browser so the next render picks up the new
+        /// executable.
         /// </summary>
         public async Task<string> InstallBrowserAsync()
         {

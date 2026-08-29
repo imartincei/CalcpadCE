@@ -38,9 +38,8 @@ const SYSTEM_FONT_STACK = "ui-monospace, 'Cascadia Code', 'Fira Code', Consolas,
 const JULIA_FONT_STACK = "'JuliaMono', 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace";
 
 /**
- * Build the Monaco `fontFamily` value from a chosen primary font. The special
- * value `"system"` (or empty) means "system monospace" — drop JuliaMono from
- * the stack. Any other value is treated as a font family name and prepended.
+ * Build the Monaco `fontFamily` value from a chosen primary font. The special value `"system"`
+ * (or empty) drops JuliaMono from the stack; anything else is prepended as a family name.
  */
 export function resolveEditorFontFamily(name: string | undefined): string {
     const trimmed = (name ?? '').trim();
@@ -50,9 +49,8 @@ export function resolveEditorFontFamily(name: string | undefined): string {
 }
 
 /**
- * Monaco measures glyph widths once when an editor is created. Web fonts load
- * asynchronously, so on the first paint the measurement happens against a
- * fallback and the cursor/glyph grid ends up misaligned. Force the chosen
+ * Monaco measures glyph widths once when an editor is created, so a web font loading
+ * asynchronously leaves the cursor/glyph grid misaligned on first paint. Force the chosen
  * primary family to load, then re-measure all editors.
  */
 export function remeasureEditorFontsWhenReady(family = 'JuliaMono', fontSize = 14): void {

@@ -38,12 +38,10 @@ export class CalcpadDefinitionsService {
     }
 
     /**
-     * Fetch definitions from the server and update the cache.
-     * Takes content string directly (not a VS Code TextDocument). `requestKey`
-     * supersedes a same-keyed request still queued or in flight — pass the
-     * owning editor group's id (not `documentKey`) so switching that group's
-     * active tab cancels its previous tab's stale request instead of leaving
-     * it to run to completion alongside the new one.
+     * Fetch definitions from the server and update the cache, taking a content string directly.
+     * `requestKey` supersedes a same-keyed request still queued or in flight — pass the owning
+     * editor group's id, not `documentKey`, so switching that group's active tab cancels its
+     * previous tab's stale request.
      */
     public async refreshDefinitions(
         content: string,

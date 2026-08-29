@@ -28,8 +28,8 @@ export class CalcpadSnippetService {
     }
 
     /**
-     * Load snippets from the server. Safe to call multiple times — will reuse existing promise.
-     * Starts background retry if initial load fails.
+     * Load snippets from the server, reusing the existing promise when called again. Starts a
+     * background retry if the initial load fails.
      */
     public async loadSnippets(): Promise<void> {
         if (this._isLoaded) return;

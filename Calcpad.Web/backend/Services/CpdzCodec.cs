@@ -5,13 +5,10 @@ namespace Calcpad.Server.Services
 {
     /// <summary>
     /// Reads and writes the compiled <c>.cpdz</c> worksheet format, matching
-    /// <c>Calcpad.Wpf</c>'s <c>Zip</c> helper so files round-trip between the two.
-    ///
-    /// Two shapes exist. The plain one is a raw deflate stream of the source text.
-    /// The composite one is a ZIP archive holding a deflated <c>code.cpd</c> entry
-    /// plus the images the worksheet references; it is recognized by the <c>PK</c>
-    /// signature. Encoding preserves whichever shape the original had, so saving a
-    /// composite file does not discard its images.
+    /// <c>Calcpad.Wpf</c>'s <c>Zip</c> helper so files round-trip between the two. Two shapes
+    /// exist — a raw deflate stream of the source text, and a ZIP archive (recognized by the
+    /// <c>PK</c> signature) holding a deflated <c>code.cpd</c> entry plus referenced images —
+    /// and encoding preserves whichever shape the original had.
     /// </summary>
     internal static class CpdzCodec
     {

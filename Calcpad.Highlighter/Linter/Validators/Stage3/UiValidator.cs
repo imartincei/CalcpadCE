@@ -7,12 +7,11 @@ using Calcpad.Highlighter.Linter.Models;
 namespace Calcpad.Highlighter.Linter.Validators.Stage3
 {
     /// <summary>
-    /// Validates the optional JSON block of the #UI directive (`#UI {...} name = value`).
-    /// Reports an unclosed or malformed block and unrecognized keys, then defers to
-    /// <see cref="UiDto"/> for the property rules, so the linter and ExpressionParser
-    /// reject the same payloads with the same wording. What stays here is what the
-    /// payload alone cannot decide: that the line assigns something, and that it does
-    /// not assign a string variable.
+    /// Validates the optional JSON block of the #UI directive (`#UI {...} name = value`), reporting
+    /// an unclosed or malformed block and unrecognized keys before deferring to <see cref="UiDto"/>
+    /// for the property rules, so the linter and ExpressionParser reject the same payloads with the
+    /// same wording. What stays here is what the payload alone cannot decide: that the line assigns
+    /// something, and that it does not assign a string variable.
     /// </summary>
     public class UiValidator
     {

@@ -37,10 +37,8 @@ let unwrappedPanel: vscode.WebviewPanel | undefined = undefined;
 let previewUpdateTimeout: NodeJS.Timeout | unknown = undefined;
 let previewSourceEditor: vscode.TextEditor | undefined = undefined;
 
-// The #UI input form is its own panel, with the report preview opening to its
-// right so entered values and their effect are visible side by side. Its
-// presence is what "UI mode is on" means. Values stay in memory until the user
-// runs "Save UI Values", which writes them into the document.
+// The #UI input form is its own panel, with the report preview opening to its right.
+// Values stay in memory until "Save UI Values" writes them into the document.
 let uiPanel: vscode.WebviewPanel | undefined = undefined;
 // The print report that accompanies the input form, showing what the entered
 // values produce. Opened to the form's right and closable on its own.
@@ -161,14 +159,9 @@ async function saveUiValuesFor(document: vscode.TextDocument): Promise<number | 
 }
 
 /**
- * Closing the input form discards the values entered into it — they only live in
- * memory until written into the document — so offer to save the unwritten ones
- * first, then drop them so the next session starts from the document again.
- *
- * `allowCancel` keeps the values when the modal is dismissed (Cancel / Escape) and
- * returns false, for callers that can still back out of what they were doing. Where
- * the form is already gone there is nothing to back out of, so dismissing it is
- * taken as "Don't Save".
+ * Closing the input form discards the values entered into it, so offer to save the
+ * unwritten ones first. `allowCancel` keeps them when the modal is dismissed and returns
+ * false, for callers that can still back out of what they were doing.
  */
 async function discardUiValues(docKey: string | undefined, allowCancel = false): Promise<boolean> {
     if (!docKey) return true;
@@ -197,11 +190,8 @@ async function discardUiValues(docKey: string | undefined, allowCancel = false):
 const autoUiConsidered = new Set<string>();
 
 /**
- * A document declaring `#UI` controls is one to fill in, so the first time one is looked at
- * its input form opens. Judged once per document per session: a tab switch back, or a `#UI`
- * line added while editing, must not re-open a form the user closed.
- *
- * The form is opened without taking the focus, so the caret stays where the user left it.
+ * A document declaring `#UI` controls opens its input form the first time it is looked at.
+ * Judged once per document per session, and opened without taking the focus.
  */
 async function maybeAutoEnterInputMode(document: vscode.TextDocument): Promise<void> {
     // Deliberately stricter than processDocument, which also lints plaintext: a .txt file
@@ -257,10 +247,9 @@ function apiAuthHeaders(): Record<string, string> {
 const PREVIEW_BUSY_DELAY_MS = 400;
 
 /**
- * Detect whether the cursor sits inside a metadata comment (`'<!--{...}-->`)
- * and push it to the Vue panel's Metadata tab. Also drives the
- * `calcpad.inMetadataComment` context key that gates the editor context-menu
- * command. Single-line only, matching the shared detector.
+ * Detect whether the cursor sits inside a metadata comment (`'<!--{...}-->`) and push it to
+ * the Vue panel's Metadata tab. Also drives the `calcpad.inMetadataComment` context key that
+ * gates the editor context-menu command.
  */
 function updateMetadataContext(editor: vscode.TextEditor | undefined): void {
     let block = null;
@@ -306,16 +295,9 @@ function previewBackground(): string {
 
 /**
  * Raises the preview's "Calculating…" overlay only if the render outlasts
- * PREVIEW_BUSY_DELAY_MS, so fast renders never flash it (mirrors Calcpad.Wpf's
- * delayed spinner). Returns a function that must be called when the render ends.
- *
- * An overlay in the shell rather than a page of its own: a page would have to be the
- * webview's document, and replacing that would throw away the buffer holding the render
- * the user is still looking at.
- *
- * The returned function only stops the overlay being raised. Lowering it belongs to the
- * render that replaces it — a request that ends by being superseded has not finished
- * calculating, it has handed that off.
+ * PREVIEW_BUSY_DELAY_MS, so fast renders never flash it. Returns a function that must be
+ * called when the render ends; it only stops the overlay being raised, since lowering it
+ * belongs to the render that replaces it.
  */
 function showPreviewLoading(panel: vscode.WebviewPanel): () => void {
     const background = previewBackground();
@@ -326,11 +308,9 @@ function showPreviewLoading(panel: vscode.WebviewPanel): () => void {
 }
 
 /**
- * The PDF options for an export: the stored host defaults, overridden per key by
- * the document's own `pdf` metadata comment. `documentContent` is optional so
- * callers with no document in hand still get the host defaults. The header title
- * falls back to `sourceFileUri`'s base name — the document being exported, not
- * whichever editor happens to be focused — matching the desktop app.
+ * The PDF options for an export: the stored host defaults, overridden per key by the
+ * document's own `pdf` metadata comment. The header title falls back to `sourceFileUri`'s
+ * base name — the document being exported, not whichever editor happens to be focused.
  */
 function getPdfSettings(documentContent?: string, sourceFileUri?: vscode.Uri): FrontendPdfSettings {
     const settingsManager = CalcpadSettingsManager.getInstance();
@@ -372,16 +352,9 @@ const IMAGE_MIME_MAP: Record<string, string> = {
 
 /**
  * Scan rendered HTML for <img src="..."> tags with local file paths, read the files from
- * disk, and return a cache mapping original src values to base64 data URIs.
- * `Calcpad.Core.ImageReferences` has already expanded any `{project}`/`{library}`/`{user}`
- * token and env var (`%VAR%`/`$VAR`) into an absolute path, so only a relative src is left
- * to join against `documentDir`.
- *
- * `maxTotalBytes` bounds what a single render will read: a worksheet referencing a folder
- * of photographs would otherwise pull all of them into memory as base64, which costs a
- * third again on top of the files themselves. Images past the budget keep their original
- * src, which the sandboxed frame cannot load, so they show as broken rather than silently
- * looking fine. The export/PDF path passes no budget — a written file keeps every image.
+ * disk, and return a cache mapping original src values to base64 data URIs. `maxTotalBytes`
+ * bounds what one render will read; images past the budget keep their unloadable original
+ * src so they show as broken, and the export/PDF path passes no budget.
  */
 async function buildImageCache(
     html: string,
@@ -464,12 +437,10 @@ function applyImageCache(html: string, imageCache: Record<string, string>): stri
 }
 
 /**
- * Generate a <script> that strips VS Code's auto-injected theme from the webview.
- * VS Code injects 400+ --vscode-* CSS variables on <html> and sets body classes
- * (vscode-dark/vscode-light) which override the server-generated theme CSS.
- * There is no API to disable this: https://github.com/microsoft/vscode/issues/209253
- * VS Code only re-injects on VS Code theme change, not continuously,
- * so stripping at DOMContentLoaded is stable.
+ * Generate a <script> that strips VS Code's auto-injected theme from the webview, which
+ * would otherwise override the server-generated theme CSS. There is no API to disable it
+ * (https://github.com/microsoft/vscode/issues/209253), and it is only re-injected on theme
+ * change, so stripping at DOMContentLoaded is stable.
  */
 function getThemeOverrideScript(previewTheme: 'light' | 'dark'): string {
     const bodyClass = previewTheme === 'light' ? 'vscode-light' : 'vscode-dark';
@@ -494,14 +465,10 @@ function getThemeOverrideScript(previewTheme: 'light' | 'dark'): string {
     `;
 }
 
-// Escape stray '<' that aren't part of complete HTML tags to prevent
-// malformed user content (e.g. '<h' from Calcpad notes) from breaking the DOM.
-// A complete tag is <...> where the content between < and > contains no nested <.
-//
-// This is a rendering repair, not a security control: <script>, <iframe> and event
-// handler attributes are all complete tags and pass through untouched, by design —
-// author HTML and JS are a Calcpad feature. What contains them is the sandboxed
-// frame in previewFrame.ts.
+// Escape stray '<' that aren't part of complete HTML tags, so malformed user content
+// (e.g. '<h' from Calcpad notes) doesn't break the DOM. A rendering repair, not a security
+// control: complete tags pass through by design, and containment is the sandboxed frame in
+// previewFrame.ts.
 function repairStrayAngleBrackets(html: string): string {
     const bodyOpen = html.indexOf('<body');
     const bodyClose = html.lastIndexOf('</body>');
@@ -602,11 +569,10 @@ function getErrorNavigationScript(maxConsoleMessages: number): string {
                 // Find all error links with data-text attributes
                 const errorLinks = document.querySelectorAll('a[data-text]');
 
-                // The code view (unwrapped output, or the wrapped view's fallback when
-                // parsing errors occur) renders .line-num anchors whose data-text is
-                // already a source line. The true wrapped view has no .line-num and its
-                // error links carry expanded *output* lines. Tag each click so the
-                // extension only does the output->unwrapped two-step for real output lines.
+                // The code view renders .line-num anchors whose data-text is already a
+                // source line, while the true wrapped view's error links carry expanded
+                // *output* lines. Tag each click so the extension only does the
+                // output->unwrapped two-step for real output lines.
                 const isCodeView = !!document.querySelector('.line-num');
 
                 errorLinks.forEach(link => {
@@ -629,10 +595,9 @@ function getErrorNavigationScript(maxConsoleMessages: number): string {
 }
 
 /**
- * Give the preview a clearly visible vertical scrollbar. VS Code webviews scroll
- * natively but the default scrollbar is nearly invisible, so we style it to match
- * the extension's Vue sidebar (calcpad-frontend/src/vue/styles/base.css). Reserving
- * the gutter with `overflow-y: scroll` keeps the layout from shifting.
+ * Give the preview a clearly visible vertical scrollbar: VS Code webviews scroll natively but the
+ * default scrollbar is nearly invisible, so it is styled to match the extension's Vue sidebar.
+ * Reserving the gutter with `overflow-y: scroll` keeps the layout from shifting.
  */
 function getScrollbarStyleScript(): string {
     return `
@@ -677,23 +642,10 @@ function getScrollbarStyleScript(): string {
 }
 
 /**
- * Inject the line-link behaviour ported from the WPF preview (doc/template.html):
- *  - each wrapped-view output line (.line) gets a hover "←" link that navigates via
- *    postMessage('navigateToLine'). Its data-text is the output line; the extension
- *    resolves output→source (the two-step hop) when the document has macros/includes.
- *    The unwrapped view isn't decorated here: its .line-num anchors already carry the
- *    source line and are handled by getErrorNavigationScript's a[data-text] binding.
- *  - error-summary .roundBox chips scroll the preview to that output line.
- *  - a 'scrollToLine' target (set by the two-step navigation) is scrolled into
- *    view on load. Baking the target into the HTML avoids a postMessage race with
- *    the webview reload.
- * The arrows are created after DOMContentLoaded (so after getErrorNavigationScript
- * binds), hence they get their own click handler here.
- *
- * `includeLinks` turns just the arrows off; the chips, the scroll target and the
- * editor->preview sync stay. The input form drops them, and so does the report
- * while it accompanies that form — the form, not the source, is what you are
- * working in.
+ * Inject the line-link behaviour ported from the WPF preview: hover "←" links on wrapped
+ * output lines, error-summary chips that scroll to a line, and a baked-in 'scrollToLine'
+ * target that avoids a postMessage race with the webview reload. `includeLinks` turns just
+ * the arrows off, which the input form and its accompanying report do.
  */
 function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true): string {
     const scrollTarget = typeof scrollToLine === 'number' ? String(scrollToLine) : 'null';
@@ -705,10 +657,9 @@ function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true):
                     var id = el.id || '';
                     var n = id.indexOf('line-') === 0 ? id.slice(5) : '';
                     // Prefer data-source-line (set by Calcpad.Core when the line came from
-                    // a macro/include expansion) so the arrow navigates straight to the
-                    // source line and skips the wrapped->unwrapped two-step. Loop
-                    // iterations past the first drop the id but keep data-source-line, so
-                    // key off the source line here. Error links keep the 'output' path.
+                    // a macro/include expansion) so the arrow skips the wrapped->unwrapped
+                    // two-step; loop iterations past the first drop the id but keep it.
+                    // Error links keep the 'output' path.
                     var src = el.getAttribute('data-source-line') || n;
                     if (!src) return;
                     var link = document.createElement('a');
@@ -761,12 +712,11 @@ function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true):
                 var scrollToLine = ${scrollTarget};
                 if (scrollToLine !== null) goTo(document.getElementById('line-' + scrollToLine), 'center');
 
-                // Editor -> preview sync. The extension posts
-                // { type: 'scrollToSourceLine', line } (a source line) on cursor
-                // move (when auto-sync is on) or via the 'Focus Preview to Line'
-                // command. Match data-source-line first (wrapped view), then the
-                // code view's line-num anchors, falling back to the nearest
-                // preceding source line so blank/continuation lines still resolve.
+                // Editor -> preview sync, driven by the extension posting
+                // { type: 'scrollToSourceLine', line } on cursor move or via the 'Focus Preview
+                // to Line' command. Match data-source-line first (wrapped view), then the code
+                // view's line-num anchors, falling back to the nearest preceding source line so
+                // blank/continuation lines still resolve.
                 var focusTimer = null;
                 // "exact" comes from a TOC click: skip the nearest-preceding-line fallback so a
                 // heading hidden by #pre/#post (no element for it at all) does nothing instead of
@@ -956,10 +906,10 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // Use the entire API response as the webview HTML
         const apiResponse = await response.text();
 
-        // Before anything copies it. Showing a render costs several times its own size —
-        // the image inlining, the injection passes, the message into the webview, and the
-        // live documents built from it — so the one check that can hold the line is the one
-        // in front of all of them. Everything below is bounded by having passed here.
+        // Before anything copies it. Showing a render costs several times its own size — the
+        // image inlining, the injection passes, the message into the webview, and the live
+        // documents built from it — so the one check that can hold the line is in front of all of
+        // them, and everything below is bounded by having passed here.
         const sizeLimit = previewSizeLimitChars(
             CalcpadSettingsManager.getInstance(extensionContext)
                 .getExtraNumber('maxPreviewSizeMB', DEFAULT_PREVIEW_SIZE_MB));
@@ -1009,24 +959,19 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // Visible, styled vertical scrollbar for the preview
         const scrollbarStyleScript = getScrollbarStyleScript();
 
-        // Hover line links + roundBox scroll + optional scroll-to-line target. The arrows
-        // need a source editor to navigate to: a compiled worksheet has none, the input
-        // form itself hides the editor behind it, and the report gives them up too while
-        // that form is in front of it. The report gets them back when it stands alone
-        // beside the editor (the 'ui' panel's disposal re-renders it, so closing input
-        // mode restores them).
+        // Hover line links + roundBox scroll + optional scroll-to-line target. The arrows need a
+        // source editor to navigate to, which a compiled worksheet has none of and which the
+        // input form hides, so the report gives them up while that form is in front of it and
+        // gets them back when it stands alone beside the editor.
         const lineLinkScript = getLineLinkScript(
             scrollToLine, !standalone && !enableUi && !(forPrint && uiPanel !== undefined));
 
         // Override VS Code's injected theme to match the selected preview theme
         const themeOverrideScript = getThemeOverrideScript(theme);
 
-        // Repair stray '<' that aren't part of valid tags. Not a security control —
-        // see the function's own comment; containment is the sandboxed frame below.
-        // The image cache is applied in the same pass rather than shipped as a script the
-        // frame runs: a script would carry every data URI as source text *and* as a parsed
-        // object, so the images would cost twice over inside the webview. This matches what
-        // calcpad-web and the PDF path already do.
+        // Repair stray '<' that aren't part of valid tags. The image cache is applied in the
+        // same pass rather than shipped as a script the frame runs, which would carry every
+        // data URI as source text *and* as a parsed object.
         const repairedResponse = applyImageCache(repairStrayAngleBrackets(apiResponse), imageCache);
 
         // Where this panel's frame was before the render that is replacing it. An
@@ -1140,10 +1085,8 @@ async function renderForExport(
 }
 
 /**
- * Convert a Calcpad document to PDF on the server and write the bytes to
- * <paramref name="saveUri"/>. Pure I/O — no UI prompts. Used by
- * <see cref="runPdfExportCommand"/>, which handles the editor lookup, save
- * dialog, progress notification, and "Open PDF" follow-up.
+ * Convert a Calcpad document to PDF on the server and write the bytes to `saveUri`. Pure
+ * I/O — `runPdfExportCommand` handles the editor lookup, dialogs and "Open PDF" follow-up.
  */
 async function generatePdfToFile(
     documentContent: string,
@@ -1265,10 +1208,9 @@ async function runPdfExportCommand(variant: ExportVariant = 'report'): Promise<v
 }
 
 /**
- * Offers the bundled headless Chromium download after PDF export found no usable
- * browser. Declining is a first-class outcome — installing Chrome/Edge/Chromium
- * themselves stays the recommended path, so that advice goes to the Output panel
- * either way. Resolves true when a browser is now installed.
+ * Offers the bundled headless Chromium download after PDF export found no usable browser;
+ * declining is a first-class outcome, so the advice to install Chrome/Edge/Chromium goes to
+ * the Output panel either way. Resolves true when a browser is now installed.
  */
 async function offerChromiumDownload(downloadSizeMb: number): Promise<boolean> {
     const size = downloadSizeMb > 0 ? `~${downloadSizeMb} MB` : 'a few hundred MB';
@@ -1449,10 +1391,10 @@ async function saveDocx(variant: ExportVariant = 'report') {
 }
 
 /**
- * Compile the active document to a `.cpdz` and save it. This is an export: the open
- * document keeps its own path and stays editable. The worksheet is bundled first —
- * includes expanded, `#read` data inlined — and its images embedded after, in that order:
- * an included file's images only resolve once the server has rewritten their paths.
+ * Compile the active document to a `.cpdz` and save it — an export, so the open document keeps
+ * its own path and stays editable. The worksheet is bundled first (includes expanded, `#read`
+ * data inlined) and its images embedded after, since an included file's images only resolve once
+ * the server has rewritten their paths.
  */
 async function saveAsCompiled() {
     const source = activeCalcpadSource();
@@ -1487,8 +1429,8 @@ async function saveAsCompiled() {
         // env vars in whatever plain relative/absolute src the author wrote directly.
         const resolve = createReferenceResolver(bundled.content, documentDir, expandEnvVars, path.resolve, os.homedir);
         // Refused rather than trimmed: the images become the file, so a compiled worksheet
-        // that quietly dropped them would be a lossy save. Mirrors the server's own limit on
-        // embedded `#read` data. The catch below turns it into the failure message.
+        // that quietly dropped them would be a lossy save. The catch below turns it into
+        // the failure message.
         const compiled = await inlineImageSources(bundled.content, new VSCodeFileSystem(), resolve, {
             maxTotalBytes: MAX_COMPILED_IMAGE_TOTAL_BYTES,
             onExceeded: 'fail',
@@ -1506,13 +1448,10 @@ async function saveAsCompiled() {
 }
 
 /**
- * Packs the active document and everything it references into a portable archive. Unlike a
- * compiled worksheet this stays text: what comes out is the document as written, with only its
- * paths changed — each one pointing into the folder of references packed beside it. For a
- * recipient who has to read or edit the calculation rather than just fill it in.
- *
- * The server does the packing, since resolving the references means reading them; refusing is
- * part of the job, so what came back is reported rather than worked around.
+ * Packs the active document and everything it references into a portable archive that stays
+ * text: the document as written, with only its paths changed to point into the folder of
+ * references packed beside it. The server does the packing, so a refusal is reported as-is
+ * rather than worked around.
  */
 async function exportPortable() {
     const source = activeCalcpadSource();
@@ -1578,15 +1517,10 @@ function navigateEditorToLine(sourceEditor: vscode.TextEditor, line: number) {
     vscode.window.showTextDocument(sourceEditor.document, vscode.ViewColumn.One);
 }
 
-// Editor -> preview sync: tell any open preview panel(s) to scroll to a 1-based
-// source line. Every view matches on data-source-line / line-num anchors, so the
-// same source line works for the preview, unwrapped, input-form and report panels.
-// The input form is included so sidebar (TOC) navigation lands there too -- it drops
-// the hover arrows but keeps the sync listener.
-// `exact` disables the nearest-preceding-line fallback in the preview's focusPreviewLine:
-// a TOC heading that fell inside a hidden #pre/#post block has no element to land on, and
-// the fallback would jump to an unrelated line, so TOC navigation should do nothing rather
-// than land somewhere odd.
+// Editor -> preview sync: tell any open preview panel(s) to scroll to a 1-based source
+// line, matched on data-source-line / line-num anchors across every view. `exact` disables
+// the nearest-preceding-line fallback, so a TOC heading inside a hidden #pre/#post block
+// does nothing instead of landing on an unrelated line.
 function postPreviewSourceLine(line: number, exact: boolean = false) {
     const msg = { type: 'scrollToSourceLine', line, exact };
     wrappedPanel?.webview.postMessage(msg);
@@ -1637,10 +1571,9 @@ function handlePreviewMessage(message: any, kind: PreviewKind) {
     }
 }
 
-// Opens (or reveals) the wrapped or unwrapped preview. The unwrapped preview is
-// stacked directly below the wrapped one so the two-step navigation reads top→bottom.
-// `scrollToLine` (an output line) is baked into the rendered HTML so the unwrapped
-// view scrolls to it on load without a postMessage race.
+// Opens (or reveals) the wrapped or unwrapped preview, the unwrapped one stacked directly
+// below the wrapped so two-step navigation reads top→bottom. `scrollToLine` (an output line)
+// is baked into the rendered HTML to avoid a postMessage race.
 async function showPreview(kind: PreviewKind, scrollToLine?: number, preserveFocus = false) {
     // When invoked from a preview line-link click the webview is focused, so there is
     // no active *text* editor — fall back to the editor that spawned the preview.
@@ -1692,18 +1625,15 @@ async function showPreview(kind: PreviewKind, scrollToLine?: number, preserveFoc
         },
         {
             enableScripts: true,
-            // The rendered document lives in a frame the shell is handed by message, not
-            // in `webview.html` (see previewFrame.ts). Letting VS Code tear the webview
-            // down on hide would therefore restore an empty shell and make every reveal
-            // pay for a fresh render — visible as a blank frame, then content. Holding the
-            // context costs memory for at most four panels and keeps a tab switch free.
+            // The rendered document lives in a frame the shell is handed by message, not in
+            // `webview.html` (see previewFrame.ts), so letting VS Code tear the webview down
+            // on hide would restore an empty shell and make every reveal pay for a fresh
+            // render. Holding the context costs memory for at most four panels.
             retainContextWhenHidden: true,
-            // No enableFindWidget: the workbench's find reaches the webview's own
-            // document, and the report it would search is a sandboxed frame deeper.
-            // previewFrame.ts carries a find widget that talks to the frame instead.
-            //
-            // Nothing local is loaded either — images arrive as data URIs — so the
-            // default roots (every workspace folder) are given up rather than left open.
+            // No enableFindWidget: the workbench's find reaches the webview's own document,
+            // not the sandboxed frame deeper, so previewFrame.ts carries its own. Nothing
+            // local is loaded either — images arrive as data URIs — so the default resource
+            // roots are given up rather than left open.
             localResourceRoots: []
         }
     );
@@ -1823,15 +1753,10 @@ export async function activate(context: vscode.ExtensionContext) {
                 const dotnetManager = new DotnetRuntimeManager(outputChannel);
                 const globalStorage = context.globalStorageUri.fsPath;
 
-                // The VSIX now ships framework-dependent: the apphost is
-                // present but requires a .NET 10 runtime to be installed
-                // somewhere on the user's machine. Always run the resolver
-                // so we either find the system install, prompt the user to
-                // install one locally, or fall back to the remote API.
-                // (Calcpad-desktop's self-contained flow is unaffected — this
-                // path only runs in vscode-calcpad.) When the resolver returns
-                // a path under the extension's globalStorage, the server-manager
-                // sets DOTNET_ROOT so the apphost can find that runtime.
+                // The VSIX ships framework-dependent, so always run the resolver: it finds
+                // a system .NET 10 install, prompts the user to install one locally, or
+                // falls back to the remote API. A resolved path under globalStorage makes
+                // the server-manager set DOTNET_ROOT so the apphost can find that runtime.
                 const dotnetPromise = dotnetManager.resolveDotnetPath(globalStorage, configuredDotnetPath, serverMode);
 
                 dotnetPromise.then((resolvedDotnetPath) => {
@@ -1899,11 +1824,9 @@ export async function activate(context: vscode.ExtensionContext) {
                         } else if (serverMode === 'local') {
                             vscode.window.showErrorMessage(`CalcpadCE: Failed to start local server: ${message}`);
                         } else {
-                            // Auto mode. Falling back to remote only makes
-                            // sense if the user actually configured a remote
-                            // URL — otherwise every API call will fail with
-                            // "Server URL not configured" / a fetch against
-                            // `/api/calcpad/*` with no host. Tell them.
+                            // Auto mode. Falling back to remote only makes sense if the
+                            // user actually configured a remote URL — otherwise every API
+                            // call fails with "Server URL not configured", so tell them.
                             const remoteUrl = settingsManager.getRemoteServerUrl();
                             if (!remoteUrl || remoteUrl.length === 0) {
                                 vscode.window.showErrorMessage(
@@ -2208,10 +2131,10 @@ export async function activate(context: vscode.ExtensionContext) {
         form?.reveal(form.viewColumn, false);
     });
 
-    // Shows or hides the report preview. It accompanies the input form when that is open —
-    // opened to its right, with focus handed back so the form stays in front — but it also
-    // stands alone beside the editor, which is how you read the print layout without
-    // filling in a form. Closing the panel directly does the same thing.
+    // Shows or hides the report preview, which accompanies the input form when that is open —
+    // opened to its right, with focus handed back — but also stands alone beside the editor,
+    // which is how you read the print layout without filling in a form. Closing the panel
+    // directly does the same thing.
     const toggleUiReportCommand = vscode.commands.registerCommand('vscode-calcpad.toggleUiReport', async () => {
         // A compiled worksheet is its own form, so its report belongs to that editor
         // rather than to the shared input-form slot.
@@ -2245,10 +2168,9 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage(`Saved ${count} #UI value(s) to the document.`);
     });
 
-    // `targetLine` lets a caller name the line (the sidebar's TOC does); invoked from the
-    // palette or a keybinding it arrives undefined and the cursor's line is used. Only that
-    // second form opens a preview when none is showing -- it is a request to see the line,
-    // where a named line only syncs whatever results are already up.
+    // `targetLine` lets a caller name the line (the sidebar's TOC does); from the palette or
+    // a keybinding it arrives undefined and the cursor's line is used. Only that second form
+    // opens a preview when none is showing.
     const focusPreviewToLineCommand = vscode.commands.registerCommand('vscode-calcpad.focusPreviewToLine', async (targetLine?: number) => {
         if (typeof targetLine === 'number') {
             postPreviewSourceLine(targetLine, true);
@@ -2405,14 +2327,9 @@ export async function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage('CalcpadCE server is not configured.');
             return;
         }
-        // Don't gate on `isRunning` — that flag only reflects whether *this*
-        // VS Code window owns or has connected to the server. A peer window
-        // may have spawned it (or this window may have been opened after the
-        // server was already alive). serverManager.stop() handles the
-        // lock-file fallback: it reads {basePath}/bin/.calcpad-server.lock
-        // and kills the recorded PID even when there's no in-process child
-        // reference. Without this, Linux users hit "server is not running"
-        // and the lock-held server keeps going.
+        // Don't gate on `isRunning` — that flag only reflects whether *this* VS Code window
+        // owns or has connected to the server. serverManager.stop() falls back to the lock
+        // file at {basePath}/bin/.calcpad-server.lock and kills the recorded PID.
         const wasRunning = serverManager.isRunning;
         try {
             await serverManager.stop();
@@ -2578,13 +2495,10 @@ export async function activate(context: vscode.ExtensionContext) {
         // this and previewSourceEditor.
         if (editor) compiledSourceUri = undefined;
         if (editor && (editor.document.languageId === 'calcpad' || editor.document.languageId === 'plaintext')) {
-            // The input form follows the active editor, so switching documents takes
-            // the form's values with it. Prompt as if the form were closing, since
-            // for the outgoing document it is, and drop them so the incoming one is
-            // seeded from its own uiOverrides comment. There is no veto for an editor
-            // switch that has already happened, so Cancel switches back instead —
-            // uiPanelDocKey still points at the outgoing document, which keeps the
-            // resulting second pass through here from prompting again.
+            // The input form follows the active editor, so switching documents takes its
+            // values with it: prompt as if the form were closing, then drop them so the
+            // incoming document is seeded from its own uiOverrides comment. There is no veto
+            // for a switch that already happened, so Cancel switches back instead.
             if (uiPanel && uiPanelDocKey && uiPanelDocKey !== editor.document.uri.toString()) {
                 const outgoing = uiPanelDocKey;
                 if (!await discardUiValues(outgoing, true)) {
@@ -2634,11 +2548,9 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    // Process all open calcpad documents on activation. Activation happens after the
-    // document that triggered it is already active, so no active-editor event follows for it:
-    // the one in front is judged for input mode here instead. The rest are marked as judged
-    // without opening anything, so a restored session with eight worksheets does not come up
-    // with eight forms.
+    // Process all open calcpad documents on activation; the one in front is judged for input
+    // mode here, since no active-editor event follows it. The rest are marked judged without
+    // opening anything, so a restored session doesn't come up with eight forms.
     {
         const activeDocument = vscode.window.activeTextEditor?.document;
         for (const document of vscode.workspace.textDocuments) {

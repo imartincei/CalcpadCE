@@ -166,10 +166,9 @@ namespace Calcpad.Highlighter.Linter.Helpers
         }
 
         /// <summary>
-        /// Effective Calcpad parse mode for the given line. Always Cpd for now:
-        /// the mode-switching directives (#cpd, #html, #markdown) are not
-        /// implemented in Calcpad.Core, so nothing populates <see cref="_lineModes"/>.
-        /// Restore the map here when Core gains the keywords.
+        /// Effective Calcpad parse mode for the given line, always Cpd for now: the mode-switching
+        /// directives (#cpd, #html, #markdown) are not implemented in Calcpad.Core, so nothing
+        /// populates <see cref="_lineModes"/>. Restore the map here when Core gains the keywords.
         /// </summary>
         public ParseMode GetLineMode(int lineNumber) =>
             _lineModes.TryGetValue(lineNumber, out var m) ? m : ParseMode.Cpd;

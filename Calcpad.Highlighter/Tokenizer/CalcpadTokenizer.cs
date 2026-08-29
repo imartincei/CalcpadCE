@@ -8,9 +8,8 @@ using Calcpad.Highlighter.Tokenizer.Models;
 namespace Calcpad.Highlighter.Tokenizer
 {
     /// <summary>
-    /// Tokenizes Calcpad source code for syntax highlighting.
-    /// Produces tokens with line/column positions that can be passed to a frontend for colorization.
-    /// Error detection is handled separately by the CalcpadLinter.
+    /// Tokenizes Calcpad source code for syntax highlighting, producing tokens with line/column
+    /// positions a frontend can colorize. Error detection is handled separately by CalcpadLinter.
     ///
     /// Partial class split:
     ///   CalcpadTokenizer.cs                - Core state, public API, main loop, token emission
@@ -343,11 +342,11 @@ namespace Calcpad.Highlighter.Tokenizer
                 else if (_builder.Length == 0)
                 {
                     _state.CurrentType = InitType(c, _state.CurrentType);
-                    // Characters that resolve to Comment here are dropped rather than buffered.
-                    // A quote was already emitted by ParseComment, so the cursor is past it and
-                    // must not be rewound — otherwise the next token (typically the bracket in
-                    // 'text'(expr)) lands a column early. Anything else is dropped outright, so
-                    // the cursor has to step over it to stay aligned with the source.
+                    // Characters that resolve to Comment here are dropped rather than buffered. A
+                    // quote was already emitted by ParseComment, so the cursor is past it and must
+                    // not be rewound — otherwise the next token (typically the bracket in
+                    // 'text'(expr)) lands a column early, while anything else is dropped outright
+                    // and the cursor has to step over it to stay aligned with the source.
                     if (_state.CurrentType != TokenType.Comment)
                     {
                         _state.TokenStartColumn = i;
@@ -581,15 +580,11 @@ namespace Calcpad.Highlighter.Tokenizer
                 return;
             }
 
-            // Track that a code token has been seen (non-comment content).
-            // This must happen before TrackDefinitions so the flag is available
-            // for the next token's ResolveType call.
-            // What the flag marks is the first identifier position on the line, so only a
-            // token that can occupy a value position ends it. Directive keywords, brackets
-            // and operators do not: the expression a directive introduces starts after the
-            // keyword, and after its JSON block in the case of #UI. Without this,
-            // "#UI a = 5" resolves 'a' as the Are unit while a bare "a = 5" correctly
-            // resolves it as a variable definition.
+            // Track that a code token has been seen, before TrackDefinitions so the flag is
+            // available for the next token's ResolveType call. The flag marks the first identifier
+            // position on the line, so only a token that can occupy a value position ends it —
+            // directive keywords, brackets and operators do not, since the expression a directive
+            // introduces starts after the keyword, and after its JSON block in the case of #UI.
             if (_beforeFirstCodeToken &&
                 type != TokenType.Comment && type != TokenType.Tag &&
                 type != TokenType.HtmlComment && type != TokenType.HtmlContent &&

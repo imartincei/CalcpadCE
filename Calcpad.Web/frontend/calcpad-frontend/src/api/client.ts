@@ -35,8 +35,7 @@ function isLoopbackUrl(url: string): boolean {
 }
 
 /**
- * Unified fetch-based API client for the CalcPad server.
- * Replaces scattered axios calls across the extension codebase.
+ * Unified fetch-based API client for the CalcPad server, replacing scattered axios calls.
  * Works in Node.js 18+, Electron, and browsers.
  */
 export class CalcpadApiClient {
@@ -44,11 +43,9 @@ export class CalcpadApiClient {
     private logger?: ILogger;
     private authToken: string | null = null;
 
-    // Per-key "latest wins" bookkeeping. A caller passes `key` (e.g. an editor
-    // group id) to mean "only the newest request for this key still matters"
-    // — an older request sharing the same key is aborted once a newer one for
-    // that key starts, instead of running to completion long after it stopped
-    // mattering. Requests with no key run independently with no supersession.
+    // Per-key "latest wins" bookkeeping: a caller passes `key` (e.g. an editor group id) to mean
+    // "only the newest request for this key still matters", so an older request sharing it is
+    // aborted once a newer one starts. Requests with no key run independently.
     private keySeq = new Map<string, number>();
     private keyAbort = new Map<string, AbortController>();
 
@@ -75,13 +72,10 @@ export class CalcpadApiClient {
     }
 
     /**
-     * Auth headers for a request this client doesn't make itself. Spread into
-     * the `headers` of any direct `fetch` against the same server — a bare
-     * request now comes back 401.
-     *
-     * Withheld for a non-loopback base URL. The token belongs to a server this
-     * machine launched; `setBaseUrl` can be pointed at a configured remote one
-     * (a preset carrying `server.url`), and that host has no business seeing it.
+     * Auth headers for a request this client doesn't make itself, to be spread into the
+     * `headers` of any direct `fetch` against the same server. Withheld for a non-loopback
+     * base URL: the token belongs to a server this machine launched, and a configured remote
+     * host has no business seeing it.
      */
     public authHeaders(): Record<string, string> {
         if (!this.authToken || !isLoopbackUrl(this.baseUrl)) return {};
@@ -93,11 +87,9 @@ export class CalcpadApiClient {
     }
 
     /**
-     * Runs `task` immediately. If `key` is given, a later call sharing that
-     * key aborts this one's signal instead of letting it run to completion
-     * after it stops mattering. A superseded call resolves to `null` — the
-     * same outcome callers already handle for a failed or non-OK response, so
-     * no caller needs to special-case it.
+     * Runs `task` immediately; if `key` is given, a later call sharing that key aborts this
+     * one's signal rather than letting it run on. A superseded call resolves to `null`, the
+     * same outcome callers already handle for a failed response.
      */
     private withSupersession<T>(key: string | undefined, task: (signal: AbortSignal) => Promise<T>): Promise<T | null> {
         if (!key) return task(new AbortController().signal);
@@ -314,9 +306,8 @@ export class CalcpadApiClient {
     }
 
     /**
-     * Convert calcpad → DOCX (Word). Backend renders to HTML internally,
-     * then runs the Calcpad.OpenXml writer over it. Returns the .docx
-     * bytes, or null on failure.
+     * Convert calcpad → DOCX (Word): the backend renders to HTML internally, then runs the
+     * Calcpad.OpenXml writer over it. Returns the .docx bytes, or null on failure.
      *
      * @param opts `forPrint` defaults to true — a Word export is a report unless the caller
      *   asks for the preview layout. `uiOverrides` makes the report show entered `#UI` values.

@@ -7,32 +7,11 @@ namespace Calcpad.Server.Services
 {
     /// <summary>
     /// Packs a worksheet and everything it references into a ZIP that runs wherever it is
-    /// unpacked, while staying the text it was: the document keeps its <c>#include</c>s, its
-    /// <c>#read</c>s and its images, and only their paths change — each one rewritten to point
-    /// into a folder beside the document carrying the file it named.
-    ///
-    /// <code>
-    /// calc.zip
-    ///   calc.cpd
-    ///   calc.cpd.refs/  image.png  loads.csv  lib.cpd
-    /// </code>
-    ///
-    /// This is the middle ground between a worksheet that only runs on the machine it was
-    /// written on and a compiled <c>.cpdz</c>, which travels anywhere but cannot be read
-    /// (see <see cref="PortableWorksheet"/>). The recipient can open, read and edit it.
-    ///
-    /// Every bundled reference is flattened straight into the refs folder by its bare file name
-    /// alone — the refs folder never carries a subfolder of its own, whatever folder the
-    /// reference sat in on the exporting machine. When two distinct files would land on the same
-    /// bare name, the second and any further one are renamed <c>name-1.ext</c>, <c>name-2.ext</c>
-    /// and so on, in path order, and every reference that named the original is rewritten to
-    /// match.
-    ///
-    /// A <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c>/<c>&lt;user&gt;</c> reference is resolved
-    /// against this exporting machine's own roots and bundled like any other: the token names a
-    /// folder there is no reason to expect the recipient has, and a package that still depended on
-    /// one would not be portable. The recipient who does have their own <c>#ProjectPath</c>/
-    /// <c>#LibraryPath</c> is better served by the document itself than by a package.
+    /// unpacked while staying the text it was: only the reference paths change, each rewritten
+    /// to point into a refs folder beside the document. References are flattened into that
+    /// folder by bare file name, collisions renamed <c>name-1.ext</c> onwards in path order,
+    /// and <c>&lt;project&gt;</c>/<c>&lt;library&gt;</c>/<c>&lt;user&gt;</c> tokens resolved
+    /// against the exporting machine and bundled like any other.
     /// </summary>
     internal static class PortablePackage
     {
@@ -62,11 +41,9 @@ namespace Calcpad.Server.Services
         /// unsaved edit is packed as it stands.
         /// </summary>
         /// <returns>
-        /// The archive, or <see cref="Result.Errors"/> saying why there is none. A reference that
-        /// cannot be read, and two outputs that would collapse onto the same file, are both
-        /// refusals: a package that fails, or overwrites one output with another, for whoever
-        /// receives it is the one thing this exists to prevent. Two references sharing a name is
-        /// not — the later one is renamed instead.
+        /// The archive, or <see cref="Result.Errors"/> saying why there is none. A reference
+        /// that cannot be read, and two outputs that would collapse onto the same file, are
+        /// both refusals; two references sharing a name is not — the later one is renamed.
         /// </returns>
         public static Result Build(string content, string? sourceFilePath)
         {
@@ -171,13 +148,9 @@ namespace Calcpad.Server.Services
         /// </summary>
         /// <remarks>
         /// A declaration inside a <c>#local</c>...<c>#global</c> section of a file reached by
-        /// <c>#include</c> is skipped, mirroring <c>CalcpadService.ProcessIncludedContent</c> —
-        /// the include delegate the real pipeline reads through — which drops that section
-        /// entirely before the includer ever sees it. Without this, a module that follows the
-        /// documented pattern of scoping its own roots to <c>#local</c> would still collide with
-        /// the including document's here, even though it never actually would at render time.
-        /// The root's own <c>#local</c> is not gated: opening it directly never goes through the
-        /// include delegate, so its declarations are live exactly as written.
+        /// <c>#include</c> is skipped, mirroring <c>CalcpadService.ProcessIncludedContent</c>,
+        /// which drops that section before the includer sees it. The root's own <c>#local</c>
+        /// is not gated: opening it directly never goes through the include delegate.
         /// </remarks>
         private static Walked Walk(
             string rootPath,
@@ -286,9 +259,8 @@ namespace Calcpad.Server.Services
             /// <summary>
             /// The folder a reference is taken as relative to. Only <c>#include</c> resolves
             /// against the file holding it: the macro parser expands includes into one worksheet
-            /// before anything else runs, so by the time a <c>#read</c> is evaluated — or an
-            /// image src is fetched — the folder its line was written in is gone, and the root
-            /// document's is what is left. That is the same asymmetry PortableWorksheet works
+            /// first, so by the time a <c>#read</c> or an image src is evaluated the root
+            /// document's folder is what is left — the same asymmetry PortableWorksheet works
             /// around by making an included file's image paths absolute.
             /// </summary>
             string ResolveDirectory(Reference reference, string owningDirectory) =>
@@ -377,13 +349,9 @@ namespace Calcpad.Server.Services
 
         /// <summary>
         /// Points every reference in <paramref name="text"/> at its bundled copy. An
-        /// <c>#include</c> is reached from wherever <paramref name="path"/> itself landed in the
-        /// zip. Everything else is reached from the root document's own location regardless of
-        /// where <paramref name="path"/> landed, because that is where it is resolved from once
-        /// the includes have been expanded — so even a bundled include sitting right beside its
-        /// own data file in the refs folder still names that file through the refs folder path
-        /// rather than as a bare sibling, because that is what resolves once the include is
-        /// flattened into the root.
+        /// <c>#include</c> is reached from wherever <paramref name="path"/> itself landed in
+        /// the zip, while everything else is reached from the root document's location, since
+        /// that is where it resolves once the includes have been expanded.
         /// </summary>
         private static string RewriteDocument(
             string text,

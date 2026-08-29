@@ -21,24 +21,14 @@ export function isCompiledPath(filePath: string): boolean {
 }
 
 /**
- * Replaces `<img src="local/path">` references with base64 data URIs, resolving
- * each `src` to an absolute path through `resolve`. Remote and `data:` sources
- * are left alone, so this is idempotent, and a source that cannot be read keeps
- * its original `src` rather than failing the whole document.
+ * Replaces `<img src="local/path">` references with base64 data URIs, resolving each `src` to an
+ * absolute path through `resolve`. Remote and `data:` sources are left alone, so this is
+ * idempotent, and a source that cannot be read keeps its original `src`.
  *
- * Used two ways, with a different `resolve` each time. Rendered HTML arrives
- * with `{project}`/`{library}`/`{user}` and environment variables already
- * expanded by `Calcpad.Core.ImageReferences`, so it only needs a path made
- * absolute against the document's folder. Raw `.cpd` source — a compiled
- * worksheet, which is deflated before Core ever sees it — still needs the full
- * {@link createReferenceResolver}. Both accept the same input because the
- * CalcPad source carries images as `'<img src="…">` comment lines.
- *
- * `budget` caps the total inlined bytes, and what happens at the cap differs by caller.
- * A preview skips the rest: it is a view, and a partly-illustrated one beats an app that
- * runs out of memory. A compiled worksheet fails instead — the images become the file, so
- * one that quietly dropped them would be a lossy save, and the recipient has no original
- * to compare against.
+ * `resolve` differs by caller: rendered HTML arrives with tokens and environment variables
+ * already expanded by `Calcpad.Core.ImageReferences`, while raw `.cpd` source still needs the
+ * full {@link createReferenceResolver}. `budget` caps the total inlined bytes — a preview skips
+ * the rest, while a compiled worksheet fails, since dropping images there would be a lossy save.
  */
 export interface InlineImageBudget {
     maxTotalBytes: number;
@@ -66,10 +56,9 @@ export class ImageBudgetError extends Error {
 }
 
 /**
- * How many bytes of images a compiled worksheet may carry. The parallel to the server's
- * `ExpressionParser.MaxEmbeddedDataSize` for `#read` data, and the same reasoning: a
- * `.cpdz` is decoded whole and run from memory, so what it carries is what a recipient
- * pays for. Kept in step with that constant by hand — there is no shared source.
+ * How many bytes of images a compiled worksheet may carry — the parallel to the server's
+ * `ExpressionParser.MaxEmbeddedDataSize` for `#read` data, since a `.cpdz` is decoded whole and
+ * run from memory. Kept in step with that constant by hand.
  */
 export const MAX_COMPILED_IMAGE_TOTAL_BYTES = 10 * 1024 * 1024;
 

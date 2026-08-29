@@ -23,9 +23,8 @@ export type { CalcpadSettings, CalcpadExtras };
 
 const SETTINGS_DIR_NAME = 'settings';
 const DEFAULT_PRESET_NAME = 'default';
-// The one file that reflects live user state. Written on every edit,
-// read at boot. Preset files (default.json, <name>.json) are read-only
-// source-of-truth snapshots — the settings editor never writes to them.
+// The one file that reflects live user state, written on every edit and read at boot. Preset
+// files (default.json, <name>.json) are read-only snapshots the settings editor never writes to.
 const ACTIVE_SETTINGS_FILE = 'active-settings.json';
 const ACTIVE_PRESET_KEY = 'calcpad-active-preset';
 
@@ -215,9 +214,8 @@ export class CalcpadSettingsManager {
     }
 
     /**
-     * Save current in-memory settings as a preset. Rejects the reserved
-     * `default` name and filename-illegal characters. Also updates the
-     * active-preset label to the saved name.
+     * Save current in-memory settings as a preset, rejecting the reserved `default` name and
+     * filename-illegal characters. Also updates the active-preset label to the saved name.
      */
     public async savePreset(rawName: string): Promise<{ ok: true } | { ok: false; message: string }> {
         const name = (rawName ?? '').trim();
@@ -306,9 +304,8 @@ export class CalcpadSettingsManager {
     }
 
     /**
-     * Ensure the settings folder exists and `default.json` is fresh from the
-     * bundled defaults. Runs on activation so `default` always represents
-     * pristine defaults. Never touches active-settings.json.
+     * Ensure the settings folder exists and `default.json` is fresh from the bundled defaults,
+     * so `default` always represents pristine defaults. Never touches active-settings.json.
      */
     private async ensureSettingsFolder(): Promise<void> {
         const dir = this.getSettingsDir();
@@ -366,9 +363,9 @@ export class CalcpadSettingsManager {
     }
 
     /**
-     * Read active-settings.json into `_settings/_extras`. Returns false when
-     * the file doesn't exist / is unreadable so the caller can decide how to
-     * seed it. On a parse error, leaves in-memory state at defaults and logs.
+     * Read active-settings.json into `_settings/_extras`, returning false when the file is
+     * missing or unreadable so the caller can decide how to seed it. A parse error leaves
+     * in-memory state at defaults and logs.
      */
     private async readActiveSettings(): Promise<boolean> {
         const activePath = this.getActiveSettingsPath();

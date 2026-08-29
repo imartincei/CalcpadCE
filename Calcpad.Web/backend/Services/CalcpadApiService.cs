@@ -66,18 +66,11 @@ namespace Calcpad.Server.Services
         /// Per-launch shared secret, handed to us by the host that spawned this process.
         /// </summary>
         /// <remarks>
-        /// Read from the environment rather than argv: argv is world-readable through
-        /// <c>/proc/{pid}/cmdline</c> on Linux and through WMI on Windows, which would hand
-        /// the token to exactly the local processes it exists to keep out. The environment
-        /// block is readable only by the same user (and root), which is the boundary this
-        /// server already lives inside.
-        /// <para>
-        /// Absent when nobody set it — <c>dotnet run</c> during development, the test
-        /// harness, a shell launch. Auth is then off and the CORS + Host-header policy in
-        /// <see cref="IsAllowedOrigin"/> is the only control, which is the behavior that
-        /// predates this. Both shipped hosts (the Tauri desktop shell and the VS Code
-        /// extension) always set it, so a user-facing launch is always authenticated.
-        /// </para>
+        /// Read from the environment rather than argv, which is world-readable through
+        /// <c>/proc/{pid}/cmdline</c> on Linux and WMI on Windows; the environment block is
+        /// readable only by the same user. Absent when nobody set it (<c>dotnet run</c>, the
+        /// test harness), in which case auth is off and the CORS + Host-header policy in
+        /// <see cref="IsAllowedOrigin"/> is the only control — both shipped hosts always set it.
         /// </remarks>
         private static readonly byte[]? ApiTokenBytes =
             Environment.GetEnvironmentVariable("CALCPAD_API_TOKEN") is { Length: > 0 } token
@@ -128,41 +121,16 @@ namespace Calcpad.Server.Services
         /// Origins permitted to call the API from a browsing context.
         /// </summary>
         /// <remarks>
-        /// Binding to loopback keeps remote machines out, but not other programs on
-        /// this one — and that includes the user's ordinary web browser. A page the
-        /// user visits in Chrome can POST to <c>http://127.0.0.1:{port}/api/calcpad/convert</c>
-        /// with <c>#include ~/.ssh/id_rsa</c>; include resolution reads whatever path
-        /// it is handed (see <see cref="CalcpadService.CreateIncludeDelegate"/>) and
-        /// returns it in the rendered HTML. The server has no authentication, so the
-        /// requesting origin is the only thing standing between that page and the
-        /// file. <c>AllowAnyOrigin</c> removed it. The desktop app's own WebView is
-        /// not involved in any of this.
+        /// Binding to loopback keeps remote machines out but not the user's own browser: a page
+        /// they visit can POST <c>#include ~/.ssh/id_rsa</c> to <c>/api/calcpad/convert</c> and
+        /// read the file back out of the rendered HTML, so the requesting origin is what stands
+        /// between that page and the file. Restricting it blocks the request rather than just
+        /// the response, since <c>[FromBody]</c> on an <c>[ApiController]</c> forces a preflight.
         /// <para>
-        /// The random port is not a defense: an ephemeral range is a few tens of
-        /// thousands of ports, sweepable from a page in seconds and fingerprintable
-        /// off <c>/api/calcpad/sample</c>.
-        /// </para>
-        /// <para>
-        /// Restricting the origin blocks the request rather than just the response.
-        /// The endpoints take <c>[FromBody]</c> on an <c>[ApiController]</c>, so they
-        /// require <c>Content-Type: application/json</c> — a non-simple request that
-        /// needs a successful preflight before the browser will send it at all.
-        /// </para>
-        /// <para>
-        /// This does not stop DNS rebinding, where the attacker's own hostname
-        /// resolves to 127.0.0.1 and the request is therefore same-origin with no
-        /// CORS check at all. <see cref="ConfigureApp"/> validates the Host header
-        /// for that.
-        /// </para>
-        /// <para>
-        /// Native callers (the VS Code extension host, build scripts) send no Origin
-        /// header and never reach this — CORS is enforced by browsers, not servers.
-        /// <c>vscode-webview://</c> is deliberately absent: VS Code webviews reach
-        /// the API through the extension host over postMessage, never by fetch.
-        /// </para>
-        /// <para>
-        /// "null" is rejected. That is what a sandboxed, opaque-origin frame sends,
-        /// which is exactly how the desktop app renders untrusted worksheet HTML.
+        /// Native callers send no Origin header and never reach this; <c>vscode-webview://</c>
+        /// is deliberately absent, and "null" — what a sandboxed opaque-origin frame sends — is
+        /// rejected. DNS rebinding is handled by the Host-header check in
+        /// <see cref="ConfigureApp"/> instead.
         /// </para>
         /// </remarks>
         internal static bool IsAllowedOrigin(string origin)
@@ -205,13 +173,11 @@ namespace Calcpad.Server.Services
                 }
             });
 
-            // DNS rebinding defense, and the reason CORS alone is not enough. An
-            // attacker who points their own hostname at 127.0.0.1 makes the request
-            // same-origin from the browser's point of view, so no CORS check runs —
-            // but the Host header still carries their name rather than ours. Only
-            // loopback names are served. Requests with no Host header at all are let
-            // through: HTTP/1.1 requires one and browsers always send it, so its
-            // absence means a native client, which was never the exposure here.
+            // DNS rebinding defense, and the reason CORS alone is not enough: an attacker who
+            // points their own hostname at 127.0.0.1 makes the request same-origin, so no CORS
+            // check runs, but the Host header still carries their name. Only loopback names are
+            // served, and a request with no Host header at all is let through as a native
+            // client, which was never the exposure here.
             app.Use(async (context, next) =>
             {
                 var host = context.Request.Host.Host;

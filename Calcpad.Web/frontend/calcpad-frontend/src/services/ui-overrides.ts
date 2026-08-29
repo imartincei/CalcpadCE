@@ -95,11 +95,10 @@ export class UiOverrideStore {
     }
 
     /**
-     * Adopts the document's saved `uiOverrides` comment whenever it has changed since the
-     * store last read or wrote it, so a hand-edited key reaches the next render rather than
-     * being shadowed by the cached map. Returns true when the stored values changed, which
-     * is when the render that asked has to be redone. An unmoved comment leaves entered
-     * values alone.
+     * Adopts the document's saved `uiOverrides` comment whenever it has changed since the store
+     * last read or wrote it, so a hand-edited key reaches the next render rather than being
+     * shadowed by the cached map. Returns true when the stored values changed, which is when the
+     * render that asked has to be redone.
      */
     public syncFromSource(docKey: string, source: string): boolean {
         const saved = readUiOverrides(source);
@@ -147,10 +146,9 @@ export function readUiOverrides(source: string): UiOverrides | null {
 }
 
 /**
- * Returns {@link source} with the saved overrides updated. An existing
- * `uiOverrides` comment is rewritten in place, keeping any other keys it carries;
- * otherwise a new comment goes on the first line. Passing an empty map removes
- * the key, and with it the comment when nothing else is left in it.
+ * Returns {@link source} with the saved overrides updated: an existing `uiOverrides` comment is
+ * rewritten in place keeping any other keys it carries, otherwise a new comment goes on the first
+ * line. Passing an empty map removes the key, and with it the comment when nothing else is left.
  */
 export function writeUiOverrides(source: string, overrides: UiOverrides): string {
     const eol = source.includes('\r\n') ? '\r\n' : '\n';
@@ -210,10 +208,10 @@ export function extractUiControls(html: string): UiControl[] {
 }
 
 /**
- * Resolves each saved override against the live controls, mirroring the narrowest-first
- * match `ExpressionParser.ApplyUiOverride` makes: this exact control, then every pass of
- * its declaration, then every declaration of the name. An override matching none of them
- * applies to nothing and is what "unused" means. Key order is the saved one.
+ * Resolves each saved override against the live controls, mirroring the narrowest-first match
+ * `ExpressionParser.ApplyUiOverride` makes: this exact control, then every pass of its
+ * declaration, then every declaration of the name. An override matching none of them is what
+ * "unused" means, and key order is the saved one.
  */
 export function classifyUiOverrides(overrides: UiOverrides, controls: UiControl[]): UiOverrideRow[] {
     const byKey = new Map<string, number>();

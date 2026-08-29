@@ -1,11 +1,8 @@
 /**
- * Rendered plot extracted from Calcpad HTML. `bytes` is the raw image payload
- * (PNG bytes for raster, UTF-8 SVG text for vector). `dataUri` is what preview
- * thumbnails reference.
- *
- * Plots are marked in the HTML by Core with a `data-plot="png"` attribute on
- * the `<img>` (for embedded PNG) or `data-plot="svg"` on the root `<svg>`.
- * File-mode plots (external URL) are not tagged and won't be extracted.
+ * Rendered plot extracted from Calcpad HTML: `bytes` is the raw image payload (PNG bytes or
+ * UTF-8 SVG text) and `dataUri` is what preview thumbnails reference. Core marks plots with
+ * `data-plot="png"` on the `<img>` or `data-plot="svg"` on the root `<svg>`, so file-mode plots
+ * are untagged and not extracted.
  */
 export interface ExtractedPlot {
     index: number;
@@ -54,13 +51,10 @@ export function extractPlotsFromHtml(html: string): ExtractedPlot[] {
 }
 
 /**
- * Debug-mode wrapping in Calcpad.Core injects `id="line-N" data-source-line=…
- * class="line"` into the outermost tag of every rendered line — including the
- * plot's `<svg>`. That leaves the opening tag with two `class` attributes,
- * which HTML5 parses fine inline but which the strict XML parser used for
- * `data:image/svg+xml` `<img>` rejects (broken image). Merge duplicate class
- * attrs on the opening tag so the standalone SVG round-trips through any
- * conforming parser.
+ * Debug-mode wrapping in Calcpad.Core injects `id="line-N" data-source-line=… class="line"` into
+ * the outermost tag of every rendered line, including the plot's `<svg>`, leaving two `class`
+ * attributes that the strict XML parser behind `data:image/svg+xml` rejects. Merge duplicate
+ * class attrs on the opening tag so the standalone SVG round-trips through any conforming parser.
  */
 function normalizeSvgForStandalone(svg: string): string {
     const openMatch = svg.match(/^<svg\b[^>]*>/);

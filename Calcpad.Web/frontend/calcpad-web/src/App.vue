@@ -578,15 +578,9 @@ export interface ProblemItem {
 }
 
 /**
- * What the results pane shows.
- *
- * - 'preview' — the document as written: `#pre` and `#post` both rendered, and the
- *   values in the source rather than anything entered in the form.
- * - 'unwrapped' — the source listing, macros and includes resolved.
- * - 'ui' — `#UI` lines as interactive controls, `#post` hidden. Takes over the window
- *   and can show the report alongside (see `uiPrintVisible`).
- * - 'report' — the print layout: `#pre` hidden and the entered `#UI` values applied,
- *   without leaving the editor for the form.
+ * What the results pane shows: 'preview' (the document as written), 'unwrapped' (the source
+ * listing with macros and includes resolved), 'ui' (`#UI` lines as interactive controls,
+ * `#post` hidden) and 'report' (the print layout with entered `#UI` values applied).
  */
 export type ResultMode = 'preview' | 'unwrapped' | 'ui' | 'report'
 
@@ -642,12 +636,9 @@ const isSplit = computed(() => groups.value.length > 1)
 const activeGroup = computed(() => groups.value.find(g => g.id === activeGroupId.value) ?? groups.value[0])
 
 /**
- * A compiled worksheet has no readable source: it is distributed to be filled in, and
- * the editor holding it is locked. Filling in the form is the only thing to do with
- * one, so input is the only mode offered — the buttons for the others are left out
- * rather than shown disabled. The report is still reachable: it renders beside the
- * form (see `uiPrintVisible`), which is where it belongs for a worksheet being
- * filled in.
+ * A compiled worksheet has no readable source and its editor is locked, so input is the only
+ * mode offered and the other buttons are left out rather than shown disabled. The report is
+ * still reachable beside the form (see `uiPrintVisible`).
  */
 const COMPILED_RESULT_MODES: ResultMode[] = ['ui']
 const activeTabIsCompiled = computed(() => {
@@ -679,11 +670,10 @@ const frontBuffer = ref<Record<string, 0 | 1>>({})
 const loadingBuffer = ref<Record<string, 0 | 1>>({})
 // Last full (unstripped) HTML rendered per group, kept for "Open Full HTML".
 const previewHtmlByGroup = new Map<string, string>()
-// Where the user was in each frame's #UI form — focused control, caret, datagrid
-// cell. Held here because the frame cannot keep it itself: a re-render assigns
-// srcdoc, and the fresh browsing context that creates has neither the previous
-// window nor, on an opaque origin, sessionStorage. Posted by the backend's #UI
-// script and seeded back into the next render.
+// Where the user was in each frame's #UI form — focused control, caret, datagrid cell. Held here
+// because a re-render assigns srcdoc, and the fresh browsing context that creates has neither the
+// previous window nor, on an opaque origin, sessionStorage; the backend's #UI script posts it and
+// it is seeded back into the next render.
 const uiPositionByFrame = new Map<string, unknown>()
 // Where each frame was looking, per frame *and* document, so re-rendering a
 // document lands back there while switching tabs still starts at the top. An
@@ -782,9 +772,8 @@ const draggingEditorDivider = ref(false)
 
 /**
  * The groups the editor side and the preview side each render. The input form is a
- * single-document view: a split would stack two forms, and with the same file open in
- * both they would share one set of entered values and fight over it. So UI mode renders
- * only the active group — one form, and one tab strip above it.
+ * single-document view — a split would stack two forms sharing one set of entered values —
+ * so UI mode renders only the active group.
  */
 const visibleGroups = computed(() =>
   uiModeFullscreen.value ? [activeGroup.value].filter(Boolean) : groups.value)
@@ -1188,14 +1177,10 @@ function postToPreviewFrame(frameId: string, message: Record<string, unknown>): 
 }
 
 /**
- * Runs a clipboard action against whatever the frame is focused on — a value
- * field, a datagrid selection, or the document selection for a plain copy.
- * Needed because the desktop WebView leaves the frame's own clipboard inert.
- *
- * The frame does the work: reaching into its DOM from here would require
- * allow-same-origin on the iframe, which would also hand any script in an
- * untrusted worksheet the run of this window (and, on desktop, the Tauri IPC).
- * Paste text is resolved first because only the host can read the clipboard.
+ * Runs a clipboard action against whatever the frame is focused on, which the desktop WebView
+ * leaves inert otherwise. The frame does the work: reaching into its DOM from here would need
+ * allow-same-origin, which would hand any script in an untrusted worksheet the run of this
+ * window and, on desktop, the Tauri IPC.
  */
 async function runPreviewClipboardAction(frameId: string, action: PreviewClipboardAction): Promise<void> {
   const text = action === 'paste' ? await readClipboardText() : undefined
@@ -1339,16 +1324,10 @@ function onDocumentInteractionForTabMenu(e: MouseEvent | KeyboardEvent): void {
 }
 
 /**
- * The frame a message came from, or null if it was not one of ours. Preview
- * frames are sandboxed to an opaque origin, so `e.origin` is the string "null"
- * for all of them and cannot tell them apart from any other opaque sender —
- * window identity is the check that means something. Anything else reaching this
- * listener (an ad frame in an embedded page, a popup that kept a handle on this
- * window) is dropped before it can drive the clipboard or the context menu.
- *
- * Both buffers of a pair count: the one behind is loading the render about to be shown,
- * and its console output and readiness ping arrive from there. Which of the two sent a
- * message still matters for scroll state — see onPreviewWindowMessage.
+ * The frame a message came from, or null if it was not one of ours. Preview frames are
+ * sandboxed to an opaque origin, so `e.origin` is the string "null" for all of them and
+ * window identity is the only check that means something; both buffers of a pair count,
+ * since the one behind is loading the render about to be shown.
  */
 function senderFrameId(source: MessageEventSource | null): string | null {
   if (!source) return null
@@ -1683,10 +1662,9 @@ const frameReadyWaiters = new Map<HTMLIFrameElement, () => void>()
 
 /**
  * Resolves when the document written into `frame` reports itself loaded, via the ping
- * injectPreviewAgent posts. The element's own load event is not usable here: a fresh
- * iframe fires one for its initial about:blank, and swapping the buffer forward on that
- * would show a blank pane. Timed out rather than left pending, so a document that never
- * finishes loading still ends up on screen.
+ * injectPreviewAgent posts — the element's own load event fires for the initial about:blank
+ * too. Timed out rather than left pending, so a document that never finishes loading still
+ * ends up on screen.
  */
 function awaitFrameReady(frame: HTMLIFrameElement): Promise<void> {
   frameReadyWaiters.get(frame)?.()
@@ -1734,12 +1712,10 @@ function commitToBuffer(frameId: string, html: string): Promise<void> {
   })
 }
 
-// Assigning srcdoc forces a real navigation (a fresh browsing context) rather than
-// rewriting the existing document in place. Reusing the same document via
-// doc.open()/write()/close() on every render left WebKit's per-frame scrolling state
-// prone to desync after certain content swaps (e.g. a resultMode change) -- once that
-// happened, the preview's scrollbar was gone for good until the iframe itself was
-// recreated. A fresh navigation each render sidesteps that entirely.
+// Assigning srcdoc forces a real navigation (a fresh browsing context) rather than rewriting
+// the existing document in place. Reusing one document via doc.open()/write()/close() left
+// WebKit's per-frame scrolling state prone to desync, losing the preview's scrollbar until
+// the iframe was recreated.
 function setPreviewHtml(groupId: string, html: string, scrollToLine?: number, docKey = ''): Promise<void> {
   if (!previewEls.has(groupId)) return Promise.resolve()
   const isUi = resultMode.value === 'ui'
@@ -1761,11 +1737,10 @@ function setPreviewHtml(groupId: string, html: string, scrollToLine?: number, do
 }
 
 /**
- * Writes the report that accompanies the input form. It carries no controls, so it needs
- * no #UI event script, and nothing in it logs, so it needs no console interception. It does
- * get the clipboard bridge — copying a result out of it is otherwise dead — but not the
- * hover line links: input mode hides the editor they would navigate to. The report shown
- * in report mode, where the editor is on screen, keeps them.
+ * Writes the report that accompanies the input form. It carries no controls and nothing in it
+ * logs, so it needs neither the #UI event script nor console interception; it does get the
+ * clipboard bridge, but not the hover line links, since input mode hides the editor they
+ * would navigate to.
  */
 function setUiPrintHtml(groupId: string, html: string, docKey = ''): Promise<void> {
   if (!uiPrintEls.has(groupId)) return Promise.resolve()
@@ -1789,44 +1764,29 @@ function toggleUiPrint(): void {
   onUiPrintToggled.value?.(uiPrintVisible.value)
 }
 
-// Mirrors the last rendered preview into the 'html' output channel (body only,
-// so it matches what the print/export path also strips out) for debugging.
-// Each render replaces the group's prior line rather than appending, since old
-// output is immediately stale. Clipped, because maxOutputLines caps lines and not
-// their length: a whole render in one line is a second copy of the document, held
-// for as long as the tab is open and rendered into the DOM whenever it is shown.
+// Mirrors the last rendered preview into the 'html' output channel (body only) for debugging,
+// each render replacing the group's prior line. Clipped, because maxOutputLines caps lines
+// and not their length: a whole render in one line is a second copy of the document.
 function setPreviewHtmlOutput(groupId: string, html: string): void {
   outputLines.value = outputLines.value.filter(l => !(l.channel === 'html' && l.groupId === groupId))
   appendOutput('info', truncateForOutput(extractBodyHtml(html), MAX_HTML_MIRROR_CHARS), 'html', groupId)
 }
 
-// Scroll a group's results to a source line (editor/TOC -> preview sync). Posts to
-// the listener injected by injectLineLinks; no-op if that frame isn't shown. The
-// report beside the input form gets it too, so navigating in input mode moves both
-// panes together -- it keeps the sync listener even though it drops the hover arrows.
-// `exact` disables the nearest-preceding-line fallback: a TOC heading that fell inside
-// a hidden #pre/#post block has no element to land on, and the fallback would jump to
-// an unrelated line, so TOC navigation should do nothing rather than land somewhere odd.
+// Scroll a group's results to a source line (editor/TOC -> preview sync), including the report
+// beside the input form so both panes move together. `exact` disables the
+// nearest-preceding-line fallback, so a TOC heading inside a hidden #pre/#post block does
+// nothing rather than jumping to an unrelated line.
 function scrollPreviewToSourceLine(groupId: string, line: number, exact = false): void {
   const msg = { type: 'scrollPreviewToLine', line, exact }
   frontFrame(groupId)?.contentWindow?.postMessage(msg, '*')
   frontFrame(UI_PRINT_FRAME + groupId)?.contentWindow?.postMessage(msg, '*')
 }
 
-// Inject the line-link behaviour ported from vscode-calcpad. Posted messages
-// carry `groupId` so main.ts routes navigation to the group that owns this
-// preview (see App.vue's per-group iframes). The scrollbar/line-focus/find-
-// highlight CSS these scripts rely on now lives in the backend's template.html
-// since it's static and applies to the print/export path too; only the
-// per-render behaviour (which needs groupId/scrollToLine) is injected here.
-//
-// `frameId` addresses the iframe itself and only differs for the report pane beside
-// the input form, which shares its group's id: navigation still targets the group's
-// editor, while the menu and find widget belong to whichever frame was clicked.
-//
-// `lineLinks` turns just the hover arrows off; the context menu, find, error chips and
-// editor->preview sync stay. Both the input form and the report shown beside it drop
-// them — the editor they navigate to isn't on screen in input mode.
+// Inject the per-render line-link behaviour ported from vscode-calcpad; the static CSS it
+// relies on lives in the backend's template.html. `frameId` addresses the iframe itself and
+// only differs for the report pane beside the input form, while `lineLinks` turns just the
+// hover arrows off — both the form and that report drop them, since the editor they navigate
+// to isn't on screen.
 function injectLineLinks(
   html: string,
   scrollToLine: number | undefined,
@@ -1959,11 +1919,9 @@ function injectLineLinks(
 }
 
 /**
- * Seeds the position the frame reported before this render into the new document,
- * where the backend's #UI script picks it up as the fallback its readState()
- * already looks for. Consumed once, matching that script's own semantics: a stale
- * position must not steal focus when a document is opened fresh rather than
- * re-rendered. Goes in <head>, so it runs before the #UI script at </body>.
+ * Seeds the position the frame reported before this render into the new document, where the
+ * backend's #UI script picks it up as the fallback its readState() already looks for. Consumed
+ * once, and placed in <head> so it runs before the #UI script at </body>.
  */
 function injectUiPosition(html: string, frameId: string): string {
   const state = uiPositionByFrame.get(frameId)
@@ -1985,22 +1943,11 @@ function insertHeadScript(html: string, body: string): string {
 }
 
 /**
- * The frame's half of find-in-preview and the clipboard bridge.
- *
- * Both used to run in the host, reaching through `iframe.contentDocument`. That
- * needs `allow-same-origin`, which — combined with the `allow-scripts` the
- * rendered report requires — is not a sandbox at all: the frame keeps this
- * window's origin, so script in a `#HTML` block of an untrusted worksheet could
- * walk `window.parent` into the app, and on desktop into the Tauri IPC. Keeping
- * the DOM work on this side lets the frame hold an opaque origin, leaving
- * postMessage as the only channel across.
- *
- * `interceptClipboard` mirrors the old injection condition: only a host that has
- * offered a clipboard to route through takes the frame's Ctrl+C/X/V, since in a
- * browser the frame's own handling is the better one. Capture phase with
- * propagation stopped, so the datagrid library never sees the keys either — its
- * Ctrl+X would clear the cells before the copy could read them, and its paste
- * depends on an event that never fires.
+ * The frame's half of find-in-preview and the clipboard bridge. Doing this DOM work in the frame
+ * lets it hold an opaque origin with postMessage as the only channel across, where running it from
+ * the host would need `allow-same-origin` — no sandbox at all alongside the `allow-scripts` the
+ * report requires — and `interceptClipboard` only takes the frame's Ctrl+C/X/V when the host
+ * offered a clipboard, in the capture phase so the datagrid library never sees the keys.
  */
 function injectPreviewAgent(
   html: string,
@@ -2179,12 +2126,10 @@ function injectPreviewAgent(
     ),
     '',
     // ---- readiness ----
-    // Tells the host to bring this document's buffer forward. Sent from inside the
-    // document because the host cannot tell an iframe's load event for the render it
-    // just wrote from the one fired for its initial about:blank. Held until the scroll
-    // agent has applied the position it was seeded with, so the buffer comes forward
-    // already where the user was instead of scrolling there in front of them; that wait
-    // is capped inside the agent.
+    // Tells the host to bring this document's buffer forward, sent from inside the document
+    // because the host cannot tell an iframe's load event for the render it just wrote from
+    // the one fired for its initial about:blank. Held (with a cap) until the scroll agent has
+    // applied the position it was seeded with.
     "  window.addEventListener('load', function() {",
     "    var ready = function() { send({ type: 'cpdFrameReady' }); };",
     '    if (window.__calcpadScrollSettled) window.__calcpadScrollSettled(ready);',

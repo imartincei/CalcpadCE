@@ -1,13 +1,9 @@
 /**
  * The `{project}`/`{library}` path-root tokens, mirrored from `Calcpad.Core.PathRoots` so the
  * editor resolves `#include`/`#read`/`#write`/`<img src>` references the same way the engine
- * does. A root is declared once, in the document, by a `#ProjectPath path` / `#LibraryPath path`
- * line — there is no host-level default, so a document with no declaration simply has no
- * root to expand against.
- *
- * A third token, `{user}` (see `isUserToken`/`expandUserToken`), needs no declaration at all: it
- * always expands to the current OS user's home directory, so it is handled separately from the
- * two declared roots rather than folded into `PathRootKind`.
+ * does; a root is declared once in the document by a `#ProjectPath`/`#LibraryPath` line, with no
+ * host-level default. A third token, `{user}`, needs no declaration and always expands to the
+ * current OS user's home directory, so it is handled separately from the two declared roots.
  */
 
 export type PathRootKind = 'project' | 'library';
@@ -96,12 +92,10 @@ export interface DeclaredPathRoots {
 }
 
 /**
- * Scans `source` top to bottom for its `#ProjectPath`/`#LibraryPath` declarations. Only the
- * first of each counts — a second is a document error Core reports at render time, not
- * something the editor needs to re-validate — and a declaration with no value is skipped the
- * same way. Callers needing the tooling-only "declared before first use" guarantee (e.g.
- * include completions offering `{library}/` only once it is live) can pass a `beforeLine` to
- * stop the scan there.
+ * Scans `source` top to bottom for its `#ProjectPath`/`#LibraryPath` declarations, where only the
+ * first of each counts and a declaration with no value is skipped. Callers needing the
+ * tooling-only "declared before first use" guarantee can pass a `beforeLine` to stop the scan
+ * there.
  */
 export function scanDeclaredPathRoots(source: string, beforeLine?: number): DeclaredPathRoots {
     const roots: DeclaredPathRoots = { project: null, library: null };
@@ -153,13 +147,11 @@ export function resolveDeclaredPathRoots(
 }
 
 /**
- * Expands a leading root token in `raw` against `roots` (and `{user}` against `homeDir`, when
- * known). Returns `raw` unchanged, together with `ok: true`, for anything that isn't a token
- * reference — so a caller can run this unconditionally ahead of its own environment-variable
- * expansion, exactly like the Core `PathRoots.TryExpand` it mirrors. `ok: false` when a
- * `{project}`/`{library}` token's root was never declared, or `{user}` is used but `homeDir`
- * isn't available — in which case `expanded` is still `raw` — the token is left in place rather
- * than guessed at.
+ * Expands a leading root token in `raw` against `roots` (and `{user}` against `homeDir`),
+ * returning `raw` unchanged with `ok: true` for anything that isn't a token reference, so a
+ * caller can run this unconditionally ahead of its own environment-variable expansion. `ok:
+ * false` means the root was never declared or `homeDir` is unavailable, and the token is left
+ * in place rather than guessed at.
  */
 export function expandPathRootToken(
     raw: string,
@@ -187,24 +179,15 @@ export function expandPathRootToken(
 }
 
 /**
- * Builds a `raw => absolute path` resolver out of `sourceText`'s own declared roots, for a
- * caller (e.g. `.cpdz` compilation, `#include` navigation) that needs to resolve many
- * references the same way: token
- * expanded, then environment variables, then made absolute against `documentDir` — the same
- * order `Environment.ExpandEnvironmentVariables`/`Path.GetFullPath` apply on the Core side. The
- * roots are declared-and-resolved once, on first use, and reused for every later call.
- * Throws for a token that could not be expanded — a `{project}`/`{library}` root never declared,
- * or a `{user}` reference with no `getHomeDir` to ask — so a caller can catch it the same way a
+ * Builds a `raw => absolute path` resolver out of `sourceText`'s own declared roots for a caller
+ * that needs to resolve many references the same way: token expanded, then environment
+ * variables, then made absolute against `documentDir`. The roots are declared and resolved once
+ * on first use, and a token that could not be expanded throws so a caller can catch it the way a
  * missing file is caught.
  *
- * `getHomeDir`, when given, is called at most once (like the roots themselves) — there is no
- * in-process OS API for "the current user's home directory" the way Core has
- * `Environment.GetFolderPath`, so it is asked of whichever host embeds this (Tauri, VS Code) the
- * first time a reference actually needs it.
- *
- * `serverRoots`, when given, takes priority per root over the text scan — the server sees the
- * whole `#include` chain, so it knows a root declared inside an included file that a scan of
- * `sourceText` alone (the entry document only) cannot.
+ * `getHomeDir`, when given, is called at most once, since there is no in-process OS API for the
+ * current user's home directory. `serverRoots` takes priority per root over the text scan: the
+ * server sees the whole `#include` chain, so it knows a root declared inside an included file.
  */
 export function createReferenceResolver(
     sourceText: string,

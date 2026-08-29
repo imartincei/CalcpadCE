@@ -16,10 +16,10 @@ namespace Calcpad.Server.Services
         }
 
         /// <summary>
-        /// Creates the Include delegate for MacroParser. Core only invokes this
-        /// when the resolved path exists on disk, so a bare File.ReadAllText is
-        /// sufficient; any I/O failure surfaces through the catch as a Calcpad
-        /// error comment. URL-hosted includes are not currently supported.
+        /// Creates the Include delegate for MacroParser. Core only invokes this when the
+        /// resolved path exists on disk, so a bare File.ReadAllText is sufficient and any I/O
+        /// failure surfaces through the catch as a Calcpad error comment (URL-hosted includes
+        /// are not currently supported).
         /// </summary>
         internal static Func<string, Queue<string>, string> CreateIncludeDelegate()
         {
@@ -122,11 +122,11 @@ namespace Calcpad.Server.Services
                 {
                     try
                     {
-                        // Debug mode makes Calcpad.Core emit per-line anchors (id="line-N" class="line")
-                        // and the error-summary boxes that the interactive preview uses for line links.
-                        // It defaults to the opposite of forPrint but is independently settable: the
-                        // on-screen report is a print layout that still wants line links, while an
-                        // exported preview wants none.
+                        // Debug mode makes Calcpad.Core emit per-line anchors (id="line-N"
+                        // class="line") and the error-summary boxes the interactive preview
+                        // uses for line links. It defaults to the opposite of forPrint but is
+                        // independently settable: the on-screen report is a print layout that
+                        // still wants line links.
                         var parser = new ExpressionParser
                         {
                             Settings = coreSettings,

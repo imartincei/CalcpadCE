@@ -235,10 +235,9 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// Emits the currently captured definition (if any) to the result and clears the
-        /// capture state so a subsequent definition on the same line can be captured.
-        /// Called at comment boundaries (' or ") and at end of line. Returns true if a
-        /// definition was emitted.
+        /// Emits the currently captured definition (if any) and clears the capture state so a
+        /// subsequent definition on the same line can be captured. Called at comment boundaries
+        /// (' or ") and at end of line; returns true if a definition was emitted.
         /// </summary>
         private bool EmitPendingDefinitionLint()
         {

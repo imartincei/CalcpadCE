@@ -154,10 +154,9 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
                     completionItems.push(item);
                 }
 
-                // Also search each open workspace folder. Skip any folder that coincides with
-                // the doc dir or a declared root — those are already covered. Workspace-folder
-                // entries get absolute-path insert text so #include resolves regardless of the
-                // current file's location.
+                // Also search each open workspace folder, skipping any that coincides with the
+                // doc dir or a declared root. Their entries get absolute-path insert text so
+                // #include resolves regardless of the current file's location.
                 const workspaceFolders = vscode.workspace.workspaceFolders ?? [];
                 const rootNorms = (['project', 'library'] as const)
                     .map(k => resolvedRoots[k])

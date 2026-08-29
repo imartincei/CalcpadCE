@@ -37,25 +37,15 @@ try
     Environment.SetEnvironmentVariable("CALCPAD_HOST", Environment.GetEnvironmentVariable("CALCPAD_HOST") ?? "127.0.0.1");
 
     // Pull our custom CLI flags out of args before handing them to ASP.NET.
-    // --port-file <path>          Write the bound base URL to this file once
-    //                             Kestrel is listening. Used by the Tauri
-    //                             desktop host to discover the random-port
-    //                             server without hard-coding 9420.
-    // --exit-on-stdin-close       When stdin reaches EOF (parent process died
-    //                             and dropped our stdin pipe), exit. On by
-    //                             default whenever stdin is piped; opt out
-    //                             via env CALCPAD_DETACHED=1 (VS Code does
-    //                             this so the server outlives the spawning
-    //                             window and is shared across instances).
-    // --no-exit-on-stdin-close    Force-disable the watchdog (overrides the
-    //                             default-on logic for stdin-piped launches).
-    //                             Tauri sets this because it uses --parent-pid
-    //                             for death detection instead.
-    // --parent-pid <pid>          Poll the given PID every 2s; self-exit when
-    //                             that process disappears. Defense-in-depth
-    //                             for the Tauri host: if Rust panics or is
-    //                             SIGKILL'd without a chance to run its
-    //                             kill-on-exit hook, this reaps the server.
+    // --port-file <path>          Write the bound base URL here once Kestrel is listening,
+    //                             so the Tauri host can discover a random-port server.
+    // --exit-on-stdin-close       Exit when stdin reaches EOF (parent died). On by default
+    //                             whenever stdin is piped; opt out via CALCPAD_DETACHED=1,
+    //                             which VS Code sets so one server is shared across windows.
+    // --no-exit-on-stdin-close    Force-disable the watchdog. Tauri sets this because it
+    //                             uses --parent-pid for death detection instead.
+    // --parent-pid <pid>          Poll the given PID every 2s and self-exit when it
+    //                             disappears, reaping the server if Rust is SIGKILL'd.
     string? portFile = null;
     bool? exitOnStdinCloseExplicit = null;
     int? parentPid = null;
@@ -206,10 +196,10 @@ try
 
     var cts = new CancellationTokenSource();
 
-    // Handle SIGINT (Ctrl+C) and SIGTERM (graceful kill from parent) on all platforms.
-    // Replaces Console.CancelKeyPress, which only covers SIGINT.
-    // An exception escaping one of these runs on the runtime's signal thread, where it
-    // kills the process with no managed handler and no log — so nothing may propagate.
+    // Handle SIGINT (Ctrl+C) and SIGTERM on all platforms, replacing Console.CancelKeyPress
+    // which only covers SIGINT. An exception escaping one of these runs on the runtime's
+    // signal thread and kills the process with no managed handler and no log, so nothing may
+    // propagate.
     void RequestShutdown(PosixSignalContext ctx, string signal)
     {
         try
@@ -232,12 +222,10 @@ try
     lifetime.ApplicationStopping.Register(() => FileLogger.LogInfo("ApplicationStopping"));
     lifetime.ApplicationStopped.Register(() => FileLogger.LogInfo("ApplicationStopped"));
 
-    // The startup check above validates the URL string handed to UseUrls, which is
-    // the intent rather than the outcome — a Kestrel:Endpoints section in
-    // appsettings.json overrides UseUrls entirely and would never appear in it.
-    // app.Urls is the ground truth, so re-check it once Kestrel has actually bound
-    // and stop the host if anything non-loopback got through. Registered before the
-    // port-file writer so `bindingRejected` is already set when that runs.
+    // The startup check above validates the URL string handed to UseUrls, which is the intent
+    // rather than the outcome — a Kestrel:Endpoints section in appsettings.json overrides
+    // UseUrls entirely. app.Urls is the ground truth, so it is re-checked once Kestrel has
+    // bound, before the port-file writer so `bindingRejected` is already set when that runs.
     var bindingRejected = false;
     lifetime.ApplicationStarted.Register(() =>
     {

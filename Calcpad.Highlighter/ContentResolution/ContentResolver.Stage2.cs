@@ -109,12 +109,10 @@ namespace Calcpad.Highlighter.ContentResolution
         }
 
         /// <summary>
-        /// Computes which parameters are "comment parameters" for each macro.
-        /// A parameter is a comment parameter if:
-        /// 1. It appears directly in a comment section (text between ' or ") in the macro content
-        /// 2. It is passed to another macro's comment parameter position (transitive)
-        ///
-        /// Uses fixed-point iteration to handle transitive dependencies.
+        /// Computes which parameters are "comment parameters" for each macro — those appearing
+        /// directly in a comment section of the macro content, or passed to another macro's
+        /// comment parameter position. Uses fixed-point iteration to handle transitive
+        /// dependencies.
         /// </summary>
         private static (Dictionary<string, HashSet<string>> CommentParams, Dictionary<string, List<string>> ParamOrder)
             ComputeMacroCommentParameters(List<MacroDefinition> macroDefinitions)
@@ -436,10 +434,8 @@ namespace Calcpad.Highlighter.ContentResolution
         /// 1. Try filesystem (Path.GetFullPath + File.Exists)
         /// 2. Try includeFiles dictionary (plain text, client-provided)
         /// 3. Try clientFileCache dictionary (raw bytes, pre-fetched by Web layer)
-        /// Returns the content, the resolved full path (for tracking source directory in nested
-        /// includes), and whether it came from the filesystem (branch 1) as opposed to
-        /// client-provided content — only a filesystem hit has independent on-disk state worth
-        /// hashing for cache invalidation.
+        /// Returns the content, the resolved full path, and whether it came from the filesystem —
+        /// only a filesystem hit has on-disk state worth hashing for cache invalidation.
         /// </summary>
         private static (string content, string resolvedPath, bool fromFilesystem) ResolveFileContent(string rawFileName, string sourceDir,
             Dictionary<string, string> includeFiles, Dictionary<string, byte[]> clientFileCache)

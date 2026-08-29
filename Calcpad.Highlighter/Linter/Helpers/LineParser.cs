@@ -193,10 +193,9 @@ namespace Calcpad.Highlighter.Linter.Helpers
         }
 
         /// <summary>
-        /// Directives whose remainder is an expression rather than a name, path or payload.
-        /// Longer keywords come first so "#else if" wins over "#else" and "#end val" is not
-        /// mistaken for "#val". Everything absent here takes no expression at all, e.g.
-        /// #include, #settings, #def, #deg, #loop.
+        /// Directives whose remainder is an expression rather than a name, path or payload, longest
+        /// keyword first so "#else if" wins over "#else" and "#end val" is not mistaken for "#val".
+        /// Everything absent here takes no expression at all, e.g. #include, #settings, #def.
         /// </summary>
         private static readonly string[] ExpressionDirectives =
         [

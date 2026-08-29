@@ -57,12 +57,10 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// Sets macro comment parameter information from ContentResolver Stage2.
-        /// Call this before Tokenize() when you have pre-computed comment parameter info.
-        /// This enables correct tokenization of macro call arguments as Comment vs expression.
+        /// Sets macro comment parameter information from ContentResolver Stage2, which enables
+        /// correct tokenization of macro call arguments as Comment vs expression. Call this before
+        /// Tokenize() when you have pre-computed comment parameter info.
         /// </summary>
-        /// <param name="commentParams">Maps macro name to set of parameter names that are comment parameters</param>
-        /// <param name="paramOrder">Maps macro name to ordered list of parameter names</param>
         public void SetMacroCommentParameters(
             Dictionary<string, HashSet<string>> commentParams,
             Dictionary<string, List<string>> paramOrder,
@@ -248,10 +246,10 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// Checks if any defined macro name matches a suffix of the builder.
-        /// If found, splits the builder: emits the prefix as current type and sets up
-        /// the suffix as Macro for the caller to emit. Uses longest-match-first.
-        /// Example: builder "innote$" with defined macro "note$" → emits "in" as Units, leaves "note$" in builder.
+        /// Checks if any defined macro name matches a suffix of the builder, longest match first;
+        /// when one does, the prefix is emitted as the current type and the suffix set up as Macro
+        /// for the caller to emit. Example: builder "innote$" with defined macro "note$" emits
+        /// "in" as Units and leaves "note$" in the builder.
         /// </summary>
         private bool TrySplitDefinedMacroSuffix()
         {
@@ -293,11 +291,10 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// When inside a macro body, checks if any macro parameter matches a suffix of the builder.
-        /// If found, splits the builder: emits the prefix as current type and sets up the suffix
-        /// as MacroParameter for the caller to emit. Uses longest-match-first to match
-        /// Calcpad.Core's parameter substitution behavior.
-        /// Example: builder "st$" with parameter "t$" → emits "s" as Variable, leaves "t$" in builder.
+        /// When inside a macro body, checks if any macro parameter matches a suffix of the builder,
+        /// longest match first to match Calcpad.Core's parameter substitution; when one does, the
+        /// prefix is emitted as the current type and the suffix set up as MacroParameter. Example:
+        /// builder "st$" with parameter "t$" emits "s" as Variable and leaves "t$" in the builder.
         /// </summary>
         private bool TrySplitMacroParameterSuffix()
         {
@@ -563,9 +560,9 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// Extracts raw argument strings and their start columns from a macro call.
-        /// Scans from startPos (just after the opening '(') until the matching ')'.
-        /// Returns list of (argText, argStartCol).
+        /// Extracts raw argument strings and their start columns from a macro call, scanning from
+        /// startPos (just after the opening '(') until the matching ')'. Returns a list of
+        /// (argText, argStartCol).
         /// </summary>
         private static List<(string Text, int StartCol)> ExtractMacroCallArgsWithPositions(ReadOnlySpan<char> text, int startPos)
         {
@@ -747,11 +744,10 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// Handles macro argument characters when pre-tokenized data is available.
-        /// Emits pre-computed tokens for each argument and handles the call's own structural
-        /// characters (the argument separators and the closing paren). Parens and semicolons
-        /// nested deeper than the call belong to an argument and are already covered by its
-        /// pre-tokenized tokens, so they are only counted here, never emitted again.
+        /// Handles macro argument characters when pre-tokenized data is available, emitting the
+        /// pre-computed tokens for each argument plus the call's own separators and closing paren.
+        /// Parens and semicolons nested deeper than the call belong to an argument and are already
+        /// covered by its tokens, so they are only counted here, never emitted again.
         /// </summary>
         private void ParseMacroArgsPreTokenized(char c, int position)
         {

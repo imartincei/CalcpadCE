@@ -53,15 +53,9 @@ const COLOR_SCALE_OPTIONS: SettingOption[] = [
 ];
 
 /**
- * Which renders are allowed to run `#write`/`#append`. A host setting, not a `#settings` key:
- * the backend takes a plain `write` boolean per request and this decides what to send.
- *
- * "Report" is the report layout wherever it is rendered — the preview pane's Report view as
- * much as a PDF, Word or HTML report export. Both are the same render, so both write.
- *
- * The input form never writes, in any mode: it is for filling in, and the report shown beside
- * it is the render that produces output. Unwrapped never writes either — it is a code listing,
- * so the document is not calculated for it.
+ * Which renders are allowed to run `#write`/`#append` — a host setting rather than a `#settings`
+ * key, since the backend takes a plain `write` boolean per request. "Report" covers the report
+ * layout wherever it is rendered, while the input form and unwrapped never write.
  */
 export type WriteMode = 'previewAndReport' | 'reportOnly' | 'manual';
 
@@ -88,10 +82,9 @@ export function coerceWriteMode(raw: string | undefined | null): WriteMode {
 }
 
 /**
- * Whether a render may run `#write`/`#append`. The two flags are the API's own: `forPrint` is
- * the report layout, which the preview pane's Report view and a report export share, and
- * `enableUi` is the input form. They never both hold — the server clears `enableUi` for a
- * report — so the three cases below are exhaustive.
+ * Whether a render may run `#write`/`#append`, decided from the API's own two flags: `forPrint`
+ * is the report layout and `enableUi` is the input form. They never both hold — the server clears
+ * `enableUi` for a report — so the three cases below are exhaustive.
  */
 export function writesAllowed(mode: WriteMode, forPrint: boolean, enableUi = false): boolean {
     if (mode === 'manual') return false;
@@ -103,9 +96,8 @@ export function writesAllowed(mode: WriteMode, forPrint: boolean, enableUi = fal
 }
 
 /**
- * Recognized keys for the `settings` overrides object (the `#settings` directive).
- * Types and ranges mirror `Calcpad.Core`'s `SettingsDto` so the panel rejects the
- * same values the engine would reject. Keep in sync with `Settings.cs`.
+ * Recognized keys for the `settings` overrides object (the `#settings` directive). Types and
+ * ranges mirror `Calcpad.Core`'s `SettingsDto`, so keep in sync with `Settings.cs`.
  */
 export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
     { key: 'decimals', label: 'Decimals', detail: 'Decimal places in output (0 to 15)', type: 'number', def: 2, min: 0, max: 15 },
