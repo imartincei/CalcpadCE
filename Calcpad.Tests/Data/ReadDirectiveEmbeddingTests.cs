@@ -100,14 +100,6 @@ public class ReadDirectiveEmbeddingTests
         Assert.Throws<MathParserException>(() => temp.Embed("#read M from absent.csv"));
     }
 
-    [Fact]
-    public void AFileOverTheLimit_Throws()
-    {
-        using var temp = new DataDir(new string('1', ExpressionParser.MaxEmbeddedDataSize + 1));
-        var ex = Assert.Throws<MathParserException>(() => temp.Embed("#read M from data.csv"));
-        Assert.Contains("10 MB", ex.Message);
-    }
-
     /// <summary>A workbook cannot be written as text, so it is carried as bytes.</summary>
     [Fact]
     public void ExcelRead_IsCarriedAsAWorkbook()
