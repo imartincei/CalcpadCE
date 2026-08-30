@@ -4,3 +4,6 @@
 
 ' CPD-1102: Missing filename
 #include
+
+' CPD-1103: Deprecated #include input values
+#include import.cpd #{2; 3}

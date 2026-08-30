@@ -6,12 +6,18 @@ c = a + b
 ' Visibility control
 #hide
 hiddenVar = 999
+#end hide
 #show
 visibleVar = 42
 #pre
 preOnly = 1
+#end pre
 #post
 postOnly = 2
+#end post
+#hide a ≡ 10
+condHidden = 1
+#end hide
 #show
 ' Equation display modes
 #val
@@ -24,10 +30,16 @@ nocMode = a + b
 ' Variable substitution
 #nosub
 nosubVar = a + b
+#end nosub
 #novar
 novarVar = a + b
+#end novar
 #varsub
 varsubVar = a + b
+#end varsub
+#nosub a ≡ 10
+condNosubVar = a + b
+#end nosub
 ' Rounding
 #round 2
 rounded2 = 3.14159265

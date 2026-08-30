@@ -1,7 +1,7 @@
 using System.IO;
 using System.Linq;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     public class ComprehensiveErrorTests : IClassFixture<HighlighterLinterFixture>
     {
@@ -50,6 +50,7 @@ namespace Calcpad.Tests.HighlighterTests
 
                 // Include errors (CPD-11xx)
                 { "include_errors.cpd", "CPD-1102" },
+                { "include_errors.cpd", "CPD-1103" }, // Warning: deprecated #include input values
 
                 // Macro errors (CPD-22xx)
                 { "macro_errors.cpd", "CPD-2201" },
@@ -81,10 +82,14 @@ namespace Calcpad.Tests.HighlighterTests
                 { "semantic_errors.cpd", "CPD-3407" },
                 { "semantic_errors.cpd", "CPD-3408" },
                 { "semantic_errors.cpd", "CPD-3410" },
+                { "semantic_errors.cpd", "CPD-3419" }, // Warning: deprecated stored input value
 
                 // Reassignment
                 { "reassignment_errors.cpd", "CPD-3409" },
                 { "reassignment_errors.cpd", "CPD-3410" },
+
+                // #UI directive
+                { "ui_errors.cpd", "CPD-3415" },
             };
             return data;
         }

@@ -2,7 +2,7 @@ using System.Linq;
 using Calcpad.Highlighter.ContentResolution;
 using Xunit;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     /// <summary>
     /// Guards the definition line-number contract: FunctionsWithParams /
