@@ -984,8 +984,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
         switch (distro) {
             case 'arch':
                 return 'Recommended on Arch / CachyOS / Manjaro:\n'
-                    + '    yay -S ungoogled-chromium-bin\n'
-                    + 'Or from the official repos:\n'
                     + '    sudo pacman -S chromium';
             case 'debian':
                 return 'Recommended on Debian / Ubuntu / Mint:\n'
@@ -1002,7 +1000,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
                 return 'Recommended on Alpine:\n'
                     + '    sudo apk add chromium';
             default:
-                return 'Install one of: chromium, ungoogled-chromium, google-chrome-stable,\n'
+                return 'Install one of: chromium, google-chrome-stable,\n'
                     + 'or microsoft-edge-stable using your distribution\'s package manager.';
         }
     }

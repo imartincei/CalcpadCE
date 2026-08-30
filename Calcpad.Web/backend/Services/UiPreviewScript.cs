@@ -5,8 +5,10 @@ namespace Calcpad.Server.Services
     /// <c>ExpressionParser</c> emitted and hydrates datagrid containers with jspreadsheet, each
     /// edit posted to the host as a <c>uiValueChange</c> message carrying the
     /// <c>data-ui-var</c> key. Emitted server side rather than per frontend so all three hosts
-    /// share one implementation, and it also stashes where the user was — focused control,
-    /// caret, selected cell — to reapply once the replacement document has hydrated.
+    /// share one implementation, which is also all they need: each renders the document into a
+    /// sandboxed frame it replaces wholesale, so there is one way out — the parent — and one way
+    /// back to where the user was, whose focused control, caret and selected cell are posted to
+    /// the host for it to seed into the replacement.
     /// </summary>
     internal static class UiPreviewScript
     {
@@ -15,21 +17,21 @@ namespace Calcpad.Server.Services
         private const string ScriptTag = """
 <script>
 (function () {
-    var vscode = null;
+    // The document is always sandboxed inside the host - a preview pane in the web and
+    // desktop editors, the shell's frame in VS Code - so the parent is the only way out.
+    // An exported input form opened on its own is the exception: the post reaches a window
+    // with no listener, leaving the controls static, as that export says they are.
+    function send(msg) {
+        try { window.parent.postMessage(msg, '*'); } catch (e) { }
+    }
+
     function post(type, varName, newValue, sourceLine) {
-        var msg = {
+        send({
             type: type, varName: varName, newValue: newValue, sourceLine: sourceLine,
             // Set by the web editor when it has several preview panes; absent
             // elsewhere, where the host routes to whatever document it owns.
             groupId: window.__calcpadGroupId
-        };
-        if (typeof acquireVsCodeApi !== 'undefined') {
-            // acquireVsCodeApi may only be called once per webview.
-            if (!vscode) vscode = window.__calcpadVsCode || (window.__calcpadVsCode = acquireVsCodeApi());
-            vscode.postMessage(msg);
-        } else if (window.parent !== window) {
-            window.parent.postMessage(msg, '*');
-        }
+        });
     }
 
     function lineOf(el) {
@@ -40,7 +42,6 @@ namespace Calcpad.Server.Services
     // carries data-ui-var too, so matching on the classes is what distinguishes the
     // control itself from its row.
     var CONTROLS = '.calcpad-ui-input, .calcpad-ui-dropdown, .calcpad-ui-checkbox, .calcpad-ui-radio, .calcpad-ui-datagrid';
-    var STATE_KEY = 'calcpadUiPosition';
     // How long a datagrid waits for data entry to stop before it posts.
     var GRID_IDLE_MS = 400;
     var sheetsByKey = {};
@@ -48,42 +49,18 @@ namespace Calcpad.Server.Services
     // the document afresh - rather than having it re-rendered - never moves focus.
     var armed = false;
 
-    // Handing the state to the host is what carries it across a re-render in the web and
-    // desktop editors: they swap the document by assigning srcdoc, so this window does not
-    // survive, and the sandboxed frame's opaque origin makes sessionStorage throw. The VS Code
-    // webview is the top window, never posts, and keeps using sessionStorage.
+    // Handing the state to the host is what carries it across a re-render: every host swaps
+    // the document by assigning srcdoc, so this window does not survive, and the frame's
+    // opaque origin denies it sessionStorage. Both the web editor and the VS Code shell hold
+    // what is posted here and seed it back into the replacement as __calcpadUiPosition.
     function postState(state) {
-        if (window.parent === window) return;
-        try {
-            window.parent.postMessage(
-                { type: 'cpdUiState', state: state, groupId: window.__calcpadGroupId }, '*');
-        } catch (e) { }
-    }
-
-    function writeState(state) {
-        postState(state);
-        try {
-            sessionStorage.setItem(STATE_KEY, JSON.stringify(state));
-            return;
-        } catch (e) { }
-        window.__calcpadUiPosition = state;
-    }
-
-    function readState() {
-        var raw = null;
-        try {
-            raw = sessionStorage.getItem(STATE_KEY);
-            sessionStorage.removeItem(STATE_KEY);
-        } catch (e) { }
-        var held = window.__calcpadUiPosition;
-        window.__calcpadUiPosition = null;
-        if (!raw) return held || null;
-        try { return JSON.parse(raw); } catch (e2) { return held || null; }
+        send({ type: 'cpdUiState', state: state, groupId: window.__calcpadGroupId });
     }
 
     // Consumed once, up front: a position left over from an earlier session must not
     // steal focus when the document is opened again rather than re-rendered.
-    var pending = readState();
+    var pending = window.__calcpadUiPosition || null;
+    window.__calcpadUiPosition = null;
 
     function saveState() {
         var state = {};
@@ -100,7 +77,7 @@ namespace Calcpad.Server.Services
             state.key = sheet.calcpadUiKey;
             state.cell = [sheet.selectedCell[0], sheet.selectedCell[1], sheet.selectedCell[2], sheet.selectedCell[3]];
         }
-        writeState(state);
+        postState(state);
     }
 
     function restoreState() {

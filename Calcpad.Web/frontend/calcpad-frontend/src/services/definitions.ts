@@ -12,7 +12,7 @@ export class CalcpadDefinitionsService {
     private logger?: ILogger;
     private requestId = 0;
 
-    // Cache definitions per document key (URI in VS Code, file path in Electron)
+    // Cache definitions per document key (URI in VS Code, file path in the desktop app)
     private cache = new Map<string, DefinitionsResponse>();
 
     constructor(apiClient: CalcpadApiClient, logger?: ILogger) {

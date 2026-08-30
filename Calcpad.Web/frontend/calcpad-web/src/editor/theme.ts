@@ -11,15 +11,10 @@ export const calcpadDarkTheme: monaco.editor.IStandaloneThemeData = {
     inherit: true,
     ...({ semanticHighlighting: true } as object),
     rules: [
-        // Core syntax
         { token: 'comment', foreground: '57A64A' },
         { token: 'keyword', foreground: 'FF80FF' },
-        { token: 'number', foreground: 'D4D4D4' },
         { token: 'operator', foreground: 'ECC860' },
         { token: 'bracket', foreground: 'FF69B4' },
-        { token: 'identifier', foreground: 'D4D4D4' },
-
-        // Semantic token rules (matched by semantic tokens provider)
         { token: 'const', foreground: 'D4D4D4' },
         { token: 'lineContinuation', foreground: 'ECC860' },
         { token: 'variable', foreground: '6B9FFF' },
@@ -68,11 +63,8 @@ export const calcpadLightTheme: monaco.editor.IStandaloneThemeData = {
     rules: [
         { token: 'comment', foreground: '008000' },
         { token: 'keyword', foreground: 'AF00DB' },
-        { token: 'number', foreground: '000000' },
         { token: 'operator', foreground: '795E26' },
         { token: 'bracket', foreground: 'C71585' },
-        { token: 'identifier', foreground: '000000' },
-
         { token: 'const', foreground: '000000' },
         { token: 'lineContinuation', foreground: '795E26' },
         { token: 'variable', foreground: '0451A5' },

@@ -36,7 +36,7 @@ function isLoopbackUrl(url: string): boolean {
 
 /**
  * Unified fetch-based API client for the CalcPad server, replacing scattered axios calls.
- * Works in Node.js 18+, Electron, and browsers.
+ * Works in Node.js 18+ and browsers.
  */
 export class CalcpadApiClient {
     private baseUrl: string;

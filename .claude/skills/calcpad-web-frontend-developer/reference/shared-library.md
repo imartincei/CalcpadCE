@@ -3,7 +3,7 @@
 The shared library is the core dependency for all three frontends (web editor, Tauri desktop, VS Code extension).
 
 ## CalcpadApiClient
-Unified fetch-based HTTP client (works in Node.js 18+, Electron, browsers):
+Unified fetch-based HTTP client (works in Node.js 18+ and browsers):
 ```typescript
 class CalcpadApiClient {
     constructor(baseUrl: string, logger?: ILogger);
