@@ -2992,12 +2992,12 @@ The app looks for one already installed on your system; if it can't find one, it
 </ul>
 <h2 id="excluding-sections-from-the-pdf-noprint">Excluding sections from the PDF (NoPrint)<a class="headerlink" href="#excluding-sections-from-the-pdf-noprint" title="Permanent link">&para;</a></h2>
 <p>Wrap sections you want visible on screen but omitted from the PDF in <code>NoPrintStart</code> / <code>NoPrintEnd</code> markers:</p>
-<div class="language-text highlight"><pre><span></span><code>&#39;&lt;!--{&quot;NoPrintStart&quot;: true}--&gt;
-&#39;These lines are visible in the preview but stripped from the PDF.
+<div class="language-text highlight"><pre><span></span><code>'&lt;!--{"NoPrintStart": true}--&gt;
+'These lines are visible in the preview but stripped from the PDF.
 debug_x = 5
 debug_y = debug_x + 1
-&#39;&lt;!--{&quot;NoPrintEnd&quot;: true}--&gt;
-&#39;This prints!&#39;
+'&lt;!--{"NoPrintEnd": true}--&gt;
+'This prints!'
 </code></pre></div>
 <p>Good to know:</p>
 <ul>

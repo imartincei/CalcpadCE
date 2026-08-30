@@ -3411,9 +3411,9 @@ The tables below group them by the kind of problem.</p>
 </table>
 <h2 id="suppressing-diagnostics-lint-ignore">Suppressing diagnostics (lint-ignore)<a class="headerlink" href="#suppressing-diagnostics-lint-ignore" title="Permanent link">&para;</a></h2>
 <p>To silence specific diagnostics in a section — for example, a prototype variable you haven't wired up yet — wrap it in <code>LintIgnore</code> / <code>EndLintIgnore</code> markers and list the codes to ignore:</p>
-<div class="language-text highlight"><pre><span></span><code>&#39;&lt;!--{&quot;LintIgnore&quot;: [&quot;CPD-3301&quot;]}--&gt;
+<div class="language-text highlight"><pre><span></span><code>'&lt;!--{"LintIgnore": ["CPD-3301"]}--&gt;
 prototype_var = 5
-&#39;&lt;!--{&quot;EndLintIgnore&quot;: []}--&gt;
+'&lt;!--{"EndLintIgnore": []}--&gt;
 </code></pre></div>
 <p>Leave the list empty (<code>"LintIgnore": []</code>) to suppress <em>all</em> diagnostics inside the region.</p>
 <p>These markers are one kind of <a href="new-metadata-comments.html">metadata comment</a>; the <strong>Properties</strong> panel tab can write them for you with a code picker.</p>

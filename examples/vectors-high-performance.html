@@ -2897,108 +2897,108 @@ The semantics match the plain mode one-to-one, so you can drop <code>hp(...)</co
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;Direct:</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'Direct:</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="nb">cos</span><span class="p">(</span><span class="m">0</span><span class="p">);</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">])</span>
-<span class="c1">&#39;Direct with another vector:</span>
+<span class="c1">'Direct with another vector:</span>
 <span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="m">8</span><span class="p">])</span>
-<span class="c1">&#39;From a custom function:</span>
+<span class="c1">'From a custom function:</span>
 <span class="nv">a</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">x</span><span class="o">^</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="nv">x</span><span class="o">^</span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="nv">x</span><span class="o">^</span><span class="m">4</span><span class="p">])</span>
 <span class="nv">a</span><span class="p">(</span><span class="m">2</span><span class="p">)</span>
 <span class="nv">a</span><span class="p">(</span><span class="m">3</span><span class="p">)</span>
-<span class="c1">&#39;By creational functions:</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector_hp</span><span class="p">(</span><span class="m">5</span><span class="p">)</span><span class="c1">&#39;- creates an empty vector with 5 elements</span>
-<span class="nb">fill</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">)</span><span class="c1">&#39;- fills the vector with a value of 5</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">range_hp</span><span class="p">(</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;- creates a vector from a range of values, starting from 0 to 10 with step 2</span>
+<span class="c1">'By creational functions:</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector_hp</span><span class="p">(</span><span class="m">5</span><span class="p">)</span><span class="c1">'- creates an empty vector with 5 elements</span>
+<span class="nb">fill</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">)</span><span class="c1">'- fills the vector with a value of 5</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">range_hp</span><span class="p">(</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">'- creates a vector from a range of values, starting from 0 to 10 with step 2</span>
 
-<span class="cs">&quot;Indexing</span>
-<span class="c1">&#39;&lt;hr/&gt;</span>
+<span class="cs">"Indexing</span>
+<span class="c1">'&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">8</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">])</span>
-<span class="nv">a</span><span class="m">.2</span><span class="c1">&#39;- simple dot operator (constant index)</span>
-<span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="c1">&#39;, &#39;</span><span class="nv">a</span><span class="p">.</span><span class="nv">k</span><span class="c1">&#39;- variable index</span>
-<span class="nv">a</span><span class="p">.(</span><span class="m">2</span><span class="o">*</span><span class="nv">k</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="c1">&#39;- expression index</span>
-<span class="nv">a</span><span class="m">.5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="c1">&#39; - assign a new value to element:&#39;</span><span class="nv">a</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector_hp</span><span class="p">(</span><span class="m">6</span><span class="p">)</span><span class="c1">&#39;,&#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector_hp</span><span class="p">(</span><span class="m">6</span><span class="p">)</span>
-<span class="c1">&#39;Initalize values in a block loop</span>
+<span class="nv">a</span><span class="m">.2</span><span class="c1">'- simple dot operator (constant index)</span>
+<span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="c1">', '</span><span class="nv">a</span><span class="p">.</span><span class="nv">k</span><span class="c1">'- variable index</span>
+<span class="nv">a</span><span class="p">.(</span><span class="m">2</span><span class="o">*</span><span class="nv">k</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="c1">'- expression index</span>
+<span class="nv">a</span><span class="m">.5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="c1">' - assign a new value to element:'</span><span class="nv">a</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector_hp</span><span class="p">(</span><span class="m">6</span><span class="p">)</span><span class="c1">','</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector_hp</span><span class="p">(</span><span class="m">6</span><span class="p">)</span>
+<span class="c1">'Initalize values in a block loop</span>
 <span class="k">#hide</span>
 <span class="k">#for</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span>
 <span class="w">    </span><span class="nv">a</span><span class="p">.</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">k</span><span class="o">^</span><span class="m">2</span>
 <span class="k">#loop</span>
 <span class="k">#show</span>
 <span class="nv">a</span>
-<span class="c1">&#39;Inline loop</span>
+<span class="c1">'Inline loop</span>
 <span class="nd">$Repeat</span><span class="p">{</span><span class="nv">b</span><span class="p">.</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">a</span><span class="p">.(</span><span class="nv">k</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nv">b</span><span class="p">)}</span>
 <span class="nv">b</span>
 
-<span class="cs">&quot;Vector operators</span>
-<span class="c1">&#39;&lt;h4&gt;Vector-vector&lt;/h4&gt;</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">])</span><span class="c1">&#39;, &#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">])</span>
-<span class="c1">&#39;Arithmetic:</span>
-<span class="nv">a</span><span class="o">!</span><span class="c1">&#39;- factorial</span>
-<span class="nv">a</span><span class="o">^</span><span class="nv">b</span><span class="c1">&#39;- exponentiation</span>
-<span class="nv">a</span><span class="o">/</span><span class="nv">b</span><span class="c1">&#39;- floating point division</span>
-<span class="nv">a</span><span class="o">\</span><span class="nv">b</span><span class="c1">&#39;- integer division</span>
-<span class="nv">a</span><span class="o">÷</span><span class="nv">b</span><span class="c1">&#39;- division bar</span>
-<span class="nv">a</span><span class="o">⦼</span><span class="nv">b</span><span class="c1">&#39;- modulo(⦼, remainder)</span>
-<span class="nv">a</span><span class="o">*</span><span class="nv">b</span><span class="c1">&#39;- multiplication</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- subtraction</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- addition</span>
-<span class="c1">&#39;Relational (comparison):</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- equal to</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">≠</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- unequal to</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- less then</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- greater than</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- less or equal</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">≥</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- greater or equal</span>
-<span class="c1">&#39;Logical:</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">∧</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- logical &quot;and&quot;</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">∨</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- logical &quot;or&quot;</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">⊕</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- logical &quot;xor&quot;</span>
+<span class="cs">"Vector operators</span>
+<span class="c1">'&lt;h4&gt;Vector-vector&lt;/h4&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">])</span><span class="c1">', '</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">])</span>
+<span class="c1">'Arithmetic:</span>
+<span class="nv">a</span><span class="o">!</span><span class="c1">'- factorial</span>
+<span class="nv">a</span><span class="o">^</span><span class="nv">b</span><span class="c1">'- exponentiation</span>
+<span class="nv">a</span><span class="o">/</span><span class="nv">b</span><span class="c1">'- floating point division</span>
+<span class="nv">a</span><span class="o">\</span><span class="nv">b</span><span class="c1">'- integer division</span>
+<span class="nv">a</span><span class="o">÷</span><span class="nv">b</span><span class="c1">'- division bar</span>
+<span class="nv">a</span><span class="o">⦼</span><span class="nv">b</span><span class="c1">'- modulo(⦼, remainder)</span>
+<span class="nv">a</span><span class="o">*</span><span class="nv">b</span><span class="c1">'- multiplication</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- subtraction</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- addition</span>
+<span class="c1">'Relational (comparison):</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- equal to</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≠</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- unequal to</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- less then</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- greater than</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- less or equal</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≥</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- greater or equal</span>
+<span class="c1">'Logical:</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">∧</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- logical "and"</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">∨</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- logical "or"</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">⊕</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- logical "xor"</span>
 
-<span class="c1">&#39;&lt;h4&gt;Vector-scalar&lt;/h4&gt;</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">])</span><span class="c1">&#39;, &#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span>
-<span class="c1">&#39;Arithmetic:</span>
-<span class="nv">a</span><span class="o">^</span><span class="m">2</span><span class="c1">&#39;- exponentiation</span>
-<span class="nv">a</span><span class="o">/</span><span class="m">2</span><span class="c1">&#39;- floating point division</span>
-<span class="nv">a</span><span class="o">\</span><span class="m">2</span><span class="c1">&#39;- integer division</span>
-<span class="nv">a</span><span class="o">÷</span><span class="m">2</span><span class="c1">&#39;- division bar</span>
-<span class="nv">a</span><span class="o">⦼</span><span class="m">2</span><span class="c1">&#39;- modulo(⦼, remainder)</span>
-<span class="nv">a</span><span class="o">*</span><span class="m">2</span><span class="c1">&#39;- multiplication</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- subtraction</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- addition</span>
-<span class="c1">&#39;Relational (comparison):</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- equal to</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">≠</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- unequal to</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- less then</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- greater than</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- less or equal</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">≥</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- greater or equal</span>
-<span class="c1">&#39;Logical:</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">∧</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- logical &quot;and&quot;</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">∨</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- logical &quot;or&quot;</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">⊕</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;- logical &quot;xor&quot;</span>
+<span class="c1">'&lt;h4&gt;Vector-scalar&lt;/h4&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">])</span><span class="c1">', '</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span>
+<span class="c1">'Arithmetic:</span>
+<span class="nv">a</span><span class="o">^</span><span class="m">2</span><span class="c1">'- exponentiation</span>
+<span class="nv">a</span><span class="o">/</span><span class="m">2</span><span class="c1">'- floating point division</span>
+<span class="nv">a</span><span class="o">\</span><span class="m">2</span><span class="c1">'- integer division</span>
+<span class="nv">a</span><span class="o">÷</span><span class="m">2</span><span class="c1">'- division bar</span>
+<span class="nv">a</span><span class="o">⦼</span><span class="m">2</span><span class="c1">'- modulo(⦼, remainder)</span>
+<span class="nv">a</span><span class="o">*</span><span class="m">2</span><span class="c1">'- multiplication</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">2</span><span class="c1">'- subtraction</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="c1">'- addition</span>
+<span class="c1">'Relational (comparison):</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">2</span><span class="c1">'- equal to</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≠</span><span class="w"> </span><span class="m">2</span><span class="c1">'- unequal to</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">2</span><span class="c1">'- less then</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">2</span><span class="c1">'- greater than</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="m">2</span><span class="c1">'- less or equal</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">≥</span><span class="w"> </span><span class="m">2</span><span class="c1">'- greater or equal</span>
+<span class="c1">'Logical:</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">∧</span><span class="w"> </span><span class="m">2</span><span class="c1">'- logical "and"</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">∨</span><span class="w"> </span><span class="m">2</span><span class="c1">'- logical "or"</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">⊕</span><span class="w"> </span><span class="m">2</span><span class="c1">'- logical "xor"</span>
 
-<span class="c1">&#39;&lt;h4&gt;Scalar-vector&lt;/h4&gt;</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;, &#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">])</span>
-<span class="c1">&#39;Arithmetic:</span>
-<span class="m">2</span><span class="o">^</span><span class="nv">b</span><span class="c1">&#39;- exponentiation</span>
-<span class="m">2</span><span class="o">/</span><span class="nv">b</span><span class="c1">&#39;- floating point division</span>
-<span class="m">2</span><span class="o">\</span><span class="nv">b</span><span class="c1">&#39;- integer division</span>
-<span class="m">2</span><span class="o">÷</span><span class="nv">b</span><span class="c1">&#39;- division bar</span>
-<span class="m">2</span><span class="o">⦼</span><span class="nv">b</span><span class="c1">&#39;- modulo(⦼, remainder)</span>
-<span class="m">2</span><span class="o">*</span><span class="nv">b</span><span class="c1">&#39;- multiplication</span>
-<span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- subtraction</span>
-<span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- addition</span>
-<span class="c1">&#39;Relational (comparison):</span>
-<span class="m">2</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- equal to</span>
-<span class="m">2</span><span class="w"> </span><span class="o">≠</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- unequal to</span>
-<span class="m">2</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- less then</span>
-<span class="m">2</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- greater than</span>
-<span class="m">2</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- less or equal</span>
-<span class="m">2</span><span class="w"> </span><span class="o">≥</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- greater or equal</span>
-<span class="c1">&#39;Logical:</span>
-<span class="m">2</span><span class="w"> </span><span class="o">∧</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- logical &quot;and&quot;</span>
-<span class="m">2</span><span class="w"> </span><span class="o">∨</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- logical &quot;or</span>
-<span class="m">2</span><span class="w"> </span><span class="o">⊕</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;- logical &quot;xor&quot;</span>
+<span class="c1">'&lt;h4&gt;Scalar-vector&lt;/h4&gt;</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="c1">', '</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">])</span>
+<span class="c1">'Arithmetic:</span>
+<span class="m">2</span><span class="o">^</span><span class="nv">b</span><span class="c1">'- exponentiation</span>
+<span class="m">2</span><span class="o">/</span><span class="nv">b</span><span class="c1">'- floating point division</span>
+<span class="m">2</span><span class="o">\</span><span class="nv">b</span><span class="c1">'- integer division</span>
+<span class="m">2</span><span class="o">÷</span><span class="nv">b</span><span class="c1">'- division bar</span>
+<span class="m">2</span><span class="o">⦼</span><span class="nv">b</span><span class="c1">'- modulo(⦼, remainder)</span>
+<span class="m">2</span><span class="o">*</span><span class="nv">b</span><span class="c1">'- multiplication</span>
+<span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- subtraction</span>
+<span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- addition</span>
+<span class="c1">'Relational (comparison):</span>
+<span class="m">2</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- equal to</span>
+<span class="m">2</span><span class="w"> </span><span class="o">≠</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- unequal to</span>
+<span class="m">2</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- less then</span>
+<span class="m">2</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- greater than</span>
+<span class="m">2</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- less or equal</span>
+<span class="m">2</span><span class="w"> </span><span class="o">≥</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- greater or equal</span>
+<span class="c1">'Logical:</span>
+<span class="m">2</span><span class="w"> </span><span class="o">∧</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- logical "and"</span>
+<span class="m">2</span><span class="w"> </span><span class="o">∨</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- logical "or</span>
+<span class="m">2</span><span class="w"> </span><span class="o">⊕</span><span class="w"> </span><span class="nv">b</span><span class="c1">'- logical "xor"</span>
 </code></pre></div>
 
 </figure>
@@ -3111,47 +3111,47 @@ The semantics match the plain mode one-to-one, so you can drop <code>hp(...)</co
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;style&gt;em {font-family:&quot;Times New Roman&quot;;}&lt;/style&gt;</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Sort&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) and &lt;b&gt;Rsort&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;style&gt;em {font-family:"Times New Roman";}&lt;/style&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Sort&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) and &lt;b&gt;Rsort&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">])</span>
-<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sort</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- vector sorted in ascending order</span>
-<span class="nv">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">rsort</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- vector sorted in descending order</span>
-<span class="nv">a</span><span class="c1">&#39; - remained unchanged</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sort</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">'- vector sorted in ascending order</span>
+<span class="nv">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">rsort</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">'- vector sorted in descending order</span>
+<span class="nv">a</span><span class="c1">' - remained unchanged</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Order&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) and &lt;b&gt;Revorder&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
-<span class="nv">x_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">])</span><span class="c1">&#39;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Order&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) and &lt;b&gt;Revorder&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nv">x_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">])</span><span class="c1">'</span>
 <span class="nv">y_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">])</span>
-<span class="nv">i_asc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">order</span><span class="p">(</span><span class="nv">x_a</span><span class="p">)</span><span class="c1">&#39;- indexes in ascending order of &lt;em&gt;x&lt;/em&gt;-values</span>
-<span class="nv">i_desc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">revorder</span><span class="p">(</span><span class="nv">x_a</span><span class="p">)</span><span class="c1">&#39;- indexes in descending order of &lt;em&gt;x&lt;/em&gt;-values</span>
-<span class="c1">&#39;Sorts points by ascending order of &lt;em&gt;x&lt;/em&gt;-values</span>
+<span class="nv">i_asc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">order</span><span class="p">(</span><span class="nv">x_a</span><span class="p">)</span><span class="c1">'- indexes in ascending order of &lt;em&gt;x&lt;/em&gt;-values</span>
+<span class="nv">i_desc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">revorder</span><span class="p">(</span><span class="nv">x_a</span><span class="p">)</span><span class="c1">'- indexes in descending order of &lt;em&gt;x&lt;/em&gt;-values</span>
+<span class="c1">'Sorts points by ascending order of &lt;em&gt;x&lt;/em&gt;-values</span>
 <span class="nv">x_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">extract</span><span class="p">(</span><span class="nv">x_a</span><span class="p">;</span><span class="w"> </span><span class="nv">i_asc</span><span class="p">)</span>
 <span class="nv">y_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">extract</span><span class="p">(</span><span class="nv">y_a</span><span class="p">;</span><span class="w"> </span><span class="nv">i_asc</span><span class="p">)</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Reverse&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
-<span class="nb">reverse</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">]))</span><span class="c1">&#39;- the elements of the vector in reverse order</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Reverse&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nb">reverse</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">]))</span><span class="c1">'- the elements of the vector in reverse order</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Count&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;value&lt;/em&gt;; &lt;em&gt;starting index&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
-<span class="nb">count</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">]);</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">)</span><span class="c1">&#39;- the number of elements equal to 1 and index ≥ 4</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Count&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;value&lt;/em&gt;; &lt;em&gt;starting index&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nb">count</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">]);</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">)</span><span class="c1">'- the number of elements equal to 1 and index ≥ 4</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Search&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;value&lt;/em&gt;; &lt;em&gt;starting index&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Search&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;value&lt;/em&gt;; &lt;em&gt;starting index&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">])</span>
-<span class="nb">search</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">&#39;- the index of the first element in &lt;em&gt;a&lt;/em&gt; with value 1 and index ≥ 3</span>
-<span class="nb">search</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">)</span><span class="c1">&#39;- when the index is out of range or nothing is found, returns 0</span>
+<span class="nb">search</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">'- the index of the first element in &lt;em&gt;a&lt;/em&gt; with value 1 and index ≥ 3</span>
+<span class="nb">search</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">)</span><span class="c1">'- when the index is out of range or nothing is found, returns 0</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Find&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;value&lt;/em&gt;; &lt;em&gt;starting index&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Find&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;value&lt;/em&gt;; &lt;em&gt;starting index&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">])</span>
-<span class="nb">find</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;- the indexes of all elements with value 1, from the 2nd onwards</span>
-<span class="nb">find</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;- if the indexes are out of range or nothing is found, returns 0</span>
-<span class="nb">find_lt</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;- the indexes of all elements, from the 2nd onwards, that are &lt; 3</span>
-<span class="nb">find_ge</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;- the indexes of all elements, from the 2nd onwards, that are ≥ 3</span>
+<span class="nb">find</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">'- the indexes of all elements with value 1, from the 2nd onwards</span>
+<span class="nb">find</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">'- if the indexes are out of range or nothing is found, returns 0</span>
+<span class="nb">find_lt</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">'- the indexes of all elements, from the 2nd onwards, that are &lt; 3</span>
+<span class="nb">find_ge</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">'- the indexes of all elements, from the 2nd onwards, that are ≥ 3</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Lookup&lt;/b&gt;(&lt;em&gt;vector_a&lt;/em&gt;; &lt;em&gt;vector_b&lt;/em&gt;; &lt;em&gt;value&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Lookup&lt;/b&gt;(&lt;em&gt;vector_a&lt;/em&gt;; &lt;em&gt;vector_b&lt;/em&gt;; &lt;em&gt;value&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">])</span>
 <span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">])</span>
-<span class="nb">lookup</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="c1">&#39;- the values ​​from vector &lt;em&gt;b&lt;/em&gt; for which the corresponding values ​​in vector &lt;em&gt;a&lt;/em&gt; are equal to 0</span>
-<span class="nb">lookup</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;- the values ​​from vector &lt;em&gt;b&lt;/em&gt; for which the corresponding values ​​in vector &lt;em&gt;a&lt;/em&gt; are equal to 2</span>
-<span class="nb">lookup_ge</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="c1">&#39;- the values ​​from vector &lt;em&gt;b&lt;/em&gt; for which the corresponding values ​​in vector &lt;em&gt;a&lt;/em&gt; are ≥ 1</span>
-<span class="nb">lookup_ne</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="c1">&#39;- the values ​​from vector &lt;em&gt;b&lt;/em&gt; for which the corresponding values ​​in vector &lt;em&gt;a&lt;/em&gt; are ≠ 1</span>
+<span class="nb">lookup</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="c1">'- the values ​​from vector &lt;em&gt;b&lt;/em&gt; for which the corresponding values ​​in vector &lt;em&gt;a&lt;/em&gt; are equal to 0</span>
+<span class="nb">lookup</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="c1">'- the values ​​from vector &lt;em&gt;b&lt;/em&gt; for which the corresponding values ​​in vector &lt;em&gt;a&lt;/em&gt; are equal to 2</span>
+<span class="nb">lookup_ge</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="c1">'- the values ​​from vector &lt;em&gt;b&lt;/em&gt; for which the corresponding values ​​in vector &lt;em&gt;a&lt;/em&gt; are ≥ 1</span>
+<span class="nb">lookup_ne</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="c1">'- the values ​​from vector &lt;em&gt;b&lt;/em&gt; for which the corresponding values ​​in vector &lt;em&gt;a&lt;/em&gt; are ≠ 1</span>
 </code></pre></div>
 
 </figure>
@@ -3208,110 +3208,110 @@ The semantics match the plain mode one-to-one, so you can drop <code>hp(...)</co
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;style&gt;em {font-family:&quot;Times New Roman&quot;;}&lt;/style&gt;</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Norm_p&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
-<span class="nb">norm_p</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">]);</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">&#39;- the Lp norm of the vector for &#39;</span><span class="nv">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;style&gt;em {font-family:"Times New Roman";}&lt;/style&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Norm_p&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nb">norm_p</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">]);</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">'- the Lp norm of the vector for '</span><span class="nv">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Norm_1&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
-<span class="nb">norm_1</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="o">-</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">]))</span><span class="c1">&#39;- the L1 (Manhattan or taxicab) norm of the vector</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Norm_1&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nb">norm_1</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="o">-</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">]))</span><span class="c1">'- the L1 (Manhattan or taxicab) norm of the vector</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Norm&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) or &lt;b&gt;Norm_2&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) or &lt;b&gt;Norm_e&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Norm&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) or &lt;b&gt;Norm_2&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) or &lt;b&gt;Norm_e&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">])</span>
 <span class="nb">norm</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span>
 <span class="nb">norm_2</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span>
-<span class="nb">norm_e</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- the L2 (Euclidian) norm of vector &lt;em&gt;a&lt;/em&gt;</span>
+<span class="nb">norm_e</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">'- the L2 (Euclidian) norm of vector &lt;em&gt;a&lt;/em&gt;</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Norm_i&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
-<span class="nb">norm_i</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">]))</span><span class="c1">&#39;- the L∞ (infinity) norm of the vector</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Norm_i&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nb">norm_i</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">]))</span><span class="c1">'- the L∞ (infinity) norm of the vector</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Unit&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
-<span class="nb">unit</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="o">-</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">]))</span><span class="c1">&#39;- the normalized (unit) vector</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Unit&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="nb">unit</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="o">-</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">]))</span><span class="c1">'- the normalized (unit) vector</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Dot&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Dot&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">])</span>
 <span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">])</span>
-<span class="nb">dot</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">)</span><span class="c1">&#39;- scalar (dot) product of vectors &lt;em&gt;a&lt;/em&gt; and &lt;em&gt;b&lt;/em&gt;;</span>
+<span class="nb">dot</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">)</span><span class="c1">'- scalar (dot) product of vectors &lt;em&gt;a&lt;/em&gt; and &lt;em&gt;b&lt;/em&gt;;</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Cross&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Cross&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">])</span>
 <span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">])</span>
-<span class="nb">cross</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">)</span><span class="c1">&#39;- cross product of vectors &lt;em&gt;a&lt;/em&gt; and &lt;em&gt;b&lt;/em&gt;;</span>
+<span class="nb">cross</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">)</span><span class="c1">'- cross product of vectors &lt;em&gt;a&lt;/em&gt; and &lt;em&gt;b&lt;/em&gt;;</span>
 
 <span class="k">#rad</span>
-<span class="c1">&#39;Trigonometric:&lt;hr/&gt;</span>
+<span class="c1">'Trigonometric:&lt;hr/&gt;</span>
 <span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">30</span><span class="p">;</span><span class="w"> </span><span class="m">45</span><span class="p">;</span><span class="w"> </span><span class="m">60</span><span class="p">;</span><span class="w"> </span><span class="m">90</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="nv">π</span><span class="o">/</span><span class="m">180</span><span class="p">)</span>
-<span class="nb">sin</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- sine</span>
-<span class="nb">cos</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- cosine</span>
-<span class="nb">tan</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- tangent</span>
-<span class="nb">csc</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- cosecant</span>
-<span class="nb">sec</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- secant</span>
-<span class="nb">cot</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- cotangent</span>
+<span class="nb">sin</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- sine</span>
+<span class="nb">cos</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- cosine</span>
+<span class="nb">tan</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- tangent</span>
+<span class="nb">csc</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- cosecant</span>
+<span class="nb">sec</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- secant</span>
+<span class="nb">cot</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- cotangent</span>
 
-<span class="c1">&#39;Hyperbolic:&lt;hr/&gt;</span>
+<span class="c1">'Hyperbolic:&lt;hr/&gt;</span>
 <span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">0.5</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">])</span>
-<span class="nb">sinh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- hyperbolic sine</span>
-<span class="nb">cosh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- hyperbolic cosine</span>
-<span class="nb">tanh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- hyperbolic tangent</span>
-<span class="nb">csch</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- hyperbolic cosecant</span>
-<span class="nb">sech</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- hyperbolic secant</span>
-<span class="nb">coth</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- hyperbolic cotangent</span>
+<span class="nb">sinh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- hyperbolic sine</span>
+<span class="nb">cosh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- hyperbolic cosine</span>
+<span class="nb">tanh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- hyperbolic tangent</span>
+<span class="nb">csch</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- hyperbolic cosecant</span>
+<span class="nb">sech</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- hyperbolic secant</span>
+<span class="nb">coth</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- hyperbolic cotangent</span>
 
-<span class="c1">&#39;Inverse trigonometric:&lt;hr/&gt;</span>
+<span class="c1">'Inverse trigonometric:&lt;hr/&gt;</span>
 <span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">0.5</span><span class="p">;</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="m">2</span><span class="p">)</span><span class="o">/</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="m">3</span><span class="p">)</span><span class="o">/</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">])</span>
 <span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">reverse</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span>
-<span class="nb">asin</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse sine</span>
-<span class="nb">acos</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse cosine</span>
-<span class="nb">atan</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse tangent</span>
-<span class="nb">atan2</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="c1">&#39;- the angle whose tangent is the quotient of y and x</span>
-<span class="nb">acsc</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse cosecant</span>
-<span class="nb">asec</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse secant</span>
-<span class="nb">acot</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse cotangent</span>
+<span class="nb">asin</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- inverse sine</span>
+<span class="nb">acos</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- inverse cosine</span>
+<span class="nb">atan</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- inverse tangent</span>
+<span class="nb">atan2</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="c1">'- the angle whose tangent is the quotient of y and x</span>
+<span class="nb">acsc</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- inverse cosecant</span>
+<span class="nb">asec</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- inverse secant</span>
+<span class="nb">acot</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- inverse cotangent</span>
 
-<span class="c1">&#39;Inverse hyperbolic:&lt;hr/&gt;</span>
+<span class="c1">'Inverse hyperbolic:&lt;hr/&gt;</span>
 <span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">])</span>
-<span class="nb">asinh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse hyperbolic sine</span>
-<span class="nb">acosh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse hyperbolic cosine</span>
-<span class="nb">atanh</span><span class="p">(</span><span class="nv">x</span><span class="o">/</span><span class="m">5</span><span class="p">)</span><span class="c1">&#39;- inverse hyperbolic tangent</span>
-<span class="nb">acsch</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse hyperbolic cosecant</span>
-<span class="nb">asech</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse hyperbolic secant</span>
-<span class="nb">acoth</span><span class="p">(</span><span class="m">5</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- inverse hyperbolic cotangent</span>
+<span class="nb">asinh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- inverse hyperbolic sine</span>
+<span class="nb">acosh</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- inverse hyperbolic cosine</span>
+<span class="nb">atanh</span><span class="p">(</span><span class="nv">x</span><span class="o">/</span><span class="m">5</span><span class="p">)</span><span class="c1">'- inverse hyperbolic tangent</span>
+<span class="nb">acsch</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- inverse hyperbolic cosecant</span>
+<span class="nb">asech</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- inverse hyperbolic secant</span>
+<span class="nb">acoth</span><span class="p">(</span><span class="m">5</span><span class="o">/</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- inverse hyperbolic cotangent</span>
 
-<span class="c1">&#39;Logarithmic, exponential and roots:&lt;hr/&gt;</span>
-<span class="nb">log</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- decimal logarithm</span>
-<span class="nb">ln</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- natural logarithm</span>
-<span class="nb">log_2</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- binary logarithm</span>
-<span class="nb">exp</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- natural exponent = eˣ</span>
-<span class="nb">sqr</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- square root</span>
-<span class="nb">cbrt</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- cubic root</span>
-<span class="nb">root</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">&#39;- n-th root</span>
+<span class="c1">'Logarithmic, exponential and roots:&lt;hr/&gt;</span>
+<span class="nb">log</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- decimal logarithm</span>
+<span class="nb">ln</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- natural logarithm</span>
+<span class="nb">log_2</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- binary logarithm</span>
+<span class="nb">exp</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- natural exponent = eˣ</span>
+<span class="nb">sqr</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- square root</span>
+<span class="nb">cbrt</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- cubic root</span>
+<span class="nb">root</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">'- n-th root</span>
 
-<span class="c1">&#39;Rounding:&lt;hr/&gt;</span>
-<span class="nb">round</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- round to the nearest integer</span>
-<span class="nb">floor</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- round to the smaller integer(towards - ∞)</span>
-<span class="nb">ceiling</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- round to the greater integer(towards + ∞)</span>
-<span class="nb">trunc</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">&#39;- round to the smaller integer(towards zero)</span>
+<span class="c1">'Rounding:&lt;hr/&gt;</span>
+<span class="nb">round</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- round to the nearest integer</span>
+<span class="nb">floor</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- round to the smaller integer(towards - ∞)</span>
+<span class="nb">ceiling</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- round to the greater integer(towards + ∞)</span>
+<span class="nb">trunc</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="c1">'- round to the smaller integer(towards zero)</span>
 
-<span class="c1">&#39;Integer:&lt;hr/&gt;</span>
+<span class="c1">'Integer:&lt;hr/&gt;</span>
 <span class="nv">x</span>
 <span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span>
-<span class="nb">mod</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="c1">&#39;- the remainder of an integer division</span>
-<span class="nb">gcd</span><span class="p">(</span><span class="nv">y</span><span class="p">)</span><span class="c1">&#39;- the greatest common divisor of several integers</span>
-<span class="nb">lcm</span><span class="p">(</span><span class="nv">y</span><span class="p">)</span><span class="c1">&#39;- the least common multiple of several integers</span>
+<span class="nb">mod</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="c1">'- the remainder of an integer division</span>
+<span class="nb">gcd</span><span class="p">(</span><span class="nv">y</span><span class="p">)</span><span class="c1">'- the greatest common divisor of several integers</span>
+<span class="nb">lcm</span><span class="p">(</span><span class="nv">y</span><span class="p">)</span><span class="c1">'- the least common multiple of several integers</span>
 
-<span class="c1">&#39;Aggregate and interpolation:&lt;hr /&gt;</span>
+<span class="c1">'Aggregate and interpolation:&lt;hr /&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">])</span>
 <span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">])</span>
-<span class="nb">min</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- minimum of multiple values</span>
-<span class="nb">max</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- maximum of multiple values</span>
-<span class="nb">sum</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- sum of multiple values</span>
-<span class="nb">sumsq</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- sum of squares</span>
-<span class="nb">srss</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- square root of sum of squares</span>
-<span class="nb">average</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- average of multiple values</span>
-<span class="nb">product</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- product of multiple values</span>
-<span class="nb">mean</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">&#39;- geometric mean</span>
-<span class="nb">take</span><span class="p">(</span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- the 3-rd element from the list</span>
-<span class="nb">line</span><span class="p">(</span><span class="m">1.5</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- linear interpolation</span>
-<span class="nb">spline</span><span class="p">(</span><span class="m">1.5</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- Hermite spline interpolation</span>
+<span class="nb">min</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">'- minimum of multiple values</span>
+<span class="nb">max</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">'- maximum of multiple values</span>
+<span class="nb">sum</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">'- sum of multiple values</span>
+<span class="nb">sumsq</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">'- sum of squares</span>
+<span class="nb">srss</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">'- square root of sum of squares</span>
+<span class="nb">average</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">'- average of multiple values</span>
+<span class="nb">product</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">'- product of multiple values</span>
+<span class="nb">mean</span><span class="p">(</span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="m">11</span><span class="p">)</span><span class="c1">'- geometric mean</span>
+<span class="nb">take</span><span class="p">(</span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span><span class="c1">'- the 3-rd element from the list</span>
+<span class="nb">line</span><span class="p">(</span><span class="m">1.5</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span><span class="c1">'- linear interpolation</span>
+<span class="nb">spline</span><span class="p">(</span><span class="m">1.5</span><span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span><span class="c1">'- Hermite spline interpolation</span>
 </code></pre></div>
 
 </figure>
@@ -3430,50 +3430,50 @@ The semantics match the plain mode one-to-one, so you can drop <code>hp(...)</co
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;style&gt;em {font-family:&quot;Times New Roman&quot;;}&lt;/style&gt;</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Len&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) and &lt;b&gt;Size&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
-<span class="c1">&#39;Explicitly initialized short vectors:</span>
-<span class="nb">len</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">]))</span><span class="c1">&#39;- vector length</span>
-<span class="nb">size</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">]))</span><span class="c1">&#39;- the actual size in memory</span>
-<span class="c1">&#39;Size is equal to length even if last elements are zero</span>
-<span class="c1">&#39;Implicitly initialized large vectors:</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;style&gt;em {font-family:"Times New Roman";}&lt;/style&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Len&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;) and &lt;b&gt;Size&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'Explicitly initialized short vectors:</span>
+<span class="nb">len</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">]))</span><span class="c1">'- vector length</span>
+<span class="nb">size</span><span class="p">(</span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">]))</span><span class="c1">'- the actual size in memory</span>
+<span class="c1">'Size is equal to length even if last elements are zero</span>
+<span class="c1">'Implicitly initialized large vectors:</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector_hp</span><span class="p">(</span><span class="m">200</span><span class="p">)</span>
 <span class="nv">a</span><span class="m">.35</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span>
-<span class="nb">len</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- the lenght is equal to the count of all elements</span>
-<span class="nb">size</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">&#39;- the size is equal to the index of the last element intitalized with a non-zero value</span>
+<span class="nb">len</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">'- the lenght is equal to the count of all elements</span>
+<span class="nb">size</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span><span class="c1">'- the size is equal to the index of the last element intitalized with a non-zero value</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Resize&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;new length&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Resize&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;new length&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">])</span>
-<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">resize</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">&#39; - set a new size and return a reference to &lt;var&gt;a&lt;/var&gt;</span>
-<span class="nv">a</span><span class="c1">&#39;- the original vector was modified</span>
-<span class="nv">b</span><span class="m">.1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="c1">&#39;- changing a value in the referece...</span>
-<span class="nv">a</span><span class="c1">&#39;- also changes the original vector.</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">resize</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">' - set a new size and return a reference to &lt;var&gt;a&lt;/var&gt;</span>
+<span class="nv">a</span><span class="c1">'- the original vector was modified</span>
+<span class="nv">b</span><span class="m">.1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="c1">'- changing a value in the referece...</span>
+<span class="nv">a</span><span class="c1">'- also changes the original vector.</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Join&lt;/b&gt;(&lt;em&gt;mixed list of arguments&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Join&lt;/b&gt;(&lt;em&gt;mixed list of arguments&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">|</span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">])</span>
 <span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="m">8</span><span class="p">;</span><span class="w"> </span><span class="m">9</span><span class="p">])</span>
-<span class="nv">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">(</span><span class="nb">join</span><span class="p">(</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">A</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">))</span><span class="c1">&#39;- by function...&#39;</span><span class="nb">isHp</span><span class="p">(</span><span class="nv">c</span><span class="p">)</span>
-<span class="nv">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">A</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">])</span><span class="c1">&#39;- or by square brackets initializer.</span>
+<span class="nv">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">(</span><span class="nb">join</span><span class="p">(</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">A</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">))</span><span class="c1">'- by function...'</span><span class="nb">isHp</span><span class="p">(</span><span class="nv">c</span><span class="p">)</span>
+<span class="nv">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">A</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span><span class="p">])</span><span class="c1">'- or by square brackets initializer.</span>
 <span class="nb">isHp</span><span class="p">(</span><span class="nv">c</span><span class="p">)</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Slice&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;start index&lt;/em&gt;; &lt;em&gt;end index&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Slice&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;start index&lt;/em&gt;; &lt;em&gt;end index&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="m">8</span><span class="p">])</span>
-<span class="nb">slice</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">)</span><span class="c1">&#39;- segment between the 3-rd and 7-th elements of vector &lt;em&gt;a&lt;/em&gt;, incl.</span>
-<span class="nb">slice</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">)</span><span class="c1">&#39;- if the index is &gt; of the vector length, returns the elements up to the end</span>
+<span class="nb">slice</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">7</span><span class="p">)</span><span class="c1">'- segment between the 3-rd and 7-th elements of vector &lt;em&gt;a&lt;/em&gt;, incl.</span>
+<span class="nb">slice</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">)</span><span class="c1">'- if the index is &gt; of the vector length, returns the elements up to the end</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;First&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;count&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;First&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;count&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">])</span>
-<span class="nb">first</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">&#39;- the first 3 elements of the vector &lt;em&gt;a&lt;/em&gt;</span>
-<span class="nb">first</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">)</span><span class="c1">&#39;- if the number of elements is &gt; the vector  length, returns all elements</span>
+<span class="nb">first</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">'- the first 3 elements of the vector &lt;em&gt;a&lt;/em&gt;</span>
+<span class="nb">first</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">)</span><span class="c1">'- if the number of elements is &gt; the vector  length, returns all elements</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Last&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;count&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Last&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;count&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">])</span>
-<span class="nb">last</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">&#39;- the last 3 elements of the vector &lt;em&gt;a&lt;/em&gt;</span>
-<span class="nb">last</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">)</span><span class="c1">&#39;- if the number of elements is &gt; the length of the vector, returns all elements</span>
+<span class="nb">last</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="c1">'- the last 3 elements of the vector &lt;em&gt;a&lt;/em&gt;</span>
+<span class="nb">last</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="m">10</span><span class="p">)</span><span class="c1">'- if the number of elements is &gt; the length of the vector, returns all elements</span>
 
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Extract&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;indexes&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Extract&lt;/b&gt;(&lt;em&gt;vector&lt;/em&gt;; &lt;em&gt;indexes&lt;/em&gt;)&lt;/p&gt;&lt;hr/&gt;</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">hp</span><span class="p">([</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">])</span>
-<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">extract</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="p">[</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">])</span><span class="c1">&#39;- the elements of &lt;em&gt;a&lt;/em&gt;, with indexes 3, 4, and 6</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">extract</span><span class="p">(</span><span class="nv">a</span><span class="p">;</span><span class="w"> </span><span class="p">[</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="m">6</span><span class="p">])</span><span class="c1">'- the elements of &lt;em&gt;a&lt;/em&gt;, with indexes 3, 4, and 6</span>
 <span class="nb">isHp</span><span class="p">(</span><span class="nv">b</span><span class="p">)</span>
 </code></pre></div>
 

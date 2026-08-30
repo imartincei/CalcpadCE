@@ -2892,20 +2892,20 @@
 <p>Calcpad.Web can build a navigable table of contents from your document's headings, with links that jump straight to each section.</p>
 <h2 id="writing-headings">Writing headings<a class="headerlink" href="#writing-headings" title="Permanent link">&para;</a></h2>
 <p>Write a heading as a comment line that starts with <code>'</code> followed by one to six <code>#</code> characters — just like Markdown:</p>
-<div class="language-text highlight"><pre><span></span><code>&#39;# Section 1
-&#39;Some content
-&#39;## Subsection 1.1
-&#39;More content
-&#39;### Deeper subsection
-&#39;# Section 2
+<div class="language-text highlight"><pre><span></span><code>'# Section 1
+'Some content
+'## Subsection 1.1
+'More content
+'### Deeper subsection
+'# Section 2
 </code></pre></div>
 <p>These become <code>&lt;h1&gt;</code>–<code>&lt;h6&gt;</code> headings in your report.
 Every heading automatically gets a unique link target, so you can link to any section — the table of contents uses these targets to jump around the document.</p>
 <h2 id="building-the-list">Building the list<a class="headerlink" href="#building-the-list" title="Permanent link">&para;</a></h2>
 <p>Add a small script block to your document to generate the nested list.
 Point it at the container where the list should appear:</p>
-<div class="language-js highlight"><pre><span></span><code><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;load&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">makeList</span><span class="p">({</span><span class="w"> </span><span class="nx">target</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;#toc&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">parent</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;article&#39;</span><span class="w"> </span><span class="p">});</span>
+<div class="language-js highlight"><pre><span></span><code><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'load'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">makeList</span><span class="p">({</span><span class="w"> </span><span class="nx">target</span><span class="o">:</span><span class="w"> </span><span class="s1">'#toc'</span><span class="p">,</span><span class="w"> </span><span class="nx">parent</span><span class="o">:</span><span class="w"> </span><span class="s1">'article'</span><span class="w"> </span><span class="p">});</span>
 <span class="p">});</span>
 </code></pre></div>
 <ul>

@@ -2947,24 +2947,24 @@ The cycloidal pair — <a href="#epicycloid">epicycloid</a> and <a href="#hypocy
 <span class="k">#rad</span>
 <span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span>
 <span class="k">#show</span>
-<span class="c1">&#39;General parametric equation:</span>
+<span class="c1">'General parametric equation:</span>
 <span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span>
 <span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span>
-<span class="c1">&#39;The radius &lt;i&gt;r&lt;/i&gt;(&lt;i&gt;θ&lt;/i&gt;) if different for each type of curve:</span>
-<span class="c1">&#39;Archimedes spiral - &#39;</span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">θ</span>
+<span class="c1">'The radius &lt;i&gt;r&lt;/i&gt;(&lt;i&gt;θ&lt;/i&gt;) if different for each type of curve:</span>
+<span class="c1">'Archimedes spiral - '</span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">θ</span>
 <span class="k">#hide</span>
 <span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span>
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">390</span>
 <span class="k">#post</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)|</span><span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">8</span><span class="o">*</span><span class="nv">π</span><span class="p">}</span>
 <span class="k">#show</span>
-<span class="c1">&#39;Fermat spiral - &#39;</span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqr</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span>
+<span class="c1">'Fermat spiral - '</span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqr</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span>
 <span class="k">#hide</span>
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">387</span>
 <span class="k">#post</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)|</span><span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span><span class="w"> </span><span class="o">-</span><span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)|</span><span class="o">-</span><span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">8</span><span class="o">*</span><span class="nv">π</span><span class="p">}</span>
 <span class="k">#show</span>
-<span class="c1">&#39;Logarithmic spiral -&#39;</span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">e</span><span class="o">^</span><span class="p">(</span><span class="nv">a</span><span class="o">*</span><span class="nv">θ</span><span class="p">)</span>
+<span class="c1">'Logarithmic spiral -'</span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">e</span><span class="o">^</span><span class="p">(</span><span class="nv">a</span><span class="o">*</span><span class="nv">θ</span><span class="p">)</span>
 <span class="k">#hide</span>
 <span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.3</span>
 <span class="nv">φ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="m">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">sqr</span><span class="p">(</span><span class="m">5</span><span class="p">))</span><span class="o">/</span><span class="m">2</span>
@@ -2972,26 +2972,26 @@ The cycloidal pair — <a href="#epicycloid">epicycloid</a> and <a href="#hypocy
 <span class="k">#post</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)|</span><span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">8</span><span class="o">*</span><span class="nv">π</span><span class="p">}</span>
 <span class="k">#show</span>
-<span class="c1">&#39;Golden spiral -&#39;</span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">φ</span><span class="o">^</span><span class="p">(</span><span class="m">2</span><span class="o">/</span><span class="nv">π</span><span class="o">*</span><span class="nv">θ</span><span class="p">)</span>
+<span class="c1">'Golden spiral -'</span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">φ</span><span class="o">^</span><span class="p">(</span><span class="m">2</span><span class="o">/</span><span class="nv">π</span><span class="o">*</span><span class="nv">θ</span><span class="p">)</span>
 <span class="k">#hide</span>
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">255</span>
 <span class="k">#post</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)|</span><span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">8</span><span class="o">*</span><span class="nv">π</span><span class="p">}</span>
 <span class="k">#show</span>
-<span class="c1">&#39;Hyperbolic spiral -&#39;</span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="o">/</span><span class="nv">θ</span>
+<span class="c1">'Hyperbolic spiral -'</span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="o">/</span><span class="nv">θ</span>
 <span class="k">#hide</span>
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">177</span>
 <span class="k">#post</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)|</span><span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">π</span><span class="o">/</span><span class="m">8</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">8</span><span class="o">*</span><span class="nv">π</span><span class="p">}</span>
 <span class="k">#show</span>
-<span class="c1">&#39;Lituus -&#39;</span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="o">/</span><span class="nb">sqr</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span>
+<span class="c1">'Lituus -'</span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="o">/</span><span class="nb">sqr</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span>
 <span class="k">#hide</span>
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">188</span>
 <span class="k">#post</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)|</span><span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">π</span><span class="o">/</span><span class="m">16</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">16</span><span class="o">*</span><span class="nv">π</span><span class="p">}</span>
 <span class="k">#pre</span>
 
-<span class="c1">&#39;Tip: Click &quot;&lt;b&gt;Calculate&lt;/b&gt;&quot; to see the respective plot.</span>
+<span class="c1">'Tip: Click "&lt;b&gt;Calculate&lt;/b&gt;" to see the respective plot.</span>
 </code></pre></div>
 
 </figure>
@@ -3019,9 +3019,9 @@ The cycloidal pair — <a href="#epicycloid">epicycloid</a> and <a href="#hypocy
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;(also &lt;strong&gt;Clothoid&lt;/strong&gt; or &lt;strong&gt;Euler Spiral&lt;/strong&gt;)</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'(also &lt;strong&gt;Clothoid&lt;/strong&gt; or &lt;strong&gt;Euler Spiral&lt;/strong&gt;)</span>
 <span class="k">#rad</span>
-<span class="c1">&#39;The equations is defined by the Fresnel integrals:</span>
+<span class="c1">'The equations is defined by the Fresnel integrals:</span>
 <span class="nv">x</span><span class="p">(</span><span class="nv">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">$Integral</span><span class="p">{</span><span class="nb">cos</span><span class="p">(</span><span class="nv">s</span><span class="o">^</span><span class="m">2</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">t</span><span class="p">}</span>
 <span class="nv">y</span><span class="p">(</span><span class="nv">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">$Integral</span><span class="p">{</span><span class="nb">sin</span><span class="p">(</span><span class="nv">s</span><span class="o">^</span><span class="m">2</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">t</span><span class="p">}</span>
 <span class="k">#hide</span>
@@ -3031,7 +3031,7 @@ The cycloidal pair — <a href="#epicycloid">epicycloid</a> and <a href="#hypocy
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">x</span><span class="p">(</span><span class="nv">t</span><span class="p">)|</span><span class="nv">y</span><span class="p">(</span><span class="nv">t</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">π</span><span class="p">}</span>
 <span class="k">#pre</span>
 
-<span class="c1">&#39;Tip: Click &quot;&lt;b&gt;Calculate&lt;/b&gt;&quot; to see the respective plot.</span>
+<span class="c1">'Tip: Click "&lt;b&gt;Calculate&lt;/b&gt;" to see the respective plot.</span>
 </code></pre></div>
 
 </figure>
@@ -3053,18 +3053,18 @@ The cycloidal pair — <a href="#epicycloid">epicycloid</a> and <a href="#hypocy
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;div style=&quot;max-width:150mm&quot;&gt;</span>
-<span class="c1">&#39;&lt;img class=&quot;side&quot; src=&quot;../../Images/math/epicycloid.png&quot; alt=&quot;epicycloid.png&quot;&gt;</span>
-<span class="c1">&#39;&lt;p style=&quot;max-width:85mm&quot;&gt;Epicycloid is a parametric curve that is obtained by rolling a smaller circle (&lt;var&gt;r&lt;/var&gt;) around a larger one (&lt;var&gt;R&lt;/var&gt;). It shows the trace of a point P, fixed on the circumference of the smaller circle.&lt;/p&gt;</span>
-<span class="c1">&#39;General equation:</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;div style="max-width:150mm"&gt;</span>
+<span class="c1">'&lt;img class="side" src="../../Images/math/epicycloid.png" alt="epicycloid.png"&gt;</span>
+<span class="c1">'&lt;p style="max-width:85mm"&gt;Epicycloid is a parametric curve that is obtained by rolling a smaller circle (&lt;var&gt;r&lt;/var&gt;) around a larger one (&lt;var&gt;R&lt;/var&gt;). It shows the trace of a point P, fixed on the circumference of the smaller circle.&lt;/p&gt;</span>
+<span class="c1">'General equation:</span>
 <span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">cos</span><span class="p">((</span><span class="nv">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="o">*</span><span class="nv">θ</span><span class="p">)</span>
 <span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">sin</span><span class="p">((</span><span class="nv">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="o">*</span><span class="nv">θ</span><span class="p">)</span>
-<span class="c1">&#39;Larger radius: &#39;</span><span class="nv">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">21</span><span class="p">}</span>
-<span class="c1">&#39;Smaller radius: &#39;</span><span class="nv">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">10</span><span class="p">}</span>
-<span class="c1">&#39;Ratio: &#39;</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">R</span><span class="o">/</span><span class="nv">r</span>
+<span class="c1">'Larger radius: '</span><span class="nv">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">21</span><span class="p">}</span>
+<span class="c1">'Smaller radius: '</span><span class="nv">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">10</span><span class="p">}</span>
+<span class="c1">'Ratio: '</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">R</span><span class="o">/</span><span class="nv">r</span>
 <span class="k">#pre</span>
 
-<span class="c1">&#39;Tip: Click &quot;&lt;b&gt;Calculate&lt;/b&gt;&quot; to see the respective plot.</span>
+<span class="c1">'Tip: Click "&lt;b&gt;Calculate&lt;/b&gt;" to see the respective plot.</span>
 <span class="k">#hide</span>
 <span class="k">#rad</span>
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span>
@@ -3072,7 +3072,7 @@ The cycloidal pair — <a href="#epicycloid">epicycloid</a> and <a href="#hypocy
 <span class="k">#post</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)|</span><span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">π</span><span class="o">*</span><span class="nv">r</span><span class="p">}</span>
 <span class="k">#show</span>
-<span class="c1">&#39;&lt;/div&gt;</span>
+<span class="c1">'&lt;/div&gt;</span>
 </code></pre></div>
 
 </figure>
@@ -3100,18 +3100,18 @@ The cycloidal pair — <a href="#epicycloid">epicycloid</a> and <a href="#hypocy
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;div style=&quot;max-width:150mm&quot;&gt;</span>
-<span class="c1">&#39;&lt;img class=&quot;side&quot; src=&quot;../../Images/math/hypocycloid.png&quot; alt=&quot;hypocycloid.png&quot;&gt;</span>
-<span class="c1">&#39;&lt;p style=&quot;max-width:90mm&quot;&gt;Hypocycloid is a parametric curve that is obtained by rolling a smaller circle (&lt;var&gt;r&lt;/var&gt;) inside a larger one (&lt;var&gt;R&lt;/var&gt;). It shows the trace of a point P, fixed on the circumference of the smaller circle.&lt;/p&gt;</span>
-<span class="c1">&#39;General equation:</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;div style="max-width:150mm"&gt;</span>
+<span class="c1">'&lt;img class="side" src="../../Images/math/hypocycloid.png" alt="hypocycloid.png"&gt;</span>
+<span class="c1">'&lt;p style="max-width:90mm"&gt;Hypocycloid is a parametric curve that is obtained by rolling a smaller circle (&lt;var&gt;r&lt;/var&gt;) inside a larger one (&lt;var&gt;R&lt;/var&gt;). It shows the trace of a point P, fixed on the circumference of the smaller circle.&lt;/p&gt;</span>
+<span class="c1">'General equation:</span>
 <span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">k</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">cos</span><span class="p">((</span><span class="nv">k</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="o">*</span><span class="nv">θ</span><span class="p">)</span>
 <span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">k</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">sin</span><span class="p">((</span><span class="nv">k</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="o">*</span><span class="nv">θ</span><span class="p">)</span>
-<span class="c1">&#39;Outer radius: &#39;</span><span class="nv">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">22</span><span class="p">}</span>
-<span class="c1">&#39;Inner radius: &#39;</span><span class="nv">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">3</span><span class="p">}</span>
-<span class="c1">&#39;Ratio: &#39;</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">R</span><span class="o">/</span><span class="nv">r</span>
+<span class="c1">'Outer radius: '</span><span class="nv">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">22</span><span class="p">}</span>
+<span class="c1">'Inner radius: '</span><span class="nv">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">3</span><span class="p">}</span>
+<span class="c1">'Ratio: '</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">R</span><span class="o">/</span><span class="nv">r</span>
 <span class="k">#pre</span>
 
-<span class="c1">&#39;Tip: Click &quot;&lt;b&gt;Calculate&lt;/b&gt;&quot; to see the respective plot.</span>
+<span class="c1">'Tip: Click "&lt;b&gt;Calculate&lt;/b&gt;" to see the respective plot.</span>
 <span class="k">#hide</span>
 <span class="k">#rad</span>
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span>
@@ -3119,7 +3119,7 @@ The cycloidal pair — <a href="#epicycloid">epicycloid</a> and <a href="#hypocy
 <span class="k">#post</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)|</span><span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">π</span><span class="o">*</span><span class="nv">r</span><span class="p">}</span>
 <span class="k">#show</span>
-<span class="c1">&#39;&lt;/div&gt;</span>
+<span class="c1">'&lt;/div&gt;</span>
 </code></pre></div>
 
 </figure>
@@ -3152,13 +3152,13 @@ The cycloidal pair — <a href="#epicycloid">epicycloid</a> and <a href="#hypocy
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span>
 <span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span>
 <span class="k">#show</span>
-<span class="c1">&#39;Equation:</span>
+<span class="c1">'Equation:</span>
 <span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="nv">a</span><span class="o">*</span><span class="nv">θ</span><span class="p">)</span>
 <span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="nv">b</span><span class="o">*</span><span class="nv">θ</span><span class="p">)</span>
-<span class="c1">&#39;Coefficients:&#39;</span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">2</span><span class="p">}</span><span class="c1">&#39;,&#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">3</span><span class="p">}</span>
+<span class="c1">'Coefficients:'</span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">2</span><span class="p">}</span><span class="c1">','</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">3</span><span class="p">}</span>
 <span class="k">#pre</span>
 
-<span class="c1">&#39;Tip: Click &quot;&lt;b&gt;Calculate&lt;/b&gt;&quot; to see the respective plot.</span>
+<span class="c1">'Tip: Click "&lt;b&gt;Calculate&lt;/b&gt;" to see the respective plot.</span>
 <span class="k">#post</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)|</span><span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">π</span><span class="p">}</span>
 </code></pre></div>
@@ -3182,45 +3182,45 @@ The cycloidal pair — <a href="#epicycloid">epicycloid</a> and <a href="#hypocy
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;General equation:</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'General equation:</span>
 <span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="nv">a</span><span class="o">/</span><span class="nv">b</span><span class="o">*</span><span class="nv">θ</span><span class="p">)</span>
 <span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span>
 <span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">r</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span>
 <span class="k">#pre</span>
-<span class="c1">&#39;&lt;p&gt;Coefficients &lt;i&gt;a&lt;/i&gt;/&lt;i&gt;b&lt;/i&gt; =</span>
-<span class="c1">&#39;&lt;select data-target=&quot;ab&quot;&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;2;1&quot;&gt;2&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;3;1&quot;&gt;3&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;4;1&quot;&gt;4&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;5;1&quot;&gt;5&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;6;1&quot;&gt;6&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;7;1&quot;&gt;7&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;3;2&quot;&gt;3/2&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;5;2&quot;&gt;5/2&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;7;2&quot;&gt;7/2&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;2;3&quot;&gt;2/3&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;4;3&quot;&gt;4/3&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;5;3&quot;&gt;5/3&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;7;3&quot;&gt;7/3&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;3;4&quot;&gt;3/4&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;5;4&quot;&gt;5/4&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;7;4&quot;&gt;7/4&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;2;5&quot;&gt;2/5&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;3;5&quot;&gt;3/5&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;4;5&quot;&gt;4/5&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;6;5&quot;&gt;6/5&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;7;5&quot;&gt;7/5&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;5;6&quot;&gt;5/6&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;7;6&quot;&gt;7/6&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;2;7&quot;&gt;2/7&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;3;7&quot;&gt;3/7&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;4;7&quot;&gt;4/7&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;5;7&quot;&gt;5/7&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;6;7&quot;&gt;6/7&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;/select&gt;&lt;/p&gt;</span>
-<span class="c1">&#39;&lt;p style=&quot;display:none;&quot; id=&quot;ab&quot;&gt;&#39;</span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">4</span><span class="p">}</span><span class="c1">&#39;,&#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">1</span><span class="p">}</span><span class="c1">&#39;&lt;/span&gt;&lt;/p&gt;</span>
+<span class="c1">'&lt;p&gt;Coefficients &lt;i&gt;a&lt;/i&gt;/&lt;i&gt;b&lt;/i&gt; =</span>
+<span class="c1">'&lt;select data-target="ab"&gt;</span>
+<span class="c1">'&lt;option value="2;1"&gt;2&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="3;1"&gt;3&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="4;1"&gt;4&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="5;1"&gt;5&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="6;1"&gt;6&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="7;1"&gt;7&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="3;2"&gt;3/2&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="5;2"&gt;5/2&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="7;2"&gt;7/2&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="2;3"&gt;2/3&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="4;3"&gt;4/3&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="5;3"&gt;5/3&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="7;3"&gt;7/3&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="3;4"&gt;3/4&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="5;4"&gt;5/4&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="7;4"&gt;7/4&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="2;5"&gt;2/5&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="3;5"&gt;3/5&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="4;5"&gt;4/5&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="6;5"&gt;6/5&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="7;5"&gt;7/5&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="5;6"&gt;5/6&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="7;6"&gt;7/6&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="2;7"&gt;2/7&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="3;7"&gt;3/7&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="4;7"&gt;4/7&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="5;7"&gt;5/7&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="6;7"&gt;6/7&lt;/option&gt;</span>
+<span class="c1">'&lt;/select&gt;&lt;/p&gt;</span>
+<span class="c1">'&lt;p style="display:none;" id="ab"&gt;'</span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">4</span><span class="p">}</span><span class="c1">','</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">1</span><span class="p">}</span><span class="c1">'&lt;/span&gt;&lt;/p&gt;</span>
 
-<span class="c1">&#39;Tip: Click &quot;&lt;b&gt;Calculate&lt;/b&gt;&quot; to see the respective plot.</span>
+<span class="c1">'Tip: Click "&lt;b&gt;Calculate&lt;/b&gt;" to see the respective plot.</span>
 <span class="k">#hide</span>
 <span class="k">#rad</span>
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span>
@@ -3228,7 +3228,7 @@ The cycloidal pair — <a href="#epicycloid">epicycloid</a> and <a href="#hypocy
 <span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b</span><span class="o">*</span><span class="p">(</span><span class="m">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="nv">a</span><span class="o">⦼</span><span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">b</span><span class="o">⦼</span><span class="m">2</span><span class="p">))</span>
 <span class="k">#post</span>
 <span class="k">#val</span>
-<span class="c1">&#39;Coefficients &lt;i&gt;a&lt;/i&gt;/&lt;i&gt;b&lt;/i&gt; =&#39;</span><span class="nv">a</span><span class="c1">&#39;/&#39;</span><span class="nv">b</span>
+<span class="c1">'Coefficients &lt;i&gt;a&lt;/i&gt;/&lt;i&gt;b&lt;/i&gt; ='</span><span class="nv">a</span><span class="c1">'/'</span><span class="nv">b</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">x</span><span class="p">(</span><span class="nv">θ</span><span class="p">)|</span><span class="nv">y</span><span class="p">(</span><span class="nv">θ</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">k</span><span class="o">*</span><span class="nv">π</span><span class="p">}</span>
 </code></pre></div>
 

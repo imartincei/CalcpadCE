@@ -2920,35 +2920,35 @@ The distributed-load variants cover a <a href="#uniformly-distributed-load">unif
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;div style=&quot;max-width:180mm;&quot;&gt;</span>
-<span class="c1">&#39;&lt;img style=&quot;width:165pt;&quot; alt=&quot;cantilever-beam-concentrated-force.png&quot; class=&quot;side&quot; src=&quot;../../Images/mechanics/beams/cantilever-beam-concentrated-force.png&quot;&gt;</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Input data&lt;/b&gt;&lt;/p&gt;</span>
-<span class="c1">&#39;Beam Length -&#39;</span><span class="nv">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">&#39;m</span>
-<span class="c1">&#39;Load -&#39;</span><span class="nv">F</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">10</span><span class="p">}</span><span class="c1">&#39;kN</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;div style="max-width:180mm;"&gt;</span>
+<span class="c1">'&lt;img style="width:165pt;" alt="cantilever-beam-concentrated-force.png" class="side" src="../../Images/mechanics/beams/cantilever-beam-concentrated-force.png"&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Input data&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'Beam Length -'</span><span class="nv">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">'m</span>
+<span class="c1">'Load -'</span><span class="nv">F</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">10</span><span class="p">}</span><span class="c1">'kN</span>
 <span class="k">#post</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Internal forces&lt;/b&gt;&lt;/p&gt;</span>
-<span class="c1">&#39;Bending -&#39;</span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">F</span><span class="o">*</span><span class="nv">l</span><span class="c1">&#39;kN·m</span>
-<span class="c1">&#39;Shear -&#39;</span><span class="nv">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">F</span><span class="c1">&#39;kN</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Diagrams&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Internal forces&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'Bending -'</span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">F</span><span class="o">*</span><span class="nv">l</span><span class="c1">'kN·m</span>
+<span class="c1">'Shear -'</span><span class="nv">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">F</span><span class="c1">'kN</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Diagrams&lt;/b&gt;&lt;/p&gt;</span>
 <span class="k">#hide</span>
 <span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">600</span>
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">150</span>
 <span class="k">#show</span>
-<span class="c1">&#39;Calculate internal forces at&#39;</span><span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">1</span><span class="p">}</span><span class="c1">&#39;m</span>
+<span class="c1">'Calculate internal forces at'</span><span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">1</span><span class="p">}</span><span class="c1">'m</span>
 <span class="k">#pre</span>
 
 
 <span class="k">#post</span>
-<span class="c1">&#39;Bending</span>
+<span class="c1">'Bending</span>
 <span class="nv">M</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nv">F</span><span class="o">*</span><span class="p">(</span><span class="nv">l</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">x</span><span class="p">)</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="o">-</span><span class="nv">M</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">l</span><span class="p">}</span>
-<span class="nv">M</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">&#39;kN·m</span>
-<span class="c1">&#39;Shear</span>
+<span class="nv">M</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">'kN·m</span>
+<span class="c1">'Shear</span>
 <span class="nv">V</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">F</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">V</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">l</span><span class="p">}</span>
-<span class="nv">V</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">&#39;kN</span>
+<span class="nv">V</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">'kN</span>
 <span class="k">#show</span>
-<span class="c1">&#39;&lt;/div&gt;</span>
+<span class="c1">'&lt;/div&gt;</span>
 </code></pre></div>
 
 </figure>
@@ -2983,34 +2983,34 @@ The distributed-load variants cover a <a href="#uniformly-distributed-load">unif
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;div style=&quot;max-width:180mm;&quot;&gt;</span>
-<span class="c1">&#39;&lt;img style=&quot;width:165pt;&quot; alt=&quot;cantilever-beam-concentrated-moment.png&quot; class=&quot;side&quot; src=&quot;../../Images/mechanics/beams/cantilever-beam-concentrated-moment.png&quot;&gt;</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Input data&lt;/b&gt;&lt;/p&gt;</span>
-<span class="c1">&#39;Beam Length -&#39;</span><span class="nv">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">&#39;m</span>
-<span class="c1">&#39;Load -&#39;</span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">10</span><span class="p">}</span><span class="c1">&#39;kN·m</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;div style="max-width:180mm;"&gt;</span>
+<span class="c1">'&lt;img style="width:165pt;" alt="cantilever-beam-concentrated-moment.png" class="side" src="../../Images/mechanics/beams/cantilever-beam-concentrated-moment.png"&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Input data&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'Beam Length -'</span><span class="nv">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">'m</span>
+<span class="c1">'Load -'</span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">10</span><span class="p">}</span><span class="c1">'kN·m</span>
 <span class="k">#post</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Internal forces&lt;/b&gt;&lt;/p&gt;</span>
-<span class="c1">&#39;Bending -&#39;</span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">M</span><span class="c1">&#39;kN·m</span>
-<span class="c1">&#39;Shear -&#39;</span><span class="nv">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="c1">&#39;kN</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Diagrams&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Internal forces&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'Bending -'</span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">M</span><span class="c1">'kN·m</span>
+<span class="c1">'Shear -'</span><span class="nv">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="c1">'kN</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Diagrams&lt;/b&gt;&lt;/p&gt;</span>
 <span class="k">#hide</span>
 <span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">600</span>
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">150</span>
 <span class="k">#show</span>
-<span class="c1">&#39;Calculate internal forces at&#39;</span><span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">1</span><span class="p">}</span><span class="c1">&#39;m</span>
+<span class="c1">'Calculate internal forces at'</span><span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">1</span><span class="p">}</span><span class="c1">'m</span>
 <span class="k">#pre</span>
 
 <span class="k">#post</span>
-<span class="c1">&#39;Bending</span>
+<span class="c1">'Bending</span>
 <span class="nv">M</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nv">M</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="o">-</span><span class="nv">M</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">l</span><span class="p">}</span>
-<span class="nv">M</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">&#39;kN·m</span>
-<span class="c1">&#39;Shear</span>
+<span class="nv">M</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">'kN·m</span>
+<span class="c1">'Shear</span>
 <span class="nv">V</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">V</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">l</span><span class="p">}</span>
-<span class="nv">V</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">&#39;kN</span>
+<span class="nv">V</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">'kN</span>
 <span class="k">#show</span>
-<span class="c1">&#39;&lt;/div&gt;</span>
+<span class="c1">'&lt;/div&gt;</span>
 </code></pre></div>
 
 </figure>
@@ -3044,36 +3044,36 @@ The distributed-load variants cover a <a href="#uniformly-distributed-load">unif
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;div style=&quot;max-width:180mm;&quot;&gt;</span>
-<span class="c1">&#39;&lt;img style=&quot;width:165pt;&quot; alt=&quot;cantilever-beam-distributed-load-linear.png&quot; class=&quot;side&quot; src=&quot;../../Images/mechanics/beams/cantilever-beam-distributed-load-linear.png&quot;&gt;</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Input data&lt;/b&gt;&lt;/p&gt;</span>
-<span class="c1">&#39;Beam Length -&#39;</span><span class="nv">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">&#39;m</span>
-<span class="c1">&#39;Load -&#39;</span><span class="nv">q_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">10</span><span class="p">}</span><span class="c1">&#39;kN/m,&#39;</span><span class="nv">q_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">&#39;kN/m</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;div style="max-width:180mm;"&gt;</span>
+<span class="c1">'&lt;img style="width:165pt;" alt="cantilever-beam-distributed-load-linear.png" class="side" src="../../Images/mechanics/beams/cantilever-beam-distributed-load-linear.png"&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Input data&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'Beam Length -'</span><span class="nv">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">'m</span>
+<span class="c1">'Load -'</span><span class="nv">q_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">10</span><span class="p">}</span><span class="c1">'kN/m,'</span><span class="nv">q_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">'kN/m</span>
 <span class="k">#post</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Internal forces&lt;/b&gt;&lt;/p&gt;</span>
-<span class="c1">&#39;Bending -&#39;</span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">l</span><span class="o">^</span><span class="m">2</span><span class="o">*</span><span class="p">(</span><span class="nv">q_1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">q_2</span><span class="p">)</span><span class="o">/</span><span class="m">6</span><span class="c1">&#39;kN·m</span>
-<span class="c1">&#39;Shear -&#39;</span><span class="nv">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">q_1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">q_2</span><span class="p">)</span><span class="o">*</span><span class="nv">l</span><span class="o">/</span><span class="m">2</span><span class="c1">&#39;kN</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Diagrams&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Internal forces&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'Bending -'</span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">l</span><span class="o">^</span><span class="m">2</span><span class="o">*</span><span class="p">(</span><span class="nv">q_1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">q_2</span><span class="p">)</span><span class="o">/</span><span class="m">6</span><span class="c1">'kN·m</span>
+<span class="c1">'Shear -'</span><span class="nv">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">q_1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">q_2</span><span class="p">)</span><span class="o">*</span><span class="nv">l</span><span class="o">/</span><span class="m">2</span><span class="c1">'kN</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Diagrams&lt;/b&gt;&lt;/p&gt;</span>
 <span class="k">#hide</span>
 <span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">600</span>
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">150</span>
 <span class="k">#show</span>
-<span class="c1">&#39;Calculate internal forces at&#39;</span><span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">1</span><span class="p">}</span><span class="c1">&#39;m</span>
+<span class="c1">'Calculate internal forces at'</span><span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">1</span><span class="p">}</span><span class="c1">'m</span>
 <span class="k">#pre</span>
 
 
 <span class="k">#post</span>
 <span class="nv">q</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">q_1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nv">q_2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">q_1</span><span class="p">)</span><span class="o">*</span><span class="nv">x</span><span class="o">/</span><span class="nv">l</span>
-<span class="c1">&#39;Bending</span>
+<span class="c1">'Bending</span>
 <span class="nv">M</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nv">M</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">V</span><span class="o">*</span><span class="nv">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="m">2</span><span class="o">*</span><span class="nv">q_1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">q</span><span class="p">(</span><span class="nv">x</span><span class="p">))</span><span class="o">*</span><span class="nv">x</span><span class="o">^</span><span class="m">2</span><span class="o">/</span><span class="m">6</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="o">-</span><span class="nv">M</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">l</span><span class="p">}</span>
-<span class="nv">M</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">&#39;kN·m</span>
-<span class="c1">&#39;Shear</span>
+<span class="nv">M</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">'kN·m</span>
+<span class="c1">'Shear</span>
 <span class="nv">V</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">V</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="nv">q_1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">q</span><span class="p">(</span><span class="nv">x</span><span class="p">))</span><span class="o">*</span><span class="nv">x</span><span class="o">/</span><span class="m">2</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">V</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">l</span><span class="p">}</span>
-<span class="nv">V</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">&#39;kN</span>
+<span class="nv">V</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">'kN</span>
 <span class="k">#show</span>
-<span class="c1">&#39;&lt;/div&gt;</span>
+<span class="c1">'&lt;/div&gt;</span>
 </code></pre></div>
 
 </figure>
@@ -3109,35 +3109,35 @@ The distributed-load variants cover a <a href="#uniformly-distributed-load">unif
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;div style=&quot;max-width:180mm;&quot;&gt;</span>
-<span class="c1">&#39;&lt;img style=&quot;width:165pt;&quot; alt=&quot;cantilever-beam-distributed-load-partial.png&quot; class=&quot;side&quot; src=&quot;../../Images/mechanics/beams/cantilever-beam-distributed-load-partial.png&quot;&gt;</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Input data&lt;/b&gt;&lt;/p&gt;</span>
-<span class="c1">&#39;Beam Length -&#39;</span><span class="nv">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">&#39;m</span>
-<span class="c1">&#39;Load -&#39;</span><span class="nv">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">&#39;kN/m</span>
-<span class="c1">&#39;Distances -&#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">3</span><span class="p">}</span><span class="c1">&#39;m,&#39;</span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">l</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">b</span><span class="c1">&#39;m</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;div style="max-width:180mm;"&gt;</span>
+<span class="c1">'&lt;img style="width:165pt;" alt="cantilever-beam-distributed-load-partial.png" class="side" src="../../Images/mechanics/beams/cantilever-beam-distributed-load-partial.png"&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Input data&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'Beam Length -'</span><span class="nv">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">'m</span>
+<span class="c1">'Load -'</span><span class="nv">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">'kN/m</span>
+<span class="c1">'Distances -'</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">3</span><span class="p">}</span><span class="c1">'m,'</span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">l</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">b</span><span class="c1">'m</span>
 <span class="k">#post</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Internal forces&lt;/b&gt;&lt;/p&gt;</span>
-<span class="c1">&#39;Bending -&#39;</span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">q</span><span class="o">*</span><span class="nv">b</span><span class="o">*</span><span class="p">(</span><span class="nv">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b</span><span class="o">/</span><span class="m">2</span><span class="p">)</span><span class="c1">&#39;kN·m</span>
-<span class="c1">&#39;Shear -&#39;</span><span class="nv">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">q</span><span class="o">*</span><span class="nv">b</span><span class="c1">&#39;kN</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Diagrams&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Internal forces&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'Bending -'</span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">q</span><span class="o">*</span><span class="nv">b</span><span class="o">*</span><span class="p">(</span><span class="nv">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b</span><span class="o">/</span><span class="m">2</span><span class="p">)</span><span class="c1">'kN·m</span>
+<span class="c1">'Shear -'</span><span class="nv">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">q</span><span class="o">*</span><span class="nv">b</span><span class="c1">'kN</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Diagrams&lt;/b&gt;&lt;/p&gt;</span>
 <span class="k">#hide</span>
 <span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">600</span>
 <span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">150</span>
 <span class="k">#show</span>
-<span class="c1">&#39;Calculate internal forces at&#39;</span><span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">1</span><span class="p">}</span><span class="c1">&#39;m</span>
+<span class="c1">'Calculate internal forces at'</span><span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">1</span><span class="p">}</span><span class="c1">'m</span>
 <span class="k">#pre</span>
 
 <span class="k">#post</span>
-<span class="c1">&#39;Bending</span>
+<span class="c1">'Bending</span>
 <span class="nv">M</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nv">M</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">V</span><span class="o">*</span><span class="nv">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">q</span><span class="o">*</span><span class="p">(</span><span class="nv">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span><span class="o">^</span><span class="m">2</span><span class="o">/</span><span class="m">2</span><span class="o">*</span><span class="p">(</span><span class="nv">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="o">-</span><span class="nv">M</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">l</span><span class="p">}</span>
-<span class="nv">M</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">&#39;kN·m</span>
-<span class="c1">&#39;Shear</span>
+<span class="nv">M</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">'kN·m</span>
+<span class="c1">'Shear</span>
 <span class="nv">V</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">V</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">q</span><span class="o">*</span><span class="p">(</span><span class="nv">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="nv">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nv">a</span><span class="p">)</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">V</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">l</span><span class="p">}</span>
-<span class="nv">V</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">&#39;kN</span>
+<span class="nv">V</span><span class="p">(</span><span class="nv">x_1</span><span class="p">)</span><span class="c1">'kN</span>
 <span class="k">#show</span>
-<span class="c1">&#39;&lt;/div&gt;</span>
+<span class="c1">'&lt;/div&gt;</span>
 </code></pre></div>
 
 </figure>
@@ -3172,12 +3172,12 @@ The distributed-load variants cover a <a href="#uniformly-distributed-load">unif
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;img style=&quot;width:165pt;&quot; alt=&quot;cantilever-beam-distributed-load-uniform.png&quot; class=&quot;side&quot; src=&quot;../../Images/mechanics/beams/cantilever-beam-distributed-load-uniform.png&quot;&gt;</span>
-<span class="c1">&#39;Beam Length - &#39;</span><span class="nv">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w">  </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">&#39;m</span>
-<span class="c1">&#39;Load- &#39;</span><span class="nv">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w">  </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">&#39;kN/m</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Internal forces&lt;/b&gt;&lt;/p&gt;</span>
-<span class="c1">&#39;Bending - &#39;</span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">q</span><span class="o">*</span><span class="nv">l</span><span class="o">^</span><span class="m">2</span><span class="o">/</span><span class="m">2</span><span class="c1">&#39;kN·m</span>
-<span class="c1">&#39;Shear  - &#39;</span><span class="nv">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">q</span><span class="o">*</span><span class="nv">l</span><span class="c1">&#39;kN</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;img style="width:165pt;" alt="cantilever-beam-distributed-load-uniform.png" class="side" src="../../Images/mechanics/beams/cantilever-beam-distributed-load-uniform.png"&gt;</span>
+<span class="c1">'Beam Length - '</span><span class="nv">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w">  </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">'m</span>
+<span class="c1">'Load- '</span><span class="nv">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w">  </span><span class="p">{</span><span class="m">5</span><span class="p">}</span><span class="c1">'kN/m</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Internal forces&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'Bending - '</span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">q</span><span class="o">*</span><span class="nv">l</span><span class="o">^</span><span class="m">2</span><span class="o">/</span><span class="m">2</span><span class="c1">'kN·m</span>
+<span class="c1">'Shear  - '</span><span class="nv">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">q</span><span class="o">*</span><span class="nv">l</span><span class="c1">'kN</span>
 </code></pre></div>
 
 </figure>

@@ -2970,7 +2970,7 @@ If the line doesn't have a metadata comment yet, one is created for you; if it d
 Only the fields that make sense for the line are shown — use <strong>Add field</strong> if you want one that's hidden.</p>
 <h2 id="what-they-look-like">What they look like<a class="headerlink" href="#what-they-look-like" title="Permanent link">&para;</a></h2>
 <p>A metadata comment is a normal CalcpadCE comment (it starts with <code>'</code> or <code>"</code>) with an HTML comment storing a JSON string <code>&lt;!--{ … }--&gt;</code>:</p>
-<div class="language-text highlight"><pre><span></span><code>&#39;&lt;!--{&quot;desc&quot;: &quot;Cross-sectional area&quot;}--&gt;
+<div class="language-text highlight"><pre><span></span><code>'&lt;!--{"desc": "Cross-sectional area"}--&gt;
 A(b; h) = b·h
 </code></pre></div>
 <p>Because it's an HTML comment, none of it appears in the HTML output.</p>
@@ -3009,13 +3009,13 @@ A(b; h) = b·h
 </tr>
 </tbody>
 </table>
-<div class="language-text highlight"><pre><span></span><code>&#39;&lt;!--{&quot;desc&quot;: &quot;Second moment of area of a rectangle&quot;, &quot;paramTypes&quot;: [&quot;value&quot;, &quot;value&quot;], &quot;paramDesc&quot;: [&quot;width&quot;, &quot;height&quot;], &quot;returnType&quot;: &quot;value&quot;}--&gt;
+<div class="language-text highlight"><pre><span></span><code>'&lt;!--{"desc": "Second moment of area of a rectangle", "paramTypes": ["value", "value"], "paramDesc": ["width", "height"], "returnType": "value"}--&gt;
 I(b; h) = b·h³/12
 </code></pre></div>
 <p>Filling in parameter and return types also helps the <a href="new-linter.html">linter</a> catch places where the function is called with the wrong kind of value.</p>
 <h2 id="document-settings">Document settings<a class="headerlink" href="#document-settings" title="Permanent link">&para;</a></h2>
 <p>You can pin settings — decimals, angle units, and so on — to a document so it always renders the same way, no matter how the app is configured. Use the <code>#settings</code> directive with a JSON object:</p>
-<div class="language-text highlight"><pre><span></span><code>#settings {&quot;decimals&quot;: 2, &quot;degrees&quot;: 1, &quot;units&quot;: &quot;cm&quot;}
+<div class="language-text highlight"><pre><span></span><code>#settings {"decimals": 2, "degrees": 1, "units": "cm"}
 </code></pre></div>
 <p>Unlike the other properties on this tab, <code>#settings</code> is a real Calcpad directive, not a metadata comment — the engine reads it while calculating. It applies to <strong>every line after it</strong>, so you can change settings partway through a document by adding another <code>#settings</code> directive. If you keep one near the top, it configures the whole file; the <strong>Properties</strong> tab writes it there for you. The settings you can set are the same ones on the <a href="new-calcpad-panel-and-settings.md#settings">Settings tab</a>:</p>
 <table>
@@ -3085,16 +3085,16 @@ Anything the app doesn't recognize is ignored.</p>
 <h2 id="quieting-the-linter">Quieting the linter<a class="headerlink" href="#quieting-the-linter" title="Permanent link">&para;</a></h2>
 <p>If the <a href="new-linter.html">linter</a> flags something that isn't actually a problem, you can silence it for a stretch of the document.
 Wrap those lines between a <code>LintIgnore</code> and an <code>EndLintIgnore</code> marker, listing the warning codes to hide (or leave the list empty to hide/unhide everything):</p>
-<div class="language-text highlight"><pre><span></span><code>&#39;&lt;!--{&quot;LintIgnore&quot;: [&quot;CPD-3301&quot;]}--&gt;
+<div class="language-text highlight"><pre><span></span><code>'&lt;!--{"LintIgnore": ["CPD-3301"]}--&gt;
 prototype_var = 5
-&#39;&lt;!--{&quot;EndLintIgnore&quot;: []}--&gt;
+'&lt;!--{"EndLintIgnore": []}--&gt;
 </code></pre></div>
 <p>The <strong>Properties</strong> tab has a picker for the codes, so you don't have to memorize them. See <a href="new-linter.html">Suppressing diagnostics</a> for the details.</p>
 <h2 id="leaving-sections-out-of-the-pdf">Leaving sections out of the PDF<a class="headerlink" href="#leaving-sections-out-of-the-pdf" title="Permanent link">&para;</a></h2>
 <p>To keep something on screen but off the printed page — debug numbers, notes to yourself — wrap it between <code>NoPrintStart</code> and <code>NoPrintEnd</code> markers:</p>
-<div class="language-text highlight"><pre><span></span><code>&#39;&lt;!--{&quot;NoPrintStart&quot;: true}--&gt;
+<div class="language-text highlight"><pre><span></span><code>'&lt;!--{"NoPrintStart": true}--&gt;
 debug_x = 5
-&#39;&lt;!--{&quot;NoPrintEnd&quot;: true}--&gt;
+'&lt;!--{"NoPrintEnd": true}--&gt;
 </code></pre></div>
 <p>The section still shows in the preview but is dropped from the PDF.
 See <a href="new-pdf-export.html">Excluding sections from the PDF</a> for more detail.</p>

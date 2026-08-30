@@ -2963,20 +2963,20 @@ Drawings, plots and 3D models are generated from the same inputs as the calculat
 <figure>
 <figcaption>Code:</figcaption>
 <div class="highlight"><pre><span></span><code><span class="k">#val</span>
-<span class="c1">&#39;&lt;script src=&quot;https://code.jquery.com/jquery-3.6.3.min.js&quot;&gt;&lt;/script&gt;</span>
+<span class="c1">'&lt;script src="https://code.jquery.com/jquery-3.6.3.min.js"&gt;&lt;/script&gt;</span>
 <span class="k">#equ</span>
-<span class="c1">&#39;&lt;!-- Animate a parametric CalcpadCE plot frame by frame: a `#for` loop emits one hidden `&lt;div&gt;` per frame, and a tiny `setInterval` script cycles through them in the browser.</span>
-<span class="c1">&#39;The same pattern works for any time- or parameter-dependent function. --&gt;</span>
-<span class="c1">&#39;&lt;!--&#39;</span><span class="nv">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">100</span><span class="c1">&#39;,&#39;</span><span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span><span class="c1">&#39;,&#39;</span><span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">350</span><span class="c1">&#39;,&#39;</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">4</span><span class="c1">&#39;,&#39;</span><span class="nv">PlotSVG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">&#39;,&#39;</span><span class="nv">PlotAdaptive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="c1">&#39;--&gt;</span>
+<span class="c1">'&lt;!-- Animate a parametric CalcpadCE plot frame by frame: a `#for` loop emits one hidden `&lt;div&gt;` per frame, and a tiny `setInterval` script cycles through them in the browser.</span>
+<span class="c1">'The same pattern works for any time- or parameter-dependent function. --&gt;</span>
+<span class="c1">'&lt;!--'</span><span class="nv">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">100</span><span class="c1">','</span><span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span><span class="c1">','</span><span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">350</span><span class="c1">','</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">4</span><span class="c1">','</span><span class="nv">PlotSVG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">','</span><span class="nv">PlotAdaptive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="c1">'--&gt;</span>
 <span class="nv">f</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">root</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="o">^</span><span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1.1</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="nv">k</span><span class="o">*</span><span class="nv">x</span><span class="p">)</span><span class="o">*</span><span class="nb">sqrt</span><span class="p">(</span><span class="m">4</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">x</span><span class="o">^</span><span class="m">2</span><span class="p">)</span>
 <span class="k">#val</span>
 <span class="k">#rad</span>
 <span class="k">#for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">n</span>
-<span class="w">     </span><span class="c1">&#39;&lt;div class=&quot;frame&quot; id=&quot;frame-&#39;</span><span class="nv">i</span><span class="c1">&#39;&quot;&gt;</span>
+<span class="w">     </span><span class="c1">'&lt;div class="frame" id="frame-'</span><span class="nv">i</span><span class="c1">'"&gt;</span>
 <span class="w">    </span><span class="nd">$Plot</span><span class="p">{</span><span class="nv">f</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">2</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="p">}</span>
-<span class="w">    </span><span class="c1">&#39;&lt;/div&gt;&lt;!--&#39;</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="c1">&#39;--&gt;</span>
+<span class="w">    </span><span class="c1">'&lt;/div&gt;&lt;!--'</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="c1">'--&gt;</span>
 <span class="k">#loop</span>
-<span class="c1">&#39;&lt;script&gt;var i = 1;setInterval(function(){++i; if(i&gt;&#39;</span><span class="nv">n</span><span class="c1">&#39;) i=1; $(&quot;.frame&quot;).hide(); $(&quot;#frame-&quot;+i).show();}, 100);&lt;/script&gt;</span>
+<span class="c1">'&lt;script&gt;var i = 1;setInterval(function(){++i; if(i&gt;'</span><span class="nv">n</span><span class="c1">') i=1; $(".frame").hide(); $("#frame-"+i).show();}, 100);&lt;/script&gt;</span>
 </code></pre></div>
 
 </figure>
@@ -9539,13 +9539,13 @@ Use this as the starting template for any publication-quality plot.</p>
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;Functions</span>
-<span class="nv">f_1</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">&#39;; &#39;</span><span class="nv">f_2</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="c1">&#39;; &#39;</span><span class="nv">f_3</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">x</span>
-<span class="nv">f_4</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">x</span><span class="c1">&#39;; &#39;</span><span class="nv">f_5</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">x</span><span class="c1">&#39;; &#39;</span><span class="nv">f_6</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">2</span>
-<span class="c1">&#39;Points</span>
-<span class="nv">x_7</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">&#39;, &#39;</span><span class="nv">y_7</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="c1">&#39;; &#39;</span><span class="nv">x_8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">&#39;, &#39;</span><span class="nv">y_8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1.5</span><span class="c1">&#39;;</span>
-<span class="nv">x_9</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">&#39;, &#39;</span><span class="nv">y_9</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">0.5</span><span class="c1">&#39;; &#39;</span><span class="nv">x_10</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">&#39;, &#39;</span><span class="nv">y_10</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">1.5</span><span class="c1">&#39;;</span>
-<span class="c1">&#39;Interval:&#39;</span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="c1">&#39;,&#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'Functions</span>
+<span class="nv">f_1</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">'; '</span><span class="nv">f_2</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="c1">'; '</span><span class="nv">f_3</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">x</span>
+<span class="nv">f_4</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">x</span><span class="c1">'; '</span><span class="nv">f_5</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">x</span><span class="c1">'; '</span><span class="nv">f_6</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">2</span>
+<span class="c1">'Points</span>
+<span class="nv">x_7</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">', '</span><span class="nv">y_7</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="c1">'; '</span><span class="nv">x_8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">', '</span><span class="nv">y_8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1.5</span><span class="c1">';</span>
+<span class="nv">x_9</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">', '</span><span class="nv">y_9</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">0.5</span><span class="c1">'; '</span><span class="nv">x_10</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">', '</span><span class="nv">y_10</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">1.5</span><span class="c1">';</span>
+<span class="c1">'Interval:'</span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="c1">','</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span>
 <span class="k">#def</span><span class="w"> </span><span class="nv">title$</span><span class="w"> </span><span class="o">=</span> Plot Title
 <span class="k">#def</span><span class="w"> </span><span class="nv">series$</span><span class="w"> </span><span class="o">=</span> f_1(x) &amp; f_2(x) &amp; x|f_3(x) &amp; x|f_4(x) &amp; x|f_5(x) &amp; x|f_6(x) &amp; x_7|y_7 &amp; x_8|y_8 &amp; x_9|y_9 &amp; x_10|y_10
 <span class="k">#def</span><span class="w"> </span><span class="nv">labelX$</span><span class="w"> </span><span class="o">=</span> Label X
@@ -9560,25 +9560,25 @@ Use this as the starting template for any publication-quality plot.</p>
 <span class="k">#def</span><span class="w"> </span><span class="nv">chart8$</span><span class="w"> </span><span class="o">=</span> Point 8
 <span class="k">#def</span><span class="w"> </span><span class="nv">chart9$</span><span class="w"> </span><span class="o">=</span> Point 9
 <span class="k">#def</span><span class="w"> </span><span class="nv">chart10$</span><span class="w"> </span><span class="o">=</span> Point 10
-<span class="c1">&#39;&lt;div style=&quot;width:360pt;&quot;&gt;</span>
+<span class="c1">'&lt;div style="width:360pt;"&gt;</span>
 <span class="k">#hide</span>
-<span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span><span class="c1">&#39;,&#39;</span><span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">200</span><span class="c1">&#39;,&#39;</span><span class="nv">PlotSVG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span>
+<span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span><span class="c1">','</span><span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">200</span><span class="c1">','</span><span class="nv">PlotSVG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span>
 <span class="k">#show</span>
-<span class="c1">&#39;&lt;p&gt;&lt;small style=&quot;float:left; position:relative; top:10pt;&quot;&gt;labelY$&lt;/small&gt;&lt;center&gt;&lt;strong&gt;title$&lt;/strong&gt;&lt;/center&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;small style="float:left; position:relative; top:10pt;"&gt;labelY$&lt;/small&gt;&lt;center&gt;&lt;strong&gt;title$&lt;/strong&gt;&lt;/center&gt;</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">series</span>$<span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">b</span><span class="p">}</span>
-<span class="c1">&#39;&lt;small style=&quot;float:right;position:relative; top:-10pt;&quot;&gt;labelX$&lt;/small&gt;</span>
-<span class="c1">&#39;&lt;b&gt;Legend:&lt;/b&gt;</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b style=&quot;color:Tomato&quot;&gt;━━━&lt;/b&gt; chart1$ &amp;ensp;</span>
-<span class="c1">&#39;&lt;b style=&quot;color:YellowGreen&quot;&gt;━━━&lt;/b&gt; chart2$ &amp;ensp;</span>
-<span class="c1">&#39;&lt;b style=&quot;color:CornflowerBlue&quot;&gt;━━━&lt;/b&gt; chart3$ &amp;ensp;</span>
-<span class="c1">&#39;&lt;b style=&quot;color:Gold&quot;&gt;━━━&lt;/b&gt; chart4$ &amp;ensp;</span>
-<span class="c1">&#39;&lt;b style=&quot;color:MediumVioletRed&quot;&gt;━━━&lt;/b&gt; chart5$ &amp;ensp;</span>
-<span class="c1">&#39;&lt;b style=&quot;color:MediumSpringGreen&quot;&gt;━━━&lt;/b&gt; chart6$</span>
-<span class="c1">&#39;&lt;br/&gt;&amp;ensp;&lt;b style=&quot;color:BlueViolet&quot;&gt;●&lt;/b&gt; chart7$ &amp;ensp;&amp;ensp;</span>
-<span class="c1">&#39;&lt;b style=&quot;color:LightSalmon&quot;&gt;●&lt;/b&gt; chart8$ &amp;ensp;&amp;ensp;</span>
-<span class="c1">&#39;&lt;b style=&quot;color:DeepPink&quot;&gt;●&lt;/b&gt; chart9$ &amp;ensp;&amp;ensp;</span>
-<span class="c1">&#39;&lt;b style=&quot;color:DarkTurquoise&quot;&gt;●&lt;/b&gt; chart10$&lt;/p&gt;</span>
-<span class="c1">&#39;&lt;/div&gt;</span>
+<span class="c1">'&lt;small style="float:right;position:relative; top:-10pt;"&gt;labelX$&lt;/small&gt;</span>
+<span class="c1">'&lt;b&gt;Legend:&lt;/b&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b style="color:Tomato"&gt;━━━&lt;/b&gt; chart1$ &amp;ensp;</span>
+<span class="c1">'&lt;b style="color:YellowGreen"&gt;━━━&lt;/b&gt; chart2$ &amp;ensp;</span>
+<span class="c1">'&lt;b style="color:CornflowerBlue"&gt;━━━&lt;/b&gt; chart3$ &amp;ensp;</span>
+<span class="c1">'&lt;b style="color:Gold"&gt;━━━&lt;/b&gt; chart4$ &amp;ensp;</span>
+<span class="c1">'&lt;b style="color:MediumVioletRed"&gt;━━━&lt;/b&gt; chart5$ &amp;ensp;</span>
+<span class="c1">'&lt;b style="color:MediumSpringGreen"&gt;━━━&lt;/b&gt; chart6$</span>
+<span class="c1">'&lt;br/&gt;&amp;ensp;&lt;b style="color:BlueViolet"&gt;●&lt;/b&gt; chart7$ &amp;ensp;&amp;ensp;</span>
+<span class="c1">'&lt;b style="color:LightSalmon"&gt;●&lt;/b&gt; chart8$ &amp;ensp;&amp;ensp;</span>
+<span class="c1">'&lt;b style="color:DeepPink"&gt;●&lt;/b&gt; chart9$ &amp;ensp;&amp;ensp;</span>
+<span class="c1">'&lt;b style="color:DarkTurquoise"&gt;●&lt;/b&gt; chart10$&lt;/p&gt;</span>
+<span class="c1">'&lt;/div&gt;</span>
 </code></pre></div>
 
 </figure>
@@ -9732,80 +9732,80 @@ Copy the code into the Desktop application to change the parameters in real-time
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;script type=&quot;module&quot; src=&quot;https://ajax.googleapis.com/ajax/libs/model-viewer/3.0.1/model-viewer.min.js&quot;&gt;&lt;/script&gt;</span>
-<span class="c1">&#39;&lt;model-viewer style=&quot;height:280pt;&quot; class=&quot;side&quot; src=&quot;./Models/bolt_and_nut.glb&quot; alt=&quot;bolt_and_nut.glb&quot; auto-rotate camera-controls shadow-intensity=&quot;0.5&quot; field-of-view=&quot;8deg&quot;&gt;&lt;/model-viewer&gt;</span>
-<span class="c1">&#39;&lt;h4&gt;Loads (for one bolt)&lt;/h4&gt;</span>
-<span class="c1">&#39;Tension -&#39;</span><span class="nv">F_t_Ed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">20</span><span class="p">}</span><span class="c1">&#39;kN</span>
-<span class="c1">&#39;Shear -&#39;</span><span class="nv">F_v_Ed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">10</span><span class="p">}</span><span class="c1">&#39;kN</span>
-<span class="c1">&#39;&lt;h4&gt;Bolt data&lt;/h4&gt;</span>
-<span class="c1">&#39;&lt;p id=&quot;bolt&quot; style=&quot;display:none;&quot;&gt;&#39;</span><span class="nv">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">12</span><span class="p">}</span><span class="c1">&#39;&lt;/p&gt;</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.0.1/model-viewer.min.js"&gt;&lt;/script&gt;</span>
+<span class="c1">'&lt;model-viewer style="height:280pt;" class="side" src="./Models/bolt_and_nut.glb" alt="bolt_and_nut.glb" auto-rotate camera-controls shadow-intensity="0.5" field-of-view="8deg"&gt;&lt;/model-viewer&gt;</span>
+<span class="c1">'&lt;h4&gt;Loads (for one bolt)&lt;/h4&gt;</span>
+<span class="c1">'Tension -'</span><span class="nv">F_t_Ed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">20</span><span class="p">}</span><span class="c1">'kN</span>
+<span class="c1">'Shear -'</span><span class="nv">F_v_Ed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">10</span><span class="p">}</span><span class="c1">'kN</span>
+<span class="c1">'&lt;h4&gt;Bolt data&lt;/h4&gt;</span>
+<span class="c1">'&lt;p id="bolt" style="display:none;"&gt;'</span><span class="nv">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">12</span><span class="p">}</span><span class="c1">'&lt;/p&gt;</span>
 <span class="k">#pre</span>
-<span class="c1">&#39;&lt;p&gt;Bolt diameter - &lt;select data-target=&quot;bolt&quot;&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;12&quot;&gt;M12&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;14&quot;&gt;M14&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;16&quot;&gt;M16&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;18&quot;&gt;M18&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;20&quot;&gt;M20&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;22&quot;&gt;M22&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;24&quot;&gt;M24&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;27&quot;&gt;M27&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;30&quot;&gt;M30&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;36&quot;&gt;M36&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;/select&gt;&lt;/p&gt;</span>
+<span class="c1">'&lt;p&gt;Bolt diameter - &lt;select data-target="bolt"&gt;</span>
+<span class="c1">'&lt;option value="12"&gt;M12&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="14"&gt;M14&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="16"&gt;M16&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="18"&gt;M18&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="20"&gt;M20&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="22"&gt;M22&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="24"&gt;M24&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="27"&gt;M27&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="30"&gt;M30&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="36"&gt;M36&lt;/option&gt;</span>
+<span class="c1">'&lt;/select&gt;&lt;/p&gt;</span>
 <span class="k">#hide</span>
 <span class="k">#if</span><span class="w"> </span><span class="nv">d</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">12</span>
-<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">84</span><span class="c1">&#39;  &#39;</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">13</span><span class="c1">&#39; &#39;</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">20.5</span>
+<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">84</span><span class="c1">'  '</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">13</span><span class="c1">' '</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">20.5</span>
 <span class="k">#else if</span><span class="w"> </span><span class="nv">d</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">14</span>
-<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">115</span><span class="c1">&#39; &#39;</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">15</span><span class="c1">&#39; &#39;</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">23.5</span>
+<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">115</span><span class="c1">' '</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">15</span><span class="c1">' '</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">23.5</span>
 <span class="k">#else if</span><span class="w"> </span><span class="nv">d</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">16</span>
-<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">157</span><span class="c1">&#39; &#39;</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">18</span><span class="c1">&#39; &#39;</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">26</span>
+<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">157</span><span class="c1">' '</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">18</span><span class="c1">' '</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">26</span>
 <span class="k">#else if</span><span class="w"> </span><span class="nv">d</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">18</span>
-<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">192</span><span class="c1">&#39; &#39;</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">20</span><span class="c1">&#39; &#39;</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">29</span>
+<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">192</span><span class="c1">' '</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">20</span><span class="c1">' '</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">29</span>
 <span class="k">#else if</span><span class="w"> </span><span class="nv">d</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">20</span>
-<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">245</span><span class="c1">&#39; &#39;</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">22</span><span class="c1">&#39; &#39;</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">32</span>
+<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">245</span><span class="c1">' '</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">22</span><span class="c1">' '</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">32</span>
 <span class="k">#else if</span><span class="w"> </span><span class="nv">d</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">22</span>
-<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">303</span><span class="c1">&#39; &#39;</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">24</span><span class="c1">&#39; &#39;</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">35.5</span>
+<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">303</span><span class="c1">' '</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">24</span><span class="c1">' '</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">35.5</span>
 <span class="k">#else if</span><span class="w"> </span><span class="nv">d</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">24</span>
-<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">353</span><span class="c1">&#39; &#39;</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">26</span><span class="c1">&#39; &#39;</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">39</span>
+<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">353</span><span class="c1">' '</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">26</span><span class="c1">' '</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">39</span>
 <span class="k">#else if</span><span class="w"> </span><span class="nv">d</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">27</span>
-<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">459</span><span class="c1">&#39; &#39;</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="c1">&#39; &#39;</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">44</span>
+<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">459</span><span class="c1">' '</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="c1">' '</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">44</span>
 <span class="k">#else if</span><span class="w"> </span><span class="nv">d</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">30</span>
-<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">561</span><span class="c1">&#39; &#39;</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">33</span><span class="c1">&#39; &#39;</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">50</span>
+<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">561</span><span class="c1">' '</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">33</span><span class="c1">' '</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">50</span>
 <span class="k">#else if</span><span class="w"> </span><span class="nv">d</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">36</span>
-<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">817</span><span class="c1">&#39; &#39;</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">39</span><span class="c1">&#39; &#39;</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">60</span>
+<span class="w">    </span><span class="nv">A_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">817</span><span class="c1">' '</span><span class="nv">d_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">39</span><span class="c1">' '</span><span class="nv">d_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">60</span>
 <span class="k">#end if</span>
 <span class="k">#post</span>
-<span class="c1">&#39;Bolt diameter -&#39;</span><span class="nv">d</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;Hole diameter -&#39;</span><span class="nv">d_0</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;Punching diameter-&#39;</span><span class="nv">d_m</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;Area of the unthreaded part (gross) -&#39;</span><span class="nv">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">π</span><span class="o">*</span><span class="nv">d</span><span class="o">^</span><span class="m">2</span><span class="o">/</span><span class="m">4</span><span class="c1">&#39;mm²</span>
-<span class="c1">&#39;Area of the threaded part (net) -&#39;</span><span class="nv">A_s</span><span class="c1">&#39;mm²</span>
+<span class="c1">'Bolt diameter -'</span><span class="nv">d</span><span class="c1">'mm</span>
+<span class="c1">'Hole diameter -'</span><span class="nv">d_0</span><span class="c1">'mm</span>
+<span class="c1">'Punching diameter-'</span><span class="nv">d_m</span><span class="c1">'mm</span>
+<span class="c1">'Area of the unthreaded part (gross) -'</span><span class="nv">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">π</span><span class="o">*</span><span class="nv">d</span><span class="o">^</span><span class="m">2</span><span class="o">/</span><span class="m">4</span><span class="c1">'mm²</span>
+<span class="c1">'Area of the threaded part (net) -'</span><span class="nv">A_s</span><span class="c1">'mm²</span>
 <span class="k">#show</span>
-<span class="c1">&#39;&lt;p id=&quot;grade&quot; style=&quot;display:none;&quot;&gt;&#39;</span><span class="nv">Grade</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">10.9</span><span class="p">}</span><span class="c1">&#39;&lt;/p&gt;</span>
+<span class="c1">'&lt;p id="grade" style="display:none;"&gt;'</span><span class="nv">Grade</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">10.9</span><span class="p">}</span><span class="c1">'&lt;/p&gt;</span>
 <span class="k">#pre</span>
-<span class="c1">&#39;&lt;p&gt;Bolt steel grade - &lt;select data-target=&quot;grade&quot;&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;4.6&quot;&gt;4.6&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;4.8&quot;&gt;4.8&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;5.6&quot;&gt;5.6&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;5.8&quot;&gt;5.8&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;6.8&quot;&gt;6.8&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;8.8&quot;&gt;8.8&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;10.9&quot;&gt;10.9&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;/select&gt;&lt;/p&gt;</span>
+<span class="c1">'&lt;p&gt;Bolt steel grade - &lt;select data-target="grade"&gt;</span>
+<span class="c1">'&lt;option value="4.6"&gt;4.6&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="4.8"&gt;4.8&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="5.6"&gt;5.6&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="5.8"&gt;5.8&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="6.8"&gt;6.8&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="8.8"&gt;8.8&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="10.9"&gt;10.9&lt;/option&gt;</span>
+<span class="c1">'&lt;/select&gt;&lt;/p&gt;</span>
 <span class="k">#hide</span>
 <span class="nv">f_ub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">floor</span><span class="p">(</span><span class="nv">Grade</span><span class="p">)</span>
 <span class="nv">f_yb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">Grade</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">f_ub</span><span class="p">)</span><span class="o">*</span><span class="nv">f_ub</span><span class="o">*</span><span class="m">100</span>
 <span class="nv">f_ub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">f_ub</span><span class="o">*</span><span class="m">100</span>
 <span class="k">#post</span>
 <span class="k">#val</span>
-<span class="c1">&#39;Bolt steel grade - &#39;</span><span class="nv">Grade</span>
+<span class="c1">'Bolt steel grade - '</span><span class="nv">Grade</span>
 <span class="k">#equ</span>
-<span class="c1">&#39;Bolt tensile strength -&#39;</span><span class="nv">f_ub</span><span class="c1">&#39;MPa</span>
-<span class="c1">&#39;Bolt yield strength -&#39;</span><span class="nv">f_yb</span><span class="c1">&#39;MPa</span>
+<span class="c1">'Bolt tensile strength -'</span><span class="nv">f_ub</span><span class="c1">'MPa</span>
+<span class="c1">'Bolt yield strength -'</span><span class="nv">f_yb</span><span class="c1">'MPa</span>
 <span class="k">#show</span>
-<span class="c1">&#39;&lt;h4&gt;Plate data&lt;/h4&gt;</span>
-<span class="c1">&#39;Plate thickness - &#39;</span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">18</span><span class="p">}</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;Steel yield strength - &#39;</span><span class="nv">f_y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">355</span><span class="p">}</span><span class="c1">&#39;MPa</span>
+<span class="c1">'&lt;h4&gt;Plate data&lt;/h4&gt;</span>
+<span class="c1">'Plate thickness - '</span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">18</span><span class="p">}</span><span class="c1">'mm</span>
+<span class="c1">'Steel yield strength - '</span><span class="nv">f_y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">355</span><span class="p">}</span><span class="c1">'MPa</span>
 <span class="k">#hide</span>
 <span class="k">#if</span><span class="w"> </span><span class="nv">f_y</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">235</span>
 <span class="w">    </span><span class="nv">f_u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">360</span>
@@ -9819,9 +9819,9 @@ Copy the code into the Desktop application to change the parameters in real-time
 <span class="w">    </span><span class="nv">f_u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">540</span>
 <span class="k">#end if</span>
 <span class="k">#show</span>
-<span class="c1">&#39;Steel tensile strength - &#39;</span><span class="nv">f_u</span><span class="c1">&#39;MPa</span>
-<span class="c1">&#39;Partial safety factors</span>
-<span class="nv">γ_M0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1.05</span><span class="c1">&#39;, &#39;</span><span class="nv">γ_M2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1.25</span>
+<span class="c1">'Steel tensile strength - '</span><span class="nv">f_u</span><span class="c1">'MPa</span>
+<span class="c1">'Partial safety factors</span>
+<span class="nv">γ_M0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1.05</span><span class="c1">', '</span><span class="nv">γ_M2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1.25</span>
 </code></pre></div>
 
 </figure>
@@ -9888,45 +9888,45 @@ Use this when you need pan, zoom, hover read-outs, or surface shading beyond the
 <span class="nv">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">100</span>
 <span class="nv">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">matrix</span><span class="p">(</span><span class="nv">n</span><span class="p">;</span><span class="w"> </span><span class="nv">n</span><span class="p">)</span>
 <span class="nd">$Repeat</span><span class="p">{</span><span class="nd">$Repeat</span><span class="p">{</span><span class="nv">A</span><span class="p">.(</span><span class="nv">i</span><span class="p">;</span><span class="w"> </span><span class="nv">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="nv">π</span><span class="o">*</span><span class="p">(</span><span class="m">2</span><span class="o">*</span><span class="nv">i</span><span class="o">/</span><span class="nv">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">))</span><span class="o">^</span><span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="nv">π</span><span class="o">*</span><span class="p">(</span><span class="m">3</span><span class="o">*</span><span class="nv">j</span><span class="o">/</span><span class="nv">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">i</span><span class="o">/</span><span class="nv">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">j</span><span class="o">/</span><span class="nv">n</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">n</span><span class="p">}</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">n</span><span class="p">}</span>
-<span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span><span class="c1">&#39;,&#39;</span><span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span>
+<span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span><span class="c1">','</span><span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span>
 <span class="nd">$Map</span><span class="p">{</span><span class="nb">spline</span><span class="p">(</span><span class="nv">i</span><span class="p">;</span><span class="w"> </span><span class="nv">j</span><span class="p">;</span><span class="w"> </span><span class="nv">A</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">&amp;</span><span class="w"> </span><span class="nv">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">}</span>
 <span class="k">#show</span>
 <span class="k">#val</span>
-<span class="c1">&#39;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js&quot;&gt;&lt;/script&gt;</span>
-<span class="c1">&#39;&lt;script src=&quot;https://cdn.plot.ly/plotly-2.26.0.min.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;</span>
-<span class="c1">&#39;&lt;div id=&quot;plotly-chart&quot;&gt;&lt;/div&gt;</span>
-<span class="c1">&#39;&lt;script&gt;</span>
-<span class="c1">&#39;var z_data=&#39;</span><span class="nv">A</span><span class="c1">&#39;;</span>
-<span class="c1">&#39;var data = [{</span>
-<span class="c1">&#39;  z: z_data,</span>
-<span class="c1">&#39;  type: &quot;surface&quot;,</span>
-<span class="c1">&#39;  colorscale: &quot;YlGnBu&quot;,</span>
-<span class="c1">&#39;  contours: {</span>
-<span class="c1">&#39;    z: {</span>
-<span class="c1">&#39;      show:true,</span>
-<span class="c1">&#39;      usecolormap:true,</span>
-<span class="c1">&#39;      highlightcolor:&quot;red&quot;,</span>
-<span class="c1">&#39;      project:{z: true}</span>
-<span class="c1">&#39;    }</span>
-<span class="c1">&#39;  }</span>
-<span class="c1">&#39;}];</span>
-<span class="c1">&#39;</span>
-<span class="c1">&#39;var layout = {</span>
-<span class="c1">&#39;  title: {</span>
-<span class="c1">&#39;    text: &quot;Plotly&quot;</span>
-<span class="c1">&#39;  },</span>
-<span class="c1">&#39;  scene: {camera: {eye: {x: 1.5, y: -1.5, z: 1.0}}, aspectmode: &quot;manual&quot;, aspectratio: { x: 1, y: 1, z: 0.5}},</span>
-<span class="c1">&#39;  width: 600,</span>
-<span class="c1">&#39;  height: 600,</span>
-<span class="c1">&#39;  margin: {</span>
-<span class="c1">&#39;    l: 50,</span>
-<span class="c1">&#39;    r: 50,</span>
-<span class="c1">&#39;    b: 50,</span>
-<span class="c1">&#39;    t: 50,</span>
-<span class="c1">&#39;  }</span>
-<span class="c1">&#39;};</span>
-<span class="c1">&#39;Plotly.newPlot(&quot;plotly-chart&quot;, data, layout);</span>
-<span class="c1">&#39;&lt;/script&gt;</span>
+<span class="c1">'&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"&gt;&lt;/script&gt;</span>
+<span class="c1">'&lt;script src="https://cdn.plot.ly/plotly-2.26.0.min.js" charset="utf-8"&gt;&lt;/script&gt;</span>
+<span class="c1">'&lt;div id="plotly-chart"&gt;&lt;/div&gt;</span>
+<span class="c1">'&lt;script&gt;</span>
+<span class="c1">'var z_data='</span><span class="nv">A</span><span class="c1">';</span>
+<span class="c1">'var data = [{</span>
+<span class="c1">'  z: z_data,</span>
+<span class="c1">'  type: "surface",</span>
+<span class="c1">'  colorscale: "YlGnBu",</span>
+<span class="c1">'  contours: {</span>
+<span class="c1">'    z: {</span>
+<span class="c1">'      show:true,</span>
+<span class="c1">'      usecolormap:true,</span>
+<span class="c1">'      highlightcolor:"red",</span>
+<span class="c1">'      project:{z: true}</span>
+<span class="c1">'    }</span>
+<span class="c1">'  }</span>
+<span class="c1">'}];</span>
+<span class="c1">'</span>
+<span class="c1">'var layout = {</span>
+<span class="c1">'  title: {</span>
+<span class="c1">'    text: "Plotly"</span>
+<span class="c1">'  },</span>
+<span class="c1">'  scene: {camera: {eye: {x: 1.5, y: -1.5, z: 1.0}}, aspectmode: "manual", aspectratio: { x: 1, y: 1, z: 0.5}},</span>
+<span class="c1">'  width: 600,</span>
+<span class="c1">'  height: 600,</span>
+<span class="c1">'  margin: {</span>
+<span class="c1">'    l: 50,</span>
+<span class="c1">'    r: 50,</span>
+<span class="c1">'    b: 50,</span>
+<span class="c1">'    t: 50,</span>
+<span class="c1">'  }</span>
+<span class="c1">'};</span>
+<span class="c1">'Plotly.newPlot("plotly-chart", data, layout);</span>
+<span class="c1">'&lt;/script&gt;</span>
 </code></pre></div>
 
 </figure>
@@ -9944,85 +9944,85 @@ Change the geometry inputs and the WebGL view, the calculations, and the report 
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;Beam length -&#39;</span><span class="nv">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6</span><span class="na">m</span>
-<span class="c1">&#39;Web width -&#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.25</span><span class="na">m</span><span class="c1">&#39;, height -&#39;</span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.8</span><span class="na">m</span>
-<span class="c1">&#39;Flange width -&#39;</span><span class="nv">b_f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1.0</span><span class="na">m</span><span class="c1">&#39;, height -&#39;</span><span class="nv">h_f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.14</span><span class="na">m</span>
-<span class="c1">&#39;Rebar diameter -&#39;</span><span class="nv">Ø</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">22</span><span class="na">mm</span><span class="p">|</span><span class="nv">m</span><span class="c1">&#39;, Concrete cover -&#39;</span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="na">cm</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'Beam length -'</span><span class="nv">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6</span><span class="na">m</span>
+<span class="c1">'Web width -'</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.25</span><span class="na">m</span><span class="c1">', height -'</span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.8</span><span class="na">m</span>
+<span class="c1">'Flange width -'</span><span class="nv">b_f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1.0</span><span class="na">m</span><span class="c1">', height -'</span><span class="nv">h_f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.14</span><span class="na">m</span>
+<span class="c1">'Rebar diameter -'</span><span class="nv">Ø</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">22</span><span class="na">mm</span><span class="p">|</span><span class="nv">m</span><span class="c1">', Concrete cover -'</span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="na">cm</span>
 <span class="k">#val</span>
-<span class="c1">&#39;&lt;script src=&quot;https://cdn.jsdelivr.net/npm/three@0.145/build/three.min.js&quot;&gt;&lt;/script&gt;</span>
-<span class="c1">&#39;&lt;script src=&quot;https://cdn.jsdelivr.net/npm/three@0.145/examples/js/controls/OrbitControls.js&quot;&gt;&lt;/script&gt;</span>
-<span class="c1">&#39;&lt;div id=&quot;beam-3d-canvas&quot;&gt;&lt;/div&gt;</span>
-<span class="c1">&#39;&lt;script&gt;</span>
-<span class="c1">&#39;(function() {</span>
-<span class="c1">&#39;if (typeof THREE === &quot;undefined&quot;|| typeof THREE.OrbitControls === &quot;undefined&quot;) {</span>
-<span class="c1">&#39;alert(&quot;Failed to load Three.js or OrbitControls.&quot;);</span>
-<span class="c1">&#39;return;</span>
-<span class="c1">&#39;}</span>
-<span class="c1">&#39;const l = &#39;</span><span class="nv">l</span><span class="c1">&#39;; const a = &#39;</span><span class="nv">a</span><span class="o">/</span><span class="nv">m</span><span class="c1">&#39;;</span>
-<span class="c1">&#39;const b = &#39;</span><span class="nv">b</span><span class="c1">&#39;; const h = &#39;</span><span class="nv">h</span><span class="c1">&#39;;</span>
-<span class="c1">&#39;const bf = &#39;</span><span class="nv">b_f</span><span class="c1">&#39;; const hf = &#39;</span><span class="nv">h_f</span><span class="c1">&#39;;</span>
-<span class="c1">&#39;const scene = new THREE.Scene();</span>
-<span class="c1">&#39;scene.background = new THREE.Color(0xffffff);</span>
-<span class="c1">&#39;const camera = new THREE.PerspectiveCamera(50, 2, 0.1*l, 2*l);</span>
-<span class="c1">&#39;camera.position.set(1.2*bf, 1.3*h, 0.7*l);</span>
-<span class="c1">&#39;camera.lookAt(0, 0, 0);</span>
-<span class="c1">&#39;const renderer = new THREE.WebGLRenderer({antialias: true});</span>
-<span class="c1">&#39;renderer.setSize(600, 350);</span>
-<span class="c1">&#39;document.getElementById(&quot;beam-3d-canvas&quot;).appendChild(renderer.domElement);</span>
-<span class="c1">&#39;const controls = new THREE.OrbitControls(camera, renderer.domElement);</span>
-<span class="c1">&#39;controls.target.set(0, 0, 0);</span>
-<span class="c1">&#39;controls.update();</span>
-<span class="c1">&#39;const light = new THREE.DirectionalLight(0xffffff, 1);</span>
-<span class="c1">&#39;light.position.set(-4, 8, 10);</span>
-<span class="c1">&#39;scene.add(light);</span>
-<span class="c1">&#39;scene.add(new THREE.AmbientLight(0xffffff));</span>
-<span class="c1">&#39;const shape = new THREE.Shape();</span>
-<span class="c1">&#39;shape.moveTo(-bf/2, 0);</span>
-<span class="c1">&#39;shape.lineTo(bf/2, 0);</span>
-<span class="c1">&#39;shape.lineTo(bf/2, -hf);</span>
-<span class="c1">&#39;shape.lineTo(b/2, -hf);</span>
-<span class="c1">&#39;shape.lineTo(b/2, -h);</span>
-<span class="c1">&#39;shape.lineTo(-b/2, -h);</span>
-<span class="c1">&#39;shape.lineTo(-b/2, -hf);</span>
-<span class="c1">&#39;shape.lineTo(-bf/2, -hf);</span>
-<span class="c1">&#39;shape.lineTo(-bf/2, 0);</span>
-<span class="c1">&#39;const extrude = new THREE.ExtrudeGeometry(shape, { depth: l, bevelEnabled: false });</span>
-<span class="c1">&#39;extrude.translate(0, h, -l/2);</span>
-<span class="c1">&#39;const textureLoader = new THREE.TextureLoader();</span>
-<span class="c1">&#39;const concreteTexture = textureLoader.load(&quot;https://cdn.polyhaven.com/asset_img/primary/concrete_layers_02.png?height=760&amp;quality=95&quot;);</span>
-<span class="c1">&#39;concreteTexture.wrapS = THREE.RepeatWrapping;</span>
-<span class="c1">&#39;concreteTexture.wrapT = THREE.RepeatWrapping;</span>
-<span class="c1">&#39;concreteTexture.repeat.set(b, 0.5*b);</span>
-<span class="c1">&#39;const concreteMaterial = new THREE.MeshStandardMaterial({</span>
-<span class="c1">&#39;map: concreteTexture, roughness: 1, metalness: 0.1, transparent: true, opacity:0.9});</span>
-<span class="c1">&#39;const beam = new THREE.Mesh(extrude, concreteMaterial);</span>
-<span class="c1">&#39;scene.add(beam);</span>
-<span class="c1">&#39;const r = &#39;</span><span class="nv">Ø</span><span class="o">/</span><span class="m">2</span><span class="c1">&#39;;</span>
-<span class="c1">&#39;const geometry = new THREE.CylinderGeometry(r, r, 1.04*l, 32);</span>
-<span class="c1">&#39;geometry.rotateX(Math.PI / 2);</span>
-<span class="c1">&#39;const steelMaterial = new THREE.MeshStandardMaterial({</span>
-<span class="c1">&#39;color: 0xff0000,</span>
-<span class="c1">&#39;metalness: 0.8,</span>
-<span class="c1">&#39;roughness: 0.4</span>
-<span class="c1">&#39;});</span>
-<span class="c1">&#39;const xb1 = b/2 - a;</span>
-<span class="c1">&#39;const yb1 = a; const yb2 = h - a;</span>
-<span class="c1">&#39;const xb = [xb1, -xb1, xb1, -xb1];</span>
-<span class="c1">&#39;const yb = [yb1, yb1, yb2, yb2];</span>
-<span class="c1">&#39;const zb = 0;</span>
-<span class="c1">&#39;var rebar = new THREE.Mesh(geometry, steelMaterial);</span>
-<span class="c1">&#39;for(var i = 0; i &lt; 4; ++i){</span>
-<span class="c1">&#39;rebar.position.set(xb[i], yb[i], zb);</span>
-<span class="c1">&#39;scene.add(rebar);</span>
-<span class="c1">&#39;rebar = rebar.clone();</span>
-<span class="c1">&#39;}</span>
-<span class="c1">&#39;function animate() {</span>
-<span class="c1">&#39;requestAnimationFrame(animate);</span>
-<span class="c1">&#39;renderer.render(scene, camera);</span>
-<span class="c1">&#39;}</span>
-<span class="c1">&#39;animate();</span>
-<span class="c1">&#39;})();</span>
-<span class="c1">&#39;&lt;/script&gt;</span>
+<span class="c1">'&lt;script src="https://cdn.jsdelivr.net/npm/three@0.145/build/three.min.js"&gt;&lt;/script&gt;</span>
+<span class="c1">'&lt;script src="https://cdn.jsdelivr.net/npm/three@0.145/examples/js/controls/OrbitControls.js"&gt;&lt;/script&gt;</span>
+<span class="c1">'&lt;div id="beam-3d-canvas"&gt;&lt;/div&gt;</span>
+<span class="c1">'&lt;script&gt;</span>
+<span class="c1">'(function() {</span>
+<span class="c1">'if (typeof THREE === "undefined"|| typeof THREE.OrbitControls === "undefined") {</span>
+<span class="c1">'alert("Failed to load Three.js or OrbitControls.");</span>
+<span class="c1">'return;</span>
+<span class="c1">'}</span>
+<span class="c1">'const l = '</span><span class="nv">l</span><span class="c1">'; const a = '</span><span class="nv">a</span><span class="o">/</span><span class="nv">m</span><span class="c1">';</span>
+<span class="c1">'const b = '</span><span class="nv">b</span><span class="c1">'; const h = '</span><span class="nv">h</span><span class="c1">';</span>
+<span class="c1">'const bf = '</span><span class="nv">b_f</span><span class="c1">'; const hf = '</span><span class="nv">h_f</span><span class="c1">';</span>
+<span class="c1">'const scene = new THREE.Scene();</span>
+<span class="c1">'scene.background = new THREE.Color(0xffffff);</span>
+<span class="c1">'const camera = new THREE.PerspectiveCamera(50, 2, 0.1*l, 2*l);</span>
+<span class="c1">'camera.position.set(1.2*bf, 1.3*h, 0.7*l);</span>
+<span class="c1">'camera.lookAt(0, 0, 0);</span>
+<span class="c1">'const renderer = new THREE.WebGLRenderer({antialias: true});</span>
+<span class="c1">'renderer.setSize(600, 350);</span>
+<span class="c1">'document.getElementById("beam-3d-canvas").appendChild(renderer.domElement);</span>
+<span class="c1">'const controls = new THREE.OrbitControls(camera, renderer.domElement);</span>
+<span class="c1">'controls.target.set(0, 0, 0);</span>
+<span class="c1">'controls.update();</span>
+<span class="c1">'const light = new THREE.DirectionalLight(0xffffff, 1);</span>
+<span class="c1">'light.position.set(-4, 8, 10);</span>
+<span class="c1">'scene.add(light);</span>
+<span class="c1">'scene.add(new THREE.AmbientLight(0xffffff));</span>
+<span class="c1">'const shape = new THREE.Shape();</span>
+<span class="c1">'shape.moveTo(-bf/2, 0);</span>
+<span class="c1">'shape.lineTo(bf/2, 0);</span>
+<span class="c1">'shape.lineTo(bf/2, -hf);</span>
+<span class="c1">'shape.lineTo(b/2, -hf);</span>
+<span class="c1">'shape.lineTo(b/2, -h);</span>
+<span class="c1">'shape.lineTo(-b/2, -h);</span>
+<span class="c1">'shape.lineTo(-b/2, -hf);</span>
+<span class="c1">'shape.lineTo(-bf/2, -hf);</span>
+<span class="c1">'shape.lineTo(-bf/2, 0);</span>
+<span class="c1">'const extrude = new THREE.ExtrudeGeometry(shape, { depth: l, bevelEnabled: false });</span>
+<span class="c1">'extrude.translate(0, h, -l/2);</span>
+<span class="c1">'const textureLoader = new THREE.TextureLoader();</span>
+<span class="c1">'const concreteTexture = textureLoader.load("https://cdn.polyhaven.com/asset_img/primary/concrete_layers_02.png?height=760&amp;quality=95");</span>
+<span class="c1">'concreteTexture.wrapS = THREE.RepeatWrapping;</span>
+<span class="c1">'concreteTexture.wrapT = THREE.RepeatWrapping;</span>
+<span class="c1">'concreteTexture.repeat.set(b, 0.5*b);</span>
+<span class="c1">'const concreteMaterial = new THREE.MeshStandardMaterial({</span>
+<span class="c1">'map: concreteTexture, roughness: 1, metalness: 0.1, transparent: true, opacity:0.9});</span>
+<span class="c1">'const beam = new THREE.Mesh(extrude, concreteMaterial);</span>
+<span class="c1">'scene.add(beam);</span>
+<span class="c1">'const r = '</span><span class="nv">Ø</span><span class="o">/</span><span class="m">2</span><span class="c1">';</span>
+<span class="c1">'const geometry = new THREE.CylinderGeometry(r, r, 1.04*l, 32);</span>
+<span class="c1">'geometry.rotateX(Math.PI / 2);</span>
+<span class="c1">'const steelMaterial = new THREE.MeshStandardMaterial({</span>
+<span class="c1">'color: 0xff0000,</span>
+<span class="c1">'metalness: 0.8,</span>
+<span class="c1">'roughness: 0.4</span>
+<span class="c1">'});</span>
+<span class="c1">'const xb1 = b/2 - a;</span>
+<span class="c1">'const yb1 = a; const yb2 = h - a;</span>
+<span class="c1">'const xb = [xb1, -xb1, xb1, -xb1];</span>
+<span class="c1">'const yb = [yb1, yb1, yb2, yb2];</span>
+<span class="c1">'const zb = 0;</span>
+<span class="c1">'var rebar = new THREE.Mesh(geometry, steelMaterial);</span>
+<span class="c1">'for(var i = 0; i &lt; 4; ++i){</span>
+<span class="c1">'rebar.position.set(xb[i], yb[i], zb);</span>
+<span class="c1">'scene.add(rebar);</span>
+<span class="c1">'rebar = rebar.clone();</span>
+<span class="c1">'}</span>
+<span class="c1">'function animate() {</span>
+<span class="c1">'requestAnimationFrame(animate);</span>
+<span class="c1">'renderer.render(scene, camera);</span>
+<span class="c1">'}</span>
+<span class="c1">'animate();</span>
+<span class="c1">'})();</span>
+<span class="c1">'&lt;/script&gt;</span>
 </code></pre></div>
 
 </figure>
@@ -10044,20 +10044,20 @@ Change the geometry inputs and the WebGL view, the calculations, and the report 
 <figure>
 <figcaption>Code:</figcaption>
 <div class="highlight"><pre><span></span><code><span class="k">#md on</span>
-<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">&#39;- horizontal radius</span>
-<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.7</span><span class="c1">&#39;- vertical radius</span>
+<span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">'- horizontal radius</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.7</span><span class="c1">'- vertical radius</span>
 <span class="k">#rad</span>
-<span class="c1">&#39;&lt;!--&#39;</span><span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span><span class="c1">&#39;, &#39;</span><span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">PlotWidth</span><span class="c1">&#39;, &#39;</span><span class="nv">PlotStep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">&#39;, &#39;</span><span class="w"> </span>_
-<span class="nv">PlotShadows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">&#39;, &#39;</span><span class="nv">PlotPalette</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">4</span><span class="c1">&#39;, &#39;</span><span class="nv">PlotLightDir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">7</span><span class="c1">&#39;--&gt;</span>
-<span class="c1">&#39;&lt;table&gt;&lt;tr&gt;&lt;td&gt;</span>
+<span class="c1">'&lt;!--'</span><span class="nv">PlotWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span><span class="c1">', '</span><span class="nv">PlotHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">PlotWidth</span><span class="c1">', '</span><span class="nv">PlotStep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">', '</span><span class="w"> </span>_
+<span class="nv">PlotShadows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="c1">', '</span><span class="nv">PlotPalette</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">4</span><span class="c1">', '</span><span class="nv">PlotLightDir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">7</span><span class="c1">'--&gt;</span>
+<span class="c1">'&lt;table&gt;&lt;tr&gt;&lt;td&gt;</span>
 <span class="nv">x</span><span class="p">(</span><span class="nv">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">a</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="nv">t</span><span class="p">)</span>
 <span class="nv">y</span><span class="p">(</span><span class="nv">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b</span><span class="o">*</span><span class="p">(</span><span class="m">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">0.2</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="nv">t</span><span class="p">))</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="nv">t</span><span class="p">)</span>
 <span class="nd">$Plot</span><span class="p">{</span><span class="nv">x</span><span class="p">(</span><span class="nv">t</span><span class="p">)|</span><span class="nv">y</span><span class="p">(</span><span class="nv">t</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="p">|</span><span class="o">-</span><span class="m">1</span><span class="w"> </span><span class="p">&amp;</span><span class="w"> </span><span class="m">1</span><span class="p">|</span><span class="m">1</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">π</span><span class="p">}</span>
-<span class="c1">&#39;&lt;/td&gt;&lt;td&gt;</span>
+<span class="c1">'&lt;/td&gt;&lt;td&gt;</span>
 <span class="nv">f</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b</span><span class="o">*</span><span class="p">(</span><span class="m">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">0.2</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="nb">acos</span><span class="p">(</span><span class="nv">x</span><span class="o">/</span><span class="nv">a</span><span class="p">)))</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="nb">acos</span><span class="p">(</span><span class="nv">x</span><span class="o">/</span><span class="nv">a</span><span class="p">))</span>
 <span class="nv">z</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="nv">f</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="o">^</span><span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">y</span><span class="o">^</span><span class="m">2</span><span class="p">)</span>
 <span class="nd">$Map</span><span class="p">{</span><span class="nv">z</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">&amp;</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="p">}</span>
-<span class="c1">&#39;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</span>
+<span class="c1">'&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</span>
 </code></pre></div>
 
 </figure>
@@ -10089,25 +10089,25 @@ Adjust any dimension and the drawing redraws itself — ideal for standardised s
 <figure>
 <figcaption>Code:</figcaption>
 <div class="highlight"><pre><span></span><code><span class="k">#include</span><span class="w"> </span><span class="nv">svg_drawing</span><span class="p">.</span><span class="nv">cpd</span>
-<span class="cs">&quot;Prestressed TT Panel - Parametric SVG Generation</span>
+<span class="cs">"Prestressed TT Panel - Parametric SVG Generation</span>
 <span class="k">#deg</span>
-<span class="c1">&#39;Dimensions:</span>
-<span class="c1">&#39;Rib height -&#39;</span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">750</span><span class="p">}</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;Rib top width -&#39;</span><span class="nv">b_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">200</span><span class="p">}</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;Slab depth -&#39;</span><span class="nv">h_f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">100</span><span class="p">}</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;Rib spacing c/c -&#39;</span><span class="nv">B_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">1500</span><span class="p">}</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;Slab width -&#39;</span><span class="nv">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">2500</span><span class="p">}</span><span class="c1">&#39;mm</span>
+<span class="c1">'Dimensions:</span>
+<span class="c1">'Rib height -'</span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">750</span><span class="p">}</span><span class="c1">'mm</span>
+<span class="c1">'Rib top width -'</span><span class="nv">b_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">200</span><span class="p">}</span><span class="c1">'mm</span>
+<span class="c1">'Slab depth -'</span><span class="nv">h_f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">100</span><span class="p">}</span><span class="c1">'mm</span>
+<span class="c1">'Rib spacing c/c -'</span><span class="nv">B_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">1500</span><span class="p">}</span><span class="c1">'mm</span>
+<span class="c1">'Slab width -'</span><span class="nv">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">2500</span><span class="p">}</span><span class="c1">'mm</span>
 <span class="k">#post</span>
-<span class="c1">&#39;Total height -&#39;</span><span class="nv">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">h</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">h_f</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;Rib bottom width -&#39;</span><span class="nv">b_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b_2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="nv">h</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">30</span><span class="p">)</span><span class="o">/</span><span class="m">10</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;- mean -&#39;</span><span class="nv">b_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">b_1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b_2</span><span class="p">)</span><span class="o">/</span><span class="m">2</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;- at &lt;var&gt;z&lt;/var&gt; from top -&#39;</span><span class="nv">b</span><span class="p">(</span><span class="nv">z</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b_2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="nv">b_2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">b_1</span><span class="p">)</span><span class="o">*</span><span class="nv">z</span><span class="o">/</span><span class="nv">h</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;Rib effective width -&#39;</span><span class="nv">b_f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">B</span><span class="o">/</span><span class="m">2</span><span class="c1">&#39;mm</span>
+<span class="c1">'Total height -'</span><span class="nv">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">h</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">h_f</span><span class="c1">'mm</span>
+<span class="c1">'Rib bottom width -'</span><span class="nv">b_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b_2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="nv">h</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">30</span><span class="p">)</span><span class="o">/</span><span class="m">10</span><span class="c1">'mm</span>
+<span class="c1">'- mean -'</span><span class="nv">b_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">b_1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b_2</span><span class="p">)</span><span class="o">/</span><span class="m">2</span><span class="c1">'mm</span>
+<span class="c1">'- at &lt;var&gt;z&lt;/var&gt; from top -'</span><span class="nv">b</span><span class="p">(</span><span class="nv">z</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b_2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="nv">b_2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">b_1</span><span class="p">)</span><span class="o">*</span><span class="nv">z</span><span class="o">/</span><span class="nv">h</span><span class="c1">'mm</span>
+<span class="c1">'Rib effective width -'</span><span class="nv">b_f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">B</span><span class="o">/</span><span class="m">2</span><span class="c1">'mm</span>
 <span class="k">#post</span>
 <span class="k">#show</span>
-<span class="c1">&#39;Distance from the center of the first row of tendons to the bottom edge -&#39;</span><span class="nv">d_p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">80</span><span class="p">}</span><span class="c1">&#39;mm</span>
-<span class="c1">&#39;Number of tendons in one row -&#39;</span><span class="nv">n_ph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">2</span><span class="p">}</span><span class="c1">&#39;</span>
-<span class="c1">&#39;Number of rows -&#39;</span><span class="nv">n_pv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">3</span><span class="p">}</span><span class="c1">&#39;</span>
+<span class="c1">'Distance from the center of the first row of tendons to the bottom edge -'</span><span class="nv">d_p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">80</span><span class="p">}</span><span class="c1">'mm</span>
+<span class="c1">'Number of tendons in one row -'</span><span class="nv">n_ph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">2</span><span class="p">}</span><span class="c1">'</span>
+<span class="c1">'Number of rows -'</span><span class="nv">n_pv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">3</span><span class="p">}</span><span class="c1">'</span>
 <span class="k">#pre</span>
 <span class="k">#hide</span>
 <span class="nv">x_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">B_0</span><span class="o">/</span><span class="m">2</span>
@@ -10120,33 +10120,33 @@ Adjust any dimension and the drawing redraws itself — ideal for standardised s
 <span class="nv">x_8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">x_1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">20</span><span class="o">*</span><span class="p">(</span><span class="nv">n_ph</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span>
 <span class="k">#post</span>
 <span class="k">#val</span>
-<span class="c1">&#39;&lt;svg viewbox=&quot;&#39;</span><span class="o">-</span><span class="nv">b_f</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">200</span><span class="c1">&#39; -150 &#39;</span><span class="nv">B</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">300</span><span class="c1">&#39; &#39;</span><span class="nv">H</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">400</span><span class="c1">&#39;&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; style=&quot;font-family: Arial Nova Cond, Noto Sans Cond, Segoe UI; font-size: &#39;</span><span class="m">54</span><span class="c1">&#39;px; width:500pt; height:&#39;</span><span class="m">500</span><span class="o">*</span><span class="nv">H</span><span class="o">/</span><span class="nv">B</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">50</span><span class="c1">&#39;pt&quot;&gt;</span>
-<span class="c1">&#39;&lt;polygon points=&quot;&#39;</span><span class="nv">b_f</span><span class="c1">&#39;,&#39;</span><span class="m">0</span><span class="c1">&#39; &#39;</span><span class="nv">b_f</span><span class="c1">&#39;,&#39;</span><span class="nv">h_f</span><span class="c1">&#39; &#39;</span><span class="nv">x_3</span><span class="c1">&#39;,&#39;</span><span class="nv">h_f</span><span class="c1">&#39; &#39;</span><span class="nv">x_2</span><span class="c1">&#39;,&#39;</span><span class="nv">h_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">30</span><span class="c1">&#39; &#39;</span><span class="nv">x_4</span><span class="c1">&#39;,&#39;</span><span class="nv">H</span><span class="c1">&#39; &#39;</span><span class="nv">x_5</span><span class="c1">&#39;,&#39;</span><span class="nv">H</span><span class="c1">&#39; &#39;</span><span class="nv">x_6</span><span class="c1">&#39;,&#39;</span><span class="nv">h_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">30</span><span class="c1">&#39; &#39;</span><span class="nv">x_7</span><span class="c1">&#39;,&#39;</span><span class="nv">h_f</span><span class="c1">&#39; &#39;</span><span class="o">-</span><span class="nv">x_7</span><span class="c1">&#39;,&#39;</span><span class="nv">h_f</span><span class="c1">&#39; &#39;</span><span class="o">-</span><span class="nv">x_6</span><span class="c1">&#39;,&#39;</span><span class="nv">h_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">30</span><span class="c1">&#39; &#39;</span><span class="o">-</span><span class="nv">x_5</span><span class="c1">&#39;,&#39;</span><span class="nv">H</span><span class="c1">&#39; &#39;</span><span class="o">-</span><span class="nv">x_4</span><span class="c1">&#39;,&#39;</span><span class="nv">H</span><span class="c1">&#39; &#39;</span><span class="o">-</span><span class="nv">x_2</span><span class="c1">&#39;,&#39;</span><span class="nv">h_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">30</span><span class="c1">&#39; &#39;</span><span class="o">-</span><span class="nv">x_3</span><span class="c1">&#39;,&#39;</span><span class="nv">h_f</span><span class="c1">&#39; &#39;</span><span class="o">-</span><span class="nv">b_f</span><span class="c1">&#39;,&#39;</span><span class="nv">h_f</span><span class="c1">&#39; &#39;</span><span class="o">-</span><span class="nv">b_f</span><span class="c1">&#39;,&#39;</span><span class="m">0</span><span class="c1">&#39;&quot; sec_style$/&gt;</span>
+<span class="c1">'&lt;svg viewbox="'</span><span class="o">-</span><span class="nv">b_f</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">200</span><span class="c1">' -150 '</span><span class="nv">B</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">300</span><span class="c1">' '</span><span class="nv">H</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">400</span><span class="c1">'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-family: Arial Nova Cond, Noto Sans Cond, Segoe UI; font-size: '</span><span class="m">54</span><span class="c1">'px; width:500pt; height:'</span><span class="m">500</span><span class="o">*</span><span class="nv">H</span><span class="o">/</span><span class="nv">B</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">50</span><span class="c1">'pt"&gt;</span>
+<span class="c1">'&lt;polygon points="'</span><span class="nv">b_f</span><span class="c1">','</span><span class="m">0</span><span class="c1">' '</span><span class="nv">b_f</span><span class="c1">','</span><span class="nv">h_f</span><span class="c1">' '</span><span class="nv">x_3</span><span class="c1">','</span><span class="nv">h_f</span><span class="c1">' '</span><span class="nv">x_2</span><span class="c1">','</span><span class="nv">h_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">30</span><span class="c1">' '</span><span class="nv">x_4</span><span class="c1">','</span><span class="nv">H</span><span class="c1">' '</span><span class="nv">x_5</span><span class="c1">','</span><span class="nv">H</span><span class="c1">' '</span><span class="nv">x_6</span><span class="c1">','</span><span class="nv">h_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">30</span><span class="c1">' '</span><span class="nv">x_7</span><span class="c1">','</span><span class="nv">h_f</span><span class="c1">' '</span><span class="o">-</span><span class="nv">x_7</span><span class="c1">','</span><span class="nv">h_f</span><span class="c1">' '</span><span class="o">-</span><span class="nv">x_6</span><span class="c1">','</span><span class="nv">h_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">30</span><span class="c1">' '</span><span class="o">-</span><span class="nv">x_5</span><span class="c1">','</span><span class="nv">H</span><span class="c1">' '</span><span class="o">-</span><span class="nv">x_4</span><span class="c1">','</span><span class="nv">H</span><span class="c1">' '</span><span class="o">-</span><span class="nv">x_2</span><span class="c1">','</span><span class="nv">h_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">30</span><span class="c1">' '</span><span class="o">-</span><span class="nv">x_3</span><span class="c1">','</span><span class="nv">h_f</span><span class="c1">' '</span><span class="o">-</span><span class="nv">b_f</span><span class="c1">','</span><span class="nv">h_f</span><span class="c1">' '</span><span class="o">-</span><span class="nv">b_f</span><span class="c1">','</span><span class="m">0</span><span class="c1">'" sec_style$/&gt;</span>
 <span class="nv">line</span>$<span class="p">(</span><span class="o">-</span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="m">100</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="nv">H</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">100</span><span class="p">;</span><span class="w"> </span><span class="nv">axis_style</span>$<span class="p">)</span>
 <span class="nv">line</span>$<span class="p">(</span><span class="w"> </span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="m">100</span><span class="p">;</span><span class="w"> </span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="nv">H</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">100</span><span class="p">;</span><span class="w"> </span><span class="nv">axis_style</span>$<span class="p">)</span>
-<span class="nv">dimh</span>$<span class="p">(</span><span class="o">-</span><span class="nv">b_f</span><span class="p">;</span><span class="w"> </span><span class="nv">b_f</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="m">60</span><span class="p">;</span><span class="w"> </span><span class="nv">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">&#39;B&#39;</span><span class="w"> </span><span class="nv">mm</span><span class="p">)</span>
-<span class="nv">dimv</span>$<span class="p">(</span><span class="o">-</span><span class="nv">b_f</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">60</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">H</span><span class="p">;</span><span class="w"> </span><span class="nv">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">&#39;H&#39;</span><span class="w"> </span><span class="nv">mm</span><span class="p">)</span>
-<span class="nv">dimv</span>$<span class="p">(</span><span class="o">-</span><span class="nv">b_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">80</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">h_f</span><span class="p">;</span><span class="w"> </span><span class="nv">h</span><span class="o">&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=</span><span class="m">20</span><span class="o">&gt;</span><span class="nv">f</span><span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=-</span><span class="m">20</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;</span><span class="c1">&#39;h_f&#39;</span><span class="w"> </span><span class="nv">mm</span><span class="w">         </span><span class="p">)</span>
-<span class="nv">dimv</span>$<span class="p">(</span><span class="o">-</span><span class="nv">b_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">80</span><span class="p">;</span><span class="w"> </span><span class="nv">h_f</span><span class="p">;</span><span class="w"> </span><span class="nv">H</span><span class="p">;</span><span class="w"> </span><span class="o">&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=</span><span class="m">100</span><span class="o">&gt;</span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">&#39;h&#39;</span><span class="w"> </span><span class="nv">mm</span><span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;</span><span class="p">)</span>
-<span class="nv">dimh</span>$<span class="p">(</span><span class="o">-</span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="nv">H</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">180</span><span class="p">;</span><span class="w"> </span><span class="nv">B</span><span class="o">&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=</span><span class="m">5</span><span class="o">&gt;</span>₀<span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=-</span><span class="m">5</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">&#39;B_0&#39;</span><span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;</span><span class="w"> </span><span class="nv">mm</span><span class="p">)</span>
-<span class="nv">dimh</span>$<span class="p">(</span><span class="o">-</span><span class="nv">x_2</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="nv">x_6</span><span class="p">;</span><span class="w"> </span><span class="nv">h_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">120</span><span class="p">;</span><span class="w">            </span><span class="nv">b</span><span class="o">&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=</span><span class="m">5</span><span class="o">&gt;</span>₂<span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=-</span><span class="m">5</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;</span><span class="c1">&#39;b_2&#39;</span><span class="w"> </span><span class="nv">mm</span><span class="p">)</span>
-<span class="nv">dimh</span>$<span class="p">(</span><span class="o">-</span><span class="nv">x_4</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="nv">x_5</span><span class="p">;</span><span class="w"> </span><span class="nv">H</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">80</span><span class="p">;</span><span class="w">            </span><span class="nv">b</span><span class="o">&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=</span><span class="m">5</span><span class="o">&gt;</span>₁<span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=-</span><span class="m">5</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;</span><span class="c1">&#39;b_1&#39;</span><span class="w"> </span><span class="nv">mm</span><span class="p">)</span>
+<span class="nv">dimh</span>$<span class="p">(</span><span class="o">-</span><span class="nv">b_f</span><span class="p">;</span><span class="w"> </span><span class="nv">b_f</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="m">60</span><span class="p">;</span><span class="w"> </span><span class="nv">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">'B'</span><span class="w"> </span><span class="nv">mm</span><span class="p">)</span>
+<span class="nv">dimv</span>$<span class="p">(</span><span class="o">-</span><span class="nv">b_f</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">60</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">H</span><span class="p">;</span><span class="w"> </span><span class="nv">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">'H'</span><span class="w"> </span><span class="nv">mm</span><span class="p">)</span>
+<span class="nv">dimv</span>$<span class="p">(</span><span class="o">-</span><span class="nv">b_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">80</span><span class="p">;</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">h_f</span><span class="p">;</span><span class="w"> </span><span class="nv">h</span><span class="o">&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=</span><span class="m">20</span><span class="o">&gt;</span><span class="nv">f</span><span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=-</span><span class="m">20</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;</span><span class="c1">'h_f'</span><span class="w"> </span><span class="nv">mm</span><span class="w">         </span><span class="p">)</span>
+<span class="nv">dimv</span>$<span class="p">(</span><span class="o">-</span><span class="nv">b_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">80</span><span class="p">;</span><span class="w"> </span><span class="nv">h_f</span><span class="p">;</span><span class="w"> </span><span class="nv">H</span><span class="p">;</span><span class="w"> </span><span class="o">&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=</span><span class="m">100</span><span class="o">&gt;</span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">'h'</span><span class="w"> </span><span class="nv">mm</span><span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;</span><span class="p">)</span>
+<span class="nv">dimh</span>$<span class="p">(</span><span class="o">-</span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="nv">x_1</span><span class="p">;</span><span class="w"> </span><span class="nv">H</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">180</span><span class="p">;</span><span class="w"> </span><span class="nv">B</span><span class="o">&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=</span><span class="m">5</span><span class="o">&gt;</span>₀<span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=-</span><span class="m">5</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">'B_0'</span><span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;</span><span class="w"> </span><span class="nv">mm</span><span class="p">)</span>
+<span class="nv">dimh</span>$<span class="p">(</span><span class="o">-</span><span class="nv">x_2</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="nv">x_6</span><span class="p">;</span><span class="w"> </span><span class="nv">h_f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">120</span><span class="p">;</span><span class="w">            </span><span class="nv">b</span><span class="o">&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=</span><span class="m">5</span><span class="o">&gt;</span>₂<span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=-</span><span class="m">5</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;</span><span class="c1">'b_2'</span><span class="w"> </span><span class="nv">mm</span><span class="p">)</span>
+<span class="nv">dimh</span>$<span class="p">(</span><span class="o">-</span><span class="nv">x_4</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="nv">x_5</span><span class="p">;</span><span class="w"> </span><span class="nv">H</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">80</span><span class="p">;</span><span class="w">            </span><span class="nv">b</span><span class="o">&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=</span><span class="m">5</span><span class="o">&gt;</span>₁<span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;&lt;</span><span class="nv">tspan</span><span class="w"> </span><span class="nv">dy</span><span class="o">=-</span><span class="m">5</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;/</span><span class="nv">tspan</span><span class="o">&gt;</span><span class="c1">'b_1'</span><span class="w"> </span><span class="nv">mm</span><span class="p">)</span>
 <span class="k">#hide</span>
-<span class="k">#def</span><span class="w"> </span><span class="nv">tendon$</span><span class="w"> </span><span class="o">=</span> r=&quot;10&quot; style=&quot;stroke:red; fill:red; stroke-width:1&quot;
+<span class="k">#def</span><span class="w"> </span><span class="nv">tendon$</span><span class="w"> </span><span class="o">=</span> r="10" style="stroke:red; fill:red; stroke-width:1"
 <span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
 <span class="k">#repeat</span><span class="w"> </span><span class="nv">n_pv</span>
 <span class="w">    </span><span class="nv">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
 <span class="w">    </span><span class="k">#repeat</span><span class="w"> </span><span class="nv">n_ph</span>
 <span class="w">        </span><span class="k">#post</span>
-<span class="w">        </span><span class="c1">&#39;&lt;circle cx=&quot;&#39;</span><span class="nv">x_8</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">40</span><span class="o">*</span><span class="nv">j</span><span class="c1">&#39;&quot; cy=&quot;&#39;</span><span class="nv">H</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">d_p1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">40</span><span class="o">*</span><span class="nv">i</span><span class="c1">&#39;&quot; tendon$/&gt;</span>
-<span class="w">        </span><span class="c1">&#39;&lt;circle cx=&quot;&#39;</span><span class="o">-</span><span class="nv">x_8</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">40</span><span class="o">*</span><span class="nv">j</span><span class="c1">&#39;&quot; cy=&quot;&#39;</span><span class="nv">H</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">d_p1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">40</span><span class="o">*</span><span class="nv">i</span><span class="c1">&#39;&quot; tendon$/&gt;</span>
+<span class="w">        </span><span class="c1">'&lt;circle cx="'</span><span class="nv">x_8</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">40</span><span class="o">*</span><span class="nv">j</span><span class="c1">'" cy="'</span><span class="nv">H</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">d_p1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">40</span><span class="o">*</span><span class="nv">i</span><span class="c1">'" tendon$/&gt;</span>
+<span class="w">        </span><span class="c1">'&lt;circle cx="'</span><span class="o">-</span><span class="nv">x_8</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">40</span><span class="o">*</span><span class="nv">j</span><span class="c1">'" cy="'</span><span class="nv">H</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">d_p1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">40</span><span class="o">*</span><span class="nv">i</span><span class="c1">'" tendon$/&gt;</span>
 <span class="w">        </span><span class="k">#hide</span>
 <span class="w">        </span><span class="nv">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">j</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span>
 <span class="w">    </span><span class="k">#loop</span>
 <span class="w">    </span><span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span>
 <span class="k">#loop</span>
 <span class="k">#post</span>
-<span class="c1">&#39;&lt;/svg&gt;</span>
+<span class="c1">'&lt;/svg&gt;</span>
 <span class="k">#equ</span>
 </code></pre></div>
 

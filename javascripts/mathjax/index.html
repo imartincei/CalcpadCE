@@ -2940,7 +2940,7 @@ longer on the CDN, as they are not what are run in the browser.</p>
 <p>If you are loading MathJax from a CDN into a web page, there is no
 need to install anything.  Simply use a <code>script</code> tag that loads
 MathJax from the CDN.  E.g.,</p>
-<div class="language-html highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js&quot;</span> <span class="na">defer</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<div class="language-html highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"</span> <span class="na">defer</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre></div>
 <p>See the <a href="https://docs.mathjax.org/en/latest/index.html#browser-components">MathJax
 documentation</a>
@@ -2959,7 +2959,7 @@ mv node_modules/mathjax &lt;path-to-server-location&gt;/mathjax
 mv mathjax &lt;path-to-server-location&gt;/mathjax
 </code></pre></div>
 <p>Then (in either case) you can use a script tag like the following:</p>
-<div class="language-html highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;&lt;url-to-your-site&gt;/mathjax/tex-chtml.js&quot;</span> <span class="na">defer</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<div class="language-html highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"&lt;url-to-your-site&gt;/mathjax/tex-chtml.js"</span> <span class="na">defer</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre></div>
 <p>where <code>&lt;url-to-your-site&gt;</code> is replaced by the URL to the location
 where you moved the MathJax files above.</p>
@@ -2972,28 +2972,28 @@ package:</p>
 <div class="language-bash highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>mathjax@4
 </code></pre></div>
 <p>Then import <code>mathjax</code> within your application and initialize it:</p>
-<div class="language-js highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">MathJax</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;mathjax&#39;</span><span class="p">;</span>
+<div class="language-js highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">MathJax</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'mathjax'</span><span class="p">;</span>
 <span class="k">await</span><span class="w"> </span><span class="nx">MathJax</span><span class="p">.</span><span class="nx">init</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
 <p>where <code>{ ... }</code> is the MathJax configuration you want to use.  E.g., </p>
-<div class="language-js highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">MathJax</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;mathjax&#39;</span><span class="p">;</span>
+<div class="language-js highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">MathJax</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'mathjax'</span><span class="p">;</span>
 <span class="k">await</span><span class="w"> </span><span class="nx">MathJax</span><span class="p">.</span><span class="nx">init</span><span class="p">({</span>
-<span class="w">  </span><span class="nx">loader</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">load</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;input/tex&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;output/svg&#39;</span><span class="p">]}</span>
+<span class="w">  </span><span class="nx">loader</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">load</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'input/tex'</span><span class="p">,</span><span class="w"> </span><span class="s1">'output/svg'</span><span class="p">]}</span>
 <span class="p">});</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">svg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">MathJax</span><span class="p">.</span><span class="nx">tex2svgPromise</span><span class="p">(</span><span class="s1">&#39;\\frac{1}{x^2-1}&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nx">display</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">});</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">svg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">MathJax</span><span class="p">.</span><span class="nx">tex2svgPromise</span><span class="p">(</span><span class="s1">'\\frac{1}{x^2-1}'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nx">display</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">});</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">MathJax</span><span class="p">.</span><span class="nx">startup</span><span class="p">.</span><span class="nx">adaptor</span><span class="p">.</span><span class="nx">serializeXML</span><span class="p">(</span><span class="nx">svg</span><span class="p">));</span>
 </code></pre></div>
 <p>Alternatively, in an ES5 node application, you can use</p>
-<div class="language-js highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">MathJax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;mathjax&#39;</span><span class="p">);</span>
+<div class="language-js highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">MathJax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'mathjax'</span><span class="p">);</span>
 <span class="nx">MathJax</span><span class="p">.</span><span class="nx">init</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}).</span><span class="nx">then</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
 <p>where the first <code>{ ... }</code> is a MathJax configuration, and the second
 <code>{ ... }</code> is the code to run after MathJax has been loaded.  E.g.</p>
-<div class="language-js highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">MathJax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;mathjax&#39;</span><span class="p">);</span>
+<div class="language-js highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">MathJax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'mathjax'</span><span class="p">);</span>
 <span class="nx">MathJax</span><span class="p">.</span><span class="nx">init</span><span class="p">({</span>
-<span class="w">  </span><span class="nx">loader</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">load</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;input/tex&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;output/svg&#39;</span><span class="p">]}</span>
+<span class="w">  </span><span class="nx">loader</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">load</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'input/tex'</span><span class="p">,</span><span class="w"> </span><span class="s1">'output/svg'</span><span class="p">]}</span>
 <span class="p">}).</span><span class="nx">then</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">svg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MathJax</span><span class="p">.</span><span class="nx">tex2svg</span><span class="p">(</span><span class="s1">&#39;\\frac{1}{x^2-1}&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nx">display</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">});</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">svg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MathJax</span><span class="p">.</span><span class="nx">tex2svg</span><span class="p">(</span><span class="s1">'\\frac{1}{x^2-1}'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nx">display</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">});</span>
 <span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">MathJax</span><span class="p">.</span><span class="nx">startup</span><span class="p">.</span><span class="nx">adaptor</span><span class="p">.</span><span class="nx">serializeXML</span><span class="p">(</span><span class="nx">svg</span><span class="p">));</span>
 <span class="p">}).</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">));</span>
 </code></pre></div>
@@ -3032,7 +3032,7 @@ need to configure the path to the font.  For example:</p>
 <div class="language-js highlight"><pre><span></span><code><span class="nx">MathJax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">loader</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nx">paths</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="s1">&#39;mathjax-stix2&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;&lt;url-to-your-server&gt;/mathjax-stix2-font&#39;</span>
+<span class="w">      </span><span class="s1">'mathjax-stix2'</span><span class="o">:</span><span class="w"> </span><span class="s1">'&lt;url-to-your-server&gt;/mathjax-stix2-font'</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">};</span>

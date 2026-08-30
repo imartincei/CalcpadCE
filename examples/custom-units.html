@@ -2853,19 +2853,19 @@
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;p&gt;&lt;b&gt;Definition&lt;/b&gt;&lt;/p&gt;</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;p&gt;&lt;b&gt;Definition&lt;/b&gt;&lt;/p&gt;</span>
 <span class="p">.</span><span class="nv">EUR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span>
 <span class="p">.</span><span class="nv">USD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.92</span><span class="na">EUR</span>
 <span class="p">.</span><span class="nv">BGN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.511291881196218</span><span class="na">EUR</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Conversion&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Conversion&lt;/b&gt;&lt;/p&gt;</span>
 <span class="m">10</span><span class="na">BGN</span><span class="p">|</span><span class="nv">USD</span>
 <span class="m">20</span><span class="na">EUR</span><span class="p">|</span><span class="nv">BGN</span>
 <span class="m">30</span><span class="na">EUR</span><span class="p">|</span><span class="nv">USD</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Usage&lt;/b&gt;&lt;/p&gt;</span>
-<span class="c1">&#39;Unit price - &#39;</span><span class="nv">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">15</span><span class="na">USD</span><span class="o">/</span><span class="nv">m</span>
-<span class="c1">&#39;Order length -&#39;</span><span class="nv">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">100</span><span class="na">m</span>
-<span class="c1">&#39;Total price in USD -&#39;</span><span class="nv">P</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">p</span><span class="o">*</span><span class="nv">L</span><span class="p">|</span><span class="nv">USD</span>
-<span class="c1">&#39;Total price in EUR -&#39;</span><span class="nv">P</span><span class="p">|</span><span class="nv">EUR</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Usage&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'Unit price - '</span><span class="nv">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">15</span><span class="na">USD</span><span class="o">/</span><span class="nv">m</span>
+<span class="c1">'Order length -'</span><span class="nv">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">100</span><span class="na">m</span>
+<span class="c1">'Total price in USD -'</span><span class="nv">P</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">p</span><span class="o">*</span><span class="nv">L</span><span class="p">|</span><span class="nv">USD</span>
+<span class="c1">'Total price in EUR -'</span><span class="nv">P</span><span class="p">|</span><span class="nv">EUR</span>
 </code></pre></div>
 
 </figure>
@@ -2894,20 +2894,20 @@
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="c1">&#39;&lt;p&gt;&lt;b&gt;Definition&lt;/b&gt;&lt;/p&gt;</span>
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;p&gt;&lt;b&gt;Definition&lt;/b&gt;&lt;/p&gt;</span>
 <span class="p">.</span><span class="nv">bit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span>
 <span class="p">.</span><span class="nv">byte</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">8</span><span class="na">bit</span>
-<span class="p">.</span><span class="nv">KB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">byte</span><span class="c1">&#39;,&#39;</span><span class="p">.</span><span class="nv">KiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">byte</span>
-<span class="p">.</span><span class="nv">MB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">KB</span><span class="c1">&#39;,&#39;</span><span class="p">.</span><span class="nv">MiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">KiB</span>
-<span class="p">.</span><span class="nv">TB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">MB</span><span class="c1">&#39;,&#39;</span><span class="p">.</span><span class="nv">TiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">MiB</span>
-<span class="p">.</span><span class="nv">PB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">TB</span><span class="c1">&#39;,&#39;</span><span class="p">.</span><span class="nv">PiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">TiB</span>
-<span class="p">.</span><span class="nv">EB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">PB</span><span class="c1">&#39;,&#39;</span><span class="p">.</span><span class="nv">EiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">PiB</span>
-<span class="p">.</span><span class="nv">ZB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">EB</span><span class="c1">&#39;,&#39;</span><span class="p">.</span><span class="nv">ZiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">EiB</span>
-<span class="p">.</span><span class="nv">YB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">ZB</span><span class="c1">&#39;,&#39;</span><span class="p">.</span><span class="nv">YiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">ZiB</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Conversion&lt;/b&gt;&lt;/p&gt;</span>
+<span class="p">.</span><span class="nv">KB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">byte</span><span class="c1">','</span><span class="p">.</span><span class="nv">KiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">byte</span>
+<span class="p">.</span><span class="nv">MB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">KB</span><span class="c1">','</span><span class="p">.</span><span class="nv">MiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">KiB</span>
+<span class="p">.</span><span class="nv">TB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">MB</span><span class="c1">','</span><span class="p">.</span><span class="nv">TiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">MiB</span>
+<span class="p">.</span><span class="nv">PB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">TB</span><span class="c1">','</span><span class="p">.</span><span class="nv">PiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">TiB</span>
+<span class="p">.</span><span class="nv">EB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">PB</span><span class="c1">','</span><span class="p">.</span><span class="nv">EiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">PiB</span>
+<span class="p">.</span><span class="nv">ZB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">EB</span><span class="c1">','</span><span class="p">.</span><span class="nv">ZiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">EiB</span>
+<span class="p">.</span><span class="nv">YB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="na">ZB</span><span class="c1">','</span><span class="p">.</span><span class="nv">YiB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1024</span><span class="na">ZiB</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Conversion&lt;/b&gt;&lt;/p&gt;</span>
 <span class="nv">MiB</span><span class="p">|</span><span class="nv">byte</span>
 <span class="nv">TiB</span><span class="p">|</span><span class="nv">byte</span>
-<span class="c1">&#39;&lt;p&gt;&lt;b&gt;Usage&lt;/b&gt;&lt;/p&gt;</span>
+<span class="c1">'&lt;p&gt;&lt;b&gt;Usage&lt;/b&gt;&lt;/p&gt;</span>
 <span class="nv">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10000000</span><span class="na">byte</span><span class="o">/</span><span class="nv">s</span>
 <span class="nv">v</span><span class="p">|</span><span class="nv">TiB</span><span class="o">/</span><span class="nv">h</span>
 </code></pre></div>

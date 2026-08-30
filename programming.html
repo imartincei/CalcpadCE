@@ -3184,30 +3184,30 @@ This is performed by enclosing the text box into an outer html element (paragrap
 Then, the content of the source element's value attribute will be automatically filled in the target text box.
 You can use the following sample code:</p>
 <h3 id="selection-box">Selection Box<a class="headerlink" href="#selection-box" title="Permanent link">&para;</a></h3>
-<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">&#39;Select an option: &lt;select name=&quot;**target1**&quot;&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;11;12&quot;&gt;x1; y1&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;21;22&quot;&gt;x2; y2&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;option value=&quot;31;32&quot;&gt;x3; y3&lt;/option&gt;</span>
-<span class="c1">&#39;&lt;/select&gt;</span>
-<span class="c1">&#39;...</span>
-<span class="c1">&#39;&lt;p id=&quot;**target1**&quot;&gt; Values:&#39;</span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">21</span><span class="p">}</span><span class="c1">&#39;,&#39;</span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">22</span><span class="p">}</span><span class="c1">&#39;&lt;/p&gt;</span>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">'Select an option: &lt;select name="**target1**"&gt;</span>
+<span class="c1">'&lt;option value="11;12"&gt;x1; y1&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="21;22"&gt;x2; y2&lt;/option&gt;</span>
+<span class="c1">'&lt;option value="31;32"&gt;x3; y3&lt;/option&gt;</span>
+<span class="c1">'&lt;/select&gt;</span>
+<span class="c1">'...</span>
+<span class="c1">'&lt;p id="**target1**"&gt; Values:'</span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">21</span><span class="p">}</span><span class="c1">','</span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">22</span><span class="p">}</span><span class="c1">'&lt;/p&gt;</span>
 </code></pre></div>
 <p><img alt="Dropdown and two input field" src="media/Image%2045.png" style="width: 300px" /></p>
 <h3 id="radio-buttons">Radio Buttons<a class="headerlink" href="#radio-buttons" title="Permanent link">&para;</a></h3>
-<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">&#39;&lt;p&gt;Select:</span>
-<span class="c1">&#39;&lt;input name=&quot;target2&quot; type=&quot;radio&quot; id=&quot;opt1&quot; value=&quot;1&quot;/&gt;</span>
-<span class="c1">&#39;&lt;label for=&quot;opt1&quot;&gt;option 1&lt;/label&gt;</span>
-<span class="c1">&#39;&lt;input name=&quot;target2&quot; type=&quot;radio&quot; id=&quot;opt2&quot; value=&quot;2&quot;/&gt;</span>
-<span class="c1">&#39;&lt;label for=&quot;opt2&quot;&gt;option 2&lt;/label&gt;</span>
-<span class="c1">&#39;...</span>
-<span class="c1">&#39;&lt;p id=&quot;target2&quot;&gt;Value -&#39;</span><span class="nv">opt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">2</span><span class="p">}</span><span class="c1">&#39;&lt;/p&gt;</span>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">'&lt;p&gt;Select:</span>
+<span class="c1">'&lt;input name="target2" type="radio" id="opt1" value="1"/&gt;</span>
+<span class="c1">'&lt;label for="opt1"&gt;option 1&lt;/label&gt;</span>
+<span class="c1">'&lt;input name="target2" type="radio" id="opt2" value="2"/&gt;</span>
+<span class="c1">'&lt;label for="opt2"&gt;option 2&lt;/label&gt;</span>
+<span class="c1">'...</span>
+<span class="c1">'&lt;p id="target2"&gt;Value -'</span><span class="nv">opt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">2</span><span class="p">}</span><span class="c1">'&lt;/p&gt;</span>
 </code></pre></div>
 <p><img alt="Two radio buttons and an input field" src="media/Image%2046.png" style="width: 250px" /></p>
 <h3 id="check-box">Check Box<a class="headerlink" href="#check-box" title="Permanent link">&para;</a></h3>
-<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">&#39;&lt;p&gt;&lt;input name=&quot;target3&quot; type=&quot;checkbox&quot; id=&quot;chk1&quot; value=&quot;3&quot;/&gt;</span>
-<span class="c1">&#39;&lt;label for=&quot;chk1&quot;&gt;Checkbox 1&lt;/label&gt;&lt;/p&gt;</span>
-<span class="c1">&#39;...</span>
-<span class="c1">&#39;&lt;p id=&quot;target3&quot;&gt;Value -&#39;</span><span class="nv">chk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">3</span><span class="p">}</span><span class="c1">&#39;&lt;/p&gt;</span>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">'&lt;p&gt;&lt;input name="target3" type="checkbox" id="chk1" value="3"/&gt;</span>
+<span class="c1">'&lt;label for="chk1"&gt;Checkbox 1&lt;/label&gt;&lt;/p&gt;</span>
+<span class="c1">'...</span>
+<span class="c1">'&lt;p id="target3"&gt;Value -'</span><span class="nv">chk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="w"> </span><span class="p">{</span><span class="m">3</span><span class="p">}</span><span class="c1">'&lt;/p&gt;</span>
 </code></pre></div>
 <p><img alt="Checkbox and an input field" src="media/Image%2047.png" style="width: 120px" /></p>
 <p>As you can see from the first example, one "value" attribute can contain multiple values, separated by semicolons ";". In this case, you have to provide the respective number of text boxes in the target paragraph.
@@ -3395,19 +3395,19 @@ Structured storage of special matrices is supported for saving space.
 The following commands are available:</p>
 <h3 id="textcsv-files">Text/CSV Files<a class="headerlink" href="#textcsv-files" title="Permanent link">&para;</a></h3>
 <p>Reads data from the specified text/CSV file into the matrix/vector <em>M</em>. The file must exist:</p>
-<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#read</span><span class="w"> </span><span class="nv">M</span><span class="w"> </span><span class="nv">from</span><span class="w"> </span><span class="nv">filename</span><span class="p">.</span><span class="nv">txt</span><span class="p">@</span><span class="nv">R1C1</span><span class="p">:</span><span class="nv">R2C2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">R</span> <span class="nv">SEP</span><span class="o">=</span><span class="c1">&#39;,&#39;</span>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#read</span><span class="w"> </span><span class="nv">M</span><span class="w"> </span><span class="nv">from</span><span class="w"> </span><span class="nv">filename</span><span class="p">.</span><span class="nv">txt</span><span class="p">@</span><span class="nv">R1C1</span><span class="p">:</span><span class="nv">R2C2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">R</span> <span class="nv">SEP</span><span class="o">=</span><span class="c1">','</span>
 </code></pre></div>
 <p>Writes data from matrix/vector <em>M</em> to the specified text/CSV file.
 If the file exists, it is entirely overwritten.
 Otherwise, a new file is created.
 In all cases, the path to the file must exist.</p>
-<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#write</span> <span class="nv">M</span> <span class="nv">to</span> <span class="nv">filename</span><span class="p">.</span><span class="nv">txt</span><span class="p">@</span><span class="nv">R1C1</span><span class="p">:</span><span class="nv">R2C2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">N</span> <span class="nv">SEP</span><span class="o">=</span><span class="c1">&#39;,&#39;</span>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#write</span> <span class="nv">M</span> <span class="nv">to</span> <span class="nv">filename</span><span class="p">.</span><span class="nv">txt</span><span class="p">@</span><span class="nv">R1C1</span><span class="p">:</span><span class="nv">R2C2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">N</span> <span class="nv">SEP</span><span class="o">=</span><span class="c1">','</span>
 </code></pre></div>
 <p>Appends data from matrix/vector <em>M</em> to the specified text/CSV file.
 If the file exists, the data is appended at the end of the existing file.
 Otherwise, a new file is created.
 In all cases, the path to the file must exist.</p>
-<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#append</span> <span class="nv">M</span> <span class="nv">to</span> <span class="nv">filename</span><span class="p">.</span><span class="nv">txt</span><span class="p">@</span><span class="nv">R1C1</span><span class="p">:</span><span class="nv">R2C2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">N</span> <span class="nv">SEP</span><span class="o">=</span><span class="c1">&#39;,&#39;</span>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#append</span> <span class="nv">M</span> <span class="nv">to</span> <span class="nv">filename</span><span class="p">.</span><span class="nv">txt</span><span class="p">@</span><span class="nv">R1C1</span><span class="p">:</span><span class="nv">R2C2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">N</span> <span class="nv">SEP</span><span class="o">=</span><span class="c1">','</span>
 </code></pre></div>
 <p>Command options:</p>
 <ul>

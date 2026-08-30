@@ -3591,12 +3591,12 @@ For example:</p>
 <p>If an index value is less than 1 or greater than the vector length <strong>len</strong>(<span class="arithmatex">\(\vec{a}\)</span>), the program will return an error: Index out of range.
 You can use indexing to initialize vectors inside loops (block or inline). For that purpose, you must include the loop counter into the index.
 For example:</p>
-<div class="language-calcpad highlight"><pre><span></span><code><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector</span><span class="p">(</span><span class="m">6</span><span class="p">)</span><span class="c1">&#39;,&#39;</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector</span><span class="p">(</span><span class="m">6</span><span class="p">)</span>
-<span class="c1">&#39;Block loop</span>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector</span><span class="p">(</span><span class="m">6</span><span class="p">)</span><span class="c1">','</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">vector</span><span class="p">(</span><span class="m">6</span><span class="p">)</span>
+<span class="c1">'Block loop</span>
 <span class="k">#for</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nv">a</span><span class="p">)</span>
 <span class="nv">a</span><span class="p">.</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">k</span><span class="o">^</span><span class="m">2</span>
 <span class="k">#loop</span>
-<span class="c1">&#39;Inline loop</span>
+<span class="c1">'Inline loop</span>
 <span class="nd">$Repeat</span><span class="p">{</span><span class="nv">b</span><span class="p">.</span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">a</span><span class="p">.(</span><span class="nv">k</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nv">b</span><span class="p">)}</span>
 </code></pre></div>
 <p>The above code will produce the following two vectors:</p>

@@ -3130,11 +3130,11 @@ Its value is 1, 100 and 1000 for m, mm and cm, respectively.
 You can use it for units conversion inside the calculations.
 For example, you can create a conditional block for displaying the selected units in the report:</p>
 <div class="language-calcpad highlight"><pre><span></span><code><span class="k">#if</span><span class="w"> </span><span class="o">*</span><span class="nv">Units</span><span class="o">*</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">1</span><span class="w">  </span>
-  <span class="c1">&#39;The selected units are meters  </span>
+  <span class="c1">'The selected units are meters  </span>
 <span class="k">#else if</span><span class="w"> </span><span class="o">*</span><span class="nv">Units</span><span class="o">*</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">100</span><span class="w">  </span>
-  <span class="c1">&#39;The selected units are centimeters  </span>
+  <span class="c1">'The selected units are centimeters  </span>
 <span class="k">#else if</span><span class="w"> </span><span class="o">*</span><span class="nv">Units</span><span class="o">*</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">1000</span><span class="w">  </span>
-  <span class="c1">&#39;The selected units are millimeters  </span>
+  <span class="c1">'The selected units are millimeters  </span>
 <span class="k">#end if</span>
 </code></pre></div>
 <h2 id="formatting-with-html-and-css">Formatting with Html and CSS<a class="headerlink" href="#formatting-with-html-and-css" title="Permanent link">&para;</a></h2>
@@ -3216,7 +3216,7 @@ For example, if you want to make some text bold, you can use the following tags:
 </table>
 <p>You can put Html tags only in comments, but you can also make them affect expressions.
 For example:</p>
-<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">&#39;&lt;span style=&quot;color:red;&quot;&gt; as simple as &#39;</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="c1">&#39;&lt;/span&gt;&#39;</span>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">'&lt;span style="color:red;"&gt; as simple as '</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="c1">'&lt;/span&gt;'</span>
 </code></pre></div>
 <p>will give the following output:</p>
 <p><span style="color:red;">as simple as <span class="arithmatex">\(2 + 2 = 4\)</span></span></p>
@@ -3248,10 +3248,10 @@ You can learn more about Html and CSS from the following links:</p>
 <p>If you have some long and detailed calculations, you can fold them optionally in the output.
 They will be hidden by default, except for the first line, which can be used for the section heading.
 All you need to do is to enclose the folding section into a Html "<strong>div</strong>" element with class "<strong>fold</strong>", as follows:</p>
-<div class="language-html highlight"><pre><span></span><code>&#39;<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fold&quot;</span><span class="p">&gt;</span>
-&#39;<span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>Heading<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;</span> (click to unfold)
-&#39;<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Content to be folded<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
-&#39;<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<div class="language-html highlight"><pre><span></span><code>'<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"fold"</span><span class="p">&gt;</span>
+'<span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>Heading<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;</span> (click to unfold)
+'<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Content to be folded<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+'<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 </code></pre></div>
 <p>The result will look as follows:</p>
 <div class="fold">
@@ -3265,7 +3265,7 @@ You can create it by some image editing software and save it to a *.png, *.gif o
 You can use some freeware programs like Paint, Gimp, InkScape, DraftSight or others.
 Then you can insert it using Html.
 All you need to do is to put the following text at the required place, inside a comment:</p>
-<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">&#39;&lt;img style=&quot;float:right&quot; src=&quot;c:/Users/Me/Pictures/Picture1.png&quot; alt=&quot;Picture1.png&quot;&gt;</span>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">'&lt;img style="float:right" src="c:/Users/Me/Pictures/Picture1.png" alt="Picture1.png"&gt;</span>
 </code></pre></div>
 <p>Of course, instead of "<strong>c:/Users/Me/Pictures/Picture1.png</strong>" you must specify the actual path to your image.
 The file can be local, network or on the Internet.
