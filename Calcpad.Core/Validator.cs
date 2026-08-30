@@ -126,7 +126,7 @@ namespace Calcpad.Core
             VarStartingChars.Contains(c);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsVarChar(char c) => IsLetter(c) || IsDigit(c);
+        public static bool IsVarChar(char c) => IsLetter(c) || char.IsAsciiDigit(c);
 
         public static bool IsValidFormatString(string format)
         {

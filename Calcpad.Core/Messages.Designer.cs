@@ -745,6 +745,15 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
+        // /   Looks up a localized string similar to Invalid variable name: &quot;{0}&quot;..
+        // / </summary>
+        public static string Invalid_variable_name_0 {
+            get {
+                return ResourceManager.GetString("Invalid_variable_name_0", resourceCulture);
+            }
+        }
+
+        // / <summary>
         // /   Looks up a localized string similar to Invalid number of arguments..
         // / </summary>
         public static string Invalid_number_of_arguments {

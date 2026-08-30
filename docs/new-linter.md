@@ -16,6 +16,7 @@ The tables below group them by the kind of problem.
 |------|----------|---------|
 | CPD-1101 | Error | Malformed `#include` statement |
 | CPD-1102 | Error | Missing `#include` filename |
+| CPD-1103 | Warning | Deprecated `#include` input values |
 
 ### Macro definitions
 
@@ -93,6 +94,10 @@ The tables below group them by the kind of problem.
 | CPD-3413 | Warning | Invalid #settings JSON |
 | CPD-3414 | Warning | Invalid PDF settings in a metadata comment |
 | CPD-3415 | Warning | Invalid `#UI` format |
+| CPD-3416 | Warning | `uiOverrides` metadata comment not on the first line |
+| CPD-3417 | Warning | Duplicate `uiOverrides` metadata comment |
+| CPD-3418 | Warning | `uiOverrides` sharing a comment with another key |
+| CPD-3419 | Warning | Deprecated stored input value |
 
 ### Formatting
 

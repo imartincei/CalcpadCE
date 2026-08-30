@@ -1,0 +1,8 @@
+"Legacy input fields
+'Deprecated input-field value storage that #UI replaces. It still parses, so it must lint without errors
+a = ?{5}
+b = a*2
+
+'The field list that fed those values into an #include
+#include import.cpd #{2; 3}
+c = circleArea(b)

@@ -358,6 +358,9 @@
   <data name="Invalid_macro_name_0" xml:space="preserve">
         <value>Invalid macro name: "{0}".</value>
     </data>
+  <data name="Invalid_variable_name_0" xml:space="preserve">
+        <value>Invalid variable name: "{0}".</value>
+    </data>
   <data name="Invalid_inside_macro_definition" xml:space="preserve">
         <value>Invalid inside macro definition.</value>
     </data>

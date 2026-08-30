@@ -127,6 +127,9 @@ namespace Calcpad.Core
         internal static MathParserException InvalidFunction(string s) =>
             new(string.Format(Messages.Invalid_function_0, s));
 
+        internal static MathParserException InvalidVariableName(string s) =>
+            new(string.Format(Messages.Invalid_variable_name_0, s));
+
         internal static MathParserException CannotEvaluateAsType(string literal, string type) =>
             new(string.Format(Messages.Cannot_evaluate_0_as_1, literal, type));
 

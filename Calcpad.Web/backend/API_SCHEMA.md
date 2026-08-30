@@ -424,6 +424,7 @@ interface LintDiagnostic {
 | **Stage 1: Pre-include validation (CPD-11xx)** |||
 | CPD-1101 | Include | Malformed #include statement |
 | CPD-1102 | Include | Missing #include filename |
+| CPD-1103 | Include | Deprecated #include input values |
 | **Stage 2: Macro definitions (CPD-22xx)** |||
 | CPD-2201 | Macro | Duplicate macro definition |
 | CPD-2202 | Macro | Macro name must end with '$' |
@@ -478,6 +479,13 @@ interface LintDiagnostic {
 | CPD-3410 | Semantic | Outer-scope assignment (←) to an undefined variable |
 | CPD-3411 | Semantic | Invalid paramType value in a metadata comment |
 | CPD-3412 | Semantic | Invalid metadata-comment JSON |
+| CPD-3413 | Semantic | Invalid #settings JSON |
+| CPD-3414 | Semantic | Invalid PDF settings in a metadata comment |
+| CPD-3415 | Semantic | Invalid #UI format |
+| CPD-3416 | Semantic | 'uiOverrides' metadata comment not on the first line |
+| CPD-3417 | Semantic | Duplicate 'uiOverrides' metadata comment |
+| CPD-3418 | Semantic | 'uiOverrides' sharing a comment with another key |
+| CPD-3419 | Semantic | Deprecated stored input value |
 | **Stage 3: Format (CPD-36xx)** |||
 | CPD-3601 | Format | Invalid format specifier |
 

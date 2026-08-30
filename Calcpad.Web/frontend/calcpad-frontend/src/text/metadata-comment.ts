@@ -158,6 +158,7 @@ export interface LintCode {
 export const LINT_CODES: LintCode[] = [
     { code: 'CPD-1101', description: 'Malformed #include statement' },
     { code: 'CPD-1102', description: 'Missing #include filename' },
+    { code: 'CPD-1103', description: 'Deprecated #include input values' },
     { code: 'CPD-2201', description: 'Duplicate macro definition' },
     { code: 'CPD-2202', description: "Macro name must end with '$'" },
     { code: 'CPD-2203', description: "Macro parameter must end with '$'" },
@@ -210,6 +211,10 @@ export const LINT_CODES: LintCode[] = [
     { code: 'CPD-3413', description: 'Invalid #settings JSON' },
     { code: 'CPD-3414', description: 'Invalid PDF settings in a metadata comment' },
     { code: 'CPD-3415', description: 'Invalid #UI format' },
+    { code: 'CPD-3416', description: "'uiOverrides' metadata comment not on the first line" },
+    { code: 'CPD-3417', description: "Duplicate 'uiOverrides' metadata comment" },
+    { code: 'CPD-3418', description: "'uiOverrides' sharing a comment with another key" },
+    { code: 'CPD-3419', description: 'Deprecated stored input value' },
     { code: 'CPD-3601', description: 'Invalid format specifier' },
 ];
 

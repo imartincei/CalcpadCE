@@ -10,6 +10,7 @@ namespace Calcpad.Highlighter.Linter.Constants
             // Stage 1: Pre-include validation (CPD-11xx)
             ["CPD-1101"] = "Malformed #include statement",
             ["CPD-1102"] = "Missing #include filename",
+            ["CPD-1103"] = "Deprecated #include input values",
 
             // Stage 2: Macro definitions (CPD-22xx)
             ["CPD-2201"] = "Duplicate macro definition",
@@ -75,6 +76,7 @@ namespace Calcpad.Highlighter.Linter.Constants
             ["CPD-3416"] = "'uiOverrides' metadata comment not on the first line",
             ["CPD-3417"] = "Duplicate 'uiOverrides' metadata comment",
             ["CPD-3418"] = "'uiOverrides' sharing a comment with another key",
+            ["CPD-3419"] = "Deprecated stored input value",
 
             // Stage 3: Format (CPD-36xx)
             ["CPD-3601"] = "Invalid format specifier"
