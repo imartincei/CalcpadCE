@@ -118,7 +118,7 @@ D = symmetric(n_J)
 #show
 D'mm/kN
 'Mass matrix
-d_M.j = $Integral{m(x) @ x = x(j) - Δx/2 : x(j) + Δx/2}
+d_M,j = $Integral{m(x) @ x = x(j) - Δx/2 : x(j) + Δx/2}
 #hide
 d_M = vector(n_J)
 #for j = 1 : n_J - 1
