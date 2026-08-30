@@ -211,11 +211,6 @@ namespace Calcpad.Core
                     _parser.Parse(item.Input, (i == 0 || i > 3) && allowAssignment);
                     item.Rpn = _parser._rpn;
                 }
-                if (_type == SolverTypes.Inf || _type == SolverTypes.Sup)
-                {
-                    var s = items[1].Input + (_type == SolverTypes.Sup ? "_sup" : "_inf");
-                    _parser.SetVariable(s, RealValue.NaN);
-                }
                 var rpn = items[1].Rpn;
                 Parameter[] parameters;
                 if (rpn.Length == 1 && rpn[0] is VariableToken vt)
@@ -226,6 +221,12 @@ namespace Calcpad.Core
                 }
                 else
                     throw Exceptions.CounterMustBeASingleVariableName();
+
+                if (_type == SolverTypes.Inf || _type == SolverTypes.Sup)
+                {
+                    var s = items[1].Input + (_type == SolverTypes.Sup ? "_sup" : "_inf");
+                    _parser.SetVariable(s, RealValue.NaN);
+                }
 
                 if (_parser.IsEnabled)
                 {

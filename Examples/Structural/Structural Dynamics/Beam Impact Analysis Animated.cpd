@@ -122,8 +122,8 @@ y(t) = A*e^(-ξ*ω_1*t)*sin(ω_1*t)
 τ_L = 2.94*root((15/16*(M_s*M_d/(M_s + M_d))*((1 - ν^2)/E + (1 - ν_s^2)/E_s))^2/(R_s*v_0); 5)|ms
 'The above values correspond well to the experimental data in [3], where the recorded durations are of a similar magnitude.
 'The impulse force function will be determined by using the recommended expressions (9.20) - (9.22) in [1]
-'The coefficient of restitution for perfectly inelastic collision is -'e. = 0
-F(t) = M_s*v_0*(1 + e.)*(π/(2*τ_L))*sin(π/τ_L*t)*(abs(t) ≤ τ_L)|kN
+'The coefficient of restitution for perfectly inelastic collision is -'e_r = 0
+F(t) = M_s*v_0*(1 + e_r)*(π/(2*τ_L))*sin(π/τ_L*t)*(abs(t) ≤ τ_L)|kN
 'Impulse load diagram
 '<!--'PlotWidth = 500','PlotHeight = 100'-->
 $Plot{F(t) @ t = 0ms : 50ms}
@@ -160,7 +160,7 @@ D = symmetric(n_J)
 #show
 D'mm/kN
 'Mass matrix
-d_M.j = m*Δx/t
+d_M,j = m*Δx/t
 #hide
 d_M = vector(n_J)
 #for j = 1 : n_J

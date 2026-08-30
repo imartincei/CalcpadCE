@@ -79,6 +79,9 @@ namespace Calcpad.Core
                 Search(s, ' ');
                 ts.ExpandTo(i0 == len ? i0 : i0 - 1);
                 Name = ts.Cut();
+                if (!Validator.IsVariable(Name.ToString()))
+                    throw Exceptions.InvalidVariableName(Name.ToString());
+
                 if (i0 == len)
                     return;
 
