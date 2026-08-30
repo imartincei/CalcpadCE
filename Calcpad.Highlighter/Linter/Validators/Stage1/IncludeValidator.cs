@@ -19,6 +19,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage1
 
                 var includeKeywordEndIndex = line.AsSpan().IndexOf("#include".AsSpan(), StringComparison.OrdinalIgnoreCase) + 8;
 
+                ValidateInputFields(i, line, includeKeywordEndIndex, result);
+
                 // Check if there's anything after #include
                 if (trimmedSpan.Length <= 8 || trimmedSpan[8..].Trim().Length == 0)
                 {
@@ -46,6 +48,26 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage1
                     continue;
                 }
             }
+        }
+
+        /// <summary>
+        /// Warns on the '#{v1; v2}' field list that fed input values into the included file, the
+        /// legacy input storage that #UI replaces. It still parses, so this is a warning that gives
+        /// existing documents time to migrate.
+        /// </summary>
+        private static void ValidateInputFields(int lineIndex, string line, int afterKeyword, LinterResult result)
+        {
+            var span = line.AsSpan();
+            var marker = span[afterKeyword..].LastIndexOf("#{");
+            if (marker < 0)
+                return;
+
+            marker += afterKeyword;
+            var close = span[marker..].IndexOf('}');
+            var end = close < 0 ? span.Length : marker + close + 1;
+            result.AddWarning(lineIndex, marker, end, "CPD-1103",
+                $"'{span[marker..end]}' - declare the inputs with #UI instead",
+                LineStage.Stage1);
         }
     }
 }

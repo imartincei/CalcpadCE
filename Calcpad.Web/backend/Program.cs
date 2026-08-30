@@ -37,25 +37,15 @@ try
     Environment.SetEnvironmentVariable("CALCPAD_HOST", Environment.GetEnvironmentVariable("CALCPAD_HOST") ?? "127.0.0.1");
 
     // Pull our custom CLI flags out of args before handing them to ASP.NET.
-    // --port-file <path>          Write the bound base URL to this file once
-    //                             Kestrel is listening. Used by the Tauri
-    //                             desktop host to discover the random-port
-    //                             server without hard-coding 9420.
-    // --exit-on-stdin-close       When stdin reaches EOF (parent process died
-    //                             and dropped our stdin pipe), exit. On by
-    //                             default whenever stdin is piped; opt out
-    //                             via env CALCPAD_DETACHED=1 (VS Code does
-    //                             this so the server outlives the spawning
-    //                             window and is shared across instances).
-    // --no-exit-on-stdin-close    Force-disable the watchdog (overrides the
-    //                             default-on logic for stdin-piped launches).
-    //                             Tauri sets this because it uses --parent-pid
-    //                             for death detection instead.
-    // --parent-pid <pid>          Poll the given PID every 2s; self-exit when
-    //                             that process disappears. Defense-in-depth
-    //                             for the Tauri host: if Rust panics or is
-    //                             SIGKILL'd without a chance to run its
-    //                             kill-on-exit hook, this reaps the server.
+    // --port-file <path>          Write the bound base URL here once Kestrel is listening,
+    //                             so the Tauri host can discover a random-port server.
+    // --exit-on-stdin-close       Exit when stdin reaches EOF (parent died). On by default
+    //                             whenever stdin is piped; opt out via CALCPAD_DETACHED=1,
+    //                             which VS Code sets so one server is shared across windows.
+    // --no-exit-on-stdin-close    Force-disable the watchdog. Tauri sets this because it
+    //                             uses --parent-pid for death detection instead.
+    // --parent-pid <pid>          Poll the given PID every 2s and self-exit when it
+    //                             disappears, reaping the server if Rust is SIGKILL'd.
     string? portFile = null;
     bool? exitOnStdinCloseExplicit = null;
     int? parentPid = null;
@@ -206,25 +196,51 @@ try
 
     var cts = new CancellationTokenSource();
 
-    // Handle SIGINT (Ctrl+C) and SIGTERM (graceful kill from parent) on all platforms.
-    // Replaces Console.CancelKeyPress, which only covers SIGINT.
-    using var sigIntReg = PosixSignalRegistration.Create(PosixSignal.SIGINT, ctx =>
+    // Handle SIGINT (Ctrl+C) and SIGTERM on all platforms, replacing Console.CancelKeyPress
+    // which only covers SIGINT. An exception escaping one of these runs on the runtime's
+    // signal thread and kills the process with no managed handler and no log, so nothing may
+    // propagate.
+    void RequestShutdown(PosixSignalContext ctx, string signal)
     {
-        FileLogger.LogInfo("Received SIGINT, shutting down");
-        ctx.Cancel = true;
-        cts.Cancel();
-    });
-    using var sigTermReg = PosixSignalRegistration.Create(PosixSignal.SIGTERM, ctx =>
-    {
-        FileLogger.LogInfo("Received SIGTERM, shutting down");
-        ctx.Cancel = true;
-        cts.Cancel();
-    });
+        try
+        {
+            FileLogger.LogInfo($"Received {signal}, shutting down");
+            ctx.Cancel = true;
+            cts.Cancel();
+        }
+        catch (Exception ex)
+        {
+            FileLogger.LogError($"{signal} handler failed", ex);
+        }
+    }
+
+    using var sigIntReg = PosixSignalRegistration.Create(PosixSignal.SIGINT, ctx => RequestShutdown(ctx, "SIGINT"));
+    using var sigTermReg = PosixSignalRegistration.Create(PosixSignal.SIGTERM, ctx => RequestShutdown(ctx, "SIGTERM"));
 
     // Log ASP.NET Core lifetime transitions so graceful-shutdown progress is visible.
     var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
     lifetime.ApplicationStopping.Register(() => FileLogger.LogInfo("ApplicationStopping"));
     lifetime.ApplicationStopped.Register(() => FileLogger.LogInfo("ApplicationStopped"));
+
+    // The startup check above validates the URL string handed to UseUrls, which is the intent
+    // rather than the outcome — a Kestrel:Endpoints section in appsettings.json overrides
+    // UseUrls entirely. app.Urls is the ground truth, so it is re-checked once Kestrel has
+    // bound, before the port-file writer so `bindingRejected` is already set when that runs.
+    var bindingRejected = false;
+    lifetime.ApplicationStarted.Register(() =>
+    {
+        foreach (var bound in app.Urls)
+        {
+            if (Program.IsLoopbackUrl(bound)) continue;
+            bindingRejected = true;
+            FileLogger.LogError(
+                $"Bound to non-loopback address '{bound}' — shutting down",
+                new InvalidOperationException("non-loopback binding"));
+            Console.Error.WriteLine($"ERROR: refusing to serve on non-loopback address '{bound}'.");
+            lifetime.StopApplication();
+            return;
+        }
+    });
 
     // When --port-file was given, write the bound URL once Kestrel is
     // listening. The frontend (Tauri desktop) polls this file to discover
@@ -233,12 +249,21 @@ try
     {
         lifetime.ApplicationStarted.Register(() =>
         {
+            // A rejected binding is being torn down; publishing its URL would point
+            // the frontend at a server that is about to stop.
+            if (bindingRejected) return;
             try
             {
                 // Use the first listening URL — Kestrel resolves any
                 // wildcard/random binding to a concrete one by this point.
                 var addresses = app.Urls.ToList();
                 var bound = addresses.FirstOrDefault() ?? serverUrl;
+                // The default port-file location on Linux is the 1777 temp dir, where
+                // any local user can read it. Tighten the mode while the file is still
+                // empty, so the URL is never briefly world-readable.
+                using (File.Create(portFile)) { }
+                if (!OperatingSystem.IsWindows())
+                    File.SetUnixFileMode(portFile, UnixFileMode.UserRead | UnixFileMode.UserWrite);
                 File.WriteAllText(portFile, bound);
                 FileLogger.LogInfo("Wrote port file", $"{portFile} -> {bound}");
             }
@@ -303,8 +328,18 @@ internal static partial class Program
     internal static bool IsLoopbackUrl(string urlString)
     {
         if (!Uri.TryCreate(urlString, UriKind.Absolute, out var uri)) return false;
-        var host = uri.Host;
+        return IsLoopbackHost(uri.Host);
+    }
+
+    /// <summary>
+    /// True for a bare hostname that denotes this machine (localhost, 127.0.0.0/8, ::1).
+    /// Takes a hostname without scheme or port, as found in a <c>Host</c> header.
+    /// </summary>
+    internal static bool IsLoopbackHost(string host)
+    {
         if (string.Equals(host, "localhost", StringComparison.OrdinalIgnoreCase)) return true;
-        return IPAddress.TryParse(host, out var ip) && IPAddress.IsLoopback(ip);
+        // Uri.Host keeps IPv6 literals in brackets; IPAddress.TryParse wants them bare.
+        var bare = host.StartsWith('[') && host.EndsWith(']') ? host[1..^1] : host;
+        return IPAddress.TryParse(bare, out var ip) && IPAddress.IsLoopback(ip);
     }
 }

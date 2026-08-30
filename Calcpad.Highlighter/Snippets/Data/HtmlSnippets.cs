@@ -157,132 +157,53 @@ namespace Calcpad.Highlighter.Snippets.Data
             },
 
             // ============================================
-            // HTML FORMS / INPUT ELEMENTS
-            // ============================================
-            new SnippetItem
-            {
-                Insert = "\n'<p>Select an option: <select name=\"target1\">\n'<option value=\"11;12\">x1; y1</option>\n'<option value=\"21;22\">x2; y2</option>\n'<option value=\"31;32\">x3; y3</option>\n'</select></p>\n'...\n'<p id=\"target1\"> Values:'x = ? {21}','y = ? {22}'</p>\n",
-                Description = "Dropdown select input",
-                Category = "HTML"
-            },
-            new SnippetItem
-            {
-                Insert = "\n'<p>Select: \n'<input name=\"target2\" type=\"radio\" id=\"opt1\" value=\"1\"/>\n'<label for=\"opt1\">option 1</label>\n'<input name=\"target2\" type=\"radio\" id=\"opt2\" value=\"2\"/>\n'<label for=\"opt2\">option 2</label>\n'...\n'<p id=\"target2\">Value -'opt = ? {2}'</p>\n",
-                Description = "Radio button group",
-                Category = "HTML"
-            },
-            new SnippetItem
-            {
-                Insert = "\n'<p><input name=\"target3\" type=\"checkbox\" id=\"chk1\" value=\"3\"/>\n'<label for=\"chk1\">Checkbox 1</label></p>\n'...\n'<p id=\"target3\">Value -'chk = ? {3}'</p>\n",
-                Description = "Checkbox input",
-                Category = "HTML"
-            },
-
-            // ============================================
-            // HTML COMMENTS - METADATA
+            // METADATA PROPERTIES
             // ============================================
             new SnippetItem
             {
                 Insert = "'<!--{\"desc\": \"text\"}-->",
                 Description = "Metadata comment with description",
                 Label = "Description metadata",
-                Category = "HTML Comments"
+                Category = "Metadata Properties"
             },
             new SnippetItem
             {
                 Insert = "'<!--{\"desc\": \"text\", \"paramTypes\": [\"Scalar\"], \"paramDesc\": [\"text\"]}-->",
                 Description = "Full metadata comment with description, parameter types, and parameter descriptions",
                 Label = "Full parameter metadata",
-                Category = "HTML Comments"
+                Category = "Metadata Properties"
             },
             new SnippetItem
             {
                 Insert = "'<!--{\"paramTypes\": [\"Scalar\"], \"paramDesc\": [\"text\"]}-->",
                 Description = "Metadata comment with parameter types and descriptions",
                 Label = "Parameter types + descriptions",
-                Category = "HTML Comments"
+                Category = "Metadata Properties"
             },
             new SnippetItem
             {
                 Insert = "'<!--{\"paramTypes\": [\"Scalar\"]}-->",
                 Description = "Metadata comment with parameter types only",
                 Label = "Parameter types only",
-                Category = "HTML Comments"
+                Category = "Metadata Properties"
             },
 
             // ============================================
-            // HTML COMMENTS - SETTINGS OVERRIDES
-            // ============================================
-            new SnippetItem
-            {
-                Insert = "'<!--{\"settings\": {}}-->",
-                Description = "File settings override block. Keys: decimals, degrees, complex, substitute, formatEquations, vectorGraphics, colorScale, etc.",
-                Label = "Settings override",
-                Category = "HTML Comments"
-            },
-            new SnippetItem
-            {
-                Insert = "'<!--{\"settings\": {\"decimals\": 2}}-->",
-                Description = "Override decimal places in output (0-15)",
-                Label = "Settings: decimals",
-                Category = "HTML Comments"
-            },
-            new SnippetItem
-            {
-                Insert = "'<!--{\"settings\": {\"degrees\": 1}}-->",
-                Description = "Set angle unit to degrees (0=radians, 1=degrees, 2=gradians)",
-                Label = "Settings: degrees",
-                Category = "HTML Comments"
-            },
-            new SnippetItem
-            {
-                Insert = "'<!--{\"settings\": {\"complex\": true}}-->",
-                Description = "Enable complex number mode",
-                Label = "Settings: complex mode",
-                Category = "HTML Comments"
-            },
-
-            // ============================================
-            // HTML COMMENTS - LINT IGNORE
+            // METADATA PROPERTIES - LINT IGNORE
             // ============================================
             new SnippetItem
             {
                 Insert = "'<!--{\"LintIgnore\": [\"CPD-XXXX\"]}-->\n\n'<!--{\"EndLintIgnore\": []}-->",
                 Description = "Suppress specific linter diagnostics in a region. Add error codes like CPD-3301.",
                 Label = "Lint ignore region (specific codes)",
-                Category = "HTML Comments"
+                Category = "Metadata Properties"
             },
             new SnippetItem
             {
                 Insert = "'<!--{\"LintIgnore\": []}-->\n\n'<!--{\"EndLintIgnore\": []}-->",
                 Description = "Suppress all linter diagnostics in a region",
                 Label = "Lint ignore region (all)",
-                Category = "HTML Comments"
-            },
-
-            // ============================================
-            // HTML COMMENTS - NO-PRINT REGION
-            // ============================================
-            new SnippetItem
-            {
-                Insert = "'<!--{\"NoPrintStart\": true}-->\n\n'<!--{\"NoPrintEnd\": true}-->",
-                Description = "Exclude a region of content from PDF/print output",
-                Label = "No-print region",
-                Category = "HTML Comments"
-            },
-            new SnippetItem
-            {
-                Insert = "'<!--{\"NoPrintStart\": true}-->",
-                Description = "Start a region excluded from PDF/print output",
-                Label = "No-print region start",
-                Category = "HTML Comments"
-            },
-            new SnippetItem
-            {
-                Insert = "'<!--{\"NoPrintEnd\": true}-->",
-                Description = "End a region excluded from PDF/print output",
-                Label = "No-print region end",
-                Category = "HTML Comments"
+                Category = "Metadata Properties"
             },
 
             // ============================================

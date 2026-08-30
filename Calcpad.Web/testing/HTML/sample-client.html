@@ -12,7 +12,7 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
-        
+
         .container {
             background: white;
             border-radius: 8px;
@@ -20,24 +20,24 @@
             padding: 30px;
             margin-bottom: 20px;
         }
-        
+
         h1 {
             color: #333;
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .input-section {
             margin-bottom: 30px;
         }
-        
+
         label {
             display: block;
             margin-bottom: 10px;
             font-weight: bold;
             color: #555;
         }
-        
+
         textarea {
             width: 100%;
             height: 200px;
@@ -49,18 +49,18 @@
             resize: vertical;
             box-sizing: border-box;
         }
-        
+
         textarea:focus {
             border-color: #007bff;
             outline: none;
         }
-        
+
         .button-group {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
         }
-        
+
         button {
             padding: 12px 24px;
             border: none;
@@ -70,69 +70,69 @@
             font-weight: bold;
             transition: background-color 0.3s;
         }
-        
+
         .btn-primary {
             background-color: #007bff;
             color: white;
         }
-        
+
         .btn-primary:hover {
             background-color: #0056b3;
         }
-        
+
         .btn-secondary {
             background-color: #6c757d;
             color: white;
         }
-        
+
         .btn-secondary:hover {
             background-color: #545b62;
         }
-        
+
         .btn-success {
             background-color: #28a745;
             color: white;
         }
-        
+
         .btn-success:hover {
             background-color: #1e7e34;
         }
-        
+
         button:disabled {
             background-color: #ccc;
             cursor: not-allowed;
         }
-        
+
         .status {
             padding: 10px;
             border-radius: 4px;
             margin-bottom: 20px;
             font-weight: bold;
         }
-        
+
         .status.success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-        
+
         .status.error {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        
+
         .status.loading {
             background-color: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
         }
-        
+
         .result-section {
             border-top: 2px solid #eee;
             padding-top: 20px;
         }
-        
+
         .result-frame {
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -140,7 +140,7 @@
             background: white;
             overflow: auto;
         }
-        
+
         .examples {
             background: #f8f9fa;
             border: 1px solid #e9ecef;
@@ -148,12 +148,12 @@
             padding: 15px;
             margin-bottom: 20px;
         }
-        
+
         .examples h3 {
             margin-top: 0;
             color: #495057;
         }
-        
+
         .example-item {
             margin-bottom: 10px;
             cursor: pointer;
@@ -162,16 +162,16 @@
             background: white;
             border: 1px solid #dee2e6;
         }
-        
+
         .example-item:hover {
             background: #e9ecef;
         }
-        
+
         .example-title {
             font-weight: bold;
             color: #007bff;
         }
-        
+
         .api-info {
             background: #e7f3ff;
             border: 1px solid #b3d9ff;
@@ -179,11 +179,11 @@
             padding: 15px;
             margin-bottom: 20px;
         }
-        
+
         .api-info strong {
             color: #0056b3;
         }
-        
+
         .settings-section {
             background: #f8f9fa;
             border: 1px solid #e9ecef;
@@ -191,22 +191,22 @@
             padding: 20px;
             margin-bottom: 20px;
         }
-        
+
         .settings-section h3 {
             margin-top: 0;
             color: #495057;
         }
-        
+
         .settings-section h4 {
             color: #6c757d;
             margin-bottom: 15px;
         }
-        
+
         .settings-section input, .settings-section select {
             border: 1px solid #ced4da;
             border-radius: 4px;
         }
-        
+
         .settings-section input:focus, .settings-section select:focus {
             border-color: #007bff;
             outline: none;
@@ -217,12 +217,12 @@
 <body>
     <div class="container">
         <h1>🧮 Calcpad API Client</h1>
-        
+
         <div class="api-info">
             <strong>API Endpoint:</strong> <span id="apiUrl">http://localhost:9420</span>
             <button type="button" onclick="changeApiUrl()" class="btn-secondary" style="margin-left: 10px; padding: 5px 10px; font-size: 12px;">Change URL</button>
         </div>
-        
+
         <div class="examples">
             <h3>📚 Example Templates:</h3>
             <div class="example-item" onclick="loadExample('basic')">
@@ -254,12 +254,12 @@
                 <div>Test new &lt;s3:download&gt; API syntax</div>
             </div>
         </div>
-        
+
         <div class="input-section">
             <label for="calcpadInput">Enter Calcpad Code:</label>
             <textarea id="calcpadInput" placeholder="Enter your Calcpad mathematical expressions here..."></textarea>
         </div>
-        
+
         <div class="settings-section">
             <h3>⚙️ Settings:</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
@@ -267,14 +267,14 @@
                     <h4>Math Settings:</h4>
                     <label for="decimals" style="font-weight: normal;">Decimal Places:</label>
                     <input type="number" id="decimals" min="0" max="15" value="6" style="width: 100%; padding: 5px; margin-bottom: 10px;">
-                    
+
                     <label for="degrees" style="font-weight: normal;">Angle Units:</label>
                     <select id="degrees" style="width: 100%; padding: 5px; margin-bottom: 10px;">
                         <option value="0">Radians</option>
                         <option value="1">Degrees</option>
                         <option value="2">Gradians</option>
                     </select>
-                    
+
                     <label style="font-weight: normal;">
                         <input type="checkbox" id="isComplex"> Enable Complex Numbers
                     </label><br>
@@ -285,7 +285,7 @@
                         <input type="checkbox" id="formatEquations" checked> Format Equations
                     </label>
                 </div>
-                
+
                 <div>
                     <h4>Plot Settings:</h4>
                     <label for="colorScale" style="font-weight: normal;">Color Scale:</label>
@@ -301,7 +301,7 @@
                         <option value="BlueToRed">Blue to Red</option>
                         <option value="PurpleToYellow">Purple to Yellow</option>
                     </select>
-                    
+
                     <label for="lightDirection" style="font-weight: normal;">Light Direction:</label>
                     <select id="lightDirection" style="width: 100%; padding: 5px; margin-bottom: 10px;">
                         <option value="NorthWest" selected>North West</option>
@@ -313,7 +313,7 @@
                         <option value="SouthWest">South West</option>
                         <option value="West">West</option>
                     </select>
-                    
+
                     <label style="font-weight: normal;">
                         <input type="checkbox" id="shadows" checked> Enable Shadows
                     </label><br>
@@ -321,7 +321,7 @@
                         <input type="checkbox" id="vectorGraphics"> Vector Graphics
                     </label>
                 </div>
-                
+
                 <div>
                     <h4>Display Settings:</h4>
                     <label for="theme" style="font-weight: normal;">Theme:</label>
@@ -330,12 +330,12 @@
                         <option value="dark">Dark</option>
                     </select>
                 </div>
-                
+
                 <div>
                     <h4>🔐 S3 Auth Settings:</h4>
                     <label for="s3Url" style="font-weight: normal;">S3 API URL:</label>
                     <input type="text" id="s3Url" placeholder="http://localhost:5000" value="http://localhost:5000" style="width: 100%; padding: 5px; margin-bottom: 10px;">
-                    
+
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                         <div>
                             <label for="s3Username" style="font-weight: normal;">Username:</label>
@@ -346,7 +346,7 @@
                             <input type="password" id="s3Password" placeholder="admin" value="admin" style="width: 100%; padding: 5px;">
                         </div>
                     </div>
-                    
+
                     <div style="margin-bottom: 10px;">
                         <button type="button" onclick="loginToS3()" class="btn-success" id="s3LoginBtn" style="padding: 6px 12px; font-size: 14px; background-color: #28a745;">
                             🔑 Login & Get JWT
@@ -355,13 +355,13 @@
                             🗑️ Clear
                         </button>
                     </div>
-                    
+
                     <div id="s3AuthStatus" style="display: none; padding: 8px; border-radius: 4px; margin-bottom: 10px; font-size: 12px;"></div>
-                    
+
                     <small style="color: #666;">Login to authenticate for API routing tests (JWT stored automatically)</small>
                 </div>
             </div>
-            
+
             <div id="pdfSettings" style="background: #f0f8ff; border: 1px solid #b3d9ff; border-radius: 4px; padding: 15px; margin-bottom: 20px;">
                 <h4>📄 PDF Settings:</h4>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -375,21 +375,21 @@
                             <option value="Legal">Legal</option>
                             <option value="Tabloid">Tabloid</option>
                         </select>
-                        
+
                         <label for="pdfOrientation" style="font-weight: normal;">Orientation:</label>
                         <select id="pdfOrientation" style="width: 100%; padding: 5px; margin-bottom: 10px;">
                             <option value="portrait" selected>Portrait</option>
                             <option value="landscape">Landscape</option>
                         </select>
                     </div>
-                    
+
                     <div>
                         <label for="pdfTitle" style="font-weight: normal;">Document Title:</label>
                         <input type="text" id="pdfTitle" placeholder="Calcpad Document" style="width: 100%; padding: 5px; margin-bottom: 10px;">
-                        
+
                         <label for="pdfAuthor" style="font-weight: normal;">Author:</label>
                         <input type="text" id="pdfAuthor" placeholder="Author Name" style="width: 100%; padding: 5px; margin-bottom: 10px;">
-                        
+
                         <label style="font-weight: normal;">
                             <input type="checkbox" id="pdfHeader"> Enable Header
                         </label><br>
@@ -400,7 +400,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="button-group">
             <button type="button" onclick="convertToHtml()" class="btn-primary" id="convertBtn">
                 🚀 Convert to HTML
@@ -424,9 +424,9 @@
                 🗑️ Clear
             </button>
         </div>
-        
+
         <div id="status" class="status" style="display: none;"></div>
-        
+
         <div class="result-section">
             <h2>📊 Result:</h2>
             <div class="result-frame" id="resultFrame">
@@ -440,7 +440,7 @@
     <script>
         let apiBaseUrl = 'http://localhost:9420';
         let s3JwtToken = null;
-        
+
         const examples = {
             basic: `"Basic Arithmetic Operations
 '<hr/>
@@ -451,7 +451,7 @@ c = 3.14
 
 'Operations:
 sum = a + b
-difference = a - b  
+difference = a - b
 product = a * b
 quotient = a / b
 power = a^2
@@ -534,8 +534,8 @@ a = 10
 b = 5
 
 'Syntax errors (these will cause parsing issues):
-c = a +    
-d = b * 
+c = a +
+d = b *
 e = undefined_variable + 10
 f = sin(invalid_syntax
 
@@ -653,7 +653,7 @@ result = base_value * scale_factor + first_value`
             statusElement.textContent = message;
             statusElement.className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
             statusElement.style.display = 'block';
-            
+
             if (type === 'success' || type === 'error') {
                 setTimeout(() => {
                     statusElement.style.display = 'none';
@@ -666,7 +666,7 @@ result = base_value * scale_factor + first_value`
             statusDiv.textContent = message;
             statusDiv.className = `status ${type}`;
             statusDiv.style.display = 'block';
-            
+
             if (type === 'success' || type === 'error') {
                 setTimeout(() => {
                     statusDiv.style.display = 'none';
@@ -680,14 +680,14 @@ result = base_value * scale_factor + first_value`
 
         async function loadSample() {
             showStatus('Loading sample from API...', 'loading');
-            
+
             try {
                 const response = await fetch(`${apiBaseUrl}/api/calcpad/sample`);
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                
+
                 const data = await response.json();
                 document.getElementById('calcpadInput').value = data.content;
                 showStatus('Sample loaded successfully!', 'success');
@@ -707,7 +707,7 @@ result = base_value * scale_factor + first_value`
         // Color scale enum mapping
         const colorScaleMap = {
             "None": 0,
-            "Gray": 1, 
+            "Gray": 1,
             "Rainbow": 2,
             "Terrain": 3,
             "VioletToYellow": 4,
@@ -733,7 +733,7 @@ result = base_value * scale_factor + first_value`
         function getSettingsFromForm() {
             const colorScaleValue = document.getElementById('colorScale').value;
             const lightDirectionValue = document.getElementById('lightDirection').value;
-            
+
             const settings = {
                 math: {
                     decimals: parseInt(document.getElementById('decimals').value),
@@ -755,7 +755,7 @@ result = base_value * scale_factor + first_value`
                     format: "html"
                 }
             };
-            
+
             // Add auth settings if JWT token is available
             const s3Url = document.getElementById('s3Url').value.trim();
             if (s3Url && s3JwtToken) {
@@ -775,7 +775,7 @@ result = base_value * scale_factor + first_value`
                     }
                 };
             }
-            
+
             return settings;
         }
 
@@ -788,27 +788,18 @@ result = base_value * scale_factor + first_value`
                 Format: document.getElementById('pdfFormat').value,
                 Orientation: document.getElementById('pdfOrientation').value,
                 PrintBackground: true,
-                Scale: 1.0,
                 MarginTop: "2cm",
-                MarginRight: "1.5cm", 
+                MarginRight: "1.5cm",
                 MarginBottom: "2cm",
                 MarginLeft: "1.5cm",
-                EnableHeader: document.getElementById('pdfHeader').checked,
-                EnableFooter: document.getElementById('pdfFooter').checked,
                 DocumentTitle: document.getElementById('pdfTitle').value || "Calcpad Document",
-                DocumentSubtitle: "",
-                HeaderCenter: "",
-                FooterCenter: "",
-                Author: document.getElementById('pdfAuthor').value || "",
-                Company: "",
-                Project: ""
             };
         }
 
 
         async function convertToHtml() {
             const input = document.getElementById('calcpadInput').value.trim();
-            
+
             if (!input) {
                 showStatus('Please enter some Calcpad code first!', 'error');
                 return;
@@ -816,20 +807,20 @@ result = base_value * scale_factor + first_value`
 
             const convertBtn = document.getElementById('convertBtn');
             const resultFrame = document.getElementById('resultFrame');
-            
+
             convertBtn.disabled = true;
             convertBtn.textContent = '⏳ Converting...';
             showStatus('Converting Calcpad code to HTML...', 'loading');
 
             try {
                 const settings = getSettingsFromForm();
-                
-                const requestBody = { 
+
+                const requestBody = {
                     content: input,
                     settings: settings,
                     theme: getTheme()
                 };
-                
+
                 const response = await fetch(`${apiBaseUrl}/api/calcpad/convert`, {
                     method: 'POST',
                     headers: {
@@ -856,11 +847,11 @@ result = base_value * scale_factor + first_value`
                         ${bodyContent}
                     </div>
                 `;
-                
+
             } catch (error) {
                 showStatus(`Conversion failed: ${error.message}`, 'error');
                 console.error('Error:', error);
-                
+
                 // Show error in result frame
                 resultFrame.innerHTML = `
                     <div style="padding: 20px; color: #721c24; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; margin: 20px;">
@@ -878,7 +869,7 @@ result = base_value * scale_factor + first_value`
 
         async function generatePdf() {
             const input = document.getElementById('calcpadInput').value.trim();
-            
+
             if (!input) {
                 showStatus('Please enter some Calcpad code first!', 'error');
                 return;
@@ -886,25 +877,25 @@ result = base_value * scale_factor + first_value`
 
             const pdfBtn = document.getElementById('pdfBtn');
             const resultFrame = document.getElementById('resultFrame');
-            
+
             pdfBtn.disabled = true;
             pdfBtn.textContent = '⏳ Generating PDF...';
             showStatus('Generating PDF...', 'loading');
 
             try {
                 const settings = getSettingsFromForm();
-                
+
                 // Set the output format to PDF
                 if (!settings.output) settings.output = {};
                 settings.output.format = 'pdf';
-                
-                const requestBody = { 
+
+                const requestBody = {
                     content: input,
                     settings: settings,
                     theme: getTheme(),
                     pdfSettings: getPdfSettings()
                 };
-                
+
                 const response = await fetch(`${apiBaseUrl}/api/calcpad/convert`, {
                     method: 'POST',
                     headers: {
@@ -928,7 +919,7 @@ result = base_value * scale_factor + first_value`
                 link.click();
                 document.body.removeChild(link);
                 window.URL.revokeObjectURL(url);
-                
+
                 resultFrame.innerHTML = `
                     <div style="padding: 20px; color: #155724; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px; margin: 20px; text-align: center;">
                         <h3>✅ PDF Generated Successfully</h3>
@@ -936,13 +927,13 @@ result = base_value * scale_factor + first_value`
                         <p>If the download doesn't start, please check your browser's download settings.</p>
                     </div>
                 `;
-                
+
                 showStatus('PDF generated and downloaded successfully!', 'success');
-                
+
             } catch (error) {
                 showStatus(`PDF generation failed: ${error.message}`, 'error');
                 console.error('Error:', error);
-                
+
                 // Show error in result frame
                 resultFrame.innerHTML = `
                     <div style="padding: 20px; color: #721c24; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; margin: 20px;">
@@ -961,7 +952,7 @@ result = base_value * scale_factor + first_value`
 
         async function convertToUnwrappedCode() {
             const input = document.getElementById('calcpadInput').value.trim();
-            
+
             if (!input) {
                 showStatus('Please enter some Calcpad code first!', 'error');
                 return;
@@ -969,20 +960,20 @@ result = base_value * scale_factor + first_value`
 
             const unwrappedBtn = document.getElementById('unwrappedBtn');
             const resultFrame = document.getElementById('resultFrame');
-            
+
             unwrappedBtn.disabled = true;
             unwrappedBtn.textContent = '⏳ Processing...';
             showStatus('Converting to unwrapped code view...', 'loading');
 
             try {
                 const settings = getSettingsFromForm();
-                
+
                 const response = await fetch(`${apiBaseUrl}/api/calcpad/convert-unwrapped`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         content: input,
                         settings: settings,
                         theme: getTheme()
@@ -1008,11 +999,11 @@ result = base_value * scale_factor + first_value`
                 `;
 
                 showStatus('Unwrapped code view generated successfully!', 'success');
-                
+
             } catch (error) {
                 showStatus(`Unwrapped conversion failed: ${error.message}`, 'error');
                 console.error('Error converting to unwrapped code:', error);
-                
+
                 // Show error in result frame
                 resultFrame.innerHTML = `
                     <div style="padding: 20px; color: #721c24; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; margin: 20px;">
@@ -1066,22 +1057,22 @@ result = base_value * scale_factor + first_value`
         function showCurrentSettings() {
             const settings = getSettingsFromForm();
             const settingsJson = JSON.stringify(settings, null, 2);
-            
+
             // Show in a modal-like overlay
             const overlay = document.createElement('div');
             overlay.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                background: rgba(0,0,0,0.5); z-index: 1000; 
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5); z-index: 1000;
                 display: flex; align-items: center; justify-content: center;
             `;
-            
+
             const modal = document.createElement('div');
             modal.style.cssText = `
-                background: white; padding: 20px; border-radius: 8px; 
+                background: white; padding: 20px; border-radius: 8px;
                 max-width: 600px; max-height: 80vh; overflow: auto;
                 box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             `;
-            
+
             modal.innerHTML = `
                 <h3>Current Settings JSON</h3>
                 <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow: auto; font-size: 12px;">${settingsJson}</pre>
@@ -1090,10 +1081,10 @@ result = base_value * scale_factor + first_value`
                     <button type="button" onclick="navigator.clipboard.writeText('${settingsJson.replace(/'/g, "\\'")}'); showStatus('Settings copied to clipboard!', 'success')" class="btn-primary" style="margin-left: 10px;">Copy to Clipboard</button>
                 </div>
             `;
-            
+
             overlay.appendChild(modal);
             document.body.appendChild(overlay);
-            
+
             // Close on outside click
             overlay.addEventListener('click', (e) => {
                 if (e.target === overlay) overlay.remove();

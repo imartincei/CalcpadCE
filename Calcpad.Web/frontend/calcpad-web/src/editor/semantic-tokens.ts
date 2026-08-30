@@ -22,13 +22,15 @@ export function registerSemanticTokensProvider(
             return legend;
         },
 
-        async provideDocumentSemanticTokens(model) {
+        async provideDocumentSemanticTokens(model, _lastResultId, token) {
             const content = model.getValue();
             const truncatedContent = truncateBase64Content(content);
             const ctx = getFileContext ? await getFileContext(content) : {};
-            const tokens = await apiClient.highlight(truncatedContent, false, ctx.sourceFilePath);
+            const tokens = await apiClient.highlight(truncatedContent, false, ctx.sourceFilePath, {
+                key: `highlight:${model.uri.toString()}`,
+            });
 
-            if (!tokens || tokens.length === 0) {
+            if (token.isCancellationRequested || !tokens || tokens.length === 0) {
                 return { data: new Uint32Array(0) };
             }
 

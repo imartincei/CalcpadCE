@@ -5,20 +5,18 @@ using Calcpad.Highlighter.Tokenizer.Models;
 namespace Calcpad.Highlighter.Linter.Helpers
 {
     /// <summary>
-    /// Helper for parsing semicolon-separated parameter lists in Calcpad.
-    /// Handles nested parentheses, braces, and brackets correctly.
-    /// Uses span-based index tracking instead of StringBuilder to reduce allocations.
+    /// Helper for parsing semicolon-separated parameter lists in Calcpad, handling nested
+    /// parentheses, braces and brackets. Uses span-based index tracking instead of StringBuilder
+    /// to reduce allocations.
     /// </summary>
     public static class ParameterParser
     {
         /// <summary>
-        /// Parses a semicolon-separated parameter string and returns a list of parameters.
-        /// Ignores semicolons inside parentheses, braces, and brackets.
-        /// Empty parameters are preserved in the result.
-        /// When <paramref name="lineTokens"/> and <paramref name="tokenGroups"/> are both
-        /// provided, also partitions the line's tokens into per-parameter groups based on
-        /// the same split boundaries. <paramref name="paramStartCol"/> is the column of the
-        /// first character inside the parentheses (column after the opening paren).
+        /// Parses a semicolon-separated parameter string, ignoring semicolons inside parentheses,
+        /// braces and brackets and preserving empty parameters. When <paramref name="lineTokens"/>
+        /// and <paramref name="tokenGroups"/> are both provided, also partitions the line's tokens
+        /// into per-parameter groups on the same boundaries, with <paramref name="paramStartCol"/>
+        /// the column just inside the opening paren.
         /// </summary>
         public static List<string> ParseParameters(string paramsStr,
             List<Token> lineTokens = null, int paramStartCol = 0,
@@ -97,10 +95,9 @@ namespace Calcpad.Highlighter.Linter.Helpers
         }
 
         /// <summary>
-        /// Counts the number of parameters in a semicolon-separated string.
-        /// Ignores semicolons inside parentheses, braces, and brackets.
-        /// Empty parameters are included in the count.
-        /// Zero-allocation: just counts delimiters at depth 0.
+        /// Counts the parameters in a semicolon-separated string, ignoring semicolons inside
+        /// parentheses, braces and brackets and including empty parameters. Zero-allocation: it
+        /// just counts delimiters at depth 0.
         /// </summary>
         public static int CountParameters(string paramsStr)
         {
@@ -166,9 +163,8 @@ namespace Calcpad.Highlighter.Linter.Helpers
         }
 
         /// <summary>
-        /// Splits content by a delimiter using span-based index tracking.
-        /// Ignores delimiters inside parentheses, braces, and brackets.
-        /// Empty segments are preserved in the result.
+        /// Splits content by a delimiter using span-based index tracking, ignoring delimiters
+        /// inside parentheses, braces and brackets. Empty segments are preserved.
         /// </summary>
         public static List<string> SplitByDelimiter(string content, char delimiter)
         {

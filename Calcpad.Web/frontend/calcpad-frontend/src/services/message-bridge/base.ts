@@ -2,15 +2,22 @@ import { CalcpadApiClient } from '../../api/client';
 import { CalcpadSnippetService } from '../snippets';
 import { CalcpadDefinitionsService } from '../definitions';
 import { parseHeadings } from '../headings';
-import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from '../../text/metadata-comment';
-import type { MetadataCommentData, MetadataCommentBlock, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
-import type { DefinitionsResponse } from '../../types/api';
-import { getDefaultSettings, buildApiSettings } from '../../types/settings';
-import type { CalcpadSettings } from '../../types/settings';
-import { DEFAULT_PDF_SETTINGS } from '../../types/pdf-settings';
+import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver, pdfSettingsFromDocument, hasMetadataContent } from '../../text/metadata-comment';
+import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
+import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
+import type { UiDirectiveData } from '../../text/ui-directive';
+import type { DefinitionsResponse, ExportVariant } from '../../types/api';
+import { getDefaultSettings, buildApiSettings, coerceWriteMode, writesAllowed } from '../../types/settings';
+import type { CalcpadSettings, WriteMode } from '../../types/settings';
+import { resolveStoredPdfSettings, resolveEffectivePdfSettings } from '../../types/pdf-settings';
+import type { PdfSettings } from '../../types/pdf-settings';
 import { buildImageCommentLine, bytesToBase64 } from '../image-utils';
 import type { ImageStorageMode, PickedImage } from '../image-utils';
 import { extractPlotsFromHtml, type ExtractedPlot } from '../plot-extract';
+import { extractUiControls } from '../ui-overrides';
+import type { UiControl } from '../ui-overrides';
+import { COMPILED_MIME } from '../cpdz';
+import { DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT } from '../preview-limits';
 import { buildZip } from '../zip-writer';
 import type { ILogger } from '../../types/interfaces';
 
@@ -39,6 +46,53 @@ export type QuickPickFn = <T>(opts: {
     options: QuickPickOption<T>[];
 }) => Promise<T | null>;
 
+/**
+ * The convert-request fields a given export variant renders with. `unwrapped` goes to a
+ * different endpoint entirely, hence the flag rather than a field.
+ *
+ * No variant carries line anchors: an exported file is read, not navigated, so the per-line
+ * ids and error-summary boxes the preview relies on are always suppressed.
+ */
+export interface VariantRender {
+    forPrint: boolean;
+    enableUi: boolean;
+    unwrap: boolean;
+    /** Whether the entered `#UI` values apply to this rendering. */
+    useOverrides: boolean;
+    /** Suffix for the save dialog's title, e.g. "Export Preview PDF". */
+    label: string;
+}
+
+/**
+ * `report` is the default (the print layout, `#pre` hidden and entered `#UI` values applied),
+ * `preview` is what the results pane shows, and `input` is the form itself — which needs
+ * `forPrint` false, since the server drops UI mode for print output.
+ *
+ * `previewAppliesUiOverrides` is the "Apply `#UI` Values in Preview" setting, and has to reach
+ * both the pane and the export or the two disagree.
+ */
+export function variantRender(variant: ExportVariant, previewAppliesUiOverrides = false): VariantRender {
+    switch (variant) {
+        case 'preview':
+            return { forPrint: false, enableUi: false, unwrap: false, useOverrides: previewAppliesUiOverrides, label: 'Preview' };
+        case 'input':
+            return { forPrint: false, enableUi: true, unwrap: false, useOverrides: true, label: 'Input Form' };
+        case 'unwrapped':
+            return { forPrint: false, enableUi: false, unwrap: true, useOverrides: false, label: 'Unwrapped' };
+        default:
+            return { forPrint: true, enableUi: false, unwrap: false, useOverrides: true, label: '' };
+    }
+}
+
+/**
+ * Save-dialog title naming the variant, so four PDF buttons don't all open an identically
+ * titled dialog. The default report variant stays unqualified: "Export PDF".
+ */
+function exportDialogTitle(verb: string, format: string, variant: ExportVariant): string {
+    const label = variantRender(variant).label;
+    return label ? `${verb} ${label} ${format}` : `${verb} ${format}`;
+}
+
 /** Base64 payloads above this size prompt a "save to file instead?" warning. */
 const BASE64_WARN_BYTES = 250 * 1024;
 
@@ -61,7 +115,12 @@ export abstract class BaseMessageBridge {
     protected definitionsService: CalcpadDefinitionsService;
     protected settings: CalcpadSettings;
     protected _onInsertText: ((text: string) => void) | null = null;
+    protected _onGoToLine: ((line: number) => boolean) | null = null;
     protected quickPick: QuickPickFn | null = null;
+    private _uiOverridesProvider: (() => Record<string, string> | undefined) | null = null;
+    private _uiControlsProvider: (() => UiControl[] | null) | null = null;
+    private _uiControlsSink: ((controls: UiControl[]) => void) | null = null;
+    private _uiOverridesSink: ((overrides: Record<string, string>) => void) | null = null;
     private _cachedPlots: ExtractedPlot[] = [];
 
     constructor(serverUrl: string, logger?: ILogger) {
@@ -79,6 +138,15 @@ export abstract class BaseMessageBridge {
 
     getSettings(): CalcpadSettings { return this.settings; }
 
+    writeMode(): WriteMode {
+        return coerceWriteMode(this.getExtraSetting('writeMode'));
+    }
+
+    /** Whether a render with these flags may run `#write`/`#append`. */
+    mayWrite(forPrint: boolean, enableUi = false): boolean {
+        return writesAllowed(this.writeMode(), forPrint, enableUi);
+    }
+
     /** Read an "extra" (non-CalcpadSettings) preference. */
     abstract getExtraSetting(key: string): string | undefined;
     /** Persist an arbitrary extra preference. */
@@ -88,9 +156,88 @@ export abstract class BaseMessageBridge {
         this._onInsertText = handler;
     }
 
+    /**
+     * Host hook for sidebar line navigation, returning true when it handled the jump
+     * itself. Only the host knows which results pane is on screen: input mode hides the
+     * editor, so the navigation has to land in the rendered form instead.
+     */
+    set onGoToLine(handler: (line: number) => boolean) {
+        this._onGoToLine = handler;
+    }
+
     /** Host injects a modal list picker used by the image-storage prompt. */
     setQuickPick(fn: QuickPickFn): void {
         this.quickPick = fn;
+    }
+
+    /**
+     * Host injects a lookup for the active document's entered `#UI` values. The store lives
+     * with the editor groups (it is keyed per document), so the bridge can't own it — but
+     * report and input-form exports need it to render what the user actually typed.
+     */
+    setUiOverridesProvider(fn: () => Record<string, string> | undefined): void {
+        this._uiOverridesProvider = fn;
+    }
+
+    protected activeUiOverrides(): Record<string, string> | undefined {
+        return this._uiOverridesProvider?.() ?? undefined;
+    }
+
+    /**
+     * Host injects the controls of the active document's last input-form render, and a way
+     * to record a fresh set. Null means the document has not been rendered as a form yet,
+     * which is what makes the Properties tab withhold its used/unused verdicts rather than
+     * declare every saved value orphaned.
+     */
+    setUiControlsProvider(fn: () => UiControl[] | null): void {
+        this._uiControlsProvider = fn;
+    }
+
+    /** Host injects where a render made here records its controls, keyed by its own document. */
+    setUiControlsSink(fn: (controls: UiControl[]) => void): void {
+        this._uiControlsSink = fn;
+    }
+
+    /** Host injects a sink for the entered `#UI` values, so an edit made in the panel sticks. */
+    setUiOverridesSink(fn: (overrides: Record<string, string>) => void): void {
+        this._uiOverridesSink = fn;
+    }
+
+    /** Pushes the cached controls, so the panel follows document and cursor changes. */
+    refreshUiControls(): void {
+        this.postToVue({ type: 'uiControls', controls: this._uiControlsProvider?.() ?? null });
+    }
+
+    /**
+     * Answers the panel's request for the live controls by rendering the document as a
+     * form. Deliberately not served from the cache: this is what the panel asks when it
+     * has no answer or wants a fresh one, and the cache is only as new as the last time
+     * the form itself was shown.
+     */
+    private async handleGetUiControls(): Promise<void> {
+        const content = this.getActiveEditorContent();
+        const { sourceFilePath } = await this.buildFileContext(content);
+        const rendered = await this.renderForExport(content, buildApiSettings(this.settings), sourceFilePath, 'input');
+        // A failed render leaves the panel unresolved rather than empty - "no controls"
+        // and "could not tell" must not read the same to a purge button.
+        if (rendered == null) return;
+        const controls = extractUiControls(rendered);
+        this._uiControlsSink?.(controls);
+        this.postToVue({ type: 'uiControls', controls });
+    }
+
+    /** The `#UI` options an export of `variant` should render with. */
+    /** The "Apply `#UI` Values in Preview" setting: Preview renders entered values, not declared ones. */
+    protected previewAppliesUiOverrides(): boolean {
+        return this.getExtraSetting('previewUiOverrides') === 'true';
+    }
+
+    protected uiOptionsFor(variant: ExportVariant): { enableUi: boolean; uiOverrides?: Record<string, string> } {
+        const render = variantRender(variant, this.previewAppliesUiOverrides());
+        return {
+            enableUi: render.enableUi,
+            uiOverrides: render.useOverrides ? this.activeUiOverrides() : undefined,
+        };
     }
 
     /** Send updated TOC headings to the Vue sidebar. */
@@ -154,6 +301,14 @@ export abstract class BaseMessageBridge {
                 this.setExtraSetting('autoRun', String(message.enabled));
                 this.postToVue({ type: 'autoRunChanged', enabled: !!message.enabled });
                 break;
+            // Read per open rather than cached, so there is nothing to broadcast.
+            case 'updateAutoInputMode':
+                this.setExtraSetting('autoInputMode', String(message.enabled));
+                break;
+            case 'updatePreviewUiOverrides':
+                this.setExtraSetting('previewUiOverrides', String(message.enabled));
+                this.postToVue({ type: 'previewUiOverridesChanged', enabled: !!message.enabled });
+                break;
             case 'updateLinterMinSeverity':
                 this.setExtraSetting('linterMinSeverity', message.severity);
                 this.postToVue({ type: 'linterMinSeverityChanged', severity: message.severity });
@@ -161,6 +316,14 @@ export abstract class BaseMessageBridge {
             case 'updateMaxOutputLines':
                 this.setExtraSetting('maxOutputLines', String(message.value));
                 this.postToVue({ type: 'maxOutputLinesChanged', value: message.value });
+                break;
+            case 'updateMaxPreviewSize':
+                this.setExtraSetting('maxPreviewSizeMB', String(message.value));
+                this.postToVue({ type: 'maxPreviewSizeChanged', value: message.value });
+                break;
+            case 'updateMaxPreviewConsoleMessages':
+                this.setExtraSetting('maxPreviewConsoleMessages', String(message.value));
+                this.postToVue({ type: 'maxPreviewConsoleMessagesChanged', value: message.value });
                 break;
             case 'getPdfSettings':
                 this.handleGetPdfSettings();
@@ -173,13 +336,19 @@ export abstract class BaseMessageBridge {
                 this.handleGetPdfSettings();
                 break;
             case 'generatePdf':
-                this.handleGeneratePdf();
+                this.handleGeneratePdf(message.variant);
                 break;
             case 'saveSourceHtml':
-                this.handleSaveSourceHtml();
+                this.handleSaveSourceHtml(message.variant);
                 break;
             case 'saveDocx':
-                this.handleSaveDocx();
+                this.handleSaveDocx(message.variant);
+                break;
+            case 'saveCompiled':
+                this.saveCompiled();
+                break;
+            case 'savePortable':
+                this.savePortable();
                 break;
             case 'getPlots':
                 this.handleGetPlots();
@@ -190,6 +359,13 @@ export abstract class BaseMessageBridge {
             case 'savePlotsZip':
                 this.handleSavePlotsZip();
                 break;
+            case 'updateWriteMode':
+                this.setExtraSetting('writeMode', coerceWriteMode(message.mode));
+                this.postToVue({ type: 'writeModeChanged', mode: this.writeMode() });
+                break;
+            case 'writeFilesNow':
+                this.handleWriteFilesNow();
+                break;
             case 'getHeadings':
                 this.refreshHeadings();
                 break;
@@ -198,6 +374,9 @@ export abstract class BaseMessageBridge {
                 break;
             case 'updateMetadata':
                 this.handleUpdateMetadata(message);
+                break;
+            case 'getUiControls':
+                this.handleGetUiControls();
                 break;
             case 'goToLine':
                 this.handleGoToLine(message.line);
@@ -236,6 +415,12 @@ export abstract class BaseMessageBridge {
     protected async saveImageToImagesFolder(_img: PickedImage): Promise<string | null> { return null; }
     /** Prompt for a save location; return the src (relative to the document) to reference it by. */
     protected async saveImageToCustomPath(_img: PickedImage): Promise<string | null> { return null; }
+    /**
+     * Embeds locally-referenced images so a compiled worksheet travels as one file.
+     * Hosts with no filesystem hand the source back untouched — a browser has no
+     * relative paths to resolve in the first place.
+     */
+    protected async buildCompiledSource(content: string): Promise<string> { return content; }
     /** Persist an export; returns the saved path when the platform has one, else null. */
     protected abstract saveExportedFile(req: ExportRequest): Promise<string | null>;
     protected abstract buildFileContext(content: string): Promise<{ sourceFilePath?: string }>;
@@ -257,13 +442,22 @@ export abstract class BaseMessageBridge {
         content: string,
         apiSettings: unknown,
         sourceFilePath: string | undefined,
+        variant: ExportVariant,
     ): Promise<ArrayBuffer | null>;
 
     protected buildSettingsResponseExtras(): Record<string, unknown> | Promise<Record<string, unknown>> { return {}; }
     protected async runPdfPreflight(): Promise<boolean> { return true; }
-    protected async onPdfError(_err: unknown): Promise<void> { /* default no-op */ }
+    /** Return `true` to have the export retried once — hosts use this after installing a browser. */
+    protected async onPdfError(_err: unknown): Promise<boolean> { return false; }
     /** Called after a PDF is successfully written, with the saved path (platforms that have one). */
     protected async onPdfSaved(_filePath: string): Promise<void> { /* default no-op */ }
+    /**
+     * Report an export that could not be produced. The message reaches the Output panel
+     * everywhere; platforms with a native dialog put one up on top of that.
+     */
+    protected async onExportError(message: string): Promise<void> {
+        this.postToVue({ type: 'exportError', message });
+    }
     protected handlePlatformMessage(_message: any): boolean { return false; }
     protected onOpenLogsFolder(): void {
         console.warn('Open Logs Folder is only available in the desktop build — server logs live on the host running CalcPad.');
@@ -317,9 +511,15 @@ export abstract class BaseMessageBridge {
             enableFormattingHotkeys: this.getExtraSetting('formattingHotkeys') !== 'false',
             enablePreviewCursorSync: this.getExtraSetting('previewCursorSync') === 'true',
             enableAutoRun: this.getExtraSetting('autoRun') !== 'false',
+            enableAutoInputMode: this.getExtraSetting('autoInputMode') !== 'false',
+            enablePreviewUiOverrides: this.previewAppliesUiOverrides(),
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
+            maxPreviewSizeMB: Number(this.getExtraSetting('maxPreviewSizeMB')) || DEFAULT_PREVIEW_SIZE_MB,
+            maxPreviewConsoleMessages: Number(this.getExtraSetting('maxPreviewConsoleMessages'))
+                || DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT,
             editorFontFamily: this.getExtraSetting('editorFontFamily') ?? 'JuliaMono',
+            writeMode: this.writeMode(),
             ...extras,
         });
     }
@@ -396,15 +596,49 @@ export abstract class BaseMessageBridge {
     }
 
     private handleGetPdfSettings(): void {
+        this.postToVue({ type: 'pdfSettingsResponse', settings: resolveStoredPdfSettings(this.getStoredPdfOptions()) });
+    }
+
+    /** The raw persisted PDF options, however much of `PdfSettings` was actually stored. */
+    protected getStoredPdfOptions(): Partial<PdfSettings> {
         const stored = this.getExtraSetting('pdfSettings');
-        const settings = stored ? JSON.parse(stored) : { ...DEFAULT_PDF_SETTINGS };
-        this.postToVue({ type: 'pdfSettingsResponse', settings });
+        if (!stored) return {};
+        try {
+            return JSON.parse(stored);
+        } catch {
+            return {};
+        }
+    }
+
+    /**
+     * The active document's base name, used as the PDF header title when neither the
+     * stored settings nor the document's `pdf` metadata comment set one. Derived the
+     * same way the export Save dialog prefills its filename, so the two always agree.
+     */
+    protected getExportFallbackTitle(): string {
+        const tabs = (window as { calcpadTabs?: { activeTab?: { filePath?: string; title?: string } } }).calcpadTabs;
+        const source = tabs?.activeTab?.filePath || tabs?.activeTab?.title || '';
+        const base = source.slice(Math.max(source.lastIndexOf('/'), source.lastIndexOf('\\')) + 1);
+        return base.replace(/\.[^./\\]+$/, '');
+    }
+
+    /**
+     * The PDF options an export should actually use: the stored defaults with the
+     * document's own `pdf` metadata comment layered over them, key by key. The
+     * Settings tab keeps editing the stored set alone — this merge is only for the
+     * request that generates a PDF.
+     */
+    protected getEffectivePdfOptions(content: string): PdfSettings {
+        return resolveEffectivePdfSettings(
+            this.getStoredPdfOptions(),
+            pdfSettingsFromDocument(content.split('\n')),
+            this.getExportFallbackTitle(),
+        );
     }
 
     private async handleInsertImage(): Promise<void> {
-        // File picker: the image already exists on disk, so reference it in
-        // place. The storage-mode prompt is only for pasted in-memory images.
-        // On web (no real file path) this returns a base64 data URI.
+        // File picker: the image already exists on disk, so it is referenced in place and
+        // the storage-mode prompt is skipped. On web this returns a base64 data URI.
         const src = await this.pickImageSrc();
         if (src && this._onInsertText) {
             this._onInsertText(buildImageCommentLine(src));
@@ -442,11 +676,10 @@ export abstract class BaseMessageBridge {
     }
 
     /**
-     * Decide how the image should be stored. On desktop we offer the base64 /
-     * images-folder / custom-path choice (matching the VS Code extension) — the
-     * images-folder option only when the document is saved (it needs a folder
-     * to sit beside). Without disk access (pure web) base64 is the only option.
-     * Large base64 embeds get a follow-up warning with a save-to-file escape hatch.
+     * Decide how the image should be stored: desktop offers the base64 / images-folder /
+     * custom-path choice, the images-folder option only for a saved document, while pure web
+     * has base64 alone. Large base64 embeds get a follow-up warning with a save-to-file
+     * escape hatch.
      */
     private async resolveImageStorageMode(image: PickedImage): Promise<ImageStorageMode | null> {
         if (!this.canSaveImageToDisk() || !this.quickPick) return 'base64';
@@ -485,33 +718,150 @@ export abstract class BaseMessageBridge {
         return mode;
     }
 
-    private async handleSaveSourceHtml(): Promise<void> {
+    private async handleSaveSourceHtml(variant: ExportVariant = 'report'): Promise<void> {
         const content = this.getActiveEditorContent();
         const apiSettings = buildApiSettings(this.settings);
         const { sourceFilePath } = await this.buildFileContext(content);
-        const result = await this.apiClient.convert(content, apiSettings, 'html', false, sourceFilePath);
-        if (!result || result instanceof ArrayBuffer) return;
+        const rendered = await this.renderForExport(content, apiSettings, sourceFilePath, variant);
+        if (rendered == null) return;
         await this.saveExportedFile({
             defaultName: 'calcpad-output.html',
-            data: result.html,
+            data: rendered,
             mime: 'text/html;charset=utf-8',
             extensions: ['html', 'htm'],
-            dialogTitle: 'Save HTML',
+            dialogTitle: exportDialogTitle('Save', 'HTML', variant),
         });
     }
 
-    private async handleSaveDocx(): Promise<void> {
+    private async handleSaveDocx(variant: ExportVariant = 'report'): Promise<void> {
+        const render = variantRender(variant, this.previewAppliesUiOverrides());
+        // A form and a code listing have no meaningful Word rendering, so the Export tab
+        // doesn't offer them; guard anyway rather than emit a nonsense document.
+        if (render.enableUi || render.unwrap) return;
         const content = this.getActiveEditorContent();
         const apiSettings = buildApiSettings(this.settings);
         const { sourceFilePath } = await this.buildFileContext(content);
-        const buf = await this.apiClient.convertDocx(content, apiSettings, sourceFilePath);
+        const buf = await this.apiClient.convertDocx(content, apiSettings, sourceFilePath, {
+            forPrint: render.forPrint,
+            uiOverrides: render.useOverrides ? this.activeUiOverrides() : undefined,
+            write: this.mayWrite(render.forPrint, render.enableUi),
+        });
         if (!buf) return;
         await this.saveExportedFile({
             defaultName: 'calcpad-output.docx',
             data: buf,
             mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             extensions: ['docx'],
-            dialogTitle: 'Save Word Document',
+            dialogTitle: exportDialogTitle('Save', 'Word Document', variant),
+        });
+    }
+
+    /**
+     * Compiles the active document to a `.cpdz` and prompts for a location — an export rather
+     * than a Save As, so the open document keeps its own path and stays editable. The worksheet
+     * is bundled before its images are embedded, since an included file's images only resolve
+     * once the server has rewritten their paths.
+     */
+    async saveCompiled(): Promise<string | null> {
+        const content = this.getActiveEditorContent();
+        const { sourceFilePath } = await this.buildFileContext(content);
+        const bundled = await this.apiClient.bundlePortable(content, sourceFilePath);
+        if (bundled.content == null) {
+            await this.onExportError(`This worksheet cannot be compiled:\n${bundled.errors.join('\n')}`);
+            return null;
+        }
+        // Embedding the images can refuse the whole export, the same way the server refuses
+        // one carrying too much `#read` data, so it is reported like that refusal rather
+        // than thrown at whatever invoked the save.
+        let compiled: string;
+        try {
+            compiled = await this.buildCompiledSource(bundled.content);
+        } catch (error) {
+            await this.onExportError(
+                `This worksheet cannot be compiled:\n${error instanceof Error ? error.message : String(error)}`);
+            return null;
+        }
+        const bytes = await this.apiClient.encodeCpdz(compiled);
+        if (!bytes) return null;
+        return this.saveExportedFile({
+            defaultName: 'calcpad-worksheet.cpdz',
+            data: bytes,
+            mime: COMPILED_MIME,
+            extensions: ['cpdz'],
+            dialogTitle: 'Save Compiled Worksheet',
+        });
+    }
+
+    /**
+     * Packs the active document and everything it references into a portable archive, then
+     * prompts for a location. Unlike a compiled worksheet this stays text — the document as
+     * written, with only its paths pointing at the folder of references packed beside it — and
+     * the server does the packing, since resolving the references means reading them.
+     */
+    async savePortable(): Promise<string | null> {
+        const content = this.getActiveEditorContent();
+        const { sourceFilePath } = await this.buildFileContext(content);
+        const packaged = await this.apiClient.packagePortable(content, sourceFilePath);
+        if (!packaged.zip) {
+            await this.onExportError(
+                `This worksheet cannot be packaged:\n${packaged.errors.join('\n')}`);
+            return null;
+        }
+        return this.saveExportedFile({
+            defaultName: packaged.name ?? 'calcpad-worksheet.zip',
+            data: packaged.zip,
+            mime: 'application/zip',
+            extensions: ['zip'],
+            dialogTitle: 'Export Portable Package',
+        });
+    }
+
+    /**
+     * Render `variant` to HTML for writing to a file: never with line anchors, and with the
+     * entered `#UI` values only where the variant calls for them. Also the first half of the
+     * PDF pipeline, which feeds this HTML to `/pdf`.
+     */
+    protected async renderForExport(
+        content: string,
+        apiSettings: unknown,
+        sourceFilePath: string | undefined,
+        variant: ExportVariant,
+    ): Promise<string | null> {
+        const render = variantRender(variant);
+        const write = this.mayWrite(render.forPrint, render.enableUi);
+        const result = render.unwrap
+            ? await this.apiClient.convertUnwrapped(content, apiSettings, sourceFilePath, undefined, { write })
+            : await this.apiClient.convert(
+                content, apiSettings, 'html', render.forPrint, sourceFilePath, undefined,
+                this.uiOptionsFor(variant), false, { write });
+        return result && !(result instanceof ArrayBuffer) ? result.html : null;
+    }
+
+    /**
+     * Runs the document's `#write`/`#append` directives now, whatever the write-mode setting
+     * says, using the report render so `#post` blocks and entered `#UI` values are included as
+     * a saved report would have them. Line anchors are on, since that is what makes the parser
+     * record the errors — the HTML is discarded and only the errors are read.
+     */
+    private async handleWriteFilesNow(): Promise<void> {
+        const content = this.getActiveEditorContent();
+        if (!content.trim()) return;
+        const { sourceFilePath } = await this.buildFileContext(content);
+        const result = await this.apiClient.convert(
+            content, buildApiSettings(this.settings), 'html', true, sourceFilePath, undefined,
+            this.uiOptionsFor('report'), true, { write: true });
+        if (result == null || result instanceof ArrayBuffer) {
+            await this.onExportError('The document could not be run, so nothing was written.');
+            return;
+        }
+        const errors = result.errors ?? [];
+        this.postToVue({ type: 'updateConvertErrors', errors });
+        this.postToVue({
+            type: 'writeFilesResult',
+            ok: errors.length === 0,
+            message: errors.length === 0
+                ? 'Data written successfully'
+                : `Ran with ${errors.length} error${errors.length === 1 ? '' : 's'} — some output may be missing.`,
         });
     }
 
@@ -568,31 +918,38 @@ export abstract class BaseMessageBridge {
         });
     }
 
-    private async handleGeneratePdf(): Promise<void> {
+    private async handleGeneratePdf(variant: ExportVariant = 'report'): Promise<void> {
         if (!(await this.runPdfPreflight())) return;
 
         const content = this.getActiveEditorContent();
         const apiSettings = buildApiSettings(this.settings);
         const { sourceFilePath } = await this.buildFileContext(content);
 
-        try {
-            const pdfBytes = await this.generatePdfBytes(content, apiSettings, sourceFilePath);
-            if (!pdfBytes) return;
-            const savedPath = await this.saveExportedFile({
-                defaultName: 'calcpad-output.pdf',
-                data: pdfBytes,
-                mime: 'application/pdf',
-                extensions: ['pdf'],
-                dialogTitle: 'Export PDF',
-            });
-            if (savedPath) await this.onPdfSaved(savedPath);
-        } catch (err) {
-            await this.onPdfError(err);
+        // Two attempts at most: onPdfError asks for a retry only when it resolved the
+        // cause (installing a browser), so the second attempt either works or reports.
+        for (let attempt = 0; attempt < 2; attempt++) {
+            try {
+                const pdfBytes = await this.generatePdfBytes(content, apiSettings, sourceFilePath, variant);
+                if (!pdfBytes) return;
+                const savedPath = await this.saveExportedFile({
+                    defaultName: 'calcpad-output.pdf',
+                    data: pdfBytes,
+                    mime: 'application/pdf',
+                    extensions: ['pdf'],
+                    dialogTitle: exportDialogTitle('Export', 'PDF', variant),
+                });
+                if (savedPath) await this.onPdfSaved(savedPath);
+                return;
+            } catch (err) {
+                const retry = await this.onPdfError(err);
+                if (!retry || attempt === 1) return;
+            }
         }
     }
 
     private handleGoToLine(line: number): void {
         if (typeof line !== 'number') return;
+        if (this._onGoToLine?.(line)) return;
         const editor = this.getActiveMonacoEditor();
         if (editor) {
             editor.revealLineInCenter(line);
@@ -626,6 +983,9 @@ export abstract class BaseMessageBridge {
             block = computeMetadataBlock(lines, pos.lineNumber - 1, this.definitionResolver());
         }
         this.postToVue({ type: 'metadataContext', block });
+        // Sent with the block so the panel's saved-values list follows the document the
+        // cursor is actually in, rather than keeping the last one it asked about.
+        this.refreshUiControls();
     }
 
     /**
@@ -635,12 +995,18 @@ export abstract class BaseMessageBridge {
      */
     private handleUpdateMetadata(msg: {
         line: number;
+        endLine?: number;
         indent?: string;
         trailingQuote?: string;
+        layout?: MetadataLayout;
         data: MetadataCommentData;
         isNew?: boolean;
         settings?: SettingsValues;
         settingsLine?: number | null;
+        settingsEndLine?: number | null;
+        settingsLayout?: MetadataLayout;
+        ui?: UiDirectiveData;
+        uiLine?: number | null;
     }): void {
         const editor = this.getActiveMonacoEditor();
         const model = editor?.getModel();
@@ -649,35 +1015,68 @@ export abstract class BaseMessageBridge {
         const edits: { range: MonacoRangeLike; text: string }[] = [];
 
         // Metadata comment (desc/params/lint/no-print) — only when it has content.
+        // A multi-line comment spans line..endLine; layout preserves its shape.
         const lineNumber = msg.line + 1;
-        if (Object.keys(msg.data).length > 0 && lineNumber >= 1 && lineNumber <= model.getLineCount()) {
-            const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '');
-            edits.push(msg.isNew
-                ? { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }, text: newText + '\n' }
-                : { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: model.getLineMaxColumn(lineNumber) }, text: newText });
+        if (lineNumber >= 1 && lineNumber <= model.getLineCount()) {
+            const endLineNumber = (msg.endLine ?? msg.line) + 1;
+            if (hasMetadataContent(msg.data)) {
+                const newText = serializeMetadataComment(msg.data, msg.indent ?? '', msg.trailingQuote ?? '', msg.layout);
+                edits.push(msg.isNew
+                    ? { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }, text: newText + '\n' }
+                    : { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: endLineNumber, endColumn: model.getLineMaxColumn(endLineNumber) }, text: newText });
+            } else if (!msg.isNew) {
+                // Every key removed - clearing the last field, or purging the last saved
+                // value - leaves an empty comment, so the comment goes with them.
+                for (let ln = endLineNumber; ln >= lineNumber; ln--)
+                    edits.push(this.deleteLineEdit(model, ln));
+            }
         }
 
         // #settings directive under the cursor. `settingsLine` (0-based) points at
         // the existing directive to rewrite, or null to create a new one at the
         // cursor — so multiple directives can coexist, each edited where it lives.
-        const settingsText = msg.settings ? serializeSettingsDirective(msg.settings) : '';
+        const settingsText = msg.settings ? serializeSettingsDirective(msg.settings, msg.settingsLayout) : '';
         let insertedSettings = false;
         if (msg.settings) {
             const dirLine = msg.settingsLine ?? null;
+            const dirEndLine = msg.settingsEndLine ?? dirLine;
             const hasExisting = dirLine !== null && dirLine >= 0 && dirLine < model.getLineCount();
             const hasSettings = Object.keys(msg.settings).length > 0;
             if (hasSettings) {
                 edits.push(hasExisting
-                    ? { range: { startLineNumber: dirLine! + 1, startColumn: 1, endLineNumber: dirLine! + 1, endColumn: model.getLineMaxColumn(dirLine! + 1) }, text: settingsText }
+                    ? { range: { startLineNumber: dirLine! + 1, startColumn: 1, endLineNumber: dirEndLine! + 1, endColumn: model.getLineMaxColumn(dirEndLine! + 1) }, text: settingsText }
                     : { range: { startLineNumber: lineNumber, startColumn: 1, endLineNumber: lineNumber, endColumn: 1 }, text: settingsText + '\n' });
                 insertedSettings = !hasExisting;
             } else if (hasExisting) {
-                edits.push(this.deleteLineEdit(model, dirLine! + 1));
+                for (let ln = dirEndLine! + 1; ln >= dirLine! + 1; ln--)
+                    edits.push(this.deleteLineEdit(model, ln));
+            }
+        }
+
+        // #UI directive at the cursor. Always a single-line replace — a #UI
+        // line never shares a physical line with the comment or #settings
+        // edits above, so this never overlaps them.
+        if (msg.ui && typeof msg.uiLine === 'number' && msg.uiLine >= 0 && msg.uiLine < model.getLineCount()) {
+            const uiLineNumber = msg.uiLine + 1;
+            const uiLineText = model.getValue().split(/\r?\n/)[msg.uiLine];
+            const uiBlock = findUiDirectiveBlock([uiLineText], 0);
+            if (uiBlock) {
+                edits.push({
+                    range: { startLineNumber: uiLineNumber, startColumn: 1, endLineNumber: uiLineNumber, endColumn: model.getLineMaxColumn(uiLineNumber) },
+                    text: serializeUiDirective(msg.ui, uiBlock),
+                });
             }
         }
 
         if (edits.length === 0) return;
         editor.executeEdits('calcpad-metadata', edits);
+
+        // Entered values are held in memory and written out on demand, so an edit to the
+        // saved ones has to reach the store too - otherwise the next "Save values" puts
+        // the purged keys straight back.
+        const overrides = msg.data.uiOverrides;
+        if (this._uiOverridesSink && overrides && typeof overrides === 'object' && !Array.isArray(overrides))
+            this._uiOverridesSink(overrides as Record<string, string>);
 
         // A freshly created directive: park the cursor on it so the re-emitted
         // context binds to it and a repeated Apply edits in place, not duplicates.

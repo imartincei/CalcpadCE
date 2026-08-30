@@ -1,9 +1,7 @@
 /**
- * Minimal STORED-only ZIP writer. Every entry is uncompressed, which keeps
- * the code short and works fine for our use case (PNGs are already compressed;
- * plot SVGs are tiny). Avoids pulling in JSZip as a dep for one feature.
- *
- * Layout: [local header + data]* + [central dir header]* + end-of-central-dir.
+ * Minimal STORED-only ZIP writer, which keeps the code short and works fine here (PNGs are
+ * already compressed, plot SVGs are tiny) without pulling in JSZip. Layout: [local header +
+ * data]* + [central dir header]* + end-of-central-dir.
  */
 
 export interface ZipEntry {

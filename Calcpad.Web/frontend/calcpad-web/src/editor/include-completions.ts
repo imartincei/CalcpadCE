@@ -1,54 +1,18 @@
 import * as monaco from 'monaco-editor';
-
-const DIRECTIVES = ['include', 'read', 'write', 'append'] as const;
-type Directive = typeof DIRECTIVES[number];
-
-const INCLUDE_EXTENSIONS = ['cpd', 'txt'];
-const DATA_EXTENSIONS = ['csv', 'tsv', 'xlsx', 'xlsm', 'xls'];
-
-export interface DirectiveParse {
-    directive: Directive;
-    pathStartCol: number;   // 0-indexed
-    partialPath: string;
-}
-
-/** Ported from vscode-calcpad/calcpadIncludeCompletionProvider.ts. */
-export function parseDirectiveLine(lineText: string): DirectiveParse | undefined {
-    let i = 0;
-    while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) i++;
-    if (i >= lineText.length || lineText[i] !== '#') return undefined;
-    i++;
-
-    const keywordStart = i;
-    while (i < lineText.length && lineText[i] !== ' ' && lineText[i] !== '\t') i++;
-    const keyword = lineText.substring(keywordStart, i).toLowerCase() as Directive;
-    if (!DIRECTIVES.includes(keyword)) return undefined;
-
-    const afterKeyword = i;
-    while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) i++;
-    if (i === afterKeyword) return undefined;
-
-    if (keyword === 'include') {
-        return { directive: keyword, pathStartCol: i, partialPath: lineText.substring(i) };
-    }
-
-    while (i < lineText.length && lineText[i] !== ' ' && lineText[i] !== '\t') i++;
-    const afterVar = i;
-    while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) i++;
-    if (i === afterVar) return undefined;
-
-    const connStart = i;
-    while (i < lineText.length && lineText[i] !== ' ' && lineText[i] !== '\t') i++;
-    const connector = lineText.substring(connStart, i).toLowerCase();
-    const expected = keyword === 'read' ? 'from' : 'to';
-    if (connector !== expected) return undefined;
-
-    const afterConn = i;
-    while (i < lineText.length && (lineText[i] === ' ' || lineText[i] === '\t')) i++;
-    if (i === afterConn) return undefined;
-
-    return { directive: keyword, pathStartCol: i, partialPath: lineText.substring(i) };
-}
+import {
+    getPathRootTokenKind,
+    isUserToken,
+    resolveCompletionPathRoots,
+    extensionsForDirective,
+    parseDirectiveLine,
+    PATH_ROOT_TOKEN,
+    USER_TOKEN,
+    DIRECTIVE_TRIGGER_CHARACTERS,
+    pathRootTokenOptions,
+    hasDanglingCloseBrace,
+    type ResolvedPathRoots,
+} from 'calcpad-frontend';
+import { pathResolve } from 'calcpad-frontend/services/paths';
 
 function pathDirname(p: string): string {
     const idx = Math.max(p.lastIndexOf('/'), p.lastIndexOf('\\'));
@@ -79,28 +43,26 @@ export interface IncludeCompletionsContext {
     getCurrentFilePath(): string | null;
     /** Currently-opened workspace folder root, or null. */
     getOpenedFolder(): Promise<string | null>;
-    /**
-     * Configured library folder, or null. Searched at the root level in
-     * addition to the current file's directory and any opened workspace
-     * folder, so shared includes remain reachable regardless of what the
-     * user has open in the Files panel.
-     */
-    getLibraryPath?(): Promise<string | null>;
+    /** Expands %VAR%/$VAR references against the host's environment. */
+    expandEnvVars(raw: string): Promise<string>;
+    /** The current OS user's home directory, for the `{user}` path-root token, or null if unknown. */
+    getHomeDir(): Promise<string | null>;
+    /** The server's resolved roots for the active document, from the last cached `/definitions`. */
+    getServerPathRoots(): ResolvedPathRoots;
 }
 
 /**
- * Register a Monaco completion provider for #include / #read / #write / #append
- * directives. Search roots (in priority order):
- *   1. The current file's parent directory.
- *   2. The opened workspace folder (if any and different).
- * Duplicates (same file reachable via multiple roots) are filtered by absolute
- * path so the same file only appears once in the completion list.
+ * Register a Monaco completion provider for #include / #read / #write / #append /
+ * #ProjectPath / #LibraryPath directives, the latter two offering folders only. Search roots in
+ * priority order — the current file's parent directory, the opened workspace folder, the OS home
+ * directory as `{user}/…`, and the document's own root declarations as `{project}/…`/`{library}/…`
+ * — are deduplicated by absolute path, so completions lead an author to the portable form.
  */
 export function registerIncludeCompletionProvider(
     ctx: IncludeCompletionsContext
 ): monaco.IDisposable {
     return monaco.languages.registerCompletionItemProvider('calcpad', {
-        triggerCharacters: [' ', '/', '\\'],
+        triggerCharacters: DIRECTIVE_TRIGGER_CHARACTERS,
 
         async provideCompletionItems(model, position) {
             const line = model.getLineContent(position.lineNumber);
@@ -109,10 +71,7 @@ export function registerIncludeCompletionProvider(
             const parsed = parseDirectiveLine(lineToCursor);
             if (!parsed) return { suggestions: [], incomplete: true };
 
-            const isInclude = parsed.directive === 'include';
-            const extensions = isInclude
-                ? INCLUDE_EXTENSIONS
-                : [...INCLUDE_EXTENSIONS, ...DATA_EXTENSIONS];
+            const extensions = extensionsForDirective(parsed.directive);
 
             // Strip trailing options (@sheet, type=, sep=)
             let partialPath = parsed.partialPath;
@@ -122,21 +81,65 @@ export function registerIncludeCompletionProvider(
             const currentFilePath = ctx.getCurrentFilePath();
             const currentDir = currentFilePath ? pathDirname(currentFilePath) : '';
             const openedFolder = await ctx.getOpenedFolder();
-            const libraryFolder = ctx.getLibraryPath ? await ctx.getLibraryPath() : null;
+            const homeDir = await ctx.getHomeDir();
+
+            const resolvedRoots = currentDir
+                ? await resolveCompletionPathRoots({
+                    serverRoots: ctx.getServerPathRoots(),
+                    sourceText: model.getValue(),
+                    beforeLine: position.lineNumber - 1,
+                    documentDir: currentDir,
+                    expandEnvVars: (raw) => ctx.expandEnvVars(raw),
+                    resolve: pathResolve,
+                    homeDir,
+                })
+                : { project: null, library: null };
+
+            // Monaco auto-closes a typed `{` into `{}`, leaving a `}` sitting right after the
+            // cursor — swallow it so inserting a full token doesn't leave it dangling.
+            const nextChar = line.charAt(position.column - 1);
+            const extraColumn = hasDanglingCloseBrace(partialPath, nextChar) ? 1 : 0;
 
             const range: monaco.IRange = {
                 startLineNumber: position.lineNumber,
                 startColumn: parsed.pathStartCol + 1,
                 endLineNumber: position.lineNumber,
-                endColumn: position.column,
+                endColumn: position.column + extraColumn,
             };
 
             const suggestions: monaco.languages.CompletionItem[] = [];
             const seenAbsolute = new Set<string>();
 
+            const tokenKind = getPathRootTokenKind(partialPath);
+            const isUser = isUserToken(partialPath);
             const hasSeparator = partialPath.includes('/') || partialPath.includes('\\');
 
-            if (hasSeparator && !pathIsAbsolute(partialPath)) {
+            if (isUser) {
+                // Drilling into a {user} reference: search the OS home directory, but
+                // reinsert completions in token form so the reference stays portable.
+                if (homeDir === null) return { suggestions: [], incomplete: true };
+
+                const tokenText = partialPath.slice(0, USER_TOKEN.length);
+                let rest = partialPath.slice(tokenText.length);
+                if (rest.startsWith('/') || rest.startsWith('\\')) rest = rest.slice(1);
+                await addEntries(
+                    ctx, homeDir, rest, extensions, range,
+                    currentFilePath, suggestions, seenAbsolute, '', false, `${tokenText}/`
+                );
+            } else if (tokenKind !== null) {
+                // Drilling into a {project}/{library} reference: search the resolved root,
+                // but reinsert completions in token form so the reference stays portable.
+                const root = resolvedRoots[tokenKind];
+                if (root === null) return { suggestions: [], incomplete: true };
+
+                const tokenText = partialPath.slice(0, PATH_ROOT_TOKEN[tokenKind].length);
+                let rest = partialPath.slice(tokenText.length);
+                if (rest.startsWith('/') || rest.startsWith('\\')) rest = rest.slice(1);
+                await addEntries(
+                    ctx, root, rest, extensions, range,
+                    currentFilePath, suggestions, seenAbsolute, '', false, `${tokenText}/`
+                );
+            } else if (hasSeparator && !pathIsAbsolute(partialPath)) {
                 // Drill down: resolve the typed prefix relative to the doc dir only.
                 await addEntries(
                     ctx, currentDir, partialPath, extensions, range,
@@ -151,7 +154,7 @@ export function registerIncludeCompletionProvider(
                     currentFilePath, suggestions, seenAbsolute, ''
                 );
             } else {
-                // Root level: current file dir + opened workspace folder (dedup).
+                // Root level: current file dir + opened workspace folder + declared roots (dedup).
                 if (currentDir) {
                     await addEntries(
                         ctx, currentDir, partialPath, extensions, range,
@@ -161,16 +164,26 @@ export function registerIncludeCompletionProvider(
                 if (openedFolder && normalize(openedFolder) !== normalize(currentDir)) {
                     await addEntries(
                         ctx, openedFolder, partialPath, extensions, range,
-                        currentFilePath, suggestions, seenAbsolute, 'Workspace'
+                        currentFilePath, suggestions, seenAbsolute, 'Workspace', true
                     );
                 }
-                if (libraryFolder
-                    && normalize(libraryFolder) !== normalize(currentDir)
-                    && (!openedFolder || normalize(libraryFolder) !== normalize(openedFolder))) {
-                    await addEntries(
-                        ctx, libraryFolder, partialPath, extensions, range,
-                        currentFilePath, suggestions, seenAbsolute, 'Library'
-                    );
+                // Offer {user}/{project}/{library} as pick-a-root placeholders rather than
+                // eagerly flattening their contents in — selecting one inserts just the token
+                // and re-triggers completion, which then drills into that root above.
+                for (const opt of pathRootTokenOptions(resolvedRoots, homeDir !== null)) {
+                    suggestions.push({
+                        label: opt.label,
+                        kind: monaco.languages.CompletionItemKind.Folder,
+                        insertText: `${opt.token}/`,
+                        filterText: `${opt.token}/`,
+                        range,
+                        sortText: '0_' + opt.label,
+                        detail: opt.detail,
+                        command: {
+                            id: 'editor.action.triggerSuggest',
+                            title: 'Re-trigger completions',
+                        },
+                    });
                 }
             }
 
@@ -188,7 +201,9 @@ async function addEntries(
     currentFilePath: string | null,
     suggestions: monaco.languages.CompletionItem[],
     seenAbsolute: Set<string>,
-    sourceLabel: string
+    sourceLabel: string,
+    useAbsolute: boolean = false,
+    insertPrefix: string = ''
 ): Promise<void> {
     let searchDir: string;
     let pathPrefix: string;
@@ -205,12 +220,6 @@ async function addEntries(
     const entries = await ctx.listDirectory(searchDir);
     if (!entries.length) return;
 
-    // For the opened-folder ("Workspace") and library ("Library") sources,
-    // inserted paths are absolute so #include resolves regardless of the
-    // current file's location. For the doc-dir root we insert relative paths
-    // (using the same prefix the user has typed so far).
-    const useAbsolute = sourceLabel === 'Workspace' || sourceLabel === 'Library';
-
     // Folders
     for (const entry of entries) {
         if (!entry.isDirectory || entry.name.startsWith('.')) continue;
@@ -223,7 +232,7 @@ async function addEntries(
         const sep = absPath.includes('\\') ? '\\' : '/';
         const insertText = useAbsolute
             ? absPath + sep
-            : pathPrefix + entry.name + sep;
+            : insertPrefix + pathPrefix + entry.name + sep;
 
         suggestions.push({
             label: entry.name,
@@ -255,7 +264,7 @@ async function addEntries(
         if (seenAbsolute.has(dedupKey)) continue;
         seenAbsolute.add(dedupKey);
 
-        const insertText = useAbsolute ? absPath : pathPrefix + entry.name;
+        const insertText = useAbsolute ? absPath : insertPrefix + pathPrefix + entry.name;
 
         suggestions.push({
             label: entry.name,

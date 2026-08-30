@@ -1,6 +1,6 @@
 {
   "name": "calcpad-desktop",
-  "version": "0.3.0",
+  "version": "8.0.0-beta1",
   "private": true,
   "description": "CalcpadCE Desktop — Tauri shell with an embedded ASP.NET Core server",
   "scripts": {

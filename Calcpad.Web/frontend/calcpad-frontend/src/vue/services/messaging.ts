@@ -2,8 +2,8 @@
  * Platform-aware messaging service for Vue components.
  * Uses import.meta.env.VITE_PLATFORM to select the adapter at build time:
  * - 'vscode': uses acquireVsCodeApi() (VS Code webview)
- * - 'electron': uses window.calcpadAPI (Electron preload bridge)
- * - 'web': uses window.calcpadBridge (in-process message bridge)
+ * - 'web': uses window.calcpadBridge (in-process message bridge) — this is also the
+ *   build the Tauri desktop app serves
  */
 
 export interface IMessaging {
@@ -48,15 +48,15 @@ export function initMessaging(): IMessaging {
         instance = {
             postMessage: (msg: unknown) => bridge.handleMessage(serializeForPostMessage(msg)),
             onMessage: (handler: (message: unknown) => void) => {
-                window.addEventListener('message', (e: MessageEvent) => handler(e.data));
+                // This window also hosts the preview iframes, which render untrusted worksheet
+                // HTML and can post anything they like. The host bridge announces itself with
+                // a synthetic MessageEvent carrying no source, so a null source is what tells
+                // a real host message from a forged one.
+                window.addEventListener('message', (e: MessageEvent) => {
+                    if (e.source !== null) return;
+                    handler(e.data);
+                });
             },
-        };
-    } else if (import.meta.env.VITE_PLATFORM === 'electron') {
-        // Electron: use preload bridge
-        const api = (window as any).calcpadAPI;
-        instance = {
-            postMessage: (msg: unknown) => api.postMessage(serializeForPostMessage(msg)),
-            onMessage: (handler: (message: unknown) => void) => api.onMessage(handler),
         };
     } else {
         // VS Code webview: use acquireVsCodeApi
@@ -65,6 +65,10 @@ export function initMessaging(): IMessaging {
         instance = {
             postMessage: (msg: unknown) => vscode.postMessage(serializeForPostMessage(msg)),
             onMessage: (handler: (message: unknown) => void) => {
+                // No source filter here, unlike the web branch: the panel webview
+                // embeds no untrusted frames (its CSP is default-src 'none' with
+                // nonce'd scripts — see CalcpadVueUIProvider), and the source VS Code
+                // attaches to extension-host messages is not contractual.
                 window.addEventListener('message', (e: MessageEvent) => handler(e.data));
             },
         };
@@ -82,7 +86,7 @@ export function getMessaging(): IMessaging {
 }
 
 /**
- * Post a message to the host (VS Code extension or Electron main process).
+ * Post a message to the host (VS Code extension or the web/desktop host).
  * Drop-in replacement for the previous services/vscode.ts postMessage().
  */
 export function postMessage(message: unknown): void {

@@ -1,3 +1,7 @@
+using Microsoft.Extensions.Caching.Memory;
+using System.Security.Cryptography;
+using System.Text;
+
 namespace Calcpad.Server.Services
 {
     /// <summary>
@@ -27,11 +31,21 @@ namespace Calcpad.Server.Services
             // PDF generation service (singleton for browser reuse)
             builder.Services.AddSingleton<PdfGeneratorService>();
 
+            // Caches ContentResolver's staged-content output across lint/highlight/definitions/
+            // symbol-at-position for the same content, singleton so entries survive across requests.
+            builder.Services.AddMemoryCache(options =>
+            {
+                options.SizeLimit = int.TryParse(
+                    Environment.GetEnvironmentVariable("CALCPAD_CONTENT_CACHE_SIZE_LIMIT"), out var limit)
+                    ? limit : 100;
+            });
+            builder.Services.AddSingleton<ContentResolutionCache>();
+
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", policy =>
+                options.AddPolicy(CorsPolicyName, policy =>
                 {
-                    policy.AllowAnyOrigin()
+                    policy.SetIsOriginAllowed(IsAllowedOrigin)
                           .AllowAnyMethod()
                           .AllowAnyHeader()
                           .WithExposedHeaders("X-Calcpad-Errors");
@@ -39,6 +53,100 @@ namespace Calcpad.Server.Services
             });
 
             return builder;
+        }
+
+        internal const string CorsPolicyName = "CalcpadHosts";
+
+        /// <summary>
+        /// Header carrying the per-launch token that <see cref="RequireApiToken"/> checks.
+        /// </summary>
+        internal const string ApiTokenHeader = "X-Calcpad-Token";
+
+        /// <summary>
+        /// Per-launch shared secret, handed to us by the host that spawned this process.
+        /// </summary>
+        /// <remarks>
+        /// Read from the environment rather than argv, which is world-readable through
+        /// <c>/proc/{pid}/cmdline</c> on Linux and WMI on Windows; the environment block is
+        /// readable only by the same user. Absent when nobody set it (<c>dotnet run</c>, the
+        /// test harness), in which case auth is off and the CORS + Host-header policy in
+        /// <see cref="IsAllowedOrigin"/> is the only control — both shipped hosts always set it.
+        /// </remarks>
+        private static readonly byte[]? ApiTokenBytes =
+            Environment.GetEnvironmentVariable("CALCPAD_API_TOKEN") is { Length: > 0 } token
+                ? Encoding.UTF8.GetBytes(token)
+                : null;
+
+        /// <summary>
+        /// Rejects any <c>/api</c> request that does not present the launch token.
+        /// </summary>
+        /// <remarks>
+        /// Registered after <c>UseCors</c> so a browser preflight is answered by the CORS
+        /// middleware and never reaches this — the preflight itself carries no custom
+        /// headers, so checking it would fail every cross-origin request before the real
+        /// one was ever sent. <c>OPTIONS</c> is skipped for the same reason.
+        /// </remarks>
+        private static void RequireApiToken(WebApplication app)
+        {
+            var expected = ApiTokenBytes;
+            if (expected is null)
+            {
+                FileLogger.LogWarning(
+                    "CALCPAD_API_TOKEN not set — /api is unauthenticated",
+                    "Any local process can reach this server. Expected only for development launches.");
+                return;
+            }
+
+            app.Use(async (context, next) =>
+            {
+                if (!context.Request.Path.StartsWithSegments("/api")
+                    || HttpMethods.IsOptions(context.Request.Method))
+                {
+                    await next();
+                    return;
+                }
+
+                var presented = Encoding.UTF8.GetBytes(context.Request.Headers[ApiTokenHeader].ToString());
+                if (!CryptographicOperations.FixedTimeEquals(presented, expected))
+                {
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync("Unauthorized");
+                    return;
+                }
+                await next();
+            });
+        }
+
+        /// <summary>
+        /// Origins permitted to call the API from a browsing context.
+        /// </summary>
+        /// <remarks>
+        /// Binding to loopback keeps remote machines out but not the user's own browser: a page
+        /// they visit can POST <c>#include ~/.ssh/id_rsa</c> to <c>/api/calcpad/convert</c> and
+        /// read the file back out of the rendered HTML, so the requesting origin is what stands
+        /// between that page and the file. Restricting it blocks the request rather than just
+        /// the response, since <c>[FromBody]</c> on an <c>[ApiController]</c> forces a preflight.
+        /// <para>
+        /// Native callers send no Origin header and never reach this; <c>vscode-webview://</c>
+        /// is deliberately absent, and "null" — what a sandboxed opaque-origin frame sends — is
+        /// rejected. DNS rebinding is handled by the Host-header check in
+        /// <see cref="ConfigureApp"/> instead.
+        /// </para>
+        /// </remarks>
+        internal static bool IsAllowedOrigin(string origin)
+        {
+            if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri)) return false;
+
+            // Tauri serves the desktop shell from a custom scheme: tauri://localhost
+            // on Linux/macOS, http(s)://tauri.localhost on Windows (WebView2).
+            if (uri.Scheme.Equals("tauri", StringComparison.OrdinalIgnoreCase)) return true;
+            if (uri.Host.Equals("tauri.localhost", StringComparison.OrdinalIgnoreCase)) return true;
+
+            // The browser build of the editor, served from loopback on any port. This
+            // also admits any other local server's pages, which is the accepted floor:
+            // anything able to serve on this machine's loopback is already past the
+            // boundary this policy defends.
+            return Program.IsLoopbackHost(uri.Host);
         }
 
         /// <summary>
@@ -52,12 +160,37 @@ namespace Calcpad.Server.Services
                 {
                     await next();
                 }
+                catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+                {
+                    // The client disconnected or superseded this request — expected under
+                    // rapid tab-switching, not a server error, so it isn't logged as one.
+                }
                 catch (Exception ex)
                 {
                     FileLogger.LogError($"Unhandled exception in request: {context.Request.Method} {context.Request.Path}", ex);
                     context.Response.StatusCode = 500;
                     await context.Response.WriteAsync("Internal Server Error");
                 }
+            });
+
+            // DNS rebinding defense, and the reason CORS alone is not enough: an attacker who
+            // points their own hostname at 127.0.0.1 makes the request same-origin, so no CORS
+            // check runs, but the Host header still carries their name. Only loopback names are
+            // served, and a request with no Host header at all is let through as a native
+            // client, which was never the exposure here.
+            app.Use(async (context, next) =>
+            {
+                var host = context.Request.Host.Host;
+                if (!string.IsNullOrEmpty(host) && !Program.IsLoopbackHost(host))
+                {
+                    FileLogger.LogWarning(
+                        "Rejected request with non-loopback Host header",
+                        $"{host} — {context.Request.Method} {context.Request.Path}");
+                    context.Response.StatusCode = 421; // Misdirected Request
+                    await context.Response.WriteAsync("Misdirected Request");
+                    return;
+                }
+                await next();
             });
 
             if (app.Environment.IsDevelopment())
@@ -67,7 +200,8 @@ namespace Calcpad.Server.Services
             }
 
             app.UseHttpsRedirection();
-            app.UseCors("AllowAll");
+            app.UseCors(CorsPolicyName);
+            RequireApiToken(app);
 
             app.MapControllers();
 

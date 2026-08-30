@@ -1,27 +1,28 @@
 {
     "core": {
         "math": {
+            "formatString": "",
             "decimals": 2,
             "degrees": 0,
             "isComplex": false,
             "substitute": true,
             "formatEquations": true,
             "zeroSmallMatrixElements": true,
+            "showHiddenOutput": false,
             "maxOutputCount": 20,
-            "formatString": "",
             "precision": 1e-14,
-            "tol": 1e-6
+            "tol": 0.000001
         },
         "plot": {
-            "isAdaptive": true,
-            "screenScaleFactor": 2,
             "imagePath": "",
             "imageUri": "",
+            "screenScaleFactor": 2,
+            "lightDirection": "NorthWest",
             "vectorGraphics": false,
             "colorScale": "Rainbow",
             "smoothScale": false,
             "shadows": true,
-            "lightDirection": "NorthWest",
+            "isAdaptive": true,
             "width": 500,
             "height": 300,
             "step": 0
@@ -31,7 +32,7 @@
             "mode": "auto"
         },
         "units": "m",
-        "isUs": false
+        "isUs": true
     },
     "extras": {
         "previewTheme": "system",
@@ -41,34 +42,29 @@
         "formattingHotkeys": true,
         "quickTyping": true,
         "previewCursorSync": false,
+        "autoInputMode": true,
+        "previewUiOverrides": false,
         "linterMinSeverity": "information",
         "maxOutputLines": 1000,
-        "libraryPath": "",
+        "maxPreviewSizeMB": 24,
+        "maxPreviewConsoleMessages": 500,
         "prettifyIndentStyle": "tab",
         "prettifyIndentSize": 4,
         "prettifyTrimTrailingWhitespace": true,
-        "writeMode": "localFile",
+        "writeMode": "reportOnly",
         "dotnetPath": "dotnet",
         "editorFontFamily": "JuliaMono",
         "pdfSettings": {
-            "enableHeader": true,
-            "documentTitle": "",
-            "documentSubtitle": "",
-            "headerCenter": "",
-            "author": "",
-            "enableFooter": true,
-            "footerCenter": "",
-            "company": "",
-            "project": "",
-            "showPageNumbers": true,
-            "format": "A4",
+            "format": "Letter",
             "orientation": "portrait",
-            "marginTop": "2cm",
-            "marginBottom": "2cm",
-            "marginLeft": "1.5cm",
-            "marginRight": "1.5cm",
-            "printBackground": true,
-            "scale": 1.0
+            "marginTop": "0.75in",
+            "marginBottom": "0.75in",
+            "marginLeft": "0.5in",
+            "marginRight": "0.5in",
+            "showPageNumbers": true,
+            "showDate": true,
+            "documentTitle": "",
+            "dateTimeFormat": "M/d/yyyy h:mm tt"
         }
     }
 }

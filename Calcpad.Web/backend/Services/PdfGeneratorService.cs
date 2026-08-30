@@ -1,11 +1,11 @@
 using System.Reflection;
+using Calcpad.Highlighter.HtmlComment;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
 using PdfSharp.Drawing;
 using PdfSharp.Fonts;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
-using CalcpadPdfOptions = Calcpad.Server.Models.Pdf.PdfOptions;
 
 namespace Calcpad.Server.Services
 {
@@ -37,10 +37,32 @@ namespace Calcpad.Server.Services
         }
     }
 
+    /// <summary>
+    /// No Chromium-family browser could be used for rendering. Carries the
+    /// <c>BROWSER_NOT_FOUND</c> contract to the controller so clients can offer the
+    /// bundled-Chromium download instead of failing with a generic 500.
+    /// </summary>
+    public class BrowserUnavailableException : Exception
+    {
+        public BrowserUnavailableException(string message, Exception? innerException = null)
+            : base(message, innerException) { }
+    }
+
+    /// <summary>Which browser the PDF pipeline would use right now, and whether a download is possible.</summary>
+    public record BrowserStatus(bool Available, string Source, string? Path, bool DownloadAllowed, int DownloadSizeMb);
+
     public class PdfGeneratorService : IAsyncDisposable
     {
+        // ChromeHeadlessShell unpacked; used only to size the confirmation prompt clients show.
+        private const int ChromiumDownloadSizeMb = 180;
+
         private IBrowser? _browser;
         private readonly SemaphoreSlim _browserLock = new(1, 1);
+        private readonly SemaphoreSlim _downloadLock = new(1, 1);
+        // Caps concurrent Chromium pages against the one shared browser, independent of
+        // _browserLock (which only guards lazy browser creation) — a burst of PDF/DOCX
+        // requests would otherwise open one page per request with no upper bound.
+        private readonly SemaphoreSlim _pageLock = new(4, 4);
         private readonly IConfiguration _config;
         private static string? _cachedChromiumPath;
 
@@ -55,26 +77,32 @@ namespace Calcpad.Server.Services
             _config = config;
         }
 
-        public async Task<byte[]> GeneratePdfAsync(string html, CalcpadPdfOptions? options = null, string? browserPath = null)
+        public async Task<byte[]> GeneratePdfAsync(string html, PdfSettingsDto? options = null)
         {
-            options ??= new CalcpadPdfOptions();
+            options ??= new PdfSettingsDto();
 
             // Step 1: Generate basic PDF with PuppeteerSharp
-            var basicPdf = await GenerateBasicPdfAsync(html, options, browserPath).ConfigureAwait(false);
+            var basicPdf = await GenerateBasicPdfAsync(html, options).ConfigureAwait(false);
 
             // Step 2: Enhance with PDFsharp (headers, footers, backgrounds)
-            if (options.EnableHeader || options.EnableFooter || !string.IsNullOrEmpty(options.BackgroundPdf))
-            {
-                return EnhancePdf(basicPdf, options);
-            }
-
-            return basicPdf;
+            return EnhancePdf(basicPdf, options);
         }
 
-        private async Task<byte[]> GenerateBasicPdfAsync(string html, CalcpadPdfOptions options, string? browserPath)
+        private async Task<byte[]> GenerateBasicPdfAsync(string html, PdfSettingsDto options)
         {
-            var browser = await GetOrCreateBrowserAsync(browserPath).ConfigureAwait(false);
-            var page = await browser.NewPageAsync().ConfigureAwait(false);
+            var browser = await GetOrCreateBrowserAsync().ConfigureAwait(false);
+
+            await _pageLock.WaitAsync().ConfigureAwait(false);
+            IPage page;
+            try
+            {
+                page = await browser.NewPageAsync().ConfigureAwait(false);
+            }
+            catch
+            {
+                _pageLock.Release();
+                throw;
+            }
 
             try
             {
@@ -161,14 +189,13 @@ namespace Calcpad.Server.Services
                 {
                     Format = ParsePaperFormat(options.Format),
                     Landscape = options.Orientation == "landscape",
-                    PrintBackground = options.PrintBackground,
-                    Scale = (decimal)options.Scale,
+                    PrintBackground = true,
                     MarginOptions = new MarginOptions
                     {
-                        Top = options.MarginTop,
-                        Right = options.MarginRight,
-                        Bottom = options.MarginBottom,
-                        Left = options.MarginLeft
+                        Top = options.MarginTop ?? PdfSettingsDefaults.MarginTop,
+                        Right = options.MarginRight ?? PdfSettingsDefaults.MarginRight,
+                        Bottom = options.MarginBottom ?? PdfSettingsDefaults.MarginBottom,
+                        Left = options.MarginLeft ?? PdfSettingsDefaults.MarginLeft
                     },
                     DisplayHeaderFooter = false
                 };
@@ -191,22 +218,24 @@ namespace Calcpad.Server.Services
             }
             finally
             {
-                await page.CloseAsync().ConfigureAwait(false);
+                try
+                {
+                    await page.CloseAsync().ConfigureAwait(false);
+                }
+                finally
+                {
+                    _pageLock.Release();
+                }
             }
         }
 
         /// <summary>
-        /// Waits for all client-side rendered images (DXF plots, charts, anything
-        /// async that ends up as an <c>&lt;img&gt;</c>) to finish before capturing
-        /// the PDF. <c>Networkidle0</c> isn't enough on its own because the work
-        /// that fills <c>img.src</c> happens after the last network request returns
-        /// (canvas-to-dataURL, font parsing, WebGL rendering, etc.).
-        ///
-        /// Strategy: poll every <c>&lt;img&gt;</c> in the document — any that have
-        /// a <c>src</c> set must report <c>complete</c> with a non-zero
-        /// <c>naturalWidth</c>. Then do a double <c>requestAnimationFrame</c>
-        /// flush so layout/paint commit before serialization. A 30 s timeout
-        /// prevents one stuck render from blocking the whole PDF.
+        /// Waits for all client-side rendered images (DXF plots, charts, anything async that
+        /// ends up as an <c>&lt;img&gt;</c>) to finish before capturing the PDF, since
+        /// <c>Networkidle0</c> misses work that happens after the last network request returns.
+        /// Every <c>&lt;img&gt;</c> with a <c>src</c> must report <c>complete</c> with a
+        /// non-zero <c>naturalWidth</c>, followed by a double <c>requestAnimationFrame</c>
+        /// flush and bounded by a 30 s timeout.
         /// </summary>
         private static async Task WaitForAsyncContentAsync(IPage page)
         {
@@ -238,7 +267,7 @@ namespace Calcpad.Server.Services
             }
         }
 
-        private async Task<IBrowser> GetOrCreateBrowserAsync(string? browserPath)
+        private async Task<IBrowser> GetOrCreateBrowserAsync()
         {
             if (_browser is { IsClosed: false })
                 return _browser;
@@ -256,7 +285,7 @@ namespace Calcpad.Server.Services
                     _browser = null;
                 }
 
-                var executablePath = await ResolveBrowserPathAsync(browserPath).ConfigureAwait(false);
+                var executablePath = await ResolveBrowserPathAsync().ConfigureAwait(false);
                 FileLogger.LogInfo("Launching browser", executablePath);
 
                 try
@@ -270,8 +299,20 @@ namespace Calcpad.Server.Services
                 }
                 catch (Exception ex)
                 {
-                    FileLogger.LogWarning("Browser launch failed, falling back to ChromeHeadlessShell download", ex.Message);
-                    var fallbackPath = await DownloadChromiumAsync().ConfigureAwait(false);
+                    FileLogger.LogWarning("Browser launch failed", ex.Message);
+
+                    // Only fall back to a ChromeHeadlessShell that is already on disk, or
+                    // download one when the host has pre-approved it. An unattended download
+                    // here is what the desktop/VS Code clients now prompt for instead.
+                    var fallbackPath = FindDownloadedChromium();
+                    if (fallbackPath == null && IsDownloadAllowed())
+                        fallbackPath = await DownloadChromiumAsync().ConfigureAwait(false);
+
+                    if (fallbackPath == null || string.Equals(fallbackPath, executablePath, StringComparison.OrdinalIgnoreCase))
+                        throw new BrowserUnavailableException(
+                            $"Failed to launch the browser at '{executablePath}'. Install a Chromium-family browser or download the bundled Chromium.", ex);
+
+                    FileLogger.LogInfo("Falling back to downloaded ChromeHeadlessShell", fallbackPath);
                     _browser = await Puppeteer.LaunchAsync(new LaunchOptions
                     {
                         Headless = true,
@@ -290,19 +331,33 @@ namespace Calcpad.Server.Services
 
         /// <summary>
         /// Resolves a Chromium-based browser executable. Checks (in order):
-        /// 1. Explicitly configured path (parameter, appsettings, env var)
+        /// 1. Host-configured path (<c>BrowserPath</c> in appsettings, or the
+        ///    <c>BROWSER_PATH</c> environment variable). Never request-supplied — an
+        ///    executable path off the wire is an arbitrary-process-launch primitive.
         /// 2. Well-known system browser locations (Edge, Chrome)
-        /// 3. BrowserFetcher download of ChromeHeadlessShell
+        /// 3. A ChromeHeadlessShell already downloaded by <see cref="InstallBrowserAsync"/>
+        /// 4. A fresh download, but only when <c>AllowChromiumDownload</c> is set
         /// </summary>
-        private async Task<string> ResolveBrowserPathAsync(string? browserPath)
+        /// <exception cref="BrowserUnavailableException">
+        /// Nothing usable was found and downloading was not pre-approved. Clients turn this into
+        /// a prompt offering the download rather than performing one silently.
+        /// </exception>
+        private async Task<string> ResolveBrowserPathAsync()
         {
-            // 1. Try configured/detected browser path
-            var path = NullIfEmpty(browserPath)
-                ?? NullIfEmpty(_config["BrowserPath"])
+            // 1. Try the host-configured browser path
+            var path = NullIfEmpty(_config["BrowserPath"])
                 ?? Environment.GetEnvironmentVariable("BROWSER_PATH");
 
             if (!string.IsNullOrEmpty(path))
-                return path;
+            {
+                if (File.Exists(path))
+                    return path;
+
+                // A stale BrowserPath (a Linux path in a config used on Windows, an
+                // uninstalled browser) shouldn't strand the user — auto-detection below
+                // usually finds a working browser.
+                FileLogger.LogWarning("Configured browser path does not exist; falling back to auto-detection", path);
+            }
 
             // 2. Try well-known system browser locations
             var systemBrowser = FindSystemBrowser();
@@ -312,8 +367,117 @@ namespace Calcpad.Server.Services
                 return systemBrowser;
             }
 
-            // 3. Fallback: download ChromeHeadlessShell
-            return await DownloadChromiumAsync().ConfigureAwait(false);
+            // 3. A ChromeHeadlessShell downloaded earlier — the user already consented once
+            var downloaded = FindDownloadedChromium();
+            if (downloaded != null)
+            {
+                FileLogger.LogInfo("Using downloaded ChromeHeadlessShell", downloaded);
+                return downloaded;
+            }
+
+            // 4. Only download unattended when the host opted in
+            if (IsDownloadAllowed())
+                return await DownloadChromiumAsync().ConfigureAwait(false);
+
+            FileLogger.LogWarning("WARNING: no Chromium-family browser found for PDF export", null);
+            throw new BrowserUnavailableException(
+                "No Chromium-family browser was found. Install Chrome, Edge or Chromium, set BrowserPath, or download the bundled Chromium.");
+        }
+
+        /// <summary>Current browser resolution, without launching or downloading anything.</summary>
+        public BrowserStatus GetBrowserStatus()
+        {
+            var configured = NullIfEmpty(_config["BrowserPath"])
+                ?? Environment.GetEnvironmentVariable("BROWSER_PATH");
+            if (!string.IsNullOrEmpty(configured) && File.Exists(configured))
+                return new BrowserStatus(true, "configured", configured, IsDownloadAllowed(), ChromiumDownloadSizeMb);
+
+            var systemBrowser = FindSystemBrowser();
+            if (systemBrowser != null)
+                return new BrowserStatus(true, "system", systemBrowser, IsDownloadAllowed(), ChromiumDownloadSizeMb);
+
+            var downloaded = FindDownloadedChromium();
+            if (downloaded != null)
+                return new BrowserStatus(true, "downloaded", downloaded, IsDownloadAllowed(), ChromiumDownloadSizeMb);
+
+            return new BrowserStatus(false, "none", null, IsDownloadAllowed(), ChromiumDownloadSizeMb);
+        }
+
+        /// <summary>
+        /// Downloads ChromeHeadlessShell on explicit request — the only path that downloads
+        /// without the <c>AllowChromiumDownload</c> opt-in, because the caller is relaying a
+        /// user's confirmation. Drops any stale browser so the next render picks up the new
+        /// executable.
+        /// </summary>
+        public async Task<string> InstallBrowserAsync()
+        {
+            await _downloadLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                var existing = FindDownloadedChromium();
+                if (existing != null)
+                    return existing;
+
+                var path = await DownloadChromiumAsync().ConfigureAwait(false);
+
+                await _browserLock.WaitAsync().ConfigureAwait(false);
+                try
+                {
+                    if (_browser != null)
+                    {
+                        try { await _browser.CloseAsync().ConfigureAwait(false); } catch { }
+                        _browser = null;
+                    }
+                }
+                finally
+                {
+                    _browserLock.Release();
+                }
+
+                return path;
+            }
+            finally
+            {
+                _downloadLock.Release();
+            }
+        }
+
+        private bool IsDownloadAllowed()
+        {
+            if (bool.TryParse(Environment.GetEnvironmentVariable("ALLOW_CHROMIUM_DOWNLOAD"), out var fromEnv))
+                return fromEnv;
+            return _config.GetValue("AllowChromiumDownload", false);
+        }
+
+        private static string? FindDownloadedChromium()
+        {
+            if (_cachedChromiumPath != null && File.Exists(_cachedChromiumPath))
+                return _cachedChromiumPath;
+
+            try
+            {
+                var fetcher = new BrowserFetcher(new BrowserFetcherOptions
+                {
+                    Path = Path.Combine(AppContext.BaseDirectory, "chromium"),
+                    Browser = SupportedBrowser.ChromeHeadlessShell
+                });
+
+                foreach (var installed in fetcher.GetInstalledBrowsers())
+                {
+                    var executable = installed.GetExecutablePath();
+                    if (File.Exists(executable))
+                    {
+                        _cachedChromiumPath = executable;
+                        return executable;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogWarning("Could not enumerate downloaded browsers", ex.Message);
+            }
+
+            return null;
         }
 
         private static string? FindSystemBrowser()
@@ -370,13 +534,13 @@ namespace Calcpad.Server.Services
             return null;
         }
 
-        private async Task<string> DownloadChromiumAsync()
+        private static async Task<string> DownloadChromiumAsync()
         {
-            if (_cachedChromiumPath != null && File.Exists(_cachedChromiumPath))
-                return _cachedChromiumPath;
+            var existing = FindDownloadedChromium();
+            if (existing != null)
+                return existing;
 
-            var baseDir = AppContext.BaseDirectory;
-            var downloadDir = Path.Combine(baseDir, "chromium");
+            var downloadDir = Path.Combine(AppContext.BaseDirectory, "chromium");
 
             FileLogger.LogInfo("Downloading ChromeHeadlessShell", downloadDir);
 
@@ -386,50 +550,45 @@ namespace Calcpad.Server.Services
                 Browser = SupportedBrowser.ChromeHeadlessShell
             });
 
-            var installed = fetcher.GetInstalledBrowsers().FirstOrDefault();
-            if (installed == null)
-            {
-                installed = await fetcher.DownloadAsync().ConfigureAwait(false);
-                FileLogger.LogInfo("ChromeHeadlessShell download complete", installed.GetExecutablePath());
-            }
-
+            var installed = await fetcher.DownloadAsync().ConfigureAwait(false);
             _cachedChromiumPath = installed.GetExecutablePath();
+            FileLogger.LogInfo("ChromeHeadlessShell download complete", _cachedChromiumPath);
             return _cachedChromiumPath;
         }
 
         private static string? NullIfEmpty(string? value) =>
             string.IsNullOrEmpty(value) ? null : value;
 
-        private static PaperFormat ParsePaperFormat(string? format) => format?.ToUpperInvariant() switch
+        /// <summary>Recognized names mirror <see cref="PdfPaperFormat"/> in Calcpad.Highlighter,
+        /// which is what validates a document's <c>pdf</c> metadata comment.</summary>
+        private static PaperFormat ParsePaperFormat(string? format) =>
+            Enum.TryParse<PdfPaperFormat>(format, true, out var parsed)
+                ? MapPaperFormat(parsed)
+                : MapPaperFormat(Enum.Parse<PdfPaperFormat>(PdfSettingsDefaults.Format, true));
+
+        private static PaperFormat MapPaperFormat(PdfPaperFormat format) => format switch
         {
-            "LETTER" => PaperFormat.Letter,
-            "LEGAL" => PaperFormat.Legal,
-            "TABLOID" => PaperFormat.Tabloid,
-            "LEDGER" => PaperFormat.Ledger,
-            "A0" => PaperFormat.A0,
-            "A1" => PaperFormat.A1,
-            "A2" => PaperFormat.A2,
-            "A3" => PaperFormat.A3,
-            "A4" => PaperFormat.A4,
-            "A5" => PaperFormat.A5,
-            "A6" => PaperFormat.A6,
-            _ => PaperFormat.A4
+            PdfPaperFormat.Letter => PaperFormat.Letter,
+            PdfPaperFormat.Legal => PaperFormat.Legal,
+            PdfPaperFormat.Tabloid => PaperFormat.Tabloid,
+            PdfPaperFormat.Ledger => PaperFormat.Ledger,
+            PdfPaperFormat.A0 => PaperFormat.A0,
+            PdfPaperFormat.A1 => PaperFormat.A1,
+            PdfPaperFormat.A2 => PaperFormat.A2,
+            PdfPaperFormat.A3 => PaperFormat.A3,
+            PdfPaperFormat.A4 => PaperFormat.A4,
+            PdfPaperFormat.A5 => PaperFormat.A5,
+            PdfPaperFormat.A6 => PaperFormat.A6,
+            _ => PaperFormat.Letter,
         };
 
         #region PDFsharp Enhancement
 
-        private byte[] EnhancePdf(byte[] pdfBytes, CalcpadPdfOptions options)
+        private byte[] EnhancePdf(byte[] pdfBytes, PdfSettingsDto options)
         {
             using var inputStream = new MemoryStream(pdfBytes);
             var document = PdfReader.Open(inputStream, PdfDocumentOpenMode.Modify);
 
-            // Add background first (drawn behind content)
-            if (!string.IsNullOrEmpty(options.BackgroundPdf) && File.Exists(options.BackgroundPdf))
-            {
-                AddBackground(document, options.BackgroundPdf);
-            }
-
-            // Add headers and footers on top
             for (int i = 0; i < document.PageCount; i++)
             {
                 var page = document.Pages[i];
@@ -438,11 +597,8 @@ namespace Calcpad.Server.Services
                 double width = page.Width.Point;
                 double height = page.Height.Point;
 
-                if (options.EnableHeader)
-                    DrawHeader(gfx, width, height, options);
-
-                if (options.EnableFooter)
-                    DrawFooter(gfx, width, height, i + 1, document.PageCount, options);
+                DrawHeader(gfx, width, height, options);
+                DrawFooter(gfx, width, height, i + 1, document.PageCount, options);
             }
 
             using var outputStream = new MemoryStream();
@@ -457,7 +613,7 @@ namespace Calcpad.Server.Services
             LinePen: new XPen(XColor.FromArgb(179, 179, 179), 0.5),
             GrayBrush: new XSolidBrush(XColor.FromArgb(77, 77, 77)));
 
-        private void DrawHeader(XGraphics gfx, double width, double height, CalcpadPdfOptions options)
+        private void DrawHeader(XGraphics gfx, double width, double height, PdfSettingsDto options)
         {
             var ctx = SetupHeaderFooterContext();
             var font = new XFont("Helvetica", 10);
@@ -478,33 +634,21 @@ namespace Calcpad.Server.Services
             {
                 gfx.DrawString(options.DocumentTitle, boldFont, darkBrush,
                     new XPoint(margin, headerY + 12));
-
-                // Subtitle
-                if (!string.IsNullOrEmpty(options.DocumentSubtitle))
-                {
-                    gfx.DrawString(options.DocumentSubtitle, font, ctx.GrayBrush,
-                        new XPoint(margin, headerY + 23));
-                }
-            }
-
-            // Header center text
-            if (!string.IsNullOrEmpty(options.HeaderCenter))
-            {
-                var size = gfx.MeasureString(options.HeaderCenter, font);
-                gfx.DrawString(options.HeaderCenter, font, ctx.GrayBrush,
-                    new XPoint((width - size.Width) / 2, headerY + 12));
             }
 
             // Timestamp (top-right)
-            var timestampFormat = string.IsNullOrEmpty(options.DateTimeFormat) ? "g" : options.DateTimeFormat;
-            var timestamp = DateTime.Now.ToString(timestampFormat);
-            var timestampSize = gfx.MeasureString(timestamp, smallFont);
-            gfx.DrawString(timestamp, smallFont, lightGrayBrush,
-                new XPoint(width - margin - timestampSize.Width, headerY + 12));
+            if (options.ShowDate ?? PdfSettingsDefaults.ShowDate)
+            {
+                var timestampFormat = string.IsNullOrEmpty(options.DateTimeFormat) ? "g" : options.DateTimeFormat;
+                var timestamp = DateTime.Now.ToString(timestampFormat);
+                var timestampSize = gfx.MeasureString(timestamp, smallFont);
+                gfx.DrawString(timestamp, smallFont, lightGrayBrush,
+                    new XPoint(width - margin - timestampSize.Width, headerY + 12));
+            }
         }
 
         private void DrawFooter(XGraphics gfx, double width, double height,
-            int pageNumber, int totalPages, CalcpadPdfOptions options)
+            int pageNumber, int totalPages, PdfSettingsDto options)
         {
             var ctx = SetupHeaderFooterContext();
             var font = new XFont("Helvetica", 8);
@@ -517,61 +661,13 @@ namespace Calcpad.Server.Services
             double lineY = footerY - 5;
             gfx.DrawLine(ctx.LinePen, margin, lineY, width - margin, lineY);
 
-            // Left side: Author / Company
-            double leftY = footerY + 8;
-            if (!string.IsNullOrEmpty(options.Author))
-            {
-                gfx.DrawString($"Author: {options.Author}", font, ctx.GrayBrush,
-                    new XPoint(margin, leftY));
-                leftY += 10;
-            }
-            if (!string.IsNullOrEmpty(options.Company))
-            {
-                gfx.DrawString(options.Company, font, ctx.GrayBrush,
-                    new XPoint(margin, leftY));
-            }
-
-            // Center: Custom footer text
-            if (!string.IsNullOrEmpty(options.FooterCenter))
-            {
-                var size = gfx.MeasureString(options.FooterCenter, centerFont);
-                gfx.DrawString(options.FooterCenter, centerFont, ctx.GrayBrush,
-                    new XPoint((width - size.Width) / 2, footerY + 8));
-            }
-
             // Right side: Page numbers
-            var pageText = $"Page {pageNumber} of {totalPages}";
-            var pageSize = gfx.MeasureString(pageText, font);
-            double rightY = footerY + 8;
-            gfx.DrawString(pageText, font, ctx.GrayBrush,
-                new XPoint(width - margin - pageSize.Width, rightY));
-
-            if (!string.IsNullOrEmpty(options.Project))
+            if (options.ShowPageNumbers ?? PdfSettingsDefaults.ShowPageNumbers)
             {
-                rightY += 10;
-                var projectText = $"Project: {options.Project}";
-                var projectSize = gfx.MeasureString(projectText, font);
-                gfx.DrawString(projectText, font, ctx.GrayBrush,
-                    new XPoint(width - margin - projectSize.Width, rightY));
-            }
-        }
-
-        private void AddBackground(PdfDocument document, string backgroundPdfPath)
-        {
-            try
-            {
-                var bgForm = XPdfForm.FromFile(backgroundPdfPath);
-
-                for (int i = 0; i < document.PageCount; i++)
-                {
-                    var page = document.Pages[i];
-                    using var gfx = XGraphics.FromPdfPage(page, XGraphicsPdfPageOptions.Prepend);
-                    gfx.DrawImage(bgForm, 0, 0, page.Width.Point, page.Height.Point);
-                }
-            }
-            catch (Exception ex)
-            {
-                FileLogger.LogWarning("Failed to add background PDF", ex.Message);
+                var pageText = $"Page {pageNumber} of {totalPages}";
+                var pageSize = gfx.MeasureString(pageText, font);
+                gfx.DrawString(pageText, font, ctx.GrayBrush,
+                    new XPoint(width - margin - pageSize.Width, footerY + 8));
             }
         }
 

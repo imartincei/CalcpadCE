@@ -187,6 +187,10 @@ export interface DefinitionsResponse {
     functions: FunctionDefinition[];
     variables: VariableDefinition[];
     customUnits: CustomUnitDefinition[];
+    /** Resolved absolute `#ProjectPath`, or null when undeclared/unresolvable. */
+    projectPath: string | null;
+    /** Resolved absolute `#LibraryPath`, or null when undeclared/unresolvable. */
+    libraryPath: string | null;
 }
 
 export interface MacroDefinition {
@@ -275,13 +279,11 @@ export enum CalcpadTypeId {
     Value = 1,
     Vector = 2,
     Matrix = 3,
-    FutureReserved4 = 4,
-    Various = 5,
-    Function = 6,
-    InlineMacro = 7,
-    MultilineMacro = 8,
-    CustomUnit = 9,
-    FutureReserved10 = 10
+    CustomUnit = 4,
+    Function = 5,
+    InlineMacro = 6,
+    MultilineMacro = 7,
+    Various = 8
 }
 
 // ============================================
@@ -300,4 +302,68 @@ export interface CalcpadError {
 export interface ConvertResult {
     html: string;
     errors: CalcpadError[];
+}
+
+export interface CpdzDecodeResponse {
+    /** The decoded Calcpad source. */
+    content: string;
+    /**
+     * True when the file is a composite archive bundling images. Its original bytes
+     * must be passed back on encode, or those images are lost.
+     */
+    composite: boolean;
+}
+
+export interface CpdzEncodeResponse {
+    /** Base64 of the encoded file's bytes. */
+    data: string;
+}
+
+/**
+ * The outcome of bundling a worksheet for compiling. `content` is the self-contained
+ * source; when it is missing, `errors` says what the worksheet still depends on.
+ */
+export interface PortableBundleResult {
+    content?: string;
+    errors: string[];
+}
+
+/**
+ * The outcome of packing a worksheet into a portable archive. `zip` is the file to save and
+ * `bundled` names what travelled with the document; when they are missing, `errors` says what
+ * stopped the package — a reference that could not be read, or two that share a name.
+ */
+export interface PortablePackageResult {
+    zip?: Uint8Array;
+    /** Suggested file name, taken from the document's own. */
+    name?: string;
+    /** The folder inside the archive holding every referenced file. */
+    refsFolder?: string;
+    bundled: string[];
+    errors: string[];
+}
+
+/**
+ * Which rendering an export captures: `report` hides `#pre` and applies the entered `#UI` values
+ * (the default everywhere), `preview` is the on-screen rendering, `input` is the `#UI` form
+ * itself, and `unwrapped` is the macro-expanded source listing. `input` and `unwrapped` have no
+ * Word form.
+ */
+export type ExportVariant = 'report' | 'preview' | 'input' | 'unwrapped';
+
+/** Interactive `#UI` options for a convert request. */
+export interface UiConvertOptions {
+    /** Render `#UI` lines as controls and hide `#post` content. */
+    enableUi?: boolean;
+    /**
+     * Values to substitute, keyed by the control identity the preview reports in
+     * `data-ui-var` (`"L:1"`, or `"L:1:2"` for the second pass of a loop). A bare
+     * `"L"` covers every declaration of that name.
+     */
+    uiOverrides?: Record<string, string>;
+    /**
+     * Drops the "on line [N]" source-line reference from error messages, since input
+     * mode has no source editor for it to point at. Defaults to `enableUi`.
+     */
+    hideErrorLines?: boolean;
 }

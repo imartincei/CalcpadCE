@@ -24,9 +24,9 @@ namespace Calcpad.Highlighter.Linter.Constants
     }
 
     /// <summary>
-    /// Provides access to built-in Calcpad language elements.
-    /// Basic lookups (functions, keywords, units, etc.) are derived from SnippetRegistry.
-    /// Semantic groupings (control blocks, standalone keywords, etc.) are hardcoded.
+    /// Provides access to built-in Calcpad language elements. Basic lookups (functions, keywords,
+    /// units) are derived from SnippetRegistry; semantic groupings (control blocks, standalone
+    /// keywords) are hardcoded.
     /// </summary>
     public static class CalcpadBuiltIns
     {
@@ -218,11 +218,11 @@ namespace Calcpad.Highlighter.Linter.Constants
         {
             "#else", "#end if", "#end def", "#loop", "#break", "#continue",
             "#local", "#global", "#pause", "#input",
-            "#hide", "#show", "#pre", "#post",
-            "#val", "#equ", "#noc", "#nosub", "#novar", "#varsub",
+            "#end hide", "#end show", "#end pre", "#end post",
+            "#end val", "#end equ", "#end noc",
+            "#end nosub", "#end novar", "#end varsub",
             "#split", "#wrap", "#phasor", "#complex",
-            "#rad", "#deg", "#gra",
-            "#html", "#cpd", "#markdown"
+            "#rad", "#deg", "#gra"
         }.ToFrozenSet(System.StringComparer.OrdinalIgnoreCase);
 
         /// <summary>

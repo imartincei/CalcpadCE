@@ -2,6 +2,12 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { execFile, execSync } from 'child_process';
+import {
+    DOTNET_DOWNLOAD_HOSTS,
+    downloadVerified,
+    extractZipToDir,
+    fetchJsonFromAllowedHost,
+} from './downloadVerification';
 
 const DOTNET_MAJOR_VERSION = '10';
 const RELEASES_JSON_URL = `https://builds.dotnet.microsoft.com/dotnet/release-metadata/${DOTNET_MAJOR_VERSION}.0/releases.json`;
@@ -13,6 +19,14 @@ type DotnetStatus = 'ready' | 'wrong-version' | 'not-found';
 interface PlatformRuntimeInfo {
     rid: string;
     archiveExt: string;
+}
+
+interface ResolvedRuntimeDownload {
+    url: string;
+    name: string;
+    /** Lowercase hex SHA512 from the release metadata's `hash` field. */
+    hash: string;
+    version: string;
 }
 
 function getPlatformRuntimeInfo(): PlatformRuntimeInfo | null {
@@ -127,9 +141,9 @@ export class DotnetRuntimeManager {
         fs.mkdirSync(storagePath, { recursive: true });
 
         const runtimeDir = path.join(storagePath, RUNTIME_DIR_NAME);
-        const downloadUrl = await this.resolveDownloadUrl(platformInfo);
+        const download = await this.resolveDownload(platformInfo);
 
-        this.log(`Downloading ASP.NET Core runtime from ${downloadUrl}`);
+        this.log(`Downloading ASP.NET Core runtime from ${download.url}`);
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
@@ -138,15 +152,14 @@ export class DotnetRuntimeManager {
         }, async (progress) => {
             progress.report({ message: 'Downloading runtime...' });
 
-            const response = await fetch(downloadUrl, { redirect: 'follow' });
-            if (!response.ok) {
-                throw new Error(`Failed to download runtime: HTTP ${response.status}`);
-            }
-
-            const arrayBuffer = await response.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-            const sizeMB = (buffer.length / 1024 / 1024).toFixed(1);
-            this.log(`Downloaded ${sizeMB} MB`);
+            // Verified in memory: nothing is written to disk until the digest matches.
+            const buffer = await downloadVerified({
+                url: download.url,
+                allowedHosts: DOTNET_DOWNLOAD_HOSTS,
+                expected: { value: download.hash, encoding: 'hex' },
+                what: `ASP.NET Core runtime ${download.version} (${download.name})`,
+                log: (message) => this.log(message),
+            });
 
             progress.report({ message: 'Extracting runtime...' });
 
@@ -164,10 +177,7 @@ export class DotnetRuntimeManager {
                 fs.mkdirSync(runtimeDir, { recursive: true });
 
                 if (platformInfo.archiveExt === 'zip') {
-                    execSync(
-                        `powershell -NoProfile -Command "Expand-Archive -Path '${archivePath}' -DestinationPath '${runtimeDir}' -Force"`,
-                        { timeout: 120000 }
-                    );
+                    extractZipToDir(archivePath, runtimeDir);
                 } else {
                     execSync(`tar xzf "${archivePath}" -C "${runtimeDir}"`, { timeout: 120000 });
                 }
@@ -250,17 +260,13 @@ export class DotnetRuntimeManager {
     }
 
     /**
-     * Fetch the releases JSON and find the download URL for the current platform.
+     * Fetch the releases JSON and resolve the archive URL plus its published
+     * SHA512 for the current platform.
      */
-    private async resolveDownloadUrl(platformInfo: PlatformRuntimeInfo): Promise<string> {
+    private async resolveDownload(platformInfo: PlatformRuntimeInfo): Promise<ResolvedRuntimeDownload> {
         this.log(`Fetching release metadata from ${RELEASES_JSON_URL}`);
 
-        const response = await fetch(RELEASES_JSON_URL);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch .NET release metadata: HTTP ${response.status}`);
-        }
-
-        const data = await response.json() as {
+        const data = await fetchJsonFromAllowedHost<{
             releases: Array<{
                 'aspnetcore-runtime': {
                     version: string;
@@ -268,10 +274,11 @@ export class DotnetRuntimeManager {
                         rid: string;
                         url: string;
                         name: string;
+                        hash?: string;
                     }>;
                 };
             }>;
-        };
+        }>(RELEASES_JSON_URL, DOTNET_DOWNLOAD_HOSTS, '.NET release metadata');
 
         // First release is the latest
         const latestRelease = data.releases?.[0];
@@ -284,23 +291,40 @@ export class DotnetRuntimeManager {
             throw new Error('No aspnetcore-runtime files in latest release');
         }
 
-        // Find the archive file for our platform (not the installer .exe/.pkg)
-        const expectedName = `aspnetcore-runtime-${runtime.version}-${platformInfo.rid}.${platformInfo.archiveExt}`;
-        const file = runtime.files.find(f => f.name === expectedName);
+        // Find the archive file for our platform (not the installer .exe/.pkg).
+        // Current metadata omits the version from `name`; older releases include it.
+        const expectedNames = [
+            `aspnetcore-runtime-${platformInfo.rid}.${platformInfo.archiveExt}`,
+            `aspnetcore-runtime-${runtime.version}-${platformInfo.rid}.${platformInfo.archiveExt}`,
+        ];
+
+        // The fallback must stay narrow: the same rid/extension also matches
+        // `aspnetcore-composite-*` and `aspnetcore-targeting-pack-*`, neither of
+        // which contains a runnable dotnet host.
+        const file = runtime.files.find(f => expectedNames.includes(f.name))
+            ?? runtime.files.find(f =>
+                f.rid === platformInfo.rid
+                && f.name.startsWith('aspnetcore-runtime-')
+                && !f.name.includes('composite')
+                && f.name.endsWith(`.${platformInfo.archiveExt}`)
+            );
 
         if (!file) {
-            // Fallback: match by RID and extension
-            const fallback = runtime.files.find(f =>
-                f.rid === platformInfo.rid && f.name.endsWith(`.${platformInfo.archiveExt}`)
-            );
-            if (fallback) {
-                return fallback.url;
-            }
             throw new Error(`No ASP.NET Core runtime download found for ${platformInfo.rid} (.${platformInfo.archiveExt})`);
         }
 
+        // A file entry without a hash is unverifiable, so treat it as fatal rather
+        // than installing unauthenticated bytes.
+        const hash = file.hash?.trim();
+        if (!hash || !/^[0-9a-fA-F]{128}$/.test(hash)) {
+            throw new Error(
+                `.NET release metadata has no usable SHA512 for ${file.name}. ` +
+                `Cannot verify the download — install the runtime manually from ${DOTNET_DOWNLOAD_PAGE}.`
+            );
+        }
+
         this.log(`Resolved download: ${file.name} (${runtime.version})`);
-        return file.url;
+        return { url: file.url, name: file.name, hash: hash.toLowerCase(), version: runtime.version };
     }
 
     private log(message: string): void {

@@ -145,6 +145,7 @@ if [[ "$CARGO_TARGET" == *linux* && "$BUNDLED_APPIMAGE" == "true" ]]; then
     APPIMG=$(find "$APPIMAGE_DIR" -maxdepth 1 -type f -name '*.AppImage' | head -n1)
     if [[ -n "$APPDIR" && -n "$APPIMG" && -f "$APPDIR/apprun-hooks/linuxdeploy-plugin-gtk.sh" ]]; then
         echo ">> Patching AppImage GTK theme detection"
+        APPIMAGE_ARCH="${CARGO_TARGET%%-*}"
         cat > "$APPDIR/apprun-hooks/linuxdeploy-plugin-gtk.sh" <<'HOOK_EOF'
 #! /usr/bin/env bash
 # Replaces the default linuxdeploy GTK hook. Picks Adwaita:dark whenever any
@@ -182,14 +183,14 @@ export GDK_BACKEND=x11
 export XDG_DATA_DIRS="$APPDIR/usr/share:/usr/share:$XDG_DATA_DIRS"
 export GSETTINGS_SCHEMA_DIR="$APPDIR/usr/share/glib-2.0/schemas"
 export GTK_EXE_PREFIX="$APPDIR/usr"
-export GTK_PATH="$APPDIR/usr/lib/gtk-3.0:/usr/lib64/gtk-3.0:/usr/lib/x86_64-linux-gnu/gtk-3.0"
+export GTK_PATH="$APPDIR/usr/lib/gtk-3.0:/usr/lib64/gtk-3.0:/usr/lib/x86_64-linux-gnu/gtk-3.0:/usr/lib/aarch64-linux-gnu/gtk-3.0"
 export GTK_IM_MODULE_FILE="$APPDIR/usr/lib/gtk-3.0/3.0.0/immodules.cache"
 export GDK_PIXBUF_MODULE_FILE="$APPDIR/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 export GIO_EXTRA_MODULES="$APPDIR/usr/lib/gio/modules"
 HOOK_EOF
         rm -f "$APPIMG"
         (cd "$APPIMAGE_DIR" && \
-            ARCH=x86_64 NO_STRIP=true \
+            ARCH="$APPIMAGE_ARCH" NO_STRIP=true \
             "$HOME/.cache/tauri/linuxdeploy-plugin-appimage.AppImage" \
             --appimage-extract-and-run --appdir "$APPDIR")
         REPACKED=$(find "$APPIMAGE_DIR" -maxdepth 1 -type f -name '*.AppImage' | head -n1)

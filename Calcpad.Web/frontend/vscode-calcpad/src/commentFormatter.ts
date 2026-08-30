@@ -94,11 +94,10 @@ export class CommentFormatter {
     }
 
     /**
-     * Wrap selected text with inline formatting tags. Also ensures every
-     * touched line starts with a comment quote right after its indentation
-     * (same rule headings use) — bold/italic/etc. tags only render as HTML
-     * inside a comment. Run as its own edit first so VS Code auto-adjusts
-     * `editor.selections` before the wrap edit reads them.
+     * Wrap selected text with inline formatting tags, ensuring every touched line starts with a
+     * comment quote right after its indentation, since the tags only render as HTML inside a
+     * comment. Run as its own edit first so VS Code auto-adjusts `editor.selections` before the
+     * wrap edit reads them.
      */
     private async wrapInline(editor: vscode.TextEditor, type: InlineFormat): Promise<void> {
         const format = this.getFormat();

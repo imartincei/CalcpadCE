@@ -19,10 +19,9 @@ namespace Calcpad.Highlighter.Tokenizer.Models
         Macro,
 
         /// <summary>
-        /// Full analysis mode for the linter.
-        /// Extracts variable definitions with expressions, function definitions
-        /// with params and body, custom units, command blocks, #for loop variables,
-        /// and #read variables. Replaces the regex-based DefinitionCollection.
+        /// Full analysis mode for the linter, extracting variable definitions with expressions,
+        /// function definitions with params and body, custom units, command blocks, #for loop
+        /// variables and #read variables. Replaces the regex-based DefinitionCollection.
         /// </summary>
         Lint
     }

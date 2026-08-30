@@ -6,9 +6,10 @@ use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
-use tauri::menu::{Menu, MenuBuilder, MenuItem, PredefinedMenuItem, Submenu};
+use tauri::menu::{IsMenuItem, Menu, MenuBuilder, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::path::BaseDirectory;
-use tauri::{AppHandle, Emitter, Manager, RunEvent, State, WindowEvent};
+use tauri::{AppHandle, Emitter, Manager, RunEvent, State};
+use tauri_plugin_fs::FsExt;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
 
@@ -18,6 +19,8 @@ static DRAFTS_DIR: OnceLock<PathBuf> = OnceLock::new();
 // Shared with spawn_sidecar so the panic hook can attach the last few KB
 // of the child's combined stdio to the dump — same trick the C# server uses.
 static SIDECAR_TAIL: OnceLock<Arc<Mutex<String>>> = OnceLock::new();
+// Per-launch bearer for the sidecar's /api routes. See api_token().
+static API_TOKEN: OnceLock<String> = OnceLock::new();
 
 // Name of the .NET apphost inside the resource dir. All ~200 sibling
 // DLLs / native libs / deps.json / runtimeconfig.json land next to it so
@@ -26,12 +29,29 @@ const SIDECAR_EXE_UNIX: &str = "Calcpad.Server";
 const SIDECAR_EXE_WINDOWS: &str = "Calcpad.Server.exe";
 const PORT_READY_TIMEOUT_MS: u64 = 30_000;
 
-/// Files handed to us by the OS at launch (double-click on .cpd via the
-/// installed file association). Populated in setup() from argv; drained by
+/// Files handed to us by the OS at launch (double-click on .cpd or .cpdz via the
+/// installed file associations). Populated in setup() from argv; drained by
 /// the frontend once it has registered its open-file listener, avoiding the
 /// race between Rust emitting and JS being ready to listen.
 #[derive(Default)]
 struct PendingLaunchFiles(Mutex<Vec<String>>);
+
+/// What the menu shows that the frontend owns. A menu item carries no mutable
+/// state of its own, so every change rebuilds the whole menu — which means each
+/// setter has to be able to read back the parts it isn't changing.
+struct MenuState {
+    source_result_modes: Mutex<bool>,
+    recent_files: Mutex<Vec<String>>,
+}
+
+impl Default for MenuState {
+    fn default() -> Self {
+        Self {
+            source_result_modes: Mutex::new(true),
+            recent_files: Mutex::new(Vec::new()),
+        }
+    }
+}
 
 #[derive(Default)]
 struct ServerState {
@@ -96,9 +116,9 @@ struct DraftContent {
     content: String,
 }
 
-/// Pull out any file paths (with .cpd extension) from a launch argv so we can
-/// open them once the frontend is ready. argv[0] is the executable path — skip
-/// it. macOS may pass an `-psn_...` process serial arg for double-click launches.
+/// Pull out any worksheet paths (.cpd or compiled .cpdz) from a launch argv so we can open
+/// them once the frontend is ready. argv[0] is the executable path, and macOS may pass an
+/// `-psn_...` process serial arg for double-click launches.
 fn extract_launch_files<I: IntoIterator<Item = String>>(args: I) -> Vec<PathBuf> {
     args.into_iter()
         .skip(1)
@@ -107,11 +127,27 @@ fn extract_launch_files<I: IntoIterator<Item = String>>(args: I) -> Vec<PathBuf>
         .filter(|p| {
             p.extension()
                 .and_then(|e| e.to_str())
-                .map(|e| e.eq_ignore_ascii_case("cpd"))
+                .map(|e| e.eq_ignore_ascii_case("cpd") || e.eq_ignore_ascii_case("cpdz"))
                 .unwrap_or(false)
         })
         .filter(|p| p.exists())
         .collect()
+}
+
+/// Per-launch shared secret the sidecar requires on every `/api` request, without which any
+/// local program would have arbitrary file read as the user — loopback binding keeps remote
+/// machines out but not other local processes, and `#include` resolution reads any path it is
+/// handed. Generated once and reused across sidecar restarts, and handed to the child through
+/// its environment rather than argv, which is world-readable via `/proc/{pid}/cmdline` and WMI.
+fn api_token() -> &'static str {
+    API_TOKEN.get_or_init(|| {
+        let mut bytes = [0u8; 32];
+        // A failure here would mean the OS entropy source is unavailable, which is
+        // unrecoverable — an all-zero or predictable token would be worse than no
+        // server at all, so panic rather than degrade.
+        getrandom::getrandom(&mut bytes).expect("OS entropy source unavailable");
+        bytes.iter().map(|b| format!("{b:02x}")).collect()
+    })
 }
 
 fn unix_millis() -> u64 {
@@ -330,9 +366,47 @@ fn server_url(state: State<'_, ServerState>) -> Option<String> {
     state.url.lock().ok().and_then(|g| g.clone())
 }
 
+/// Hands the webview the token it must send as `X-Calcpad-Token` on every API call. Safe to
+/// expose: the webview is the app's own frontend served from `tauri://`, while worksheet
+/// content renders inside a sandboxed opaque-origin frame with no IPC access.
+#[tauri::command]
+fn server_token() -> &'static str {
+    api_token()
+}
+
 #[tauri::command]
 fn take_pending_launch_files(state: State<'_, PendingLaunchFiles>) -> Vec<String> {
     state.0.lock().map(|mut g| std::mem::take(&mut *g)).unwrap_or_default()
+}
+
+/// Grants read access to `path` and the directory holding it, which is what worksheets need
+/// since image `src`s resolve relative to the document's folder and the dialog plugin grants
+/// only the clicked file. Non-recursive, so picking a file in a large tree does not hand over
+/// the whole subtree.
+fn allow_file_and_parent(app: &AppHandle, path: &Path) {
+    let scope = app.fs_scope();
+    let _ = scope.allow_file(path);
+    if let Some(parent) = path.parent() {
+        let _ = scope.allow_directory(parent, false);
+    }
+}
+
+/// Extends the read scope to the folder of a document the webview may already read, gated on
+/// the runtime scope already allowing `path` — only true once the user picked it through a
+/// dialog — so webview script cannot grant itself a directory it was never given. The
+/// capability's `fs:deny-default` entries are unaffected.
+#[tauri::command]
+fn allow_document_dir(app: AppHandle, path: String) -> Result<(), String> {
+    let path = PathBuf::from(&path);
+    if !app.fs_scope().is_allowed(&path) {
+        return Err(format!("outside the current read scope: {}", path.display()));
+    }
+    let parent = path
+        .parent()
+        .ok_or_else(|| format!("no parent directory: {}", path.display()))?;
+    app.fs_scope()
+        .allow_directory(parent, false)
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -347,23 +421,75 @@ async fn stop_server(app: AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+/// True for the handful of variables the frontend legitimately expands: `expandEnvVars` feeds
+/// this names lifted straight out of worksheet text, so an unrestricted `get_env` would turn any
+/// `$AWS_SECRET_ACCESS_KEY` in a document into a value the webview can see. Only names that name
+/// a location are answered; everything else reads as unset.
+fn is_readable_env(name: &str) -> bool {
+    // Only ever set on the sidecar's own env block, so this process should never
+    // hold it — denied anyway so an inherited one can't be expanded out of a
+    // worksheet and into the rendered preview, which has network egress.
+    if name == "CALCPAD_API_TOKEN" {
+        return false;
+    }
+    matches!(name, "HOME" | "USERPROFILE" | "APPDATA")
+        || name.starts_with("XDG_")
+        || name.starts_with("CALCPAD_")
+}
+
 #[tauri::command]
 fn get_env(name: String) -> Option<String> {
+    if !is_readable_env(&name) {
+        return None;
+    }
     std::env::var(name).ok()
 }
 
-// Inside a linuxdeploy-generated AppImage, AppRun exports LD_LIBRARY_PATH so
-// the bundled binary can find its libs. If we spawn xdg-open through the
-// opener plugin, the child inherits that env, and any glib/dbus tools it
-// invokes crash trying to load the AppImage's bundled libc/libglib against
-// the host system. Strip those vars (plus the archived originals AppRun
-// stashes) so xdg-open sees a pristine environment.
+fn refresh_menu(app: &AppHandle) -> Result<(), String> {
+    let menu = build_menu(app).map_err(|e| e.to_string())?;
+    app.set_menu(menu).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+/// Shows or hides the result-mode entries that need a document with readable source —
+/// dropped while a compiled worksheet is open, since the results toolbar drops their
+/// buttons too.
+#[tauri::command]
+fn set_source_result_modes_visible(app: AppHandle, visible: bool) -> Result<(), String> {
+    *app.state::<MenuState>()
+        .source_result_modes
+        .lock()
+        .expect("menu state mutex poisoned") = visible;
+    refresh_menu(&app)
+}
+
+/// Replaces the File → Open Recent entries, most recent first. The list itself is
+/// owned by the frontend's plugin-store; this only mirrors it into the native menu.
+#[tauri::command]
+fn set_recent_files(app: AppHandle, paths: Vec<String>) -> Result<(), String> {
+    *app.state::<MenuState>()
+        .recent_files
+        .lock()
+        .expect("menu state mutex poisoned") = paths;
+    refresh_menu(&app)
+}
+
+// Inside a linuxdeploy-generated AppImage, AppRun exports LD_LIBRARY_PATH so the bundled
+// binary can find its libs, and a spawned xdg-open would inherit it and crash any glib/dbus
+// tools it invokes. Strip those vars (plus the archived originals AppRun stashes).
 #[tauri::command]
 fn open_path_native(path: String) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
+        // xdg-open has no `--` end-of-options marker — it is a shell script that would
+        // try to open a file literally named `--` — so a leading dash is rejected
+        // outright rather than escaped.
+        if path.starts_with('-') {
+            return Err(format!("refusing a path that reads as an option: {path}"));
+        }
+        let target = PathBuf::from(&path);
         let mut cmd = std::process::Command::new("xdg-open");
-        cmd.arg(&path);
+        cmd.arg(&target);
         for key in [
             "LD_LIBRARY_PATH",
             "LD_PRELOAD",
@@ -409,9 +535,8 @@ fn server_dir(app: AppHandle) -> Result<String, String> {
         .map_err(|e| e.to_string())
 }
 
-// Writable log directory shared with the .NET sidecar. On an AppImage the
-// resource dir is a read-only FUSE mount, so the server can't create logs/
-// beside its apphost. Point both sides at app_data_dir/logs instead.
+// Writable log directory shared with the .NET sidecar. On an AppImage the resource dir is a
+// read-only FUSE mount, so both sides point at app_data_dir/logs instead.
 fn resolve_log_dir(app: &AppHandle) -> Option<PathBuf> {
     let dir = app.path().app_data_dir().ok()?.join("logs");
     let _ = std::fs::create_dir_all(&dir);
@@ -427,27 +552,16 @@ fn log_dir(app: AppHandle) -> Result<String, String> {
 
 /// Launch the .NET calculation server as a background child process.
 ///
-/// **Why not `tauri_plugin_shell::sidecar()`?** Framework-dependent .NET
-/// publishes need ~200 sibling DLLs / native libs / deps.json in the same
-/// directory as the apphost. Tauri's `externalBin` places binaries in
-/// `usr/bin/` on Linux `.deb`, `Contents/MacOS/` on macOS `.app`, and the
-/// install root on Windows — all read-only at runtime — while
-/// `bundle.resources` land in a separate resource dir. There is no config
-/// path that puts both in the same directory, and Tauri v2 has no post-bundle
-/// hook (`beforeBundleCommand` runs before packaging). Spawning directly
-/// from the resource dir via `tokio::process::Command` sidesteps the layout
-/// mismatch entirely — the apphost and its siblings all live under
-/// `BaseDirectory::Resource`.
+/// **Why not `tauri_plugin_shell::sidecar()`?** Framework-dependent .NET publishes need ~200
+/// sibling DLLs / native libs / deps.json in the apphost's own directory, and no Tauri config
+/// puts `externalBin` and `bundle.resources` in the same place (nor is there a post-bundle
+/// hook). Spawning directly from the resource dir via `tokio::process::Command` sidesteps the
+/// layout mismatch entirely.
 ///
-/// **macOS limitation** — dropping `externalBin` also drops Tauri's automatic
-/// codesigning of the child binary and its ~200 `.dylib` siblings. On macOS,
-/// notarization will reject an unsigned bundle. macOS is not a primary
-/// target for this project today, so this is deferred. When it becomes one,
-/// either (a) add a `codesign --deep --force --sign "$IDENTITY" --options
-/// runtime` pass over the publish tree in `beforeBundleCommand`, or (b)
-/// revisit once Tauri v2 supports codesigning resource files directly.
-/// Tracking upstream: tauri-apps/tauri#8501 (per-arch resources), #11992
-/// (macOS notarization + externalBin bugs).
+/// **macOS limitation** — dropping `externalBin` also drops Tauri's automatic codesigning of
+/// the child binary and its `.dylib` siblings, which notarization would reject. Deferred while
+/// macOS is not a primary target; the fix is a `codesign` pass in `beforeBundleCommand` or
+/// upstream support (tauri-apps/tauri#8501, #11992).
 async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     let state: State<'_, ServerState> = app.state();
     let my_gen = state.generation.fetch_add(1, Ordering::SeqCst) + 1;
@@ -499,18 +613,22 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     if let Some(dir) = &log_dir {
         command.env("CALCPAD_LOG_DIR", dir);
     }
+    // Every /api route on the child requires this header value, passed via env rather than argv
+    // (see api_token()). ASPNETCORE_ENVIRONMENT is pinned because the child inherits our whole
+    // environment: a developer with Development exported would otherwise get Swagger and the
+    // debug-crash endpoint on a shipped app.
+    command
+        .env("CALCPAD_API_TOKEN", api_token())
+        .env("ASPNETCORE_ENVIRONMENT", "Production");
 
-    // Enable the .NET runtime's on-crash minidump (createdump). StackOverflow,
-    // FailFast and access violations bypass AppDomain.UnhandledException, so the
-    // server's own FileLogger never sees them — the runtime-level dump is the
-    // only trace. These vars must be set before the runtime boots (setting them
-    // from inside the server is too late), which is why this lives here and not
-    // in Program.cs. Mirrors the VS Code extension's spawn config.
+    // Enable the .NET runtime's on-crash minidump (createdump) for StackOverflow, FailFast and
+    // access violations, which bypass AppDomain.UnhandledException so the server's FileLogger
+    // never sees them. These vars must be set before the runtime boots, which is why they live
+    // here rather than in Program.cs.
     //
-    // The dump goes to the writable logs/ dir (CRASH_DIR, falling back to the
-    // locally-resolved log dir or temp) because on an AppImage the resource dir
-    // beside the apphost is read-only. Fixed filename — each crash overwrites the
-    // last, matching the one-server-at-a-time model.
+    // The dump goes to the writable logs/ dir because on an AppImage the resource dir beside
+    // the apphost is read-only. Fixed filename — each crash overwrites the last, matching the
+    // one-server-at-a-time model.
     let dump_dir = crash_dir()
         .map(|p| p.to_path_buf())
         .or_else(|| log_dir.clone())
@@ -619,15 +737,10 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
         });
     }
 
-    // Stdout/stderr line readers — replaces the shell plugin's CommandEvent
-    // stream. Each stream drains on its own task so a chatty stderr doesn't
-    // starve stdout. Both feed the shared tail buffer and scan for Kestrel's
-    // "Now listening on:" marker as a fallback for the port file.
-    //
-    // `stdout` and `stderr` are different concrete types (ChildStdout /
-    // ChildStderr), so we can't share a single non-generic closure. Type-erase
-    // both to `Box<dyn AsyncRead + Send + Unpin>` and hand them to one reader
-    // function; keeps the drain logic in one place.
+    // Stdout/stderr line readers — replaces the shell plugin's CommandEvent stream. Each stream
+    // drains on its own task so a chatty stderr doesn't starve stdout, both feed the shared tail
+    // buffer while scanning for Kestrel's "Now listening on:" marker, and both are type-erased to
+    // `Box<dyn AsyncRead + Send + Unpin>` since they are different concrete types.
     use tokio::io::AsyncRead;
     fn spawn_stream_reader(
         stream: Box<dyn AsyncRead + Send + Unpin>,
@@ -709,13 +822,10 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
         let tail = tail.clone();
         let dump_path = dump_path.clone();
         tauri::async_runtime::spawn(async move {
-            // `killed` distinguishes an explicit stop (kill_rx fired — restart,
-            // menu Stop, window close) from an unexpected exit. We must NOT
-            // infer this from a shared `intentional_stop` flag: a concurrent
-            // spawn during restart resets any such flag before the old process
-            // finishes dying, so its intentional kill gets misreported as a
-            // crash (start_kill exits with code 1 on Windows), which triggers a
-            // JS auto-restart storm. The branch that fired is the ground truth.
+            // `killed` distinguishes an explicit stop (kill_rx fired) from an unexpected exit.
+            // It must NOT be inferred from a shared `intentional_stop` flag: a concurrent
+            // spawn during restart resets any such flag before the old process finishes dying,
+            // misreporting its intentional kill as a crash and triggering a JS restart storm.
             let mut killed = false;
             let exit_code: Option<i32> = tokio::select! {
                 r = child.wait() => r.ok().and_then(|s| s.code()),
@@ -866,8 +976,121 @@ fn assign_to_job_object(pid: u32) {
     }
 }
 
+/// Label for a recent entry: the full path with the user's home collapsed to `~`.
+/// The file name on its own repeats across folders too often to identify one.
+fn recent_label(app: &AppHandle, path: &str) -> String {
+    let Ok(home) = app.path().home_dir() else {
+        return path.to_string();
+    };
+    match path.strip_prefix(home.to_string_lossy().as_ref()) {
+        Some(rest) => format!("~{rest}"),
+        None => path.to_string(),
+    }
+}
+
+/// Builds the app menu from `MenuState`: the recent-file list, and whether to keep
+/// the View entries that only make sense for a document with readable source.
 fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
+    let state = app.state::<MenuState>();
+    let source_result_modes = *state
+        .source_result_modes
+        .lock()
+        .expect("menu state mutex poisoned");
+    let recent = state
+        .recent_files
+        .lock()
+        .expect("menu state mutex poisoned")
+        .clone();
     let sep = || PredefinedMenuItem::separator(app);
+
+    // Grouped by what gets rendered: the unsuffixed ids are the report — the default variant
+    // everywhere — while `:preview`, `:input` and `:unwrapped` name one explicitly, and the
+    // frontend parses `export-<format>[:<variant>]`. A form and a code listing have no meaningful
+    // Word form, so neither offers one.
+    let export = Submenu::with_items(
+        app,
+        "Export",
+        true,
+        &[
+            &MenuItem::with_id(app, "export-pdf", "Report PDF...", true, Some("CmdOrCtrl+E"))?,
+            &MenuItem::with_id(app, "export-html", "Report HTML...", true, None::<&str>)?,
+            &MenuItem::with_id(app, "export-docx", "Report Word...", true, None::<&str>)?,
+            &sep()?,
+            &MenuItem::with_id(app, "export-pdf:preview", "Preview PDF...", true, None::<&str>)?,
+            &MenuItem::with_id(
+                app,
+                "export-html:preview",
+                "Preview HTML...",
+                true,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                "export-docx:preview",
+                "Preview Word...",
+                true,
+                None::<&str>,
+            )?,
+            &sep()?,
+            &MenuItem::with_id(
+                app,
+                "export-pdf:input",
+                "Input Form PDF...",
+                true,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                "export-html:input",
+                "Input Form HTML...",
+                true,
+                None::<&str>,
+            )?,
+            &sep()?,
+            &MenuItem::with_id(
+                app,
+                "export-pdf:unwrapped",
+                "Unwrapped PDF...",
+                true,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                "export-html:unwrapped",
+                "Unwrapped HTML...",
+                true,
+                None::<&str>,
+            )?,
+        ],
+    )?;
+
+    // Each entry carries its own path in the id rather than a list index, so a click
+    // can never land on a different file than the one whose label was read. The
+    // frontend strips the `open-recent:` prefix and opens the rest.
+    let recent_items = recent
+        .iter()
+        .map(|path| {
+            MenuItem::with_id(
+                app,
+                format!("open-recent:{path}"),
+                recent_label(app, path),
+                true,
+                None::<&str>,
+            )
+        })
+        .collect::<tauri::Result<Vec<_>>>()?;
+    let no_recent = MenuItem::with_id(app, "no-recent", "No Recent Files", false, None::<&str>)?;
+    let clear_recent = MenuItem::with_id(app, "clear-recent", "Clear Recent", true, None::<&str>)?;
+    let recent_sep = sep()?;
+    let mut recent_refs: Vec<&dyn IsMenuItem<tauri::Wry>> = Vec::new();
+    if recent_items.is_empty() {
+        recent_refs.push(&no_recent);
+    } else {
+        recent_refs.extend(recent_items.iter().map(|i| i as &dyn IsMenuItem<tauri::Wry>));
+        recent_refs.push(&recent_sep);
+        recent_refs.push(&clear_recent);
+    }
+    let open_recent = Submenu::with_items(app, "Open Recent", true, &recent_refs)?;
 
     let file = Submenu::with_items(
         app,
@@ -876,6 +1099,7 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         &[
             &MenuItem::with_id(app, "new", "New Tab", true, Some("CmdOrCtrl+N"))?,
             &MenuItem::with_id(app, "open", "Open...", true, Some("CmdOrCtrl+O"))?,
+            &open_recent,
             &sep()?,
             &MenuItem::with_id(app, "save", "Save", true, Some("CmdOrCtrl+S"))?,
             &MenuItem::with_id(
@@ -885,12 +1109,27 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
                 true,
                 Some("CmdOrCtrl+Shift+S"),
             )?,
+            // Compiling is an export: it writes a .cpdz alongside, leaving the open
+            // document on its own path, so it sits apart from the Save entries. Packaging
+            // is the same kind of thing, for a recipient who has to read the source.
+            &MenuItem::with_id(
+                app,
+                "save-as-compiled",
+                "Save As Compiled Worksheet...",
+                true,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                "save-as-portable",
+                "Export Portable Package...",
+                true,
+                None::<&str>,
+            )?,
             &sep()?,
             &MenuItem::with_id(app, "close-tab", "Close Tab", true, Some("CmdOrCtrl+W"))?,
             &sep()?,
-            &MenuItem::with_id(app, "export-pdf", "Export PDF...", true, None::<&str>)?,
-            &MenuItem::with_id(app, "export-html", "Export HTML...", true, None::<&str>)?,
-            &MenuItem::with_id(app, "export-docx", "Export Word...", true, None::<&str>)?,
+            &export,
             &sep()?,
             &MenuItem::with_id(app, "quit", "Quit", true, Some("CmdOrCtrl+Q"))?,
         ],
@@ -914,64 +1153,85 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         ],
     )?;
 
-    let view = Submenu::with_items(
+    let toggle_sidebar = MenuItem::with_id(
         app,
-        "View",
+        "toggle-sidebar",
+        "Toggle Sidebar",
         true,
-        &[
-            &MenuItem::with_id(
-                app,
-                "toggle-sidebar",
-                "Toggle Sidebar",
-                true,
-                Some("CmdOrCtrl+Shift+B"),
-            )?,
-            &MenuItem::with_id(
-                app,
-                "toggle-preview",
-                "Toggle Preview",
-                true,
-                Some("CmdOrCtrl+P"),
-            )?,
-            &MenuItem::with_id(
-                app,
-                "toggle-word-wrap",
-                "Toggle Word Wrap",
-                true,
-                Some("Alt+Z"),
-            )?,
-            &sep()?,
-            &MenuItem::with_id(
-                app,
-                "split-editor",
-                "Split Editor Down",
-                true,
-                Some("CmdOrCtrl+\\"),
-            )?,
-            &MenuItem::with_id(
-                app,
-                "unsplit-editor",
-                "Merge Editor Groups",
-                true,
-                None::<&str>,
-            )?,
-            &sep()?,
-            &MenuItem::with_id(
-                app,
-                "preview-mode:wrapped",
-                "Preview Mode: Wrapped",
-                true,
-                None::<&str>,
-            )?,
-            &MenuItem::with_id(
-                app,
-                "preview-mode:unwrapped",
-                "Preview Mode: Unwrapped",
-                true,
-                None::<&str>,
-            )?,
-        ],
+        Some("CmdOrCtrl+Shift+B"),
     )?;
+    let toggle_preview = MenuItem::with_id(
+        app,
+        "toggle-preview",
+        "Toggle Preview",
+        true,
+        Some("CmdOrCtrl+P"),
+    )?;
+    let toggle_word_wrap =
+        MenuItem::with_id(app, "toggle-word-wrap", "Toggle Word Wrap", true, Some("Alt+Z"))?;
+    let split_editor = MenuItem::with_id(
+        app,
+        "split-editor",
+        "Split Editor Down",
+        true,
+        Some("CmdOrCtrl+\\"),
+    )?;
+    let unsplit_editor = MenuItem::with_id(
+        app,
+        "unsplit-editor",
+        "Merge Editor Groups",
+        true,
+        None::<&str>,
+    )?;
+    // Same order as the results toolbar. "Preview" shows #pre and #post with the
+    // document's own values; "Report" hides #pre and applies entered #UI values.
+    let mode_preview = MenuItem::with_id(
+        app,
+        "result-mode:preview",
+        "Result Mode: Preview",
+        true,
+        None::<&str>,
+    )?;
+    let mode_unwrapped = MenuItem::with_id(
+        app,
+        "result-mode:unwrapped",
+        "Result Mode: Unwrapped",
+        true,
+        None::<&str>,
+    )?;
+    let mode_input =
+        MenuItem::with_id(app, "result-mode:ui", "Result Mode: Input", true, None::<&str>)?;
+    let mode_report = MenuItem::with_id(
+        app,
+        "result-mode:report",
+        "Result Mode: Report",
+        true,
+        None::<&str>,
+    )?;
+    let view_sep_1 = sep()?;
+    let view_sep_2 = sep()?;
+    let mut view_items: Vec<&dyn IsMenuItem<tauri::Wry>> = vec![
+        &toggle_sidebar,
+        &toggle_preview,
+        &toggle_word_wrap,
+        &view_sep_1,
+        &split_editor,
+        &unsplit_editor,
+        &view_sep_2,
+    ];
+    // A compiled worksheet is only ever filled in: it has no source for preview or
+    // unwrapped to render, and its report is read beside the form rather than in place
+    // of it. Input is all that is left, so the rest are omitted from the menu the way
+    // the results toolbar omits their buttons.
+    if source_result_modes {
+        view_items.push(&mode_preview);
+        view_items.push(&mode_unwrapped);
+    }
+    view_items.push(&mode_input);
+    if source_result_modes {
+        view_items.push(&mode_report);
+    }
+    let view = Submenu::with_items(app, "View", true, &view_items)?;
 
     let server = Submenu::with_items(
         app,
@@ -1026,11 +1286,17 @@ pub fn run() {
                 let _ = w.unminimize();
             }
             for path in extract_launch_files(argv) {
+                // The OS handing us this path is the user's consent; no dialog ran.
+                allow_file_and_parent(app, &path);
                 let _ = app.emit("open-file-request", path.to_string_lossy().to_string());
             }
         }))
-        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
+        // Must follow the fs plugin: it reaches for that plugin's scope at setup
+        // and silently no-ops if it isn't managed yet. Persists the per-pick grants
+        // the dialog adds at runtime, so a recent file or restored folder outside
+        // $HOME still opens after a restart.
+        .plugin(tauri_plugin_persisted_scope::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_store::Builder::default().build())
@@ -1038,11 +1304,12 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_log::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(ServerState::default())
         .manage(PendingLaunchFiles::default())
+        .manage(MenuState::default())
         .invoke_handler(tauri::generate_handler![
             server_url,
+            server_token,
             restart_server,
             stop_server,
             get_env,
@@ -1054,6 +1321,9 @@ pub fn run() {
             open_path_native,
             log_dir,
             take_pending_launch_files,
+            allow_document_dir,
+            set_source_result_modes_visible,
+            set_recent_files,
         ])
         .setup(|app| {
             // Pin the on-disk locations the panic hook + draft commands need.
@@ -1123,6 +1393,7 @@ pub fn run() {
                 let pending: State<'_, PendingLaunchFiles> = app.state();
                 let mut guard = pending.0.lock().expect("pending launch files mutex poisoned");
                 for path in launch_files {
+                    allow_file_and_parent(app.handle(), &path);
                     guard.push(path.to_string_lossy().to_string());
                 }
             }
@@ -1134,11 +1405,8 @@ pub fn run() {
             // See tauri-apps/tauri#11856 and #13440.
             Ok(())
         })
-        .on_window_event(|window, event| {
-            if let WindowEvent::CloseRequested { .. } = event {
-                stop_sidecar(&window.app_handle().clone());
-            }
-        })
+        // No CloseRequested handler: the frontend preventDefaults it, so killing there
+        // leaves an open window with a dead server.
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app, event| {

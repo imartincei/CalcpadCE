@@ -7,6 +7,7 @@ import {
     formatFunctionCompletion,
     formatVariableCompletion,
     formatCustomUnitCompletion,
+    parseDirectiveLine,
     type CompletionData,
     type CompletionKind,
     METADATA_SETTINGS_KEYS,
@@ -68,6 +69,11 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
         // Check if we're inside a metadata comment JSON block first
         const lineText = document.lineAt(position.line).text;
         const beforeCursor = lineText.substring(0, position.character);
+
+        // Inside a #include/#read/#write/#append/#ProjectPath/#LibraryPath path, only
+        // CalcpadIncludeCompletionProvider's file suggestions should show.
+        if (parseDirectiveLine(beforeCursor)) return [];
+
         const metadataCompletions = this.provideMetadataJsonCompletions(beforeCursor, position);
         if (metadataCompletions) {
             return metadataCompletions;

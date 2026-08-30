@@ -9,6 +9,7 @@
 //   * calcpad-desktop/src-tauri/Cargo.lock (calcpad-desktop [[package]] entry)
 //   * calcpad-desktop/src-tauri/tauri.conf.json (version)
 //   * calcpad-desktop/packaging/arch/PKGBUILD (pkgver, and pkgrel back to 1)
+//   * Directory.Build.props (<Version>, inherited by every C# project)
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -29,6 +30,7 @@ if (exact !== null) {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const frontendRoot = resolve(here, '..');
+const repoRoot = resolve(frontendRoot, '../..');
 const pkgDirs = ['calcpad-frontend', 'calcpad-desktop', 'vscode-calcpad', 'calcpad-web'];
 
 const parse = v => v.split('.').map(n => parseInt(n, 10));
@@ -103,15 +105,30 @@ updateJson(resolve(frontendRoot, 'calcpad-desktop/src-tauri/tauri.conf.json'), j
     const p = j.version; j.version = next; return p;
 });
 
-// A new upstream version restarts the Arch package revision at 1.
+// A new upstream version restarts the Arch package revision at 1. makepkg
+// rejects hyphens in pkgver, so a prerelease like 8.0.0-beta1 becomes 8.0.0.beta1.
 const pkgbuild = resolve(frontendRoot, 'calcpad-desktop/packaging/arch/PKGBUILD');
 if (existsSync(pkgbuild)) {
+    const pkgver = next.replace(/-/g, '.');
     const src = readFileSync(pkgbuild, 'utf8');
     const updated = src
         .replace(/^(pkgver=)(.*)$/m, (_, a, prev) => {
-            console.log(`calcpad-desktop/packaging/arch/PKGBUILD: ${prev} -> ${next}`);
-            return a + next;
+            console.log(`calcpad-desktop/packaging/arch/PKGBUILD: ${prev} -> ${pkgver}`);
+            return a + pkgver;
         })
         .replace(/^pkgrel=.*$/m, 'pkgrel=1');
     writeFileSync(pkgbuild, updated);
+}
+
+const buildProps = resolve(repoRoot, 'Directory.Build.props');
+if (existsSync(buildProps)) {
+    const src = readFileSync(buildProps, 'utf8');
+    const updated = src.replace(
+        /(<Version>)([^<]+)(<\/Version>)/,
+        (_, a, prev, c) => {
+            console.log(`Directory.Build.props: ${prev} -> ${next}`);
+            return a + next + c;
+        },
+    );
+    writeFileSync(buildProps, updated);
 }

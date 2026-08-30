@@ -27,9 +27,6 @@ namespace Calcpad.Highlighter.Linter.Models
         public static readonly HashSet<string> ValidMacroParamTypes =
             new(Enum.GetNames(typeof(TokenType)), StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>All known JSON property names for metadata comments</summary>
-        public static readonly string[] KnownProperties = { "desc", "paramTypes", "paramDesc", "returnType" };
-
         /// <summary>
         /// Maps a metadata returnType string to a <see cref="CalcpadType"/>, or null when
         /// the value isn't a recognized function return type. "any" maps to Various.
@@ -49,10 +46,9 @@ namespace Calcpad.Highlighter.Linter.Models
         }
 
         /// <summary>
-        /// Attempts to parse a metadata comment from a line of text.
-        /// Looks for the pattern '<!--{...}--> (Calcpad comment containing HTML-comment-wrapped JSON).
-        /// Returns true if a valid metadata comment was found and parsed.
-        /// Malformed JSON is silently ignored (returns false).
+        /// Attempts to parse a metadata comment from a line of text, looking for the pattern
+        /// '<!--{...}--> (a Calcpad comment wrapping JSON in an HTML comment) and returning true
+        /// when one was found and parsed. Malformed JSON is silently ignored.
         /// </summary>
         public static bool TryParse(ReadOnlySpan<char> line, out DefinitionMetadata metadata)
         {
@@ -146,9 +142,9 @@ namespace Calcpad.Highlighter.Linter.Models
         }
 
         /// <summary>
-        /// Extracts JSON string from an HtmlComment token text.
-        /// Strips comment quotes (' or ") and HTML comment markers (&lt;-- and --&gt;).
-        /// Returns null if the token doesn't contain valid JSON markers.
+        /// Extracts the JSON string from an HtmlComment token, stripping comment quotes (' or ")
+        /// and HTML comment markers (&lt;-- and --&gt;). Returns null if the token doesn't contain
+        /// valid JSON markers.
         /// </summary>
         public static string ExtractJsonFromComment(string tokenText)
         {

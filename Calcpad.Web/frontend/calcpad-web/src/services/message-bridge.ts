@@ -1,7 +1,8 @@
 import { BaseMessageBridge, type ExportRequest } from 'calcpad-frontend/services/message-bridge/base';
 import { getDefaultSettings } from 'calcpad-frontend/types/settings';
 import type { CalcpadSettings } from 'calcpad-frontend/types/settings';
-import { mimeFromExtension, bytesToBase64 } from 'calcpad-frontend';
+import type { ExportVariant } from 'calcpad-frontend/types/api';
+import { mimeFromExtension, bytesToBase64, pdfResponseError } from 'calcpad-frontend';
 import { setAppTheme, coerceAppTheme } from '../editor/app-theme';
 import { getActiveDocumentKey } from '../editor/bridge';
 
@@ -116,13 +117,28 @@ export class MessageBridge extends BaseMessageBridge {
         return this.definitionsService.getCachedDefinitions(getActiveDocumentKey());
     }
 
+    /**
+     * Render, then hand the HTML to the server's PDF endpoint. `/convert` has no PDF output
+     * of its own — it ignores `outputFormat` and always answers with HTML — so asking it for
+     * one produced a `.pdf` full of markup.
+     */
     protected async generatePdfBytes(
         content: string,
         apiSettings: unknown,
-        _sourceFilePath: string | undefined,
+        sourceFilePath: string | undefined,
+        variant: ExportVariant,
     ): Promise<ArrayBuffer | null> {
-        const result = await this.apiClient.convert(content, apiSettings, 'pdf', true);
-        return result instanceof ArrayBuffer ? result : null;
+        const html = await this.renderForExport(content, apiSettings, sourceFilePath, variant);
+        if (html == null) return null;
+
+        const response = await fetch(`${this.apiClient.getBaseUrl()}/api/calcpad/pdf`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...this.apiClient.authHeaders() },
+            body: JSON.stringify({ html, options: this.getEffectivePdfOptions(content) }),
+            signal: AbortSignal.timeout(60000),
+        });
+        if (!response.ok) throw await pdfResponseError(response);
+        return await response.arrayBuffer();
     }
 
     private loadSettings(): CalcpadSettings {

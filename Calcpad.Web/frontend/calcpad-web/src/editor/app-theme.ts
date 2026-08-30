@@ -1,9 +1,8 @@
 import { setCalcpadEditorTheme } from './setup';
 
 /**
- * App theme labels shown in the Color Theme dropdown. "System" follows the
- * OS `prefers-color-scheme`; "Dark"/"Light" are the two built-in variants.
- * These labels must match the entries the bridges send in `availableThemes`,
+ * App theme labels shown in the Color Theme dropdown, where "System" follows the OS
+ * `prefers-color-scheme`. These must match the entries the bridges send in `availableThemes`,
  * plus the static "System" option in CalcpadSettingsTab.vue.
  */
 export const APP_THEME_LABELS = ['System', 'Dark', 'Light'] as const;
@@ -29,9 +28,8 @@ let mqlListener: ((e: MediaQueryListEvent) => void) | null = null;
 let current: AppThemeLabel = 'System';
 
 /**
- * Apply the given color theme label. When called with "System", subscribes to
- * OS color-scheme changes so the app flips in real time. Any subsequent call
- * replaces the previous subscription.
+ * Apply the given color theme label, subscribing to OS color-scheme changes when called with
+ * "System". Any subsequent call replaces the previous subscription.
  */
 export function setAppTheme(label: AppThemeLabel): void {
     current = label;

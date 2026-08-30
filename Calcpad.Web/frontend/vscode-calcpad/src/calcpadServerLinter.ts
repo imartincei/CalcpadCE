@@ -34,7 +34,7 @@ export class CalcpadServerLinter {
 
         try {
             const sourceFilePath = document.uri.fsPath;
-            const lintResponse = await this.lintService.lintContent(content, sourceFilePath);
+            const lintResponse = await this.lintService.lintContent(content, sourceFilePath, document.uri.toString());
 
             if (lintResponse) {
                 const diagnostics = this.convertToDiagnostics(lintResponse.diagnostics);

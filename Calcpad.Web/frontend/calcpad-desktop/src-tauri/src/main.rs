@@ -2,12 +2,10 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    // WebKitGTK's DMABUF renderer crashes with "Error 71 (Protocol error)
-    // dispatching to Wayland display" on many current compositors (Hyprland,
-    // recent KDE/GNOME Wayland sessions). Disabling the DMABUF and compositing
-    // fast paths falls back to the software renderer that's actually stable.
-    // Must be set BEFORE GTK/WebKit initializes — main.rs is the earliest we
-    // can touch env vars.
+    // WebKitGTK's DMABUF renderer crashes with "Error 71 (Protocol error) dispatching to
+    // Wayland display" on many current compositors, so the DMABUF and compositing fast paths
+    // are disabled in favour of the software renderer. Must be set before GTK/WebKit
+    // initializes, which makes main.rs the earliest place to do it.
     #[cfg(target_os = "linux")]
     {
         if std::env::var_os("WEBKIT_DISABLE_DMABUF_RENDERER").is_none() {

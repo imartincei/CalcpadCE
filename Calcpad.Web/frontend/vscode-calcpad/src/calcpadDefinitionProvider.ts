@@ -1,25 +1,24 @@
 import * as vscode from 'vscode';
-import { CalcpadApiClient, SymbolAtPositionResponse } from 'calcpad-frontend';
+import { CalcpadApiClient, SymbolAtPositionResponse, parseDirectiveLine } from 'calcpad-frontend';
 import { VSCodeLogger, VSCodeFileSystem } from './adapters';
-import { resolveSymbolLocation, resolveIncludeDirectiveLocation } from './calcpadLocationResolver';
-import { parseDirectiveLine } from './calcpadIncludeCompletionProvider';
+import { resolveSymbolLocation, resolveIncludeDirectiveLocation, resolveDocumentPathRoots } from './calcpadLocationResolver';
+import type { CalcpadDefinitionsService } from './calcpadDefinitionsService';
 
 /**
- * Provides "Go to Definition" (Ctrl+click / F12) for CalcPad functions,
- * macros, variables, and `#include` directives.
- *
- * For `#include FILEPATH` lines, clicking anywhere on the path jumps straight
- * to that file. Otherwise asks the server which symbol is at the cursor
- * (`symbol-at-position`) and jumps to its first assignment location.
+ * Provides "Go to Definition" (Ctrl+click / F12) for CalcPad functions, macros, variables, and
+ * `#include` directives. Clicking an `#include FILEPATH` path jumps straight to that file;
+ * otherwise the server is asked which symbol is at the cursor and the first assignment wins.
  */
 export class CalcpadDefinitionProvider implements vscode.DefinitionProvider {
     private apiClient: CalcpadApiClient;
+    private definitionsService: CalcpadDefinitionsService;
     private outputChannel: vscode.OutputChannel;
     private logger: VSCodeLogger;
     private fileSystem: VSCodeFileSystem;
 
-    constructor(apiClient: CalcpadApiClient, outputChannel: vscode.OutputChannel) {
+    constructor(apiClient: CalcpadApiClient, definitionsService: CalcpadDefinitionsService, outputChannel: vscode.OutputChannel) {
         this.apiClient = apiClient;
+        this.definitionsService = definitionsService;
         this.outputChannel = outputChannel;
         this.logger = new VSCodeLogger(outputChannel);
         this.fileSystem = new VSCodeFileSystem();
@@ -33,7 +32,10 @@ export class CalcpadDefinitionProvider implements vscode.DefinitionProvider {
         const includeTarget = this.includePathAt(document, position);
         if (includeTarget !== undefined) {
             if (!includeTarget) return null;
-            return resolveIncludeDirectiveLocation(document, includeTarget, this.fileSystem, this.outputChannel, '[Definition]');
+            const roots = resolveDocumentPathRoots(
+                document, this.definitionsService.getCachedPathRoots(document.uri.toString()),
+            );
+            return resolveIncludeDirectiveLocation(document, includeTarget, this.fileSystem, this.outputChannel, '[Definition]', roots);
         }
 
         const sym = await this.fetchSymbol(document, position);
@@ -89,9 +91,10 @@ export class CalcpadDefinitionProvider implements vscode.DefinitionProvider {
 
     static register(
         apiClient: CalcpadApiClient,
+        definitionsService: CalcpadDefinitionsService,
         outputChannel: vscode.OutputChannel
     ): vscode.Disposable {
-        const provider = new CalcpadDefinitionProvider(apiClient, outputChannel);
+        const provider = new CalcpadDefinitionProvider(apiClient, definitionsService, outputChannel);
         return vscode.languages.registerDefinitionProvider(
             { language: 'calcpad' },
             provider

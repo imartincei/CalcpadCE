@@ -56,7 +56,9 @@ export class CalcpadSemanticTokensProvider implements vscode.DocumentSemanticTok
         try {
             const truncatedContent = truncateBase64Content(content);
             const sourceFilePath = document.uri.fsPath;
-            const tokens = await this.apiClient.highlight(truncatedContent, false, sourceFilePath);
+            const tokens = await this.apiClient.highlight(truncatedContent, false, sourceFilePath, {
+                key: `highlight:${document.uri.toString()}`,
+            });
 
             if (cancellationToken.isCancellationRequested) {
                 this.debugChannel.appendLine('[Highlight #' + reqId + '] Cancelled after ' + (Date.now() - startTime) + 'ms');

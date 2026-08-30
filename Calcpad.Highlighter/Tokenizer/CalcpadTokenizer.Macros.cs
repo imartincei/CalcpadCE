@@ -57,12 +57,10 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// Sets macro comment parameter information from ContentResolver Stage2.
-        /// Call this before Tokenize() when you have pre-computed comment parameter info.
-        /// This enables correct tokenization of macro call arguments as Comment vs expression.
+        /// Sets macro comment parameter information from ContentResolver Stage2, which enables
+        /// correct tokenization of macro call arguments as Comment vs expression. Call this before
+        /// Tokenize() when you have pre-computed comment parameter info.
         /// </summary>
-        /// <param name="commentParams">Maps macro name to set of parameter names that are comment parameters</param>
-        /// <param name="paramOrder">Maps macro name to ordered list of parameter names</param>
         public void SetMacroCommentParameters(
             Dictionary<string, HashSet<string>> commentParams,
             Dictionary<string, List<string>> paramOrder,
@@ -248,10 +246,10 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// Checks if any defined macro name matches a suffix of the builder.
-        /// If found, splits the builder: emits the prefix as current type and sets up
-        /// the suffix as Macro for the caller to emit. Uses longest-match-first.
-        /// Example: builder "innote$" with defined macro "note$" → emits "in" as Units, leaves "note$" in builder.
+        /// Checks if any defined macro name matches a suffix of the builder, longest match first;
+        /// when one does, the prefix is emitted as the current type and the suffix set up as Macro
+        /// for the caller to emit. Example: builder "innote$" with defined macro "note$" emits
+        /// "in" as Units and leaves "note$" in the builder.
         /// </summary>
         private bool TrySplitDefinedMacroSuffix()
         {
@@ -293,11 +291,10 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// When inside a macro body, checks if any macro parameter matches a suffix of the builder.
-        /// If found, splits the builder: emits the prefix as current type and sets up the suffix
-        /// as MacroParameter for the caller to emit. Uses longest-match-first to match
-        /// Calcpad.Core's parameter substitution behavior.
-        /// Example: builder "st$" with parameter "t$" → emits "s" as Variable, leaves "t$" in builder.
+        /// When inside a macro body, checks if any macro parameter matches a suffix of the builder,
+        /// longest match first to match Calcpad.Core's parameter substitution; when one does, the
+        /// prefix is emitted as the current type and the suffix set up as MacroParameter. Example:
+        /// builder "st$" with parameter "t$" emits "s" as Variable and leaves "t$" in the builder.
         /// </summary>
         private bool TrySplitMacroParameterSuffix()
         {
@@ -388,12 +385,12 @@ namespace Calcpad.Highlighter.Tokenizer
             }
         }
 
-        private void ParseMacroArgs(char c)
+        private void ParseMacroArgs(char c, int position)
         {
             // If we have pre-tokenized data from body substitution, use that instead
             if (_macroCallPreTokenized != null)
             {
-                ParseMacroArgsPreTokenized(c);
+                ParseMacroArgsPreTokenized(c, position);
                 return;
             }
 
@@ -563,9 +560,9 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// Extracts raw argument strings and their start columns from a macro call.
-        /// Scans from startPos (just after the opening '(') until the matching ')'.
-        /// Returns list of (argText, argStartCol).
+        /// Extracts raw argument strings and their start columns from a macro call, scanning from
+        /// startPos (just after the opening '(') until the matching ')'. Returns a list of
+        /// (argText, argStartCol).
         /// </summary>
         private static List<(string Text, int StartCol)> ExtractMacroCallArgsWithPositions(ReadOnlySpan<char> text, int startPos)
         {
@@ -747,28 +744,29 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// Handles macro argument characters when pre-tokenized data is available.
-        /// Emits pre-computed tokens for each argument and handles structural characters (;, (, )) normally.
+        /// Handles macro argument characters when pre-tokenized data is available, emitting the
+        /// pre-computed tokens for each argument plus the call's own separators and closing paren.
+        /// Parens and semicolons nested deeper than the call belong to an argument and are already
+        /// covered by its tokens, so they are only counted here, never emitted again.
         /// </summary>
-        private void ParseMacroArgsPreTokenized(char c)
+        private void ParseMacroArgsPreTokenized(char c, int position)
         {
             // Emit pre-computed tokens for current arg if not yet done
             if (!_macroArgPreEmitted &&
                 _state.CurrentMacroArgIndex < _macroCallPreTokenized.Count)
             {
-                var argTokens = _macroCallPreTokenized[_state.CurrentMacroArgIndex];
-                foreach (var token in argTokens)
+                foreach (var token in _macroCallPreTokenized[_state.CurrentMacroArgIndex])
                 {
                     _result.AddToken(token);
                 }
-                // Advance TokenStartColumn to end of the emitted tokens
-                if (argTokens.Count > 0)
-                {
-                    var lastToken = argTokens[argTokens.Count - 1];
-                    _state.TokenStartColumn = lastToken.Column + lastToken.Length;
-                }
                 _macroArgPreEmitted = true;
             }
+
+            // Structural characters carry their own column, so the token cursor is set from
+            // the character position instead of accumulating over skipped argument content.
+            // Only the call's own closing paren and its argument separators sit at call depth;
+            // the opening paren was already emitted by ParseBrackets.
+            var atCallDepth = _state.BracketCount <= _state.MacroArgs;
 
             if (c == '(' || c == ')')
             {
@@ -776,7 +774,7 @@ namespace Calcpad.Highlighter.Tokenizer
                     _state.BracketCount++;
                 else
                 {
-                    if (_state.BracketCount <= _state.MacroArgs)
+                    if (atCallDepth)
                     {
                         _state.MacroArgs = 0;
                         _state.CurrentMacroCall = null;
@@ -787,18 +785,23 @@ namespace Calcpad.Highlighter.Tokenizer
                     _state.BracketCount--;
                 }
 
-                _builder.Clear();
-                _builder.Append(c);
-                _state.CurrentType = TokenType.Bracket;
-                Append(TokenType.Bracket);
+                if (c == ')' && atCallDepth)
+                {
+                    _builder.Clear();
+                    _builder.Append(c);
+                    _state.TokenStartColumn = position;
+                    _state.CurrentType = TokenType.Bracket;
+                    Append(TokenType.Bracket);
+                }
 
                 if (_state.TextComment != '\0' && c == ')' && _state.BracketCount == 0)
                     _state.CurrentType = TokenType.Comment;
             }
-            else if (c == ';')
+            else if (c == ';' && atCallDepth)
             {
                 _builder.Clear();
                 _builder.Append(c);
+                _state.TokenStartColumn = position;
                 _state.CurrentType = TokenType.Operator;
                 Append(TokenType.Operator);
 

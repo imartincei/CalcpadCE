@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as os from 'os';
 import type { SymbolLocation } from 'calcpad-frontend';
+import { scanDeclaredPathRoots, resolveDeclaredPathRoots, expandPathRootToken, type ResolvedPathRoots } from 'calcpad-frontend';
 import { VSCodeFileSystem } from './adapters';
 
 /** Expands %VAR% (Windows) and $VAR / ${VAR} (POSIX) references against process.env. */
@@ -12,10 +14,29 @@ export function expandEnvVars(input: string): string {
 }
 
 /**
- * Resolve a raw `#include FILEPATH` path (as typed, possibly with %VAR%/$VAR
- * env references) to a concrete `vscode.Location` pointing at the start of
- * that file. Same lookup order as resolveSymbolLocation: document dir first,
- * then a workspace-wide search; null if neither finds it.
+ * The document's `{project}`/`{library}` roots: `serverRoots`' value when non-null — live
+ * regardless of where in the `#include` chain it was declared — otherwise this document's own
+ * text scan (declares-locally-only, or no server response cached yet).
+ */
+export function resolveDocumentPathRoots(
+    document: vscode.TextDocument,
+    serverRoots?: ResolvedPathRoots,
+): ResolvedPathRoots {
+    const documentDir = path.dirname(document.uri.fsPath);
+    const declared = scanDeclaredPathRoots(document.getText());
+    const local = resolveDeclaredPathRoots(declared, documentDir, expandEnvVars, path.resolve, os.homedir());
+    return {
+        project: serverRoots?.project ?? local.project,
+        library: serverRoots?.library ?? local.library,
+    };
+}
+
+/**
+ * Resolve a raw `#include FILEPATH` path (as typed, possibly with a
+ * `{project}`/`{library}` token and/or %VAR%/$VAR env references) to a
+ * concrete `vscode.Location` pointing at the start of that file. Same lookup
+ * order as resolveSymbolLocation: document dir first, then a workspace-wide
+ * search; null if neither finds it (including an undeclared token root).
  */
 export async function resolveIncludeDirectiveLocation(
     document: vscode.TextDocument,
@@ -23,8 +44,14 @@ export async function resolveIncludeDirectiveLocation(
     fileSystem: VSCodeFileSystem,
     outputChannel: vscode.OutputChannel,
     logPrefix: string,
+    roots: ResolvedPathRoots = resolveDocumentPathRoots(document),
 ): Promise<vscode.Location | null> {
-    const expanded = expandEnvVars(rawPath.trim());
+    const { expanded: tokenExpanded, ok } = expandPathRootToken(rawPath.trim(), roots, os.homedir());
+    if (!ok) {
+        outputChannel.appendLine(`${logPrefix} Include target's path root is not declared: ${rawPath}`);
+        return null;
+    }
+    const expanded = expandEnvVars(tokenExpanded);
     if (!expanded) return null;
     const start = new vscode.Position(0, 0);
 
@@ -52,18 +79,11 @@ export async function resolveIncludeDirectiveLocation(
 }
 
 /**
- * Resolve a `SymbolLocation` (from the symbol-at-position endpoint) into a
- * concrete `vscode.Location` the editor can jump to.
- *
- * Resolution rules for `source: 'include'` locations:
- *   1. Resolve `loc.sourceFile` against the active document's directory.
- *      That matches how the backend's `#include` resolver finds files, so
- *      we land on the same physical file the linter saw.
- *   2. If that file doesn't exist, fall back to a workspace-wide glob —
- *      handles cases where the user opened a loose file outside any folder
- *      that contains its include sibling.
- *   3. If both miss, return null so the caller can drop the location
- *      instead of synthesizing a phantom location in the active document.
+ * Resolve a `SymbolLocation` (from the symbol-at-position endpoint) into a concrete
+ * `vscode.Location` the editor can jump to. For a `source: 'include'` location, `loc.sourceFile`
+ * is resolved against the active document's directory first — matching how the backend's
+ * `#include` resolver finds files — then against a workspace-wide glob, and null if both miss so
+ * the caller can drop the location rather than synthesize a phantom one.
  */
 export async function resolveSymbolLocation(
     document: vscode.TextDocument,

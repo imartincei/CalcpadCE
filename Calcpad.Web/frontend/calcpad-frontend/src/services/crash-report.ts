@@ -1,16 +1,8 @@
 /**
- * Shared crash-report formatting for the bundled Calcpad.Server.
- *
- * Both hosts capture the same two artifacts when the server dies of an
- * unrecoverable fault (StackOverflow / FailFast / access violation) that
- * bypasses the in-process FileLogger: a .NET `createdump` minidump and its
- * sibling `<dump>.crashreport.json`. This module renders them into one
- * human-readable `last-crash.txt` so the VS Code extension and the Tauri
- * desktop shell produce an identical record.
- *
- * Everything here is pure — no fs/path/Tauri APIs. Each host does its own IO
- * (reading the crashreport.json, writing the record) with whatever file API it
- * has (Node `fs`, or `@tauri-apps/plugin-fs`).
+ * Shared crash-report formatting for the bundled Calcpad.Server: both hosts capture a .NET
+ * `createdump` minidump and its sibling `<dump>.crashreport.json` when the server dies of a fault
+ * the in-process FileLogger cannot see, and this module renders them into one human-readable
+ * `last-crash.txt`. Everything here is pure — each host does its own IO.
  */
 
 export interface CrashRecordInput {
@@ -66,13 +58,10 @@ interface CrashPayload {
 }
 
 /**
- * Parse a .NET createdump `*.crashreport.json` string and render the crashed
- * thread's managed exception + stack as a traceback-style block. Returns null
- * if the JSON is missing/malformed or has no crashed thread.
- *
- * Frames are in createdump's order (most-recent-first). Managed frames show the
- * method name (+ defining file when known); native frames show the unmanaged
- * symbol, else the module.
+ * Parse a .NET createdump `*.crashreport.json` string and render the crashed thread's managed
+ * exception and stack as a traceback-style block, or null when the JSON is missing, malformed or
+ * has no crashed thread. Frames are in createdump's most-recent-first order, managed ones
+ * showing the method name and native ones the unmanaged symbol or module.
  */
 export function formatCrashReportPayload(rawJson: string): string | null {
     let parsed: { payload?: CrashPayload };

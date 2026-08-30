@@ -57,18 +57,11 @@ export type TabContentChangeListener = (tabId: string) => void;
 export type TabRemovedListener = (tabId: string) => void;
 
 /**
- * Owns the open-tabs list, their Monaco models, and view-state restoration.
- * Mirrors VS Code's tab semantics: one editor instance, many models, view
- * state saved/restored on switch.
- *
- * The TabManager is platform-agnostic — file I/O lives in the caller. It
- * just tracks `filePath` so the caller can decide what to read/write.
- *
- * A model may be shared by tabs in more than one TabManager (see
- * openLinked/modelForTab) — used to split the same file into another editor
- * group with live-synced content, same as VS Code's "split into new group".
- * Models are refcounted across all TabManagers so the underlying document
- * survives as long as any tab still references it.
+ * Owns the open-tabs list, their Monaco models, and view-state restoration, mirroring VS
+ * Code's tab semantics: one editor instance, many models, view state saved and restored on
+ * switch. File I/O lives in the caller, and a model may be shared by tabs in more than one
+ * TabManager (see openLinked/modelForTab), refcounted so the document survives as long as any
+ * tab still references it.
  */
 export class TabManager {
     private tabs: InternalTab[] = [];
@@ -189,9 +182,8 @@ export class TabManager {
     // ---- Mutation ----
 
     /**
-     * Create a new untitled tab with the given content (default empty) and
-     * activate it. Returns the new tab's id. `title` overrides the default
-     * "Untitled-N" label (used for read-view tabs like "Open Full HTML").
+     * Create a new untitled tab with the given content (default empty) and activate it,
+     * returning its id. `title` overrides the default "Untitled-N" label.
      */
     newUntitled(content: string = '', title?: string): string {
         let label = title;
@@ -205,9 +197,8 @@ export class TabManager {
     }
 
     /**
-     * Open a file in a new tab. If a tab with that path is already open,
-     * activates it instead and ignores `content` (caller already has it open).
-     * Returns the tab id.
+     * Open a file in a new tab and return its id. A tab already holding that path is
+     * activated instead, and `content` is ignored.
      */
     openFile(filePath: string, content: string): string {
         const existing = this.tabs.find(t => docFor(t.model).filePath === filePath);
@@ -291,9 +282,8 @@ export class TabManager {
     }
 
     /**
-     * Close a tab. Caller is responsible for the dirty-prompt (so it can
-     * await the user's choice with platform-appropriate UI). When the active
-     * tab closes, focus moves to the right neighbor (then left, then none).
+     * Close a tab; the caller owns the dirty-prompt so it can await the user's choice. When
+     * the active tab closes, focus moves to the right neighbor, then left, then none.
      */
     close(id: string): void {
         const idx = this.tabs.findIndex(t => t.id === id);
@@ -329,9 +319,8 @@ export class TabManager {
     }
 
     /**
-     * Mark the active tab saved at its current content. Optionally update its
-     * file path / title (for save-as). Notifies every other tab sharing this
-     * model (e.g. a synced split of the same file) so their dirty/title
+     * Mark the active tab saved at its current content, optionally updating its file path or
+     * title for save-as. Every other tab sharing this model is notified so their dirty/title
      * state updates too.
      */
     markActiveSaved(opts?: { filePath?: string }): void {
@@ -397,10 +386,9 @@ export class TabManager {
     }
 
     /**
-     * Dispose every model + subscription this manager owns. Used when an
-     * editor group is closed (unsplit). Fires the removed-listeners so the
-     * caller can clean up per-tab state (drafts) first, then clears listeners
-     * so no stale callbacks fire against the disposed editor.
+     * Dispose every model and subscription this manager owns, used when an editor group is
+     * closed. Fires the removed-listeners so the caller can clean up per-tab state first, then
+     * clears listeners so no stale callbacks fire against the disposed editor.
      */
     disposeAll(): void {
         for (const t of this.tabs) {
@@ -426,6 +414,14 @@ export class TabManager {
         // across rename and unique even when two tabs hold the same file path.
         const uri = monaco.Uri.parse(`inmemory:///${id}.cpd`);
         const model = monaco.editor.createModel(opts.content, 'calcpad', uri);
+        // Models created this way start with Monaco's global bracket-pair-colorization
+        // default (enabled), independent of the `bracketPairColorization: { enabled: false }`
+        // passed to individual editor instances in setup.ts — that option only takes effect
+        // when an editor creates its own model implicitly. Disable it here instead, so rainbow
+        // bracket colors never clobber the theme's semantic-token colors for this model.
+        model.updateOptions({
+            bracketColorizationOptions: { enabled: false, independentColorPoolPerBracketType: false },
+        });
         const savedVersionId = model.getAlternativeVersionId();
         const doc: DocEntry = {
             filePath: opts.filePath,

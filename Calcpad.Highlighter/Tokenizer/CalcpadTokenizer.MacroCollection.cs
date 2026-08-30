@@ -7,9 +7,9 @@ using Calcpad.Highlighter.Tokenizer.Models;
 namespace Calcpad.Highlighter.Tokenizer
 {
     /// <summary>
-    /// Macro collection mode: captures full MacroDefinition objects during tokenization.
-    /// Called when TokenizerMode is Macro (Stage 2 of content resolution).
-    /// Follows the same hook pattern as CalcpadTokenizer.Definitions.cs (Lint mode).
+    /// Macro collection mode: captures full MacroDefinition objects during tokenization, called
+    /// when TokenizerMode is Macro (Stage 2 of content resolution). Follows the same hook pattern
+    /// as CalcpadTokenizer.Definitions.cs (Lint mode).
     /// </summary>
     public partial class CalcpadTokenizer
     {
@@ -52,9 +52,9 @@ namespace Calcpad.Highlighter.Tokenizer
             switch (type)
             {
                 case TokenType.Macro:
-                    // Inside a #def line, capture the macro name.
-                    // Use _state.IsMacro (not HasMacro) because Append() is called BEFORE
-                    // HasMacro is set in ParseMacro(). IsMacro is still true at this point.
+                    // Inside a #def line, capture the macro name. Use _state.IsMacro (not
+                    // HasMacro) because Append() is called before HasMacro is set in ParseMacro(),
+                    // so IsMacro is still true at this point.
                     if (_state.IsMacro && _macroCurrName == null)
                     {
                         _macroCurrName = text;

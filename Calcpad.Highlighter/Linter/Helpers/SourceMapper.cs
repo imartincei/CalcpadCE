@@ -70,6 +70,14 @@ namespace Calcpad.Highlighter.Linter.Helpers
             var stage2Line = stage3.Stage3ToStage2Map.TryGetValue(stage3Line, out var s2) ? s2 : stage3Line;
             var stage1Line = stage2.Stage2ToStage1Map.TryGetValue(stage2Line, out var s1) ? s1 : stage2Line;
 
+            // Macro-expanded lines: the Stage 3 columns index into the substituted macro body,
+            // which shares no layout with the call site, so highlight the whole call site line
+            // instead of a range that would land on unrelated text (or past the end of the line).
+            if (stage3.MacroExpansions != null && stage3.MacroExpansions.ContainsKey(stage3Line))
+            {
+                return MapWholeLineToOriginal(stage1Line, stage1);
+            }
+
             // Check if this Stage 1 line has line continuation segments
             if (stage1.LineContinuationSegments.TryGetValue(stage1Line, out var segments) && segments.Count > 1)
             {
@@ -83,6 +91,48 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 Line = originalLine,
                 Column = column,
                 EndColumn = endColumn,
+                AdditionalRanges = null
+            };
+        }
+
+        /// <summary>
+        /// Builds a position covering the full extent of a Stage 1 line in the original source.
+        /// When the Stage 1 line is a continuation merge, every original line it was built from
+        /// is covered: the first as the primary range, the rest as additional ranges.
+        /// </summary>
+        private static MappedPosition MapWholeLineToOriginal(int stage1Line, Stage1Context stage1)
+        {
+            if (stage1.LineContinuationSegments.TryGetValue(stage1Line, out var segments) && segments.Count > 0)
+            {
+                List<(int Line, int Column, int EndColumn)> additionalRanges = null;
+                if (segments.Count > 1)
+                {
+                    additionalRanges = new List<(int, int, int)>(segments.Count - 1);
+                    for (int i = 1; i < segments.Count; i++)
+                    {
+                        additionalRanges.Add((segments[i].OriginalLine, 0, segments[i].Length));
+                    }
+                }
+
+                return new MappedPosition
+                {
+                    Line = segments[0].OriginalLine,
+                    Column = 0,
+                    EndColumn = segments[0].Length,
+                    AdditionalRanges = additionalRanges
+                };
+            }
+
+            var originalLine = stage1.SourceMap.TryGetValue(stage1Line, out var orig) ? orig : stage1Line;
+            var length = stage1Line >= 0 && stage1Line < stage1.Lines.Count
+                ? stage1.Lines[stage1Line].Length
+                : 0;
+
+            return new MappedPosition
+            {
+                Line = originalLine,
+                Column = 0,
+                EndColumn = length,
                 AdditionalRanges = null
             };
         }

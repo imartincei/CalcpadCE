@@ -24,15 +24,16 @@ namespace Calcpad.Highlighter.Linter
         private readonly FormatValidator _formatValidator = new();
         private readonly HtmlCommentValidator _htmlCommentValidator = new();
         private readonly SettingsValidator _settingsValidator = new();
+        private readonly UiValidator _uiValidator = new();
+        private readonly LegacyInputValidator _legacyInputValidator = new();
 
         /// <summary>
         /// Lint code using pre-processed staged content from ContentResolver.
         /// </summary>
         /// <param name="staged">Staged resolved content from ContentResolver.</param>
         /// <param name="ignoreRegions">
-        /// Optional list of source-level regions in which specific diagnostic codes
-        /// are suppressed. Line numbers are original source line numbers (0-based).
-        /// Applied after all diagnostics are mapped back to original lines.
+        /// Optional source-level regions in which specific diagnostic codes are suppressed, with
+        /// 0-based original source line numbers. Applied after all diagnostics are mapped back.
         /// </param>
         public LinterResult Lint(StagedResolvedContent staged,
             IReadOnlyList<LintIgnoreRegion> ignoreRegions = null)
@@ -175,6 +176,14 @@ namespace Calcpad.Highlighter.Linter
                 context.Stage3ToStage2Map[kvp.Key] = stage2Line;
             }
 
+            if (stage3Result.IncludeMap != null)
+            {
+                foreach (var kvp in stage3Result.IncludeMap)
+                {
+                    context.IncludeMap[kvp.Key] = kvp.Value;
+                }
+            }
+
             context.DefinedVariables = stage3Result.DefinedVariables;
             context.DefinedFunctions = stage3Result.UserDefinedFunctions;
 
@@ -182,6 +191,14 @@ namespace Calcpad.Highlighter.Linter
             foreach (var kvp in stage3Result.UserDefinedMacros)
             {
                 context.DefinedMacros[kvp.Key] = kvp.Value;
+            }
+
+            if (stage3Result.MacroExpansions != null)
+            {
+                foreach (var kvp in stage3Result.MacroExpansions)
+                {
+                    context.MacroExpansions[kvp.Key] = kvp.Value;
+                }
             }
 
             // Convert custom units to HashSet of names
@@ -225,6 +242,8 @@ namespace Calcpad.Highlighter.Linter
             _formatValidator.Validate(stage3, result, tokenProvider);
             _htmlCommentValidator.Validate(stage3, result, tokenProvider);
             _settingsValidator.Validate(stage3, result, tokenProvider);
+            _uiValidator.Validate(stage3, result, tokenProvider);
+            _legacyInputValidator.Validate(stage3, result, tokenProvider);
         }
     }
 }

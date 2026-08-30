@@ -3,9 +3,8 @@ using System;
 namespace Calcpad.Highlighter.Parsing
 {
     /// <summary>
-    /// Zero-allocation line enumerator that handles \r\n, \r, and \n line endings.
-    /// Replaces string.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None).
-    /// Returns ReadOnlySpan&lt;char&gt; per line without allocating strings.
+    /// Zero-allocation line enumerator handling \r\n, \r and \n line endings, replacing
+    /// string.Split. Returns ReadOnlySpan&lt;char&gt; per line without allocating strings.
     /// </summary>
     public ref struct LineEnumerator(ReadOnlySpan<char> span)
     {
@@ -58,9 +57,9 @@ namespace Calcpad.Highlighter.Parsing
     }
 
     /// <summary>
-    /// ReadOnlyMemory&lt;char&gt; variant of LineEnumerator. Use this when the caller
-    /// needs to store the per-line slice in a field across method boundaries (a
-    /// ref-struct Span cannot escape a method). Same \r\n / \r / \n semantics.
+    /// ReadOnlyMemory&lt;char&gt; variant of LineEnumerator, for a caller that needs to store the
+    /// per-line slice in a field across method boundaries (a ref-struct Span cannot escape a
+    /// method). Same \r\n / \r / \n semantics.
     /// </summary>
     public struct LineMemoryEnumerator(ReadOnlyMemory<char> memory)
     {
