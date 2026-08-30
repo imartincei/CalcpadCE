@@ -1309,7 +1309,8 @@
  <p>
   The coefficient of restitution for perfectly inelastic collision is -
   <span class="eq">
-   <var>e.</var>
+   <var>e</var>
+   <sub>r</sub>
    = 0
   </span>
  </p>
@@ -1325,7 +1326,8 @@
    <var>v</var>
    <sub>0</sub>
    ·  ( 1 +
-   <var>e.</var>
+   <var>e</var>
+   <sub>r</sub>
    )  ·
    <span class="dvc">
     <var>π</var>
@@ -2387,7 +2389,7 @@ circle.Series3 {fill:CornflowerBlue;}
  <p>
   <span class="eq">
    <var>d</var>
-   <sub>M.j</sub>
+   <sub>M,j</sub>
    =
    <span class="dvc">
     <var>m</var>
