@@ -117,10 +117,10 @@ namespace Calcpad.Server
                 ? header + Environment.NewLine
                 : header + Environment.NewLine + details + Environment.NewLine;
 
-            // Echo to stdout so the VS Code extension's stdout pipe surfaces every
-            // log entry in the server debug channel. The C# console is auto-flushed
-            // (see Program.cs), so entries appear in real time. Errors here are
-            // ignored — the file write below is the source of truth.
+            // Echo to stdout so the VS Code extension's stdout pipe surfaces every log entry in
+            // the server debug channel; the console is auto-flushed (see Program.cs), so entries
+            // appear in real time. Errors here are ignored — the file write below is the source
+            // of truth.
             try { Console.Write(logEntry); } catch { /* console may be closed */ }
 
             if (string.IsNullOrEmpty(_logFilePath))

@@ -2,7 +2,7 @@
   "name": "vscode-calcpad",
   "displayName": "VS Code CalcpadCE",
   "description": "Calculator extension for VS Code",
-  "version": "0.3.0",
+  "version": "8.0.0-beta1",
   "publisher": "imartincei",
   "repository": "https://github.com/imartincei/vscode-calcpad",
   "icon": "calcpad-icon.png",
@@ -14,6 +14,12 @@
   ],
   "activationEvents": [],
   "main": "./dist/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "Opening a worksheet spawns a local calculation server and renders author-supplied HTML, and #include resolves paths the document names. Neither is safe against a repository you have not vetted."
+    }
+  },
   "contributes": {
     "languages": [
       {
@@ -23,10 +29,21 @@
           "calcpad"
         ],
         "extensions": [
-          ".cpd",
-          ".cpdz"
+          ".cpd"
         ],
         "configuration": "./language-configuration.json"
+      }
+    ],
+    "customEditors": [
+      {
+        "viewType": "calcpad.compiledWorksheet",
+        "displayName": "CalcpadCE Compiled Worksheet",
+        "selector": [
+          {
+            "filenamePattern": "*.cpdz"
+          }
+        ],
+        "priority": "default"
       }
     ],
     "grammars": [
@@ -244,6 +261,21 @@
         "icon": "$(eye)"
       },
       {
+        "command": "vscode-calcpad.toggleUiMode",
+        "title": "CalcpadCE: Toggle #UI Input Mode",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "vscode-calcpad.toggleUiReport",
+        "title": "CalcpadCE: Toggle Report Preview",
+        "icon": "$(book)"
+      },
+      {
+        "command": "vscode-calcpad.saveUiValues",
+        "title": "CalcpadCE: Save #UI Values to Document",
+        "icon": "$(save)"
+      },
+      {
         "command": "vscode-calcpad.focusPreviewToLine",
         "title": "CalcpadCE: Focus Preview to Line",
         "icon": "$(target)"
@@ -254,7 +286,7 @@
       },
       {
         "command": "vscode-calcpad.printToPdf",
-        "title": "Print CalcpadCE Preview to PDF",
+        "title": "CalcpadCE: Print Report to PDF",
         "icon": "$(file-pdf)"
       },
       {
@@ -266,6 +298,25 @@
         "command": "vscode-calcpad.saveDocx",
         "title": "CalcpadCE: Save as Word Document…",
         "icon": "$(file)"
+      },
+      {
+        "command": "vscode-calcpad.writeDataFiles",
+        "title": "CalcpadCE: Write #write/#append Files to Disk",
+        "icon": "$(save)"
+      },
+      {
+        "command": "vscode-calcpad.saveAsCompiled",
+        "title": "CalcpadCE: Save As Compiled Worksheet…",
+        "icon": "$(file-binary)"
+      },
+      {
+        "command": "vscode-calcpad.exportPortable",
+        "title": "CalcpadCE: Export Portable Package…",
+        "icon": "$(file-zip)"
+      },
+      {
+        "command": "vscode-calcpad.saveCompiledUiValues",
+        "title": "CalcpadCE: Save Values to Compiled Worksheet"
       },
       {
         "command": "vscode-calcpad.insertImage",
@@ -350,8 +401,13 @@
         "icon": "$(symbol-ruler)"
       },
       {
-        "command": "calcpad.refreshDocument",
+        "command": "calcpad.runPreview",
         "title": "CalcpadCE: Run Preview",
+        "icon": "$(play)"
+      },
+      {
+        "command": "calcpad.refreshDocument",
+        "title": "CalcpadCE: Restart Server",
         "icon": "$(refresh)"
       },
       {
@@ -372,7 +428,7 @@
           "group": "navigation"
         },
         {
-          "command": "vscode-calcpad.showInsert",
+          "command": "vscode-calcpad.toggleUiMode",
           "when": "resourceLangId == plaintext || resourceLangId == calcpad",
           "group": "navigation"
         },
@@ -387,8 +443,18 @@
           "group": "navigation"
         },
         {
-          "command": "vscode-calcpad.insertImage",
-          "when": "resourceLangId == plaintext || resourceLangId == calcpad",
+          "command": "vscode-calcpad.toggleUiReport",
+          "when": "resourceLangId == plaintext || resourceLangId == calcpad || activeWebviewPanelId == htmlPreviewUi || activeCustomEditorId == calcpad.compiledWorksheet",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.printToPdf",
+          "when": "activeWebviewPanelId == htmlPreviewUi || activeWebviewPanelId == htmlPreviewUiReport || activeWebviewPanelId == calcpadCompiledReport || activeCustomEditorId == calcpad.compiledWorksheet",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.saveUiValues",
+          "when": "activeWebviewPanelId == htmlPreviewUi",
           "group": "navigation"
         }
       ],
@@ -397,23 +463,48 @@
           "command": "vscode-calcpad.viewWebviewSource",
           "when": "webviewId == htmlPreview || webviewId == htmlPreviewUnwrapped",
           "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.toggleUiReport",
+          "when": "webviewId == htmlPreviewUi",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.printToPdf",
+          "when": "webviewId == htmlPreviewUi || webviewId == htmlPreviewUiReport || webviewId == calcpadCompiledReport",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.saveUiValues",
+          "when": "webviewId == htmlPreviewUi",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-calcpad.toggleUiMode",
+          "when": "webviewId == htmlPreviewUi || webviewId == htmlPreviewUiReport",
+          "group": "navigation"
         }
       ],
       "view/title": [
         {
-          "command": "calcpad.stopServer",
+          "command": "calcpad.runPreview",
           "when": "view == calcpadVueUI",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "command": "calcpad.refreshDocument",
           "when": "view == calcpadVueUI",
-          "group": "navigation"
+          "group": "navigation@2"
+        },
+        {
+          "command": "calcpad.stopServer",
+          "when": "view == calcpadVueUI",
+          "group": "navigation@3"
         }
       ],
       "editor/context": [
         {
-          "command": "calcpad.refreshDocument",
+          "command": "calcpad.runPreview",
           "when": "resourceLangId == calcpad || resourceLangId == plaintext",
           "group": "calcpad@0"
         },
@@ -436,12 +527,17 @@
           "command": "vscode-calcpad.editMetadataProperties",
           "when": "resourceLangId == calcpad || resourceLangId == plaintext",
           "group": "calcpad@4"
+        },
+        {
+          "command": "vscode-calcpad.exportPortable",
+          "when": "resourceLangId == calcpad || resourceLangId == plaintext",
+          "group": "calcpad@5"
         }
       ]
     },
     "keybindings": [
       {
-        "command": "calcpad.refreshDocument",
+        "command": "calcpad.runPreview",
         "key": "ctrl+alt+x",
         "mac": "cmd+alt+x",
         "when": "editorLangId == 'calcpad' || editorLangId == 'plaintext'"
@@ -604,7 +700,8 @@
         "editor.unicodeHighlight.ambiguousCharacters": false,
         "editor.unicodeHighlight.nonBasicASCII": false,
         "editor.acceptSuggestionOnEnter": "off",
-        "editor.lightbulb.enabled": "off"
+        "editor.lightbulb.enabled": "off",
+        "editor.colorDecorators": false
       },
       "editor.semanticTokenColorCustomizations": {
         "enabled": true,

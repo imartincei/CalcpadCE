@@ -29,6 +29,7 @@
       @expand-folder="handleExpandFolder"
       @open-containing-folder="handleOpenContainingFolder"
       @close-folder="handleCloseFolder"
+      @refresh-folder="handleRefreshFolder"
     />
 
     <div v-show="!versionConfig.isDesktop || activeView === 'calcpad'" class="calcpad-view" :class="{ split: isSplit }">
@@ -37,7 +38,8 @@
       <button
         v-for="tab in tabs"
         :key="tab.id"
-        :class="['tab', { active: pane.activeTab === tab.id }]"
+        :class="['tab', { active: pane.activeTab === tab.id, unavailable: tabUnavailable(tab.id) }]"
+        :title="tabUnavailable(tab.id) ? INPUT_MODE_NOTE : undefined"
         @click="activateTab(pane, tab.id)"
       >
         {{ tab.label }}
@@ -51,7 +53,11 @@
       ></button>
     </div>
 
-    <div class="tab-content">
+    <p v-if="tabUnavailable(pane.activeTab)" class="unavailable-note">{{ INPUT_MODE_NOTE }}</p>
+
+    <!-- `inert` rather than a per-control disabled flag: it takes the whole tab out of
+         both pointer and keyboard reach in one attribute, whatever it holds. -->
+    <div class="tab-content" :class="{ unavailable: tabUnavailable(pane.activeTab) }" :inert="tabUnavailable(pane.activeTab)">
       <CalcpadInsertTab
         v-if="pane.activeTab === 'insert'"
         :insert-items="insertItems"
@@ -75,17 +81,23 @@
         :initial-enable-formatting-hotkeys="enableFormattingHotkeys"
         :initial-enable-preview-cursor-sync="enablePreviewCursorSync"
         :initial-enable-auto-run="enableAutoRun"
+        :initial-enable-auto-input-mode="enableAutoInputMode"
+        :initial-enable-preview-ui-overrides="enablePreviewUiOverrides"
         :initial-dark-background="darkBackground"
         :initial-linter-min-severity="linterMinSeverity"
         :initial-max-output-lines="maxOutputLines"
+        :initial-max-preview-size="maxPreviewSizeMB"
+        :initial-max-preview-console-messages="maxPreviewConsoleMessages"
         :version-config="versionConfig"
-        :initial-library-path="libraryPath"
         :initial-active-config="activeConfig"
         :initial-available-configs="availableConfigs"
         :initial-editor-font-family="editorFontFamily"
         :initial-available-fonts="availableFonts"
         :app-version="appVersion"
+        :pdf-settings="pdfSettings"
         @update-settings="handleUpdateSettings"
+        @update-pdf-settings="handleUpdatePdfSettings"
+        @reset-pdf-settings="handleResetPdfSettings"
         @update-preview-theme="handleUpdatePreviewTheme"
         @update-color-theme="handleUpdateColorTheme"
         @update-quick-typing="handleUpdateQuickTyping"
@@ -93,10 +105,13 @@
         @update-formatting-hotkeys="handleUpdateFormattingHotkeys"
         @update-preview-cursor-sync="handleUpdatePreviewCursorSync"
         @update-auto-run="handleUpdateAutoRun"
+        @update-auto-input-mode="handleUpdateAutoInputMode"
+        @update-preview-ui-overrides="handleUpdatePreviewUiOverrides"
         @update-dark-background="handleUpdateDarkBackground"
         @update-linter-min-severity="handleUpdateLinterMinSeverity"
         @update-max-output-lines="handleUpdateMaxOutputLines"
-        @update-library-path="handleUpdateLibraryPath"
+        @update-max-preview-size="handleUpdateMaxPreviewSize"
+        @update-max-preview-console-messages="handleUpdateMaxPreviewConsoleMessages"
         @reset-settings="handleResetSettings"
         @save-named-config="handleSaveNamedConfig"
         @switch-config="handleSwitchConfig"
@@ -112,13 +127,6 @@
         :loading="variablesLoading"
         @insert-text="handleInsertText"
       />
-      <CalcpadPdfTab
-        v-else-if="pane.activeTab === 'pdf'"
-        :pdf-settings="pdfSettings"
-        @update-pdf-settings="handleUpdatePdfSettings"
-        @reset-pdf-settings="handleResetPdfSettings"
-        @generate-pdf="handleGeneratePdf"
-      />
       <CalcpadFormattingTab
         v-else-if="pane.activeTab === 'formatting'"
         :indent-style="prettifyIndentStyle"
@@ -133,11 +141,20 @@
         v-else-if="pane.activeTab === 'export'"
         :plots="plots"
         :loading="plotsLoading"
+        :version-config="versionConfig"
+        :is-compiled="activeIsCompiled"
+        :write-mode="writeMode"
+        :write-result="writeResult"
+        @save-pdf="handleSavePdf"
         @save-html="handleSaveSourceHtml"
         @save-docx="handleSaveDocx"
+        @save-compiled="handleSaveCompiled"
+        @save-portable="handleSavePortable"
         @refresh-plots="handleRefreshPlots"
         @save-plot="handleSavePlot"
         @save-plots-zip="handleSavePlotsZip"
+        @update-write-mode="handleUpdateWriteMode"
+        @write-files-now="handleWriteFilesNow"
       />
       <CalcpadErrorsTab
         v-else-if="pane.activeTab === 'errors'"
@@ -147,7 +164,10 @@
       <CalcpadMetadataTab
         v-else-if="pane.activeTab === 'metadata'"
         :block="metadataBlock"
+        :ui-controls="uiControls"
         @apply="handleApplyMetadata"
+        @go-to-line="handleGoToLine"
+        @refresh-ui-controls="handleRefreshUiControls"
       />
     </div>
     </div>
@@ -161,7 +181,6 @@ import CalcpadInsertTab from './CalcpadInsertTab.vue'
 import CalcpadTocTab from './CalcpadTocTab.vue'
 import CalcpadSettingsTab from './CalcpadSettingsTab.vue'
 import CalcpadVariablesTab from './CalcpadVariablesTab.vue'
-import CalcpadPdfTab from './CalcpadPdfTab.vue'
 import CalcpadFormattingTab from './CalcpadFormattingTab.vue'
 import CalcpadExportTab from './CalcpadExportTab.vue'
 import CalcpadFilesTab from './CalcpadFilesTab.vue'
@@ -169,10 +188,18 @@ import CalcpadErrorsTab from './CalcpadErrorsTab.vue'
 import CalcpadMetadataTab from './CalcpadMetadataTab.vue'
 import { postMessage } from '../services/messaging'
 import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '../../text/metadata-comment'
+import type { UiDirectiveData } from '../../text/ui-directive'
+import type { UiControl } from '../../services/ui-overrides'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
-import type { CalcpadError } from '../../types/api'
+import type { CalcpadError, ExportVariant } from '../../types/api'
+import type { WriteMode } from '../../types/settings'
+import { coerceWriteMode } from '../../types/settings'
 import { DEFAULT_PDF_SETTINGS } from '../types'
+import {
+  DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB,
+  DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
+} from '../../services/preview-limits'
 
 // Props
 interface Props {
@@ -223,10 +250,13 @@ const commentFormat = ref('auto')
 const enableFormattingHotkeys = ref(true)
 const enablePreviewCursorSync = ref(false)
 const enableAutoRun = ref(true)
+const enableAutoInputMode = ref(true)
+const enablePreviewUiOverrides = ref(false)
 const darkBackground = ref('#1e1e1e')
 const linterMinSeverity = ref('information')
 const maxOutputLines = ref(1000)
-const libraryPath = ref('')
+const maxPreviewSizeMB = ref(DEFAULT_PREVIEW_SIZE_MB)
+const maxPreviewConsoleMessages = ref(DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT)
 const activeConfig = ref('default')
 const availableConfigs = ref<string[]>(['default'])
 const editorFontFamily = ref('JuliaMono')
@@ -246,6 +276,8 @@ const prettifyIndentSize = ref(4)
 const prettifyTrimTrailing = ref(true)
 
 const metadataBlock = ref<MetadataCommentBlock | null>(null)
+// #UI controls of the last input-form render, null until the host resolves them.
+const uiControls = ref<UiControl[] | null>(null)
 
 const tabs = computed<Tab[]>(() => {
   const base: Tab[] = [
@@ -253,7 +285,6 @@ const tabs = computed<Tab[]>(() => {
     { id: 'toc', label: 'TOC' },
     { id: 'settings', label: 'Settings' },
     { id: 'variables', label: 'Variables' },
-    { id: 'pdf', label: 'PDF' },
     { id: 'formatting', label: 'Formatting' },
     { id: 'export', label: 'Export' },
     { id: 'errors', label: 'Errors' }
@@ -266,11 +297,28 @@ const tabs = computed<Tab[]>(() => {
   return base
 })
 
+/**
+ * Input mode fills a worksheet in rather than editing it — the host hides the editor,
+ * and for a compiled worksheet there is no source behind it at all. The tabs that act
+ * on source have nothing to act on there, so their content is shown inert: TOC, Export
+ * and Settings still work, since a filled-in worksheet is still navigated and exported.
+ */
+const SOURCE_TABS = ['insert', 'variables', 'formatting', 'errors', 'metadata']
+const INPUT_MODE_NOTE = 'Unavailable in input mode — this acts on the document source, which the input form does not edit.'
+const inputMode = ref(false)
+const tabUnavailable = (tabId: string) => inputMode.value && SOURCE_TABS.includes(tabId)
+// A compiled worksheet has no source at all, so the Export tab drops the exports
+// and re-packaging options that would need it.
+const activeIsCompiled = ref(false)
+
 const convertErrors = ref<CalcpadError[]>([])
 
 interface PlotSummary { index: number; ext: 'png' | 'svg'; dataUri: string; sizeBytes: number }
 const plots = ref<PlotSummary[]>([])
 const plotsLoading = ref(false)
+
+const writeMode = ref<WriteMode>('reportOnly')
+const writeResult = ref<{ ok: boolean; message: string } | null>(null)
 
 // Methods
 const switchView = (viewId: string) => {
@@ -301,6 +349,10 @@ const handleCloseFolder = () => {
   openedFolder.value = null
   fileTreeRoots.value = []
   postMessage({ type: 'closeFolder' })
+}
+
+const handleRefreshFolder = () => {
+  postMessage({ type: 'getOpenedFolder' })
 }
 
 // Insert children into the tree at the given directory path.
@@ -337,6 +389,8 @@ const closePane = (index: number) => {
 
 const activateTab = (pane: Pane, tabId: string) => {
   pane.activeTab = tabId
+  // Nothing below is worth asking the host for while the tab is inert.
+  if (tabUnavailable(tabId)) return
 
   // Request fresh data when switching to variables tab
   if (tabId === 'variables') {
@@ -374,12 +428,24 @@ const switchTab = (tabId: string) => {
   activateTab(panes.value[0], tabId)
 }
 
-const handleSaveSourceHtml = () => {
-  postMessage({ type: 'saveSourceHtml' })
+const handleSavePdf = (variant: ExportVariant) => {
+  postMessage({ type: 'generatePdf', variant })
 }
 
-const handleSaveDocx = () => {
-  postMessage({ type: 'saveDocx' })
+const handleSaveSourceHtml = (variant: ExportVariant) => {
+  postMessage({ type: 'saveSourceHtml', variant })
+}
+
+const handleSaveDocx = (variant: ExportVariant) => {
+  postMessage({ type: 'saveDocx', variant })
+}
+
+const handleSaveCompiled = () => {
+  postMessage({ type: 'saveCompiled' })
+}
+
+const handleSavePortable = () => {
+  postMessage({ type: 'savePortable' })
 }
 
 const handleRefreshPlots = () => {
@@ -393,6 +459,17 @@ const handleSavePlot = (index: number) => {
 
 const handleSavePlotsZip = () => {
   postMessage({ type: 'savePlotsZip' })
+}
+
+const handleUpdateWriteMode = (mode: WriteMode) => {
+  writeMode.value = mode
+  writeResult.value = null
+  postMessage({ type: 'updateWriteMode', mode })
+}
+
+const handleWriteFilesNow = () => {
+  writeResult.value = null
+  postMessage({ type: 'writeFilesNow' })
 }
 
 const handleInsertText = (text: string) => {
@@ -444,6 +521,16 @@ const handleUpdatePreviewCursorSync = (enabled: boolean) => {
   postMessage({ type: 'updatePreviewCursorSync', enabled })
 }
 
+const handleUpdateAutoInputMode = (enabled: boolean) => {
+  enableAutoInputMode.value = enabled
+  postMessage({ type: 'updateAutoInputMode', enabled })
+}
+
+const handleUpdatePreviewUiOverrides = (enabled: boolean) => {
+  enablePreviewUiOverrides.value = enabled
+  postMessage({ type: 'updatePreviewUiOverrides', enabled })
+}
+
 const handleUpdateAutoRun = (enabled: boolean) => {
   enableAutoRun.value = enabled
   postMessage({ type: 'updateAutoRun', enabled })
@@ -464,9 +551,14 @@ const handleUpdateMaxOutputLines = (value: number) => {
   postMessage({ type: 'updateMaxOutputLines', value })
 }
 
-const handleUpdateLibraryPath = (path: string) => {
-  libraryPath.value = path
-  postMessage({ type: 'updateLibraryPath', path })
+const handleUpdateMaxPreviewSize = (value: number) => {
+  maxPreviewSizeMB.value = value
+  postMessage({ type: 'updateMaxPreviewSize', value })
+}
+
+const handleUpdateMaxPreviewConsoleMessages = (value: number) => {
+  maxPreviewConsoleMessages.value = value
+  postMessage({ type: 'updateMaxPreviewConsoleMessages', value })
 }
 
 const handleResetSettings = () => {
@@ -560,20 +652,34 @@ const handleUpdatePrettifyTrim = (enabled: boolean) => {
   postMessage({ type: 'updatePrettifyTrim', value: enabled })
 }
 
-const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: SettingsValues }) => {
+// Re-resolving renders the document, so the stale result is dropped first: the panel
+// withholds its used/unused verdicts while nothing is resolved rather than showing an
+// answer from before the edit that prompted the refresh.
+const handleRefreshUiControls = () => {
+  uiControls.value = null
+  postMessage({ type: 'getUiControls' })
+}
+
+const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: SettingsValues; ui?: UiDirectiveData }) => {
   if (!metadataBlock.value) return
-  // One message → one atomic edit covering both the metadata comment and the
-  // document-level #settings directive, so the two writes can't race or shift
-  // each other's line numbers.
+  // One message → one atomic edit covering the metadata comment, the
+  // document-level #settings directive, and the #UI directive at the cursor,
+  // so the writes can't race or shift each other's line numbers.
   postMessage({
     type: 'updateMetadata',
     line: metadataBlock.value.line,
+    endLine: metadataBlock.value.endLine,
     indent: metadataBlock.value.indent,
     trailingQuote: metadataBlock.value.trailingQuote,
+    layout: metadataBlock.value.layout,
     isNew: metadataBlock.value.isNew,
     data: payload.data,
     settings: payload.settings,
-    settingsLine: metadataBlock.value.settingsLine ?? null
+    settingsLine: metadataBlock.value.settingsLine ?? null,
+    settingsEndLine: metadataBlock.value.settingsEndLine ?? metadataBlock.value.settingsLine ?? null,
+    settingsLayout: metadataBlock.value.settingsLayout,
+    ui: payload.ui,
+    uiLine: metadataBlock.value.uiDirective?.line ?? null,
   })
 }
 
@@ -595,12 +701,21 @@ const handleMessage = (event: MessageEvent) => {
       if (typeof message.enableQuickTyping === 'boolean') enableQuickTyping.value = message.enableQuickTyping
       if (typeof message.enablePreviewCursorSync === 'boolean') enablePreviewCursorSync.value = message.enablePreviewCursorSync
       if (typeof message.enableAutoRun === 'boolean') enableAutoRun.value = message.enableAutoRun
+      if (typeof message.enableAutoInputMode === 'boolean') enableAutoInputMode.value = message.enableAutoInputMode
+      if (typeof message.enablePreviewUiOverrides === 'boolean') enablePreviewUiOverrides.value = message.enablePreviewUiOverrides
       darkBackground.value = message.darkBackground || '#1e1e1e'
       linterMinSeverity.value = message.linterMinSeverity || 'information'
+      writeMode.value = coerceWriteMode(message.writeMode)
       if (typeof message.maxOutputLines === 'number' && message.maxOutputLines >= 10) {
         maxOutputLines.value = message.maxOutputLines
       }
-      libraryPath.value = message.libraryPath || ''
+      if (typeof message.maxPreviewSizeMB === 'number' && message.maxPreviewSizeMB >= MIN_PREVIEW_SIZE_MB) {
+        maxPreviewSizeMB.value = message.maxPreviewSizeMB
+      }
+      if (typeof message.maxPreviewConsoleMessages === 'number'
+        && message.maxPreviewConsoleMessages >= MIN_CONSOLE_MESSAGES_PER_DOCUMENT) {
+        maxPreviewConsoleMessages.value = message.maxPreviewConsoleMessages
+      }
       if (message.activeConfig) activeConfig.value = message.activeConfig
       if (Array.isArray(message.availableConfigs)) availableConfigs.value = message.availableConfigs
       if (typeof message.editorFontFamily === 'string') editorFontFamily.value = message.editorFontFamily
@@ -651,8 +766,21 @@ const handleMessage = (event: MessageEvent) => {
       plots.value = Array.isArray(message.plots) ? message.plots : []
       plotsLoading.value = false
       break
+    case 'writeModeChanged':
+      writeMode.value = coerceWriteMode(message.mode)
+      break
+    case 'writeFilesResult':
+      writeResult.value = { ok: message.ok !== false, message: String(message.message ?? '') }
+      break
     case 'metadataContext':
       metadataBlock.value = message.block ?? null
+      break
+    case 'uiControls':
+      uiControls.value = Array.isArray(message.controls) ? message.controls : null
+      break
+    case 'inputModeChanged':
+      inputMode.value = !!message.active
+      activeIsCompiled.value = !!message.compiled
       break
     case 'focusTab':
       if (typeof message.tab === 'string') switchTab(message.tab)
@@ -694,13 +822,9 @@ onUnmounted(() => {
 
 <style scoped>
 .calcpad-vue-ui {
-  /* Natural document flow inside the parent (#vue-sidebar in calcpad-desktop,
-   * <body> in the VS Code webview). Avoids flex-column edge cases where a
-   * wrapped .tab-container can render on top of .tab-content because the
-   * column's fixed height was computed before the wrap layout pass.
-   * min-height (not height) so the box grows to the full content height:
-   * a fixed 100% would cap it at one viewport, and the sticky .activity-icons
-   * bar would un-stick once its containing block scrolled past. */
+  /* Natural document flow inside the parent, avoiding flex-column edge cases where a wrapped
+   * .tab-container can render on top of .tab-content. min-height (not height) so the box grows
+   * to the full content height and the sticky .activity-icons bar stays stuck. */
   min-height: 100%;
   display: block;
   font-family: var(--vscode-font-family);
@@ -817,6 +941,12 @@ onUnmounted(() => {
   border-bottom: 2px solid var(--vscode-tab-activeBorder);
 }
 
+/* Still clickable while unavailable: opening the tab is how the note explaining
+ * why its content is inert gets read. */
+.tab.unavailable {
+  opacity: 0.5;
+}
+
 /* Split / close button pinned to the right end of the tab strip. */
 .pane-action {
   margin-left: auto;
@@ -846,6 +976,20 @@ onUnmounted(() => {
   /* Natural-flow content area — grows with its content. The parent
    * (#vue-sidebar) handles overflow scrolling for the whole panel. */
   padding: 0;
+}
+
+.tab-content.unavailable {
+  opacity: 0.45;
+}
+
+/* Sits outside .tab-content so it stays legible while the tab itself is dimmed. */
+.unavailable-note {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--vscode-descriptionForeground);
+  border-bottom: 1px solid var(--vscode-widget-border);
 }
 
 .tab-placeholder {

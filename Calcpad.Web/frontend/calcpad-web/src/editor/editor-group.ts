@@ -3,12 +3,10 @@ import { createCalcpadEditor, type CalcpadEditorOptions } from './setup';
 import { TabManager } from '../tabs/tab-manager';
 
 /**
- * One editor group in the split layout: a Monaco editor instance paired with
- * its own TabManager. The desktop app supports up to two groups stacked
- * top/bottom (see App.vue). Language providers (completions, hover,
- * diagnostics, semantic tokens) are registered globally per-language and apply
- * to every group's editor automatically — only per-instance wiring (commands,
- * listeners, text helpers) is attached per group in main.ts's wireGroup().
+ * One editor group in the split layout: a Monaco editor instance paired with its own
+ * TabManager, up to two groups stacked top/bottom. Language providers are registered globally
+ * per-language and apply to every group automatically, so only per-instance wiring is attached
+ * per group in main.ts's wireGroup().
  */
 export class EditorGroup {
     readonly id: string;

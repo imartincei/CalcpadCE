@@ -144,9 +144,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         }
 
         /// <summary>
-        /// Validates parameter types against all matching overloads.
-        /// If any overload matches all parameters, no error is reported.
-        /// Only reports an error if NO overload matches the parameter types.
+        /// Validates parameter types against all matching overloads. An error is reported only
+        /// when no overload matches the parameter types.
         /// </summary>
         private void ValidateParameterTypesAgainstOverloads(
             List<string> parameters,

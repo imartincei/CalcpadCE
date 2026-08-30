@@ -14,15 +14,17 @@ import {
     getExtraBool,
     getExtraNumber,
     getExtraObject,
+    coerceWriteMode,
+    writesAllowed,
 } from 'calcpad-frontend';
+import type { WriteMode } from 'calcpad-frontend';
 
 export type { CalcpadSettings, CalcpadExtras };
 
 const SETTINGS_DIR_NAME = 'settings';
 const DEFAULT_PRESET_NAME = 'default';
-// The one file that reflects live user state. Written on every edit,
-// read at boot. Preset files (default.json, <name>.json) are read-only
-// source-of-truth snapshots — the settings editor never writes to them.
+// The one file that reflects live user state, written on every edit and read at boot. Preset
+// files (default.json, <name>.json) are read-only snapshots the settings editor never writes to.
 const ACTIVE_SETTINGS_FILE = 'active-settings.json';
 const ACTIVE_PRESET_KEY = 'calcpad-active-preset';
 
@@ -99,6 +101,20 @@ export class CalcpadSettingsManager {
 
     public getExtraBool(key: string, defaultValue: boolean): boolean {
         return getExtraBool(this._extras, key, defaultValue);
+    }
+
+    public getWriteMode(): WriteMode {
+        return coerceWriteMode(this.getExtra('writeMode'));
+    }
+
+    /** Whether a render with these flags may run `#write`/`#append`. */
+    public mayWrite(forPrint: boolean, enableUi = false): boolean {
+        return writesAllowed(this.getWriteMode(), forPrint, enableUi);
+    }
+
+    /** The "Apply #UI Values in Preview" setting: Preview renders entered values, not declared ones. */
+    public previewAppliesUiOverrides(): boolean {
+        return this.getExtraBool('previewUiOverrides', false);
     }
 
     public getExtraNumber(key: string, defaultValue: number): number {
@@ -198,9 +214,8 @@ export class CalcpadSettingsManager {
     }
 
     /**
-     * Save current in-memory settings as a preset. Rejects the reserved
-     * `default` name and filename-illegal characters. Also updates the
-     * active-preset label to the saved name.
+     * Save current in-memory settings as a preset, rejecting the reserved `default` name and
+     * filename-illegal characters. Also updates the active-preset label to the saved name.
      */
     public async savePreset(rawName: string): Promise<{ ok: true } | { ok: false; message: string }> {
         const name = (rawName ?? '').trim();
@@ -208,7 +223,7 @@ export class CalcpadSettingsManager {
         if (name.toLowerCase() === DEFAULT_PRESET_NAME) {
             return { ok: false, message: 'The "default" preset is protected and cannot be overridden.' };
         }
-        if (/[\\/:*?"<>|\x00-\x1f]/.test(name)) {
+        if (!this.isValidPresetName(name)) {
             return { ok: false, message: 'Config name contains invalid characters.' };
         }
         const presetPath = this.getPresetPath(name);
@@ -232,7 +247,10 @@ export class CalcpadSettingsManager {
      * untouched.
      */
     public async loadPreset(name: string): Promise<void> {
-        if (!name) return;
+        if (!this.isValidPresetName(name)) {
+            getOutputChannel().appendLine(`[Settings] loadPreset refused invalid name "${name}"`);
+            return;
+        }
         getOutputChannel().appendLine(`[Settings] loadPreset("${name}") — was active="${this._activePresetName}"`);
         await this.readPresetInto(name);
         await this.setActivePresetName(name);
@@ -260,7 +278,22 @@ export class CalcpadSettingsManager {
         return path.join(this._context.globalStorageUri.fsPath, SETTINGS_DIR_NAME);
     }
 
+    /**
+     * A preset name is a filename component, so it may not contain a path
+     * separator, a drive letter, a `..`, or anything Windows rejects outright.
+     * Applied on read as well as write: `savePreset` validated already, but the
+     * `switchConfig` webview message reaches `loadPreset` with a name that never
+     * passed through it, and that name is joined straight onto the settings dir.
+     */
+    private isValidPresetName(name: string): boolean {
+        return name.length > 0
+            && name.length <= 128
+            && name !== '.' && name !== '..'
+            && !/[\\/:*?"<>|\x00-\x1f]/.test(name);
+    }
+
     private getPresetPath(name: string): string | null {
+        if (!this.isValidPresetName(name)) return null;
         const dir = this.getSettingsDir();
         return dir ? path.join(dir, `${name}.json`) : null;
     }
@@ -271,9 +304,8 @@ export class CalcpadSettingsManager {
     }
 
     /**
-     * Ensure the settings folder exists and `default.json` is fresh from the
-     * bundled defaults. Runs on activation so `default` always represents
-     * pristine defaults. Never touches active-settings.json.
+     * Ensure the settings folder exists and `default.json` is fresh from the bundled defaults,
+     * so `default` always represents pristine defaults. Never touches active-settings.json.
      */
     private async ensureSettingsFolder(): Promise<void> {
         const dir = this.getSettingsDir();
@@ -331,9 +363,9 @@ export class CalcpadSettingsManager {
     }
 
     /**
-     * Read active-settings.json into `_settings/_extras`. Returns false when
-     * the file doesn't exist / is unreadable so the caller can decide how to
-     * seed it. On a parse error, leaves in-memory state at defaults and logs.
+     * Read active-settings.json into `_settings/_extras`, returning false when the file is
+     * missing or unreadable so the caller can decide how to seed it. A parse error leaves
+     * in-memory state at defaults and logs.
      */
     private async readActiveSettings(): Promise<boolean> {
         const activePath = this.getActiveSettingsPath();

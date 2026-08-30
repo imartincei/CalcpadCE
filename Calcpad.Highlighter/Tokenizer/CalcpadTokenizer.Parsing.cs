@@ -34,6 +34,7 @@ namespace Calcpad.Highlighter.Tokenizer
                     var isInclude = false;
                     var isFormat = false;
                     var isSettings = false;
+                    var isPathRoot = false;
                     if (_state.CurrentType == TokenType.Keyword)
                     {
                         isInclude = len == 8 &&
@@ -48,6 +49,12 @@ namespace Calcpad.Highlighter.Tokenizer
                             _builder[1] == 's' &&
                             _builder[2] == 'e' &&
                             _builder[3] == 't';
+                        // Case-insensitive, unlike the checks above: #ProjectPath/#LibraryPath are
+                        // suggested to authors in PascalCase, so a case-sensitive check here would
+                        // silently miss the exact spelling this feature itself recommends.
+                        isPathRoot = len == 12 &&
+                            (_builder.ToString().Equals("#projectpath", StringComparison.OrdinalIgnoreCase) ||
+                             _builder.ToString().Equals("#librarypath", StringComparison.OrdinalIgnoreCase));
                     }
 
                     Append(_state.CurrentType);
@@ -75,6 +82,12 @@ namespace Calcpad.Highlighter.Tokenizer
                     {
                         _state.CurrentType = TokenType.SettingsJson;
                         // Set start column to AFTER this space for the JSON payload token
+                        _state.TokenStartColumn = position + 1;
+                    }
+                    else if (isPathRoot)
+                    {
+                        _state.CurrentType = TokenType.FilePath;
+                        // Set start column to AFTER this space for the path value token
                         _state.TokenStartColumn = position + 1;
                     }
                     else
@@ -115,7 +128,7 @@ namespace Calcpad.Highlighter.Tokenizer
             }
         }
 
-        private void ParseBrackets(char c)
+        private void ParseBrackets(char c, int position = -1)
         {
             var t = _state.CurrentTypeOrPrevious;
             if (c == '(')
@@ -188,6 +201,8 @@ namespace Calcpad.Highlighter.Tokenizer
                 {
                     _state.CommandCount++;
                     _state.IsInCommandBlock = true;
+                    if (position >= 0)
+                        CollectCommandScopeVariables(_state.Text.Span, position);
                 }
 
                 _state.CurrentType = TokenType.Bracket;
@@ -216,6 +231,45 @@ namespace Calcpad.Highlighter.Tokenizer
 
             _builder.Append(c);
             Append(_state.CurrentType);
+        }
+
+        /// <summary>
+        /// Registers the scope variables a command block declares after its body, e.g. the s in
+        /// $Integral{cos(s^2) @ s = 0 : t}. The body is tokenized before the @ declaration is
+        /// reached, so without this a name that is also a unit (s, t, min, ...) resolves to Units.
+        /// </summary>
+        private void CollectCommandScopeVariables(ReadOnlySpan<char> text, int bracePosition)
+        {
+            var depth = 0;
+            for (int i = bracePosition; i < text.Length; i++)
+            {
+                var c = text[i];
+                if (c == '\'' || c == '"')
+                    return;
+
+                if (c == '{')
+                    ++depth;
+                else if (c == '}')
+                {
+                    if (--depth == 0)
+                        return;
+                }
+                else if (c == '@' || c == '&')
+                {
+                    var j = i + 1;
+                    while (j < text.Length && char.IsWhiteSpace(text[j]))
+                        ++j;
+
+                    var start = j;
+                    while (j < text.Length && CalcpadCharacterHelpers.IsIdentifierChar(text[j]))
+                        ++j;
+
+                    if (j > start)
+                        _localVariables.Add(text[start..j].ToString());
+
+                    i = j - 1;
+                }
+            }
         }
 
         private void ParseOperator(char c)
@@ -319,7 +373,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 _state.CurrentType = TokenType.Units;
         }
 
-        private void ParseLineBreak()
+        private void ParseLineBreak(int underscorePosition)
         {
             // Emit current token if any
             if (_builder.Length > 0)
@@ -347,8 +401,10 @@ namespace Calcpad.Highlighter.Tokenizer
                 }
             }
 
-            // Emit line continuation token with space and underscore
-            _state.TokenStartColumn = _builder.Length > 0 ? _state.TokenStartColumn + _builder.Length : _state.TokenStartColumn;
+            // Emit line continuation token spanning the space and the underscore. The space may
+            // already have been emitted as a None token by ParseSpace, so anchor the token on the
+            // underscore's position rather than on the running cursor.
+            _state.TokenStartColumn = underscorePosition - 1;
             _builder.Append(" _");
             Append(TokenType.LineContinuation);
 
@@ -356,6 +412,7 @@ namespace Calcpad.Highlighter.Tokenizer
             // knows it's still inside a quoted comment (e.g., 'text<br> _\n continued')
             _continueTextComment = _state.TextComment;
             _continueTagComment = _state.TagComment;
+            _explicitLineBreak = true;
         }
 
         private bool IsDoubleOp(char c, char op)

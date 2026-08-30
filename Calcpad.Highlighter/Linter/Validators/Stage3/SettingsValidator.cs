@@ -7,13 +7,15 @@ using Calcpad.Highlighter.Tokenizer.Models;
 namespace Calcpad.Highlighter.Linter.Validators.Stage3
 {
     /// <summary>
-    /// Validates the JSON payload of the #settings directive (`#settings {...}`).
-    /// Reports malformed JSON, non-object payloads, unrecognized keys, wrong value
-    /// types, and out-of-range values. Recognized keys, types, and ranges come from
-    /// <see cref="SettingsDto"/> so the linter and the runtime parser stay in sync.
+    /// Validates the JSON payload of the #settings directive (`#settings {...}`), reporting
+    /// malformed JSON, non-object payloads, unrecognized keys, wrong value types and out-of-range
+    /// values. Recognized keys, types and ranges come from <see cref="SettingsDto"/> so the linter
+    /// and the runtime parser stay in sync.
     /// </summary>
     public class SettingsValidator
     {
+        private const string Code = "CPD-3413";
+
         public void Validate(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
             for (int i = 0; i < stage3.Lines.Count; i++)
@@ -34,33 +36,18 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             if (json.Length == 0)
                 return;
 
-            JsonDocument doc;
-            try
-            {
-                doc = JsonDocument.Parse(json);
-            }
-            catch (JsonException)
-            {
-                result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3413",
-                    "malformed JSON in #settings directive");
-                return;
-            }
+            var reporter = new DirectiveJsonReporter(
+                result, lineIndex, token.Column, token.Column + token.Length, Code, "#settings");
 
-            using (doc)
+            using (var doc = reporter.TryParse(json))
             {
-                if (doc.RootElement.ValueKind != JsonValueKind.Object)
-                {
-                    result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3413",
-                        "#settings payload must be a JSON object");
+                if (doc is null)
                     return;
-                }
 
-                foreach (var prop in doc.RootElement.EnumerateObject())
-                {
-                    if (!SettingsDto.KnownKeys.Contains(prop.Name))
-                        result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3413",
-                            "'" + prop.Name + "' is not a recognized setting");
-                }
+                if (!reporter.RequireObject(doc.RootElement))
+                    return;
+
+                reporter.CheckKnownKeys(doc.RootElement, SettingsDto.KnownKeys.Contains, "setting");
             }
 
             SettingsDto dto;
@@ -70,13 +57,12 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             }
             catch (JsonException)
             {
-                result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3413",
-                    "a #settings value has the wrong type");
+                reporter.Warn("a #settings value has the wrong type");
                 return;
             }
 
             foreach (var error in dto.Validate())
-                result.AddWarning(lineIndex, token.Column, token.Column + token.Length, "CPD-3413", error.Message);
+                reporter.Warn(error.Message);
         }
     }
 }

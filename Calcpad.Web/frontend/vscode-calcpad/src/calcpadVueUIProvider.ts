@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver } from 'calcpad-frontend';
-import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, DefinitionResolver, DefinitionsResponse, SettingsValues } from 'calcpad-frontend';
+import * as crypto from 'crypto';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode } from 'calcpad-frontend';
+import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse, SettingsValues, UiDirectiveData, UiControl } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 
@@ -13,6 +14,8 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     private _outputChannel: vscode.OutputChannel;
     private _cachedPlots: ExtractedPlot[] = [];
     private _cachedHtml: string = '';
+    private _inputMode = false;
+    private _sourceless = false;
     /**
      * Extension supplies a getter that combines `activeTextEditor` with the
      * remembered preview-source editor so plot fetching still works when the
@@ -23,6 +26,14 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     public onSettingsChanged?: () => void | Promise<void>;
     /** Real highlighter definitions for a document URI, used to resolve metadata context. */
     public getDefinitions?: (documentUri: string) => DefinitionsResponse | undefined;
+    /**
+     * Renders the active document as an input form and reports the controls it produced,
+     * or null when it could not be rendered. The extension owns the api client and the
+     * per-document cache, so the panel asks rather than renders.
+     */
+    public resolveUiControls?: () => Promise<UiControl[] | null>;
+    /** Entered #UI values the panel rewrote, so the extension's in-memory ones follow. */
+    public onUiOverridesEdited?: (documentUri: string, overrides: Record<string, string>) => void;
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
@@ -147,6 +158,17 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     this._settingsManager.setExtra('autoRun', data.enabled);
                     break;
 
+                case 'updateAutoInputMode':
+                    this._settingsManager.setExtra('autoInputMode', data.enabled);
+                    break;
+
+                // Changes what an open preview renders, so it is re-run rather than
+                // left showing the values the previous setting asked for.
+                case 'updatePreviewUiOverrides':
+                    this._settingsManager.setExtra('previewUiOverrides', data.enabled);
+                    void this.onSettingsChanged?.();
+                    break;
+
                 case 'updateDarkBackground':
                     this._settingsManager.setExtra('darkBackground', data.color);
                     break;
@@ -155,8 +177,27 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     this._settingsManager.setExtra('linterMinSeverity', data.severity);
                     break;
 
-                case 'updateLibraryPath':
-                    this._settingsManager.setExtra('libraryPath', data.path);
+                case 'updateWriteMode':
+                    this._settingsManager.setExtra('writeMode', coerceWriteMode(data.mode));
+                    break;
+
+                case 'writeFilesNow':
+                    vscode.commands.executeCommand('vscode-calcpad.writeDataFiles');
+                    break;
+
+                // Decides whether an open preview is shown at all, so raising it has to
+                // re-render — a document blocked under the old value is showing the notice
+                // rather than a render, and nothing else would replace it.
+                case 'updateMaxPreviewSize':
+                    this._settingsManager.setExtra('maxPreviewSizeMB', data.value);
+                    void this.onSettingsChanged?.();
+                    break;
+
+                // Baked into the scripts a render injects, so it only takes effect on the
+                // next one.
+                case 'updateMaxPreviewConsoleMessages':
+                    this._settingsManager.setExtra('maxPreviewConsoleMessages', data.value);
+                    void this.onSettingsChanged?.();
                     break;
 
                 case 'updatePdfSettings': {
@@ -202,16 +243,26 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     break;
                 }
 
+                // The Export tab names which rendering it wants; the PDF tab's Generate
+                // button sends none, and the commands default to the report.
                 case 'generatePdf':
-                    vscode.commands.executeCommand('vscode-calcpad.printToPdf');
+                    vscode.commands.executeCommand('vscode-calcpad.printToPdf', data.variant);
                     break;
 
                 case 'saveSourceHtml':
-                    vscode.commands.executeCommand('vscode-calcpad.saveSourceHtml');
+                    vscode.commands.executeCommand('vscode-calcpad.saveSourceHtml', data.variant);
                     break;
 
                 case 'saveDocx':
-                    vscode.commands.executeCommand('vscode-calcpad.saveDocx');
+                    vscode.commands.executeCommand('vscode-calcpad.saveDocx', data.variant);
+                    break;
+
+                case 'saveCompiled':
+                    vscode.commands.executeCommand('vscode-calcpad.saveAsCompiled');
+                    break;
+
+                case 'savePortable':
+                    vscode.commands.executeCommand('vscode-calcpad.exportPortable');
                     break;
 
                 case 'getPlots':
@@ -240,7 +291,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 
                 case 'getHeadings':
                     {
-                        const headingsEditor = vscode.window.activeTextEditor;
+                        const headingsEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
                         if (headingsEditor && (headingsEditor.document.languageId === 'calcpad' || headingsEditor.document.languageId === 'plaintext')) {
                             const text = headingsEditor.document.getText();
                             const headings = parseHeadings(text);
@@ -257,22 +308,32 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     }
                     break;
 
+                // While a worksheet is being filled in, the panel the user is working in is
+                // the input form, not the source editor, and a focused webview leaves
+                // `activeTextEditor` undefined. So the rendered views are scrolled too, and
+                // the cursor moves without pulling focus off the form.
                 case 'goToLine':
                     {
-                        const goToEditor = vscode.window.activeTextEditor;
-                        if (goToEditor && typeof data.line === 'number') {
-                            const lineIndex = Math.max(0, data.line - 1);
+                        const goToEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
+                        if (typeof data.line !== 'number') break;
+                        if (goToEditor) {
+                            const lineIndex = Math.min(Math.max(0, data.line - 1), goToEditor.document.lineCount - 1);
                             const lineEnd = goToEditor.document.lineAt(lineIndex).range.end;
                             goToEditor.selection = new vscode.Selection(lineEnd, lineEnd);
                             goToEditor.revealRange(goToEditor.document.lineAt(lineIndex).range, vscode.TextEditorRevealType.InCenter);
-                            vscode.window.showTextDocument(goToEditor.document, goToEditor.viewColumn);
+                            if (!this._inputMode) {
+                                vscode.window.showTextDocument(goToEditor.document, goToEditor.viewColumn);
+                            }
+                        }
+                        if (this._inputMode) {
+                            vscode.commands.executeCommand('vscode-calcpad.focusPreviewToLine', data.line);
                         }
                     }
                     break;
 
                 case 'refreshDocument':
-                    this._outputChannel.appendLine('[Vue UI] Refresh document requested');
-                    vscode.commands.executeCommand('calcpad.refreshDocument');
+                    this._outputChannel.appendLine('[Vue UI] Run preview requested');
+                    vscode.commands.executeCommand('calcpad.runPreview');
                     break;
 
                 case 'prettifyDocument':
@@ -310,6 +371,16 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     await this._handleUpdateMetadata(data);
                     break;
 
+                case 'getUiControls':
+                    {
+                        // A failed render leaves the panel unresolved rather than empty:
+                        // "no controls" and "could not tell" must not read the same to a
+                        // purge button.
+                        const controls = await this.resolveUiControls?.();
+                        if (controls) this.updateUiControls(controls);
+                    }
+                    break;
+
                 case 'debug':
                     this._outputChannel.appendLine(`[Vue Debug] ${data.message}`);
                     break;
@@ -318,6 +389,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 
         // Send initial data
         this._sendInitialData();
+        this._postInputMode();
 
         // Refresh headings when the user switches editor tabs
         vscode.window.onDidChangeActiveTextEditor(() => {
@@ -390,9 +462,14 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             enableQuickTyping: sm.getExtraBool('quickTyping', true),
             enablePreviewCursorSync: sm.getExtraBool('previewCursorSync', false),
             enableAutoRun: sm.getExtraBool('autoRun', true),
+            enableAutoInputMode: sm.getExtraBool('autoInputMode', true),
+            enablePreviewUiOverrides: sm.getExtraBool('previewUiOverrides', false),
             darkBackground: sm.getExtra('darkBackground', '#1e1e1e'),
             linterMinSeverity: sm.getExtra('linterMinSeverity', 'information'),
-            libraryPath: sm.getExtra('libraryPath', ''),
+            writeMode: sm.getWriteMode(),
+            maxPreviewSizeMB: sm.getExtraNumber('maxPreviewSizeMB', DEFAULT_PREVIEW_SIZE_MB),
+            maxPreviewConsoleMessages: sm.getExtraNumber(
+                'maxPreviewConsoleMessages', DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT),
             activeConfig: sm.getActivePresetName(),
             availableConfigs: await sm.listPresets(),
         };
@@ -497,9 +574,23 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         this._view?.webview.postMessage({ type: 'updateConvertErrors', errors });
     }
 
+    /** Report the outcome of a "Write to Disk" run to the Export tab. */
+    public writeFilesResult(ok: boolean, message: string) {
+        this._view?.webview.postMessage({ type: 'writeFilesResult', ok, message });
+    }
+
     /** Push the metadata comment (or null) the cursor currently sits in to the panel. */
     public updateMetadataContext(block: MetadataCommentBlock | null) {
         this._view?.webview.postMessage({ type: 'metadataContext', block });
+    }
+
+    /**
+     * Push the `#UI` controls of the active document's last input-form render. Null means
+     * it has never been rendered as one, which is what makes the Properties tab withhold
+     * its used/unused verdicts rather than declare every saved value orphaned.
+     */
+    public updateUiControls(controls: UiControl[] | null) {
+        this._view?.webview.postMessage({ type: 'uiControls', controls });
     }
 
     /** Detect the single-line metadata comment at the source editor's cursor. */
@@ -525,34 +616,69 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     }
 
     /**
+     * Tells the panel whether the user is filling a worksheet in rather than editing it — the
+     * input form is open, or a compiled worksheet is active — and whether that worksheet has
+     * any source behind it. Only `sourceless` greys the tabs that act on source, and the state
+     * is remembered so a re-resolved view comes back in step.
+     */
+    public setInputMode(active: boolean, sourceless: boolean) {
+        if (active === this._inputMode && sourceless === this._sourceless) return;
+        this._inputMode = active;
+        this._sourceless = sourceless;
+        this._postInputMode();
+    }
+
+    private _postInputMode() {
+        this._view?.webview.postMessage({ type: 'inputModeChanged', active: this._sourceless });
+    }
+
+    /**
      * Rewrite the metadata comment line the panel edited. The panel sends the
      * 0-based line, its original indentation and trailing quote, and the new
      * data object; we serialize and replace the whole line.
      */
     private async _handleUpdateMetadata(data: {
         line: number;
+        endLine?: number;
         indent?: string;
         trailingQuote?: string;
+        layout?: MetadataLayout;
         data: MetadataCommentData;
         isNew?: boolean;
         settings?: SettingsValues;
         settingsLine?: number | null;
+        settingsEndLine?: number | null;
+        settingsLayout?: MetadataLayout;
+        ui?: UiDirectiveData;
+        uiLine?: number | null;
     }): Promise<void> {
         const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
         if (!editor || typeof data.line !== 'number') return;
 
         const document = editor.document;
-        const settingsText = data.settings ? serializeSettingsDirective(data.settings) : '';
+        const settingsText = data.settings ? serializeSettingsDirective(data.settings, data.settingsLayout) : '';
         let insertedSettings = false;
 
         await editor.edit(editBuilder => {
-            // Metadata comment (desc/params/lint/no-print) — only when it has content.
-            if (Object.keys(data.data).length > 0 && data.line >= 0 && data.line < document.lineCount) {
-                const newText = serializeMetadataComment(data.data, data.indent ?? '', data.trailingQuote ?? '');
-                if (data.isNew) {
-                    editBuilder.insert(new vscode.Position(data.line, 0), newText + '\n');
-                } else {
-                    editBuilder.replace(document.lineAt(data.line).range, newText);
+            // Metadata comment (desc/params/lint/no-print) — only when it has
+            // content. A multi-line comment spans line..endLine; layout preserves
+            // its shape (existing keys in place, new keys on the last line).
+            if (data.line >= 0 && data.line < document.lineCount) {
+                const endLine = Math.min(data.endLine ?? data.line, document.lineCount - 1);
+                if (hasMetadataContent(data.data)) {
+                    const newText = serializeMetadataComment(data.data, data.indent ?? '', data.trailingQuote ?? '', data.layout);
+                    if (data.isNew) {
+                        editBuilder.insert(new vscode.Position(data.line, 0), newText + '\n');
+                    } else {
+                        const range = document.lineAt(data.line).range.with({ end: document.lineAt(endLine).range.end });
+                        editBuilder.replace(range, newText);
+                    }
+                } else if (!data.isNew) {
+                    // Every key removed — clearing the last field, or purging the last
+                    // saved value — leaves an empty comment, so the comment goes with them.
+                    editBuilder.delete(new vscode.Range(
+                        document.lineAt(data.line).range.start,
+                        document.lineAt(endLine).rangeIncludingLineBreak.end));
                 }
             }
 
@@ -561,20 +687,39 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             // the cursor — so multiple directives can coexist, each edited in place.
             if (data.settings) {
                 const dirLine = data.settingsLine ?? null;
+                const dirEndLine = Math.min(data.settingsEndLine ?? dirLine ?? 0, document.lineCount - 1);
                 const hasExisting = dirLine !== null && dirLine >= 0 && dirLine < document.lineCount;
                 const hasSettings = Object.keys(data.settings).length > 0;
                 if (hasSettings) {
                     if (hasExisting) {
-                        editBuilder.replace(document.lineAt(dirLine!).range, settingsText);
+                        const range = document.lineAt(dirLine!).range.with({ end: document.lineAt(dirEndLine).range.end });
+                        editBuilder.replace(range, settingsText);
                     } else {
                         editBuilder.insert(new vscode.Position(data.line, 0), settingsText + '\n');
                         insertedSettings = true;
                     }
                 } else if (hasExisting) {
-                    editBuilder.delete(document.lineAt(dirLine!).rangeIncludingLineBreak);
+                    const start = document.lineAt(dirLine!).range.start;
+                    editBuilder.delete(new vscode.Range(start, document.lineAt(dirEndLine).rangeIncludingLineBreak.end));
                 }
             }
+
+            // #UI directive at the cursor. Always a single-line replace — a #UI
+            // line never shares a physical line with the comment or #settings
+            // edits above, so this never overlaps them.
+            if (data.ui && typeof data.uiLine === 'number' && data.uiLine >= 0 && data.uiLine < document.lineCount) {
+                const currentLine = document.lineAt(data.uiLine);
+                const uiBlock = findUiDirectiveBlock([currentLine.text], 0);
+                if (uiBlock) editBuilder.replace(currentLine.range, serializeUiDirective(data.ui, uiBlock));
+            }
         });
+
+        // Entered values are held in memory and written out on demand, so an edit to the
+        // saved ones has to reach the store too — otherwise the next "Save UI Values"
+        // would write the old ones back.
+        const overrides = data.data.uiOverrides;
+        if (overrides && typeof overrides === 'object' && !Array.isArray(overrides))
+            this.onUiOverridesEdited?.(document.uri.toString(), overrides as Record<string, string>);
 
         // A freshly created directive: park the cursor on it so the re-emitted
         // context binds to it and a repeated Apply edits in place, not duplicates.
@@ -639,11 +784,9 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     }
 }
 
+// A CSP nonce is a guessing target, and Math.random is a seeded PRNG whose stream is
+// recoverable from a few outputs, so this takes OS entropy instead. base64url keeps it valid
+// inside the CSP header without escaping.
 function getNonce() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 32; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
+    return crypto.randomBytes(24).toString('base64url');
 }

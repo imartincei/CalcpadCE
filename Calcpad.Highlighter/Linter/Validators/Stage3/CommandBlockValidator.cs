@@ -28,9 +28,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         }
 
         /// <summary>
-        /// Validates that command block statements don't contain # symbol.
-        /// Inside $Inline, $Block, $While blocks, # directives are not allowed.
-        /// Use if(), $Repeat, etc. instead.
+        /// Validates that command block statements don't contain a # symbol — inside $Inline,
+        /// $Block and $While blocks, # directives are not allowed. Use if(), $Repeat, etc. instead.
         /// </summary>
         private void ValidateNoHashDirectivesInBlocks(Stage3Context stage3, LinterResult result)
         {

@@ -29,13 +29,10 @@ namespace Calcpad.Highlighter.ContentResolution
     public static class SymbolResolver
     {
         /// <summary>
-        /// Find the symbol at the given original-source position. Returns null
-        /// when no user-defined variable/function/macro covers the cursor.
-        ///
-        /// Macros are checked first because their `$`-suffixed names cannot
-        /// collide with variable or function names. Function tokens take the
-        /// next priority over variables for the same reason (a function call
-        /// site won't overlap a same-named variable token).
+        /// Find the symbol at the given original-source position, or null when no user-defined
+        /// variable/function/macro covers the cursor. Macros are checked first because their
+        /// `$`-suffixed names cannot collide with variable or function names, and function tokens
+        /// take the next priority for the same reason.
         /// </summary>
         public static SymbolHit ResolveSymbolAt(Stage3Result stage3, int line, int column)
         {
@@ -57,12 +54,10 @@ namespace Calcpad.Highlighter.ContentResolution
         }
 
         /// <summary>
-        /// Scan one index for any local-source location that covers the cursor.
-        /// Inclusive on both edges (`column >= start && column &lt;= start + length`)
-        /// so editors that report cursor one-past the clicked character — e.g. a
-        /// cursor placed between a macro's `$` and its `(` — still resolve to
-        /// the token they're visually attached to. When multiple locations match
-        /// at edges, prefer an interior match (cursor strictly inside the token).
+        /// Scan one index for any local-source location that covers the cursor, inclusive on both
+        /// edges so an editor reporting the cursor one-past the clicked character still resolves to
+        /// the token it is visually attached to. When multiple locations match at edges, prefer an
+        /// interior match.
         /// </summary>
         private static (string Name, SymbolLocation Loc) FindInIndex(
             Dictionary<string, List<SymbolLocation>> index, int line, int column)

@@ -22,12 +22,12 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         }
 
         /// <summary>
-        /// Validates the @ separator pattern in commands like $Repeat{expr @ variable = start : end}.
-        /// Two passes folded into one (formerly ValidateCommandSyntax + ValidateCommandVariables):
+        /// Validates the @ separator pattern in commands like $Repeat{expr @ variable = start : end},
+        /// folding two former passes into one:
         ///   - CPD-3406: command syntax — exactly one variable token between @ and =, no numbers
         ///   - CPD-3408: expression uses the declared loop variable
-        /// $Plot is exempt from both checks when the expression contains | or & (multi-function /
-        /// parametric forms). $Map is exempt from the loop-variable check (allows multiple counters).
+        /// $Plot is exempt from both when the expression contains | or & (multi-function /
+        /// parametric forms), and $Map is exempt from the loop-variable check.
         /// </summary>
         private void ValidateCommands(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
@@ -210,13 +210,22 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
                 var trimmed = line.Trim();
 
+                // Most directives take no expression, but conditions (#hide x ≡ 5), loop bounds
+                // and #UI assignments do, and the identifiers in those still have to resolve, so
+                // the check runs from the expression onwards. Captured before Apply so the
+                // condition of '#noc x ≡ 5' is still checked, since the parser evaluates it even
+                // though the block it opens is not.
+                var wasNoCalculation = directives.Output == OutputMode.NoCalculation;
+                var expressionStart = 0;
                 if (LineParser.IsDirectiveLine(trimmed))
                 {
                     directives.Apply(trimmed);
-                    continue;
+                    expressionStart = LineParser.GetDirectiveExpressionStart(line);
+                    if (expressionStart < 0)
+                        continue;
                 }
 
-                if (directives.Output == OutputMode.NoCalculation)
+                if (wasNoCalculation)
                     continue;
 
                 // Skip undefined variable checks for function definitions with command blocks
@@ -235,6 +244,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
                 foreach (var token in tokens)
                 {
+                    if (token.Column < expressionStart)
+                        continue;
+
                     // Skip LocalVariable tokens - these are function params, loop vars, command scope vars
                     // The tokenizer has already identified them as locally scoped
                     if (token.Type == TokenType.LocalVariable)
@@ -364,11 +376,10 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         }
 
         /// <summary>
-        /// Extracts command-scope variables from numerical method commands.
-        /// For example: "$Root{f(x) @ x = 0 : 5}" returns {"x"}
-        /// Also handles: "$Sum{k^2 @ k = 1 : 5}", "$Plot{sin(x) @ x = 0 : 2*π}"
-        /// Also handles command block local variables ($Inline, $Block, $While).
-        /// Uses tokens for correct variable name extraction (handles commas, dots, etc.).
+        /// Extracts command-scope variables from numerical method commands and command block local
+        /// variables — "$Root{f(x) @ x = 0 : 5}" returns {"x"}, and $Sum, $Plot, $Inline, $Block
+        /// and $While work the same way. Uses tokens so names extract correctly around commas
+        /// and dots.
         /// </summary>
         private static HashSet<string> GetCommandScopeVariables(string line, List<Token> tokens)
         {
@@ -460,9 +471,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         }
 
         /// <summary>
-        /// Checks if a line is a function definition that uses $Inline, $Block, or $While command blocks.
-        /// These command blocks have their own local scope, so we skip undefined variable checks.
-        /// Line continuations are already processed by Stage 1 before the linter runs.
+        /// Checks if a line is a function definition that uses $Inline, $Block or $While command
+        /// blocks, which have their own local scope and so skip undefined variable checks. Line
+        /// continuations are already processed by Stage 1 before the linter runs.
         /// </summary>
         private static bool IsCommandBlockFunctionDefinition(string trimmedLine)
         {
@@ -674,12 +685,10 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         }
 
         /// <summary>
-        /// Validates that defined variables are actually used after their last assignment.
-        /// Reports warnings for unused definitions to help identify dead code.
-        ///
-        /// Uses pre-collected variable assignment and usage data from the content resolver's
-        /// Lint-mode tokenization, which correctly identifies Variable tokens even inside
-        /// function call arguments and macro call arguments.
+        /// Validates that defined variables are actually used after their last assignment, warning
+        /// on unused definitions to help identify dead code. Uses pre-collected assignment and
+        /// usage data from the content resolver's Lint-mode tokenization, which identifies Variable
+        /// tokens correctly even inside function and macro call arguments.
         ///
         /// Examples:
         /// - var = 1 / var / var = 2       -> warns on line 3 (var = 2 is never used after)

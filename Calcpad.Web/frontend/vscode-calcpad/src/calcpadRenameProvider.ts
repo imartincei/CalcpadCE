@@ -3,10 +3,9 @@ import { CalcpadApiClient, SymbolAtPositionResponse } from 'calcpad-frontend';
 import { VSCodeLogger, VSCodeFileSystem } from './adapters';
 
 /**
- * Provides "Rename Symbol" (F2) for CalcPad variables, functions, and macros.
- * Asks the server for the symbol at the cursor and rewrites every local
- * occurrence. Cross-file rename is intentionally rejected — users must rename
- * inside the include file itself.
+ * Provides "Rename Symbol" (F2) for CalcPad variables, functions, and macros by asking the
+ * server for the symbol at the cursor and rewriting every local occurrence. Cross-file rename
+ * is intentionally rejected — users must rename inside the include file itself.
  */
 export class CalcpadRenameProvider implements vscode.RenameProvider {
     private apiClient: CalcpadApiClient;

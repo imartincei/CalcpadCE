@@ -12,7 +12,7 @@ import {
     exists,
 } from '@tauri-apps/plugin-fs';
 import { open as dialogOpen, save as dialogSave, message as dialogMessage, ask as dialogAsk } from '@tauri-apps/plugin-dialog';
-import { openPath } from '@tauri-apps/plugin-opener';
+import { openPath, revealItemInDir } from '@tauri-apps/plugin-opener';
 import { Store } from '@tauri-apps/plugin-store';
 import { platform } from '@tauri-apps/plugin-os';
 import { BaseMessageBridge, type ExportRequest } from 'calcpad-frontend/services/message-bridge/base';
@@ -25,15 +25,27 @@ import {
     serializeSettingsBlob,
     getExtraBool,
     getExtraNumber,
-    getExtraObject,
 } from 'calcpad-frontend/types/settings';
 import type { CalcpadSettings, CalcpadExtras } from 'calcpad-frontend/types/settings';
+import type { ExportVariant } from 'calcpad-frontend/types/api';
 import {
     IMAGE_EXTENSIONS,
     bytesToBase64,
-    isImageExtension,
-    mimeFromExtension,
+    isCompiledPath,
+    inlineImageSources,
+    MAX_COMPILED_IMAGE_TOTAL_BYTES,
+    createReferenceResolver,
+    pathBasename,
+    pathDirname,
+    pathExtension,
+    pathRelative,
+    pathResolve,
+    fetchPdfBrowserStatus,
+    installPdfBrowser,
+    isBrowserNotFound,
+    pdfResponseError,
     type PickedImage,
+    type InlineImageBudget,
 } from 'calcpad-frontend';
 import { setAppTheme, coerceAppTheme } from '../editor/app-theme';
 
@@ -54,97 +66,33 @@ const RECENT_FILES_KEY = 'calcpad-recent-files';
 const OPENED_FOLDER_KEY = 'calcpad-opened-folder';
 const MAX_RECENT_FILES = 10;
 
-function pathDirname(p: string): string {
-    const idx = Math.max(p.lastIndexOf('/'), p.lastIndexOf('\\'));
-    return idx > 0 ? p.slice(0, idx) : '';
-}
-
-function pathBasename(p: string): string {
-    const idx = Math.max(p.lastIndexOf('/'), p.lastIndexOf('\\'));
-    return idx >= 0 ? p.slice(idx + 1) : p;
-}
-
-/** POSIX-style relative path from `from` to `to`, using forward slashes. */
-function pathRelative(from: string, to: string): string {
-    const norm = (p: string) => p.replace(/\\/g, '/').replace(/\/+$/, '');
-    const fromParts = norm(from).split('/').filter(Boolean);
-    const toParts = norm(to).split('/').filter(Boolean);
-    let i = 0;
-    while (i < fromParts.length && i < toParts.length && fromParts[i] === toParts[i]) i++;
-    const up = fromParts.slice(i).map(() => '..');
-    const down = toParts.slice(i);
-    const rel = [...up, ...down].join('/');
-    return rel || '.';
-}
-
-function pathIsAbsolute(p: string): boolean {
-    return p.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(p);
-}
-
-function pathResolve(dir: string, file: string): string {
-    if (pathIsAbsolute(file)) return file;
-    if (!dir) return file;
-    const sep = dir.includes('\\') ? '\\' : '/';
-    const raw = `${dir}${sep}${file}`.replace(/\\/g, '/');
-    const parts = raw.split('/');
-    const result: string[] = [];
-    for (const part of parts) {
-        if (part === '..') result.pop();
-        else if (part !== '.') result.push(part);
-    }
-    const joined = result.join('/');
-    return sep === '\\' ? joined.replace(/\//g, '\\') : joined;
-}
+/** The `IFileSystem` reader `inlineImageSources` needs, over the Tauri fs plugin. */
+const tauriReader = { readFile: (path: string) => fsReadFile(path) };
 
 /**
- * Replace `<img src="local/path">` references in `html` with base64 data URIs
- * so PuppeteerSharp's headless Chromium — which has no local-filesystem
- * access — can render user-supplied images inside exported PDFs.
+ * Applies `accepted[0]` when the chosen path carries none of them. Tauri's save
+ * dialog returns the typed name verbatim and never reports which filter was
+ * selected, so on GTK a name typed without an extension comes back bare — which
+ * for `.cpdz` would silently produce a plain text file.
  */
-async function inlineLocalImages(html: string, documentDir: string): Promise<string> {
-    const cache: Record<string, string> = {};
-    const imgRegex = /<img\s[^>]*?src\s*=\s*["']([^"']+)["'][^>]*>/gi;
-    const seen = new Set<string>();
-    let m: RegExpExecArray | null;
-    while ((m = imgRegex.exec(html)) !== null) {
-        const src = m[1];
-        if (seen.has(src)) continue;
-        seen.add(src);
-        if (src.startsWith('data:') || /^https?:\/\//i.test(src)) continue;
-
-        const ext = (src.split('.').pop() ?? '').toLowerCase();
-        if (!isImageExtension(ext)) continue;
-        const mime = mimeFromExtension(ext);
-
-        const absolute = pathResolve(documentDir, src);
-
-        try {
-            const bytes = await fsReadFile(absolute);
-            cache[src] = `data:${mime};base64,${bytesToBase64(bytes)}`;
-        } catch {
-            // missing file or permission error → leave src untouched
-        }
-    }
-
-    if (Object.keys(cache).length === 0) return html;
-    return html.replace(
-        /<img\s([^>]*?)src\s*=\s*["']([^"']+)["']([^>]*?)>/gi,
-        (full, before, src, after) =>
-            cache[src] ? `<img ${before}src="${cache[src]}"${after}>` : full,
-    );
+function withExtension(filePath: string, accepted: string[]): string {
+    if (accepted.length === 0 || accepted.includes('*')) return filePath;
+    const ext = pathExtension(filePath);
+    return accepted.some(a => a.toLowerCase() === ext) ? filePath : `${filePath}.${accepted[0]}`;
 }
 
 /**
- * Message bridge for the Tauri desktop platform. Settings JSON files live
- * under `$APPDATA/settings/`; recent files and the opened folder live in a
- * plugin-store JSON. Native dialogs, filesystem, and clipboard flow through
- * the Tauri JS API plugins.
+ * Message bridge for the Tauri desktop platform. Settings JSON files live under
+ * `$APPDATA/settings/` and recent files in a plugin-store JSON, while native dialogs,
+ * filesystem and clipboard flow through the Tauri JS API plugins.
  */
 export class TauriMessageBridge extends BaseMessageBridge {
     private _extraSettings: CalcpadExtras = getDefaultExtras();
     readonly ready: Promise<void>;
     private _lastDialogDir: string | null = null;
-    private _resolvedLibraryPath: string | null | undefined = undefined;
+    // Original bytes of each open .cpdz, kept only for the composite archives that
+    // bundle images — re-encoding needs them to preserve the non-code entries.
+    private readonly _compiledOriginals = new Map<string, Uint8Array | undefined>();
     private _activePresetName: string = DEFAULT_PRESET_NAME;
     private _appDataDir: string = '';
     private _settingsDir: string = '';
@@ -176,6 +124,9 @@ export class TauriMessageBridge extends BaseMessageBridge {
             this._serverLogDir = '';
         }
         this._store = await Store.load(STORE_FILE);
+        // The menu Rust built at setup() has no recents in it yet — this session's
+        // first sync carries the list persisted by earlier ones.
+        await this.syncRecentFilesMenu(await this.getRecentFiles());
         await this.loadSettingsFromStorage();
         await this.loadUserFonts();
         await listen<string>('open-file-request', (evt) => {
@@ -189,7 +140,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     setExtraSetting(key: string, value: string): void {
         this.persistSetting(key, value);
-        if (key === 'libraryPath') this._resolvedLibraryPath = undefined;
     }
 
     private persistSetting(key: string, value: string): void {
@@ -207,7 +157,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
         await this.readPresetInto(DEFAULT_PRESET_NAME);
         await this.setActivePresetName(DEFAULT_PRESET_NAME);
         await this.saveActiveSettings();
-        this._resolvedLibraryPath = undefined;
     }
 
     protected async afterResetSettings(): Promise<void> {
@@ -264,14 +213,45 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     /**
-     * Replace on-disk `<img src>` references in preview HTML with base64 data
-     * URIs so the sandboxed preview iframe can render them (the VS Code
-     * extension does the same via its image cache). Absolute paths resolve
-     * even for untitled documents; relative paths need the active tab's folder.
-     * Remote/data URIs are left untouched.
+     * Replace on-disk `<img src>` references in rendered HTML with base64 data URIs so the
+     * sandboxed preview iframe can render them, leaving remote/data URIs untouched.
+     * `Calcpad.Core.ImageReferences` has already resolved every token and environment
+     * variable, so only a relative `src` is left, which needs the active tab's folder.
+     *
+     * `budget` bounds the total inlined bytes, which the preview passes and an export does
+     * not — a written file keeps every image.
      */
-    async inlineDocumentImages(html: string): Promise<string> {
-        return inlineLocalImages(html, this.activeTabDirectory());
+    async inlineDocumentImages(html: string, budget?: InlineImageBudget): Promise<string> {
+        const documentDir = this.activeTabDirectory();
+        return inlineImageSources(html, tauriReader, (src) => pathResolve(documentDir, src), budget);
+    }
+
+    /**
+     * A compiled worksheet holds `.cpd` source, not rendered HTML, so its image
+     * references are still as authored and need the full token/environment-variable
+     * resolver rather than the plain join {@link inlineDocumentImages} uses.
+     */
+    protected async buildCompiledSource(content: string): Promise<string> {
+        const documentDir = this.activeTabDirectory();
+        const resolve = createReferenceResolver(
+            content, documentDir, (raw) => this.expandEnvVars(raw), pathResolve, () => this.getHomeDir());
+        return inlineImageSources(content, tauriReader, resolve, {
+            maxTotalBytes: MAX_COMPILED_IMAGE_TOTAL_BYTES,
+            onExceeded: 'fail',
+        });
+    }
+
+    /**
+     * The current user's home directory, for the `{user}` path-root token. There is no single
+     * env var name that holds it on every platform the way `expandEnvVars` can otherwise treat
+     * uniformly, so this asks the Tauri host for whichever one applies.
+     */
+    async getHomeDir(): Promise<string | null> {
+        try {
+            return (await invoke<string | null>('get_env', { name: this._platform === 'windows' ? 'USERPROFILE' : 'HOME' })) ?? null;
+        } catch {
+            return null;
+        }
     }
 
     protected async saveImageToImagesFolder(img: PickedImage): Promise<string | null> {
@@ -319,12 +299,13 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     protected async saveExportedFile(req: ExportRequest): Promise<string | null> {
-        const filePath = await dialogSave({
+        const chosen = await dialogSave({
             title: req.dialogTitle,
             defaultPath: this.getExportDefaultPath(req),
             filters: [{ name: `${req.dialogTitle} Files`, extensions: req.extensions }],
         });
-        if (!filePath) return null;
+        if (!chosen) return null;
+        const filePath = withExtension(chosen, req.extensions);
         this.rememberDialogDir(filePath);
         if (typeof req.data === 'string') {
             await writeTextFile(filePath, req.data);
@@ -362,7 +343,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     protected async buildSettingsResponseExtras(): Promise<Record<string, unknown>> {
         return {
-            libraryPath: this._extraSettings.libraryPath || '',
             activeConfig: this._activePresetName,
             availableConfigs: await this.listPresets(),
             availableFonts: [...this._availableFonts],
@@ -370,52 +350,60 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     protected async runPdfPreflight(): Promise<boolean> {
-        if (await this.browserMissing()) {
-            await this.warnBrowserMissing();
-            return false;
-        }
-        return true;
+        const status = await fetchPdfBrowserStatus(this.apiClient.getBaseUrl(), this.apiClient.authHeaders());
+        // A null status means the endpoint is unreachable or predates this contract —
+        // let the export run and report whatever it actually hits.
+        if (!status || status.available) return true;
+        return await this.offerBrowserDownload(status.downloadSizeMb);
     }
 
     protected async generatePdfBytes(
         content: string,
         apiSettings: unknown,
         sourceFilePath: string | undefined,
+        variant: ExportVariant,
     ): Promise<ArrayBuffer | null> {
-        const baseUrl = this.apiClient.getBaseUrl();
-        const htmlResp = await fetch(`${baseUrl}/api/calcpad/convert`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content, settings: apiSettings, forPrint: true, sourceFilePath }),
-            signal: AbortSignal.timeout(30000),
-        });
-        if (!htmlResp.ok) throw new Error(`HTML convert returned ${htmlResp.status}`);
-        let html = await htmlResp.text();
+        const rendered = await this.renderForExport(content, apiSettings, sourceFilePath, variant);
+        if (rendered == null) throw new Error('HTML convert produced no output');
 
-        html = await inlineLocalImages(html, this.activeTabDirectory());
+        // The headless browser has no filesystem access, so on-disk images have to travel
+        // as data URIs.
+        const html = await this.inlineDocumentImages(rendered);
 
-        const pdfResp = await fetch(`${baseUrl}/api/calcpad/pdf`, {
+        const pdfResp = await fetch(`${this.apiClient.getBaseUrl()}/api/calcpad/pdf`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ html, options: this.getPdfOptions() }),
+            headers: { 'Content-Type': 'application/json', ...this.apiClient.authHeaders() },
+            body: JSON.stringify({ html, options: this.getEffectivePdfOptions(content) }),
             signal: AbortSignal.timeout(60000),
         });
-        if (!pdfResp.ok) throw new Error(`PDF endpoint returned ${pdfResp.status}`);
+        if (!pdfResp.ok) throw await pdfResponseError(pdfResp);
         return await pdfResp.arrayBuffer();
     }
 
-    protected async onPdfError(err: unknown): Promise<void> {
+    protected async onPdfError(err: unknown): Promise<boolean> {
         const msg = err instanceof Error ? err.message : String(err);
         this.postToVue({ type: 'pdfError', message: `PDF export failed: ${msg}` });
         this.handleGetServerLog();
-        if (await this.browserMissing()) {
-            await this.warnBrowserMissing();
-            return;
-        }
+
+        // The export is retried only if the user accepts the download, so the retry
+        // starts from a state where a browser actually exists.
+        if (isBrowserNotFound(err))
+            return await this.offerBrowserDownload(err.downloadSizeMb);
+
         try {
             await dialogMessage(msg, { title: 'Failed to generate PDF', kind: 'error', okLabel: 'OK' });
         } catch {
             /* output panel already carries the error */
+        }
+        return false;
+    }
+
+    protected async onExportError(message: string): Promise<void> {
+        await super.onExportError(message);
+        try {
+            await dialogMessage(message, { title: 'Export failed', kind: 'error', okLabel: 'OK' });
+        } catch {
+            /* output panel already carries the message */
         }
     }
 
@@ -447,9 +435,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
                 return true;
             case 'openSettingsFolder':
                 this.handleOpenSettingsFolder();
-                return true;
-            case 'updateLibraryPath':
-                this.setExtraSetting('libraryPath', message.path ?? '');
                 return true;
             case 'getPrettifySettings':
                 this.handleGetPrettifySettings();
@@ -529,29 +514,66 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     // ---- File operations (exposed for menu actions) ----
 
+    /**
+     * Widens the fs read scope to the picked document's folder, since the dialog grants only
+     * the file itself while `inlineImageSources` reads paths resolved against its directory.
+     * Rust rejects any path the scope doesn't already cover, so a failure here just leaves
+     * images uninlined.
+     */
+    private async allowDocumentDir(filePath: string): Promise<void> {
+        try {
+            await invoke('allow_document_dir', { path: filePath });
+        } catch {
+            /* stays scoped to the picked file */
+        }
+    }
+
     async openFile(): Promise<{ path: string; content: string } | null> {
         const selected = await dialogOpen({
             title: 'Open File',
             multiple: false,
             defaultPath: this.getDialogDefaultPath(),
             filters: [
-                { name: 'CalcpadCE Files', extensions: ['cpd'] },
+                { name: 'CalcpadCE Files', extensions: ['cpd', 'cpdz'] },
+                { name: 'CalcpadCE Compiled', extensions: ['cpdz'] },
                 { name: 'All Files', extensions: ['*'] },
             ],
         });
         if (!selected || Array.isArray(selected)) return null;
         this.rememberDialogDir(selected);
-        const content = await readTextFile(selected);
+        await this.allowDocumentDir(selected);
+        const content = await this.readFile(selected);
         return { path: selected, content };
     }
 
     async saveFile(filePath: string, content: string): Promise<void> {
         this.rememberDialogDir(filePath);
+        if (isCompiledPath(filePath)) {
+            await this.writeCompiled(filePath, content);
+            return;
+        }
         await writeTextFile(filePath, content);
     }
 
     async readFile(filePath: string): Promise<string> {
-        return readTextFile(filePath);
+        if (!isCompiledPath(filePath)) return readTextFile(filePath);
+
+        const bytes = await fsReadFile(filePath);
+        const decoded = await this.apiClient.decodeCpdz(bytes);
+        if (!decoded) throw new Error(`Could not read the compiled worksheet ${filePath}`);
+        // Kept so a composite archive's images survive the next save.
+        this._compiledOriginals.set(filePath, decoded.composite ? bytes : undefined);
+        return decoded.content;
+    }
+
+    /**
+     * Writes a .cpdz, re-encoding from the current text. A composite archive is
+     * rebuilt from the bytes captured on read, so its images are carried over.
+     */
+    private async writeCompiled(filePath: string, content: string): Promise<void> {
+        const encoded = await this.apiClient.encodeCpdz(content, this._compiledOriginals.get(filePath));
+        if (!encoded) throw new Error(`Could not write the compiled worksheet ${filePath}`);
+        await fsWriteFile(filePath, encoded);
     }
 
     async getRecentFiles(): Promise<string[]> {
@@ -560,6 +582,19 @@ export class TauriMessageBridge extends BaseMessageBridge {
             return Array.isArray(list) ? list : [];
         } catch {
             return [];
+        }
+    }
+
+    /**
+     * Mirrors the recent list into the native File → Open Recent submenu, which
+     * Rust has to rebuild to change. Failing to redraw a menu is not worth failing
+     * the save or open that triggered it, so errors are swallowed.
+     */
+    private async syncRecentFilesMenu(paths: string[]): Promise<void> {
+        try {
+            await invoke('set_recent_files', { paths });
+        } catch {
+            /* menu keeps its previous entries */
         }
     }
 
@@ -572,6 +607,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
             await this._store.set(RECENT_FILES_KEY, trimmed);
             await this._store.save();
         }
+        await this.syncRecentFilesMenu(trimmed);
     }
 
     async clearRecentFiles(): Promise<void> {
@@ -579,6 +615,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
             await this._store.set(RECENT_FILES_KEY, []);
             await this._store.save();
         }
+        await this.syncRecentFilesMenu([]);
     }
 
     async saveFileAs(content: string): Promise<string | null> {
@@ -587,12 +624,14 @@ export class TauriMessageBridge extends BaseMessageBridge {
             defaultPath: this.getSaveDialogDefaultPath(),
             filters: [
                 { name: 'CalcpadCE Files', extensions: ['cpd'] },
+                { name: 'CalcpadCE Compiled', extensions: ['cpdz'] },
                 { name: 'All Files', extensions: ['*'] },
             ],
         });
         if (!filePath) return null;
         this.rememberDialogDir(filePath);
-        await writeTextFile(filePath, content);
+        await this.allowDocumentDir(filePath);
+        await this.saveFile(filePath, content);
         return filePath;
     }
 
@@ -636,6 +675,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
             title: 'Open Folder',
             directory: true,
             multiple: false,
+            recursive: true,
             defaultPath: this.getDialogDefaultPath(),
         });
         if (!folder || Array.isArray(folder)) return;
@@ -655,8 +695,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     private async handleGetOpenedFolder(): Promise<void> {
-        const explicit = await this.getOpenedFolder();
-        const folder = explicit ?? (await this.getLibraryPath());
+        const folder = await this.getOpenedFolder();
         if (!folder) {
             this.postToVue({ type: 'folderOpened', path: null, entries: [] });
             return;
@@ -681,14 +720,14 @@ export class TauriMessageBridge extends BaseMessageBridge {
         }
     }
 
+    // Reveals rather than opening the parent, so the file manager lands with the
+    // item already selected.
     private async handleOpenContainingFolder(itemPath: string): Promise<void> {
         if (!itemPath || typeof itemPath !== 'string') return;
-        const parent = pathDirname(itemPath);
-        const target = parent || itemPath;
         try {
-            await this.openPathSafe(target);
+            await revealItemInDir(itemPath);
         } catch (err) {
-            console.error(`Failed to open containing folder for ${itemPath}:`, err);
+            console.error(`Failed to reveal ${itemPath}:`, err);
         }
     }
 
@@ -704,25 +743,10 @@ export class TauriMessageBridge extends BaseMessageBridge {
         await openPath(target);
     }
 
-    // ---- Library path resolution ----
+    // ---- Environment variable expansion ----
 
-    getLibraryPathRaw(): string {
-        return this._extraSettings.libraryPath || '';
-    }
-
-    async getLibraryPath(): Promise<string | null> {
-        if (this._resolvedLibraryPath !== undefined) return this._resolvedLibraryPath;
-        const raw = this.getLibraryPathRaw().trim();
-        if (!raw) {
-            this._resolvedLibraryPath = null;
-            return null;
-        }
-        const expanded = await this.expandEnvVars(raw);
-        this._resolvedLibraryPath = expanded ? expanded : null;
-        return this._resolvedLibraryPath;
-    }
-
-    private async expandEnvVars(input: string): Promise<string> {
+    /** Expands `%VAR%`/`$VAR` references against the Tauri host's environment. */
+    async expandEnvVars(input: string): Promise<string> {
         const names = new Set<string>();
         for (const m of input.matchAll(/%([^%]+)%/g)) names.add(m[1]);
         for (const m of input.matchAll(/\$([A-Za-z_][A-Za-z0-9_]*)/g)) names.add(m[1]);
@@ -739,14 +763,23 @@ export class TauriMessageBridge extends BaseMessageBridge {
             .replace(/\$([A-Za-z_][A-Za-z0-9_]*)/g, (_, n) => values[n] ?? '');
     }
 
+    /** Resolves `#include`/reference-navigation paths, expanding `{project}`/`{library}`/`{user}` the same way `buildCompiledSource` does. */
     public async resolveIncludePath(rawFileName: string): Promise<string> {
-        const expanded = await this.expandEnvVars(rawFileName);
-        return pathResolve(this.activeTabSourceDir(), expanded);
+        const serverRoots = this.definitionsService.getCachedPathRoots(getActiveDocumentKey());
+        const resolve = createReferenceResolver(
+            this.activeTabSourceText(), this.activeTabSourceDir(), (raw) => this.expandEnvVars(raw), pathResolve,
+            () => this.getHomeDir(), serverRoots);
+        return resolve(rawFileName);
     }
 
     private activeTabFilePath(): string {
         const tabs = (window as any).calcpadTabs;
         return tabs?.activeTab?.filePath ?? '';
+    }
+
+    private activeTabSourceText(): string {
+        const tabs = (window as any).calcpadTabs;
+        return tabs?.activeModel?.getValue() ?? '';
     }
 
     private activeTabTitle(): string {
@@ -809,10 +842,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     // ---- Server log + browser-missing warning ----
 
-    private getPdfOptions(): unknown {
-        return getExtraObject<Record<string, unknown>>(this._extraSettings, 'pdfSettings', {});
-    }
-
     private async handleGetServerLog(): Promise<void> {
         const path = await this.getServerLogPath();
         if (!path) {
@@ -862,9 +891,10 @@ export class TauriMessageBridge extends BaseMessageBridge {
         }
     }
 
+    // No fall back to the resource dir: it sits outside the opener scope (and is
+    // read-only inside an AppImage anyway), so an open there would only fail.
     private getServerLogDir(): string | null {
-        if (this._serverLogDir) return this._serverLogDir;
-        return this._serverDir ? `${this._serverDir}/logs` : null;
+        return this._serverLogDir || null;
     }
 
     private async handleOpenLogsFolder(): Promise<void> {
@@ -883,32 +913,60 @@ export class TauriMessageBridge extends BaseMessageBridge {
         }
     }
 
-    private async browserMissing(): Promise<boolean> {
-        const path = await this.getServerLogPath();
-        if (!path) return false;
-        try {
-            const raw = await readTextFile(path);
-            return /WARNING: no Chromium-family browser/i.test(raw)
-                || /Could not find browser revision|Failed to launch the browser/i.test(raw);
-        } catch {
-            return false;
-        }
-    }
-
-    private async warnBrowserMissing(): Promise<void> {
+    /**
+     * Asks whether to download the bundled headless Chromium, and does it if the user agrees;
+     * declining leaves the install advice for their platform on screen. Returns true when a
+     * browser is now available and the export should proceed.
+     */
+    private async offerBrowserDownload(downloadSizeMb: number): Promise<boolean> {
         const advice = await this.browserInstallAdvice();
-        const message =
-            'PDF export needs a Chromium-family browser, but none was found on PATH.\n\n'
+        const size = downloadSizeMb > 0 ? `about ${downloadSizeMb} MB` : 'a few hundred MB';
+        const question =
+            'PDF export needs a Chromium-family browser, but none was found.\n\n'
+            + `CalcpadCE can download a private headless Chromium (${size}) just for exports, `
+            + 'or you can install a browser yourself:\n\n'
             + advice
-            + '\n\nAfter installing, restart CalcpadCE (Server → Restart App) and try again.';
+            + '\n\nDownload the bundled Chromium now?';
+
+        let accepted = false;
         try {
-            await dialogMessage(message, {
+            accepted = await dialogAsk(question, {
                 title: 'Chromium browser required for PDF export',
                 kind: 'warning',
-                okLabel: 'OK',
+                okLabel: 'Download Chromium',
+                cancelLabel: 'Not now',
             });
         } catch {
-            this.postToVue({ type: 'pdfError', message });
+            this.postToVue({ type: 'pdfError', message: question });
+            return false;
+        }
+
+        if (!accepted) {
+            this.postToVue({
+                type: 'pdfError',
+                message: 'PDF export cancelled — no Chromium-family browser available.\n\n' + advice
+                    + '\n\nAfter installing one, restart CalcpadCE (Server → Restart App) and try again.',
+            });
+            return false;
+        }
+
+        this.postToVue({ type: 'pdfInfo', message: 'Downloading headless Chromium — this can take a few minutes…' });
+        try {
+            const path = await installPdfBrowser(this.apiClient.getBaseUrl(), this.apiClient.authHeaders());
+            this.postToVue({ type: 'pdfInfo', message: `Chromium ready: ${path}` });
+            return true;
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            this.postToVue({ type: 'pdfError', message: `Chromium download failed: ${msg}` });
+            try {
+                await dialogMessage(
+                    `The download failed: ${msg}\n\nInstall a browser instead:\n\n${advice}`,
+                    { title: 'Chromium download failed', kind: 'error', okLabel: 'OK' },
+                );
+            } catch {
+                /* output panel already carries the error */
+            }
+            return false;
         }
     }
 
@@ -926,8 +984,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
         switch (distro) {
             case 'arch':
                 return 'Recommended on Arch / CachyOS / Manjaro:\n'
-                    + '    yay -S ungoogled-chromium-bin\n'
-                    + 'Or from the official repos:\n'
                     + '    sudo pacman -S chromium';
             case 'debian':
                 return 'Recommended on Debian / Ubuntu / Mint:\n'
@@ -944,7 +1000,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
                 return 'Recommended on Alpine:\n'
                     + '    sudo apk add chromium';
             default:
-                return 'Install one of: chromium, ungoogled-chromium, google-chrome-stable,\n'
+                return 'Install one of: chromium, google-chrome-stable,\n'
                     + 'or microsoft-edge-stable using your distribution\'s package manager.';
         }
     }
@@ -1121,7 +1177,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
         await this.readPresetInto(name);
         await this.setActivePresetName(name);
         await this.saveActiveSettings();
-        this._resolvedLibraryPath = undefined;
         if (this.settings.server?.url) {
             this.apiClient.setBaseUrl(this.settings.server.url);
         }

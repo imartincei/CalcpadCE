@@ -4,9 +4,8 @@ using Calcpad.Highlighter.Linter.Helpers;
 namespace Calcpad.Highlighter.Parsing
 {
     /// <summary>
-    /// Character classification categories for the tokenizer's main parsing loop.
-    /// Provides O(1) lookup for ASCII characters via pre-computed array,
-    /// with pattern matching fallback for Unicode.
+    /// Character classification categories for the tokenizer's main parsing loop, giving O(1)
+    /// lookup for ASCII via a pre-computed array with a pattern-matching fallback for Unicode.
     /// Adapted from Calcpad.Core.MathParser.Input's CharTypes pattern.
     /// </summary>
     public enum CharClass : byte
@@ -141,6 +140,15 @@ namespace Calcpad.Highlighter.Parsing
         public static bool IsDelimiter(char c)
         {
             return c < 128 && AsciiTypes[c] == CharClass.Delimiter;
+        }
+
+        /// <summary>
+        /// True for the characters ;|&amp;@:({[ that continue a line implicitly when they are the
+        /// last non-whitespace character outside a comment. Matches Calcpad.Core's line extensions.
+        /// </summary>
+        public static bool IsLineExtension(char c)
+        {
+            return IsDelimiter(c) || c == '(' || c == '{' || c == '[';
         }
     }
 }

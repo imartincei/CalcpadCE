@@ -63,7 +63,7 @@ export function registerFormattingCommands(
     // Comments
     add('calcpad.toggleComment',  'CalcpadCE: Toggle Comment',   [KM.CtrlCmd | KC.KeyQ], () => toggleComment(editor));
     add('calcpad.uncomment',      'CalcpadCE: Uncomment',        [KM.CtrlCmd | KM.Shift | KC.KeyQ], () => uncomment(editor));
-    add('calcpad.pasteAsComment', 'CalcpadCE: Paste as Comment', [KM.CtrlCmd | KM.Shift | KC.KeyV], () => pasteAsComment(editor));
+    add('calcpad.pasteAsComment', 'CalcpadCE: Paste as Comment', [KM.CtrlCmd | KM.Shift | KC.KeyV], () => pasteAsComment(editor, bridge));
 
     return { dispose() { for (const d of disposables) d.dispose(); } };
 }
@@ -90,11 +90,9 @@ function detectFormatAtCursor(editor: monaco.editor.IStandaloneCodeEditor): Comm
 }
 
 /**
- * Insert a comment quote on every selected line that needs one, right after
- * its indentation (same rule headings use). A line is skipped when it already
- * opens a comment or when the selection already lands inside a text region
- * mid-line. Returns the 1-based column each quote was inserted at, keyed by
- * line number, for shifting selections.
+ * Insert a comment quote on every selected line that needs one, right after its indentation,
+ * skipping any line that already opens a comment or whose selection lands inside a text region
+ * mid-line. Returns the 1-based column each quote was inserted at, keyed by line number.
  */
 function ensureCommentPrefixes(
     model: monaco.editor.ITextModel,
@@ -175,9 +173,14 @@ function insertHeading(
     const selections = editor.getSelections() ?? [];
 
     const edits: monaco.editor.IIdentifiedSingleEditOperation[] = [];
+    const contentWasEmpty: boolean[] = [];
     for (const sel of selections) {
         const lineNumber = sel.positionLineNumber;
         const lineText = model.getLineContent(lineNumber);
+        const strippedContent = lineText
+            .replace(/^<h[1-6]>(.*)<\/h[1-6]>$/, '$1')
+            .replace(/^#{1,6}\s+(.*)$/, '$1');
+        contentWasEmpty.push(strippedContent.trim().length === 0);
         edits.push({
             range: new monaco.Range(lineNumber, 1, lineNumber, lineText.length + 1),
             text: buildHeadingLine(lineText, level, format),
@@ -185,6 +188,23 @@ function insertHeading(
         });
     }
     editor.executeEdits('calcpad-format-heading', edits);
+
+    // Place cursor between tags when the line's content was empty, same as the VS Code extension.
+    if (format === 'html') {
+        const closingTag = `</h${level}>`;
+        const newSelections: monaco.Selection[] = [];
+        for (let i = 0; i < selections.length; i++) {
+            if (contentWasEmpty[i]) {
+                const lineNumber = selections[i].positionLineNumber;
+                const lineLength = model.getLineLength(lineNumber);
+                const col = lineLength + 1 - closingTag.length;
+                newSelections.push(new monaco.Selection(lineNumber, col, lineNumber, col));
+            } else {
+                newSelections.push(selections[i]);
+            }
+        }
+        editor.setSelections(newSelections);
+    }
 }
 
 function insertParagraph(editor: monaco.editor.IStandaloneCodeEditor): void {
@@ -303,10 +323,10 @@ function uncomment(editor: monaco.editor.IStandaloneCodeEditor): void {
     editor.executeEdits('calcpad-uncomment', edits);
 }
 
-async function pasteAsComment(editor: monaco.editor.IStandaloneCodeEditor): Promise<void> {
+async function pasteAsComment(editor: monaco.editor.IStandaloneCodeEditor, bridge: EditorBridge): Promise<void> {
     let clipboardText = '';
     try {
-        clipboardText = await navigator.clipboard.readText();
+        clipboardText = await (bridge.readClipboardText ? bridge.readClipboardText() : navigator.clipboard.readText());
     } catch {
         return;
     }

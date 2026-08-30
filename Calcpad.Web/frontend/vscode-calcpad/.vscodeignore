@@ -51,8 +51,22 @@ Dockerfile
 # IDE specific
 .claude/**
 
-# Bundled server binaries (include in VSIX)
-!bin/**
+# Bundled server binaries are shipped, so bin/ is deliberately not ignored.
+# Do NOT add a `!bin/**` re-include here: vsce applies every negation after all
+# ignores, so it would override the exclusions below and repackage them.
+
+# The server's runtime droppings and dev-only config must never ship. These are
+# regenerated locally by every debug session and leak worksheet content and
+# local source paths if packaged.
+bin/logs/**
+bin/cache/**
+bin/**/*.log
+bin/.calcpad-server.lock
+bin/appsettings.Development.json
+
+# Build-time environment config
+.env
+.env.*
 
 # Package files
 *.vsix
@@ -62,5 +76,5 @@ package-lock.json
 
 # Temporary and cache files
 .DS_Store
-*.log
+**/*.log
 npm-debug.log*

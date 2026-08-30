@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using Calcpad.Core;
 using Calcpad.Highlighter.Linter.Helpers;
 using Calcpad.Highlighter.Parsing;
 using Calcpad.Highlighter.Tokenizer;
@@ -27,19 +29,34 @@ namespace Calcpad.Highlighter.ContentResolution
             var sourceMap = new Dictionary<int, int>();  // expanded line -> stage1 line
             var includeMap = new Dictionary<int, SourceInfo>();
             var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var includedFileHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var rootDir = !string.IsNullOrEmpty(sourceFilePath)
+                ? Path.GetDirectoryName(sourceFilePath) : null;
+            // Shared across the root and every included file, exactly like MacroParser's own
+            // instance field — a {project}/{library} reference resolves against whichever
+            // declaration came first in document order, wherever it was written.
+            var pathRoots = new PathRoots();
 
             for (int i = 0; i < stage1.Lines.Count; i++)
             {
                 var line = stage1.Lines[i];
                 var trimmedSpan = line.AsSpan().Trim();
 
-                if (IsIncludeDirective(trimmedSpan))
+                if (PathRoots.IsDeclaration(trimmedSpan, out var isProject, out var declStart, out var declLength))
+                {
+                    if (declLength > 0)
+                        pathRoots.TryDeclare(isProject, trimmedSpan.Slice(declStart, declLength).ToString(),
+                            rootDir, out _);
+                    // A malformed or duplicate declaration is reported when the document is
+                    // actually parsed/converted (Calcpad.Core.MacroParser/ExpressionParser) — the
+                    // editor's lint pass only needs the roots it can resolve, not to re-validate.
+                }
+                else if (IsIncludeDirective(trimmedSpan))
                 {
                     var rawFileName = ExtractIncludeFilename(trimmedSpan);
-                    var sourceDir = !string.IsNullOrEmpty(sourceFilePath)
-                        ? Path.GetDirectoryName(sourceFilePath) : null;
+                    pathRoots.TryExpand(rawFileName, out rawFileName, out _);
                     ExpandInclude(rawFileName, i, includeFiles, clientFileCache,
-                        expandedLines, sourceMap, includeMap, visited, 0, sourceDir);
+                        expandedLines, sourceMap, includeMap, visited, includedFileHashes, 0, rootDir, pathRoots);
                     continue;
                 }
 
@@ -85,17 +102,17 @@ namespace Calcpad.Highlighter.ContentResolution
                 MacroCommentParameters = macroCommentParams,
                 MacroParameterOrder = macroParamOrder,
                 MacroBodies = macroBodies,
-                UserDefinedMacros = tokenizerResult.UserDefinedMacros
+                UserDefinedMacros = tokenizerResult.UserDefinedMacros,
+                PathRoots = pathRoots,
+                IncludedFileHashes = includedFileHashes
             };
         }
 
         /// <summary>
-        /// Computes which parameters are "comment parameters" for each macro.
-        /// A parameter is a comment parameter if:
-        /// 1. It appears directly in a comment section (text between ' or ") in the macro content
-        /// 2. It is passed to another macro's comment parameter position (transitive)
-        ///
-        /// Uses fixed-point iteration to handle transitive dependencies.
+        /// Computes which parameters are "comment parameters" for each macro — those appearing
+        /// directly in a comment section of the macro content, or passed to another macro's
+        /// comment parameter position. Uses fixed-point iteration to handle transitive
+        /// dependencies.
         /// </summary>
         private static (Dictionary<string, HashSet<string>> CommentParams, Dictionary<string, List<string>> ParamOrder)
             ComputeMacroCommentParameters(List<MacroDefinition> macroDefinitions)
@@ -327,9 +344,12 @@ namespace Calcpad.Highlighter.ContentResolution
             Dictionary<int, int> sourceMap,
             Dictionary<int, SourceInfo> includeMap,
             HashSet<string> visited,
+            Dictionary<string, string> includedFileHashes,
             int depth,
-            string sourceDir = null)
+            string sourceDir = null,
+            PathRoots pathRoots = null)
         {
+            pathRoots ??= new PathRoots();
             if (depth > 20 || string.IsNullOrEmpty(rawFileName) || !visited.Add(rawFileName))
             {
                 expandedLines.Add("' Error: Include file not provided: " + rawFileName);
@@ -338,7 +358,7 @@ namespace Calcpad.Highlighter.ContentResolution
                 return;
             }
 
-            var (fileContent, resolvedPath) = ResolveFileContent(rawFileName, sourceDir, includeFiles, clientFileCache);
+            var (fileContent, resolvedPath, fromFilesystem) = ResolveFileContent(rawFileName, sourceDir, includeFiles, clientFileCache);
             if (fileContent == null)
             {
                 expandedLines.Add("' Error: Include file not provided: " + rawFileName);
@@ -346,6 +366,9 @@ namespace Calcpad.Highlighter.ContentResolution
                 includeMap[expandedLines.Count - 1] = new SourceInfo { Source = "include", SourceFile = rawFileName };
                 return;
             }
+
+            if (fromFilesystem)
+                includedFileHashes[resolvedPath] = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(fileContent)));
 
             // Process included content through Stage1 (line continuations)
             var includedLines = new List<string>();
@@ -371,12 +394,25 @@ namespace Calcpad.Highlighter.ContentResolution
                 if (directives.Scope == ScopeMode.Local)
                     continue;
 
-                if (IsIncludeDirective(trimmedSpan))
+                var nestedSourceDir = resolvedPath != null ? Path.GetDirectoryName(resolvedPath) : sourceDir;
+                if (PathRoots.IsDeclaration(trimmedSpan, out var isProject, out var declStart, out var declLength))
+                {
+                    // A #local-scoped declaration never reaches here — the scope check above
+                    // already excluded it, the same way the real include delegate
+                    // (CalcpadService.ProcessIncludedContent) strips it before Core ever parses
+                    // the includer's flattened text. One that does reach here is added to
+                    // expandedLines below like any other line — it is genuinely part of the
+                    // flattened document, same as the root's own declaration.
+                    if (declLength > 0)
+                        pathRoots.TryDeclare(isProject, trimmedSpan.Slice(declStart, declLength).ToString(),
+                            nestedSourceDir, out _);
+                }
+                else if (IsIncludeDirective(trimmedSpan))
                 {
                     var nestedFileName = ExtractIncludeFilename(trimmedSpan);
-                    var nestedSourceDir = resolvedPath != null ? Path.GetDirectoryName(resolvedPath) : sourceDir;
+                    pathRoots.TryExpand(nestedFileName, out nestedFileName, out _);
                     ExpandInclude(nestedFileName, stage1Line, includeFiles, clientFileCache,
-                        expandedLines, sourceMap, includeMap, visited, depth + 1, nestedSourceDir);
+                        expandedLines, sourceMap, includeMap, visited, includedFileHashes, depth + 1, nestedSourceDir, pathRoots);
                     continue;
                 }
 
@@ -398,9 +434,10 @@ namespace Calcpad.Highlighter.ContentResolution
         /// 1. Try filesystem (Path.GetFullPath + File.Exists)
         /// 2. Try includeFiles dictionary (plain text, client-provided)
         /// 3. Try clientFileCache dictionary (raw bytes, pre-fetched by Web layer)
-        /// Returns the content and the resolved full path (for tracking source directory in nested includes).
+        /// Returns the content, the resolved full path, and whether it came from the filesystem —
+        /// only a filesystem hit has on-disk state worth hashing for cache invalidation.
         /// </summary>
-        private static (string content, string resolvedPath) ResolveFileContent(string rawFileName, string sourceDir,
+        private static (string content, string resolvedPath, bool fromFilesystem) ResolveFileContent(string rawFileName, string sourceDir,
             Dictionary<string, string> includeFiles, Dictionary<string, byte[]> clientFileCache)
         {
             string resolvedPath = null;
@@ -413,23 +450,23 @@ namespace Calcpad.Highlighter.ContentResolution
                     ? Path.GetFullPath(expandedPath, sourceDir)
                     : Path.GetFullPath(expandedPath);
                 if (File.Exists(resolvedPath))
-                    return (File.ReadAllText(resolvedPath), resolvedPath);
+                    return (File.ReadAllText(resolvedPath), resolvedPath, true);
             }
             catch { /* Not a valid filesystem path (URLs, API syntax, etc.) */ }
 
             // 2. Try includeFiles — resolved path first, then raw filename
             if (resolvedPath != null && includeFiles.TryGetValue(resolvedPath, out var content))
-                return (content, resolvedPath);
+                return (content, resolvedPath, false);
             if (includeFiles.TryGetValue(rawFileName, out content))
-                return (content, null);
+                return (content, null, false);
 
             // 3. Try clientFileCache — resolved path first, then raw filename
             if (resolvedPath != null && clientFileCache.TryGetValue(resolvedPath, out var contentBytes))
-                return (Encoding.UTF8.GetString(contentBytes), resolvedPath);
+                return (Encoding.UTF8.GetString(contentBytes), resolvedPath, false);
             if (clientFileCache.TryGetValue(rawFileName, out contentBytes))
-                return (Encoding.UTF8.GetString(contentBytes), null);
+                return (Encoding.UTF8.GetString(contentBytes), null, false);
 
-            return (null, null);
+            return (null, null, false);
         }
 
         private static List<string> ParseParameters(string paramsStr)

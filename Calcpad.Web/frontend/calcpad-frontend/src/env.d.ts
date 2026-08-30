@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-    readonly VITE_PLATFORM: 'vscode' | 'electron' | 'web';
+    readonly VITE_PLATFORM: 'vscode' | 'web';
 }
 
 interface ImportMeta {

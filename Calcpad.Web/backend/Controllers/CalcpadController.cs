@@ -20,16 +20,24 @@ namespace Calcpad.Server.Controllers
     {
         private readonly CalcpadService _calcpadService;
         private readonly PdfGeneratorService _pdfService;
+        private readonly ContentResolutionCache _contentResolutionCache;
+        private readonly IWebHostEnvironment _environment;
         private static readonly LintIgnoreRegionParser _lintIgnoreRegionParser = new();
 
-        public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService)
+        /// <summary>Error code clients match on to offer the bundled-Chromium download.</summary>
+        private const string BrowserNotFoundCode = "BROWSER_NOT_FOUND";
+
+        public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService, ContentResolutionCache contentResolutionCache, IWebHostEnvironment environment)
         {
             _calcpadService = calcpadService;
             _pdfService = pdfService;
+            _contentResolutionCache = contentResolutionCache;
+            _environment = environment;
         }
 
         [HttpPost("convert")]
-        public IActionResult ConvertToHtml([FromBody] CalcpadRequest request, [FromQuery] bool unwrap = false)
+        public IActionResult ConvertToHtml(
+            [FromBody] CalcpadRequest request, CancellationToken cancellationToken, [FromQuery] bool unwrap = false)
         {
             try
             {
@@ -39,7 +47,11 @@ namespace Calcpad.Server.Controllers
                 }
 
                 var forceUnwrapped = unwrap || request.ForceUnwrappedCode;
-                var (htmlResult, _, errors) = _calcpadService.Convert(request.Content, request.Settings, forceUnwrapped, request.Theme, request.SourceFilePath, request.ForPrint);
+                var (htmlResult, _, errors) = _calcpadService.Convert(
+                    request.Content, request.Settings, forceUnwrapped, request.Theme, request.SourceFilePath,
+                    request.ForPrint, captureOpenXml: false, request.EnableUi, request.UiOverrides,
+                    debug: request.IncludeLineAnchors, hideErrorLines: request.HideErrorLines,
+                    write: request.Write, cancellationToken: cancellationToken);
                 if (unwrap)
                 {
                     htmlResult = ProcessDataTextLinks(htmlResult);
@@ -53,10 +65,110 @@ namespace Calcpad.Server.Controllers
                 Response.Headers["X-Calcpad-Errors"] = Uri.EscapeDataString(errorsJson);
                 return Content(htmlResult, "text/html");
             }
+            catch (OperationCanceledException)
+            {
+                // Superseded or the client gave up — expected under rapid tab-switching, not an error.
+                return StatusCode(499);
+            }
             catch (Exception ex)
             {
                 FileLogger.LogError("Convert request failed", ex);
                 return StatusCode(500, $"Error processing Calcpad content: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Decodes a compiled <c>.cpdz</c> worksheet to its source text. Accepts both the
+        /// plain deflate form and the composite archive that bundles images.
+        /// </summary>
+        [HttpPost("cpdz/decode")]
+        public IActionResult DecodeCpdz([FromBody] CpdzDecodeRequest request)
+        {
+            try
+            {
+                var result = CpdzCodec.Decode(Convert.FromBase64String(request.Data));
+                return Ok(new CpdzDecodeResponse { Content = result.Text, Composite = result.IsComposite });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("cpdz decode failed", ex);
+                return BadRequest(new { error = "Not a valid .cpdz file", message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Encodes source text as a <c>.cpdz</c> worksheet. Pass the file's current bytes
+        /// as <c>Original</c> when overwriting, so a composite archive keeps its images.
+        /// </summary>
+        [HttpPost("cpdz/encode")]
+        public IActionResult EncodeCpdz([FromBody] CpdzEncodeRequest request)
+        {
+            try
+            {
+                var original = string.IsNullOrEmpty(request.Original)
+                    ? null
+                    : Convert.FromBase64String(request.Original);
+                var bytes = CpdzCodec.Encode(request.Content, original);
+                return Ok(new CpdzEncodeResponse { Data = Convert.ToBase64String(bytes) });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("cpdz encode failed", ex);
+                return StatusCode(500, new { error = "Failed to encode .cpdz", message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Rewrites a worksheet into the self-contained form a compiled <c>.cpdz</c> needs:
+        /// macros and includes expanded, <c>#read</c> data inlined, an included file's image
+        /// paths made absolute. Reading a data file that isn't there is an error, not a
+        /// warning — the worksheet would otherwise be handed out broken.
+        /// </summary>
+        [HttpPost("portable/bundle")]
+        public IActionResult BundlePortable([FromBody] PortableBundleRequest request)
+        {
+            try
+            {
+                var result = PortableWorksheet.Build(request.Content, request.SourceFilePath);
+                if (result.Errors.Count > 0)
+                    return BadRequest(new { error = "The worksheet is not self-contained", messages = result.Errors });
+
+                return Ok(new PortableBundleResponse { Content = result.Content });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("portable bundle failed", ex);
+                return StatusCode(500, new { error = "Failed to bundle the worksheet", message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Packs a worksheet and the files it references into a ZIP that stays text: the document
+        /// keeps its directives and only their paths change, each rewritten to point into a folder
+        /// beside it holding the file it named. The middle ground between a worksheet that only
+        /// runs where it was written and a compiled one that cannot be read.
+        /// </summary>
+        [HttpPost("portable/package")]
+        public IActionResult PackagePortable([FromBody] PortableBundleRequest request)
+        {
+            try
+            {
+                var result = PortablePackage.Build(request.Content, request.SourceFilePath);
+                if (result.Zip is null)
+                    return BadRequest(new { error = "The worksheet cannot be packaged", messages = result.Errors });
+
+                return Ok(new PortablePackageResponse
+                {
+                    Data = Convert.ToBase64String(result.Zip),
+                    Name = result.Name,
+                    RefsFolder = result.RefsFolder,
+                    Bundled = result.Bundled,
+                });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("portable package failed", ex);
+                return StatusCode(500, new { error = "Failed to package the worksheet", message = ex.Message });
             }
         }
 
@@ -78,9 +190,8 @@ namespace Calcpad.Server.Controllers
 
         private string ProcessDataTextLinks(string html)
         {
-            // Replace links with data-text attribute to point to actual line anchors
-            // Pattern: <a href="#0" data-text="123">
-            // Replace with: <a href="#line-123" data-text="123">
+            // Point data-text links at real line anchors: <a href="#0" data-text="123">
+            // becomes <a href="#line-123" data-text="123">.
             var pattern = @"<a\s+href=""#0""\s+data-text=""(\d+)""";
             var replacement = @"<a href=""#line-$1"" data-text=""$1""";
             return System.Text.RegularExpressions.Regex.Replace(html, pattern, replacement);
@@ -93,14 +204,18 @@ namespace Calcpad.Server.Controllers
             return Ok(new CalcpadRequest { Content = sampleContent });
         }
 
-        // Debug-only: intentionally crashes the server to verify which crash paths
-        // are picked up by FileLogger / AppDomain.UnhandledException / TaskScheduler.
-        // Different modes exercise different failure paths because not all of them
-        // route through the same handlers (e.g. StackOverflow and FailFast bypass
-        // managed exception handling entirely).
+        // Debug-only: intentionally crashes the server to verify which crash paths are picked
+        // up by FileLogger / AppDomain.UnhandledException / TaskScheduler. Different modes
+        // exercise different failure paths, since StackOverflow and FailFast bypass managed
+        // exception handling entirely.
         [HttpGet("debug-crash")]
         public IActionResult DebugCrash([FromQuery] string mode = "background-thread")
         {
+            // A plain GET needs no preflight, so outside Development any page the user
+            // visits could reach this and terminate their local server.
+            if (!_environment.IsDevelopment())
+                return NotFound();
+
             FileLogger.LogInfo("debug-crash invoked", $"mode={mode}");
 
             switch (mode)
@@ -172,11 +287,24 @@ namespace Calcpad.Server.Controllers
 
                 FileLogger.LogInfo("PDF generation request received", $"HTML length: {request.Html.Length}");
 
-                var pdfBytes = await _pdfService.GeneratePdfAsync(request.Html, request.Options, request.BrowserPath);
+                var pdfBytes = await _pdfService.GeneratePdfAsync(request.Html, request.Options);
 
                 FileLogger.LogInfo("PDF generated successfully", $"Size: {pdfBytes.Length} bytes");
 
                 return File(pdfBytes, "application/pdf", "document.pdf");
+            }
+            catch (BrowserUnavailableException ex)
+            {
+                FileLogger.LogWarning("PDF generation blocked: no usable browser", ex.Message);
+                var status = _pdfService.GetBrowserStatus();
+                return StatusCode(503, new
+                {
+                    error = "No usable browser",
+                    code = BrowserNotFoundCode,
+                    message = ex.Message,
+                    canDownload = true,
+                    downloadSizeMb = status.DownloadSizeMb
+                });
             }
             catch (Exception ex)
             {
@@ -192,23 +320,64 @@ namespace Calcpad.Server.Controllers
         }
 
         /// <summary>
+        /// Which browser PDF export would use, so a client can warn before an export
+        /// rather than after one fails.
+        /// </summary>
+        [HttpGet("pdf/browser")]
+        public IActionResult GetPdfBrowser()
+        {
+            var status = _pdfService.GetBrowserStatus();
+            return Ok(new
+            {
+                available = status.Available,
+                source = status.Source,
+                path = status.Path,
+                downloadAllowed = status.DownloadAllowed,
+                downloadSizeMb = status.DownloadSizeMb
+            });
+        }
+
+        /// <summary>
+        /// Downloads the bundled headless Chromium. Called only after the client has asked
+        /// the user — the render path never downloads on its own unless the host set
+        /// <c>AllowChromiumDownload</c>.
+        /// </summary>
+        [HttpPost("pdf/browser/install")]
+        public async Task<IActionResult> InstallPdfBrowser()
+        {
+            try
+            {
+                var path = await _pdfService.InstallBrowserAsync();
+                return Ok(new { installed = true, path });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("Chromium download failed", ex);
+                return StatusCode(500, new { error = "Chromium download failed", message = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Convert calcpad → HTML → DOCX (Word) using Calcpad.OpenXml.OpenXmlWriter.
         /// Returns the .docx bytes; the frontend handles the download / save dialog.
         /// </summary>
         [HttpPost("docx")]
-        public async Task<IActionResult> GenerateDocx([FromBody] CalcpadRequest request)
+        public IActionResult GenerateDocx([FromBody] CalcpadRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request.Content))
                     return BadRequest(new { error = "Content is required" });
 
-                // forPrint=true so the HTML is the printable / unwrapped form,
-                // matching what the OpenXmlWriter expects. captureOpenXml=true tells
-                // the parser to emit OMML so equations render as native Word math
-                // instead of empty <m:oMath/>.
+                // captureOpenXml=true tells the parser to emit OMML so equations render as
+                // native Word math instead of empty <m:oMath/>. A Word document is a file,
+                // never a navigable preview, so line anchors are always off - but ForPrint
+                // and UiOverrides come from the request, so the caller chooses between a
+                // report (#pre hidden, entered #UI values applied) and the preview layout.
                 var (html, openXmlExpressions, _) = _calcpadService.Convert(
-                    request.Content, request.Settings, request.ForceUnwrappedCode, request.Theme, request.SourceFilePath, forPrint: true, captureOpenXml: true);
+                    request.Content, request.Settings, request.ForceUnwrappedCode, request.Theme, request.SourceFilePath,
+                    forPrint: request.ForPrint, captureOpenXml: true, enableUi: false, uiOverrides: request.UiOverrides,
+                    debug: false, write: request.Write, cancellationToken: cancellationToken);
 
                 using var ms = new MemoryStream();
                 var writer = new OpenXmlWriter(openXmlExpressions.ToList());
@@ -220,6 +389,10 @@ namespace Calcpad.Server.Controllers
                     bytes,
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     "document.docx");
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(499);
             }
             catch (Exception ex)
             {
@@ -233,12 +406,15 @@ namespace Calcpad.Server.Controllers
         /// Returns tokens with line/column positions and types for frontend colorization.
         /// </summary>
         [HttpPost("highlight")]
-        public IActionResult GetHighlightTokens([FromBody] HighlightRequest request)
+        public IActionResult GetHighlightTokens([FromBody] HighlightRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request.Content))
                     return BadRequest("Content is required");
+
+                // A stale request whose client already gave up shouldn't do this work at all.
+                cancellationToken.ThrowIfCancellationRequested();
 
                 FileLogger.LogInfo("Highlight request received", $"Length: {request.Content.Length}");
 
@@ -248,8 +424,7 @@ namespace Calcpad.Server.Controllers
                 // referenced files from disk via SourceFilePath when no in-memory cache is supplied).
                 if (!string.IsNullOrEmpty(request.SourceFilePath))
                 {
-                    var resolver = new ContentResolver();
-                    var staged = resolver.GetStagedContent(request.Content, sourceFilePath: request.SourceFilePath);
+                    var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
                     tokenizer.SetMacroCommentParameters(
                         staged.Stage2.MacroCommentParameters,
                         staged.Stage2.MacroParameterOrder,
@@ -258,6 +433,10 @@ namespace Calcpad.Server.Controllers
 
                 var result = tokenizer.Tokenize(request.Content);
                 return Ok(MapTokensToResponse(result.Tokens, request.IncludeText));
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(499);
             }
             catch (Exception ex)
             {
@@ -292,19 +471,20 @@ namespace Calcpad.Server.Controllers
         /// Lint Calcpad source code and return diagnostics (errors and warnings).
         /// </summary>
         [HttpPost("lint")]
-        public IActionResult LintContent([FromBody] LintRequest request)
+        public IActionResult LintContent([FromBody] LintRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request.Content))
                     return BadRequest("Content is required");
 
+                cancellationToken.ThrowIfCancellationRequested();
+
                 FileLogger.LogInfo("Lint request received", "Length: " + request.Content.Length);
 
-                var resolver = new ContentResolver();
                 var linter = new CalcpadLinter();
 
-                var staged = resolver.GetStagedContent(request.Content, sourceFilePath: request.SourceFilePath);
+                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
 
                 // Extract LintIgnore regions from raw source, then lint with suppression
                 var ignoreRegions = _lintIgnoreRegionParser.ExtractRegions(request.Content);
@@ -330,6 +510,10 @@ namespace Calcpad.Server.Controllers
 
                 return Ok(response);
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(499);
+            }
             catch (Exception ex)
             {
                 FileLogger.LogError("Lint request failed", ex);
@@ -342,17 +526,18 @@ namespace Calcpad.Server.Controllers
         /// Returns type information, parameters, return types, and source locations.
         /// </summary>
         [HttpPost("definitions")]
-        public IActionResult GetDefinitions([FromBody] DefinitionsRequest request)
+        public IActionResult GetDefinitions([FromBody] DefinitionsRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request.Content))
                     return BadRequest("Content is required");
 
+                cancellationToken.ThrowIfCancellationRequested();
+
                 FileLogger.LogInfo("Definitions request received", "Length: " + request.Content.Length);
 
-                var resolver = new ContentResolver();
-                var staged = resolver.GetStagedContent(request.Content, sourceFilePath: request.SourceFilePath);
+                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
 
                 var typeTracker = staged.Stage3.TypeTracker;
 
@@ -418,10 +603,17 @@ namespace Calcpad.Server.Controllers
                         Source = u.Source ?? "local",
                         SourceFile = u.SourceFile,
                         Description = u.Description
-                    }).ToList()
+                    }).ToList(),
+
+                    ProjectPath = staged.Stage2.PathRoots?.Project,
+                    LibraryPath = staged.Stage2.PathRoots?.Library
                 };
 
                 return Ok(response);
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(499);
             }
             catch (Exception ex)
             {
@@ -438,15 +630,16 @@ namespace Calcpad.Server.Controllers
         /// the clients don't each re-implement it.
         /// </summary>
         [HttpPost("symbol-at-position")]
-        public IActionResult SymbolAtPosition([FromBody] SymbolAtPositionRequest request)
+        public IActionResult SymbolAtPosition([FromBody] SymbolAtPositionRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request.Content))
                     return BadRequest("Content is required");
 
-                var resolver = new ContentResolver();
-                var staged = resolver.GetStagedContent(request.Content, sourceFilePath: request.SourceFilePath);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
                 var hit = SymbolResolver.ResolveSymbolAt(staged.Stage3, request.Line, request.Column);
                 if (hit == null) return Ok(null);
 
@@ -467,6 +660,10 @@ namespace Calcpad.Server.Controllers
                     Locations = hit.Locations.Select(ToDto).ToList()
                 };
                 return Ok(response);
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(499);
             }
             catch (Exception ex)
             {
@@ -663,9 +860,9 @@ namespace Calcpad.Server.Controllers
         public string Theme { get; set; } = "light"; // "light" or "dark"
 
         /// <summary>
-        /// When true, strip <c>NoPrintStart</c>/<c>NoPrintEnd</c> regions from the source
-        /// before conversion. The frontend should set this for renders destined for PDF
-        /// so those sections do not appear in print output.
+        /// When true, resolves <c>#pre</c>/<c>#post</c> directives for print output
+        /// (<c>#pre</c> content is hidden, <c>#post</c> content is shown). The frontend
+        /// should set this for renders destined for PDF.
         /// </summary>
         public bool ForPrint { get; set; } = false;
 
@@ -674,6 +871,112 @@ namespace Calcpad.Server.Controllers
         /// #include and #read paths against the parent file's directory.
         /// </summary>
         public string? SourceFilePath { get; set; }
+
+        /// <summary>
+        /// When true, <c>#UI</c> lines render as interactive controls and <c>#post</c>
+        /// content is hidden. When false the document renders as a report, exactly as
+        /// it would without the <c>#UI</c> keywords.
+        /// </summary>
+        public bool EnableUi { get; set; } = false;
+
+        /// <summary>
+        /// Values entered into <c>#UI</c> controls, keyed by the control identity the
+        /// preview reports in <c>data-ui-var</c> (e.g. <c>"L:1"</c>). Applied in both
+        /// modes, so a report shows the values that were actually entered.
+        /// </summary>
+        public Dictionary<string, string>? UiOverrides { get; set; }
+
+        /// <summary>
+        /// Emits per-line anchors and the error-summary boxes the preview uses for line links,
+        /// defaulting to the opposite of <see cref="ForPrint"/>. Set it explicitly to break that
+        /// pairing: the on-screen report wants the print layout <em>with</em> links, and every
+        /// export wants a rendering <em>without</em> them.
+        /// </summary>
+        public bool? IncludeLineAnchors { get; set; }
+
+        /// <summary>
+        /// Drops the "on line [N]" source-line reference from error messages, since input
+        /// mode has no source editor for it to point at. Defaults to <see cref="EnableUi"/>.
+        /// </summary>
+        public bool? HideErrorLines { get; set; }
+
+        /// <summary>
+        /// Whether this request may run <c>#write</c>/<c>#append</c>. False by default, so a
+        /// preview refresh does not rewrite the document's output on every keystroke.
+        /// </summary>
+        public bool Write { get; set; }
+    }
+
+    public class CpdzDecodeRequest
+    {
+        /// <summary>Base64 of the file's raw bytes.</summary>
+        public string Data { get; set; } = string.Empty;
+    }
+
+    public class CpdzDecodeResponse
+    {
+        /// <summary>The decoded Calcpad source.</summary>
+        public string Content { get; set; } = string.Empty;
+
+        /// <summary>
+        /// True when the file is a composite archive bundling images. Its bytes must be
+        /// passed back as <c>Original</c> on encode, or those images are lost.
+        /// </summary>
+        public bool Composite { get; set; }
+    }
+
+    public class CpdzEncodeRequest
+    {
+        /// <summary>The Calcpad source to compile.</summary>
+        public string Content { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Base64 of the file being overwritten, when there is one. A composite archive
+        /// keeps every entry but the code, so bundled images survive the save.
+        /// </summary>
+        public string? Original { get; set; }
+    }
+
+    public class CpdzEncodeResponse
+    {
+        /// <summary>Base64 of the encoded file's bytes.</summary>
+        public string Data { get; set; } = string.Empty;
+    }
+
+    public class PortableBundleRequest
+    {
+        /// <summary>The Calcpad source to bundle.</summary>
+        public string Content { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Full path of the source file on disk. Relative <c>#include</c> and <c>#read</c>
+        /// paths resolve against its folder, as they do when the worksheet runs.
+        /// </summary>
+        public string? SourceFilePath { get; set; }
+    }
+
+    public class PortableBundleResponse
+    {
+        /// <summary>
+        /// The bundled source: no includes, no data files, and images left as absolute paths
+        /// for the caller to embed.
+        /// </summary>
+        public string Content { get; set; } = string.Empty;
+    }
+
+    public class PortablePackageResponse
+    {
+        /// <summary>Base64 of the archive's bytes.</summary>
+        public string Data { get; set; } = string.Empty;
+
+        /// <summary>Suggested file name, taken from the document's own.</summary>
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>The folder inside the archive holding every referenced file.</summary>
+        public string RefsFolder { get; set; } = string.Empty;
+
+        /// <summary>The bundled entries, for reporting what was packed.</summary>
+        public IReadOnlyList<string> Bundled { get; set; } = [];
     }
 
     public class HighlightRequest
@@ -806,6 +1109,16 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>All custom unit definitions</summary>
         public List<CustomUnitDefinitionDto> CustomUnits { get; set; } = new();
+
+        /// <summary>
+        /// The resolved absolute `#ProjectPath`, if declared anywhere in the document's
+        /// `#include` chain; null when undeclared, when the document is untitled, or in
+        /// browser mode where the server cannot read the included files.
+        /// </summary>
+        public string? ProjectPath { get; set; }
+
+        /// <summary>The resolved absolute `#LibraryPath`, under the same conditions as <see cref="ProjectPath"/>.</summary>
+        public string? LibraryPath { get; set; }
     }
 
     public class MacroDefinitionDto

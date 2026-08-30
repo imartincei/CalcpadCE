@@ -205,6 +205,7 @@ namespace Calcpad.Highlighter.ContentResolution
             {
                 Lines = lines,
                 SourceMap = sourceMap,
+                IncludeMap = filteredIncludeMap,
                 MacroExpansions = macroExpansions,
                 UserDefinedFunctions = functions,
                 FunctionsWithParams = functionsWithParams,
@@ -316,9 +317,9 @@ namespace Calcpad.Highlighter.ContentResolution
 
 
         /// <summary>
-        /// Scans Lint-mode tokens to collect all variable assignment positions and usage positions.
-        /// Assignments are Variable tokens on the left side of = (not comparison operators).
-        /// Usages are all other Variable tokens.
+        /// Scans Lint-mode tokens to collect all variable assignment and usage positions.
+        /// Assignments are Variable tokens on the left side of = (not comparison operators);
+        /// usages are all other Variable tokens.
         /// </summary>
         private static (List<(string Name, int Line, int Column, int Length)> Assignments,
                          List<(string Name, int Line, int Column)> Usages)
@@ -334,12 +335,22 @@ namespace Calcpad.Highlighter.ContentResolution
                 var lineNumber = lineEntry.Key;
                 var tokens = lineEntry.Value;
 
-                // Skip empty/comment/directive lines (same filtering as the linter)
+                // Skip empty/comment lines (same filtering as the linter). Directives are
+                // scanned from their expression onwards, so '#UI L = 10m' still registers
+                // an assignment while the keyword itself is ignored.
                 if (lineNumber < 0 || lineNumber >= lines.Count)
                     continue;
                 var line = lines[lineNumber];
-                if (LineParser.ShouldSkipLine(line) || LineParser.IsDirectiveLine(line.Trim()))
+                if (LineParser.ShouldSkipLine(line))
                     continue;
+
+                var expressionStart = 0;
+                if (LineParser.IsDirectiveLine(line.Trim()))
+                {
+                    expressionStart = LineParser.GetDirectiveExpressionStart(line);
+                    if (expressionStart < 0)
+                        continue;
+                }
 
                 // Find first Variable token on the line
                 Token? firstVar = null;
@@ -347,6 +358,8 @@ namespace Calcpad.Highlighter.ContentResolution
                 for (int t = 0; t < tokens.Count; t++)
                 {
                     var token = tokens[t];
+                    if (token.Column < expressionStart)
+                        continue;
 
                     if (firstVar == null && token.Type == TokenType.Variable)
                         firstVar = token;
@@ -401,10 +414,9 @@ namespace Calcpad.Highlighter.ContentResolution
         /// <summary>
         /// Registers the variables that $Inf and $Sup implicitly define: for a solver whose
         /// counter is <c>k</c>, the argument extremum is exposed as <c>k_inf</c> / <c>k_sup</c>
-        /// (see MathParser.SolveBlock). These are global, so they must resolve as defined and
-        /// appear in autocomplete / the variables tab. A brace stack tracks the enclosing command
-        /// per '@', so nested solvers (e.g. $inf{$inf{f(x;y) @ x = ..} @ y = ..} yielding both
-        /// x_inf and y_inf) attribute each counter to the correct command.
+        /// (see MathParser.SolveBlock), and being global they must resolve as defined and appear
+        /// in autocomplete. A brace stack tracks the enclosing command per '@', so nested solvers
+        /// attribute each counter to the correct command.
         /// </summary>
         private static void CollectImplicitSolverVariables(
             TokenizerResult tokenizerResult, List<VariableDefinition> variablesWithDefs)
@@ -801,10 +813,9 @@ namespace Calcpad.Highlighter.ContentResolution
                 }
             }
 
-            // Add macro calls found inside macro definition bodies.
-            // Multiline macro bodies (between #def and #end def) are skipped in Stage 3,
-            // so their macro references aren't captured by the expansion-based tracking above.
-            // Inline macro content (after '=') is also scanned.
+            // Add macro calls found inside macro definition bodies: multiline bodies (between
+            // #def and #end def) are skipped in Stage 3, so the expansion-based tracking above
+            // never sees their references. Inline macro content (after '=') is also scanned.
             var allMacroNameSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var md in macroDefinitions)
                 allMacroNameSet.Add(md.Name);
@@ -923,11 +934,10 @@ namespace Calcpad.Highlighter.ContentResolution
         }
 
         /// <summary>
-        /// Finds the column of a macro-name occurrence in a line, requiring that the
-        /// character before it is not a macro-name letter. This prevents a shorter
-        /// macro name from matching inside a longer one (e.g. "check$" must not match
-        /// inside "doubleCheck$"). Returns -1 when the name does not appear as a
-        /// standalone macro reference.
+        /// Finds the column of a macro-name occurrence in a line, requiring that the character
+        /// before it is not a macro-name letter, so a shorter macro name cannot match inside a
+        /// longer one ("check$" must not match inside "doubleCheck$"). Returns -1 when the name
+        /// does not appear as a standalone macro reference.
         /// </summary>
         private static int FindMacroNameColumn(string line, string macroName)
         {
@@ -985,10 +995,9 @@ namespace Calcpad.Highlighter.ContentResolution
         }
 
         /// <summary>
-        /// Expands macros in a line, handling nested macro names by matching the longest name first.
-        /// This matches Calcpad.Core's MacroParser behavior where longer macro names take precedence.
-        /// For example, with macros "string$" and "ng$", "gstring$" should expand "string$", not "ng$".
-        /// Optionally tracks which macros were expanded for source mapping.
+        /// Expands macros in a line, matching the longest name first as Calcpad.Core's MacroParser
+        /// does — with macros "string$" and "ng$", "gstring$" expands "string$". Optionally tracks
+        /// which macros were expanded for source mapping.
         /// </summary>
         private string ExpandMacros(string line, List<(string Name, List<string> Params, List<string> Content)> sortedMacros, List<string> expandedMacroNames = null, HashSet<string> currentlyExpanding = null)
         {

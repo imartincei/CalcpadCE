@@ -44,9 +44,8 @@ namespace Calcpad.Highlighter.Tokenizer.Models
         Macro = 8,
 
         /// <summary>
-        /// Macro parameters in #def statements.
-        /// e.g., in #def macro$(param1$; param2$), param1$ and param2$ are MacroParameter.
-        /// These are local to the macro definition scope.
+        /// Macro parameters in #def statements, local to the macro definition scope. In
+        /// #def macro$(param1$; param2$), param1$ and param2$ are MacroParameter.
         /// </summary>
         MacroParameter = 9,
 

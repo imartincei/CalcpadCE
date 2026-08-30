@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Calcpad.Core;
 using Calcpad.Highlighter.Linter.Helpers;
 
 namespace Calcpad.Highlighter.ContentResolution
@@ -262,9 +263,16 @@ namespace Calcpad.Highlighter.ContentResolution
         public List<DuplicateMacro> DuplicateMacros { get; set; }
 
         /// <summary>
-        /// Maps macro name to its comment parameters (parameters used in comments, directly or transitively).
-        /// Computed after all macros are collected, with transitive closure for nested macro calls.
-        /// Key: macro name (case-insensitive), Value: set of parameter names that are comment parameters.
+        /// The `#ProjectPath`/`#LibraryPath` roots declared anywhere in the root file or its
+        /// `#include` chain, in document order — the same instance <see cref="ContentResolver"/>
+        /// builds while expanding includes.
+        /// </summary>
+        public PathRoots PathRoots { get; set; }
+
+        /// <summary>
+        /// Maps macro name (case-insensitive) to its comment parameters — those used in comments,
+        /// directly or transitively. Computed after all macros are collected, with transitive
+        /// closure for nested macro calls.
         /// </summary>
         public Dictionary<string, HashSet<string>> MacroCommentParameters { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
 
@@ -286,12 +294,20 @@ namespace Calcpad.Highlighter.ContentResolution
         /// Key: macro name (case-insensitive), Value: MacroInfo with param counts.
         /// </summary>
         public Dictionary<string, MacroInfo> UserDefinedMacros { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// SHA256 hex digest of each `#include`d file's content, keyed by its resolved absolute
+        /// path, as read from disk during this resolution. Lets a caller detect a changed include
+        /// by re-hashing just these files, without rerunning include resolution/macro expansion.
+        /// </summary>
+        public Dictionary<string, string> IncludedFileHashes { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
     }
 
     public class Stage3Result
     {
         public List<string> Lines { get; set; }
         public Dictionary<int, int> SourceMap { get; set; }
+        public Dictionary<int, SourceInfo> IncludeMap { get; set; }
         public Dictionary<int, MacroExpansionInfo> MacroExpansions { get; set; }
         public Dictionary<string, FunctionInfo> UserDefinedFunctions { get; set; }
         public List<FunctionDefinition> FunctionsWithParams { get; set; }
@@ -322,38 +338,37 @@ namespace Calcpad.Highlighter.ContentResolution
         public List<(string Name, int Line, int Column)> OuterScopeAssignments { get; set; } = new();
 
         /// <summary>
-        /// All variable assignment positions (definitions and reassignments) from Lint-mode tokenization.
-        /// Each entry is (Name, Line, Column, Length) identifying where a variable is assigned.
-        /// Used by the linter for unused variable detection.
+        /// All variable assignment positions (definitions and reassignments) from Lint-mode
+        /// tokenization, each entry (Name, Line, Column, Length). Used by the linter for unused
+        /// variable detection.
         /// </summary>
         public List<(string Name, int Line, int Column, int Length)> VariableAssignments { get; set; } = new();
 
         /// <summary>
-        /// All variable usage positions (non-assignment Variable tokens) from Lint-mode tokenization.
-        /// Each entry is (Name, Line, Column) identifying where a variable is read.
-        /// Used by the linter for unused variable detection.
+        /// All variable usage positions (non-assignment Variable tokens) from Lint-mode
+        /// tokenization, each entry (Name, Line, Column). Used by the linter for unused variable
+        /// detection.
         /// </summary>
         public List<(string Name, int Line, int Column)> VariableUsages { get; set; } = new();
 
         /// <summary>
-        /// Index of all variable occurrences (assignments and usages) grouped by name.
-        /// Positions are mapped to original source lines with include file info.
-        /// Used for go-to-definition and find-all-occurrences features.
+        /// Index of all variable occurrences (assignments and usages) grouped by name, mapped to
+        /// original source lines with include file info. Used for go-to-definition and
+        /// find-all-occurrences.
         /// </summary>
         public Dictionary<string, List<SymbolLocation>> VariableIndex { get; set; } = new(System.StringComparer.Ordinal);
 
         /// <summary>
-        /// Index of all user-defined function occurrences (definitions and calls) grouped by name.
-        /// Positions are mapped to original source lines with include file info.
-        /// Used for go-to-definition and find-all-occurrences features.
+        /// Index of all user-defined function occurrences (definitions and calls) grouped by name,
+        /// mapped to original source lines with include file info. Used for go-to-definition and
+        /// find-all-occurrences.
         /// </summary>
         public Dictionary<string, List<SymbolLocation>> FunctionIndex { get; set; } = new(System.StringComparer.Ordinal);
 
         /// <summary>
-        /// Index of all macro occurrences (definitions and call sites) grouped by name.
-        /// Definitions come from Stage 2 macro collection; call sites from macro expansion tracking.
-        /// Positions are mapped to original source lines with include file info.
-        /// Used for go-to-definition and find-all-occurrences features.
+        /// Index of all macro occurrences grouped by name — definitions from Stage 2 collection,
+        /// call sites from expansion tracking — mapped to original source lines with include file
+        /// info. Used for go-to-definition and find-all-occurrences.
         /// </summary>
         public Dictionary<string, List<SymbolLocation>> MacroIndex { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
 

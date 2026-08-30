@@ -8,9 +8,8 @@ using Calcpad.Highlighter.Tokenizer.Models;
 namespace Calcpad.Highlighter.Tokenizer
 {
     /// <summary>
-    /// Tokenizes Calcpad source code for syntax highlighting.
-    /// Produces tokens with line/column positions that can be passed to a frontend for colorization.
-    /// Error detection is handled separately by the CalcpadLinter.
+    /// Tokenizes Calcpad source code for syntax highlighting, producing tokens with line/column
+    /// positions a frontend can colorize. Error detection is handled separately by CalcpadLinter.
     ///
     /// Partial class split:
     ///   CalcpadTokenizer.cs                - Core state, public API, main loop, token emission
@@ -29,6 +28,11 @@ namespace Calcpad.Highlighter.Tokenizer
         private TokenizerResult _result = new();
         private StringBuilder _builder = new(100);
         private TokenizerState _state;
+
+        // Carries structural state across line continuations, so bracket/command nesting
+        // opened on one physical line is still in effect on the lines that continue it.
+        private bool _explicitLineBreak;
+        private bool _continueLine;
 
         private struct TokenizerState
         {
@@ -106,6 +110,8 @@ namespace Calcpad.Highlighter.Tokenizer
             ResetCommentState();
             ResetTypeResolutionState();
             ResetMacroState();
+            _explicitLineBreak = false;
+            _continueLine = false;
 
             if (_mode == TokenizerMode.Lint)
                 InitLintState();
@@ -131,6 +137,8 @@ namespace Calcpad.Highlighter.Tokenizer
             _result = new TokenizerResult();
             _builder = new StringBuilder(100);
             _inHtmlComment = false;
+            _explicitLineBreak = false;
+            _continueLine = false;
             TokenizeLineInternal(line.AsMemory(), lineNumber);
             return _result;
         }
@@ -161,13 +169,14 @@ namespace Calcpad.Highlighter.Tokenizer
                 // Line continuation check - works in both code and comments
                 if (c == '_' && (i == len - 1 || text[(i + 1)..].IsWhiteSpace()) && i > 0 && text[i - 1] == ' ')
                 {
-                    ParseLineBreak();
+                    ParseLineBreak(i);
                     break;
                 }
 
                 // Format string handling - accumulate format specifier characters
-                // Stops at whitespace, comment chars, or end of line
-                if (_state.CurrentType == TokenType.Format && c != '\'' && c != '"' && !char.IsWhiteSpace(c))
+                // Stops at whitespace, comment chars, '$' (a macro reference may immediately
+                // follow, e.g. "5ft|in:f2text$"), or end of line
+                if (_state.CurrentType == TokenType.Format && c != '\'' && c != '"' && c != '$' && !char.IsWhiteSpace(c))
                 {
                     _builder.Append(c);
                     continue;
@@ -188,7 +197,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 // Main parsing logic
                 if (_state.MacroArgs > 0)
                 {
-                    ParseMacroArgs(c);
+                    ParseMacroArgs(c, i);
                 }
                 else if (_state.TextComment != '\0')
                 {
@@ -293,7 +302,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 }
                 else if (IsBracket(c))
                 {
-                    ParseBrackets(c);
+                    ParseBrackets(c, i);
                 }
                 else if (CalcpadBuiltIns.Operators.Contains(c))
                 {
@@ -332,10 +341,21 @@ namespace Calcpad.Highlighter.Tokenizer
                 }
                 else if (_builder.Length == 0)
                 {
-                    _state.TokenStartColumn = i;
                     _state.CurrentType = InitType(c, _state.CurrentType);
+                    // Characters that resolve to Comment here are dropped rather than buffered. A
+                    // quote was already emitted by ParseComment, so the cursor is past it and must
+                    // not be rewound — otherwise the next token (typically the bracket in
+                    // 'text'(expr)) lands a column early, while anything else is dropped outright
+                    // and the cursor has to step over it to stay aligned with the source.
                     if (_state.CurrentType != TokenType.Comment)
+                    {
+                        _state.TokenStartColumn = i;
                         _builder.Append(c);
+                    }
+                    else if (c != '\'' && c != '"')
+                    {
+                        _state.TokenStartColumn = i + 1;
+                    }
 
                     if (_state.CurrentType == TokenType.Input)
                         Append(TokenType.Input);
@@ -423,6 +443,26 @@ namespace Calcpad.Highlighter.Tokenizer
                     _macroParameters.Clear();
                 }
             }
+
+            _continueLine = _explicitLineBreak || HasImplicitContinuation(text);
+            _explicitLineBreak = false;
+        }
+
+        /// <summary>
+        /// True when the line ends with a line extension character outside a comment and
+        /// brackets, matrices or command blocks are still open, so the next line continues it.
+        /// </summary>
+        private bool HasImplicitContinuation(ReadOnlySpan<char> text)
+        {
+            if (_state.TextComment != '\0' ||
+                (_state.BracketCount <= 0 && _state.MatrixCount <= 0 && _state.CommandCount <= 0))
+                return false;
+
+            var i = text.Length - 1;
+            while (i >= 0 && char.IsWhiteSpace(text[i]))
+                i--;
+
+            return i >= 0 && CharClassifier.IsLineExtension(text[i]);
         }
 
         private void InitState(ReadOnlyMemory<char> textMemory, int lineNumber)
@@ -430,8 +470,13 @@ namespace Calcpad.Highlighter.Tokenizer
             // Preserve special content state across lines
             var prevInSpecialContent = _state.InSpecialContent;
             var prevHasHtmlContent = _state.HasHtmlContent;
+            var previous = _state;
+            var isContinuation = _continueLine;
+            _continueLine = false;
 
-            _localVariables.Clear();
+            if (!isContinuation)
+                _localVariables.Clear();
+
             _pendingVariableName = null;
             _pendingVariableLine = -1;
             _pendingFunctionName = null;
@@ -449,6 +494,27 @@ namespace Calcpad.Highlighter.Tokenizer
                 InSpecialContent = prevInSpecialContent,
                 HasHtmlContent = prevHasHtmlContent
             };
+
+            if (isContinuation)
+            {
+                _state.IsPlot |= previous.IsPlot;
+                _state.IsUnits = previous.IsUnits;
+                _state.BracketCount = previous.BracketCount;
+                _state.MatrixCount = previous.MatrixCount;
+                _state.CommandCount = previous.CommandCount;
+                _state.IsInCommandBlock = previous.IsInCommandBlock;
+                _state.IsAfterAtOrAmp = previous.IsAfterAtOrAmp;
+                _state.IsFunction = previous.IsFunction;
+                _state.IsFunctionDefinition = previous.IsFunctionDefinition;
+                _state.IsInFunctionParams = previous.IsInFunctionParams;
+                _state.IsMacro = previous.IsMacro;
+                _state.HasMacro = previous.HasMacro;
+                _state.MacroArgs = previous.MacroArgs;
+                _state.IsDataExchangeKeyword = previous.IsDataExchangeKeyword;
+                _state.Keyword = previous.Keyword;
+                _state.CurrentMacroCall = previous.CurrentMacroCall;
+                _state.CurrentMacroArgIndex = previous.CurrentMacroArgIndex;
+            }
 
             // Restore comment state from line continuation
             // When the previous line ended with " _" inside a comment, the comment continues
@@ -478,13 +544,7 @@ namespace Calcpad.Highlighter.Tokenizer
 
             if (type == TokenType.Input)
             {
-                AddToken(type, "? ");
-                return;
-            }
-
-            if (type == TokenType.Bracket && text.Length > 0 && text[0] == '#')
-            {
-                AddToken(type, " " + text);
+                AddToken(type, text);
                 return;
             }
 
@@ -520,14 +580,18 @@ namespace Calcpad.Highlighter.Tokenizer
                 return;
             }
 
-            // Track that a code token has been seen (non-comment content).
-            // This must happen before TrackDefinitions so the flag is available
-            // for the next token's ResolveType call.
+            // Track that a code token has been seen, before TrackDefinitions so the flag is
+            // available for the next token's ResolveType call. The flag marks the first identifier
+            // position on the line, so only a token that can occupy a value position ends it —
+            // directive keywords, brackets and operators do not, since the expression a directive
+            // introduces starts after the keyword, and after its JSON block in the case of #UI.
             if (_beforeFirstCodeToken &&
                 type != TokenType.Comment && type != TokenType.Tag &&
                 type != TokenType.HtmlComment && type != TokenType.HtmlContent &&
                 type != TokenType.Css && type != TokenType.JavaScript &&
-                type != TokenType.Svg)
+                type != TokenType.Svg &&
+                type != TokenType.Keyword && type != TokenType.ControlBlockKeyword &&
+                type != TokenType.Bracket && type != TokenType.Operator)
             {
                 _beforeFirstCodeToken = false;
             }

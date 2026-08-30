@@ -43,9 +43,17 @@ if (-not (Test-Path $ReleaseDir)) {
 Remove-Item -Recurse -Force $StageDir -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force -Path $StageDir | Out-Null
 
-$excludedExtensions = '.pdb', '.d', '.lib', '.rlib'
+$excludedExtensions = '.pdb', '.d', '.lib', '.rlib', '.log'
+# stage-sidecar mirrors the publish tree into target\<profile>\ for the dev
+# loop, and the server writes logs there when run from it. Neither belongs in
+# a shipped zip: the logs carry worksheet content and local source paths.
+$excludedNames = 'appsettings.Development.json'
 Get-ChildItem -Path $ReleaseDir -File |
-    Where-Object { $_.Extension -notin $excludedExtensions -and -not $_.Name.StartsWith('.cargo-') } |
+    Where-Object {
+        $_.Extension -notin $excludedExtensions -and
+        $_.Name -notin $excludedNames -and
+        -not $_.Name.StartsWith('.cargo-')
+    } |
     Copy-Item -Destination $StageDir
 
 foreach ($sub in 'bg', 'zh', 'Fonts') {

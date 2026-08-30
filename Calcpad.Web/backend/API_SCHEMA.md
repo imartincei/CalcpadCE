@@ -5,30 +5,52 @@
 ## Base URL
 
 ```
-http://localhost:9420/api/calcpad
+http://127.0.0.1:{port}/api/calcpad
 ```
 
-Default port is `9420` (override with `CALCPAD_PORT`).
+With neither `CALCPAD_PORT` nor `--urls` set, the server binds `http://127.0.0.1:0` and takes a free port from the OS, so instances never collide. The bound URL is on the `Now listening on:` startup line and is written to the port file (`--port-file <path>`, defaulting to `.calcpad-server.port` beside the binary) for clients to discover.
+
+Setting `CALCPAD_PORT` pins the port and restores the legacy `http://127.0.0.1:9420` base. `ASPNETCORE_URLS` is **not** honored — the host calls `UseUrls` explicitly, which overrides it; pass `--urls` on the command line instead.
+
+---
+
+## Authentication
+
+When the server is launched with `CALCPAD_API_TOKEN` set, every `/api/**` request must carry that value in an `X-Calcpad-Token` header. Anything else gets `401 Unauthorized`. CORS preflights (`OPTIONS`) are exempt — a preflight carries no custom headers, so checking it would fail the real request before it was sent.
+
+```
+X-Calcpad-Token: <per-launch token>
+```
+
+Both shipped hosts set the variable when they spawn the server and never put it on the command line — argv is readable by any local process through `/proc/{pid}/cmdline` and WMI. The Tauri shell generates it in Rust and hands it to the webview via the `server_token` command; the VS Code extension generates it in the extension host and publishes it in the mode-`0600` lock file so other windows sharing the server can adopt it.
+
+Launches that do not set the variable (a `dotnet run` during development, the sample client, the test harness) stay unauthenticated, and the server logs a warning saying so. Loopback binding, the CORS origin policy, and the `Host`-header check are then the only controls.
 
 ---
 
 ## Table of Contents
 
 - [POST /convert](#post-convert)
-- [POST /convert-unwrapped](#post-convert-unwrapped)
 - [GET /sample](#get-sample)
 - [GET /debug-crash](#get-debug-crash)
 - [POST /pdf](#post-pdf)
 - [GET /pdf/health](#get-pdfhealth)
+- [GET /pdf/browser](#get-pdfbrowser)
+- [POST /pdf/browser/install](#post-pdfbrowserinstall)
 - [POST /docx](#post-docx)
 - [POST /highlight](#post-highlight)
 - [POST /highlight-line](#post-highlight-line)
 - [POST /lint](#post-lint)
 - [POST /definitions](#post-definitions)
-- [POST /find-references](#post-find-references)
+- [POST /symbol-at-position](#post-symbol-at-position)
 - [POST /prettify](#post-prettify)
+- [POST /cpdz/decode](#post-cpdzdecode)
+- [POST /cpdz/encode](#post-cpdzencode)
+- [POST /portable/bundle](#post-portablebundle)
+- [POST /portable/package](#post-portablepackage)
 - [GET /snippets](#get-snippets)
 - [Usage Notes](#usage-notes)
+- [Environment Variables](#environment-variables)
 
 ---
 
@@ -44,20 +66,66 @@ interface CalcpadRequest {
   forceUnwrappedCode?: boolean; // If true, return code without calculation (default: false)
   theme?: string;               // "light" or "dark" (default: "light")
   sourceFilePath?: string;      // Full path of source file on client (used to resolve relative #include against the parent file's directory)
+
+  // Render mode. #pre is hidden when forPrint is true; #post is hidden when enableUi is true.
+  forPrint?: boolean;           // Report layout (default: false)
+  enableUi?: boolean;           // Render #UI lines as interactive controls (default: false).
+                                //   Ignored when forPrint is true — print output carries no controls.
+  uiOverrides?: Record<string, string>;
+                                // Values entered into #UI controls, keyed by the control identity
+                                //   the preview reports in data-ui-var ("L:1", or "L:1:2" for the
+                                //   second pass of a loop; a bare "L" covers every declaration).
+                                //   Replaces the right-hand side of the annotated assignment, so a
+                                //   report reflects what was entered.
+  includeLineAnchors?: boolean; // Per-line anchors + error-summary boxes for in-preview line links.
+                                //   Defaults to !forPrint. Set true for an on-screen report, false
+                                //   for anything written to a file.
+  hideErrorLines?: boolean;    // Drops the "on line [N]" reference from error messages, since
+                                //   input mode has no source editor for it to point at. Defaults
+                                //   to enableUi; the report pane shown beside the form overrides
+                                //   it to true even though enableUi is false there.
+
+  // Whether this request may run #write/#append. False by default, so a preview refresh does
+  // not rewrite the document's output on every keystroke. The front ends resolve their
+  // three-way "when to write" setting into this per request: always, only when forPrint, or
+  // never until the Export tab's "Write to Disk" asks for it.
+  write?: boolean;              // Run #write/#append (default: false)
 }
 ```
 
+The four renderings the front ends expose map onto these as:
+
+| Variant | `forPrint` | `enableUi` | `uiOverrides` | `includeLineAnchors` | `hideErrorLines` |
+|---------|-----------|-----------|---------------|----------------------|-------------------|
+| Preview | `false` | `false` | — | on screen: default; export: `false` | default (`false`) |
+| Report | `true` | `false` | yes | on screen: `true`; export: `false` | default, unless shown beside input form: `true` |
+| Input form | `false` | `true` | yes | export: `false` | default (`true`) |
+| Unwrapped | — | — | — | n/a (`?unwrap=true`) | n/a |
+
 **Response:** HTML content (`text/html`)
+
+Calculation errors do not change the status code — they come back beside the HTML in an `X-Calcpad-Errors` response header, URL-encoded JSON of:
+
+```typescript
+Array<{
+  sourceLine: number;
+  outputLine: number;
+  message: string;
+  source: "Macro" | "Expression";
+}>
+```
+
+The header is listed in the CORS policy's exposed headers, so a browser client can read it.
+
+Every local `<img src>` comes back with its `{project}`/`{library}`/`{user}` token and any environment variable already expanded to an absolute forward-slash path, resolved against the roots declared anywhere in the `#include` chain. A source with no token is returned as authored, so a relative one still needs joining against `sourceFilePath`'s folder — the only path work left to a client that has to read the file off disk (to base64-inline it for a sandboxed preview, say). An undeclared root is reported as a normal render error and the source is left as written.
 
 ---
 
-## POST /convert-unwrapped
+### Unwrapped output
 
-Convert Calcpad source code to HTML without calculation (raw code with syntax highlighting). Automatically processes `data-text` links so they remain functional.
+`POST /convert?unwrap=true` returns the raw, fully expanded source instead of a calculated report, with its `data-text` links rewritten to the per-line anchors so in-preview navigation keeps working. The body field `forceUnwrappedCode` also produces unwrapped output, but only the query parameter rewrites the links.
 
-**Request:** Same as `/convert` (uses `CalcpadRequest`)
-
-**Response:** HTML content (`text/html`)
+There is no separate `/convert-unwrapped` endpoint.
 
 ---
 
@@ -77,9 +145,14 @@ interface CalcpadRequest {
 
 ## GET /debug-crash
 
-Write a debug crash event from the client to the server's on-disk crash log. Used by the VS Code extension and desktop wrapper to surface client-side failures into the server log stream.
+Deliberately crashes the server, to verify which failure paths `FileLogger` actually catches. **Served only in the Development environment** — anywhere else it returns `404`, since a plain GET needs no preflight and any page the user visits could otherwise kill their local server.
 
-**Response:** `200 OK`
+**Query Parameters:**
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| mode | `background-thread` | `throw`, `background-thread`, `unobserved-task`, `stackoverflow`, `accessviolation`, `failfast`, or `exit` |
+
+**Response:** `202 Accepted` with `{ mode, note }` for the modes that schedule a crash, `400` for an unknown mode, or no response at all for the modes that terminate the process immediately.
 
 ---
 
@@ -91,47 +164,56 @@ Generate a PDF from HTML content using Playwright browser automation and PDFshar
 ```typescript
 interface PdfGenerateRequest {
   html: string;              // HTML content to convert to PDF (required)
-  browserPath?: string;      // Custom browser executable path
   options?: PdfOptions;      // PDF generation settings
-}
-
-interface PdfOptions {
-  // Page settings
-  format?: string;           // Page format (default: "A4")
-  orientation?: string;      // "portrait" or "landscape" (default: "portrait")
-  printBackground?: boolean; // Print background graphics (default: true)
-  scale?: number;            // Scale factor (default: 1.0)
-
-  // Margins
-  marginTop?: string;        // Top margin (default: "2cm")
-  marginRight?: string;      // Right margin (default: "1.5cm")
-  marginBottom?: string;     // Bottom margin (default: "2cm")
-  marginLeft?: string;       // Left margin (default: "1.5cm")
-
-  // Headers and footers
-  enableHeader?: boolean;    // Enable page header
-  enableFooter?: boolean;    // Enable page footer
-
-  // Document metadata
-  documentTitle?: string;
-  documentSubtitle?: string;
-  author?: string;
-  company?: string;
-  project?: string;
-
-  // Custom content
-  headerCenter?: string;
-  footerCenter?: string;
-
-  // Timestamp format (null/empty uses system default)
-  dateTimeFormat?: string;
-
-  // Background PDF (base64-encoded or file path)
-  backgroundPdf?: string;
 }
 ```
 
+The browser executable is never taken from the request — an executable path off the wire
+is an arbitrary-process-launch primitive. It comes from `BrowserPath` in `appsettings.json`
+or the `BROWSER_PATH` environment variable, else auto-detection. See
+[GET /pdf/browser](#get-pdfbrowser).
+
+```typescript
+
+interface PdfOptions {
+  // Page settings
+  format?: string;           // Letter | Legal | Tabloid | Ledger | A0-A6 (default: "Letter")
+  orientation?: string;      // "portrait" or "landscape" (default: "portrait")
+
+  // Margins — a length with a unit, e.g. "2cm", "0.5in", "12mm"
+  marginTop?: string;        // Top margin (default: "0.75in")
+  marginRight?: string;      // Right margin (default: "0.5in")
+  marginBottom?: string;     // Bottom margin (default: "0.75in")
+  marginLeft?: string;       // Left margin (default: "0.5in")
+
+  // Header and footer content. The bands are always drawn; these control what
+  // goes in them, and an empty/omitted value simply leaves that slot blank.
+  documentTitle?: string;    // Header, left, bold
+  showPageNumbers?: boolean; // "Page n of m", footer right (default: true)
+  showDate?: boolean;        // Timestamp, header right (default: true)
+  dateTimeFormat?: string;   // .NET format string for the timestamp (empty uses "g")
+}
+```
+
+Unrecognized properties are ignored, so a settings blob written by an older client
+is still accepted.
+
 **Response:** PDF binary (`application/pdf`, filename: `document.pdf`)
+
+**503 — no usable browser:** rendering needs a Chromium-family browser and none was found.
+The server does **not** download one on its own unless `AllowChromiumDownload` is set
+(`appsettings.json`, or the `ALLOW_CHROMIUM_DOWNLOAD` environment variable). Clients are
+expected to ask the user and then call `POST /pdf/browser/install`.
+
+```json
+{
+  "error": "No usable browser",
+  "code": "BROWSER_NOT_FOUND",
+  "message": "No Chromium-family browser was found. …",
+  "canDownload": true,
+  "downloadSizeMb": 180
+}
+```
 
 ---
 
@@ -150,11 +232,46 @@ Health check for the PDF generation service.
 
 ---
 
+## GET /pdf/browser
+
+Which browser PDF export would use. Resolves without launching or downloading anything,
+so a client can warn before an export rather than after one fails.
+
+**Response:**
+```json
+{
+  "available": true,
+  "source": "system",
+  "path": "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
+  "downloadAllowed": false,
+  "downloadSizeMb": 180
+}
+```
+
+`source` is `configured` (`BrowserPath`/`BROWSER_PATH`), `system` (auto-detected Chrome/Edge/Chromium),
+`downloaded` (a previously installed headless Chromium), or `none`.
+
+---
+
+## POST /pdf/browser/install
+
+Downloads the bundled headless Chromium (ChromeHeadlessShell) into `chromium/` beside the
+server binary and returns immediately if one is already there. Call this **only after the
+user has agreed** — it is a multi-hundred-megabyte download, and it is the one path that
+downloads regardless of `AllowChromiumDownload` because the caller is relaying consent.
+
+**Response:**
+```json
+{ "installed": true, "path": "…/chromium/chrome-headless-shell-win64/chrome-headless-shell.exe" }
+```
+
+---
+
 ## POST /docx
 
-Generate a Word `.docx` from the source. Runs the calcpad → HTML pipeline (`forPrint: true`) and feeds it through `Calcpad.OpenXml.OpenXmlWriter`.
+Generate a Word `.docx` from the source. Runs the calcpad → HTML pipeline and feeds the result through `Calcpad.OpenXml.OpenXmlWriter`.
 
-**Request:** Same as `/convert` (uses `CalcpadRequest`)
+**Request:** Same as `/convert` (uses `CalcpadRequest`). `forPrint` and `uiOverrides` are honored, so the caller chooses between a report and the preview layout. `enableUi` and `includeLineAnchors` are ignored — a Word document has neither controls nor navigation anchors.
 
 **Response:** Word binary (`application/vnd.openxmlformats-officedocument.wordprocessingml.document`)
 
@@ -194,23 +311,33 @@ interface HighlightToken {
 |----|------|-------------|
 | 0 | None | Whitespace or unknown content |
 | 1 | Const | Numeric constants (e.g., 123, 3.14, 1e-5) |
-| 2 | Units | Unit identifiers (e.g., m, kg, N/m^2) |
-| 3 | Operator | Operators (e.g., +, -, *, /, =) |
-| 4 | Variable | Variable identifiers |
-| 5 | Function | Function names (built-in or user-defined) |
-| 6 | Keyword | Keywords starting with # (e.g., #if, #else, #def) |
-| 7 | Command | Commands starting with $ (e.g., $Plot, $Root, $Sum) |
-| 8 | Bracket | Brackets: (), [], {} |
-| 9 | Comment | Comments enclosed in ' or " |
-| 10 | Tag | HTML tags within comments |
-| 11 | Input | Input markers (? or #{...}) |
-| 12 | Include | Include file paths |
-| 13 | Macro | Macro names and parameters (ending with $) |
-| 14 | HtmlComment | HTML comments |
-| 15 | Format | Format specifiers (e.g., :f2, :e3) |
-| 16 | LocalVariable | Local variables scoped to expressions (function params, #for vars, command scope vars) |
+| 2 | Operator | Operators (e.g., +, -, *, /, =) |
+| 3 | Bracket | Brackets: (), [], {} |
+| 4 | LineContinuation | Line continuation marker (trailing `_`) |
+| 5 | Variable | Variable identifiers |
+| 6 | LocalVariable | Local variables scoped to expressions (function params, #for vars, command scope vars) |
+| 7 | Function | Function names (built-in or user-defined) |
+| 8 | Macro | Macro names (ending with $) |
+| 9 | MacroParameter | Macro parameters in #def statements |
+| 10 | Units | Unit identifiers (e.g., m, kg, N/m^2) |
+| 11 | Setting | Setting variables (PlotHeight, PlotWidth, Precision, Tol, ...) |
+| 12 | Keyword | Keywords starting with # (e.g., #include, #def, #hide) |
+| 13 | ControlBlockKeyword | Control-block keywords (#if, #else, #for, #while, #repeat) |
+| 14 | EndKeyword | Block terminators (#end if, #loop, #end def) |
+| 15 | Command | Commands starting with $ (e.g., $Plot, $Root, $Sum) |
+| 16 | Include | Include file paths |
 | 17 | FilePath | File paths in data exchange keywords (#read, #write, #append) |
 | 18 | DataExchangeKeyword | Sub-keywords in data exchange statements (from, to, sep, type) |
+| 19 | Comment | Comments enclosed in ' or " |
+| 20 | HtmlComment | HTML comments |
+| 21 | Tag | HTML tags within comments |
+| 22 | HtmlContent | Text content inside HTML tags |
+| 23 | JavaScript | Script content |
+| 24 | Css | Style content |
+| 25 | Svg | Inline SVG markup |
+| 26 | Input | Input markers (? or #{...}) |
+| 27 | Format | Format specifiers (e.g., :f2, :e3) |
+| 28 | SettingsJson | Embedded settings JSON in a metadata comment |
 
 **Example Request:**
 ```json
@@ -224,17 +351,17 @@ interface HighlightToken {
 ```json
 {
   "tokens": [
-    { "line": 0, "column": 0, "length": 1, "type": "Variable", "typeId": 4, "text": "a" },
-    { "line": 0, "column": 2, "length": 1, "type": "Operator", "typeId": 3, "text": "=" },
+    { "line": 0, "column": 0, "length": 1, "type": "Variable", "typeId": 5, "text": "a" },
+    { "line": 0, "column": 2, "length": 1, "type": "Operator", "typeId": 2, "text": "=" },
     { "line": 0, "column": 4, "length": 1, "type": "Const", "typeId": 1, "text": "5" },
-    { "line": 0, "column": 5, "length": 1, "type": "Operator", "typeId": 3, "text": "*" },
-    { "line": 0, "column": 6, "length": 1, "type": "Units", "typeId": 2, "text": "m" },
-    { "line": 1, "column": 0, "length": 1, "type": "Variable", "typeId": 4, "text": "b" },
-    { "line": 1, "column": 2, "length": 1, "type": "Operator", "typeId": 3, "text": "=" },
-    { "line": 1, "column": 4, "length": 3, "type": "Function", "typeId": 5, "text": "sin" },
-    { "line": 1, "column": 7, "length": 1, "type": "Bracket", "typeId": 8, "text": "(" },
+    { "line": 0, "column": 5, "length": 1, "type": "Operator", "typeId": 2, "text": "*" },
+    { "line": 0, "column": 6, "length": 1, "type": "Units", "typeId": 10, "text": "m" },
+    { "line": 1, "column": 0, "length": 1, "type": "Variable", "typeId": 5, "text": "b" },
+    { "line": 1, "column": 2, "length": 1, "type": "Operator", "typeId": 2, "text": "=" },
+    { "line": 1, "column": 4, "length": 3, "type": "Function", "typeId": 7, "text": "sin" },
+    { "line": 1, "column": 7, "length": 1, "type": "Bracket", "typeId": 3, "text": "(" },
     { "line": 1, "column": 8, "length": 2, "type": "Const", "typeId": 1, "text": "45" },
-    { "line": 1, "column": 10, "length": 1, "type": "Bracket", "typeId": 8, "text": ")" }
+    { "line": 1, "column": 10, "length": 1, "type": "Bracket", "typeId": 3, "text": ")" }
   ]
 }
 ```
@@ -297,6 +424,7 @@ interface LintDiagnostic {
 | **Stage 1: Pre-include validation (CPD-11xx)** |||
 | CPD-1101 | Include | Malformed #include statement |
 | CPD-1102 | Include | Missing #include filename |
+| CPD-1103 | Include | Deprecated #include input values |
 | **Stage 2: Macro definitions (CPD-22xx)** |||
 | CPD-2201 | Macro | Duplicate macro definition |
 | CPD-2202 | Macro | Macro name must end with '$' |
@@ -351,6 +479,13 @@ interface LintDiagnostic {
 | CPD-3410 | Semantic | Outer-scope assignment (←) to an undefined variable |
 | CPD-3411 | Semantic | Invalid paramType value in a metadata comment |
 | CPD-3412 | Semantic | Invalid metadata-comment JSON |
+| CPD-3413 | Semantic | Invalid #settings JSON |
+| CPD-3414 | Semantic | Invalid PDF settings in a metadata comment |
+| CPD-3415 | Semantic | Invalid #UI format |
+| CPD-3416 | Semantic | 'uiOverrides' metadata comment not on the first line |
+| CPD-3417 | Semantic | Duplicate 'uiOverrides' metadata comment |
+| CPD-3418 | Semantic | 'uiOverrides' sharing a comment with another key |
+| CPD-3419 | Semantic | Deprecated stored input value |
 | **Stage 3: Format (CPD-36xx)** |||
 | CPD-3601 | Format | Invalid format specifier |
 
@@ -412,6 +547,8 @@ interface DefinitionsResponse {
   functions: FunctionDefinitionDto[];
   variables: VariableDefinitionDto[];
   customUnits: CustomUnitDefinitionDto[];
+  projectPath: string | null;  // Resolved absolute #ProjectPath, or null when undeclared/unresolvable
+  libraryPath: string | null;  // Resolved absolute #LibraryPath, or null when undeclared/unresolvable
 }
 
 interface MacroDefinitionDto {
@@ -425,7 +562,6 @@ interface MacroDefinitionDto {
   description?: string;
   paramTypes?: string[];
   paramDescriptions?: string[];
-  defaults?: (string | null)[];
 }
 
 interface FunctionDefinitionDto {
@@ -443,7 +579,6 @@ interface FunctionDefinitionDto {
   description?: string;
   paramTypes?: string[];
   paramDescriptions?: string[];
-  defaults?: (string | null)[];
 }
 
 interface VariableDefinitionDto {
@@ -463,6 +598,7 @@ interface CustomUnitDefinitionDto {
   lineNumber: number;
   source: string;
   sourceFile?: string;
+  description?: string;
 }
 ```
 
@@ -473,11 +609,11 @@ interface CustomUnitDefinitionDto {
 | 1 | Value | Scalar numeric value |
 | 2 | Vector | Vector (1D array) |
 | 3 | Matrix | Matrix (2D array) |
-| 5 | Various | Type varies (assigned different types in different places) |
-| 6 | Function | Function type |
-| 7 | InlineMacro | Inline macro |
-| 8 | MultilineMacro | Multiline macro |
-| 9 | CustomUnit | Custom unit definition |
+| 4 | CustomUnit | Custom unit definition |
+| 5 | Function | Function type |
+| 6 | InlineMacro | Inline macro |
+| 7 | MultilineMacro | Multiline macro |
+| 8 | Various | Type varies (assigned different types in different places) |
 
 **Example Request:**
 ```json
@@ -568,18 +704,26 @@ Response includes:
 
 ---
 
-## POST /find-references
+## POST /symbol-at-position
 
-Get all symbol occurrence locations (definitions, reassignments, and usages) for go-to-definition and find-all-references features. Returns dictionaries mapping symbol names to all their occurrences with original source line positions.
+Resolve a cursor position to the user-defined symbol under it and return every occurrence of that symbol — definition, reassignments, and usages. One round-trip serves go-to-definition, find-all-references, and rename; the matching heuristic lives on the server so clients don't each re-implement it.
 
-**Request:** Same as `/definitions` (uses `DefinitionsRequest`)
+**Request:**
+```typescript
+interface SymbolAtPositionRequest {
+  content: string;
+  line: number;             // Zero-based line of the cursor in the original source
+  column: number;           // Zero-based column of the cursor
+  sourceFilePath?: string;  // Full path of source file on client (resolves #include)
+}
+```
 
 **Response:**
 ```typescript
-interface FindReferencesResponse {
-  variables: Record<string, SymbolLocationDto[]>;
-  functions: Record<string, SymbolLocationDto[]>;
-  macros: Record<string, SymbolLocationDto[]>;
+interface SymbolAtPositionResponse {
+  symbolName: string;
+  kind: "variable" | "function" | "macro";
+  locations: SymbolLocationDto[];
 }
 
 interface SymbolLocationDto {
@@ -592,32 +736,27 @@ interface SymbolLocationDto {
 }
 ```
 
+`null` is returned when no user-defined symbol sits under the position.
+
 **Example Request:**
 ```json
 {
-  "content": "a = 5\nb = a + 1\nc = a * b"
+  "content": "a = 5\nb = a + 1\nc = a * b",
+  "line": 1,
+  "column": 4
 }
 ```
 
 **Example Response:**
 ```json
 {
-  "variables": {
-    "a": [
-      { "line": 0, "column": 0, "length": 1, "source": "local", "isAssignment": true },
-      { "line": 1, "column": 4, "length": 1, "source": "local", "isAssignment": false },
-      { "line": 2, "column": 4, "length": 1, "source": "local", "isAssignment": false }
-    ],
-    "b": [
-      { "line": 1, "column": 0, "length": 1, "source": "local", "isAssignment": true },
-      { "line": 2, "column": 8, "length": 1, "source": "local", "isAssignment": false }
-    ],
-    "c": [
-      { "line": 2, "column": 0, "length": 1, "source": "local", "isAssignment": true }
-    ]
-  },
-  "functions": {},
-  "macros": {}
+  "symbolName": "a",
+  "kind": "variable",
+  "locations": [
+    { "line": 0, "column": 0, "length": 1, "source": "local", "isAssignment": true },
+    { "line": 1, "column": 4, "length": 1, "source": "local", "isAssignment": false },
+    { "line": 2, "column": 4, "length": 1, "source": "local", "isAssignment": false }
+  ]
 }
 ```
 
@@ -625,16 +764,126 @@ interface SymbolLocationDto {
 
 ## POST /prettify
 
-Pretty-print Calcpad source code (consistent spacing, indentation for control blocks, etc.).
+Re-indent Calcpad source by tracking control-block depth across `#if`/`#else`/`#end if`, `#for`/`#while`/`#repeat`/`#loop`, and multiline `#def`/`#end def`. Only leading whitespace is adjusted; line endings and content are preserved.
 
 **Request:**
 ```typescript
 interface PrettifyRequest {
   content: string;
+  indentUnit?: string;            // Emitted per indent level (default: a single tab)
+  trimTrailingWhitespace?: boolean; // Default: true
 }
 ```
 
-**Response:** Plain text (`text/plain`) — the prettified source code.
+**Response:**
+```typescript
+interface PrettifyResponse {
+  content: string;   // The re-indented source
+}
+```
+
+---
+
+## POST /cpdz/decode
+
+Decode a compiled `.cpdz` worksheet to its source text. Accepts both the plain deflate form and the composite archive that bundles images.
+
+**Request:**
+```typescript
+interface CpdzDecodeRequest {
+  data: string;              // base64 of the file's raw bytes
+}
+```
+
+**Response:**
+```typescript
+interface CpdzDecodeResponse {
+  content: string;           // the decoded Calcpad source
+  composite: boolean;        // true when the archive bundles images
+}
+```
+
+A composite file's original bytes must be passed back as `original` on encode, or those images are lost.
+
+**400** when the bytes are not a valid `.cpdz`: `{ error, message }`.
+
+---
+
+## POST /cpdz/encode
+
+Encode source text as a `.cpdz` worksheet. Run [`/portable/bundle`](#post-portablebundle) first — this endpoint compresses whatever it is handed and does not make a worksheet self-contained.
+
+**Request:**
+```typescript
+interface CpdzEncodeRequest {
+  content: string;
+  original?: string;         // base64 of the file being overwritten, when there is one
+}
+```
+
+Passing `original` for a composite archive keeps every entry but the code, so bundled images survive the save.
+
+**Response:**
+```typescript
+interface CpdzEncodeResponse {
+  data: string;              // base64 of the encoded file's bytes
+}
+```
+
+---
+
+## POST /portable/bundle
+
+Rewrite a worksheet into the self-contained form a compiled `.cpdz` needs: macros and `#include`d files expanded in place, every `#read` replaced by the data it imports (hidden, so it stays out of the report), and an included file's relative image paths made absolute. Images themselves are left for the caller to embed — the host owns the filesystem the editor sees — so the order is bundle, embed images, then `POST /cpdz/encode`.
+
+**Request:**
+```typescript
+interface PortableBundleRequest {
+  content: string;
+  sourceFilePath?: string;   // relative #include and #read paths resolve against its folder
+}
+```
+
+An absolute `#write`/`#append` target is always collapsed to its bare filename, so the output lands beside wherever the worksheet ends up rather than a folder that may not exist there; a relative target already does that and is untouched. `{project}`/`{library}`/`{user}` references are always resolved against this machine's own declared roots.
+
+**Response:**
+```typescript
+interface PortableBundleResponse {
+  content: string;           // no includes, no data files, images by absolute path
+}
+```
+
+**400** when the worksheet still depends on something that cannot be read (missing `.csv`, unresolved `#include`, an undeclared `{project}`/`{library}` root, or a relative path with no `sourceFilePath` to resolve against), or when two `#write`/`#append` targets collapse onto the same file: `{ error, messages: string[] }`. Nothing is skipped — a worksheet that would fail, or overwrite one output with another, for whoever receives it is not written.
+
+---
+
+## POST /portable/package
+
+Pack a worksheet and the files it references into a ZIP that stays text — the middle ground between a `.cpd`, which only runs where it was written, and a `.cpdz`, which runs anywhere but cannot be read. The document keeps its directives; only their paths change, each rewritten to reach the copy bundled beside it:
+
+```
+calc.zip
+  calc.cpd
+  calc.cpd.refs/  logo.png  library.cpd  loads.csv
+```
+
+`#include`, `#read` and local `<img src>` paths are rewritten and their files bundled, recursively through included files. Images given as `http(s):`/`data:` are left as written. Note the asymmetry the engine imposes: an `#include` resolves against the file holding it, while everything else resolves against the *root* document, because includes are expanded before anything else runs — so a path inside a bundled include is rewritten relative to the document, not to the include.
+
+An absolute `#write`/`#append` target is collapsed to its bare filename so the output lands beside wherever the package is unpacked; a relative target is untouched. A `{project}`/`{library}`/`{user}` reference is resolved against this machine's own declared roots and bundled like any other — a package that still needed a root declared on the recipient's side would not be portable, and its root must therefore be declared here or the export is refused.
+
+**Request:** `PortableBundleRequest` (as above).
+
+**Response:**
+```typescript
+interface PortablePackageResponse {
+  data: string;              // base64 of the .zip
+  name: string;              // suggested file name, from the document's own
+  refsFolder: string;        // "<document>.refs"
+  bundled: string[];         // the entries packed beside the document
+}
+```
+
+**400** when the package cannot be built: `{ error, messages: string[] }`. Two refusals, both naming what to fix — a reference that cannot be read (including one through an undeclared `{project}`/`{library}` root), and two `#write`/`#append` targets that would collapse onto the same file. Two references sharing a file name is not one of them: the flat refs folder renames the second, and any further one, `name-1.ext`, `name-2.ext` and so on instead. Nothing partial is ever returned.
 
 ---
 
@@ -656,16 +905,29 @@ interface SnippetsResponse {
 
 interface SnippetDto {
   insert: string;                     // Use '§' as cursor placeholder
-  description: string;
-  label?: string;
+  description: string;                // Short label for tooltips and completion detail
+  documentation?: string;             // Long-form Markdown description for hover docs
+  example?: string;                   // Calcpad usage example, rendered as a fenced code block
+  label?: string;                     // Display label (defaults to description)
   category: string;                   // e.g. "Functions/Trigonometric"
   quickType?: string;                 // Shortcut without ~ prefix (e.g., "a" means ~a -> insert)
+  keywordType?: string;               // "Function", "Keyword", "Command", "Constant", "Unit",
+                                      //   "Operator", "Setting", "ControlBlockKeyword", "EndKeyword".
+                                      //   Null for UI-only snippets.
+  returnType?: string;                // CalcpadType name (null for non-functions)
+  returnTypeDescription?: string;     // e.g. "Angle in radians"
+  isElementWise: boolean;             // Operates element-wise on vectors/matrices
+  acceptsAnyCount: boolean;           // Parameter-count validation is skipped (switch, gcd, lcm, ...)
   parameters?: SnippetParameterDto[]; // Parameter info for functions (null for non-functions)
 }
 
 interface SnippetParameterDto {
   name: string;
   description?: string;
+  type?: string;                      // ParameterType name ("Scalar", "Vector", "Matrix", "Any", ...)
+  typeDescription?: string;           // Falls back to type when null
+  isOptional: boolean;
+  isVariadic: boolean;                // The type applies to all remaining arguments
 }
 ```
 
@@ -746,5 +1008,15 @@ GET /api/calcpad/snippets?category=Functions/Trigonometric
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CALCPAD_PORT` | `9420` | Server port (host always loopback) |
-| `ASPNETCORE_URLS` / `--urls` | `http://localhost:9420` | Full bind URL (must resolve to loopback) |
+| `CALCPAD_PORT` | *(unset — OS-assigned port)* | Pins the server port. When set but empty of a value, falls back to `9420` |
+| `CALCPAD_HOST` | `127.0.0.1` | Host part of the bind URL. Must resolve to loopback |
+| `CALCPAD_ENABLE_HTTPS` | `false` | Serves `https` instead of `http`. Only applies on the `CALCPAD_PORT` path |
+| `CALCPAD_API_TOKEN` | *(unset — unauthenticated)* | Per-launch token required in `X-Calcpad-Token` |
+| `CALCPAD_DETACHED` | *(unset)* | `1` disables the stdin-EOF watchdog and the default port file, so the server outlives its parent |
+| `CALCPAD_CONTENT_CACHE_SIZE_LIMIT` | `100` | Entries kept in the resolved-content cache shared by lint/highlight/definitions |
+| `BROWSER_PATH` | *(auto-detect)* | Chromium-family executable for PDF export. Also `BrowserPath` in `appsettings.json` |
+| `ALLOW_CHROMIUM_DOWNLOAD` | `false` | Lets the render path download Chromium on its own. Also `AllowChromiumDownload` in `appsettings.json` |
+
+`ASPNETCORE_URLS` is ignored: the host always calls `UseUrls`, which overrides it. Use `--urls` on the command line.
+
+**CLI flags:** `--urls <url>`, `--port-file <path>` (write the bound URL once Kestrel is listening), `--parent-pid <pid>` (self-exit when that process disappears), `--exit-on-stdin-close` / `--no-exit-on-stdin-close`.

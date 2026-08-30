@@ -3,11 +3,7 @@
     <div class="formatting-container p-3">
       <h3 class="section-title">Prettify</h3>
       <p class="section-desc">
-        Auto-indents the active document based on
-        <code>#if</code>/<code>#for</code>/<code>#while</code>/<code>#repeat</code>
-        and multiline <code>#def</code> blocks. Inline <code>#def name = …</code>
-        is left flat. Comments and content are not modified — only leading
-        whitespace.
+        Auto-indents the active document. Content is not modified outside of whitespace.
       </p>
 
       <div class="form-row">

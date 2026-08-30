@@ -7,10 +7,9 @@ namespace Calcpad.Highlighter.Prettifier
     /// <summary>
     /// Re-indents Calcpad source by tracking control-block depth across
     /// <c>#if</c>/<c>#else</c>/<c>#end if</c>, <c>#for</c>/<c>#while</c>/<c>#repeat</c>/<c>#loop</c>,
-    /// and multiline <c>#def</c>/<c>#end def</c>. Inline <c>#def name = ...</c> does not open a block.
-    ///
-    /// The prettifier only adjusts leading whitespace; line content, comments, and
-    /// the original line-ending style (CRLF vs LF) are preserved.
+    /// and multiline <c>#def</c>/<c>#end def</c>, where inline <c>#def name = ...</c> does not open
+    /// a block. Only leading whitespace is adjusted; line content, comments and the original
+    /// line-ending style are preserved.
     /// </summary>
     public static class CalcpadPrettifier
     {

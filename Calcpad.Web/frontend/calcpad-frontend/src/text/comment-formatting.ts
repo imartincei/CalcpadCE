@@ -76,13 +76,11 @@ export function isColumnInTextContext(lineText: string, column: number): boolean
 }
 
 /**
- * 1-based column at which a missing comment quote should be inserted —
- * right after the line's indentation — or null if none is needed.
- * HTML/markdown formatting hotkeys need the tags to sit inside a comment to
- * render as HTML rather than literal text. No quote is needed when the line
- * already opens a comment, or when the selection (`selectionColumn`, 0-based)
- * already lands inside a text region mid-line — inserting one there would
- * wrongly comment out the code preceding it.
+ * 1-based column at which a missing comment quote should be inserted — right after the line's
+ * indentation — or null if none is needed, since HTML/markdown formatting hotkeys need their
+ * tags inside a comment to render. No quote is needed when the line already opens a comment, or
+ * when the selection already lands inside a text region mid-line, where inserting one would
+ * wrongly comment out the preceding code.
  */
 export function getCommentPrefixInsertColumn(lineText: string, selectionColumn?: number): number | null {
     const indentLen = getIndentLength(lineText);

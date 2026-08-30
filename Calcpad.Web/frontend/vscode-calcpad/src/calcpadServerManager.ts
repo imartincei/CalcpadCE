@@ -1,11 +1,30 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { execSync } from 'child_process';
 import { BaseServerManager } from './baseServerManager';
 import { VSCodeLogger } from './adapters';
+import {
+    NUGET_HOSTS,
+    assertAllowedUrl,
+    downloadVerified,
+    extractZipToDir,
+    fetchJsonFromAllowedHost,
+} from './downloadVerification';
 
 const SKIASHARP_VERSION = '3.119.1';
+
+/**
+ * NuGet v3 registration leaf. Resolves to the flat-container download URL plus
+ * the catalog entry that publishes the package's SHA512 — the v2
+ * `/api/v2/package/{id}/{version}` endpoint we used before has no hash at all.
+ */
+const NUGET_REGISTRATION_BASE = 'https://api.nuget.org/v3/registration5-semver1';
+
+interface ResolvedNupkg {
+    url: string;
+    /** Base64 SHA512 from the catalog entry's `packageHash`. */
+    hash: string;
+}
 
 interface PlatformNativeInfo {
     nugetPackage: string;
@@ -14,18 +33,11 @@ interface PlatformNativeInfo {
 }
 
 /**
- * NuGet dependencies stripped from the bundled bin/ and downloaded on first
- * activation. Same shape and lifecycle as SkiaSharp's native libs — fetch the
- * .nupkg from nuget.org, extract the DLLs we need into bin/, never re-download
- * if the files are already present.
- *
- * Pulling these out shaves ~20 MB off the VSIX; the rest of the savings comes
- * from the framework-dependent publish (no bundled .NET runtime) handled by
- * DotnetRuntimeManager.
- *
- * Versions must stay in lock-step with Calcpad.Server.deps.json. The sync
- * script (sync-bundled-server.mjs) strips these same DLLs from the bundled
- * bin/ before packaging — keep both lists in sync when bumping a package.
+ * NuGet dependencies stripped from the bundled bin/ and downloaded on first activation, same
+ * shape and lifecycle as SkiaSharp's native libs: fetch the .nupkg, extract the DLLs we need
+ * into bin/, never re-download if they are already present. Versions must stay in lock-step
+ * with Calcpad.Server.deps.json, and sync-bundled-server.mjs strips these same DLLs before
+ * packaging — keep both lists in sync when bumping a package.
  */
 interface ExternalManagedDep {
     /** NuGet package id, used to build the v2 download URL. */
@@ -221,19 +233,13 @@ export class CalcpadServerManager extends BaseServerManager implements vscode.Di
     }
 
     /**
-     * Download a NuGet package's .nupkg and extract it into a fresh subdir
-     * under `tmpDir`. Returns the extracted directory. Caller is responsible
-     * for cleaning up tmpDir.
+     * Download a NuGet package's .nupkg and extract it into a fresh subdir under `tmpDir`,
+     * returning the extracted directory. The caller is responsible for cleaning up `tmpDir`.
      */
     private async fetchAndUnzipNupkg(packageId: string, version: string, tmpDir: string): Promise<string> {
-        const url = `https://www.nuget.org/api/v2/package/${packageId}/${version}`;
         this.outputChannel.appendLine(`[ServerManager] Fetching ${packageId} v${version}`);
 
-        const response = await fetch(url, { redirect: 'follow' });
-        if (!response.ok) {
-            throw new Error(`Failed to download ${packageId} v${version}: HTTP ${response.status}`);
-        }
-        const buffer = Buffer.from(await response.arrayBuffer());
+        const buffer = await this.downloadVerifiedNupkg(packageId, version);
 
         // Use a unique subdir per call so concurrent extractions don't clash.
         const slot = path.join(tmpDir, `${packageId}-${version}`);
@@ -248,7 +254,7 @@ export class CalcpadServerManager extends BaseServerManager implements vscode.Di
         fs.rmSync(extractDir, { recursive: true, force: true });
         fs.mkdirSync(extractDir, { recursive: true });
 
-        this.extractZipToDir(nupkgPath, extractDir);
+        extractZipToDir(nupkgPath, extractDir);
 
         // Signed .nupkg files have made Expand-Archive return success with an
         // empty output directory more than once; this check turns that silent
@@ -264,57 +270,52 @@ export class CalcpadServerManager extends BaseServerManager implements vscode.Di
     }
 
     /**
-     * Cross-platform .nupkg / .zip extractor.
-     *
-     * On Windows we call `[System.IO.Compression.ZipFile]::ExtractToDirectory`
-     * directly via PowerShell — `Expand-Archive` has a long-standing habit of
-     * silently no-op'ing on signed `.nupkg` files (the `.signature.p7s` member
-     * trips up its file iteration), which manifested here as
-     * "DocumentFormat.OpenXml.dll not found in lib/…" even though the DLL was
-     * sitting in the .nupkg at lib/net8.0/. The underlying .NET API works fine.
-     *
-     * On Linux/macOS we shell out to `unzip`, which is preinstalled in macOS
-     * and present on essentially every Linux distro. We surface stderr so a
-     * missing `unzip` doesn't degenerate into the same "lib/ not found"
-     * mystery — the user sees "unzip: command not found" instead.
-     *
-     * Paths are passed via env vars on Windows so backslashes / apostrophes /
-     * spaces in the user's extension path can't break shell quoting.
+     * Resolve a pinned package to its flat-container URL and published SHA512.
+     * Both the registration leaf and the catalog entry it points at are checked
+     * against the NuGet host allow-list before being followed.
      */
-    private extractZipToDir(zipPath: string, destDir: string): void {
-        if (process.platform === 'win32') {
-            try {
-                execSync(
-                    'powershell -NoProfile -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; ' +
-                    '[System.IO.Compression.ZipFile]::ExtractToDirectory($env:NUPKG_ZIP, $env:NUPKG_DST)"',
-                    {
-                        timeout: 120000,
-                        env: { ...process.env, NUPKG_ZIP: zipPath, NUPKG_DST: destDir },
-                        stdio: ['ignore', 'ignore', 'pipe'],
-                    }
-                );
-            } catch (err) {
-                const stderr = (err as { stderr?: Buffer }).stderr?.toString().trim() || '';
-                throw new Error(`Windows ZIP extract failed: ${stderr || (err as Error).message}`);
-            }
-        } else {
-            try {
-                execSync(`unzip -o "${zipPath}" -d "${destDir}"`, {
-                    timeout: 120000,
-                    stdio: ['ignore', 'ignore', 'pipe'],
-                });
-            } catch (err) {
-                const stderr = (err as { stderr?: Buffer }).stderr?.toString().trim() || '';
-                // ENOENT from execSync's spawn = `unzip` isn't on PATH at all.
-                if ((err as { code?: string }).code === 'ENOENT' || /command not found|not recognized/i.test(stderr)) {
-                    throw new Error(
-                        `\`unzip\` not found on PATH. Install it (e.g. \`apt install unzip\` / ` +
-                        `\`brew install unzip\`) and reload the window to retry the bundle download.`
-                    );
-                }
-                throw new Error(`unzip failed: ${stderr || (err as Error).message}`);
-            }
+    private async resolveNupkg(packageId: string, version: string): Promise<ResolvedNupkg> {
+        // The v3 API keys packages by lowercase id and normalized version.
+        const id = packageId.toLowerCase();
+        const normalizedVersion = version.toLowerCase();
+        const what = `${packageId} v${version} metadata`;
+
+        const leaf = await fetchJsonFromAllowedHost<{
+            packageContent?: string;
+            catalogEntry?: string;
+        }>(`${NUGET_REGISTRATION_BASE}/${id}/${normalizedVersion}.json`, NUGET_HOSTS, what);
+
+        if (!leaf.packageContent || !leaf.catalogEntry) {
+            throw new Error(`${what}: registration leaf has no packageContent/catalogEntry`);
         }
+
+        const entry = await fetchJsonFromAllowedHost<{
+            packageHash?: string;
+            packageHashAlgorithm?: string;
+        }>(leaf.catalogEntry, NUGET_HOSTS, `${what} (catalog entry)`);
+
+        if (entry.packageHashAlgorithm !== 'SHA512' || !entry.packageHash) {
+            throw new Error(
+                `${what}: expected a SHA512 packageHash, got ` +
+                `'${entry.packageHashAlgorithm ?? 'none'}'. Refusing to download unverifiable content.`
+            );
+        }
+
+        assertAllowedUrl(leaf.packageContent, NUGET_HOSTS, `${packageId} v${version} download`);
+        return { url: leaf.packageContent, hash: entry.packageHash };
+    }
+
+    /** Download a pinned .nupkg and verify it against the hash NuGet publishes for it. */
+    private async downloadVerifiedNupkg(packageId: string, version: string): Promise<Buffer> {
+        const resolved = await this.resolveNupkg(packageId, version);
+
+        return await downloadVerified({
+            url: resolved.url,
+            allowedHosts: NUGET_HOSTS,
+            expected: { value: resolved.hash, encoding: 'base64' },
+            what: `${packageId} v${version}`,
+            log: (message) => this.outputChannel.appendLine(`[ServerManager] ${message}`),
+        });
     }
 
     private async ensureNativeLibs(): Promise<void> {
@@ -349,32 +350,24 @@ export class CalcpadServerManager extends BaseServerManager implements vscode.Di
         binDir: string,
         progress: vscode.Progress<{ increment?: number; message?: string }>
     ): Promise<void> {
-        const nugetUrl = `https://www.nuget.org/api/v2/package/${info.nugetPackage}/${SKIASHARP_VERSION}`;
-        this.outputChannel.appendLine(`[ServerManager] Downloading ${info.nugetPackage} v${SKIASHARP_VERSION} from ${nugetUrl}`);
+        this.outputChannel.appendLine(`[ServerManager] Downloading ${info.nugetPackage} v${SKIASHARP_VERSION} from NuGet`);
 
         progress.report({ message: `Downloading ${info.nugetPackage}...` });
 
-        const response = await fetch(nugetUrl, { redirect: 'follow' });
-        if (!response.ok) {
-            throw new Error(`Failed to download ${info.nugetPackage}: HTTP ${response.status}`);
-        }
-
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
+        const buffer = await this.downloadVerifiedNupkg(info.nugetPackage, SKIASHARP_VERSION);
 
         const tmpDir = path.join(binDir, '.tmp-nupkg');
         fs.mkdirSync(tmpDir, { recursive: true });
         const nupkgPath = path.join(tmpDir, 'package.nupkg');
         fs.writeFileSync(nupkgPath, buffer);
 
-        this.outputChannel.appendLine(`[ServerManager] Downloaded ${(buffer.length / 1024 / 1024).toFixed(1)} MB`);
         progress.report({ message: 'Extracting native library...' });
 
         const extractDir = path.join(tmpDir, 'extracted');
         fs.rmSync(extractDir, { recursive: true, force: true });
         fs.mkdirSync(extractDir, { recursive: true });
 
-        this.extractZipToDir(nupkgPath, extractDir);
+        extractZipToDir(nupkgPath, extractDir);
 
         const ridSearchOrder = [info.rid];
         if (info.rid.startsWith('osx-')) {

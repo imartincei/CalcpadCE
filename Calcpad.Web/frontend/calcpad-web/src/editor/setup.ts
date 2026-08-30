@@ -1,14 +1,14 @@
 import * as monaco from 'monaco-editor';
-import { calcpadLanguage, calcpadLanguageConfiguration } from './language';
+import { calcpadLanguageConfiguration } from './language';
 import { calcpadDarkTheme, calcpadLightTheme } from './theme';
 
 /**
  * Register the CalcPad language and theme with Monaco.
- * Call this once before creating any editors.
+ * Call this once before creating any editors. No token provider is registered —
+ * highlighting comes solely from the server's semantic tokens.
  */
 export function registerCalcpadLanguage(): void {
-    monaco.languages.register({ id: 'calcpad', extensions: ['.cpd'] });
-    monaco.languages.setMonarchTokensProvider('calcpad', calcpadLanguage);
+    monaco.languages.register({ id: 'calcpad', extensions: ['.cpd', '.cpdz'] });
     monaco.languages.setLanguageConfiguration('calcpad', calcpadLanguageConfiguration);
 }
 
@@ -38,9 +38,8 @@ const SYSTEM_FONT_STACK = "ui-monospace, 'Cascadia Code', 'Fira Code', Consolas,
 const JULIA_FONT_STACK = "'JuliaMono', 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace";
 
 /**
- * Build the Monaco `fontFamily` value from a chosen primary font. The special
- * value `"system"` (or empty) means "system monospace" — drop JuliaMono from
- * the stack. Any other value is treated as a font family name and prepended.
+ * Build the Monaco `fontFamily` value from a chosen primary font. The special value `"system"`
+ * (or empty) drops JuliaMono from the stack; anything else is prepended as a family name.
  */
 export function resolveEditorFontFamily(name: string | undefined): string {
     const trimmed = (name ?? '').trim();
@@ -50,9 +49,8 @@ export function resolveEditorFontFamily(name: string | undefined): string {
 }
 
 /**
- * Monaco measures glyph widths once when an editor is created. Web fonts load
- * asynchronously, so on the first paint the measurement happens against a
- * fallback and the cursor/glyph grid ends up misaligned. Force the chosen
+ * Monaco measures glyph widths once when an editor is created, so a web font loading
+ * asynchronously leaves the cursor/glyph grid misaligned on first paint. Force the chosen
  * primary family to load, then re-measure all editors.
  */
 export function remeasureEditorFontsWhenReady(family = 'JuliaMono', fontSize = 14): void {

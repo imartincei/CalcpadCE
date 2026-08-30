@@ -55,8 +55,6 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 }
                 lineTokens.Add(token);
             }
-
-            BuildLineModeMap();
         }
 
         /// <summary>
@@ -168,10 +166,9 @@ namespace Calcpad.Highlighter.Linter.Helpers
         }
 
         /// <summary>
-        /// Effective Calcpad parse mode for the given line.
-        /// Mode-switching directives (#cpd, #html, #markdown) take effect on the
-        /// line AFTER the directive — the directive line itself stays in the
-        /// previous mode so it is still tokenized/linted as a Calcpad keyword.
+        /// Effective Calcpad parse mode for the given line, always Cpd for now: the mode-switching
+        /// directives (#cpd, #html, #markdown) are not implemented in Calcpad.Core, so nothing
+        /// populates <see cref="_lineModes"/>. Restore the map here when Core gains the keywords.
         /// </summary>
         public ParseMode GetLineMode(int lineNumber) =>
             _lineModes.TryGetValue(lineNumber, out var m) ? m : ParseMode.Cpd;
@@ -182,43 +179,5 @@ namespace Calcpad.Highlighter.Linter.Helpers
         /// content is not linted).
         /// </summary>
         public bool IsCpdMode(int lineNumber) => GetLineMode(lineNumber) == ParseMode.Cpd;
-
-        private void BuildLineModeMap()
-        {
-            if (_tokenCache.Count == 0)
-                return;
-
-            int maxLine = 0;
-            foreach (var line in _tokenCache.Keys)
-            {
-                if (line > maxLine) maxLine = line;
-            }
-
-            var current = ParseMode.Cpd;
-            for (int i = 0; i <= maxLine; i++)
-            {
-                _lineModes[i] = current;
-
-                if (!_tokenCache.TryGetValue(i, out var tokens))
-                    continue;
-
-                foreach (var token in tokens)
-                {
-                    if (token.Type == TokenType.None)
-                        continue;
-                    if (token.Type == TokenType.Keyword)
-                    {
-                        var text = token.Text?.TrimEnd();
-                        if (string.Equals(text, "#cpd", StringComparison.OrdinalIgnoreCase))
-                            current = ParseMode.Cpd;
-                        else if (string.Equals(text, "#html", StringComparison.OrdinalIgnoreCase))
-                            current = ParseMode.Html;
-                        else if (string.Equals(text, "#markdown", StringComparison.OrdinalIgnoreCase))
-                            current = ParseMode.Markdown;
-                    }
-                    break;
-                }
-            }
-        }
     }
 }

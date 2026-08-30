@@ -6,7 +6,24 @@ import CalcpadAppVue from 'calcpad-frontend/vue/components/CalcpadApp.vue';
 import { initMessaging } from 'calcpad-frontend/vue/services/messaging';
 import { MessageBridge } from './services/message-bridge';
 import { buildApiSettings } from 'calcpad-frontend/types/settings';
-import { findMetadataCommentBlock, serializeMetadataComment, buildDefinitionResolver } from 'calcpad-frontend';
+import {
+    findMetadataCommentBlock,
+    serializeMetadataComment,
+    buildDefinitionResolver,
+    UiOverrideStore,
+    writeUiOverrides,
+    extractUiControls,
+    isCompiledPath,
+    documentHasUiDirectives,
+    DEFAULT_PREVIEW_SIZE_MB,
+    MIN_PREVIEW_SIZE_MB,
+    MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
+    MAX_INLINE_IMAGE_TOTAL_BYTES,
+    previewSizeLimitChars,
+    previewLimitNoticeHtml,
+    formatSize,
+    type InlineImageBudget,
+} from 'calcpad-frontend';
 import { registerCalcpadLanguage, registerCalcpadTheme, remeasureEditorFontsWhenReady, resolveEditorFontFamily } from './editor/setup';
 import { setAppTheme, coerceAppTheme } from './editor/app-theme';
 import { registerSemanticTokensProvider } from './editor/semantic-tokens';
@@ -27,9 +44,10 @@ import { attachOperatorReplacer } from './editor/operator-replacer';
 import { attachAutoIndenter } from './editor/auto-indent';
 import { registerFormattingCommands } from './editor/formatting-commands';
 import { registerFormatDocumentProvider } from './editor/format-document';
-import { setActiveDocumentKeyResolver, type EditorBridge } from './editor/bridge';
+import { setActiveDocumentKeyResolver, getActiveDocumentKey, type EditorBridge } from './editor/bridge';
 import { EditorGroup } from './editor/editor-group';
 import type { TabManager } from './tabs/tab-manager';
+import type { UiControl } from 'calcpad-frontend';
 import './editor/vscode-variables.css';
 import 'calcpad-frontend/vue/styles/base.css';
 import './styles/app.css';
@@ -40,10 +58,7 @@ import './editor/workers';
 /** Runtime check: are we running inside a Tauri webview? */
 const isTauri = typeof (window as any).__TAURI_INTERNALS__ !== 'undefined';
 
-// Determine server URL:
-// 1. ?server= query param
-// 2. VITE_SERVER_URL env var
-// 3. Default to same origin
+// Server URL: the ?server= query param, then VITE_SERVER_URL, then same origin.
 function getServerUrl(): string {
     const params = new URLSearchParams(window.location.search);
     const fromParam = params.get('server');
@@ -153,7 +168,7 @@ async function showServerBlockedDialog(details: string): Promise<void> {
     }
 }
 
-type PreviewMode = 'wrapped' | 'unwrapped';
+type ResultMode = 'preview' | 'unwrapped' | 'ui' | 'report';
 
 async function bootstrap(): Promise<void> {
     let serverUrl: string;
@@ -195,6 +210,7 @@ async function bootstrap(): Promise<void> {
 
         const { TauriMessageBridge } = await import('./services/tauri-bridge');
         tauriBridge = new TauriMessageBridge(serverUrl);
+        tauriBridge.api.setAuthToken(serverManager.getAuthToken());
         (window as any).calcpadBridge = tauriBridge;
     } else {
         // Pure web: use in-process web bridge
@@ -319,51 +335,325 @@ async function bootstrap(): Promise<void> {
     async function refreshDefinitionsFor(group: EditorGroup): Promise<void> {
         const content = group.editor.getValue();
         const ctx = getFileContext ? await getFileContext(content) : {};
-        editorBridge.definitions.refreshDefinitions(content, docKeyFor(group), ctx.sourceFilePath);
+        editorBridge.definitions.refreshDefinitions(content, docKeyFor(group), ctx.sourceFilePath, `defs:${group.id}`);
     }
 
+    // Also hands the result to App.vue, which themes the loading overlay with it.
     function resolvePreviewTheme(): 'light' | 'dark' {
         const stored = editorBridge.getExtraSetting('previewTheme') ?? 'system';
-        if (stored === 'light' || stored === 'dark') return stored;
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const resolved = stored === 'light' || stored === 'dark'
+            ? stored
+            : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        appInstance.setPreviewTheme(resolved);
+        return resolved;
     }
 
     // Output line the next unwrapped refresh should scroll to, per group. Set
     // by the wrapped->unwrapped two-step in the 'navigateToLine' handler.
     const pendingPreviewScrollLine = new Map<string, number>();
 
+    // Values entered into #UI controls. Held in memory so typing in a form never
+    // dirties the file; "Save values" writes them into the document.
+    const uiOverrides = new UiOverrideStore();
+    // Documents whose in-memory values have not been written back yet.
+    const uiOverridesDirty = new Set<string>();
+    // Controls each document's last input-form render produced, which is what tells the
+    // Properties tab whether a saved value still applies to anything.
+    const uiControls = new Map<string, UiControl[]>();
+
+    /** Caps what a preview render will inline, and says so rather than dropping images silently. */
+    function previewImageBudget(group: EditorGroup): InlineImageBudget {
+        return {
+            maxTotalBytes: MAX_INLINE_IMAGE_TOTAL_BYTES,
+            // A view, so it degrades: refusing the render would be worse than an
+            // under-illustrated one. The compiled export fails instead.
+            onExceeded: 'skip',
+            onSkip: (skipped) => appInstance.appendOutput('warn',
+                `Image budget of ${formatSize(MAX_INLINE_IMAGE_TOTAL_BYTES)} reached — ${skipped} image(s) left unembedded in the preview.`,
+                'preview', group.id),
+        };
+    }
+
+    function previewSizeLimit(): number {
+        const stored = Number(editorBridge.getExtraSetting('maxPreviewSizeMB'));
+        return previewSizeLimitChars(Number.isFinite(stored) && stored > 0 ? stored : DEFAULT_PREVIEW_SIZE_MB);
+    }
+
+    /**
+     * Whether this render is too big to show, and if so shows the notice in its place.
+     * Called before anything copies the HTML: the pipeline below multiplies it several
+     * times over, so passing here is what bounds every one of those copies.
+     */
+    function previewTooLarge(group: EditorGroup, html: string, uiPrint = false): boolean {
+        const docKey = uiDocKeyFor(group);
+        const limit = previewSizeLimit();
+        if (html.length <= limit) return false;
+
+        appInstance.appendOutput('warn',
+            `Preview blocked: this document rendered to ${formatSize(html.length)}, over the ${formatSize(limit)} limit.`,
+            'preview', group.id);
+        const notice = previewLimitNoticeHtml({
+            chars: html.length,
+            limitChars: limit,
+            theme: resolvePreviewTheme(),
+        });
+        if (uiPrint) void appInstance.setUiPrintHtml(group.id, notice, docKey);
+        else void appInstance.setPreviewHtml(group.id, notice, undefined, docKey);
+        return true;
+    }
+
+    // Tauri's `invoke`, once the desktop-only block below has imported it. Null in the
+    // web build, where there is no native menu to keep in step.
+    let invokeTauri: (<T>(cmd: string, args?: Record<string, unknown>) => Promise<T>) | null = null;
+
+    /**
+     * A .cpdz is a compiled worksheet: it is distributed to be filled in, not read
+     * or edited, so it opens straight into the input form with the editor locked.
+     * Entered values can still be saved back — the file is decoded and re-encoded
+     * around the uiOverrides comment, so no source is exposed on the way through.
+     */
+    function applyCompiledWorksheetMode(group: EditorGroup): void {
+        const activeId = group.tabs.activeId;
+        const path = activeId ? group.tabs.getFilePath(activeId) : null;
+        const compiled = !!path && isCompiledPath(path);
+        group.editor.updateOptions({ readOnly: compiled });
+        if (group === activeGroup) {
+            syncSourceModeMenuItems(!compiled);
+            syncInputMode();
+        }
+        if (compiled && appInstance.getResultMode() !== 'ui') {
+            if (!appInstance.isPreviewVisible()) appInstance.togglePreview();
+            appInstance.setResultMode('ui');
+        }
+    }
+
+    // Files already judged for input mode. Held per path for the session: the point of the
+    // whole thing is that a tab switch, or a #UI line added while editing, never drags the
+    // user back into a form they deliberately left.
+    const autoUiSeenPaths = new Set<string>();
+    // Set while the auto-switch drives setResultMode, so the mode it picks is not persisted
+    // as the session's own — one #UI document would otherwise pin every later launch to it.
+    let autoUiSwitchInFlight = false;
+
+    /**
+     * Whether opening this tab should go straight to the input form: a document declaring
+     * `#UI` controls is one to fill in. Decided once per file and recorded as decided even
+     * when the answer is no, and split from {@link autoEnterUiMode} so the caller can skip
+     * its own preview refresh.
+     */
+    function shouldAutoEnterUiMode(group: EditorGroup): boolean {
+        if (!isTauri) return false;
+        const activeId = group.tabs.activeId;
+        if (!activeId) return false;
+
+        const path = group.tabs.getFilePath(activeId);
+        // Untitled documents are left alone: there is no file yet to remember the decision
+        // against, and a #UI line typed into a scratch buffer is being written rather than
+        // filled in.
+        if (!path || isCompiledPath(path)) return false;
+        if (autoUiSeenPaths.has(path)) return false;
+        autoUiSeenPaths.add(path);
+
+        // A recovered draft comes back dirty, and hiding it behind a form right after the
+        // recovery prompt is the last thing the user wants to see.
+        if (group.tabs.isDirty(activeId)) return false;
+        if (editorBridge.getExtraSetting('autoInputMode') === 'false') return false;
+        // Toggling the preview off leaves the mode at 'ui', so the pane's visibility is part
+        // of "already there" — otherwise this would do nothing and show nothing.
+        if (appInstance.getResultMode() === 'ui' && appInstance.isPreviewVisible()) return false;
+
+        return documentHasUiDirectives(group.editor.getValue());
+    }
+
+    function autoEnterUiMode(): void {
+        autoUiSwitchInFlight = true;
+        if (!appInstance.isPreviewVisible()) appInstance.togglePreview();
+        void appInstance.setResultMode('ui');
+        autoUiSwitchInFlight = false;
+    }
+
+    /**
+     * The result modes a compiled worksheet has nothing to render for, so the native View
+     * menu drops the matching entries rather than greying them. Only the desktop build has
+     * a menu — elsewhere `invokeTauri` stays null and the App.vue guard is the whole story.
+     */
+    let sourceModeMenuShown = true;
+    function syncSourceModeMenuItems(shown: boolean): void {
+        if (shown === sourceModeMenuShown) return;
+        sourceModeMenuShown = shown;
+        void invokeTauri?.('set_source_result_modes_visible', { visible: shown });
+    }
+
+    /**
+     * Tells the sidebar whether the active document is being filled in rather than
+     * edited, so the tabs that act on source can grey themselves out. Input mode hides
+     * the editor; a compiled worksheet has no source to act on at all, however the
+     * results pane happens to be set.
+     */
+    function syncInputMode(): void {
+        const activeId = activeGroup.tabs.activeId;
+        const path = activeId ? activeGroup.tabs.getFilePath(activeId) : null;
+        const compiled = !!path && isCompiledPath(path);
+        const active = compiled
+            || (appInstance.isPreviewVisible() && appInstance.getResultMode() === 'ui');
+        window.dispatchEvent(new MessageEvent('message', {
+            data: { type: 'inputModeChanged', active, compiled },
+        }));
+    }
+
+    /**
+     * Key that #UI values are stored under: the file path, so the same document open in two
+     * tabs or two groups shares one set of entered values. Unsaved documents fall back to
+     * the tab key, which is the only thing that tells them apart.
+     */
+    function uiDocKeyFor(group: EditorGroup): string {
+        const activeId = group.tabs.activeId;
+        return (activeId && group.tabs.getFilePath(activeId)) || docKeyFor(group);
+    }
+
+    function activeUiDocKey(): string {
+        return uiDocKeyFor(activeGroup);
+    }
+
+    function refreshUiDirtyIndicator(): void {
+        appInstance.setUiOverridesDirty(uiOverridesDirty.has(activeUiDocKey()));
+    }
+
+    // The store is keyed per document and owned here, so the bridge is handed a lookup
+    // rather than the store: report and input-form exports render the entered values.
+    activeBridge.setUiOverridesProvider(() => {
+        syncUiOverrides(activeGroup, activeGroup.editor.getValue());
+        return uiOverrides.toRecord(activeUiDocKey());
+    });
+    activeBridge.setUiControlsProvider(() => uiControls.get(activeUiDocKey()) ?? null);
+    activeBridge.setUiControlsSink((controls) => uiControls.set(activeUiDocKey(), controls));
+    // An edit made in the Properties tab is an edit to the entered values, so the store
+    // follows it - otherwise the next "Save values" would write the old ones back.
+    activeBridge.setUiOverridesSink((overrides) => {
+        const docKey = activeUiDocKey();
+        uiOverrides.replace(docKey, overrides);
+        uiOverridesDirty.delete(docKey);
+        refreshUiDirtyIndicator();
+        void refreshPreviewFor(activeGroup);
+    });
+
+    /**
+     * Sidebar line navigation (the TOC) while the input form is up: the editor it would
+     * normally reveal is hidden, so the form and the report beside it are scrolled instead.
+     * The cursor still moves without taking focus off the form.
+     */
+    activeBridge.onGoToLine = (line: number) => {
+        if (!appInstance.isPreviewVisible() || appInstance.getResultMode() !== 'ui') return false;
+        appInstance.scrollPreviewToSourceLine(activeGroup.id, line, true);
+        activeGroup.editor.revealLineInCenter(line);
+        activeGroup.editor.setPosition({ lineNumber: line, column: 1 });
+        return true;
+    };
+
+    /**
+     * Whether the plain preview renders with the entered #UI values applied. Off by default,
+     * since preview is where the document itself is read; turned on it becomes a debugging
+     * view of the filled-in form.
+     */
+    function previewAppliesUiOverrides(): boolean {
+        return editorBridge.getExtraSetting('previewUiOverrides') === 'true';
+    }
+
+    /**
+     * Keeps a document's overrides in step with its saved uiOverrides comment, so entered
+     * values survive reopening the file and an edit to that comment — a key renamed by hand
+     * to follow a renamed variable — reaches the render instead of being shadowed by them.
+     */
+    function syncUiOverrides(group: EditorGroup, content: string): void {
+        if (!uiOverrides.syncFromSource(uiDocKeyFor(group), content)) return;
+        uiOverridesDirty.delete(uiDocKeyFor(group));
+        refreshUiDirtyIndicator();
+    }
+
+    /**
+     * Retires the controls cached for a document, so an edit that renames or removes a #UI
+     * line is not judged against the list a render found before it. The panel asks for a
+     * fresh one while it is showing saved values; anywhere else the next form render fills it.
+     */
+    function invalidateUiControls(group: EditorGroup): void {
+        if (!uiControls.delete(uiDocKeyFor(group))) return;
+        if (group === activeGroup) activeBridge.refreshUiControls();
+    }
+
     const PREVIEW_LOADING_DELAY_MS = 400;
+    const PREVIEW_LOADING_MIN_MS = 300;
+    const previewLoadingSeq = new Map<string, number>();
+
+    /**
+     * Delayed "Calculating…" overlay, returning the call that takes it back down.
+     * Shown only if the round-trip runs long, so fast renders never flash it, and held
+     * for a minimum once shown so one finishing just past the delay does not strobe it.
+     */
+    function showPreviewLoading(group: EditorGroup): () => Promise<void> {
+        // Held past the response, so a superseded render is still holding the overlay
+        // when its replacement starts and would otherwise hide it on the way out.
+        const seq = (previewLoadingSeq.get(group.id) ?? 0) + 1;
+        previewLoadingSeq.set(group.id, seq);
+        let shownAt = 0;
+        const timer = window.setTimeout(() => {
+            if (previewLoadingSeq.get(group.id) !== seq) return;
+            shownAt = performance.now();
+            appInstance.setPreviewLoading(group.id, true);
+        }, PREVIEW_LOADING_DELAY_MS);
+        return async () => {
+            window.clearTimeout(timer);
+            if (shownAt) {
+                const held = performance.now() - shownAt;
+                if (held < PREVIEW_LOADING_MIN_MS)
+                    await new Promise(r => setTimeout(r, PREVIEW_LOADING_MIN_MS - held));
+            }
+            if (previewLoadingSeq.get(group.id) !== seq) return;
+            appInstance.setPreviewLoading(group.id, false);
+        };
+    }
 
     async function refreshPreviewFor(group: EditorGroup): Promise<void> {
         if (!appInstance.isPreviewVisible()) return;
+        if (appInstance.getResultMode() === 'ui' && group !== activeGroup) return;
 
         const content = group.editor.getValue();
         const settings = activeBridge.getSettings();
         const apiSettings = buildApiSettings(settings);
-        const mode = appInstance.getPreviewMode() as PreviewMode;
+        const mode = appInstance.getResultMode() as ResultMode;
         const theme = resolvePreviewTheme();
 
         if (!content.trim()) {
-            appInstance.setPreviewHtml(group.id, getEmptyPreviewHtml(theme));
+            void appInstance.setPreviewHtml(group.id, getEmptyPreviewHtml(theme));
             return;
         }
 
         const fileContext = getFileContext ? await getFileContext(content) : {};
 
-        // Show the "Calculating…" overlay only if the round-trip runs long, so
-        // fast renders never flash it (mirrors Calcpad.Wpf's delayed spinner).
-        const loadingTimer = window.setTimeout(
-            () => appInstance.setPreviewLoading(group.id, true),
-            PREVIEW_LOADING_DELAY_MS,
-        );
+        const hideLoading = showPreviewLoading(group);
         let result;
         try {
+            // The report applies entered values just as the input form does, so both need
+            // the document's saved ones seeded first. Preview joins them when the setting
+            // asks it to, which is how an error that only shows up once the form is filled
+            // in gets looked at against the source.
+            const overrideMode = mode === 'ui' || mode === 'report'
+                || (mode === 'preview' && previewAppliesUiOverrides());
+            if (overrideMode) syncUiOverrides(group, content);
+            // Unwrapped always shows the document as written.
+            const ui = overrideMode
+                ? { enableUi: mode === 'ui', uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }
+                : undefined;
+            const write = activeBridge.mayWrite(mode === 'report', mode === 'ui');
             result = mode === 'unwrapped'
-                ? await activeBridge.api.convertUnwrapped(content, apiSettings, fileContext.sourceFilePath, theme)
-                : await activeBridge.api.convert(content, apiSettings, 'html', false, fileContext.sourceFilePath, theme);
-        } finally {
-            window.clearTimeout(loadingTimer);
-            appInstance.setPreviewLoading(group.id, false);
+                ? await activeBridge.api.convertUnwrapped(content, apiSettings, fileContext.sourceFilePath, theme, { key: `preview:${group.id}`, write })
+                // The report is a print layout, but on screen, so it keeps the line
+                // anchors that forPrint would otherwise suppress.
+                : await activeBridge.api.convert(
+                    content, apiSettings, 'html', mode === 'report', fileContext.sourceFilePath, theme, ui,
+                    mode === 'report' ? true : undefined, { key: `preview:${group.id}`, write });
+        } catch (err) {
+            void hideLoading();
+            throw err;
         }
 
         // Consume any pending two-step scroll target for this group: only the
@@ -374,20 +664,64 @@ async function bootstrap(): Promise<void> {
         pendingPreviewScrollLine.delete(group.id);
 
         if (result && !(result instanceof ArrayBuffer)) {
+            // Before the image inlining and the injection passes each copy it. Showing a
+            // render costs several times its own size, so the check that can hold the line
+            // is the one in front of all of them.
+            if (previewTooLarge(group, result.html)) {
+                await hideLoading();
+                return;
+            }
             // Desktop: inline on-disk images so relative <img src> paths (from
             // the images-folder / custom-path insert options) render in the
             // sandboxed preview iframe, matching PDF export.
             const finalHtml = tauriBridge
-                ? await tauriBridge.inlineDocumentImages(result.html)
+                ? await tauriBridge.inlineDocumentImages(result.html, previewImageBudget(group))
                 : result.html;
-            appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine);
+            const committed = appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine, uiDocKeyFor(group));
+            if (mode === 'ui') uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
             window.dispatchEvent(new MessageEvent('message', {
                 data: { type: 'updateConvertErrors', errors: result.errors },
             }));
+            await committed;
         }
+        await hideLoading();
+
+        if (mode === 'ui' && appInstance.isUiPrintVisible())
+            await refreshUiPrintFor(group, content, apiSettings, fileContext.sourceFilePath, theme);
+    }
+
+    /**
+     * Renders the report that sits beside the input form: the print layout, with
+     * the entered values applied, so #post content and the results they produce
+     * are visible while filling the form in.
+     */
+    async function refreshUiPrintFor(
+        group: EditorGroup,
+        content: string,
+        apiSettings: unknown,
+        sourceFilePath: string | undefined,
+        theme: 'light' | 'dark',
+    ): Promise<void> {
+        const result = await activeBridge.api.convert(
+            content, apiSettings, 'html', true, sourceFilePath, theme,
+            { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)), hideErrorLines: true },
+            // A report even though a form is open, so this is the half of input mode that writes.
+            true, { key: `preview:${group.id}`, write: activeBridge.mayWrite(true) });
+        if (!result || result instanceof ArrayBuffer) return;
+        if (previewTooLarge(group, result.html, true)) return;
+
+        const html = tauriBridge
+            ? await tauriBridge.inlineDocumentImages(result.html, previewImageBudget(group))
+            : result.html;
+        await appInstance.setUiPrintHtml(group.id, html, uiDocKeyFor(group));
     }
 
     function refreshAllPreviews(): void {
+        // UI mode renders the active group only — the other has no iframe.
+        if (appInstance.getResultMode() === 'ui') {
+            void refreshPreviewFor(activeGroup);
+            return;
+        }
         for (const g of groups.values()) void refreshPreviewFor(g);
     }
 
@@ -425,6 +759,8 @@ async function bootstrap(): Promise<void> {
         // Refresh active-group-scoped UI (Problems panel, sidebar TOC, preview).
         refreshProblemsFor(group);
         activeBridge.refreshHeadings();
+        refreshUiDirtyIndicator();
+        syncInputMode();
         if (appInstance.isPreviewVisible()) void refreshPreviewFor(group);
     }
 
@@ -455,7 +791,7 @@ async function bootstrap(): Promise<void> {
         group.diagnostics = setupDiagnostics(ed, activeBridge.api, () => {
             const sev = editorBridge.getExtraSetting('linterMinSeverity');
             return (sev === 'error' || sev === 'warning') ? sev : 'information';
-        }, getFileContext);
+        }, getFileContext, `lint:${group.id}`);
 
         // Focus-the-preview-to-line context action (targets this group).
         ed.addAction({
@@ -467,10 +803,9 @@ async function bootstrap(): Promise<void> {
             run: () => syncPreviewToCursorFor(group, true),
         });
 
-        // Manual "run" — re-renders all previews. Useful when Auto-Run Preview
-        // is off. The Ctrl+Alt+X shortcut is bound both here (works when the
-        // editor has focus) and at the window level (Tauri) so it fires from
-        // anywhere in the app.
+        // Manual "run" — re-renders all previews, for when Auto-Run Preview is off. The
+        // Ctrl+Alt+X shortcut is bound both here and at the window level (Tauri) so it fires
+        // from anywhere in the app.
         ed.addAction({
             id: 'calcpad.runPreview',
             label: 'Run Preview',
@@ -542,14 +877,18 @@ async function bootstrap(): Promise<void> {
         });
 
         // Content changes: refresh this group's definitions cache + preview,
-        // and (only when this is the active group) the sidebar TOC.
+        // retire its cached #UI controls, and (only when this is the active group) the
+        // sidebar TOC.
         let definitionsTimer: ReturnType<typeof setTimeout> | null = null;
         let previewTimer: ReturnType<typeof setTimeout> | null = null;
         let tocTimer: ReturnType<typeof setTimeout> | null = null;
         group.disposables.push(
             ed.onDidChangeModelContent(() => {
                 if (definitionsTimer) clearTimeout(definitionsTimer);
-                definitionsTimer = setTimeout(() => void refreshDefinitionsFor(group), 800);
+                definitionsTimer = setTimeout(() => {
+                    invalidateUiControls(group);
+                    void refreshDefinitionsFor(group);
+                }, 800);
                 if (appInstance.isPreviewVisible() && editorBridge.getExtraSetting('autoRun') !== 'false') {
                     if (previewTimer) clearTimeout(previewTimer);
                     previewTimer = setTimeout(() => void refreshPreviewFor(group), 800);
@@ -588,13 +927,18 @@ async function bootstrap(): Promise<void> {
 
         // On tab switch within this group, re-emit markers + re-lint + repaint.
         group.tabs.onActiveModelChanged(() => {
+            applyCompiledWorksheetMode(group);
+            const enteringUi = shouldAutoEnterUiMode(group);
             refreshProblemsFor(group);
             // Re-lint: content-change events don't fire on tab switch, so the
             // debounced lint in setupDiagnostics never re-runs for the new model.
             void group.diagnostics?.refresh();
-            if (appInstance.isPreviewVisible()) void refreshPreviewFor(group);
+            // The mode switch below renders the form itself, so rendering here first would
+            // just be a preview nobody sees.
+            if (!enteringUi && appInstance.isPreviewVisible()) void refreshPreviewFor(group);
             if (group === activeGroup) activeBridge.refreshHeadings();
             void refreshDefinitionsFor(group);
+            if (enteringUi) autoEnterUiMode();
         });
 
         // Initial definitions population for the seeded tab.
@@ -602,10 +946,9 @@ async function bootstrap(): Promise<void> {
     }
 
     /**
-     * Create a group's editor in its App.vue container, wire it, seed a tab.
-     * If `linkFrom` is given, the new group's first tab shares that group's
-     * active tab's model instead of starting blank — used by splitEditor() so
-     * a split defaults to a second, live-synced view of the current file.
+     * Create a group's editor in its App.vue container, wire it, seed a tab. If `linkFrom`
+     * is given the new group's first tab shares that group's active tab's model instead of
+     * starting blank, which is how a split defaults to a live-synced view of the current file.
      */
     async function createAndWireGroup(id: string, seedContent = '', linkFrom?: EditorGroup): Promise<EditorGroup> {
         appInstance.addGroup(id);
@@ -640,14 +983,19 @@ async function bootstrap(): Promise<void> {
 
     // ---- Split / merge / focus wiring ----
     let confirmCloseGroup: (g: EditorGroup) => Promise<boolean> = async () => true;
-    // Monotonic group-id allocator. Never reuse ids: after an unsplit the
-    // surviving group may be the second one (g1), so a fixed 'g1' would collide
-    // on the next split and silently no-op. 'g0' is the primary (seeded above).
+    // Monotonic group-id allocator. Ids are never reused: after an unsplit the surviving
+    // group may be the second one, so a fixed 'g1' would collide on the next split.
     let groupSeq = 0;
 
     async function splitEditor(): Promise<void> {
         if (groups.size >= 2) {
             activeGroup.editor.focus();
+            return;
+        }
+        // The input form owns the window and shows one document; a second group
+        // would have nowhere to render and would share this one's entered values.
+        if (appInstance.getResultMode() === 'ui' && appInstance.isPreviewVisible()) {
+            appInstance.appendOutput('info', 'Exit input mode to split the editor.');
             return;
         }
         const source = activeGroup;
@@ -678,10 +1026,9 @@ async function bootstrap(): Promise<void> {
     };
 
     // ---- Include navigation (Go-to-Definition / Find All References) ----
-    // Find All References needs the include files' models registered so the
-    // panel can render their snippets. Only wire this up on Tauri desktop, where
-    // we have filesystem access; in the pure-web build the provider silently
-    // skips include locations. All handlers act on the active group.
+    // Find All References needs the include files' models registered so the panel can render
+    // their snippets, so this is only wired up on Tauri desktop where there is filesystem
+    // access. All handlers act on the active group.
     const openIncludeFile: IncludeFileOpener | undefined = tauriBridge
         ? async (rawFileName: string) => {
             try {
@@ -704,14 +1051,11 @@ async function bootstrap(): Promise<void> {
         }
         : undefined;
 
-    // Go-to-Definition must stay side-effect free — Monaco calls provideDefinition
-    // on Ctrl+hover just to draw the underline, so opening a file or moving the
-    // cursor there would navigate on hover with no click. The provider gets a
-    // pure URI for the include (below); the real open + cursor move happens in
-    // the editor opener, which Monaco invokes only on an actual click / F12.
-    // We stash the resolved absolute path keyed by the exact URI string we mint
-    // so the opener recovers it verbatim (fsPath would re-case the Windows drive
-    // letter and break the tab lookup's strict path compare).
+    // Go-to-Definition must stay side-effect free — Monaco calls provideDefinition on
+    // Ctrl+hover just to draw the underline, so the provider gets a pure URI and the real
+    // open happens in the editor opener. The resolved absolute path is stashed under the
+    // exact URI string we mint, since fsPath would re-case the Windows drive letter and
+    // break the tab lookup's strict path compare.
     const includeUriToPath = new Map<string, string>();
     const resolveIncludeUri: IncludeUriResolver | undefined = tauriBridge
         ? async (rawFileName: string): Promise<monaco.Uri | null> => {
@@ -779,7 +1123,9 @@ async function bootstrap(): Promise<void> {
             listDirectory: (p) => tauriBridge.listDirectory(p),
             getCurrentFilePath: () => tabs.activeTab?.filePath ?? null,
             getOpenedFolder: () => tauriBridge.getOpenedFolder(),
-            getLibraryPath: () => tauriBridge.getLibraryPath(),
+            expandEnvVars: (raw) => tauriBridge.expandEnvVars(raw),
+            getHomeDir: () => tauriBridge.getHomeDir(),
+            getServerPathRoots: () => editorBridge.definitions.getCachedPathRoots(getActiveDocumentKey()),
         });
     }
     registerHoverProvider(editorBridge);
@@ -797,6 +1143,24 @@ async function bootstrap(): Promise<void> {
             const n = Number(e.data.value);
             if (Number.isFinite(n)) appInstance.setMaxOutputLines(n);
         }
+        // A raised limit should take effect on what is already on screen, and a document
+        // blocked under the old one is showing the notice rather than a render.
+        if (e.data?.type === 'maxPreviewSizeChanged') {
+            const n = Number(e.data.value);
+            if (Number.isFinite(n) && n >= MIN_PREVIEW_SIZE_MB) refreshAllPreviews();
+        }
+        // Baked into the scripts a render injects, so the previews are re-run to pick it up
+        // rather than left relaying under the old cap.
+        if (e.data?.type === 'maxPreviewConsoleMessagesChanged') {
+            const n = Number(e.data.value);
+            if (Number.isFinite(n) && n >= MIN_CONSOLE_MESSAGES_PER_DOCUMENT) {
+                appInstance.setMaxPreviewConsoleMessages(n);
+                refreshAllPreviews();
+            }
+        }
+        if (e.data?.type === 'exportError') {
+            appInstance.appendOutput('error', String(e.data.message ?? 'Export failed'));
+        }
     });
 
     // Apply persisted cap at startup — the sidebar's settingsResponse will
@@ -804,6 +1168,9 @@ async function bootstrap(): Promise<void> {
     {
         const stored = Number(editorBridge.getExtraSetting('maxOutputLines'));
         if (Number.isFinite(stored) && stored >= 10) appInstance.setMaxOutputLines(stored);
+        const messages = Number(editorBridge.getExtraSetting('maxPreviewConsoleMessages'));
+        if (Number.isFinite(messages) && messages >= MIN_CONSOLE_MESSAGES_PER_DOCUMENT)
+            appInstance.setMaxPreviewConsoleMessages(messages);
     }
 
     // Wire the bridge's insertText handler to the active editor.
@@ -842,6 +1209,9 @@ async function bootstrap(): Promise<void> {
         level: 'info' | 'debug' | 'warn' | 'error',
     ) => (...args: any[]) => {
         orig.apply(console, args);
+        // Monaco's ConsoleLogger emits styled `%c INFO`/`%c  ERR` lines whose CSS
+        // argument only produces noise in the panel; leave those to devtools.
+        if (typeof args[0] === 'string' && args[0].startsWith('%c')) return;
         appInstance.appendOutput(level, args.map(fmtConsoleArg).join(' '));
     };
 
@@ -866,9 +1236,20 @@ async function bootstrap(): Promise<void> {
         const data = e.data;
         if (!data) return;
 
+        // Two kinds of sender reach this listener. The host's own bridge announces settings
+        // changes with a synthetic MessageEvent carrying no source; everything else comes
+        // from a preview frame rendering untrusted worksheet HTML and drives editor
+        // navigation and #UI values, so it is accepted only from a window that really is one
+        // of our preview frames — they are sandboxed to an opaque origin, so e.origin is
+        // "null" and window identity is the only usable check.
+        const fromHost = e.source === null;
+        const fromPreview = appInstance.isPreviewFrameSource(e.source);
+        if (!fromHost && !fromPreview) return;
+
         // Forward console.* + uncaught errors to the "Preview Console" channel,
         // tagged with the originating group.
         if (data.type === 'previewConsole') {
+            if (!fromPreview) return;
             const level: 'info' | 'warn' | 'error' | 'debug' =
                 data.level === 'warn' ? 'warn'
                 : data.level === 'error' ? 'error'
@@ -878,29 +1259,50 @@ async function bootstrap(): Promise<void> {
             return;
         }
 
-        if (data.type === 'previewThemeChanged' || data.type === 'settingsChanged') {
+        // Settings announcements are the host talking to itself; a preview must not
+        // be able to trigger a full re-render loop by forging one.
+        if (data.type === 'previewThemeChanged' || data.type === 'settingsChanged'
+            || data.type === 'previewUiOverridesChanged') {
+            if (!fromHost) return;
             refreshAllPreviews();
             return;
         }
 
-        // Preview -> editor navigation. An 'output' line comes from the true
-        // wrapped view; when the document has macros/includes that line only
-        // makes sense in the unwrapped view, so flip the pane to unwrapped
-        // scrolled there (the two-step). A 'source' line navigates Monaco
-        // directly. The message's groupId selects which group to act on.
+        // A #UI control was edited in the preview. Record the value and re-render
+        // that group so dependent results recalculate.
+        if (data.type === 'uiValueChange') {
+            if (!fromPreview) return;
+            const group = (data.groupId && groups.get(data.groupId)) || activeGroup;
+            const docKey = uiDocKeyFor(group);
+            if (!uiOverrides.set(docKey, String(data.varName), String(data.newValue))) return;
+            uiOverridesDirty.add(docKey);
+            refreshUiDirtyIndicator();
+            void refreshPreviewFor(group);
+            return;
+        }
+
+        // Results -> editor navigation. An 'output' line only makes sense in the unwrapped
+        // view when the document has macros/includes, so the pane flips there scrolled to it
+        // (the two-step); a 'source' line navigates Monaco directly, and the message's
+        // groupId selects the group.
         if (data.type === 'navigateToLine') {
+            if (!fromPreview) return;
             const line = Number(data.line);
             if (!Number.isFinite(line) || line < 1) return;
             const group = (data.groupId && groups.get(data.groupId)) || activeGroup;
             if (group !== activeGroup) setActiveGroup(group);
             const isOutputLine = data.lineType === 'output';
             const hasMacros = /^\s*#(def|include)\b/im.test(group.editor.getValue());
-            if (isOutputLine && appInstance.getPreviewMode() === 'wrapped' && hasMacros) {
+            const mode = appInstance.getResultMode() as ResultMode;
+            // A compiled worksheet has no unwrapped view to route through, so the
+            // click falls through to revealing the line in the editor instead.
+            if (isOutputLine && (mode === 'preview' || mode === 'report') && hasMacros
+                && appInstance.resultModeAvailable('unwrapped')) {
                 // Bake the target into the unwrapped refresh (avoids an
-                // iframe-reload postMessage race); setPreviewMode triggers
-                // onPreviewModeChanged -> refresh all previews.
+                // iframe-reload postMessage race); setResultMode triggers
+                // onResultModeChanged -> refresh all previews.
                 pendingPreviewScrollLine.set(group.id, line);
-                appInstance.setPreviewMode('unwrapped');
+                appInstance.setResultMode('unwrapped');
             } else {
                 group.editor.revealLineInCenter(line);
                 group.editor.setPosition({ lineNumber: line, column: 1 });
@@ -964,12 +1366,16 @@ async function bootstrap(): Promise<void> {
     // ---- Tab-strip user actions (dispatched by group id) ----
     // The Tauri branch overrides the close handlers with save-prompt-aware
     // versions; on web there's nothing to save, so a plain close is correct.
-    appInstance.onTabActivate = (groupId: string, id: string) => {
+    async function activateTab(groupId: string, id: string): Promise<void> {
         const g = groups.get(groupId);
         if (!g) return;
+        if (g === activeGroup && g.tabs.activeId === id) return;
+        if (!await confirmLeaveUiDoc()) return;
         if (activeGroup !== g) setActiveGroup(g);
         g.tabs.activate(id);
-    };
+    }
+
+    appInstance.onTabActivate = (groupId: string, id: string) => { void activateTab(groupId, id); };
     appInstance.onTabCloseRequest = (groupId: string, id: string) => {
         groups.get(groupId)?.tabs.close(id);
     };
@@ -1008,11 +1414,19 @@ async function bootstrap(): Promise<void> {
         switchView?: (id: string) => void;
     };
 
-    // Initialize preview mode from saved extra setting (Tauri) or default (web).
-    const savedMode = (editorBridge.getExtraSetting('previewMode') as PreviewMode | undefined);
-    if (savedMode === 'wrapped' || savedMode === 'unwrapped') {
-        appInstance.setPreviewMode(savedMode);
+    // Initialize the result mode from the saved extra setting (Tauri) or default (web).
+    // The key was `previewMode` and the rendered view was `wrapped`, so fall back to the
+    // old key and translate the old value — otherwise an existing install loses its mode.
+    const savedMode = editorBridge.getExtraSetting('resultMode')
+        ?? editorBridge.getExtraSetting('previewMode');
+    const restoredMode = savedMode === 'wrapped' ? 'preview' : savedMode;
+    if (restoredMode === 'preview' || restoredMode === 'unwrapped'
+        || restoredMode === 'ui' || restoredMode === 'report') {
+        appInstance.setResultMode(restoredMode);
     }
+    // The restore above predates onResultModeChanged, and the sidebar has only just
+    // mounted, so seed it with the mode the session came up in.
+    syncInputMode();
 
     // Manual refresh: re-lint with current settings, refresh definitions/
     // headings, redraw previews, and re-extract Export-tab plots. Called from
@@ -1031,13 +1445,97 @@ async function bootstrap(): Promise<void> {
         window.dispatchEvent(new MessageEvent('message', { data: { type: 'getPlots' } }));
     }
 
-    appInstance.onPreviewModeChanged = (mode: PreviewMode) => {
-        editorBridge.setExtraSetting('previewMode', mode);
+    appInstance.onResultModeChanged = (mode: ResultMode) => {
+        // Not persisted when a #UI document chose it rather than the user: the session would
+        // otherwise come back up in a form, whatever document is opened next.
+        if (!autoUiSwitchInFlight) editorBridge.setExtraSetting('resultMode', mode);
+        refreshUiDirtyIndicator();
+        syncInputMode();
         refreshAllPreviews();
     };
 
+    // "Print PDF" on the report/input toolbar. The report is the default export variant,
+    // so this is the same render the Export tab's Report group produces.
+    appInstance.onPrintReportRequest = () => {
+        activeBridge.handleMessage({ type: 'generatePdf' });
+    };
+
+    // The report pane renders on demand; showing it needs a fresh convert.
+    appInstance.onUiPrintToggled = () => {
+        // The new iframe only exists after Vue has patched the DOM.
+        void nextTick(refreshAllPreviews);
+    };
+
+    // Writes the active tab to disk. Set by the Tauri branch below; on web there
+    // is no file behind the document, so the model edit is all there is.
+    let persistActiveTab: (() => Promise<boolean>) | null = null;
+
+    // "Save values": write the entered #UI values into the active document as a
+    // uiOverrides metadata comment, so they are restored the next time it opens.
+    async function saveUiOverrides(): Promise<void> {
+        const docKey = activeUiDocKey();
+        const overrides = uiOverrides.toRecord(docKey);
+        if (!overrides) return;
+
+        const model = activeGroup.editor.getModel();
+        if (!model) return;
+
+        const updated = writeUiOverrides(model.getValue(), overrides);
+        if (updated !== model.getValue()) {
+            // Edited through the model rather than the editor: a compiled worksheet
+            // locks the editor, which would reject executeEdits. Undo is preserved.
+            model.pushStackElement();
+            model.pushEditOperations([], [{ range: model.getFullModelRange(), text: updated }], () => null);
+            model.pushStackElement();
+        }
+        uiOverridesDirty.delete(docKey);
+        refreshUiDirtyIndicator();
+        // The values are only "saved" once they reach the file — a form filled in
+        // and left dirty in the editor is exactly what the user asked to avoid.
+        await persistActiveTab?.();
+        appInstance.appendOutput('info', `Saved ${Object.keys(overrides).length} #UI value(s) to the document.`);
+    }
+
+    appInstance.onSaveUiOverridesRequest = () => { void saveUiOverrides(); };
+
+    /**
+     * Leaving the input form discards the entered values — they only live in memory
+     * until written into the document — so prompt for unwritten ones first. Returns
+     * false to keep the form open when the user cancels.
+     */
+    async function leaveUiDoc(): Promise<boolean> {
+        const docKey = activeUiDocKey();
+        if (uiOverridesDirty.has(docKey)) {
+            const choice = await appInstance.showConfirm({
+                title: 'Unsaved input values',
+                message: 'Save the values entered in the input form before exiting? They are discarded otherwise.',
+                yesLabel: 'Save',
+                noLabel: "Don't Save",
+            });
+            if (choice === 'cancel') return false;
+            if (choice === 'yes') await saveUiOverrides();
+        }
+        uiOverrides.clear(docKey);
+        uiOverridesDirty.delete(docKey);
+        refreshUiDirtyIndicator();
+        return true;
+    }
+
+    appInstance.onExitUiModeRequest = leaveUiDoc;
+
+    /**
+     * The input form always shows the active document, so switching documents takes the
+     * form's values with it — prompt as if the form were closing. Returns false when the
+     * user cancels the switch.
+     */
+    async function confirmLeaveUiDoc(): Promise<boolean> {
+        if (!appInstance.isPreviewVisible() || appInstance.getResultMode() !== 'ui') return true;
+        return await leaveUiDoc();
+    }
+
     // Refresh all previews when the preview pane is first opened.
     appInstance.onPreviewToggled = (visible: boolean) => {
+        syncInputMode();
         if (visible) {
             setTimeout(refreshAllPreviews, 50);
         }
@@ -1061,11 +1559,20 @@ async function bootstrap(): Promise<void> {
             import('@tauri-apps/plugin-clipboard-manager'),
             import('@tauri-apps/api/core'),
         ]);
+        invokeTauri = tauriInvoke;
+        // Route Ctrl+Shift+V "Paste as Comment" through the same Tauri-native
+        // clipboard as the rest of the app (WebKitGTK workaround).
+        editorBridge.readClipboardText = () => tauriClipboard.readText();
+        // The seeded tab decided the menu state before `invoke` existed, so the cached flag
+        // is inverted here to defeat the no-op guard and let the real state through.
+        const sourceModesShown = appInstance.resultModeAvailable('unwrapped');
+        sourceModeMenuShown = !sourceModesShown;
+        syncSourceModeMenuItems(sourceModesShown);
 
         // ---- Autosave drafts (10s debounce per tab) ----
-        // Rust owns the on-disk drafts dir (<app_data>/drafts). Each tab is
-        // assigned a stable UUID on first autosave. Tab ids are namespaced per
-        // group (see TabManager), so drafts never collide across groups.
+        // Rust owns the on-disk drafts dir (<app_data>/drafts) and each tab is assigned a
+        // stable UUID on first autosave. Tab ids are namespaced per group, so drafts never
+        // collide across groups.
         const AUTOSAVE_DEBOUNCE_MS = 10_000;
         const draftTimers = new Map<string, ReturnType<typeof setTimeout>>();
         const draftIds = new Map<string, string>();
@@ -1185,21 +1692,15 @@ async function bootstrap(): Promise<void> {
             // 'cancel' leaves the drafts on disk — surfaced again on next launch.
         });
 
-        // Menu is built in Rust (src-tauri/src/lib.rs:build_menu). The frontend
-        // just tracks recents in the plugin-store; there is no dynamic menu
-        // rebuild. Recent files remain accessible via the sidebar's Files tab.
-        void tauriBridge.getRecentFiles();
-
         /**
-         * Open `path` in a tab. If the active group already holds that file,
-         * just focuses it. If another group has it open, opens a second,
-         * live-synced tab onto the same model in the active group instead of
-         * jumping away — this is what lets the same file be open in both
-         * split panes at once. Otherwise reads from disk into the active
-         * group.
+         * Open `path` in a tab: focuses it if the active group already holds that file, or
+         * opens a second live-synced tab onto the same model when another group has it, which
+         * is what lets one file be open in both split panes. Otherwise reads from disk.
          */
         async function loadFile(path: string): Promise<void> {
             const inActive = tabs.findByPath(path);
+            if (inActive && inActive.id === tabs.activeId) return;
+            if (!await confirmLeaveUiDoc()) return;
             if (inActive) {
                 tabs.activate(inActive.id);
                 return;
@@ -1218,6 +1719,11 @@ async function bootstrap(): Promise<void> {
             try {
                 const content = await tauriBridge!.readFile(path);
                 tabs.openFile(path, content);
+                // Opening into the seeded empty tab replaces it in place, which is not an
+                // active-model change, so the listener that normally settles the mode for a
+                // newly opened file never runs — and that is the first file of every session.
+                applyCompiledWorksheetMode(activeGroup);
+                if (shouldAutoEnterUiMode(activeGroup)) autoEnterUiMode();
                 await tauriBridge!.addRecentFile(path);
             } catch (err) {
                 appInstance.appendOutput('error', 'Failed to open file: ' + (err instanceof Error ? err.message : String(err)));
@@ -1243,8 +1749,8 @@ async function bootstrap(): Promise<void> {
         }
 
         /**
-         * Save the active tab. If it has no file path, prompts for one.
-         * Returns true if saved, false if the user cancelled / no active tab.
+         * Save the active tab, prompting for a path when it has none. Returns true if saved,
+         * false if the user cancelled or there is no active tab.
          */
         async function saveActive(): Promise<boolean> {
             const active = tabs.activeTab;
@@ -1259,10 +1765,14 @@ async function bootstrap(): Promise<void> {
             const newPath = await tauriBridge!.saveFileAs(content);
             if (!newPath) return false;
             tabs.markActiveSaved({ filePath: newPath });
+            // Saving as .cpdz turns the tab into a compiled worksheet.
+            applyCompiledWorksheetMode(activeGroup);
             await tauriBridge!.addRecentFile(newPath);
             await deleteDraft(active.id);
             return true;
         }
+
+        persistActiveTab = saveActive;
 
         async function saveAsActive(): Promise<boolean> {
             const active = tabs.activeTab;
@@ -1270,23 +1780,27 @@ async function bootstrap(): Promise<void> {
             const newPath = await tauriBridge!.saveFileAs(content);
             if (!newPath) return false;
             tabs.markActiveSaved({ filePath: newPath });
+            applyCompiledWorksheetMode(activeGroup);
             await tauriBridge!.addRecentFile(newPath);
             if (active) await deleteDraft(active.id);
             return true;
         }
 
         /**
-         * Close a tab in a specific group, prompting if dirty. Returns true on
-         * close, false if the user cancelled the prompt. Skips the prompt when
-         * another tab (in this or another group) still references the same
-         * model — the content isn't actually being discarded.
+         * Close a tab in a specific group, prompting if dirty; returns false if the user
+         * cancelled. The prompt is skipped when another tab still references the same model,
+         * since the content isn't actually being discarded.
          */
         async function tryCloseTab(group: EditorGroup, id: string): Promise<boolean> {
             const target = group.tabs.all.find(t => t.id === id);
             if (!target) return true;
+            // Closing the document the input form is showing takes its values away.
+            if (group === activeGroup && id === group.tabs.activeId && !await confirmLeaveUiDoc()) return false;
             // Activate the group + tab so the editor shows what's being asked about.
             if (activeGroup !== group) setActiveGroup(group);
-            if (target.dirty && group.tabs.isLastReference(id)) {
+            // Re-read the dirty flag: saving the input form's values above may have
+            // written the file already.
+            if (group.tabs.isDirty(id) && group.tabs.isLastReference(id)) {
                 if (id !== group.tabs.activeId) group.tabs.activate(id);
                 const choice = await appInstance.showConfirm({
                     title: 'Unsaved changes',
@@ -1433,6 +1947,13 @@ async function bootstrap(): Promise<void> {
         };
 
         appInstance.onCopyTextRequest = (text: string) => { void writeClipboardText(text); };
+        appInstance.onClipboardReadRequest = async () => {
+            try {
+                return await tauriClipboard.readText();
+            } catch {
+                return '';
+            }
+        };
 
         appInstance.onTabCopyFullPathRequest = (groupId: string, id: string) => {
             const g = groups.get(groupId);
@@ -1490,11 +2011,14 @@ async function bootstrap(): Promise<void> {
         async function runClipboardAction(
             action: 'cut' | 'copy' | 'paste' | 'select-all' | 'undo' | 'redo' | 'find' | 'replace',
         ): Promise<void> {
-            if (action === 'copy' || action === 'cut') {
-                // A real DOM selection (e.g. text picked inside the hover panel,
-                // parameter hints, or output) takes priority over the editor's
-                // own model selection, since Monaco renders the main text via
-                // its own selection overlay rather than native browser selection.
+            // A real DOM selection (text picked inside the hover panel, parameter hints or
+            // output) takes priority over the editor's own model selection, since Monaco
+            // renders the main text via its own selection overlay. Copy only, and only when
+            // the editor lacks focus: Monaco mirrors its selection into a hidden textarea
+            // whose value is a truncated screen-reader representation for large selections,
+            // and a cut routed this way also wrote to the clipboard without touching the
+            // document.
+            if (action === 'copy' && !editor.hasTextFocus()) {
                 const domText = window.getSelection()?.toString() ?? '';
                 if (domText) {
                     try { await tauriClipboard.writeText(domText); } catch { /* ignored */ }
@@ -1554,6 +2078,11 @@ async function bootstrap(): Promise<void> {
                 editor.trigger('menu', cmd, null);
                 return;
             }
+            // A focused preview frame (the #UI input form, above all) handles the
+            // action against whichever control it is sitting in.
+            if (action === 'cut' || action === 'copy' || action === 'paste') {
+                if (appInstance.runFocusedPreviewClipboardAction(action)) return;
+            }
             // Fallback for sidebar / preview / etc.
             const el = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
             if (action === 'paste') {
@@ -1597,11 +2126,32 @@ async function bootstrap(): Promise<void> {
         await tauriListen<{ id: string }>('menu-click', async (evt) => {
             const id: string = evt.payload.id;
 
-            // Preview mode picker (View → Preview Mode: Wrapped/Unwrapped)
-            if (id.startsWith('preview-mode:')) {
-                const mode = id.split(':')[1] as PreviewMode;
-                appInstance.setPreviewMode(mode);
+            // Result mode picker (View → Result Mode: Preview/Unwrapped/Input/Report)
+            if (id.startsWith('result-mode:')) {
+                const mode = id.split(':')[1] as ResultMode;
+                appInstance.setResultMode(mode);
                 return;
+            }
+
+            // File → Open Recent. The id carries the path itself, so the click opens
+            // the file whose label was clicked even if the list has moved on since.
+            if (id.startsWith('open-recent:')) {
+                await loadFile(id.slice('open-recent:'.length));
+                return;
+            }
+
+            // File → Export. A bare `export-pdf` is the report (the default variant);
+            // `export-pdf:preview` and friends name one explicitly.
+            if (id.startsWith('export-')) {
+                const [format, variant] = id.slice('export-'.length).split(':');
+                const type = format === 'pdf' ? 'generatePdf'
+                    : format === 'html' ? 'saveSourceHtml'
+                    : format === 'docx' ? 'saveDocx'
+                    : null;
+                if (type) {
+                    tauriBridge.handleMessage({ type, variant: variant ?? 'report' });
+                    return;
+                }
             }
 
             switch (id) {
@@ -1621,6 +2171,10 @@ async function bootstrap(): Promise<void> {
                     break;
                 }
 
+                case 'clear-recent':
+                    await tauriBridge.clearRecentFiles();
+                    break;
+
                 case 'save':
                     await saveActive();
                     break;
@@ -1629,16 +2183,14 @@ async function bootstrap(): Promise<void> {
                     await saveAsActive();
                     break;
 
-                case 'export-pdf':
-                    tauriBridge.handleMessage({ type: 'generatePdf' });
+                // An export, so the tab keeps its own path and stays editable —
+                // unlike Save As, which would turn it into a locked worksheet.
+                case 'save-as-compiled':
+                    await tauriBridge.saveCompiled();
                     break;
 
-                case 'export-html':
-                    tauriBridge.handleMessage({ type: 'saveSourceHtml' });
-                    break;
-
-                case 'export-docx':
-                    tauriBridge.handleMessage({ type: 'saveDocx' });
+                case 'save-as-portable':
+                    await tauriBridge.savePortable();
                     break;
 
                 case 'toggle-sidebar':
@@ -1767,6 +2319,8 @@ async function bootstrap(): Promise<void> {
                 appInstance.appendOutput('info', '--- end server log ---');
             } else if (data.type === 'pdfError') {
                 appInstance.appendOutput('error', String(data.message || 'PDF export failed'));
+            } else if (data.type === 'pdfInfo') {
+                appInstance.appendOutput('info', String(data.message || ''));
             }
         });
 
@@ -1846,11 +2400,9 @@ async function bootstrap(): Promise<void> {
             // Ctrl+1..9 → activate Nth tab in the active group (Ctrl+9 = last).
             if (e.key >= '1' && e.key <= '9' && !e.shiftKey && !e.altKey) {
                 const n = parseInt(e.key, 10);
-                if (n === 9) {
-                    activeGroup.tabs.activateByIndex(activeGroup.tabs.count - 1);
-                } else {
-                    activeGroup.tabs.activateByIndex(n - 1);
-                }
+                const index = n === 9 ? activeGroup.tabs.count - 1 : n - 1;
+                const target = activeGroup.tabs.all[index];
+                if (target) void activateTab(activeGroup.id, target.id);
                 e.preventDefault();
             }
         });
@@ -1863,6 +2415,10 @@ async function bootstrap(): Promise<void> {
             isExiting = true;
 
             try {
+                if (!await confirmLeaveUiDoc()) {
+                    isExiting = false;
+                    return;
+                }
                 // Walk every dirty tab across all groups one at a time, like VS
                 // Code does on window-close. Reuses tryCloseTab so the prompt
                 // copy + save-as fallback are identical to manual tab close.

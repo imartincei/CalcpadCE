@@ -3,7 +3,7 @@
 // Consolidated from the former calcpad-monaco package.
 // =============================================================================
 
-export { calcpadLanguage, calcpadLanguageConfiguration } from './language';
+export { calcpadLanguageConfiguration } from './language';
 export { calcpadDarkTheme } from './theme';
 export {
     registerCalcpadLanguage,

@@ -366,15 +366,6 @@ body {
   font-size: 10px;
 }
 
-.error {
-  color: #d32f2f;
-  background: #ffebee;
-  padding: 8px;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  font-size: 12px;
-}
-
 .form-group {
   margin-bottom: 12px;
 }

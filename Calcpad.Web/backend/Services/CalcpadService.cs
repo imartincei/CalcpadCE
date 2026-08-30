@@ -6,20 +6,20 @@ namespace Calcpad.Server.Services
     public class CalcpadService
     {
         private readonly string _tempDirectory;
-        private readonly string _htmlTemplate;
-        private static readonly NoPrintRegionStripper _noPrintRegionStripper = new();
+
+        // Scoped service, so this would otherwise re-read the ~200KB template on every request.
+        private static readonly string _htmlTemplate = LoadHtmlTemplate();
 
         public CalcpadService()
         {
             _tempDirectory = Path.GetTempPath();
-            _htmlTemplate = LoadHtmlTemplate();
         }
 
         /// <summary>
-        /// Creates the Include delegate for MacroParser. Core only invokes this
-        /// when the resolved path exists on disk, so a bare File.ReadAllText is
-        /// sufficient; any I/O failure surfaces through the catch as a Calcpad
-        /// error comment. URL-hosted includes are not currently supported.
+        /// Creates the Include delegate for MacroParser. Core only invokes this when the
+        /// resolved path exists on disk, so a bare File.ReadAllText is sufficient and any I/O
+        /// failure surfaces through the catch as a Calcpad error comment (URL-hosted includes
+        /// are not currently supported).
         /// </summary>
         internal static Func<string, Queue<string>, string> CreateIncludeDelegate()
         {
@@ -44,7 +44,13 @@ namespace Calcpad.Server.Services
             string theme = "light",
             string? sourceFilePath = null,
             bool forPrint = false,
-            bool captureOpenXml = false)
+            bool captureOpenXml = false,
+            bool enableUi = false,
+            Dictionary<string, string>? uiOverrides = null,
+            bool? debug = null,
+            bool? hideErrorLines = null,
+            bool write = false,
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(calcpadContent))
             {
@@ -52,20 +58,26 @@ namespace Calcpad.Server.Services
                 throw new ArgumentException("Content cannot be null or empty", nameof(calcpadContent));
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
+
             try
             {
                 Console.WriteLine($"=== CALCPAD SERVICE: Starting conversion, length: {calcpadContent.Length} ===");
                 FileLogger.LogInfo("Starting conversion", $"Content length: {calcpadContent.Length}, Has settings: {settings != null}, Force unwrapped: {forceUnwrappedCode}, For print: {forPrint}");
                 FileLogger.LogInfo("Content preview:", calcpadContent.Substring(0, Math.Min(200, calcpadContent.Length)));
 
-                // When generating for PDF, strip NoPrintStart/NoPrintEnd regions from the source
-                // before any further processing so they never enter the macro/expression pipeline.
-                if (forPrint)
-                    calcpadContent = _noPrintRegionStripper.Strip(calcpadContent);
-
                 // 1. Use Calcpad.Core settings directly (defaults are set in constructors).
                 //    Per-file overrides now come from the #settings directive, handled in Core.
                 Settings coreSettings = settings ?? new Settings();
+
+                // Printed output is a report by definition, so it never carries controls.
+                // Overrides still apply - the report shows the values that were entered.
+                enableUi &= !forPrint;
+
+                // Input mode hides the source editor, so its "on line [N]" links point at
+                // nothing reachable. Defaults to following enableUi; the report pane beside
+                // the form passes its own override since it isn't gated on enableUi.
+                var showErrorLines = !(hideErrorLines ?? enableUi);
 
                 // 2. Parse macros and includes (server reads referenced files from disk).
                 var macroParser = new MacroParser
@@ -76,6 +88,8 @@ namespace Calcpad.Server.Services
 
                 string outputText;
                 var hasMacroErrors = macroParser.Parse(calcpadContent, out outputText, null, 0, true);
+
+                cancellationToken.ThrowIfCancellationRequested();
 
                 string htmlResult;
                 IReadOnlyList<string> openXmlExpressions = Array.Empty<string>();
@@ -91,7 +105,9 @@ namespace Calcpad.Server.Services
                     {
                         try
                         {
-                            var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, Debug = true };
+                            // Hard-coded rather than threaded from `write`: this pass exists only to
+                            // collect error lines, so it must never repeat the document's writes.
+                            var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, PathRoots = macroParser.PathRoots, Debug = true, AllowDataWrite = false };
                             silent.Parse(outputText, true, false);
                             errors.AddRange(silent.Errors);
                         }
@@ -106,10 +122,23 @@ namespace Calcpad.Server.Services
                 {
                     try
                     {
-                        // Debug mode makes Calcpad.Core emit per-line anchors (id="line-N" class="line")
-                        // and the error-summary boxes that the interactive preview uses for line links.
-                        // Keep it off for print/PDF so exported output has no navigation anchors.
-                        var parser = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, Debug = !forPrint };
+                        // Debug mode makes Calcpad.Core emit per-line anchors (id="line-N"
+                        // class="line") and the error-summary boxes the interactive preview
+                        // uses for line links. It defaults to the opposite of forPrint but is
+                        // independently settable: the on-screen report is a print layout that
+                        // still wants line links.
+                        var parser = new ExpressionParser
+                        {
+                            Settings = coreSettings,
+                            SourceFilePath = sourceFilePath,
+                            PathRoots = macroParser.PathRoots,
+                            Debug = debug ?? !forPrint,
+                            ForPrint = forPrint,
+                            EnableUi = enableUi,
+                            UiOverrides = uiOverrides,
+                            ShowErrorLines = showErrorLines,
+                            AllowDataWrite = write
+                        };
                         parser.Parse(outputText, true, captureOpenXml);
                         htmlResult = RemoveEmptyParagraphs(parser.HtmlResult);
                         errors.AddRange(parser.Errors);
@@ -124,10 +153,16 @@ namespace Calcpad.Server.Services
                 }
 
                 // 6. Apply HTML wrapper with theme support
-                var finalHtml = WrapHtmlResult(htmlResult, theme);
+                var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);
                 FileLogger.LogInfo("Conversion completed successfully", $"Output length: {finalHtml.Length}");
 
                 return (finalHtml, openXmlExpressions, errors);
+            }
+            catch (OperationCanceledException)
+            {
+                // Let this propagate as-is rather than the wrapped InvalidOperationException
+                // below — it's an expected supersede/abort, not a conversion failure.
+                throw;
             }
             catch (MathParserException ex)
             {
@@ -429,7 +464,7 @@ tan_angle = tan(angle°)";
             return "!^/÷\\⦼*-+<>≤≥≡≠=∧∨⊕(){}[]|&@:;".Contains(c);
         }
 
-        private string LoadHtmlTemplate()
+        private static string LoadHtmlTemplate()
         {
             try
             {
@@ -464,7 +499,7 @@ tan_angle = tan(angle°)";
             }
         }
 
-        private string GetFallbackTemplate()
+        private static string GetFallbackTemplate()
         {
             return @"<!DOCTYPE html>
 <html>
@@ -498,7 +533,7 @@ tan_angle = tan(angle°)";
             );
         }
 
-        private string WrapHtmlResult(string htmlContent, string theme = "light")
+        private string WrapHtmlResult(string htmlContent, string theme = "light", bool enableUi = false)
         {
             // Use the comprehensive HTML template with theme support
             var themeClass = theme.ToLower() == "dark" ? " class=\"dark-theme\"" : "";
@@ -508,12 +543,27 @@ tan_angle = tan(angle°)";
             // template CSS (e.g. Jost*), so they don't depend on OS installation,
             // and expose window.__calcpadFonts for any other client-side use.
             // Injected before </head> so it runs before any module scripts in body.
-            var fontMarkup = BundledFonts.GetFontFaceStyleTag() + BundledFonts.GetInjectionScript();
-            if (!string.IsNullOrEmpty(fontMarkup))
+            var headMarkup = BundledFonts.GetFontFaceStyleTag() + BundledFonts.GetInjectionScript();
+
+            // The datagrid libraries are large, so they only go in when a grid is
+            // actually present. jspreadsheet has to be defined before the event
+            // script runs, hence <head> rather than alongside it.
+            if (enableUi && htmlContent.Contains("calcpad-ui-datagrid", StringComparison.Ordinal))
+                headMarkup += BundledUiAssets.GetHeadMarkup();
+
+            if (!string.IsNullOrEmpty(headMarkup))
             {
                 var headCloseIdx = templateWithTheme.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);
                 if (headCloseIdx >= 0)
-                    templateWithTheme = templateWithTheme.Insert(headCloseIdx, fontMarkup);
+                    templateWithTheme = templateWithTheme.Insert(headCloseIdx, headMarkup);
+            }
+
+            // Report and print output carry no controls, so they get no event script.
+            if (enableUi)
+            {
+                var bodyCloseIdx = templateWithTheme.LastIndexOf("</body>", StringComparison.OrdinalIgnoreCase);
+                if (bodyCloseIdx >= 0)
+                    templateWithTheme = templateWithTheme.Insert(bodyCloseIdx, UiPreviewScript.GetScriptTag());
             }
 
             return templateWithTheme.Replace("{{CONTENT}}", htmlContent);
@@ -535,6 +585,13 @@ tan_angle = tan(angle°)";
         /// <summary>
         /// Processes included file content to respect #local and #global directives.
         /// Following the pattern from Calcpad.Cli.CalcpadReader.Include
+        /// <para>
+        /// A saved 'uiOverrides' comment only has any effect on the file that carries it -
+        /// the host restores it by scanning the document you have open, before #include is
+        /// expanded, so one coming from an included file would otherwise sit inert in the
+        /// flattened text. Stripped the same way #local content is, whether or not the
+        /// including file wrapped it in #local/#global itself.
+        /// </para>
         /// </summary>
         private static string ProcessIncludedContent(string content)
         {
@@ -542,11 +599,19 @@ tan_angle = tan(angle°)";
                 return content;
 
             var isLocal = false;
+            var isUiOverridesComment = false;
             var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.None);
             var outputLines = new List<string>();
 
             foreach (var line in lines)
             {
+                if (isUiOverridesComment)
+                {
+                    if (line.Contains("-->", StringComparison.Ordinal))
+                        isUiOverridesComment = false;
+
+                    continue;
+                }
                 if (Validator.IsKeyword(line, "#local"))
                 {
                     isLocal = true;
@@ -554,6 +619,10 @@ tan_angle = tan(angle°)";
                 else if (Validator.IsKeyword(line, "#global"))
                 {
                     isLocal = false;
+                }
+                else if (IsUiOverridesCommentStart(line))
+                {
+                    isUiOverridesComment = !line.Contains("-->", StringComparison.Ordinal);
                 }
                 else
                 {
@@ -566,6 +635,20 @@ tan_angle = tan(angle°)";
             }
 
             return string.Join(Environment.NewLine, outputLines);
+        }
+
+        /// <summary>
+        /// True for the first line of a metadata comment ('<!--{...}-->) whose JSON carries
+        /// a 'uiOverrides' key. A cheap substring check rather than a JSON parse, matching
+        /// the rest of this method's line-based approach - good enough since the host always
+        /// writes the key verbatim.
+        /// </summary>
+        private static bool IsUiOverridesCommentStart(string line)
+        {
+            var trimmed = line.TrimStart();
+            return (trimmed.StartsWith('\'') || trimmed.StartsWith('"'))
+                && trimmed.Contains("<!--", StringComparison.Ordinal)
+                && trimmed.Contains("uiOverrides", StringComparison.Ordinal);
         }
     }
 }

@@ -4,9 +4,9 @@ using System.Linq;
 namespace Calcpad.Highlighter.Parsing
 {
     /// <summary>
-    /// Zero-allocation token span tracker. Tracks start/end indices within a ReadOnlySpan&lt;char&gt;
-    /// to avoid string allocations during parsing. Only materializes to string via ToString().
-    /// Adapted from Calcpad.Core.TextSpan.
+    /// Zero-allocation token span tracker: tracks start/end indices within a
+    /// ReadOnlySpan&lt;char&gt; to avoid string allocations during parsing, materializing only via
+    /// ToString(). Adapted from Calcpad.Core.TextSpan.
     /// </summary>
     public ref struct TextSpan(ReadOnlySpan<char> contents)
     {

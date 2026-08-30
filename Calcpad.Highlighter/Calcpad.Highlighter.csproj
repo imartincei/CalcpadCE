@@ -5,9 +5,8 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <RootNamespace>Calcpad.Highlighter</RootNamespace>
     <OutputType>Library</OutputType>
-    <Version>7.6.1</Version>
-    <Authors>Nedelcho Ganchovski</Authors>
-    <Company>Proektsoft EOOD</Company>
+    <Authors>CalcpadCE Contributors</Authors>
+    <Company>CalcpadCE Community</Company>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
   </PropertyGroup>

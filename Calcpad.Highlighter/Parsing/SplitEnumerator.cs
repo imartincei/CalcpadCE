@@ -3,9 +3,8 @@ using System;
 namespace Calcpad.Highlighter.Parsing
 {
     /// <summary>
-    /// Zero-allocation string splitter by single-character delimiter.
-    /// Supports foreach iteration over ReadOnlySpan&lt;char&gt; segments.
-    /// Adapted from Calcpad.Core.SplitEnumerator.
+    /// Zero-allocation string splitter by single-character delimiter, supporting foreach iteration
+    /// over ReadOnlySpan&lt;char&gt; segments. Adapted from Calcpad.Core.SplitEnumerator.
     /// </summary>
     public ref struct SplitEnumerator(ReadOnlySpan<char> span, char delimiter)
     {

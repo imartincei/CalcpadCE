@@ -141,6 +141,28 @@ namespace Calcpad.Highlighter.Snippets.Data
             },
             new SnippetItem
             {
+                Insert = "#ProjectPath path",
+                Description = "Declares the folder {project} stands for in #include, #read, #write and image paths below this line.",
+                Documentation = "One `#ProjectPath` is allowed per document, and it has to come before the first "
+                    + "`{project}` reference — a reference reached first reports it as undeclared rather than "
+                    + "guessing. A module meant to be `#include`d elsewhere should declare its own inside "
+                    + "`#local`...`#global`, so it does not clash with the including document's.",
+                Category = "Modules and Macros",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#LibraryPath path",
+                Description = "Declares the folder {library} stands for in #include, #read, #write and image paths below this line.",
+                Documentation = "One `#LibraryPath` is allowed per document, and it has to come before the first "
+                    + "`{library}` reference — a reference reached first reports it as undeclared rather than "
+                    + "guessing. A module meant to be `#include`d elsewhere should declare its own inside "
+                    + "`#local`...`#global`, so it does not clash with the including document's.",
+                Category = "Modules and Macros",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
                 Insert = "#local",
                 Description = "Start local section (not included when file is imported)",
                 Category = "Modules and Macros",
@@ -312,84 +334,206 @@ namespace Calcpad.Highlighter.Snippets.Data
             new SnippetItem
             {
                 Insert = "#show",
-                Description = "Show the output contents (default)",
+                Description = "Show the output contents (default). Optionally takes a condition, e.g. '#show x == 5'. Applies to the rest of the document, or up to a matching #end show.",
+                Example = "x = 5\n'Conditional - shows everything below if x > 3\n#show x > 3\ny = 2*x\n\n'Bounded - #end show restores the previous visibility\n#show x > 3\nz = 3*x\n#end show\n'Previous visibility restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#hide",
-                Description = "Hide the output contents",
+                Description = "Hide the output contents. Optionally takes a condition, e.g. '#hide x == 5'. Applies to the rest of the document, or up to a matching #end hide.",
+                Example = "x = 5\n'Conditional - hides everything below if x > 3\n#hide x > 3\ny = 2*x\n\n'Bounded - #end hide restores the previous visibility\n#hide x > 3\nz = 3*x\n#end hide\n'Previous visibility restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#pre",
-                Description = "Show contents only before calculations",
+                Description = "Show contents on screen only - hidden when printing/exporting to PDF. Optionally takes a condition. Applies to the rest of the document, or up to a matching #end pre.",
+                Example = "x = 5\n'Conditional - screen only from here on if x > 3\n#pre x > 3\ny = 2*x\n\n'Bounded - #end pre restores the previous visibility\n#pre x > 3\nz = 3*x\n#end pre\n'Previous visibility restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#post",
-                Description = "Show contents only after calculations",
+                Description = "Show contents in the preview and when printing/exporting to PDF - hidden in UI mode. Optionally takes a condition. Applies to the rest of the document, or up to a matching #end post.",
+                Example = "x = 5\n'Conditional - hidden in UI mode from here on if x > 3\n#post x > 3\ny = 2*x\n\n'Bounded - #end post restores the previous visibility\n#post x > 3\nz = 3*x\n#end post\n'Previous visibility restored",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#UI L = 10m",
+                Description = "Expose the following assignment as an input control in UI mode. Ignored when rendering a report.",
+                Category = "UI Inputs",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#UI {\"type\": \"datagrid\", \"rows\": 2, \"columns\": 3, \"columnHeaders\": [\"a\", \"b\", \"c\"]} M = [1; 2; 3 | 4; 5; 6]",
+                Description = "Editable grid for a vector or matrix. Rows and columns are auto-detected from the right hand side when omitted.",
+                Category = "UI Inputs",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#UI v = [1; 2; 3]",
+                Description = "Editable grid whose size is auto-detected from the vector or matrix assigned to it.",
+                Category = "UI Inputs",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#UI {\"type\": \"dropdown\", \"keys\": [\"Low\", \"High\"], \"values\": [\"1\", \"2\"]} x = 1",
+                Description = "Drop-down list. 'keys' are the labels shown, 'values' are substituted into the calculation.",
+                Category = "UI Inputs",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#UI {\"type\": \"radio\", \"keys\": [\"Steel\", \"Concrete\"], \"values\": [\"200GPa\", \"25GPa\"]} E = 200GPa",
+                Description = "Radio button group. 'keys' are the labels shown, 'values' are substituted into the calculation.",
+                Category = "UI Inputs",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#UI {\"type\": \"checkbox\"} b = 1",
+                Description = "Checkbox toggling the value between 1 and 0.",
+                Category = "UI Inputs",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end hide",
+                Description = "Restore the visibility state in effect before the matching #hide",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end show",
+                Description = "Restore the visibility state in effect before the matching #show",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end pre",
+                Description = "Restore the visibility state in effect before the matching #pre",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end post",
+                Description = "Restore the visibility state in effect before the matching #post",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#val",
-                Description = "Show only the result, without the equation",
+                Description = "Show only the result, without the equation. Optionally takes a condition. Applies to the rest of the document, or up to a matching #end val.",
+                Example = "x = 5\n'Conditional - results only from here on if x > 3\n#val x > 3\ny = 2*x\n\n'Bounded - #end val restores the previous output mode\n#val x > 3\nz = 3*x\n#end val\n'Previous output mode restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#equ",
-                Description = "Show complete equations and results (default)",
+                Description = "Show complete equations and results (default). Optionally takes a condition. Applies to the rest of the document, or up to a matching #end equ.",
+                Example = "x = 5\n'Conditional - full equations from here on if x > 3\n#equ x > 3\ny = 2*x\n\n'Bounded - #end equ restores the previous output mode\n#equ x > 3\nz = 3*x\n#end equ\n'Previous output mode restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#noc",
-                Description = "Show equations without results (no calculations)",
+                Description = "Show equations without results (no calculations). Optionally takes a condition. Applies to the rest of the document, or up to a matching #end noc.",
+                Example = "x = 5\n'Conditional - equations without results from here on if x > 3\n#noc x > 3\ny = 2*x\n\n'Bounded - #end noc restores the previous output mode\n#noc x > 3\nz = 3*x\n#end noc\n'Previous output mode restored",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end val",
+                Description = "Restore the output mode in effect before the matching #val",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end equ",
+                Description = "Restore the output mode in effect before the matching #equ",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end noc",
+                Description = "Restore the output mode in effect before the matching #noc",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#varsub",
-                Description = "Show equations with variables and substituted values (default)",
+                Description = "Show equations with both variable names and their substituted values (default). Optionally takes a condition. Applies to the rest of the document, or up to a matching #end varsub.",
+                Example = "x = 5\n'Conditional - names and values from here on if x > 3\n#varsub x > 3\ny = 2*x\n\n'Bounded - #end varsub restores the previous substitution mode\n#varsub x > 3\nz = 3*x\n#end varsub\n'Previous substitution mode restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#nosub",
-                Description = "Do not substitute variables (no substitution)",
+                Description = "Show equations with variable names only, without substituted values. Optionally takes a condition. Applies to the rest of the document, or up to a matching #end nosub.",
+                Example = "x = 5\n'Conditional - names only from here on if x > 3\n#nosub x > 3\ny = 2*x\n\n'Bounded - #end nosub restores the previous substitution mode\n#nosub x > 3\nz = 3*x\n#end nosub\n'Previous substitution mode restored",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#novar",
-                Description = "Show equations only with substituted values (no variables)",
+                Description = "Show equations with substituted values only, without variable names. Optionally takes a condition. Applies to the rest of the document, or up to a matching #end novar.",
+                Example = "x = 5\n'Conditional - values only from here on if x > 3\n#novar x > 3\ny = 2*x\n\n'Bounded - #end novar restores the previous substitution mode\n#novar x > 3\nz = 3*x\n#end novar\n'Previous substitution mode restored",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end varsub",
+                Description = "Restore the substitution mode in effect before the matching #varsub",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end nosub",
+                Description = "Restore the substitution mode in effect before the matching #nosub",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end novar",
+                Description = "Restore the substitution mode in effect before the matching #novar",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#split",
-                Description = "Split long equations after the \"=\" symbol onto a new indented line",
+                Description = "Split long equations after the \"=\" symbol onto a new indented line. Applies to the rest of the document; takes no condition and has no #end form - switch back with #wrap.",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#wrap",
-                Description = "Wrap long equations at the end of the line (default)",
+                Description = "Wrap long equations at the end of the line (default). Applies to the rest of the document; takes no condition and has no #end form - switch back with #split.",
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
@@ -397,14 +541,14 @@ namespace Calcpad.Highlighter.Snippets.Data
             {
                 Insert = "#round digits",
                 Description = "Round output to n digits after decimal point",
-                Category = "Output Control",
+                Category = "Settings/Rounding",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#round default",
                 Description = "Restore rounding to default settings",
-                Category = "Output Control",
+                Category = "Settings/Rounding",
                 KeywordType = "Keyword"
             },
             new SnippetItem
@@ -424,8 +568,8 @@ namespace Calcpad.Highlighter.Snippets.Data
             new SnippetItem
             {
                 Insert = "#settings {\"decimals\": 4, \"units\": \"cm\"}",
-                Description = "Override engine settings for subsequent lines via JSON",
-                Category = "Output Control",
+                Description = "Override engine settings for subsequent lines via JSON. Use the Properties panel to see the available settings and edit them.",
+                Category = "Settings/Overrides",
                 KeywordType = "Keyword"
             },
             new SnippetItem
@@ -456,27 +600,9 @@ namespace Calcpad.Highlighter.Snippets.Data
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
-            new SnippetItem
-            {
-                Insert = "#cpd",
-                Description = "Switch parsing mode to Calcpad (default)",
-                Category = "Output Control",
-                KeywordType = "Keyword"
-            },
-            new SnippetItem
-            {
-                Insert = "#html",
-                Description = "Switch parsing mode to raw HTML (no Calcpad evaluation)",
-                Category = "Output Control",
-                KeywordType = "Keyword"
-            },
-            new SnippetItem
-            {
-                Insert = "#markdown",
-                Description = "Switch parsing mode to Markdown (no Calcpad evaluation)",
-                Category = "Output Control",
-                KeywordType = "Keyword"
-            },
+            // The parsing-mode switches #cpd, #html and #markdown are deliberately
+            // absent: Calcpad.Core has no Keyword entry for them, so they must lint
+            // as invalid keywords until Core implements them.
 
             // ============================================
             // BREAKPOINTS
@@ -484,40 +610,40 @@ namespace Calcpad.Highlighter.Snippets.Data
             new SnippetItem
             {
                 Insert = "#pause",
-                Description = "Pause calculation and wait for user to resume",
+                Description = "Pause calculation and wait for user to resume. Not supported in Calcpad.Web.",
                 Category = "Breakpoints",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#input",
-                Description = "Render input form and wait for user input",
+                Description = "Render input form and wait for user input. Not supported in Calcpad.Web.",
                 Category = "Breakpoints",
                 KeywordType = "Keyword"
             },
 
             // ============================================
-            // ANGLE UNITS
+            // SETTINGS / ANGLE UNITS
             // ============================================
             new SnippetItem
             {
                 Insert = "#deg",
                 Description = "Set angle units to degrees",
-                Category = "Angle Units",
+                Category = "Settings/Angle Units",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#rad",
                 Description = "Set angle units to radians",
-                Category = "Angle Units",
+                Category = "Settings/Angle Units",
                 KeywordType = "Keyword"
             },
             new SnippetItem
             {
                 Insert = "#gra",
                 Description = "Set angle units to gradians",
-                Category = "Angle Units",
+                Category = "Settings/Angle Units",
                 KeywordType = "Keyword"
             },
         ];

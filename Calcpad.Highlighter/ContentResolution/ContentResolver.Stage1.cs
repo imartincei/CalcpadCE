@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Calcpad.Highlighter.Parsing;
 
 namespace Calcpad.Highlighter.ContentResolution
 {
@@ -9,13 +10,6 @@ namespace Calcpad.Highlighter.ContentResolution
     /// </summary>
     public partial class ContentResolver
     {
-        /// <summary>
-        /// Characters that allow implicit line continuation when at end of line (not in a comment).
-        /// From Calcpad.Wpf UserDefined.cs: "_;|&@:({["
-        /// Note: '_' is handled separately as explicit continuation with space before it.
-        /// </summary>
-        private static readonly HashSet<char> LineExtensionChars = new HashSet<char> { ';', '|', '&', '@', ':', '(', '{', '[' };
-
         /// <summary>
         /// STAGE 1: Process line continuations only
         /// Line continuation occurs when:
@@ -130,12 +124,10 @@ namespace Calcpad.Highlighter.ContentResolution
         }
 
         /// <summary>
-        /// Check if a line has a valid line continuation and calculate bracket depths.
-        /// Uses lightweight span-based comment detection instead of full tokenization.
-        /// Line continuation occurs when:
-        /// 1. Explicit: Line ends with " _" (space followed by underscore) and NOT in a comment
-        /// 2. Implicit: Line ends with one of ;|&@:({[ and is not a comment and has unbalanced brackets
-        /// Returns: (hasExplicitContinuation, hasImplicitContinuation, content, parenDelta, bracketDelta, braceDelta)
+        /// Check if a line has a valid line continuation and calculate bracket depths, using
+        /// lightweight span-based comment detection instead of full tokenization. Continuation is
+        /// explicit when the line ends with " _" outside a comment, implicit when it ends with one
+        /// of ;|&@:({[ outside a comment and brackets are unbalanced.
         /// </summary>
         private static (bool explicitContinuation, bool implicitContinuation, string content, int parenDepth, int bracketDepth, int braceDepth) GetLineContinuationWithDepth(string line)
         {
@@ -156,9 +148,9 @@ namespace Calcpad.Highlighter.ContentResolution
             if (lastCharPosInLine < 0)
                 return (false, false, line, 0, 0, 0);
 
-            // Lightweight comment detection: walk the line tracking quote state.
-            // In Calcpad, comments start with ' or " and extend to the matching quote or end of line.
-            // We count brackets only in non-comment regions and detect if the end of the line is in a comment.
+            // Lightweight comment detection: walk the line tracking quote state, since a Calcpad
+            // comment starts with ' or " and extends to the matching quote or end of line.
+            // Brackets are counted only in non-comment regions.
             bool inComment = false;
             char commentChar = '\0';
             int commentStartCol = -1;
@@ -211,7 +203,7 @@ namespace Calcpad.Highlighter.ContentResolution
 
             // Check for implicit line continuation (ends with one of the special characters)
             var lastChar = lineSpan[lastCharPosInLine];
-            bool hasImplicitContinuation = LineExtensionChars.Contains(lastChar);
+            bool hasImplicitContinuation = CharClassifier.IsLineExtension(lastChar);
 
             // Always return actual bracket depths - they're used to track unbalanced delimiters
             return (false, hasImplicitContinuation, line, parenDepth, bracketDepth, braceDepth);

@@ -23,130 +23,54 @@
           Math Settings
         </h3>
         <div v-show="bodyVisible('math')" class="section-body">
-          <div v-show="rowVisible('math', 'decimals')" class="setting-group">
-            <label for="decimals">Decimals:</label>
-            <input
-              id="decimals"
-              v-model.number="localSettings.math.decimals"
-              type="number"
-              min="0"
-              max="15"
-              :class="{ 'input-invalid': settingErrors.decimals }"
-              :title="settingErrors.decimals || undefined"
-              @input="updateSettings"
-            />
-          </div>
-
-          <div v-show="rowVisible('math', 'degrees')" class="setting-group">
-            <label for="degrees">Angle Units:</label>
-            <select
-              id="degrees"
-              v-model.number="localSettings.math.degrees"
-              @change="updateSettings"
-            >
-              <option :value="0">Radians</option>
-              <option :value="1">Degrees</option>
-              <option :value="2">Gradians</option>
-            </select>
-          </div>
-
-          <div v-show="rowVisible('math', 'isComplex')" class="setting-group">
-            <label>
+          <div
+            v-for="spec in MATH_KEYS"
+            :key="spec.key"
+            v-show="rowVisible('math', spec.key)"
+            class="setting-group"
+          >
+            <label v-if="spec.type === 'boolean'">
               <input
-                v-model="localSettings.math.isComplex"
                 type="checkbox"
+                v-model="settingModel(spec.key).value"
                 @change="updateSettings"
               />
-              Complex Numbers
+              {{ spec.label }}
+              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
             </label>
-          </div>
-
-          <div v-show="rowVisible('math', 'substitute')" class="setting-group">
-            <label>
-              <input
-                v-model="localSettings.math.substitute"
-                type="checkbox"
+            <template v-else>
+              <label :for="spec.key">
+                {{ spec.label }}:
+                <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+              </label>
+              <select
+                v-if="spec.type === 'enum'"
+                :id="spec.key"
+                v-model="settingModel(spec.key).value"
                 @change="updateSettings"
-              />
-              Substitute Variables
-            </label>
-          </div>
-
-          <div v-show="rowVisible('math', 'formatEquations')" class="setting-group">
-            <label>
+              >
+                <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              </select>
               <input
-                v-model="localSettings.math.formatEquations"
-                type="checkbox"
-                @change="updateSettings"
+                v-else-if="spec.type === 'number'"
+                :id="spec.key"
+                type="number"
+                v-model="settingModel(spec.key).value"
+                :min="spec.min"
+                :max="spec.max"
+                :step="numberStep(spec.key)"
+                :class="{ 'input-invalid': settingErrors[spec.key] }"
+                :title="settingErrors[spec.key] || undefined"
+                @input="updateSettings"
               />
-              Format Equations
-              <span class="setting-info" title="Professional (checked) renders equations in stacked math form; Inline (unchecked) renders them on a single line.">ⓘ</span>
-            </label>
-          </div>
-
-          <div v-show="rowVisible('math', 'zeroSmall')" class="setting-group">
-            <label>
               <input
-                v-model="localSettings.math.zeroSmallMatrixElements"
-                type="checkbox"
-                @change="updateSettings"
+                v-else
+                :id="spec.key"
+                type="text"
+                v-model="settingModel(spec.key).value"
+                @input="updateSettings"
               />
-              Zero Small Matrix Elements
-              <span class="setting-info" title="Display very small matrix/vector values as 0 instead of using scientific notation.">ⓘ</span>
-            </label>
-          </div>
-
-          <div v-show="rowVisible('math', 'maxOutput')" class="setting-group">
-            <label for="maxOutputCount">
-              Max Output Count:
-              <span class="setting-info" title="Maximum number of rows/columns shown for large matrices and vectors (5–100).">ⓘ</span>
-            </label>
-            <input
-              id="maxOutputCount"
-              v-model.number="localSettings.math.maxOutputCount"
-              type="number"
-              min="5"
-              max="100"
-              :class="{ 'input-invalid': settingErrors.maxOutputCount }"
-              :title="settingErrors.maxOutputCount || undefined"
-              @input="updateSettings"
-            />
-          </div>
-
-          <div v-show="rowVisible('math', 'precision')" class="setting-group">
-            <label for="precision">
-              Numerical Precision:
-              <span class="setting-info" title="Relative precision for numerical methods such as integration and root finding (1e-2 to 1e-15). Can be overridden per-document with a Precision = … line.">ⓘ</span>
-            </label>
-            <input
-              id="precision"
-              v-model.number="localSettings.math.precision"
-              type="number"
-              step="any"
-              min="1e-15"
-              max="1e-2"
-              :class="{ 'input-invalid': settingErrors.precision }"
-              :title="settingErrors.precision || undefined"
-              @input="updateSettings"
-            />
-          </div>
-
-          <div v-show="rowVisible('math', 'tol')" class="setting-group">
-            <label for="tol">
-              Solver Tolerance:
-              <span class="setting-info" title="Target tolerance for the iterative PCG solver and eigensolver. Can be overridden per-document with a Tol = … line.">ⓘ</span>
-            </label>
-            <input
-              id="tol"
-              v-model.number="localSettings.math.tol"
-              type="number"
-              step="any"
-              min="1e-15"
-              max="1e-2"
-              :class="{ 'input-invalid': settingErrors.tol }"
-              :title="settingErrors.tol || undefined"
-              @input="updateSettings"
-            />
+            </template>
           </div>
         </div>
       </section>
@@ -157,15 +81,16 @@
           Plot Settings
         </h3>
         <div v-show="bodyVisible('plot')" class="section-body">
-          <div v-show="rowVisible('plot', 'isAdaptive')" class="setting-group">
+          <div
+            v-for="spec in PLOT_KEYS_A"
+            :key="spec.key"
+            v-show="rowVisible('plot', spec.key)"
+            class="setting-group"
+          >
             <label>
-              <input
-                v-model="localSettings.plot.isAdaptive"
-                type="checkbox"
-                @change="updateSettings"
-              />
-              Adaptive Plotting
-              <span class="setting-info" title="Concentrates sample points where the curve bends sharply instead of spacing them evenly. Produces smoother plots of curved functions at a lower point count; disable for a fixed dense sampling.">ⓘ</span>
+              <input type="checkbox" v-model="settingModel(spec.key).value" @change="updateSettings" />
+              {{ spec.label }}
+              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
             </label>
           </div>
 
@@ -182,54 +107,38 @@
             />
           </div>
 
-          <div v-show="rowVisible('plot', 'vectorGraphics')" class="setting-group">
-            <label>
-              <input
-                v-model="localSettings.plot.vectorGraphics"
-                type="checkbox"
-                @change="updateSettings"
-              />
-              Vector Graphics
-              <span class="setting-info" title="Renders plots as SVG (scalable, sharp at any zoom) instead of raster PNG images.">ⓘ</span>
+          <div
+            v-for="spec in PLOT_KEYS_B"
+            :key="spec.key"
+            v-show="rowVisible('plot', spec.key)"
+            class="setting-group"
+          >
+            <label v-if="spec.type === 'boolean'">
+              <input type="checkbox" v-model="settingModel(spec.key).value" @change="updateSettings" />
+              {{ spec.label }}
+              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
             </label>
-          </div>
-
-          <div v-show="rowVisible('plot', 'colorScale')" class="setting-group">
-            <label for="colorScale">Color Scale:</label>
-            <select
-              id="colorScale"
-              v-model="localSettings.plot.colorScale"
-              @change="updateSettings"
-            >
-              <option value="Rainbow">Rainbow</option>
-              <option value="Grayscale">Grayscale</option>
-              <option value="Hot">Hot</option>
-              <option value="Cool">Cool</option>
-              <option value="Jet">Jet</option>
-              <option value="Parula">Parula</option>
-            </select>
-          </div>
-
-          <div v-show="rowVisible('plot', 'smoothScale')" class="setting-group">
-            <label>
-              <input
-                v-model="localSettings.plot.smoothScale"
-                type="checkbox"
+            <template v-else>
+              <label :for="spec.key">
+                {{ spec.label }}:
+                <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+              </label>
+              <select
+                v-if="spec.type === 'enum'"
+                :id="spec.key"
+                v-model="settingModel(spec.key).value"
                 @change="updateSettings"
-              />
-              Smooth Scale
-            </label>
-          </div>
-
-          <div v-show="rowVisible('plot', 'shadows')" class="setting-group">
-            <label>
+              >
+                <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              </select>
               <input
-                v-model="localSettings.plot.shadows"
-                type="checkbox"
-                @change="updateSettings"
+                v-else
+                :id="spec.key"
+                type="text"
+                v-model="settingModel(spec.key).value"
+                @input="updateSettings"
               />
-              Shadows
-            </label>
+            </template>
           </div>
 
           <div v-show="rowVisible('plot', 'lightDirection')" class="setting-group">
@@ -250,50 +159,24 @@
             </select>
           </div>
 
-          <div v-show="rowVisible('plot', 'width')" class="setting-group">
-            <label for="plotWidth">
-              Plot Width (px):
-              <span class="setting-info" title="Width of the plot area in pixels. Can be overridden per-document with a PlotWidth = … line.">ⓘ</span>
+          <div
+            v-for="spec in PLOT_KEYS_C"
+            :key="spec.key"
+            v-show="rowVisible('plot', spec.key)"
+            class="setting-group"
+          >
+            <label :for="spec.key">
+              {{ spec.label }}:
+              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
             </label>
             <input
-              id="plotWidth"
-              v-model.number="localSettings.plot.width"
+              :id="spec.key"
               type="number"
-              min="1"
-              :class="{ 'input-invalid': settingErrors.plotWidth }"
-              :title="settingErrors.plotWidth || undefined"
-              @input="updateSettings"
-            />
-          </div>
-
-          <div v-show="rowVisible('plot', 'height')" class="setting-group">
-            <label for="plotHeight">
-              Plot Height (px):
-              <span class="setting-info" title="Height of the plot area in pixels. Can be overridden per-document with a PlotHeight = … line.">ⓘ</span>
-            </label>
-            <input
-              id="plotHeight"
-              v-model.number="localSettings.plot.height"
-              type="number"
-              min="1"
-              :class="{ 'input-invalid': settingErrors.plotHeight }"
-              :title="settingErrors.plotHeight || undefined"
-              @input="updateSettings"
-            />
-          </div>
-
-          <div v-show="rowVisible('plot', 'step')" class="setting-group">
-            <label for="plotStep">
-              Map Mesh Step:
-              <span class="setting-info" title="Mesh size for map (surface) plotting; 0 lets Calcpad choose automatically. Can be overridden per-document with a PlotStep = … line.">ⓘ</span>
-            </label>
-            <input
-              id="plotStep"
-              v-model.number="localSettings.plot.step"
-              type="number"
-              min="0"
-              :class="{ 'input-invalid': settingErrors.plotStep }"
-              :title="settingErrors.plotStep || undefined"
+              v-model="settingModel(spec.key).value"
+              :min="spec.min"
+              :max="spec.max"
+              :class="{ 'input-invalid': settingErrors[spec.key] }"
+              :title="settingErrors[spec.key] || undefined"
               @input="updateSettings"
             />
           </div>
@@ -335,6 +218,59 @@
               <option :value="false">UK (Imperial)</option>
               <option :value="true">US Customary</option>
             </select>
+          </div>
+        </div>
+      </section>
+
+      <section v-show="sectionVisible('pdf')" class="settings-section">
+        <h3 class="section-header" @click="toggle('pdf')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('pdf') }">&#x25BC;</span>
+          PDF Export
+        </h3>
+        <div v-show="bodyVisible('pdf')" class="section-body">
+          <div
+            v-for="spec in pdfKeys"
+            :key="spec.key"
+            v-show="rowVisible('pdf', spec.key)"
+            class="setting-group"
+          >
+            <label :for="'pdf-' + spec.key">
+              {{ spec.label }}:
+              <span class="setting-info" :title="spec.detail">ⓘ</span>
+            </label>
+            <select
+              v-if="spec.type === 'boolean'"
+              :id="'pdf-' + spec.key"
+              v-model="localPdfSettings[spec.key]"
+              @change="updatePdfSettings"
+            >
+              <option :value="true">Yes</option>
+              <option :value="false">No</option>
+            </select>
+            <select
+              v-else-if="spec.type === 'enum'"
+              :id="'pdf-' + spec.key"
+              v-model="localPdfSettings[spec.key]"
+              @change="updatePdfSettings"
+            >
+              <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+            <input
+              v-else
+              :id="'pdf-' + spec.key"
+              type="text"
+              v-model="localPdfSettings[spec.key]"
+              :class="{ 'input-invalid': pdfErrors[spec.key] }"
+              :title="pdfErrors[spec.key] || undefined"
+              @input="updatePdfSettings"
+            />
+            <span v-if="pdfErrors[spec.key]" class="setting-error">{{ pdfErrors[spec.key] }}</span>
+          </div>
+
+          <div v-show="rowVisible('pdf', 'reset')" class="settings-actions">
+            <button @click="resetPdfSettings" class="reset-button">
+              Reset PDF Settings
+            </button>
           </div>
         </div>
       </section>
@@ -403,6 +339,30 @@
               />
               Auto-Run Preview
               <span class="setting-info" title="When off, the preview only re-renders when it is first opened or a manual run is triggered.">ⓘ</span>
+            </label>
+          </div>
+
+          <div v-if="!versionConfig.isWeb" v-show="rowVisible('editor', 'autoInputMode')" class="setting-group">
+            <label>
+              <input
+                v-model="enableAutoInputMode"
+                type="checkbox"
+                @change="updateAutoInputMode"
+              />
+              Open #UI Documents in Input Mode
+              <span class="setting-info" title="A document declaring #UI controls opens as its input form the first time you open it.">ⓘ</span>
+            </label>
+          </div>
+
+          <div v-show="rowVisible('editor', 'previewUiOverrides')" class="setting-group">
+            <label>
+              <input
+                v-model="enablePreviewUiOverrides"
+                type="checkbox"
+                @change="updatePreviewUiOverrides"
+              />
+              Apply #UI Values in Preview
+              <span class="setting-info" title="Preview normally shows the document's own values. Turn this on to render it with the values entered into the input form instead, for tracking down an error that only appears once a form is filled in.">ⓘ</span>
             </label>
           </div>
 
@@ -505,20 +465,6 @@
             </select>
           </div>
 
-          <div v-show="rowVisible('editor', 'libraryPath')" class="setting-group">
-            <label for="libraryPath">
-              Library Path:
-              <span class="setting-info" title="Shared .cpd/.txt files for #include autocomplete. Supports %ENV% variables.">ⓘ</span>
-            </label>
-            <input
-              id="libraryPath"
-              v-model="libraryPath"
-              type="text"
-              placeholder="%USERPROFILE%\Documents\CalcpadLibrary"
-              @input="updateLibraryPath"
-            />
-          </div>
-
           <div v-show="rowVisible('editor', 'linterMinSeverity')" class="setting-group">
             <label for="linterMinSeverity">Linter Minimum Severity:</label>
             <select
@@ -581,6 +527,38 @@
               max="100000"
               step="100"
               @change="updateMaxOutputLines"
+            />
+          </div>
+
+          <div v-show="rowVisible('diagnostics', 'maxPreviewSize')" class="setting-group">
+            <label for="maxPreviewSize">
+              Max Preview Size (MB):
+              <span class="setting-info" title="A worksheet that renders to more HTML than this is not shown in the preview — showing it risks running the app out of memory. Exporting to PDF, HTML or DOCX is unaffected. Raise it only if you need very large documents on screen.">ⓘ</span>
+            </label>
+            <input
+              id="maxPreviewSize"
+              v-model.number="maxPreviewSizeMB"
+              type="number"
+              :min="MIN_PREVIEW_SIZE_MB"
+              :max="MAX_PREVIEW_SIZE_MB"
+              step="8"
+              @change="updateMaxPreviewSize"
+            />
+          </div>
+
+          <div v-show="rowVisible('diagnostics', 'maxPreviewConsoleMessages')" class="setting-group">
+            <label for="maxPreviewConsoleMessages">
+              Max Preview Console Messages:
+              <span class="setting-info" title="How many console lines one preview render may relay before the rest are dropped. A worksheet whose scripts log in a loop can otherwise flood the console channel. Raise it when debugging a script, lower it when a library is noisy. Each line is clipped to 4 KB regardless.">ⓘ</span>
+            </label>
+            <input
+              id="maxPreviewConsoleMessages"
+              v-model.number="maxPreviewConsoleMessages"
+              type="number"
+              :min="MIN_CONSOLE_MESSAGES_PER_DOCUMENT"
+              :max="MAX_CONSOLE_MESSAGES_PER_DOCUMENT"
+              step="100"
+              @change="updateMaxPreviewConsoleMessages"
             />
           </div>
         </div>
@@ -652,10 +630,17 @@
 
 <script setup lang="ts">
 import { ref, watch, computed, reactive } from 'vue'
-import type { Settings, ThemeInfo, VersionConfig } from '../types'
-import { DEFAULT_VERSION_CONFIG } from '../types'
-import { getDefaultSettings } from '../../types/settings'
-import { validateSettingValue } from '../../text/metadata-comment'
+import type { WritableComputedRef } from 'vue'
+import type { PdfSettings, Settings, ThemeInfo, VersionConfig } from '../types'
+import { DEFAULT_PDF_SETTINGS, DEFAULT_VERSION_CONFIG } from '../types'
+import { getDefaultSettings, METADATA_SETTINGS_KEYS, validateSettingValue, SETTINGS_PATH } from '../../types/settings'
+import { PDF_SETTING_KEYS, validatePdfValue } from '../../types/pdf-settings'
+import { specForKey } from '../../types/catalog'
+import {
+  DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB, MAX_PREVIEW_SIZE_MB,
+  DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
+  MAX_CONSOLE_MESSAGES_PER_DOCUMENT,
+} from '../../services/preview-limits'
 
 // Props
 interface Props {
@@ -668,16 +653,20 @@ interface Props {
   initialEnableFormattingHotkeys?: boolean
   initialEnablePreviewCursorSync?: boolean
   initialEnableAutoRun?: boolean
+  initialEnableAutoInputMode?: boolean
+  initialEnablePreviewUiOverrides?: boolean
   initialDarkBackground?: string
   initialLinterMinSeverity?: string
   initialMaxOutputLines?: number
+  initialMaxPreviewSize?: number
+  initialMaxPreviewConsoleMessages?: number
   versionConfig?: VersionConfig
-  initialLibraryPath?: string
   initialActiveConfig?: string
   initialAvailableConfigs?: string[]
   initialEditorFontFamily?: string
   initialAvailableFonts?: string[]
   appVersion?: string
+  pdfSettings?: PdfSettings
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -690,16 +679,20 @@ const props = withDefaults(defineProps<Props>(), {
   initialEnableFormattingHotkeys: true,
   initialEnablePreviewCursorSync: false,
   initialEnableAutoRun: true,
+  initialEnableAutoInputMode: true,
+  initialEnablePreviewUiOverrides: false,
   initialDarkBackground: '#1a1a2e',
   initialLinterMinSeverity: 'information',
   initialMaxOutputLines: 1000,
+  initialMaxPreviewSize: DEFAULT_PREVIEW_SIZE_MB,
+  initialMaxPreviewConsoleMessages: DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT,
   versionConfig: () => ({ ...DEFAULT_VERSION_CONFIG }),
-  initialLibraryPath: '',
   initialActiveConfig: 'default',
   initialAvailableConfigs: () => ['default'],
   initialEditorFontFamily: 'JuliaMono',
   initialAvailableFonts: () => [],
-  appVersion: ''
+  appVersion: '',
+  pdfSettings: () => ({ ...DEFAULT_PDF_SETTINGS })
 })
 
 // Emits
@@ -712,10 +705,13 @@ const emit = defineEmits<{
   updateFormattingHotkeys: [enabled: boolean]
   updatePreviewCursorSync: [enabled: boolean]
   updateAutoRun: [enabled: boolean]
+  updateAutoInputMode: [enabled: boolean]
+  updatePreviewUiOverrides: [enabled: boolean]
   updateDarkBackground: [color: string]
   updateLinterMinSeverity: [severity: string]
   updateMaxOutputLines: [value: number]
-  updateLibraryPath: [path: string]
+  updateMaxPreviewSize: [value: number]
+  updateMaxPreviewConsoleMessages: [value: number]
   resetSettings: []
   saveNamedConfig: [name: string]
   switchConfig: [name: string]
@@ -724,10 +720,55 @@ const emit = defineEmits<{
   openFontsFolder: []
   refreshFonts: []
   updateEditorFontFamily: [family: string]
+  updatePdfSettings: [settings: PdfSettings]
+  resetPdfSettings: []
 }>()
 
 // State
 const localSettings = ref<Settings>({ ...props.settings })
+
+// Ordered per-section key lists — METADATA_SETTINGS_KEYS' array order doesn't
+// group Math/Plot/Units contiguously (units/isUs sit mid-array, precision/tol
+// sit at the end), so the render order is spelled out here instead of sliced.
+// Plot is split around screenScaleFactor/lightDirection, which have no
+// #settings-directive counterpart and so stay hardcoded, to keep the visible
+// field order unchanged.
+const MATH_KEYS = [
+  'decimals', 'degrees', 'complex', 'substitute', 'formatEquations',
+  'zeroSmallMatrixElements', 'showHiddenOutput', 'maxOutputCount', 'precision', 'tol',
+].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
+const PLOT_KEYS_A = ['adaptivePlot'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
+const PLOT_KEYS_B = ['vectorGraphics', 'colorScale', 'smoothScale', 'shadows'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
+const PLOT_KEYS_C = ['plotWidth', 'plotHeight', 'plotStep'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
+
+/** Writable computed bound through SETTINGS_PATH's dot-path, one per key, cached. */
+const settingModelCache = new Map<string, WritableComputedRef<string | number | boolean>>()
+function settingModel(key: string): WritableComputedRef<string | number | boolean> {
+  let model = settingModelCache.get(key)
+  if (!model) {
+    const [a, b] = SETTINGS_PATH[key]!.split('.')
+    model = computed({
+      get: () => (b ? (localSettings.value as any)[a][b] : (localSettings.value as any)[a]),
+      set: (v) => {
+        const current = b ? (localSettings.value as any)[a][b] : (localSettings.value as any)[a]
+        const coerced = typeof current === 'number' ? Number(v) : v
+        if (b) (localSettings.value as any)[a][b] = coerced
+        else (localSettings.value as any)[a] = coerced
+      },
+    })
+    settingModelCache.set(key, model)
+  }
+  return model
+}
+
+/** `step` for a generic number input — precision/tol are continuous, everything else is integral. */
+const numberStep = (key: string) => (key === 'precision' || key === 'tol' ? 'any' : '1')
+
+// Defaults first, so a settings blob written before a key existed still renders a
+// real value rather than validating `undefined` against the key's allowed set.
+const localPdfSettings = reactive<Record<string, string | number | boolean>>(
+  { ...DEFAULT_PDF_SETTINGS, ...props.pdfSettings }
+)
 const previewTheme = ref(props.initialPreviewTheme)
 const colorTheme = ref(props.initialColorTheme)
 const availableThemes = ref<ThemeInfo[]>(props.initialAvailableThemes)
@@ -749,10 +790,13 @@ const commentFormat = ref(props.initialCommentFormat)
 const enableFormattingHotkeys = ref(props.initialEnableFormattingHotkeys)
 const enablePreviewCursorSync = ref(props.initialEnablePreviewCursorSync)
 const enableAutoRun = ref(props.initialEnableAutoRun)
+const enableAutoInputMode = ref(props.initialEnableAutoInputMode)
+const enablePreviewUiOverrides = ref(props.initialEnablePreviewUiOverrides)
 const darkBackground = ref(props.initialDarkBackground)
 const linterMinSeverity = ref(props.initialLinterMinSeverity)
 const maxOutputLines = ref(props.initialMaxOutputLines)
-const libraryPath = ref(props.initialLibraryPath)
+const maxPreviewSizeMB = ref(props.initialMaxPreviewSize)
+const maxPreviewConsoleMessages = ref(props.initialMaxPreviewConsoleMessages)
 const activeConfig = ref(props.initialActiveConfig)
 const availableConfigs = ref<string[]>(props.initialAvailableConfigs)
 const editorFontFamily = ref(props.initialEditorFontFamily)
@@ -772,11 +816,12 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
     rows: {
       decimals: 'decimals precision digits',
       degrees: 'angle units degrees radians gradians',
-      isComplex: 'complex numbers imaginary',
+      complex: 'complex numbers imaginary',
       substitute: 'substitute variables',
       formatEquations: 'format equations professional inline',
-      zeroSmall: 'zero small matrix elements scientific notation',
-      maxOutput: 'max output count rows columns matrices vectors',
+      zeroSmallMatrixElements: 'zero small matrix elements scientific notation',
+      showHiddenOutput: 'show hidden output hide debug debugging suppressed',
+      maxOutputCount: 'max output count rows columns matrices vectors',
       precision: 'numerical precision integration root finding tolerance',
       tol: 'solver tolerance pcg eigensolver iterative'
     }
@@ -784,16 +829,16 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
   plot: {
     title: 'Plot Settings',
     rows: {
-      isAdaptive: 'adaptive plotting sample points',
+      adaptivePlot: 'adaptive plotting sample points',
       screenScale: 'screen scale factor resolution',
       vectorGraphics: 'vector graphics svg png raster',
-      colorScale: 'color scale rainbow grayscale hot cool jet parula',
+      colorScale: 'color scale none gray grayscale rainbow terrain violet green blues blue yellow red purple',
       smoothScale: 'smooth scale',
       shadows: 'shadows',
       lightDirection: 'light direction',
-      width: 'plot width pixels size',
-      height: 'plot height pixels size',
-      step: 'map mesh step surface plotting'
+      plotWidth: 'plot width pixels size',
+      plotHeight: 'plot height pixels size',
+      plotStep: 'map mesh step surface plotting'
     }
   },
   units: {
@@ -801,6 +846,22 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
     rows: {
       units: 'default input length unit meters centimeters millimeters',
       isUs: 'non-metric units us uk imperial customary'
+    }
+  },
+  pdf: {
+    title: 'PDF Export',
+    rows: {
+      format: 'pdf paper size page format letter legal tabloid ledger a4 a3',
+      orientation: 'pdf page orientation portrait landscape',
+      marginTop: 'pdf top margin page',
+      marginBottom: 'pdf bottom margin page',
+      marginLeft: 'pdf left margin page',
+      marginRight: 'pdf right margin page',
+      showPageNumbers: 'pdf page numbers footer',
+      showDate: 'pdf date timestamp header',
+      documentTitle: 'pdf document title header',
+      dateTimeFormat: 'pdf timestamp date time format',
+      reset: 'reset pdf settings default'
     }
   },
   editor: {
@@ -811,12 +872,13 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       formattingHotkeys: 'formatting hotkeys bold italic',
       previewCursorSync: 'sync preview cursor line scroll',
       autoRun: 'auto-run preview render',
+      autoInputMode: 'auto input mode ui form first open',
+      previewUiOverrides: 'apply ui values preview entered overrides debug troubleshoot',
       fontFamily: 'editor font family juliamono system',
       fontsFolder: 'open fonts folder custom',
       previewTheme: 'preview theme system light dark',
       darkBackground: 'dark mode background color',
       colorTheme: 'color theme syntax',
-      libraryPath: 'library path include autocomplete',
       linterMinSeverity: 'linter minimum severity error warning information'
     }
   },
@@ -830,7 +892,9 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
     title: 'Diagnostics',
     rows: {
       logsFolder: 'open logs folder crash dump',
-      maxOutputLines: 'max output lines channel'
+      maxOutputLines: 'max output lines channel',
+      maxPreviewSize: 'max preview size memory limit mb blocked too large',
+      maxPreviewConsoleMessages: 'max preview console messages javascript js log flood suppressed'
     }
   },
   configuration: {
@@ -891,22 +955,36 @@ const anyVisible = computed(() =>
 // Per-field validation against the ranges Calcpad.Core enforces. Invalid fields
 // are highlighted and block the settings from being applied (rather than clamped).
 const settingErrors = computed<Record<string, string | null>>(() => {
-  const { math, plot } = localSettings.value
-  return {
-    decimals: validateSettingValue('decimals', math.decimals),
-    maxOutputCount: validateSettingValue('maxOutputCount', math.maxOutputCount),
-    precision: validateSettingValue('precision', math.precision),
-    tol: validateSettingValue('tol', math.tol),
-    plotWidth: validateSettingValue('plotWidth', plot.width),
-    plotHeight: validateSettingValue('plotHeight', plot.height),
-    plotStep: validateSettingValue('plotStep', plot.step),
-  }
+  const out: Record<string, string | null> = {}
+  for (const spec of [...MATH_KEYS, ...PLOT_KEYS_A, ...PLOT_KEYS_B, ...PLOT_KEYS_C])
+    if (spec.type === 'number') out[spec.key] = validateSettingValue(spec.key, settingModel(spec.key).value)
+  return out
 })
 const hasSettingErrors = computed(() => Object.values(settingErrors.value).some(Boolean))
 
 const updateSettings = () => {
   if (hasSettingErrors.value) return
   emit('updateSettings', localSettings.value)
+}
+
+// These are the host-level defaults. A document can override any of them for its
+// own export via the `pdf` key of a metadata comment (see the Properties tab).
+const pdfKeys = PDF_SETTING_KEYS
+
+const pdfErrors = computed<Record<string, string | null>>(() => {
+  const out: Record<string, string | null> = {}
+  for (const spec of PDF_SETTING_KEYS)
+    out[spec.key] = validatePdfValue(spec.key, localPdfSettings[spec.key])
+  return out
+})
+
+const updatePdfSettings = () => {
+  if (Object.values(pdfErrors.value).some(Boolean)) return
+  emit('updatePdfSettings', { ...localPdfSettings } as unknown as PdfSettings)
+}
+
+const resetPdfSettings = () => {
+  emit('resetPdfSettings')
 }
 
 const updatePreviewTheme = () => {
@@ -937,6 +1015,14 @@ const updateAutoRun = () => {
   emit('updateAutoRun', enableAutoRun.value)
 }
 
+const updateAutoInputMode = () => {
+  emit('updateAutoInputMode', enableAutoInputMode.value)
+}
+
+const updatePreviewUiOverrides = () => {
+  emit('updatePreviewUiOverrides', enablePreviewUiOverrides.value)
+}
+
 const updateDarkBackground = () => {
   emit('updateDarkBackground', darkBackground.value)
 }
@@ -956,8 +1042,21 @@ const updateMaxOutputLines = () => {
   emit('updateMaxOutputLines', Math.floor(n))
 }
 
-const updateLibraryPath = () => {
-  emit('updateLibraryPath', libraryPath.value)
+const updateMaxPreviewSize = () => {
+  const n = Number(maxPreviewSizeMB.value)
+  if (!Number.isFinite(n)) return
+  const clamped = Math.min(MAX_PREVIEW_SIZE_MB, Math.max(MIN_PREVIEW_SIZE_MB, Math.floor(n)))
+  maxPreviewSizeMB.value = clamped
+  emit('updateMaxPreviewSize', clamped)
+}
+
+const updateMaxPreviewConsoleMessages = () => {
+  const n = Number(maxPreviewConsoleMessages.value)
+  if (!Number.isFinite(n)) return
+  const clamped = Math.min(MAX_CONSOLE_MESSAGES_PER_DOCUMENT,
+    Math.max(MIN_CONSOLE_MESSAGES_PER_DOCUMENT, Math.floor(n)))
+  maxPreviewConsoleMessages.value = clamped
+  emit('updateMaxPreviewConsoleMessages', clamped)
 }
 
 const resetSettings = () => {
@@ -1062,6 +1161,20 @@ watch(
 )
 
 watch(
+  () => props.initialEnableAutoInputMode,
+  (newValue) => {
+    enableAutoInputMode.value = newValue
+  }
+)
+
+watch(
+  () => props.initialEnablePreviewUiOverrides,
+  (newValue) => {
+    enablePreviewUiOverrides.value = newValue
+  }
+)
+
+watch(
   () => props.initialEnableAutoRun,
   (newValue) => {
     enableAutoRun.value = newValue
@@ -1090,9 +1203,16 @@ watch(
 )
 
 watch(
-  () => props.initialLibraryPath,
+  () => props.initialMaxPreviewSize,
   (newValue) => {
-    libraryPath.value = newValue
+    maxPreviewSizeMB.value = newValue
+  }
+)
+
+watch(
+  () => props.initialMaxPreviewConsoleMessages,
+  (newValue) => {
+    maxPreviewConsoleMessages.value = newValue
   }
 )
 
@@ -1122,6 +1242,14 @@ watch(
   (newValue) => {
     availableFonts.value = newValue
   }
+)
+
+watch(
+  () => props.pdfSettings,
+  (newSettings) => {
+    if (newSettings) Object.assign(localPdfSettings, DEFAULT_PDF_SETTINGS, newSettings)
+  },
+  { deep: true }
 )
 
 </script>

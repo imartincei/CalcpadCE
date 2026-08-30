@@ -21,6 +21,16 @@ namespace Calcpad.Highlighter.HtmlComment
         /// <summary>Zero-based end line in the tokenizer result (inclusive)</summary>
         public int EndLine { get; init; }
 
+        /// <summary>Column where the comment starts on <see cref="StartLine"/>.</summary>
+        public int StartColumn { get; init; }
+
+        /// <summary>
+        /// Column just past the comment's extent on <see cref="StartLine"/>. For a
+        /// single-line block that is its end; for a multi-line one it is the end of the
+        /// opening line, which is where diagnostics anchor.
+        /// </summary>
+        public int EndColumn { get; init; }
+
         /// <summary>Raw text between &lt;!-- and --&gt;, trimmed</summary>
         public string? RawJson { get; init; }
 
@@ -41,10 +51,9 @@ namespace Calcpad.Highlighter.HtmlComment
     ///   '&lt;!--{"json": "hello", _                    multi line via " _" continuation
     ///   "more": "world"}--&gt;
     ///
-    /// Requires that the tokenizer has been run with <see cref="CalcpadTokenizer._inHtmlComment"/>
-    /// state tracking enabled, so all lines of a multi-line block are typed as HtmlComment.
-    /// A line gap (non-consecutive line numbers) in the HtmlComment token stream terminates
-    /// an open block without emitting a result.
+    /// Requires the tokenizer to have run with <see cref="CalcpadTokenizer._inHtmlComment"/> state
+    /// tracking enabled, so every line of a multi-line block is typed as HtmlComment. A line gap in
+    /// the HtmlComment token stream terminates an open block without emitting a result.
     /// </summary>
     public sealed class HtmlCommentParser
     {
@@ -56,14 +65,35 @@ namespace Calcpad.Highlighter.HtmlComment
             if (tokenizerResult == null)
                 throw new ArgumentNullException(nameof(tokenizerResult));
 
+            return Parse(tokenizerResult.Tokens);
+        }
+
+        public IReadOnlyList<HtmlCommentBlock> Parse(IReadOnlyList<Token> tokens)
+        {
+            if (tokens == null)
+                throw new ArgumentNullException(nameof(tokens));
+
             var results = new List<HtmlCommentBlock>();
 
             var state    = ParseState.Normal;
             var buffer   = new List<string>();
-            int startLine = -1;
             int lastLine  = -1;
+            Token opener  = default;
 
-            foreach (var token in tokenizerResult.Tokens)
+            // One buffer entry per source line: entries are later joined with "\n", so
+            // several HtmlComment tokens on the same line (a macro parameter or a '>' in
+            // the payload can split one) must be concatenated, not newline-separated.
+            void AddFragment(int line, string text)
+            {
+                if (buffer.Count > 0 && line == lastLine)
+                    buffer[^1] += text;
+                else
+                    buffer.Add(text);
+
+                lastLine = line;
+            }
+
+            foreach (var token in tokens)
             {
                 if (token.Type != TokenType.HtmlComment)
                     continue;
@@ -82,7 +112,7 @@ namespace Calcpad.Highlighter.HtmlComment
                     if (closeIdx >= 0)
                     {
                         // Single-line block
-                        var block = BuildBlock(token.Line, token.Line, afterOpen[..closeIdx]);
+                        var block = BuildBlock(token, token.Line, afterOpen[..closeIdx]);
                         if (block != null)
                             results.Add(block);
                     }
@@ -90,9 +120,8 @@ namespace Calcpad.Highlighter.HtmlComment
                     {
                         // Start of multi-line block
                         buffer.Clear();
-                        buffer.Add(afterOpen);
-                        startLine = token.Line;
-                        lastLine  = token.Line;
+                        AddFragment(token.Line, afterOpen);
+                        opener    = token;
                         state     = ParseState.InHtmlComment;
                     }
                 }
@@ -113,15 +142,14 @@ namespace Calcpad.Highlighter.HtmlComment
 
                         if (closeIdx >= 0)
                         {
-                            var block = BuildBlock(token.Line, token.Line, afterOpen[..closeIdx]);
+                            var block = BuildBlock(token, token.Line, afterOpen[..closeIdx]);
                             if (block != null)
                                 results.Add(block);
                         }
                         else
                         {
-                            buffer.Add(afterOpen);
-                            startLine = token.Line;
-                            lastLine  = token.Line;
+                            AddFragment(token.Line, afterOpen);
+                            opener    = token;
                             state     = ParseState.InHtmlComment;
                         }
 
@@ -131,8 +159,8 @@ namespace Calcpad.Highlighter.HtmlComment
                     int closingIdx = content.IndexOf(CloseMarker, StringComparison.Ordinal);
                     if (closingIdx >= 0)
                     {
-                        buffer.Add(content[..closingIdx]);
-                        var block = BuildBlock(startLine, token.Line, string.Join("\n", buffer));
+                        AddFragment(token.Line, content[..closingIdx]);
+                        var block = BuildBlock(opener, token.Line, string.Join("\n", buffer));
                         if (block != null)
                             results.Add(block);
                         buffer.Clear();
@@ -140,8 +168,7 @@ namespace Calcpad.Highlighter.HtmlComment
                     }
                     else
                     {
-                        buffer.Add(content);
-                        lastLine = token.Line;
+                        AddFragment(token.Line, content);
                     }
                 }
             }
@@ -150,7 +177,7 @@ namespace Calcpad.Highlighter.HtmlComment
             return results;
         }
 
-        private static HtmlCommentBlock? BuildBlock(int startLine, int endLine, string rawJson)
+        private static HtmlCommentBlock? BuildBlock(Token opener, int endLine, string rawJson)
         {
             rawJson = rawJson.Trim();
             if (rawJson.Length == 0)
@@ -161,22 +188,26 @@ namespace Calcpad.Highlighter.HtmlComment
                 using var doc = JsonDocument.Parse(rawJson);
                 return new HtmlCommentBlock
                 {
-                    StartLine = startLine,
-                    EndLine   = endLine,
-                    RawJson   = rawJson,
-                    Data      = doc.RootElement.Clone(),
-                    Status    = HtmlCommentParseStatus.Success
+                    StartLine   = opener.Line,
+                    EndLine     = endLine,
+                    StartColumn = opener.Column,
+                    EndColumn   = opener.Column + opener.Length,
+                    RawJson     = rawJson,
+                    Data        = doc.RootElement.Clone(),
+                    Status      = HtmlCommentParseStatus.Success
                 };
             }
             catch (JsonException ex)
             {
                 return new HtmlCommentBlock
                 {
-                    StartLine  = startLine,
-                    EndLine    = endLine,
-                    RawJson    = rawJson,
-                    ParseError = ex.Message,
-                    Status     = HtmlCommentParseStatus.InvalidJson
+                    StartLine   = opener.Line,
+                    EndLine     = endLine,
+                    StartColumn = opener.Column,
+                    EndColumn   = opener.Column + opener.Length,
+                    RawJson     = rawJson,
+                    ParseError  = ex.Message,
+                    Status      = HtmlCommentParseStatus.InvalidJson
                 };
             }
         }
