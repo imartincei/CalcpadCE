@@ -25,9 +25,9 @@ jobs:
           SHORT_SHA=$(git rev-parse --short HEAD)
           echo "version=${BASE_VERSION}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
 
-  build-windows-installer:
+  build-desktop-windows:
     needs: determine-version
-    uses: ./.github/workflows/build-windows-installer.yml
+    uses: ./.github/workflows/build-desktop-windows.yml
     with:
       version: ${{ needs.determine-version.outputs.version }}
 

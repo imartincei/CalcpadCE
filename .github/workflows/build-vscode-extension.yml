@@ -1,0 +1,45 @@
+name: Build VS Code Extension
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  build-vscode-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Set version
+        run: node Calcpad.Web/frontend/scripts/bump-versions.mjs set ${{ inputs.version }}
+
+      - name: Build calcpad-frontend
+        run: |
+          npm ci --prefix Calcpad.Web/frontend/calcpad-frontend
+          npm run build --prefix Calcpad.Web/frontend/calcpad-frontend
+
+      - name: Install extension dependencies
+        run: npm ci --prefix Calcpad.Web/frontend/vscode-calcpad
+
+      - name: Package extension
+        run: npm run package:vsix --prefix Calcpad.Web/frontend/vscode-calcpad
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: Calcpad.Web/frontend/vscode-calcpad/*.vsix
+          archive: false

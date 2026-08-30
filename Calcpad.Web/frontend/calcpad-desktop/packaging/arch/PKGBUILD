@@ -11,7 +11,7 @@
 #   cd packaging/arch && makepkg -f
 
 pkgname=calcpad-ce
-pkgver=0.5.0
+pkgver=8.0.0.beta1
 pkgrel=1
 pkgdesc='CalcpadCE desktop editor — Vue frontend with an embedded ASP.NET Core server'
 arch=('x86_64' 'aarch64')

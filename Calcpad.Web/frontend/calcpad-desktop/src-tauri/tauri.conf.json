@@ -1,6 +1,6 @@
 {
   "productName": "CalcpadCE",
-  "version": "0.5.0",
+  "version": "8.0.0-beta1",
   "identifier": "com.calcpadce.desktop",
   "build": {
     "frontendDist": "../../calcpad-web/dist"

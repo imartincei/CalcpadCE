@@ -105,14 +105,16 @@ updateJson(resolve(frontendRoot, 'calcpad-desktop/src-tauri/tauri.conf.json'), j
     const p = j.version; j.version = next; return p;
 });
 
-// A new upstream version restarts the Arch package revision at 1.
+// A new upstream version restarts the Arch package revision at 1. makepkg
+// rejects hyphens in pkgver, so a prerelease like 8.0.0-beta1 becomes 8.0.0.beta1.
 const pkgbuild = resolve(frontendRoot, 'calcpad-desktop/packaging/arch/PKGBUILD');
 if (existsSync(pkgbuild)) {
+    const pkgver = next.replace(/-/g, '.');
     const src = readFileSync(pkgbuild, 'utf8');
     const updated = src
         .replace(/^(pkgver=)(.*)$/m, (_, a, prev) => {
-            console.log(`calcpad-desktop/packaging/arch/PKGBUILD: ${prev} -> ${next}`);
-            return a + next;
+            console.log(`calcpad-desktop/packaging/arch/PKGBUILD: ${prev} -> ${pkgver}`);
+            return a + pkgver;
         })
         .replace(/^pkgrel=.*$/m, 'pkgrel=1');
     writeFileSync(pkgbuild, updated);

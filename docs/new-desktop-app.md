@@ -173,6 +173,7 @@ If these do not work and the server shows "Disconnected" in the bottom-right cor
 | Preview blank or not updating | **Server → Refresh**, then **Server → Restart Server** if needed. Check **Server → Show Server Log** to see messages from the calculation engine. Click **Open Log Folder** in the **Settings** tab to submit logs showing an error as a Github Issue. |
 | PDF export fails | Install a Chromium browser. On Linux the app names the package to install — see [Exports → Troubleshooting](new-exports.md#troubleshooting). |
 | Unsaved work after a crash | The app writes backup copies of unsaved files; reopen them from the Files tab. |
+| AppImage will not start: `dlopen(): error loading libfuse.so.2` | An AppImage mounts itself at launch and needs FUSE 2, but many current distributions ship only FUSE 3. Either run `./CalcpadCE.AppImage --appimage-extract-and-run`, or install FUSE 2 — the package is `fuse2` on Arch, `libfuse2` on Debian and Ubuntu. |
 
 ## See also
 

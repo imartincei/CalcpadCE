@@ -1,6 +1,6 @@
 {
   "name": "calcpad-web",
-  "version": "0.5.0",
+  "version": "8.0.0-beta1",
   "private": true,
   "description": "CalcpadCE web editor — Monaco + Vue sidebar powered by calcpad-frontend",
   "type": "module",
