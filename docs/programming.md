@@ -356,6 +356,16 @@ Reads data from the specified text/CSV file into the matrix/vector *M*. The fil
 #read M from filename.txt@R1C1:R2C2 TYPE=R SEP=','
 ```
 
+A read can also carry its data instead of naming a file, by giving a base64 [data URI](https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/data) as the source.
+Everything else is written as it always is — the range, the type and the separator apply to the carried data the same way:
+
+```calcpad
+#read M from data:text/csv;base64,MSwzCjIsNAo= TYPE=R SEP=','
+```
+
+The media type must be one of `text/csv`, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` (**\*.xlsx**) or `application/vnd.ms-excel.sheet.macroEnabled.12` (**\*.xlsm**).
+This is what [saving a compiled worksheet](new-exports.md#save-as-compiled-worksheet) writes, so that it runs with no data files beside it.
+
 Writes data from matrix/vector *M* to the specified text/CSV file.
 If the file exists, it is entirely overwritten.
 Otherwise, a new file is created.

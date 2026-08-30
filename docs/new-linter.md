@@ -1,14 +1,9 @@
 # Linter and Diagnostics
 
-> Calcpad.Web only (web editor, desktop app, and VS Code extension). Not available in the standalone WPF desktop application for Windows.
-
-Calcpad.Web checks your document as you write and flags problems before you ever run it.
+CalcpadCE checks your document as you write and flags problems before you ever run it.
 Each diagnostic has a short, stable code (like `CPD-3301`) so you can look up exactly what it means.
 
-Diagnostics appear:
-
-- In **VS Code** — as squiggles in the editor and entries in the Problems panel.
-- In the **desktop and web editors** — as colored marks (red for errors, yellow for warnings, blue for information) at the spot with the problem, and in the **Problems** panel.
+Diagnostics appear as squiggles in the editor and entries in the Problems panel.
 
 ## Diagnostic codes
 
@@ -21,6 +16,7 @@ The tables below group them by the kind of problem.
 |------|----------|---------|
 | CPD-1101 | Error | Malformed `#include` statement |
 | CPD-1102 | Error | Missing `#include` filename |
+| CPD-1103 | Warning | Deprecated `#include` input values |
 
 ### Macro definitions
 
@@ -95,7 +91,13 @@ The tables below group them by the kind of problem.
 | CPD-3410 | Error | Outer-scope assignment (`←`) to an undefined variable |
 | CPD-3411 | Warning | Invalid `paramType` value in a metadata comment |
 | CPD-3412 | Warning | Invalid metadata-comment JSON |
-| CPD-3413 | Error| Invalid #settings JSON |
+| CPD-3413 | Warning | Invalid #settings JSON |
+| CPD-3414 | Warning | Invalid PDF settings in a metadata comment |
+| CPD-3415 | Warning | Invalid `#UI` format |
+| CPD-3416 | Warning | `uiOverrides` metadata comment not on the first line |
+| CPD-3417 | Warning | Duplicate `uiOverrides` metadata comment |
+| CPD-3418 | Warning | `uiOverrides` sharing a comment with another key |
+| CPD-3419 | Warning | Deprecated stored input value |
 
 ### Formatting
 
@@ -105,7 +107,7 @@ The tables below group them by the kind of problem.
 
 ## Suppressing diagnostics (lint-ignore)
 
-To silence specific diagnostics in a section — for example, a prototype variable you haven't wired up yet — wrap it in `LintIgnore` / `EndLintIgnore` markers and list the codes to ignore:
+To silence specific diagnostics in a section, wrap it in `LintIgnore` / `EndLintIgnore` markers and list the codes to ignore:
 
 ```text
 '<!--{"LintIgnore": ["CPD-3301"]}-->
@@ -117,9 +119,10 @@ Leave the list empty (`"LintIgnore": []`) to suppress *all* diagnostics inside t
 
 These markers are one kind of [metadata comment](new-metadata-comments.md); the **Properties** panel tab can write them for you with a code picker.
 
-## Choosing how much to show (VS Code)
+## Choosing how much to show
 
-The `calcpad.linter.minimumSeverity` setting (`error` | `warning` | `information`, default `information`) hides diagnostics below the level you choose — set it to `warning` to see only warnings and errors, or `error` for errors alone.
+The [**Minimum Severity**](new-settings.md#linter) setting hides diagnostics below the level you choose.
+Set it to `warning` to see only warnings and errors, or `error` for errors alone.
 
 ## See also
 

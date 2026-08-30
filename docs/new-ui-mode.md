@@ -1,0 +1,362 @@
+# UI Mode
+
+UI mode turns a worksheet into a **fill-in form**.
+Mark the inputs of your calculation with the `#UI` keyword, switch the results pane to input mode, and those lines are rendered as text boxes, drop-downs, radio buttons, checkboxes or editable grids instead of plain results.
+Type a new value and the whole document recalculates.
+
+The same file is still an ordinary worksheet.
+In the preview, report, and PDF/Word exports — the `#UI` keyword changes nothing about how the line looks unless this is explicitly set (see [reportStyle property](#json-properties)).
+
+```text
+#UI L = 6m
+#UI w = 25kN/m
+M = w*L^2/8
+```
+
+Preview and Report show three ordinary lines.
+In Input mode `L` and `w` become text boxes, and `M` follows whatever you type into them.
+
+## Turning it on
+
+A document that declares `#UI` controls exists to be filled in, so the first time you open one it comes up as its input form.
+You can turn this behavior off with **Open `#UI` Documents in Input Mode** on the panel's **Settings** tab.
+
+### VS Code
+
+The input form and the report each open as their own panel — see [Live preview](new-vscode-extension.md#live-preview) for the buttons and commands that open them, and [Exports](new-exports.md) for **Print Report to PDF**.
+
+Closing the form asks whether to save first; declining discards them.
+The report preview is not tied to the form: open it on its own to read the print layout beside the editor, and it stays open when the form closes.
+However, it is recommended to save and close the input form before making changes to the code.
+
+### Desktop App
+
+**Input** takes over the window and hides the editor.
+Its toolbar also offers **Report** (the report beside the form), **Save values** (once you have changed something) and **Exit input mode**, which leaves you in **Report**.
+In **Input** and **Report**, a **Print PDF** button exports the report.
+
+## `#pre` and `#post`
+
+The two directives split a document into the part that is filled in and the part that is read back.
+`#pre` is hidden in a report; `#post` is hidden while the form is on screen:
+
+| | `#pre` shown | `#post` shown | Entered `#UI` values applied |
+|---|---|---|---|
+| **Preview** | yes | yes | no, unless a setting is changed |
+| **Input** | yes | no | yes |
+| **Report** | no | yes | yes |
+
+```text
+#pre
+'<p>Enter the span below.</p>
+#end pre
+#UI L = 6m
+#post
+'<p>Span used: 'L'</p>
+#end post
+```
+
+**Preview** is the suggested mode to write CalcpadCE code in: it shows everything at once, and it ignores input values so you see the default values of the document.
+
+Turning on the **Apply #UI Values in Preview** setting will render the preview with the input values applied.
+This can make debugging issues from values input into the form easier.
+
+## Writing a `#UI` line
+
+```text
+#UI { JSON properties } name = value
+```
+
+The JSON properties are optional.
+Without it, the input properties are derived from the right-hand side.
+
+`#UI` is only allowed where the right-hand side is a plain value or a vector/matrix function by itself:
+
+| Right-hand side | Accepted | Example |
+|-----------------|----------|---------|
+| Number, with or without a unit | ✔ | `#UI L = 10m`, `#UI n = 4`, `#UI q = 3kN/m` |
+| Vector or matrix literal | ✔ | `#UI v = [1; 2; 3]`, `#UI M = [1; 2 \| 3; 4]` |
+| `vector()` / `matrix()` constructor | ✔ | `#UI Z = vector(5)`, `#UI G = matrix(r; c)` |
+| An expression | ✘ | `#UI k = 2*E`, `#UI k = max(v)`, `#UI v = [1; sqrt(4)]` |
+| Text | ✘ | `#UI text = 'text'` |
+
+Some considerations:
+- Exponent notation is not valid: write the full number instead.
+- Saved values are matched to controls by variable name, so be careful when renaming variables — see [Editing a document that has saved values](#editing-a-document-that-has-saved-values).
+
+### Labels
+
+An inline comment on the line can label the control:
+
+```text
+#UI 'Span, 'L = 6m
+```
+
+### Several controls on one line
+
+Comment segments separate assignments, so one `#UI` line can declare more than one control.
+They share the line's JSON properties but are saved and overridden separately.
+
+```text
+#UI 'b = 'b = 200mm', h = 'h = 400mm
+```
+
+## JSON properties
+
+| Property | Type | Applies to | Meaning |
+|----------|------|-----------|---------|
+| `type` | string | all | `entry`, `datagrid`, `dropdown`, `radio`, `checkbox`. Auto-detected when omitted |
+| `mode` | string | all | Only `number` is currently accepted; string inputs are planned but not yet supported |
+| `style` | string | all | CSS class applied to the input element |
+| `reportStyle` | string | all | CSS class applied to the line in the report |
+| `rows` | number | datagrid | Grid rows. Auto-detected when omitted |
+| `columns` | number | datagrid | Grid columns. Auto-detected when omitted |
+| `rowHeaders` | array | datagrid | Row header labels |
+| `columnHeaders` | array | datagrid | Column header labels |
+| `keys` | array | dropdown, radio | The labels shown to the user |
+| `values` | array | dropdown, radio | The values substituted into the calculation, one per key |
+
+`keys` and `values` are both required for a drop-down or radio group, and must be the same length.
+Header arrays must not be longer than the grid dimension they label.
+
+You don't have to write JSON by hand — the [Properties tab](new-calcpad-panel.md#properties) has a form for it that fills in the fields that apply to the control type it detects.
+
+## The control types
+
+### `entry`: an input box
+
+The default for a numeric right-hand side.
+The unit stays in the document beside the box, so only the number is editable; the box accepts digits, a decimal point and a sign, and rejects anything else as you type.
+
+```text
+#UI L = 10m
+#UI {"type": "entry"} W = 5m
+```
+
+### `dropdown`: a list
+
+`keys` are shown, `values` are substituted.
+A value may carry its own unit, so a drop-down can switch units as well as magnitudes.
+
+```text
+#UI {"type": "dropdown", "keys": ["Low", "Medium", "High"], "values": ["1", "2", "3"]} grade = 1
+```
+
+### `radio`: a button group
+
+Same `keys`/`values` pairing as a drop-down, laid out as radio buttons.
+
+```text
+#UI {"type": "radio", "keys": ["Steel", "Concrete"], "values": ["200GPa", "25GPa"]} E = 200GPa
+```
+
+### `checkbox`: a toggle
+
+Checked is `1`, unchecked is `0`.
+
+```text
+#UI {"type": "checkbox"} useSteel = 1
+```
+
+### `datagrid`: an editable grid
+
+The default whenever the right-hand side is a vector/matrix literal or a `vector()`/`matrix()` call.
+
+```text
+#UI v = [1; 2; 3]
+#UI M = [1; 2; 3 | 4; 5; 6]
+#UI Z = vector(5)
+#UI G = matrix(3; 4)
+```
+
+Sizes computed from a variable or expression work too — `matrix(r; c)`, `matrix(len(x); len(y))` — the grid is sized from the value the line produced.
+
+Declaring `rows` and `columns` explicitly fits the literal to that shape: missing cells become `0`, extra ones are dropped.
+
+```text
+#UI {"type": "datagrid", "rows": 2, "columns": 3, "columnHeaders": ["a", "b", "c"], "rowHeaders": ["r1", "r2"]} T = [0; 0; 0 | 0; 0; 0]
+```
+
+The grid's size comes from the directive, so rows and columns cannot be inserted or deleted in the form.
+Every cell becomes an element of a matrix literal, so a cell holding text — typed or pasted in — is put back to `0`.
+
+>Note:
+>Setting a datagrid with a row length of 1 will output a vector instead of matrix due to limitations in how vectors/matricies are input. This is planned to be fixed in a future version. As this is mostly an issue when dynamically defining row lengths from a variable, you can check if the row length is one and convert it to a matrix using vec2row() where this is an issue.
+
+## Styling with CSS
+
+Two properties attach CSS classes:
+
+- **`style`** — added to the input control itself, and only in Input mode.
+- **`reportStyle`** — added to the element wrapping the line, everywhere the line is *not* a
+  control: Preview, Report, and every export but the input form.
+
+### The base classes
+
+Every control also carries a class of its own, which is what your class combines with:
+
+| Type | HTML Element | Base class |
+|------|---------|-----------|
+| `entry` | `<input type="text">` | `calcpad-ui-input` |
+| `dropdown` | `<select>` | `calcpad-ui-dropdown` |
+| `radio` | `<span>` wrapping the buttons | `calcpad-ui-radio`, each button's `<label>` is `calcpad-ui-radio-label` |
+| `checkbox` | `<input type="checkbox">` | `calcpad-ui-checkbox` |
+| `datagrid` | `<div>` holding the grid | `calcpad-ui-datagrid` |
+
+Write your selector as the base class plus your own class, so it only hits the controls you marked: `.calcpad-ui-input.highlight`, not `.highlight`.
+A `reportStyle` class lands on the line's element, which is a paragraph, so target a class called `boxed` as `p.boxed`.
+
+### Where to put the style sheet
+
+Put the CSS in a comment block, and wrap that block in `#val` … `#end val` so the lines are emitted as written instead of each being wrapped in a paragraph — a `<p>` tag inserted into the middle of a `<style>` element breaks the rules around it.
+
+```text
+#val
+'<style>
+'  .calcpad-ui-input.highlight { background-color: #eeeeee; border: 1px solid #aaaaaa; }
+'  .calcpad-ui-dropdown.primary { font-weight: 600; }
+'  .calcpad-ui-radio.compact .calcpad-ui-radio-label { margin-right: 4px; }
+'  .calcpad-ui-checkbox.switch { accent-color: #2a8f3f; }
+'  .calcpad-ui-datagrid.bordered { border: 2px solid #444444; }
+'  p.boxed { border: 1px solid #cccccc; padding: 2px 4px; }
+'</style>
+#end val
+```
+
+Then name the classes on the directives:
+
+```text
+#UI {"style": "highlight"} depth = 2m
+#UI {"reportStyle": "boxed"} P = 25kN
+#UI {"style": "highlight", "reportStyle": "boxed"} q = 3kN/m
+#UI {"type": "dropdown", "style": "primary", "keys": ["Low", "High"], "values": ["1", "2"]} g = 1
+#UI {"type": "radio", "style": "compact", "keys": ["Steel", "Concrete"], "values": ["200GPa", "25GPa"]} E = 200GPa
+#UI {"type": "checkbox", "style": "switch"} flag = 1
+#UI {"type": "datagrid", "style": "bordered"} T = [1; 2 | 3; 4]
+```
+
+`depth` is highlighted in the form and unremarkable in the report; `P` is boxed in the report and an ordinary text box in the form; `q` gets both.
+
+Also, several classes can be listed at once — `"style": "highlight wide"` 
+
+### Inside a datagrid
+
+A grid is a third-party widget, so a `style` class reaches its outer container but not the cells, headers or context menu inside it.
+Those are styled by a stylesheet that ships with the application, not from the document — see *Customizing the `#UI` Datagrid* from `DEVELOPER.md` in the Github repository files.
+Column widths and the grid's overall size are set by the preview script and are not adjustable from CSS at all.
+
+## Saving what was entered
+
+Saving input values writes them into a metadata comment at the top of the document, which is what restores them the next time you open it:
+
+```text
+'<!--{"uiOverrides":{"L:1":"8","q:1":"30"}}-->
+```
+
+The keys are control identities: the variable name, a number indicating the order that variable appears in when it is re-defined (`L:1` is the first `L`), then a number representing the order it was re-defined inside a loop (`y:1:2`).
+A saved value replaces the right-hand side of its assignment in the form and in the report, so the report shows the numbers that were entered.
+Hand-writing an entry in the uiOverrides data works too, and the Properties tab can help make editing easier.
+This is useful if you changed the source code after applying inputs and need to re-map renamed variables or want to remove deleted entries.
+
+See [Metadata Comments](new-metadata-comments.md) for the comment format itself.
+The comment has to be the **first line of the file** to take effect.
+See [`#UI` overrides and includes](new-includes.md#ui-overrides-and-includes) for more information.
+
+Values do not have to be saved to be exported: an export made while the form is filled in uses what is currently entered.
+Saving is what makes them survive closing the document.
+
+### Editing a document that has saved values
+
+Because a saved value is tied to a variable name and to which declaration of that name it is, **editing the source of a document can move or orphan the values already saved in it**.
+The document still calculates correctly — the risk is that a filled-in form comes back with a value on the wrong control, or with a control reset to the default value.
+
+The ordinal counts the `#UI` declarations of that name in the order the document runs them, so what matters is not where a line sits in the file but how many declarations of the same name come before it:
+
+- **Renaming a variable** orphans its value. `L:1` no longer matches anything, the control comes
+  up with the default value, and the stale entry stays in the metadata comment until it
+  is overwritten by the next save or purged in the Properties tab.
+- **Deleting one of several `#UI` lines that declare the same name** renumbers the ones after it.
+  Delete the first of three `L` controls and the old `L:2` and `L:3` values land on what are now
+  `L:1` and `L:2` — the values survive, attached to the wrong controls.
+- **Inserting a new `#UI` declaration of a name that already exists** shifts every later
+  declaration of that name the same way.
+- **Moving, editing or deleting lines that declare *other* names** is safe. So is reordering, as
+  long as the declarations that use the same name keep their relative order.
+
+If you plan to use #UI elements on a document where the source code can changge, the most stable arrangement is **one `#UI` declaration per variable name**.
+Give each input its own name instead of re-assigning one, and every key is `name:1`: it cannot be renumbered by anything you do elsewhere in the document, and only renaming or removing that input affects it.
+
+If a document's values do end up scrambled, the metadata comment is plain text: fix the keys by hand, or clear the `uiOverrides` entry to start the form from the document's own values again.
+Editing the comment takes effect on the next render, and what it says replaces what is currently entered — including values typed into the form but not yet saved.
+
+The [Properties tab](new-calcpad-panel.md#properties) does this without hand-editing: its **Saved #UI values** list shows every entry, lets you edit one in place or jump to its control, flags entries that no longer match a control still in the document, and has a **Purge unused** button to drop them.
+
+## Exporting
+
+A document with `#UI` controls exports like any other — see [Exports](new-exports.md) for the
+variants, the formats, and where each one lives.
+
+An **input form** exported to HTML is static. Its controls render, but nothing is behind them to recalculate.
+
+## Compiled (`.cpdz`) worksheets
+
+A [compiled worksheet](new-exports.md#save-as-compiled-worksheet) is a `.cpdz` file with its source locked and only the `#UI` form left editable.
+It changes a few things from the ordinary-file behaviour described above:
+
+- It always opens as its input form — the "first time you open it" auto-detection under
+  [Turning it on](#turning-it-on) doesn't apply, since there is no other mode to default to.
+- Exporting drops the **Preview** and **Unwrapped** variants: there is no source to render them
+  from, so only **Report** and **Input form** are offered.
+- Saving values uses a separate command in VS Code — **Save Values to Compiled Worksheet** rather than
+  **Save #UI Values to Document** — since the values are written back into the compiled file
+  itself, not a `.cpd` source file.
+
+## `#UI` in macros, conditions and loops
+
+The keyword works anywhere a normal assignment does.
+
+```text
+#def Beam$(span$)
+	#UI load = 10kN/m
+	M = load*span$^2/8
+#end def
+Beam$(6m)
+```
+
+Inside `#if`, flipping the branch does not renumber the controls that follow (each branch gets its own override value that you can switch between):
+
+```text
+#UI {"type": "checkbox"} useSteel = 1
+#if useSteel ≡ 1
+	#UI E = 200GPa
+#else
+	#UI E = 25GPa
+#end if
+```
+
+Inside a loop each pass renders its own control, and each is entered separately:
+
+```text
+#repeat 3
+	#UI y = 2
+	y
+#loop
+```
+
+## Diagnostics
+
+`#UI` problems are reported under `CPD-3415` by the linter and also appear at the offending line by the calculation engine when you run the document:
+
+| Message | Cause |
+|---------|-------|
+| The `#UI` keyword requires a variable assignment. | The line assigns nothing |
+| `#UI` directives do not support expressions. | The right-hand side is computed, not a value |
+| String mode is not supported by the `#UI` keyword. | The variable ends with `$`, or `"mode"` is not `number` |
+| Improper format for `#UI` keyword. Missing closing brace. | The JSON block is unterminated |
+| Invalid JSON in `#UI`. | The block is not valid JSON |
+| A `#UI` value has the wrong type. | A property was given the wrong kind of value |
+| The `#UI` type '…' is not recognized… | `"type"` is not one of the five |
+| The `#UI` … requires both keys and values arrays. | A drop-down or radio group is missing one |
+| The `#UI` … keys and values arrays must have the same length. | They are paired, so the counts must match |
+| The `#UI` … has *n* entries but the grid has *m* … | More headers than rows or columns |
+| `#UI` '…' must not be negative. | `rows` or `columns` was given a negative number |

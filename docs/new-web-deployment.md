@@ -4,7 +4,7 @@ The desktop app and the VS Code extension start the CalcpadCE calculation server
 However, people who are familiar with coding can also run it directly — for example, to point several tools at one shared instance, or to script conversions and calls against its API.
 This page covers running the server and the API it exposes.
 
-> **Localhost only.** This build runs the server bound to your own machine (`localhost`, `127.0.0.1`, or `::1`) only. If you point it at any other address, it refuses to start. There is no multi-user hosting, authentication, or shared file storage in this build.
+> **Localhost only.** This build runs the server bound to your own machine (`localhost`, `127.0.0.1`, or `::1`) only. If you point it at any other address, it refuses to start. There is no multi-user hosting, user-based authentication, or shared file storage in this build.
 
 ## Running
 
@@ -13,66 +13,128 @@ cd Calcpad.Web/backend
 dotnet run
 ```
 
-By default the server listens on `http://localhost:9420`.
-To change the port, set `CALCPAD_PORT`, or pass a full bind URL with `--urls` — as long as it still points at a loopback address.
+With no port set, the server takes a free port from the operating system rather than a fixed one, so two instances never collide.
+The port it picked is on the `Now listening on:` line in the startup output, and is also written to `.calcpad-server.port` next to the binary (`bin/Debug/net10.0/` for a `dotnet run` launch) for as long as the server is up.
+
+To pin the port instead, set `CALCPAD_PORT`:
+
+```bash
+CALCPAD_PORT=9420 dotnet run
+```
+
+That serves `http://127.0.0.1:9420`.
+`CALCPAD_HOST` changes the host part and defaults to `127.0.0.1`; passing a full bind URL with `--urls` works too.
+Either way the address has to stay on a loopback interface, or the server refuses to start.
+
+### Launching from a script
+
+The server watches its stdin and exits when it reaches EOF, so that it doesn't outlive the process that spawned it.
+That means a launch with redirected or piped stdin (`dotnet run | tee`, most CI steps) shuts down immediately.
+Set `CALCPAD_DETACHED=1` to opt out and keep the server running independently of its parent — this is what the VS Code extension does so one server can be shared across windows.
+
+## Authentication
+
+When `CALCPAD_API_TOKEN` is set, every `/api` request must present that value in an `X-Calcpad-Token` header, or it is rejected with `401`.
+The desktop app and the VS Code extension always set it, so a server they launched will not answer an unauthenticated request.
+A bare `dotnet run` leaves the variable unset, and the API is then open to anything on the machine.
+
+Two restrictions apply either way:
+
+- Requests whose `Host` header is not a loopback name are rejected with `421`, which blocks DNS-rebinding attacks from a browser.
+- Browser requests are only accepted from loopback origins and the desktop app's own `tauri://` origin. Native callers send no `Origin` header and are unaffected.
 
 ## API endpoints
 
+All paths are relative to `/api/calcpad`.
+
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| `/api/calcpad/convert` | POST | Convert a document to an HTML report (with theme + settings) |
-| `/api/calcpad/convert-unwrapped` | POST | HTML of the raw, fully expanded source (used for error navigation) |
-| `/api/calcpad/sample` | GET | Fetch a sample document |
-| `/api/calcpad/pdf` | POST | Generate a PDF |
-| `/api/calcpad/pdf/health` | GET | PDF service health check |
-| `/api/calcpad/docx` | POST | Generate a Word `.docx` document |
-| `/api/calcpad/highlight` | POST | Tokenize a full document for syntax highlighting |
-| `/api/calcpad/highlight-line` | POST | Tokenize a single line (incremental) |
-| `/api/calcpad/lint` | POST | Run the linter and return diagnostics |
-| `/api/calcpad/definitions` | POST | List macros, functions, variables, and units |
-| `/api/calcpad/find-references` | POST | Every occurrence of each symbol |
-| `/api/calcpad/prettify` | POST | Pretty-print CalcpadCE source |
-| `/api/calcpad/snippets` | GET | Snippets, optionally filtered by category |
-| `/api/calcpad/debug-crash` | GET | Record a client-side crash in the server log |
+| `/convert` | POST | Convert a document to an HTML report (with theme + settings) |
+| `/docx` | POST | Generate a Word `.docx` document |
+| `/pdf` | POST | Generate a PDF from rendered HTML |
+| `/pdf/health` | GET | PDF service health check |
+| `/pdf/browser` | GET | Which browser PDF export would use, and whether one is available |
+| `/pdf/browser/install` | POST | Download the bundled headless Chromium |
+| `/sample` | GET | Fetch a sample document |
+| `/highlight` | POST | Tokenize a full document for syntax highlighting |
+| `/highlight-line` | POST | Tokenize a single line (incremental) |
+| `/lint` | POST | Run the linter and return diagnostics |
+| `/definitions` | POST | List macros, functions, variables, and units |
+| `/symbol-at-position` | POST | The symbol under a cursor position and all its occurrences |
+| `/prettify` | POST | Pretty-print CalcpadCE source |
+| `/snippets` | GET | Snippets, optionally filtered by category |
+| `/cpdz/decode` | POST | Decode a compiled `.cpdz` worksheet to its source |
+| `/cpdz/encode` | POST | Encode source as a `.cpdz` worksheet |
+| `/portable/bundle` | POST | Rewrite a worksheet into self-contained form, ready to compile |
+| `/portable/package` | POST | Pack a worksheet and the files it references into a ZIP |
+| `/debug-crash` | GET | Crash-path testing. Only served in the Development environment |
 
-The full request/response schema lives at [Calcpad.Web/backend/API_SCHEMA.md](../Calcpad.Web/backend/API_SCHEMA.md); the common shapes are summarized below.
+Pass `?unwrap=true` to `/convert` for HTML of the raw, fully expanded source, with its line links rewritten for error navigation.
+
+The full request/response schema lives at [Calcpad.Web/backend/API_SCHEMA.md](https://github.com/imartincei/CalcpadCE/blob/main/Calcpad.Web/backend/API_SCHEMA.md); the common shapes are summarized below.
 
 ## Common request fields
 
-Most POST endpoints accept a request with these fields:
+`/convert` and `/docx` take a document request:
 
 - `content` — the CalcpadCE source code
 - `settings` — math / plot / unit configuration
 - `theme` — `"light"` or `"dark"`
-- `sourceFilePath` — the document's file path, used to resolve relative `#include` paths against the file's folder
-- `forPrint` — when `true`, `NoPrint` regions are stripped before conversion (used by PDF export)
+- `sourceFilePath` — the document's file path, used to resolve relative `#include` and `#read` paths against the file's folder
+- `forPrint` — when `true`, `#pre` regions are hidden and `#post` regions shown (used by PDF export)
+- `enableUi` — when `true`, `#UI` lines render as interactive controls and `#post` is hidden
+- `uiOverrides` — values entered into `#UI` controls, keyed by the control identity the preview reports in `data-ui-var`
+- `includeLineAnchors` — emits the per-line anchors and error boxes the preview navigates by. Defaults to the opposite of `forPrint`
+- `hideErrorLines` — drops the "on line [N]" reference from error messages. Defaults to `enableUi`
+- `write` — whether this request may run `#write`/`#append`. `false` by default, so a preview refresh doesn't rewrite output on every keystroke
+
+The analysis endpoints (`/highlight`, `/lint`, `/definitions`, `/symbol-at-position`) take `content` and `sourceFilePath` only.
 
 ## Response shapes
 
-### Definitions
+### Convert
 
-Returns four parallel arrays:
-
-- `macros[]` — name, parameters, isMultiline, content, source, description, paramTypes, paramDescriptions, defaults
-- `functions[]` — name, parameters, expression, returnType, returnTypeId, hasCommandBlock, commandBlockType, commandBlockStatements, defaults
-- `variables[]` — name, expression, type, typeId
-- `customUnits[]` — name, expression
-
-`typeId` values: 0 Unknown, 1 Value, 2 Vector, 3 Matrix, 5 Various, 6 Function, 7 InlineMacro, 8 MultilineMacro, 9 CustomUnit.
-
-### Find-references
-
-Three dictionaries (`variables`, `functions`, `macros`), each mapping a symbol name to an array of:
+`text/html` — the rendered document, not JSON.
+Calculation errors come back alongside it in an `X-Calcpad-Errors` response header, URL-encoded JSON of:
 
 ```typescript
-{ line, column, length, source, sourceFile?, isAssignment }
+Array<{ sourceLine, outputLine, message, source: "Macro" | "Expression" }>
+```
+
+### Definitions
+
+Four parallel arrays, plus the resolved `projectPath` and `libraryPath` when the document's `#include` chain declares them:
+
+- `macros[]` — name, parameters, isMultiline, content, lineNumber, source, sourceFile, description, paramTypes, paramDescriptions
+- `functions[]` — name, parameters, expression, returnType, returnTypeId, hasCommandBlock, commandBlockType, commandBlockStatements, lineNumber, source, sourceFile, description, paramTypes, paramDescriptions
+- `variables[]` — name, expression, type, typeId, lineNumber, source, sourceFile, description
+- `customUnits[]` — name, expression, lineNumber, source, sourceFile, description
+
+`source` is `"local"` or `"include"`; `sourceFile` names the file for the latter.
+`typeId` values: 0 Unknown, 1 Value, 2 Vector, 3 Matrix, 4 CustomUnit, 5 Function, 6 InlineMacro, 7 MultilineMacro, 8 Various.
+
+### Symbol-at-position
+
+Takes `line` and `column` alongside the content, and resolves the user-defined symbol under that cursor position.
+One round-trip serves go-to-definition, find-all-references, and rename:
+
+```typescript
+{
+  symbolName: string,
+  kind: "variable" | "function" | "macro",
+  locations: Array<{ line, column, length, source, sourceFile?, isAssignment }>
+}
 ```
 
 `isAssignment: true` marks a definition or reassignment.
+The response is `null` when no symbol sits under the position.
 
 ### Highlight
 
-An array of `{ line, column, length, type, typeId, text? }`.
+```typescript
+{ tokens: Array<{ line, column, length, type, typeId, text? }> }
+```
+
 The `text` field is omitted by default; pass `includeText: true` to include it.
 
 ### Lint
@@ -102,10 +164,17 @@ See [Linter and Diagnostics](new-linter.md) for what each code means.
   snippets: Array<{
     insert: string,        // § marks cursor placement
     description: string,
+    documentation?: string,
+    example?: string,
     label?: string,
     category: string,      // e.g. "Functions/Trigonometric"
     quickType?: string,    // e.g. "a" for ~a → α
-    parameters?: Array<{ name, description? }>
+    keywordType?: string,  // "Function", "Keyword", "Command", "Constant", "Unit", ...
+    returnType?: string,
+    returnTypeDescription?: string,
+    isElementWise: boolean,
+    acceptsAnyCount: boolean,
+    parameters?: Array<{ name, description?, type?, typeDescription?, isOptional, isVariadic }>
   }>
 }
 ```
@@ -114,5 +183,5 @@ Filter with a query string, e.g. `?category=Functions/Trigonometric`.
 
 ## See also
 
-- [Includes and File Reads](new-includes.md) · [Linter and Diagnostics](new-linter.md) · [PDF Export](new-pdf-export.md)
+- [Includes and File Reads](new-includes.md) · [Linter and Diagnostics](new-linter.md) · [Exports](new-exports.md)
 - [Using the Desktop App](new-desktop-app.md) · [Using the VS Code Extension](new-vscode-extension.md)
