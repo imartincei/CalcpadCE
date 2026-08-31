@@ -125,6 +125,12 @@ namespace Calcpad.Highlighter.Snippets.Data
             },
             new SnippetItem
             {
+                Insert = "'<div style=\"margin-left: 20px;\">text</div>",
+                Description = "Generic div container",
+                Category = "HTML"
+            },
+            new SnippetItem
+            {
                 Insert = "'<div class=\"fold\">\n'<h4>Heading</h4>\n'Folded content\n'</div>",
                 Description = "Foldable/collapsible section",
                 Category = "HTML"
