@@ -7,9 +7,11 @@ namespace Calcpad.Highlighter.Prettifier
     /// <summary>
     /// Re-indents Calcpad source by tracking control-block depth across
     /// <c>#if</c>/<c>#else</c>/<c>#end if</c>, <c>#for</c>/<c>#while</c>/<c>#repeat</c>/<c>#loop</c>,
-    /// and multiline <c>#def</c>/<c>#end def</c>, where inline <c>#def name = ...</c> does not open
-    /// a block. Only leading whitespace is adjusted; line content, comments and the original
-    /// line-ending style are preserved.
+    /// multiline <c>#def</c>/<c>#end def</c>, and HTML <c>&lt;div&gt;</c>/<c>&lt;/div&gt;</c> blocks.
+    /// Inline <c>#def name = ...</c> and <c>&lt;div&gt;...&lt;/div&gt;</c> do not open blocks.
+    ///
+    /// The prettifier only adjusts leading whitespace; line content, comments, and
+    /// the original line-ending style (CRLF vs LF) are preserved.
     /// </summary>
     public static class CalcpadPrettifier
     {
@@ -22,6 +24,7 @@ namespace Calcpad.Highlighter.Prettifier
             var indentUnit = options.IndentUnit ?? "\t";
             var sb = new StringBuilder(source.Length);
             var depth = 0;
+            var divDepth = 0;
             var pos = 0;
 
             while (pos < source.Length)
@@ -58,6 +61,9 @@ namespace Calcpad.Highlighter.Prettifier
                     sb.Append(lineEnding);
                     continue;
                 }
+
+                var divTags = GetDivTags(trimmed);
+                divDepth = Math.Max(0, divDepth - divTags.LeadingClosures);
 
                 var blockType = CalcpadBuiltIns.GetBlockType(trimmed);
                 int renderDepth;
@@ -102,12 +108,80 @@ namespace Calcpad.Highlighter.Prettifier
                         break;
                 }
 
-                AppendIndent(sb, indentUnit, renderDepth);
+                AppendIndent(sb, indentUnit, renderDepth + divDepth);
                 sb.Append(trimmed);
                 sb.Append(lineEnding);
+
+                divDepth += divTags.Openings;
+                divDepth = Math.Max(0, divDepth - (divTags.Closures - divTags.LeadingClosures));
             }
 
             return sb.ToString();
+        }
+
+        private static (int LeadingClosures, int Openings, int Closures) GetDivTags(string line)
+        {
+            if (line.Length < 2 || line[0] != '\'')
+                return (0, 0, 0);
+
+            var html = line.AsSpan(1).TrimStart();
+            var leadingClosures = 0;
+            var openings = 0;
+            var closures = 0;
+            var onlyLeadingClosures = true;
+
+            for (int pos = 0; pos < html.Length;)
+            {
+                var relativeStart = html.Slice(pos).IndexOf('<');
+                if (relativeStart < 0)
+                    break;
+
+                var tagStart = pos + relativeStart;
+                if (!IsWhitespace(html.Slice(pos, relativeStart)))
+                    onlyLeadingClosures = false;
+
+                var tag = html.Slice(tagStart);
+                var isClosing = tag.StartsWith("</div", StringComparison.OrdinalIgnoreCase);
+                var nameLength = isClosing ? 5 : 4;
+                var isOpening = !isClosing && tag.StartsWith("<div", StringComparison.OrdinalIgnoreCase);
+                var end = tag.IndexOf('>');
+
+                if ((isOpening || isClosing) &&
+                    tag.Length > nameLength &&
+                    (tag[nameLength] == '>' || char.IsWhiteSpace(tag[nameLength])) &&
+                    end >= nameLength)
+                {
+                    if (isClosing)
+                    {
+                        closures++;
+                        if (onlyLeadingClosures)
+                            leadingClosures++;
+                    }
+                    else
+                    {
+                        openings++;
+                        onlyLeadingClosures = false;
+                    }
+
+                    pos = tagStart + end + 1;
+                }
+                else
+                {
+                    onlyLeadingClosures = false;
+                    pos = tagStart + 1;
+                }
+            }
+
+            return (leadingClosures, openings, closures);
+        }
+
+        private static bool IsWhitespace(ReadOnlySpan<char> text)
+        {
+            foreach (var c in text)
+                if (!char.IsWhiteSpace(c))
+                    return false;
+
+            return true;
         }
 
         private static void AppendIndent(StringBuilder sb, string indentUnit, int depth)
