@@ -6,8 +6,7 @@ using System.Text;
 namespace Calcpad.Server
 {
     /// <summary>
-    /// Verbosity of a log entry. Ordered most-severe-first so filtering is a single
-    /// <c>&gt;</c> test against <see cref="FileLogger.MinLevel"/>.
+    /// Verbosity of a log entry. Most-severe-first, so filtering is one <c>&gt;</c> test.
     /// </summary>
     public enum LogLevel
     {
@@ -18,12 +17,10 @@ namespace Calcpad.Server
     }
 
     /// <summary>
-    /// Process-wide log sink. Every request logs before doing any work, so a stall here wedges
-    /// every endpoint at once. Both outputs are therefore decoupled from the caller and from each
-    /// other — stdout via <see cref="ConsoleRelay"/>, the file via a bounded queue and its own
-    /// drain thread — so neither a stalled pipe nor a stalled disk can park a request thread, and
-    /// a stalled pipe still leaves us the log file. <see cref="LogCrash"/> is the exception: it
-    /// writes synchronously and fsyncs, to survive a kill the drain thread would not.
+    /// Process-wide log sink. Every request logs before doing work, so a stall here wedges every
+    /// endpoint at once; both outputs are therefore decoupled from the caller and from each other
+    /// — stdout via <see cref="ConsoleRelay"/>, the file via its own queue and drain thread.
+    /// <see cref="LogCrash"/> is the exception: synchronous and fsynced, to survive a kill.
     /// </summary>
     public static class FileLogger
     {
@@ -35,8 +32,7 @@ namespace Calcpad.Server
         private static readonly ConsoleRelay _stdoutRelay = new(Console.OpenStandardOutput());
         private static readonly ConsoleRelay _stderrRelay = new(Console.OpenStandardError());
 
-        // A field initializer, not the static ctor body: this has to be set before the ctor
-        // logs its own first entry.
+        // Field initializers, not ctor body: set before the ctor logs its own first entry.
         private static readonly string? _rawEnvLevel = Environment.GetEnvironmentVariable("CALCPAD_LOG_LEVEL");
         private static volatile LogLevel _minLevel = ParseLevel(_rawEnvLevel) ?? LogLevel.Warning;
 
@@ -44,13 +40,14 @@ namespace Calcpad.Server
         private static FileStream? _stream;
         private static bool _dirty;
         private static int _fileDropped;
+        private static int _filePending;
         private static int _reportedConsoleDrops;
         private static long _lastConsoleDropReportTicks;
         private const int ConsoleDropReportIntervalMs = 5000;
 
         /// <summary>
-        /// Entries more verbose than this are dropped. Set from <c>CALCPAD_LOG_LEVEL</c> at
-        /// startup and from the <c>/api/calcpad/log-level</c> endpoint at runtime.
+        /// Entries more verbose than this are dropped. From <c>CALCPAD_LOG_LEVEL</c> at startup,
+        /// then <c>/api/calcpad/log-level</c> at runtime.
         /// </summary>
         public static LogLevel MinLevel
         {
@@ -61,8 +58,8 @@ namespace Calcpad.Server
         public static readonly string[] LevelNames = ["error", "warning", "information", "verbose"];
 
         /// <summary>
-        /// Maps a level name to a <see cref="LogLevel"/>, accepting common aliases. Null when
-        /// nothing matched, so callers choose their own default.
+        /// Maps a level name, accepting common aliases. Null when nothing matched, so callers
+        /// choose their own default.
         /// </summary>
         public static LogLevel? ParseLevel(string? value) => value?.Trim().ToLowerInvariant() switch
         {
@@ -85,10 +82,8 @@ namespace Calcpad.Server
         {
             try
             {
-                // Host apps (Tauri AppImage, VS Code extension) set CALCPAD_LOG_DIR
-                // when the executable dir is read-only (AppImage FUSE mount, MSI
-                // Program Files, etc.). Fall back to executable-adjacent logs/ for
-                // dev runs and other embedders that don't set it.
+                // Hosts set CALCPAD_LOG_DIR when the executable dir is read-only (AppImage FUSE
+                // mount, Program Files). Executable-adjacent logs/ otherwise.
                 var overrideDir = Environment.GetEnvironmentVariable("CALCPAD_LOG_DIR");
                 string logsDir;
                 if (!string.IsNullOrEmpty(overrideDir))
@@ -139,8 +134,7 @@ namespace Calcpad.Server
         }
 
         /// <summary>
-        /// Routes <see cref="Console"/> through the non-blocking relays. Call once at startup,
-        /// before anything else writes to the console.
+        /// Routes <see cref="Console"/> through the non-blocking relays. Call once, first.
         /// </summary>
         public static void InstallConsoleRelay()
         {
@@ -198,13 +192,18 @@ namespace Calcpad.Server
 
             WriteDirect(Format("CRASH", "Application crashed", sb.ToString()));
 
-            try { Console.WriteLine($"CRASH: {exception.Message} (details: {_logFilePath})"); }
+            // Drained here, not at ProcessExit: an unhandled rethrow skips exit handlers.
+            try
+            {
+                Console.WriteLine($"CRASH: {exception.Message} (details: {_logFilePath})");
+                _stdoutRelay.Drain(1000);
+            }
             catch { /* Ignore console errors */ }
         }
 
         /// <summary>
-        /// Writes <paramref name="body"/> straight to the log file, bypassing the queue, and
-        /// fsyncs. For diagnostics that must survive a hard kill or a wedged drain thread.
+        /// Writes straight to the log file and fsyncs, bypassing the queue. For diagnostics that
+        /// must survive a hard kill or a wedged drain thread.
         /// </summary>
         public static void WriteDirect(string body)
         {
@@ -213,20 +212,24 @@ namespace Calcpad.Server
             {
                 lock (_fileLock)
                 {
-                    var stream = EnsureStream();
-                    if (stream == null) return;
-                    var bytes = Encoding.UTF8.GetBytes(body);
-                    stream.Write(bytes, 0, bytes.Length);
-                    stream.Flush(flushToDisk: true);
-                    _dirty = false;
+                    try
+                    {
+                        var stream = EnsureStream();
+                        if (stream == null) return;
+                        var bytes = Encoding.UTF8.GetBytes(body);
+                        stream.Write(bytes, 0, bytes.Length);
+                        stream.Flush(flushToDisk: true);
+                        _dirty = false;
+                    }
+                    catch { DropStream(); }
                 }
             }
             catch { /* never throw from the logger */ }
         }
 
         /// <summary>
-        /// The single funnel for level-bearing entries, and so the only place the filter lives.
-        /// <see cref="LogCrash"/> and <see cref="WriteDirect"/> bypass it deliberately.
+        /// The only place the level filter lives. <see cref="LogCrash"/> and
+        /// <see cref="WriteDirect"/> bypass it deliberately.
         /// </summary>
         private static void WriteLog(LogLevel level, string message, string? details = null)
         {
@@ -248,8 +251,10 @@ namespace Calcpad.Server
         private static void QueueForFile(string entry)
         {
             if (string.IsNullOrEmpty(_logFilePath)) return;
-            if (!_fileQueue.TryAdd(entry))
-                Interlocked.Increment(ref _fileDropped);
+            Interlocked.Increment(ref _filePending);
+            if (_fileQueue.TryAdd(entry)) return;
+            Interlocked.Decrement(ref _filePending);
+            Interlocked.Increment(ref _fileDropped);
         }
 
         private static void FileDrainLoop()
@@ -260,7 +265,9 @@ namespace Calcpad.Server
                 {
                     if (_fileQueue.TryTake(out var entry, FlushIntervalMs))
                     {
-                        AppendToFile(entry);
+                        // Decremented after the write, not on dequeue, so Flush covers this one.
+                        try { AppendToFile(entry); }
+                        finally { Interlocked.Decrement(ref _filePending); }
 
                         var dropped = Interlocked.Exchange(ref _fileDropped, 0);
                         if (dropped > 0)
@@ -268,8 +275,8 @@ namespace Calcpad.Server
 
                         ReportConsoleDrops();
 
-                        // Flush at the end of each burst rather than only when idle, so a hard
-                        // kill loses at most the entries still queued behind this one.
+                        // End of each burst, not only when idle: a kill then loses at most what
+                        // is still queued behind this entry.
                         if (_fileQueue.Count == 0) FlushFile();
                     }
                     else
@@ -283,30 +290,37 @@ namespace Calcpad.Server
         }
 
         /// <summary>
-        /// Mirrors stdout-relay drops into the log file. A stalled pipe reader is exactly when
-        /// the relay's own in-band notice cannot be seen.
+        /// Mirrors console-relay drops into the log file — a stalled reader is exactly when the
+        /// relay's own in-band notice cannot be seen.
         /// </summary>
         private static void ReportConsoleDrops()
         {
-            var total = _stdoutRelay.DroppedTotal;
+            var outDropped = _stdoutRelay.DroppedTotal;
+            var errDropped = _stderrRelay.DroppedTotal;
+            var total = outDropped + errDropped;
             if (total == _reportedConsoleDrops) return;
-            // Throttled: drops arrive in floods, and one warning per drain pass would itself
-            // become the bulk of the log.
+            // Throttled: drops flood, and one warning per pass would become the bulk of the log.
             if (Environment.TickCount64 - _lastConsoleDropReportTicks < ConsoleDropReportIntervalMs) return;
             _lastConsoleDropReportTicks = Environment.TickCount64;
             _reportedConsoleDrops = total;
-            AppendToFile(Format("WARN", $"{total} console line(s) dropped since start — stdout reader is not draining", null));
+            AppendToFile(Format("WARN",
+                $"{total} console write(s) dropped since start — a console reader is not draining",
+                $"stdout: {outDropped}, stderr: {errDropped}"));
         }
 
         private static void AppendToFile(string entry)
         {
             lock (_fileLock)
             {
-                var stream = EnsureStream();
-                if (stream == null) return;
-                var bytes = Encoding.UTF8.GetBytes(entry);
-                stream.Write(bytes, 0, bytes.Length);
-                _dirty = true;
+                try
+                {
+                    var stream = EnsureStream();
+                    if (stream == null) return;
+                    var bytes = Encoding.UTF8.GetBytes(entry);
+                    stream.Write(bytes, 0, bytes.Length);
+                    _dirty = true;
+                }
+                catch { DropStream(); }
             }
         }
 
@@ -320,8 +334,19 @@ namespace Calcpad.Server
                     _stream.Flush();
                     _dirty = false;
                 }
-                catch { /* retried on the next tick */ }
+                catch { DropStream(); }
             }
+        }
+
+        /// <summary>
+        /// Discards a stream that failed a write so the next entry reopens. Without it one
+        /// transient failure ends file logging for the life of the process.
+        /// </summary>
+        private static void DropStream()
+        {
+            try { _stream?.Dispose(); } catch { }
+            _stream = null;
+            _dirty = false;
         }
 
         private static FileStream? EnsureStream()
@@ -330,8 +355,7 @@ namespace Calcpad.Server
             if (string.IsNullOrEmpty(_logFilePath)) return null;
             try
             {
-                // ReadWrite share so a second instance can hold an append handle the same day,
-                // matching the interleaving the old open-per-entry write allowed.
+                // ReadWrite share so a second instance can append the same day.
                 _stream = new FileStream(
                     _logFilePath,
                     FileMode.Append,
@@ -348,25 +372,31 @@ namespace Calcpad.Server
         }
 
         /// <summary>
-        /// Drains anything still queued and forces it to disk. Call from shutdown handlers
-        /// (ProcessExit, etc.) so final entries survive process termination.
+        /// Drains the file queue and both console relays, then fsyncs. Call from shutdown
+        /// handlers: every drain thread here is a background one, so the tail is otherwise lost.
         /// </summary>
         public static void Flush()
         {
             var deadline = Stopwatch.StartNew();
-            while (_fileQueue.Count > 0 && deadline.ElapsedMilliseconds < 2000)
+            while (Volatile.Read(ref _filePending) > 0 && deadline.ElapsedMilliseconds < 2000)
                 Thread.Sleep(10);
 
             lock (_fileLock)
             {
-                if (_stream == null) return;
-                try
+                if (_stream != null)
                 {
-                    _stream.Flush(flushToDisk: true);
-                    _dirty = false;
+                    try
+                    {
+                        _stream.Flush(flushToDisk: true);
+                        _dirty = false;
+                    }
+                    catch { /* best-effort */ }
                 }
-                catch { /* best-effort */ }
             }
+
+            // Bounded separately: a host that stopped reading can never drain these.
+            _stdoutRelay.Drain(1000);
+            _stderrRelay.Drain(1000);
         }
 
         public static string? GetLogFilePath() => _logFilePath;

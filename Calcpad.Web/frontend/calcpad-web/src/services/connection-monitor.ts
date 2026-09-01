@@ -66,6 +66,9 @@ export class ConnectionMonitor {
         this.generation++;
         this.suspended = false;
         this.failures = 0;
+        // Reset here, not only on transition: a retry re-enters an already-'connecting' state,
+        // and setStatus early-returns, so the grace would still be timing the first attempt.
+        this.connectingSince = Date.now();
         this.setStatus('connecting', reason);
         this.schedule(300);
     }

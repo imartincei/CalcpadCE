@@ -4,10 +4,9 @@ using System.Text;
 namespace Calcpad.Server
 {
     /// <summary>
-    /// Detects the process staying alive but no longer completing requests — a state that leaves
-    /// no exception, no dump and no final log entry, only a log that stops mid-sentence. Uses a
-    /// dedicated thread and <see cref="FileLogger.WriteDirect"/> because thread-pool starvation
-    /// and a stalled log queue are both things it has to be able to report on.
+    /// Detects the process staying alive but no longer completing requests. Uses a dedicated
+    /// thread and <see cref="FileLogger.WriteDirect"/> because pool starvation and a stalled
+    /// log queue are both things it must still be able to report on.
     /// </summary>
     public static class HangWatchdog
     {
@@ -15,7 +14,7 @@ namespace Calcpad.Server
         private static long _nextId;
         private static long _lastCompletedTicks = Environment.TickCount64;
         private static long _completedTotal;
-        private static bool _reported;
+        private static volatile bool _reported;
 
         private readonly record struct InFlight(string Path, long StartTicks);
 
@@ -34,9 +33,7 @@ namespace Calcpad.Server
             thread.Start();
         }
 
-        /// <summary>
-        /// Registers a request as in flight. Dispose the result when it finishes.
-        /// </summary>
+        /// <summary>Registers a request as in flight. Dispose the result when it finishes.</summary>
         public static IDisposable Track(string path)
         {
             var id = Interlocked.Increment(ref _nextId);
@@ -68,12 +65,17 @@ namespace Calcpad.Server
                 {
                     Thread.Sleep(5000);
 
-                    var stalledFor = (Environment.TickCount64 - Interlocked.Read(ref _lastCompletedTicks)) / 1000;
-                    if (_reported || _inFlight.IsEmpty || stalledFor < ThresholdSeconds)
+                    // Oldest in-flight, not last completion: an idle server never advances that.
+                    if (_reported) continue;
+                    var now = Environment.TickCount64;
+                    long oldest = 0;
+                    foreach (var entry in _inFlight.Values)
+                        oldest = Math.Max(oldest, now - entry.StartTicks);
+                    if (oldest / 1000 < ThresholdSeconds)
                         continue;
 
                     _reported = true;
-                    FileLogger.WriteDirect(BuildReport(stalledFor));
+                    FileLogger.WriteDirect(BuildReport(oldest / 1000));
                     TryCaptureDump();
                 }
                 catch { /* the watchdog must never be the thing that dies */ }
@@ -82,10 +84,11 @@ namespace Calcpad.Server
 
         private static string BuildReport(long stalledForSeconds)
         {
+            var sinceCompletion = (Environment.TickCount64 - Interlocked.Read(ref _lastCompletedTicks)) / 1000;
             var sb = new StringBuilder();
             sb.AppendLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [HANG] Server stopped completing requests");
-            sb.AppendLine($"No request has completed in {stalledForSeconds}s; {_inFlight.Count} still in flight.");
-            sb.AppendLine($"Completed since start: {Interlocked.Read(ref _completedTotal)}");
+            sb.AppendLine($"Oldest of {_inFlight.Count} in-flight request(s) has been running {stalledForSeconds}s.");
+            sb.AppendLine($"Last completion was {sinceCompletion}s ago; {Interlocked.Read(ref _completedTotal)} completed since start.");
             sb.AppendLine();
 
             sb.AppendLine("--- Thread pool ---");
@@ -114,9 +117,8 @@ namespace Calcpad.Server
         }
 
         /// <summary>
-        /// Spawns the runtime's <c>createdump</c> against this process — the only way to get
-        /// managed stacks for every thread, as .NET has no in-process equivalent. Off unless
-        /// CALCPAD_HANG_DUMP=1, since it suspends the process while writing.
+        /// Spawns the runtime's <c>createdump</c> — the only way to get managed stacks for every
+        /// thread. Off unless CALCPAD_HANG_DUMP=1, since it suspends the process while writing.
         /// </summary>
         private static void TryCaptureDump()
         {

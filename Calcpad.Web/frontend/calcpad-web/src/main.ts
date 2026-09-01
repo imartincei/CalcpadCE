@@ -1457,12 +1457,17 @@ async function bootstrap(): Promise<void> {
     // mounted, so seed it with the mode the session came up in.
     syncInputMode();
 
-    // Manual refresh: re-lint with current settings, refresh definitions/
-    // headings, redraw previews, and re-extract Export-tab plots. Called from
-    // the Server > Refresh menu item and the editor's Run action.
+    // Manual refresh: re-lint, refresh definitions/headings, redraw previews, and re-extract
+    // Export-tab plots. From the Server > Refresh menu, the Run action, and on reconnect.
     let refreshInFlight = false;
+    let refreshQueued = false;
     async function runRefresh(reason: string = 'Refreshing…'): Promise<void> {
-        if (refreshInFlight) return;
+        // Coalesced rather than dropped: the reconnect refresh has no user to retry it, and
+        // rendering against the server it just replaced is what it exists to correct.
+        if (refreshInFlight) {
+            refreshQueued = true;
+            return;
+        }
         refreshInFlight = true;
         appInstance.appendOutput('info', reason);
         try {
@@ -1472,12 +1477,14 @@ async function bootstrap(): Promise<void> {
                 if (appInstance.isPreviewVisible()) await refreshPreviewFor(g);
             }
             activeBridge.refreshHeadings();
-            // Refresh the Export tab's plot list — it caches independently of the
-            // preview and would otherwise show stale plots until the user clicks
-            // "Refresh Plots" manually.
+            // The Export tab's plot list caches independently of the preview.
             window.dispatchEvent(new MessageEvent('message', { data: { type: 'getPlots' } }));
         } finally {
             refreshInFlight = false;
+        }
+        if (refreshQueued) {
+            refreshQueued = false;
+            await runRefresh(reason);
         }
     }
 

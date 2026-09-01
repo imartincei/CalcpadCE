@@ -109,6 +109,10 @@ namespace Calcpad.Server.Services
                 SlidingExpiration = _baseOptions.SlidingExpiration,
                 Size = Math.Clamp(staged.Stage3.Lines?.Count ?? 1, 1, _sizeLimit),
             };
+            // Without this the map keeps one entry per file path ever seen, outliving by far
+            // the cache entries it points at.
+            options.RegisterPostEvictionCallback((_, _, _, _) =>
+                _activeKeyBySourceFile.TryRemove(new KeyValuePair<string, string>(fileKey, key)));
             _cache.Set(key, entry, options);
             _activeKeyBySourceFile[fileKey] = key;
             return entry;

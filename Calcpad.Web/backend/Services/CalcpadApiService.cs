@@ -22,16 +22,16 @@ namespace Calcpad.Server.Services
                 ContentRootPath = AppContext.BaseDirectory
             });
 
-            // ASP.NET's own console provider writes through Console.Out, which
-            // InstallConsoleRelay has replaced — so its output reaches stdout and the hosts'
-            // Output panels without ever passing FileLogger's filter. At Information that is a
-            // "Request starting"/"Request finished" pair per request, as much noise as our own
-            // logging, so it tracks MinLevel too.
+            // ASP.NET's console provider writes through Console.Out, which InstallConsoleRelay
+            // has replaced, so its output reaches the hosts' Output panels without passing
+            // FileLogger's filter — it has to track MinLevel too.
             //
-            // Microsoft.Hosting.Lifetime is pinned back: it logs "Now listening on: <url>",
-            // which the Tauri host sniffs (extract_listening_url) as its fallback when the port
-            // file is unreadable. Raising the floor without this silently removes that path.
-            builder.Logging.SetMinimumLevel(FrameworkLevelFor(FileLogger.MinLevel));
+            // A catch-all rule, not SetMinimumLevel: that applies only when no rule matches, and
+            // appsettings.json's Logging:LogLevel:Default is such a rule, so it would always win.
+            //
+            // Microsoft.Hosting.Lifetime is pinned back for "Now listening on: <url>", which the
+            // Tauri host sniffs (extract_listening_url) when the port file is unreadable.
+            builder.Logging.AddFilter((string?)null, FrameworkLevelFor(FileLogger.MinLevel));
             builder.Logging.AddFilter("Microsoft.Hosting.Lifetime", Microsoft.Extensions.Logging.LogLevel.Information);
 
             builder.Services.AddControllers()
@@ -67,9 +67,8 @@ namespace Calcpad.Server.Services
         }
 
         /// <summary>
-        /// Our verbosity mapped onto the framework's. Only read at startup — the framework
-        /// caches filters per (provider, category), so a later <see cref="FileLogger.MinLevel"/>
-        /// change does not reach it.
+        /// Our verbosity mapped onto the framework's. Startup only: the framework caches filters
+        /// per (provider, category), so a later <see cref="FileLogger.MinLevel"/> change misses.
         /// </summary>
         private static Microsoft.Extensions.Logging.LogLevel FrameworkLevelFor(LogLevel level) => level switch
         {
@@ -92,11 +91,9 @@ namespace Calcpad.Server.Services
         /// Per-launch shared secret, handed to us by the host that spawned this process.
         /// </summary>
         /// <remarks>
-        /// Read from the environment rather than argv, which is world-readable through
-        /// <c>/proc/{pid}/cmdline</c> on Linux and WMI on Windows; the environment block is
-        /// readable only by the same user. Absent when nobody set it (<c>dotnet run</c>, the
-        /// test harness), in which case auth is off and the CORS + Host-header policy in
-        /// <see cref="IsAllowedOrigin"/> is the only control — both shipped hosts always set it.
+        /// From the environment, not argv: argv is world-readable (<c>/proc/{pid}/cmdline</c>,
+        /// WMI). Absent under <c>dotnet run</c> and tests, where auth is off and the CORS +
+        /// Host-header policy is the only control; both shipped hosts always set it.
         /// </remarks>
         private static readonly byte[]? ApiTokenBytes =
             Environment.GetEnvironmentVariable("CALCPAD_API_TOKEN") is { Length: > 0 } token
@@ -107,10 +104,9 @@ namespace Calcpad.Server.Services
         /// Rejects any <c>/api</c> request that does not present the launch token.
         /// </summary>
         /// <remarks>
-        /// Registered after <c>UseCors</c> so a browser preflight is answered by the CORS
-        /// middleware and never reaches this — the preflight itself carries no custom
-        /// headers, so checking it would fail every cross-origin request before the real
-        /// one was ever sent. <c>OPTIONS</c> is skipped for the same reason.
+        /// After <c>UseCors</c> so preflights are answered before reaching this: a preflight
+        /// carries no custom headers, so checking it would fail every cross-origin request.
+        /// <c>OPTIONS</c> is skipped for the same reason.
         /// </remarks>
         private static void RequireApiToken(WebApplication app)
         {
@@ -147,31 +143,25 @@ namespace Calcpad.Server.Services
         /// Origins permitted to call the API from a browsing context.
         /// </summary>
         /// <remarks>
-        /// Binding to loopback keeps remote machines out but not the user's own browser: a page
-        /// they visit can POST <c>#include ~/.ssh/id_rsa</c> to <c>/api/calcpad/convert</c> and
-        /// read the file back out of the rendered HTML, so the requesting origin is what stands
-        /// between that page and the file. Restricting it blocks the request rather than just
-        /// the response, since <c>[FromBody]</c> on an <c>[ApiController]</c> forces a preflight.
+        /// Loopback keeps remote machines out but not the user's own browser: a page they visit
+        /// can POST <c>#include ~/.ssh/id_rsa</c> to <c>/convert</c> and read the file back out
+        /// of the HTML. <c>[FromBody]</c> forces a preflight, so this blocks the request itself.
         /// <para>
-        /// Native callers send no Origin header and never reach this; <c>vscode-webview://</c>
-        /// is deliberately absent, and "null" — what a sandboxed opaque-origin frame sends — is
-        /// rejected. DNS rebinding is handled by the Host-header check in
-        /// <see cref="ConfigureApp"/> instead.
+        /// Native callers send no Origin and never reach this; <c>vscode-webview://</c> and
+        /// "null" (a sandboxed opaque origin) are deliberately rejected. DNS rebinding is the
+        /// Host-header check in <see cref="ConfigureApp"/> instead.
         /// </para>
         /// </remarks>
         internal static bool IsAllowedOrigin(string origin)
         {
             if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri)) return false;
 
-            // Tauri serves the desktop shell from a custom scheme: tauri://localhost
-            // on Linux/macOS, http(s)://tauri.localhost on Windows (WebView2).
+            // tauri://localhost on Linux/macOS, tauri.localhost on Windows (WebView2).
             if (uri.Scheme.Equals("tauri", StringComparison.OrdinalIgnoreCase)) return true;
             if (uri.Host.Equals("tauri.localhost", StringComparison.OrdinalIgnoreCase)) return true;
 
-            // The browser build of the editor, served from loopback on any port. This
-            // also admits any other local server's pages, which is the accepted floor:
-            // anything able to serve on this machine's loopback is already past the
-            // boundary this policy defends.
+            // The browser build, on any loopback port. Admits other local servers' pages too —
+            // the accepted floor, since serving on loopback is already past this boundary.
             return Program.IsLoopbackHost(uri.Host);
         }
 
@@ -202,8 +192,7 @@ namespace Calcpad.Server.Services
                 }
                 catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
                 {
-                    // The client disconnected or superseded this request — expected under
-                    // rapid tab-switching, not a server error, so it isn't logged as one.
+                    // Client disconnected or superseded the request — not a server error.
                 }
                 catch (Exception ex)
                 {
@@ -213,11 +202,9 @@ namespace Calcpad.Server.Services
                 }
             });
 
-            // DNS rebinding defense, and the reason CORS alone is not enough: an attacker who
-            // points their own hostname at 127.0.0.1 makes the request same-origin, so no CORS
-            // check runs, but the Host header still carries their name. Only loopback names are
-            // served, and a request with no Host header at all is let through as a native
-            // client, which was never the exposure here.
+            // DNS rebinding defense, and why CORS alone is not enough: a hostname pointed at
+            // 127.0.0.1 makes the request same-origin, so no CORS check runs, but the Host
+            // header still names them. No Host at all is a native client, never the exposure.
             app.Use(async (context, next) =>
             {
                 var host = context.Request.Host.Host;
