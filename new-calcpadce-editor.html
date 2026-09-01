@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="new-exports.html">
+        <link rel="prev" href="new-desktop-app.html">
       
       
-        <link rel="next" href="new-linter.html">
+        <link rel="next" href="new-calcpad-panel.html">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Includes and File Reads - CalcpadCE Documentation</title>
+        <title>The CalcpadCE Editor - CalcpadCE Documentation</title>
       
     
     
@@ -75,7 +75,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#includes-and-file-reads" class="md-skip">
+        <a href="#the-calcpadce-editor" class="md-skip">
           Skip to content
         </a>
       
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Includes and File Reads
+              The CalcpadCE Editor
             
           </span>
         </div>
@@ -1211,10 +1211,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="new-calcpadce-editor.html" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CalcpadCE Editor
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="new-calcpadce-editor.html" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1230,6 +1257,125 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#syntax-highlighting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syntax highlighting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autocomplete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autocomplete
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-type-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick-type symbols
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operator-replacement-and-auto-indent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operator replacement and auto-indent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#formatting-hotkeys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formatting hotkeys
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#navigating-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Navigating symbols
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-completion-for-includes-and-data-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path completion for includes and data files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#linting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1323,37 +1469,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Includes and File Reads
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="new-includes.html" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="new-includes.html" class="md-nav__link">
         
   
   
@@ -1369,92 +1488,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#reusing-math-with-include" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reusing math with #include
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#include-vs-read" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        #include vs #read
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#path-root-tokens-project-and-library" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Path root tokens: {project} and {library}
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ui-overrides-and-includes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        #UI overrides and includes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#path-root-token-user" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Path root token: {user}
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2959,10 +2992,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#reusing-math-with-include" class="md-nav__link">
+  <a href="#syntax-highlighting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reusing math with #include
+        Syntax highlighting
       
     </span>
   </a>
@@ -2970,10 +3003,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#include-vs-read" class="md-nav__link">
+  <a href="#autocomplete" class="md-nav__link">
     <span class="md-ellipsis">
       
-        #include vs #read
+        Autocomplete
       
     </span>
   </a>
@@ -2981,10 +3014,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#path-root-tokens-project-and-library" class="md-nav__link">
+  <a href="#quick-type-symbols" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Path root tokens: {project} and {library}
+        Quick-type symbols
       
     </span>
   </a>
@@ -2992,10 +3025,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ui-overrides-and-includes" class="md-nav__link">
+  <a href="#operator-replacement-and-auto-indent" class="md-nav__link">
     <span class="md-ellipsis">
       
-        #UI overrides and includes
+        Operator replacement and auto-indent
       
     </span>
   </a>
@@ -3003,10 +3036,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#path-root-token-user" class="md-nav__link">
+  <a href="#formatting-hotkeys" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Path root token: {user}
+        Formatting hotkeys
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#navigating-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Navigating symbols
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-completion-for-includes-and-data-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path completion for includes and data files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#linting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linting
       
     </span>
   </a>
@@ -3041,103 +3107,162 @@
 
 
 
-<h1 id="includes-and-file-reads">Includes and File Reads<a class="headerlink" href="#includes-and-file-reads" title="Permanent link">&para;</a></h1>
-<p><code>#include</code> and <code>#read</code> let you pull in other files, and both can follow chains of files.</p>
-<h2 id="reusing-math-with-include">Reusing math with <code>#include</code><a class="headerlink" href="#reusing-math-with-include" title="Permanent link">&para;</a></h2>
-<p><code>#include</code> inlines the contents of another CalcpadCE file into your document at parse time, so you can keep shared constants, functions, and macros in one place and reuse them everywhere:</p>
-<div class="language-text highlight"><pre><span></span><code>#include shared/constants.cpd
-#include shared/helpers.cpd
-</code></pre></div>
-<p>An included file can include others in turn, and those can include more — the chain is followed automatically.</p>
-<p>Include chains can go up to 20 levels deep.</p>
-<h2 id="include-vs-read"><code>#include</code> vs <code>#read</code><a class="headerlink" href="#include-vs-read" title="Permanent link">&para;</a></h2>
-<p>Both bring in outside content, but they do different jobs:</p>
+<h1 id="the-calcpadce-editor">The CalcpadCE Editor<a class="headerlink" href="#the-calcpadce-editor" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>The editor described here is the same in the <a href="new-vscode-extension.html">VS Code extension</a> and the <a href="new-desktop-app.html">desktop app</a>. Both frontends embed the same Monaco editor and language tooling.
+Where a host behaves differently, it is called out below.</p>
+</blockquote>
+<h2 id="syntax-highlighting">Syntax highlighting<a class="headerlink" href="#syntax-highlighting" title="Permanent link">&para;</a></h2>
+<p><code>.cpd</code> files get semantic highlighting: numbers, units, operators, variables, functions, macros, keywords, commands, file paths, and embedded HTML/Markdown/CSS/JS/SVG in comments are each colored distinctly.
+Highlighting updates per line as you type, for both dark and light themes.</p>
+<p>A few editor defaults are set for <code>.cpd</code> files so the language behaves predictably:</p>
+<ul>
+<li>The default font is <strong>JuliaMono</strong>.<ul>
+<li><strong>VS Code</strong> — run <strong>CalcpadCE: Install JuliaMono Font</strong> from the Command Palette if you chose not to install when prompted.</li>
+<li><strong>Desktop app</strong> — JuliaMono is bundled with the app.</li>
+</ul>
+</li>
+<li><strong>Enter always inserts a newline</strong> — it never accepts a suggestion.
+  Press <strong>Tab</strong> to accept a completion instead.</li>
+<li><strong>Tab accepts suggestions</strong> and triggers completion on a partial word.</li>
+</ul>
+<h2 id="autocomplete">Autocomplete<a class="headerlink" href="#autocomplete" title="Permanent link">&para;</a></h2>
+<p>As you type, the completion list offers:</p>
+<ul>
+<li><strong>Your own symbols first</strong> — variables, functions, macros, and custom units defined in the current document (and its <code>#include</code> files) are prioritized above built-ins.</li>
+<li><strong>Built-in functions</strong> with snippet placeholders — accept one and press <strong>Tab</strong> to jump between arguments.</li>
+<li><strong>Setting keys</strong> (<code>decimals</code>, <code>degrees</code>, <code>complex</code>, <code>units</code>, <code>colorScale</code>, …) where a setting is expected.</li>
+<li><strong><a href="new-metadata-comments.html">Metadata keys</a></strong> inside an HTML-comment block placed directly above a definition.
+  The <strong>Properties</strong> panel tab also edits these through a form.</li>
+</ul>
+<h2 id="quick-type-symbols">Quick-type symbols<a class="headerlink" href="#quick-type-symbols" title="Permanent link">&para;</a></h2>
+<p>Type <code>~</code> followed by a key and press <strong>space</strong> to insert a Greek letter or math symbol.
+For example <code>~a</code> + space → <code>α</code>, <code>~p</code> + space → <code>π</code>, <code>~S</code> + space → <code>Σ</code>.
+The full set is shown in the <strong>Insert</strong> tab's Symbol Palette.
+Toggle this with the <code>quickTyping</code> setting in the CalcpadCE <strong>Settings</strong> tab.</p>
+<h2 id="operator-replacement-and-auto-indent">Operator replacement and auto-indent<a class="headerlink" href="#operator-replacement-and-auto-indent" title="Permanent link">&para;</a></h2>
+<p>Typing ASCII operators auto-converts them to Unicode: <code>&lt;=</code> → <code>≤</code>, <code>&gt;=</code> → <code>≥</code>, <code>!=</code> → <code>≠</code>.
+Block keywords indent automatically: <code>#if</code> / <code>#else</code> / <code>#end if</code>, <code>#for</code> / <code>#end for</code>, and <code>#def</code> / <code>#end def</code> for example.</p>
+<h2 id="formatting-hotkeys">Formatting hotkeys<a class="headerlink" href="#formatting-hotkeys" title="Permanent link">&para;</a></h2>
+<p>When the cursor is in a <code>.cpd</code> file, these hotkeys wrap the selection in HTML or Markdown markup.
+Whether HTML or Markdown is emitted depends on the <code>commentFormat</code> setting (<code>auto</code> / <code>html</code> / <code>markdown</code>).</p>
 <table>
 <thead>
 <tr>
-<th></th>
-<th><code>#include</code></th>
-<th><code>#read</code></th>
+<th>Keybinding</th>
+<th>Effect</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>What it brings in</td>
-<td>A CalcpadCE file</td>
-<td>Data (CSV, Excel)</td>
+<td><strong>Ctrl+B</strong></td>
+<td>Bold</td>
 </tr>
 <tr>
-<td>When it happens</td>
-<td>At parse time — the contents are inlined</td>
-<td>At run time — the data is loaded into a variable</td>
+<td><strong>Ctrl+I</strong></td>
+<td>Italic</td>
 </tr>
 <tr>
-<td>Result</td>
-<td>The included file becomes part of your document</td>
-<td>You get a matrix or vector variable to compute with</td>
+<td><strong>Ctrl+U</strong></td>
+<td>Underline</td>
+</tr>
+<tr>
+<td><strong>Ctrl+=</strong></td>
+<td>Subscript</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+=</strong></td>
+<td>Superscript</td>
+</tr>
+<tr>
+<td><strong>Ctrl+1</strong> … <strong>Ctrl+6</strong></td>
+<td>Headings 1–6</td>
+</tr>
+<tr>
+<td><strong>Ctrl+L</strong></td>
+<td>Paragraph</td>
+</tr>
+<tr>
+<td><strong>Ctrl+R</strong></td>
+<td>Line break</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+L</strong></td>
+<td>Bulleted list</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+N</strong></td>
+<td>Numbered list</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Q</strong></td>
+<td>Toggle <code>'</code> comment prefix</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+Q</strong></td>
+<td>Uncomment</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+V</strong></td>
+<td>Paste as comment (each line prefixed with <code>'</code>)</td>
 </tr>
 </tbody>
 </table>
-<h2 id="path-root-tokens-project-and-library">Path root tokens: <code>{project}</code> and <code>{library}</code><a class="headerlink" href="#path-root-tokens-project-and-library" title="Permanent link">&para;</a></h2>
-<p><code>{project}</code> and <code>{library}</code> are symbolic roots you can use as a prefix in <code>#include</code>, <code>#read</code>, <code>#write</code>/<code>#append</code>, and <code>&lt;img src="..."&gt;</code>, instead of a path specific to your machine:</p>
-<div class="language-text highlight"><pre><span></span><code>#ProjectPath C:/Jobs/1042
-#LibraryPath %APPDATA%/Calcpad/lib
-#include {library}/steel/aisc.cpd
-#read L from {project}/data/loads.csv
-#write R to {project}/out/results.csv
-'&lt;img src="{library}/logo.png"&gt;
-</code></pre></div>
+<p>On macOS use <strong>Cmd</strong> instead of <strong>Ctrl</strong>.
+Turn the whole set off with the <code>enableFormattingHotkeys</code> setting if it conflicts with your other bindings.</p>
+<h2 id="navigating-symbols">Navigating symbols<a class="headerlink" href="#navigating-symbols" title="Permanent link">&para;</a></h2>
+<p>The editor provides IDE-grade navigation across variables, functions, macros, and custom units — including across <code>#include</code> files:</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Go to Definition</strong></td>
+<td><strong>Ctrl+Click</strong> or <strong>F12</strong> — jumps to the first assignment</td>
+</tr>
+<tr>
+<td><strong>Find All References</strong></td>
+<td><strong>Shift+Alt+F12</strong>, or right-click → <em>Find All References</em></td>
+</tr>
+<tr>
+<td><strong>Rename Symbol</strong></td>
+<td><strong>F2</strong> — renames occurrences in the current document only (not across <code>#include</code> files)</td>
+</tr>
+<tr>
+<td><strong>Hover</strong></td>
+<td>Point at a symbol for its signature, type, source file, and docs</td>
+</tr>
+</tbody>
+</table>
+<p>Hovering over a built-in function shows its signature, description, return type, per-parameter documentation, and a runnable example.</p>
+<p>Hover, definitions, references, the linter, the preview, and the TOC are all scoped to the document you are editing, so symbols and errors never bleed between unrelated documents.</p>
+<h2 id="path-completion-for-includes-and-data-files">Path completion for includes and data files<a class="headerlink" href="#path-completion-for-includes-and-data-files" title="Permanent link">&para;</a></h2>
+<p>When you type a path after <code>#include</code>, <code>#read</code>, <code>#write</code>, or <code>#append</code>, the editor completes filenames from the workspace or open folder and, once the document declares them, from its <code>#ProjectPath</code>/<code>#LibraryPath</code> roots:</p>
 <ul>
-<li><code>#ProjectPath ...</code> — the job- or document-specific folder, useful for referencing files that may change from project to project.</li>
-<li><code>#LibraryPath ...</code> — a shared folder of reusable <code>.cpd</code>/<code>.txt</code> files, e.g. a firm-wide function or materials library. If you want a project specific library to prevent edits to a central library from breaking older files, this is easy to change in a single place.</li>
+<li><code>#include</code>: <code>.cpd</code>, <code>.txt</code></li>
+<li><code>#read</code> / <code>#write</code> / <code>#append</code>: <code>.cpd</code>, <code>.txt</code>, <code>.csv</code>, <code>.xlsx</code>, <code>.xlsm</code></li>
+<li>The completion list expands <code>%VAR%</code>, <code>{user}</code>, <code>{project}</code>, <code>{library}</code> as you type.
+See <a href="new-includes.html#path-root-tokens-project-and-library">Includes and File Reads</a>.</li>
 </ul>
-<p>A relative value resolves against the folder of the file that declares it — so a module reached through <code>#include</code> that declares <code>#ProjectPath .</code> means <em>its own</em> folder, not the including document's.</p>
-<p><strong>Environment variables expand in every path, not just these two directives.</strong> <code>%VAR%</code> is expanded — on every platform, including macOS/Linux — in <code>#include</code>, <code>#read</code>/<code>#write</code>/<code>#append</code>, <code>&lt;img src="..."&gt;</code>, and a <code>#ProjectPath</code>/<code>#LibraryPath</code> value itself, whether or not a path-root token is involved:</p>
-<div class="language-text highlight"><pre><span></span><code>#LibraryPath %APPDATA%/Calcpad/lib
-#include %APPDATA%/Calcpad/scratch/notes.cpd
-</code></pre></div>
-<p><strong>Rules:</strong></p>
+<h2 id="linting">Linting<a class="headerlink" href="#linting" title="Permanent link">&para;</a></h2>
+<p>CalcpadCE checks your document as you write and flags problems before they are converted to HTML.
+Issues are marked in red, yellow, or blue at the spot with the problem, based on severity, and appear in the <strong>Problems</strong> list with a link to the offending line.
+Each carries a <code>CPD-XXXX</code> code, and the linter minimum-severity setting controls how much is shown.</p>
 <ul>
-<li><strong>One <code>#ProjectPath</code> and one <code>#LibraryPath</code> per document.</strong> A second declaration of the same root is an error. Make sure to define these in a <code>#local</code> scope for .cpd files you intend to <code>#include</code> elsewhere.</li>
-<li><strong>Declare before first use.</strong> An <code>#include</code> whose token is used above its declaration results in an error</li>
-<li><strong>The folder has to actually exist.</strong> A value that doesn't resolve to a real folder on disk is an error at the declaration</li>
+<li><strong>VS Code</strong> — diagnostics appear in the <strong>Problems</strong> panel (<strong>Ctrl+Shift+M</strong>).</li>
+<li><strong>Desktop app</strong> — diagnostics appear in the <strong>Problems</strong> panel below the editor.</li>
 </ul>
-<h2 id="ui-overrides-and-includes"><code>#UI</code> overrides and includes<a class="headerlink" href="#ui-overrides-and-includes" title="Permanent link">&para;</a></h2>
-<p>A saved <code>uiOverrides</code> comment only takes effect on the <strong>first line of the file that carries it</strong> — a second one anywhere in the same file is ignored.</p>
-<ul>
-<li><strong>A <code>uiOverrides</code> comment inside an included file never reaches the document that includes it.</strong> The calculation engine treats any <code>uiOverrides</code> comment in an included file's content as if it sat inside that file's own <code>#local</code> block: it is stripped out.</li>
-<li><strong>Only the includer's own <code>uiOverrides</code> comment can override it instead</strong>, by targeting the rendered element after the preview is generated.</li>
-</ul>
-<p>This is deliberate behavior, as resolving an included module's own saved values automatically would prevent overriding it in the main calculation file.</p>
-<p><strong>To share entered values across several files, write them out as data instead of relying on <code>#include</code>:</strong></p>
-<p><strong>module.cpd:</strong>
-<div class="language-text highlight"><pre><span></span><code>#local
-#ProjectPath C:/path-to-my-project
-#UI sharedData = [1; 2|3; 4]
-#write sharedData to {project}/shared-inputs.csv
-#global
-'To read it automatically from the file calling the module:'
-#read M from {project}/shared-inputs.csv
-</code></pre></div></p>
-<p>As <code>#write</code> sits inside <code>#local</code>, it only runs when <code>shared/inputs.cpd</code> is opened by itself, so including this file elsewhere never re-triggers the write or input form.</p>
-<p><strong>calculation.cpd:</strong></p>
-<div class="language-text highlight"><pre><span></span><code>'This reads shared data that in input from a module without triggering the datagrid UI.
-#ProjectPath C:/path-to-my-project
-#include module.cpd
-</code></pre></div>
-<h2 id="path-root-token-user">Path root token: <code>{user}</code><a class="headerlink" href="#path-root-token-user" title="Permanent link">&para;</a></h2>
-<p><code>{user}</code> is a third root, usable anywhere <code>{project}</code>/<code>{library}</code> are — but unlike them, it needs no <code>#ProjectPath</code>/<code>#LibraryPath</code>-style declaration first. It always expands to the current OS user's home directory: <code>%USERPROFILE%</code> on Windows, <code>$HOME</code> on macOS/Linux.</p>
-<div class="language-text highlight"><pre><span></span><code>#include {user}/calcpad/lib/steel.cpd
-#read L from {user}/data/loads.csv
-'&lt;img src="{user}/logo.png"&gt;
-</code></pre></div>
-<p>It can also appear inside a <code>#ProjectPath</code>/<code>#LibraryPath</code> value itself:</p>
-<div class="language-text highlight"><pre><span></span><code>#LibraryPath {user}/calcpad/lib
-</code></pre></div>
+<p>See <strong><a href="new-linter.html">Linter and Diagnostics</a></strong> for what each code means.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="new-exports.html#portable-exports">Exports</a> · <a href="working-with-files.html">Working with Files</a> · <a href="programming.html">Programming</a></li>
-<li><a href="new-vscode-extension.html">Using the VS Code Extension</a> — path completion for <code>#include</code> and <code>#read</code></li>
+<li><a href="new-calcpad-panel.html">The CalcpadCE Panel</a> — the shared sidebar and all settings</li>
+<li><a href="new-vscode-extension.html">VS Code Extension</a> · <a href="new-desktop-app.html">Desktop App</a></li>
+<li><a href="new-includes.html">Includes and File Reads</a> · <a href="new-linter.html">Linter and Diagnostics</a> · <a href="new-metadata-comments.html">Metadata Comments</a></li>
+<li><a href="writing-math.html">Writing Math</a> · <a href="quick-reference.html">Quick Reference</a></li>
 </ul>
 
 

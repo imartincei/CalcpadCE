@@ -12,7 +12,7 @@
         <link rel="prev" href="new-vscode-extension.html">
       
       
-        <link rel="next" href="new-calcpad-panel.html">
+        <link rel="next" href="new-calcpadce-editor.html">
       
       
         
@@ -231,7 +231,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="new-vscode-extension.html" class="md-tabs__link">
+        <a href="new-selecting-calcpadce-deployment.html" class="md-tabs__link">
           
   
   
@@ -1130,6 +1130,34 @@
   
   
     <li class="md-nav__item">
+      <a href="new-selecting-calcpadce-deployment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Selecting a CalcpadCE Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="new-vscode-extension.html" class="md-nav__link">
         
   
@@ -1284,15 +1312,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#live-preview" class="md-nav__link">
+  <a href="#live-results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Live preview
+        Live results
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Live preview">
+    <nav class="md-nav" aria-label="Live results">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1415,6 +1443,34 @@
   
   
     <li class="md-nav__item">
+      <a href="new-calcpadce-editor.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CalcpadCE Editor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="new-calcpad-panel.html" class="md-nav__link">
         
   
@@ -1471,14 +1527,14 @@
   
   
     <li class="md-nav__item">
-      <a href="new-pdf-export.html" class="md-nav__link">
+      <a href="new-exports.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    PDF Export
+    Exports
   
 
     
@@ -1555,14 +1611,70 @@
   
   
     <li class="md-nav__item">
-      <a href="new-table-of-contents.html" class="md-nav__link">
+      <a href="new-ui-mode.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Table of Contents
+    UI Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-visibility-directives.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visibility Directives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-metadata-comments.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata Comments
   
 
     
@@ -1611,14 +1723,14 @@
   
   
     <li class="md-nav__item">
-      <a href="new-metadata-comments.html" class="md-nav__link">
+      <a href="migration-guide.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Metadata Comments
+    Migration Guide
   
 
     
@@ -3029,15 +3141,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#live-preview" class="md-nav__link">
+  <a href="#live-results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Live preview
+        Live results
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Live preview">
+    <nav class="md-nav" aria-label="Live results">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3162,9 +3274,10 @@
 
 
 <h1 id="calcpadce-desktop-app">CalcpadCE Desktop App<a class="headerlink" href="#calcpadce-desktop-app" title="Permanent link">&para;</a></h1>
-<p>The <strong>CalcpadCE Desktop App</strong> is a native application for Windows and Linux that wraps the same editor you get in the browser and bundles the calculation engine inside it.
-You get the full editor — multi-tab editing, syntax highlighting, autocomplete, live preview, and the CalcpadCE sidebar — plus native file dialogs, a native menu bar, and drag-and-drop, with no browser to open and no server to set up.</p>
-<p>For the CalcpadCE language itself, start with <strong><a href="writing-math.html">Writing Math</a></strong> and the <strong><a href="quick-reference.html">Quick Reference</a></strong>.</p>
+<p>The <strong>CalcpadCE Desktop App</strong> is a native application for Windows.
+You get the full editor — multi-tab editing, syntax highlighting, autocomplete, live preview, and the CalcpadCE sidebar.
+It uses native file dialogs and menu bar and has offline capabilities.</p>
+<p>See <a href="new-selecting-calcpadce-deployment.html">Selecting a CalcpadCE Deployment</a> to help decide if this is the right CalcpadCE deployment for you.</p>
 <h2 id="installing">Installing<a class="headerlink" href="#installing" title="Permanent link">&para;</a></h2>
 <p>The app ships as a per-platform download:</p>
 <table>
@@ -3181,14 +3294,27 @@ You get the full editor — multi-tab editing, syntax highlighting, autocomplete
 </tr>
 <tr>
 <td>Linux</td>
-<td>AppImage (run directly, no install for beta)</td>
+<td>AppImage (run directly)</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>Debian <code>.deb</code></td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>Fedora <code>.rpm</code></td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>Arch (compressed package with PKGBUILD)</td>
 </tr>
 </tbody>
 </table>
-<p>The calculation engine and its fonts and templates are bundled inside the app — you do <strong>not</strong> need .NET installed separately.
-On Linux, the <code>.AppImage</code> includes what it needs to run; the <code>.deb</code> package expects WebKitGTK to already be present on the system.</p>
+<p>The calculation engine and its dependencies are bundled inside the app — you do <strong>not</strong> need .NET installed separately.
+The Linux <code>.AppImage</code> and Windows Portable builds include what they need to run.
+The other Linux options expect WebKitGTK to already be present on the system and may require installing a few other common dependencies.</p>
 <p>For PDF export you need a <strong>Chromium-based browser</strong> (Chrome, Edge, or Chromium) installed on the system.
-On Linux the app will tell you which package to install if none is found — see <a href="new-pdf-export.html">PDF Export</a>.</p>
+On Linux, the app will tell you which package to install if none is found — see <a href="new-exports.html#browser-requirement">Exports</a>.</p>
 <h2 id="your-first-document">Your first document<a class="headerlink" href="#your-first-document" title="Permanent link">&para;</a></h2>
 <ol>
 <li>Launch the app. It opens with an empty <strong>Untitled-1</strong> tab.</li>
@@ -3223,23 +3349,15 @@ On Linux the app will tell you which package to install if none is found — see
 </tr>
 <tr>
 <td>Open a file</td>
-<td><strong>File → Open…</strong>, or drag a file onto the window</td>
+<td><strong>Ctrl+O</strong>, or <strong>File → Open…</strong>, or drag a file onto the window</td>
 </tr>
 <tr>
 <td>Close tab</td>
 <td><strong>Ctrl+W</strong>, the <strong>✕</strong> on the tab, or middle-click the tab</td>
 </tr>
 <tr>
-<td>Next / previous tab</td>
-<td><strong>Ctrl+Tab</strong> / <strong>Ctrl+Shift+Tab</strong></td>
-</tr>
-<tr>
-<td>Jump to tab 1–8</td>
-<td><strong>Ctrl+1</strong> … <strong>Ctrl+8</strong></td>
-</tr>
-<tr>
-<td>Jump to last tab</td>
-<td><strong>Ctrl+9</strong></td>
+<td>Next  tab</td>
+<td><strong>Ctrl+Tab</strong></td>
 </tr>
 </tbody>
 </table>
@@ -3250,99 +3368,67 @@ On Linux the app will tell you which package to install if none is found — see
 <li><strong>Opening an already-open file</strong> activates its existing tab instead of duplicating it.</li>
 <li><strong>Opening a file from an empty Untitled tab</strong> replaces it in place rather than stacking a new tab.</li>
 <li><strong>Closing a tab with unsaved changes</strong> prompts Save / Don't Save / Cancel. Quitting the app walks through every unsaved tab; cancel any prompt to abort the quit.</li>
-<li>Hover, definitions, references, the linter, the preview, and the TOC are all scoped to the active tab, so symbols and errors never bleed between unrelated documents.</li>
 </ul>
 <h2 id="opening-files">Opening files<a class="headerlink" href="#opening-files" title="Permanent link">&para;</a></h2>
 <p>There are several ways to open documents:</p>
 <ul>
 <li><strong>File → Open…</strong> — native file picker.</li>
-<li><strong>Drag and drop</strong> — drop one or more files onto the editor; each opens in its own tab. Dropping plain text (e.g. from a browser) opens it as a new untitled tab.</li>
 <li><strong>Files tab</strong> in the sidebar — open a folder and browse its tree.</li>
 <li><strong>Recent files</strong> — tracked automatically and available from the File menu.</li>
 </ul>
+<p>Compiled <strong><code>.cpdz</code></strong> worksheets open the same way and are registered as their own file type.
+See <a href="new-ui-mode.html#compiled-cpdz-worksheets">UI Mode</a>.</p>
 <h2 id="the-editor">The editor<a class="headerlink" href="#the-editor" title="Permanent link">&para;</a></h2>
+<p>The editor is the same across every CalcpadCE frontend — see <strong><a href="new-calcpadce-editor.html">The CalcpadCE Editor</a></strong>.</p>
+<p>Desktop specifics:</p>
 <ul>
-<li><strong>Syntax highlighting</strong> for numbers, units, operators, variables, functions, macros, keywords, commands, and embedded HTML/Markdown in comments.</li>
-<li><strong>Autocomplete</strong> that prioritizes your own symbols over built-ins, with snippet placeholders for function arguments.</li>
-<li><strong>Quick-type symbols</strong> — <code>~a</code> + space → <code>α</code>, <code>~p</code> + space → <code>π</code>, etc.</li>
-<li><strong>Operator replacement</strong> — <code>&lt;=</code> → <code>≤</code>, <code>&gt;=</code> → <code>≥</code>, <code>!=</code> → <code>≠</code>.</li>
-<li><strong>Auto-indentation</strong> for <code>#if</code> / <code>#for</code> / <code>#def</code> blocks.</li>
-<li><strong>Go to Definition</strong>, <strong>Find All References</strong>, <strong>Rename</strong>, and <strong>hover</strong> for symbols, including across <code>#include</code> files.</li>
+<li>Path completion draws on the folder opened in the <strong>Files</strong> tab as well as the document's <code>#ProjectPath</code>/<code>#LibraryPath</code> roots.</li>
+<li>JuliaMono is bundled with the app, so math glyphs render consistantly without installing a font.</li>
 </ul>
-<p>Two key behaviors worth knowing:</p>
-<ul>
-<li><strong>Enter always inserts a newline</strong> — it never accepts a suggestion. Press <strong>Tab</strong> to accept a completion.</li>
-<li><strong>Tab accepts suggestions</strong> and triggers completion on a partial word.</li>
-</ul>
-<p>These are the same editor features as the <a href="new-vscode-extension.html">VS Code extension</a>, so anything you learn in one carries over to the other.</p>
 <h2 id="the-calcpadce-sidebar">The CalcpadCE sidebar<a class="headerlink" href="#the-calcpadce-sidebar" title="Permanent link">&para;</a></h2>
 <p>Toggle the sidebar with <strong>View → Toggle Sidebar</strong>.
-It has a <strong>Files</strong> view and a <strong>CalcpadCE</strong> view; the CalcpadCE view is split into tabs (Insert, TOC, Settings, Variables, PDF, Formatting, Export, Errors).</p>
-<p>The sidebar is the same across every CalcpadCE front end — see <strong><a href="new-calcpad-panel.html">The CalcpadCE Panel &amp; Settings</a></strong> for a full walkthrough of each tab, including Prettify options and the Export buttons.</p>
-<h2 id="live-preview">Live preview<a class="headerlink" href="#live-preview" title="Permanent link">&para;</a></h2>
-<p>The preview pane renders your report live and re-renders as you type.
-From <strong>View</strong> you can:</p>
-<ul>
-<li><strong>Toggle Preview</strong> — show/hide the pane.</li>
-<li><strong>Preview Mode: Wrapped</strong> — the normal report view.</li>
-<li><strong>Preview Mode: Unwrapped</strong> — the fully expanded source, with macros and includes resolved. Useful for debugging what the engine computes.</li>
-</ul>
+It has a <strong>Files</strong> view and a <strong>CalcpadCE</strong> view.</p>
+<p>The sidebar is the same across every CalcpadCE frontend — see <strong><a href="new-calcpad-panel.html">The CalcpadCE Panel &amp; Settings</a></strong> for a full walkthrough of each tab.</p>
+<h2 id="live-results">Live results<a class="headerlink" href="#live-results" title="Permanent link">&para;</a></h2>
+<p>The <strong>Results</strong> pane renders your document live and re-renders as you type.
+Its toolbar (and <strong>View → Result Mode</strong>) offers four modes — <strong>Preview</strong>, <strong>Unwrapped</strong>, <strong>Input</strong>, and <strong>Report</strong> — each rendering the same thing its matching export captures.
+See <a href="new-exports.html#export-variants">Exports → Export variants</a> for a breakdown of each one.</p>
+<p><strong>View → Toggle Preview</strong> shows and hides the pane.
+Drag the border between the editor and the results pane to resize either side.</p>
+<p>Right-click a preview → <strong>View Webview Source HTML</strong> to inspect the rendered HTML.</p>
 <h3 id="running-on-demand-auto-run-off">Running on demand (Auto-Run off)<a class="headerlink" href="#running-on-demand-auto-run-off" title="Permanent link">&para;</a></h3>
 <p>By default the preview re-renders continuously as you type.
-If you turn <strong>Settings → Auto-Run Preview</strong> off — useful for long-running documents — the preview only re-renders when you:</p>
+If you turn <strong>Settings → Auto-Run Preview</strong> off, the preview only re-renders when you:</p>
 <ul>
 <li>Click <strong>▶ Run</strong> on the editor toolbar.</li>
 <li>Press <strong>Ctrl+Alt+X</strong>.</li>
 <li>Right-click in the editor → <strong>Run Preview</strong>.</li>
-<li>Use <strong>Server → Refresh</strong> in the native menu (same shortcut).</li>
+<li>Use <strong>Server → Refresh</strong> in the menu bar.</li>
 </ul>
-<p>A manual run also re-lints the document, refreshes definitions and the table of contents, and rebuilds the Export tab's plot list.</p>
+<p>A manual run also re-lints the document, writes data, refreshes definitions and the table of contents, and rebuilds the Export tab's plot list.</p>
 <h2 id="splitting-the-editor">Splitting the editor<a class="headerlink" href="#splitting-the-editor" title="Permanent link">&para;</a></h2>
 <p>The <strong>Split ⬓</strong> button in the editor toolbar (also <strong>View → Split Editor</strong>) opens a second editor group stacked below the first.
 Each group has its own tabs, tab strip, preview, and Problems markers.
 Click <strong>Unsplit</strong> (same button) to close the bottom group; any unsaved tabs in it are walked through the save prompt first.
-The active group — the one you most recently clicked into — drives the sidebar (Problems, TOC, Variables).</p>
+The active group drives the sidebar.</p>
 <h2 id="errors">Errors<a class="headerlink" href="#errors" title="Permanent link">&para;</a></h2>
 <p><strong>Linter</strong> — CalcpadCE checks your document as you write and flags problems before they're converted to HTML.
-Issues are marked in red, yellow, or blue at the spot with the problem, based on severity, and appear in the <strong>Problems</strong> panel with a link to the offending line.
-See <strong><a href="new-linter.html">Linter and Diagnostics</a></strong> for the full list of codes.</p>
+Issues are marked in red, yellow, or blue at the spot with the problem, based on severity, and appear in the <strong>Problems</strong> panel with a link to the offending line.</p>
 <p><strong>Preview errors</strong> — errors from the calculation engine (including inside hidden code) are listed in the <strong>Errors</strong> tab of the sidebar, each with a link to its source line.</p>
+<p>See <strong><a href="new-calcpadce-editor.html#linting">The CalcpadCE Editor → Linting</a></strong> and <strong><a href="new-linter.html">Linter and Diagnostics</a></strong> for the full list of codes.</p>
 <h2 id="exporting">Exporting<a class="headerlink" href="#exporting" title="Permanent link">&para;</a></h2>
-<p>Every export uses the app's built-in engine, so the output matches the preview exactly.</p>
-<table>
-<thead>
-<tr>
-<th>Output</th>
-<th>How</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>PDF</strong></td>
-<td><strong>File → Export PDF…</strong></td>
-<td>Full-fidelity export via a native save dialog. Requires a Chromium browser — see <a href="new-pdf-export.html">PDF Export</a>.</td>
-</tr>
-<tr>
-<td><strong>HTML</strong></td>
-<td><strong>Save HTML…</strong> on the sidebar's <strong>Export</strong> tab</td>
-<td>Native save dialog writes a standalone <code>.html</code> report.</td>
-</tr>
-<tr>
-<td><strong>Word (.docx)</strong></td>
-<td><strong>Save Word…</strong> on the sidebar's <strong>Export</strong> tab</td>
-<td>Native save dialog writes a <code>.docx</code> document.</td>
-</tr>
-</tbody>
-</table>
-<p>Set the document title, timestamp format, page size, and header/footer in the sidebar's <strong>PDF</strong> tab before exporting.
-The <strong>Export</strong> tab also has a <strong>Plots</strong> section that lists every plot the document produces, so you can save each one individually or all at once as a ZIP — see <a href="new-calcpad-panel.html#export">The CalcpadCE Panel &amp; Settings → Export</a>.</p>
+<p>Exporting is the same across every CalcpadCE frontend — see <strong><a href="new-exports.html">Exports</a></strong>.</p>
+<p>Desktop specifics:</p>
+<ul>
+<li>Every export is in <strong>File → Export</strong>.</li>
+<li><strong>File → Save As Compiled Worksheet…</strong> and <strong>File → Export Portable Package…</strong> produce the two handoff formats — see <a href="new-exports.html#portable-exports">Exports → Portable exports</a>.</li>
+</ul>
 <h2 id="the-native-menu">The native menu<a class="headerlink" href="#the-native-menu" title="Permanent link">&para;</a></h2>
 <p>The menu bar drives the whole app:</p>
 <ul>
-<li><strong>File</strong> — New Tab · Open… · Save · Save As… · Close Tab · Export PDF… · Quit</li>
+<li><strong>File</strong> — New Tab · Open… · Save · Save As… · Save As Compiled Worksheet… · Export Portable Package… · Close Tab · Export ▸ · Quit — see <a href="new-exports.html">Exports</a> for what each export command produces</li>
 <li><strong>Edit</strong> — Undo · Redo · Cut · Copy · Paste · Select All · Find · Replace</li>
-<li><strong>View</strong> — Toggle Sidebar · Toggle Preview · Split Editor · Preview Mode: Wrapped / Unwrapped</li>
+<li><strong>View</strong> — Toggle Sidebar · Toggle Preview · Toggle Word Wrap · Split Editor · Result Mode: Preview / Unwrapped / Input / Report</li>
 <li><strong>Server</strong> — Refresh (<strong>Ctrl+Alt+X</strong>) · Show Server Log · Stop Server · Restart Server</li>
 <li><strong>Help</strong> — Documentation (opens the docs site in your default browser)</li>
 </ul>
@@ -3357,8 +3443,9 @@ It starts automatically when the app launches and shuts down when you close it �
 <ul>
 <li><strong>Refresh</strong> (<strong>Ctrl+Alt+X</strong>) — re-run the active document.</li>
 <li><strong>Show Server Log</strong> — open the engine's log file to diagnose a problem.</li>
-<li><strong>Stop Server</strong> / <strong>Restart Server</strong> — cycle the engine.</li>
+<li><strong>Stop Server</strong> / <strong>Restart Server</strong> — cycle the calculation engine.</li>
 </ul>
+<p>If these do not work and the server shows "Disconnected" in the bottom-right corner, restarting the app typically fixes it. Because the calculation engine is separate from the editor, it is normally possible to save and modify files even if the calculation engine crashes.</p>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -3374,19 +3461,24 @@ It starts automatically when the app launches and shuts down when you close it �
 </tr>
 <tr>
 <td>PDF export fails</td>
-<td>Install a Chromium browser. On Linux the app names the package to install — see <a href="new-pdf-export.html">PDF Export</a>.</td>
+<td>Install a Chromium browser. On Linux the app names the package to install — see <a href="new-exports.html#troubleshooting">Exports → Troubleshooting</a>.</td>
 </tr>
 <tr>
 <td>Unsaved work after a crash</td>
 <td>The app writes backup copies of unsaved files; reopen them from the Files tab.</td>
 </tr>
+<tr>
+<td>AppImage will not start: <code>dlopen(): error loading libfuse.so.2</code></td>
+<td>An AppImage mounts itself at launch and needs FUSE 2, but many current distributions ship only FUSE 3. Either run <code>./CalcpadCE.AppImage --appimage-extract-and-run</code>, or install FUSE 2 — the package is <code>fuse2</code> on Arch, <code>libfuse2</code> on Debian and Ubuntu.</td>
+</tr>
 </tbody>
 </table>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
+<li><a href="new-calcpadce-editor.html">The CalcpadCE Editor</a> — the shared editor, navigation, and linting</li>
 <li><a href="new-calcpad-panel.html">The CalcpadCE Panel &amp; Settings</a> — the shared sidebar and all settings</li>
 <li><a href="new-vscode-extension.html">Using the VS Code Extension</a></li>
-<li><a href="new-pdf-export.html">PDF Export</a> · <a href="new-includes.html">Includes and File Reads</a> · <a href="new-linter.html">Linter and Diagnostics</a> · <a href="new-table-of-contents.html">Table of Contents</a></li>
+<li><a href="new-exports.html">Exports</a> · <a href="new-includes.html">Includes and File Reads</a> · <a href="new-linter.html">Linter and Diagnostics</a> · <a href="new-calcpad-panel.html#toc">Table of Contents</a></li>
 <li><a href="writing-math.html">Writing Math</a> · <a href="quick-reference.html">Quick Reference</a></li>
 </ul>
 

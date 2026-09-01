@@ -12,7 +12,7 @@
         <link rel="prev" href="new-calcpad-panel.html">
       
       
-        <link rel="next" href="new-pdf-export.html">
+        <link rel="next" href="new-exports.html">
       
       
         
@@ -231,7 +231,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="new-vscode-extension.html" class="md-tabs__link">
+        <a href="new-selecting-calcpadce-deployment.html" class="md-tabs__link">
           
   
   
@@ -1130,6 +1130,34 @@
   
   
     <li class="md-nav__item">
+      <a href="new-selecting-calcpadce-deployment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Selecting a CalcpadCE Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="new-vscode-extension.html" class="md-nav__link">
         
   
@@ -1166,6 +1194,34 @@
     
   
     Desktop App
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-calcpadce-editor.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CalcpadCE Editor
   
 
     
@@ -1307,6 +1363,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#pdf-export" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PDF Export
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#server" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1362,10 +1429,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#library" class="md-nav__link">
+  <a href="#data-output" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Library
+        Data output
       
     </span>
   </a>
@@ -1432,14 +1499,14 @@
   
   
     <li class="md-nav__item">
-      <a href="new-pdf-export.html" class="md-nav__link">
+      <a href="new-exports.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    PDF Export
+    Exports
   
 
     
@@ -1516,14 +1583,70 @@
   
   
     <li class="md-nav__item">
-      <a href="new-table-of-contents.html" class="md-nav__link">
+      <a href="new-ui-mode.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Table of Contents
+    UI Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-visibility-directives.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visibility Directives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-metadata-comments.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata Comments
   
 
     
@@ -1572,14 +1695,14 @@
   
   
     <li class="md-nav__item">
-      <a href="new-metadata-comments.html" class="md-nav__link">
+      <a href="migration-guide.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Metadata Comments
+    Migration Guide
   
 
     
@@ -2957,6 +3080,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#pdf-export" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PDF Export
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#server" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3012,10 +3146,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#library" class="md-nav__link">
+  <a href="#data-output" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Library
+        Data output
       
     </span>
   </a>
@@ -3084,11 +3218,8 @@
 
 
 <h1 id="settings">Settings<a class="headerlink" href="#settings" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p>Part of the <a href="new-calcpad-panel.html">CalcpadCE Panel</a>, shared across the <a href="new-vscode-extension.html">VS Code extension</a>, the <a href="new-desktop-app.html">desktop app</a>, and the web editor.</p>
-</blockquote>
-<p>The <strong>Settings</strong> tab is the single place to control the calculation engine and the editor.
-Editing settings here keeps them in sync with the host and the server — in VS Code, do <strong>not</strong> use VS Code's own settings editor for these.</p>
+<p>The <a href="new-calcpad-panel.html#settings">Settings</a> tab is the single place to control the calculation engine and the editor.
+In VS Code, do not use VS Code's own settings editor.</p>
 <h2 id="math">Math<a class="headerlink" href="#math" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -3130,9 +3261,24 @@ Editing settings here keeps them in sync with the host and the server — in VS 
 <td>Show very small matrix/vector values as <code>0</code> instead of using scientific notation.</td>
 </tr>
 <tr>
+<td><strong>Show Hidden Output</strong></td>
+<td>on/off</td>
+<td>Ignore <code>#hide</code> so suppressed content is rendered anyway. For debugging.</td>
+</tr>
+<tr>
 <td><strong>Max Output Count</strong></td>
 <td>5–100</td>
 <td>Maximum number of rows/columns shown for large matrices and vectors.</td>
+</tr>
+<tr>
+<td><strong>Numerical Precision</strong></td>
+<td>1e-15–1e-2</td>
+<td>Relative precision used by integration, root-finding, and other numerical methods.</td>
+</tr>
+<tr>
+<td><strong>Solver Tolerance</strong></td>
+<td>1e-15–1e-2</td>
+<td>Target tolerance for the iterative (PCG/eigen) solver.</td>
 </tr>
 </tbody>
 </table>
@@ -3157,6 +3303,16 @@ Editing settings here keeps them in sync with the host and the server — in VS 
 <td>Scale of rendered plots/images.</td>
 </tr>
 <tr>
+<td><strong>Plot Width / Height</strong></td>
+<td>≥1 (px)</td>
+<td>Default size of the plot canvas.</td>
+</tr>
+<tr>
+<td><strong>Plot Mesh Step</strong></td>
+<td>≥0 (px)</td>
+<td>Mesh size for surface/map plots; <code>0</code> samples automatically.</td>
+</tr>
+<tr>
 <td><strong>Image Path</strong></td>
 <td>text</td>
 <td>Directory used for generated plot images.</td>
@@ -3168,7 +3324,7 @@ Editing settings here keeps them in sync with the host and the server — in VS 
 </tr>
 <tr>
 <td><strong>Color Scale</strong></td>
-<td>Rainbow / Grayscale / Hot / Cool / Jet / Parula</td>
+<td>None / Gray / Rainbow / Terrain / VioletToYellow / GreenToYellow / Blues / BlueToYellow / BlueToRed / PurpleToYellow</td>
 <td>Palette for 3D/surface plots.</td>
 </tr>
 <tr>
@@ -3190,15 +3346,65 @@ Editing settings here keeps them in sync with the host and the server — in VS 
 </table>
 <h2 id="units">Units<a class="headerlink" href="#units" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Default Input Length Unit</strong> — <code>m</code> / <code>cm</code> / <code>mm</code>. Used for <code>%u</code> placeholders in input forms.</li>
-<li><strong>Non-Metric Units</strong> — <strong>UK (Imperial)</strong> or <strong>US Customary</strong>. Selects the definition of bare unit names that differ between the two systems (<code>gal</code>, <code>ton</code>, <code>cwt</code>, <code>pt</code>, <code>qt</code>, <code>bbl</code>, <code>tonf</code>, <code>therm</code>, …). This lives on <code>Settings.IsUs</code> and is unified across the WPF app, the CLI, and the web/desktop/VS Code hosts.</li>
+<li><strong>Default Input Length Unit</strong> — <code>m</code> / <code>cm</code> / <code>mm</code>. Used for <code>%u</code> placeholders.</li>
+<li><strong>Non-Metric Units</strong> — <strong>UK (Imperial)</strong> or <strong>US Customary</strong>, defaulting to <strong>US Customary</strong>. Selects the definition of bare unit names that differ between the two systems (<code>gal</code>, <code>ton</code>, <code>cwt</code>, <code>pt</code>, <code>qt</code>, <code>bbl</code>, <code>tonf</code>, <code>therm</code>, etc).</li>
 </ul>
+<h2 id="pdf-export">PDF Export<a class="headerlink" href="#pdf-export" title="Permanent link">&para;</a></h2>
+<p>Your default page setup for <a href="new-exports.html#pdf-export">PDF export</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Values</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper size</strong></td>
+<td>Letter / Legal / Tabloid / Ledger / A0–A6</td>
+<td>Page size.</td>
+</tr>
+<tr>
+<td><strong>Orientation</strong></td>
+<td>Portrait / Landscape</td>
+<td>Page orientation.</td>
+</tr>
+<tr>
+<td><strong>Top / Bottom / Left / Right margin</strong></td>
+<td>a length with a unit, e.g. <code>2cm</code>, <code>0.5in</code>, <code>12mm</code></td>
+<td>Page margins. A bare number is rejected.</td>
+</tr>
+<tr>
+<td><strong>Page numbers</strong></td>
+<td>on/off</td>
+<td>"Page <em>n</em> of <em>m</em>" in the footer.</td>
+</tr>
+<tr>
+<td><strong>Date</strong></td>
+<td>on/off</td>
+<td>The timestamp in the header.</td>
+</tr>
+<tr>
+<td><strong>Document title</strong></td>
+<td>text</td>
+<td>Header title. Empty falls back to the file name.</td>
+</tr>
+<tr>
+<td><strong>Timestamp format</strong></td>
+<td>.NET format string, e.g. <code>M/d/yyyy h:mm tt</code></td>
+<td>How the header timestamp is written.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reset PDF Settings</strong> restores just this section, leaving everything else alone.</p>
+<p>Any document can override these for itself with a <code>pdf</code> <a href="new-metadata-comments.html#pdf-export-settings">metadata comment</a>, so a report that must print A4 landscape carries that with it, and still follows your defaults for everything it doesn't mention.</p>
 <h2 id="server">Server<a class="headerlink" href="#server" title="Permanent link">&para;</a></h2>
-<p><strong>Remote Server URL</strong> — the address used when the host is configured to talk to a remote CalcpadCE server rather than a local one.</p>
+<p><strong>Remote Server URL</strong> — the address used when the host is configured to talk to a remote CalcpadCE server rather than a local one. This does not work in the beta version, as the server cannot yet run non-locally.</p>
 <h2 id="preview-theme">Preview theme<a class="headerlink" href="#preview-theme" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Theme</strong> — System / Light / Dark for the rendered preview.</li>
-<li><strong>Dark Mode Background</strong> — the background color used in dark mode (default <code>#1e1e1e</code>), with a <strong>Reset</strong> button.</li>
+<li><strong>Dark Mode Background</strong> — the preview background color used in dark mode (default <code>#1e1e1e</code>), with a <strong>Reset</strong> button.</li>
 </ul>
 <h2 id="color-theme">Color theme<a class="headerlink" href="#color-theme" title="Permanent link">&para;</a></h2>
 <p><strong>Color Theme</strong> — the syntax-highlighting theme, defaulting to <em>System</em> with the available dark and light themes grouped in the list.</p>
@@ -3216,10 +3422,33 @@ Pick the Monaco editor's font family from:</p>
 <li><strong>Enable Formatting Hotkeys</strong> — the Ctrl+B / Ctrl+I / Ctrl+1–6 … bindings.</li>
 <li><strong>Sync Preview to Cursor Line</strong> — scroll the preview to follow the line the cursor is on.</li>
 <li><strong>Auto-Run Preview</strong> <em>(default on)</em> — when off, the preview only re-renders when the preview panel is first opened or a manual <strong>Run Preview</strong> is triggered (<strong>Ctrl+Alt+X</strong>, the ▶ Run button, the editor context menu, or the Server → Refresh menu in the desktop app). Turn this off for large documents where every keystroke re-render is too costly.</li>
+<li><strong>Open <code>#UI</code> Documents in Input Mode</strong> <em>(default on)</em> — a document declaring <code>#UI</code> controls opens as its input form the first time you open it. See <a href="new-ui-mode.html">UI Mode</a>.</li>
+<li><strong>Apply <code>#UI</code> Values in Preview</strong> <em>(default off)</em> — Preview normally renders the document's own default values; turn this on and it renders the values entered into the input form instead, while still showing <code>#pre</code> and <code>#post</code> together. Useful for tracking down errors that only appear once a form is filled in. This also affects exporting and #write/#append.</li>
 </ul>
-<h2 id="library">Library<a class="headerlink" href="#library" title="Permanent link">&para;</a></h2>
-<p><strong>Library Path</strong> — a directory of shared <code>.cpd</code>/<code>.txt</code> files that appear in <code>#include</code> / <code>#read</code> path completion, so a team can share a common library.
-Supports <code>%ENV%</code> variables.</p>
+<h2 id="data-output">Data output<a class="headerlink" href="#data-output" title="Permanent link">&para;</a></h2>
+<p><strong>Write files</strong> — when <code>#write</code> and <code>#append</code> are allowed to run. Lives in the <strong>Export</strong> tab beside the <strong>Write to Disk</strong> button, not the settings tab.</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>When the files are written</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Report Only <em>(default)</em></td>
+<td>On a report render only: the preview pane on <strong>Report</strong>, and a report export. The <strong>Preview</strong> view does not write (default setting because #write would otherwise use default input values in some cases).</td>
+</tr>
+<tr>
+<td>Preview and Report</td>
+<td>On a <strong>Preview</strong> or <strong>Report</strong> render — so the files are rewritten as you type in with either view active. Best if you don't use input forms or have <strong>Apply <code>#UI</code> Values in Preview</strong> on.</td>
+</tr>
+<tr>
+<td>Manual</td>
+<td>Does not write on result rendering. Only writes when you press <strong>Write to Disk</strong>.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="linter">Linter<a class="headerlink" href="#linter" title="Permanent link">&para;</a></h2>
 <p><strong>Minimum Severity</strong> — Error / Warning / Information (all).
 The lowest severity surfaced as a diagnostic.</p>
@@ -3227,21 +3456,24 @@ The lowest severity surfaced as a diagnostic.</p>
 <ul>
 <li><strong>Open Logs Folder</strong> — opens the folder holding server logs and the most recent crash dump.</li>
 <li><strong>Max Output Lines (per channel)</strong> <em>(web/desktop)</em> — 10–100000, default 1000. Number of lines retained in each Output panel channel before older lines are dropped. Lower values reduce memory use and keep the UI responsive when logs are noisy.</li>
+<li><strong>Max Preview Size (MB)</strong> — 1–256, default 24. A document that renders to more HTML than this is not shown; the preview shows a <strong>Preview blocked</strong> page giving the render's size and the limit instead. Showing it risks running the app out of memory. PDF, HTML, and Word export are unaffected as they don't go through the preview. Raise it to preview a very large document anyway.</li>
+<li><strong>Max Preview Console Messages</strong> — 10–100000, default 500. How many console lines one preview render may relay before the rest are dropped. Lines go to the <strong>Preview Console</strong> output channel in the desktop app and to the <strong>CalcpadCE Webview Console</strong> channel in VS Code. A worksheet whose scripts log in a loop can otherwise flood the channel.</li>
 </ul>
+<p>A single render can have at most 24 MB of inline base64 image data — past that the remaining images are blocked and a warning is logged.
+Use external files with filepaths for larger images.</p>
 <h2 id="named-configurations">Named configurations<a class="headerlink" href="#named-configurations" title="Permanent link">&para;</a></h2>
 <p>The <strong>Configuration</strong> section lets you keep more than one named set of settings — for example a metric configuration with 3 decimals and an imperial one in degrees — and switch between them:</p>
 <ul>
 <li><strong>Active Config</strong> — pick the configuration to apply.</li>
 <li><strong>Save current settings as</strong> — type a name and click <strong>Save</strong> to store the current settings under it.</li>
-<li><strong>Open Settings Folder</strong> — reveal where configurations are stored.</li>
+<li><strong>Open Settings Folder</strong> — reveal where configurations are stored for manual editing.</li>
 <li><strong>Reset to Default</strong> — restore the default settings.</li>
 </ul>
-<p>Configurations persist between sessions in the VS Code extension and the desktop app.
-(The pure browser build does not yet mirror named configs.)</p>
+<p>Configurations persist between sessions.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="new-calcpad-panel.html">The CalcpadCE Panel</a></li>
-<li><a href="new-linter.html">Linter</a> · <a href="new-pdf-export.html">PDF Export</a></li>
+<li><a href="new-linter.html">Linter</a> · <a href="new-exports.html">Exports</a></li>
 </ul>
 
 

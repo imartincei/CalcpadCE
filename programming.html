@@ -231,7 +231,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="new-vscode-extension.html" class="md-tabs__link">
+        <a href="new-selecting-calcpadce-deployment.html" class="md-tabs__link">
           
   
   
@@ -1343,6 +1343,34 @@
   
   
     <li class="md-nav__item">
+      <a href="new-selecting-calcpadce-deployment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Selecting a CalcpadCE Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="new-vscode-extension.html" class="md-nav__link">
         
   
@@ -1379,6 +1407,34 @@
     
   
     Desktop App
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-calcpadce-editor.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CalcpadCE Editor
   
 
     
@@ -1455,14 +1511,14 @@
   
   
     <li class="md-nav__item">
-      <a href="new-pdf-export.html" class="md-nav__link">
+      <a href="new-exports.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    PDF Export
+    Exports
   
 
     
@@ -1539,14 +1595,70 @@
   
   
     <li class="md-nav__item">
-      <a href="new-table-of-contents.html" class="md-nav__link">
+      <a href="new-ui-mode.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Table of Contents
+    UI Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-visibility-directives.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visibility Directives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-metadata-comments.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata Comments
   
 
     
@@ -1595,14 +1707,14 @@
   
   
     <li class="md-nav__item">
-      <a href="new-metadata-comments.html" class="md-nav__link">
+      <a href="migration-guide.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Metadata Comments
+    Migration Guide
   
 
     
@@ -3397,6 +3509,12 @@ The following commands are available:</p>
 <p>Reads data from the specified text/CSV file into the matrix/vector <em>M</em>. The file must exist:</p>
 <div class="language-calcpad highlight"><pre><span></span><code><span class="k">#read</span><span class="w"> </span><span class="nv">M</span><span class="w"> </span><span class="nv">from</span><span class="w"> </span><span class="nv">filename</span><span class="p">.</span><span class="nv">txt</span><span class="p">@</span><span class="nv">R1C1</span><span class="p">:</span><span class="nv">R2C2</span> <span class="nv">TYPE</span><span class="o">=</span><span class="nv">R</span> <span class="nv">SEP</span><span class="o">=</span><span class="c1">','</span>
 </code></pre></div>
+<p>A read can also carry its data instead of naming a file, by giving a base64 <a href="https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/data">data URI</a> as the source.
+Everything else is written as it always is — the range, the type and the separator apply to the carried data the same way:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#read</span><span class="w"> </span><span class="nv">M</span><span class="w"> </span><span class="nv">from</span><span class="w"> </span><span class="nv">data</span><span class="p">:</span><span class="nv">text</span><span class="o">/</span><span class="nv">csv</span><span class="p">;</span><span class="nv">base64,MSwzCjIsNAo</span><span class="o">=</span><span class="w"> </span><span class="nv">TYPE</span><span class="o">=</span><span class="nv">R</span><span class="w"> </span><span class="nv">SEP</span><span class="o">=</span><span class="c1">','</span>
+</code></pre></div>
+<p>The media type must be one of <code>text/csv</code>, <code>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</code> (<strong>*.xlsx</strong>) or <code>application/vnd.ms-excel.sheet.macroEnabled.12</code> (<strong>*.xlsm</strong>).
+This is what <a href="new-exports.html#save-as-compiled-worksheet">saving a compiled worksheet</a> writes, so that it runs with no data files beside it.</p>
 <p>Writes data from matrix/vector <em>M</em> to the specified text/CSV file.
 If the file exists, it is entirely overwritten.
 Otherwise, a new file is created.

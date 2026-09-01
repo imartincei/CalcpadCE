@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="new-exports.html">
+        <link rel="prev" href="new-web-deployment.html">
       
       
-        <link rel="next" href="new-linter.html">
+        <link rel="next" href="quick-reference.html">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Includes and File Reads - CalcpadCE Documentation</title>
+        <title>Migration Guide - CalcpadCE Documentation</title>
       
     
     
@@ -75,7 +75,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#includes-and-file-reads" class="md-skip">
+        <a href="#migration-guide" class="md-skip">
           Skip to content
         </a>
       
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Includes and File Reads
+              Migration Guide
             
           </span>
         </div>
@@ -1323,37 +1323,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Includes and File Reads
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="new-includes.html" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="new-includes.html" class="md-nav__link">
         
   
   
@@ -1369,92 +1342,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#reusing-math-with-include" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reusing math with #include
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#include-vs-read" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        #include vs #read
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#path-root-tokens-project-and-library" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Path root tokens: {project} and {library}
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ui-overrides-and-includes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        #UI overrides and includes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#path-root-token-user" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Path root token: {user}
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1604,10 +1491,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="migration-guide.html" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="migration-guide.html" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1623,6 +1537,121 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#migrate-from-7xx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migrate from 7.x.x
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Migrate from 7.x.x">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-syntax-is-deprecated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ?{} Input syntax is deprecated
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="?{} Input syntax is deprecated">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-breaks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What breaks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to update
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dots-are-no-longer-allowed-as-part-of-a-variable-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dots are no longer allowed as part of a variable name
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dots are no longer allowed as part of a variable name">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-breaks_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What breaks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-update_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to update
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -2959,68 +2988,97 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#reusing-math-with-include" class="md-nav__link">
+  <a href="#migrate-from-7xx" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reusing math with #include
+        Migrate from 7.x.x
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Migrate from 7.x.x">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-syntax-is-deprecated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ?{} Input syntax is deprecated
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="?{} Input syntax is deprecated">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-breaks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What breaks
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#include-vs-read" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-update" class="md-nav__link">
     <span class="md-ellipsis">
       
-        #include vs #read
+        How to update
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#path-root-tokens-project-and-library" class="md-nav__link">
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dots-are-no-longer-allowed-as-part-of-a-variable-name" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Path root tokens: {project} and {library}
+        Dots are no longer allowed as part of a variable name
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dots are no longer allowed as part of a variable name">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-breaks_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What breaks
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#ui-overrides-and-includes" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-update_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        #UI overrides and includes
+        How to update
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#path-root-token-user" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Path root token: {user}
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3041,104 +3099,60 @@
 
 
 
-<h1 id="includes-and-file-reads">Includes and File Reads<a class="headerlink" href="#includes-and-file-reads" title="Permanent link">&para;</a></h1>
-<p><code>#include</code> and <code>#read</code> let you pull in other files, and both can follow chains of files.</p>
-<h2 id="reusing-math-with-include">Reusing math with <code>#include</code><a class="headerlink" href="#reusing-math-with-include" title="Permanent link">&para;</a></h2>
-<p><code>#include</code> inlines the contents of another CalcpadCE file into your document at parse time, so you can keep shared constants, functions, and macros in one place and reuse them everywhere:</p>
-<div class="language-text highlight"><pre><span></span><code>#include shared/constants.cpd
-#include shared/helpers.cpd
+<h1 id="migration-guide">Migration Guide<a class="headerlink" href="#migration-guide" title="Permanent link">&para;</a></h1>
+<p>Most changes to CalcpadCE are additive, and documents written for an earlier version keep calculating unchanged.
+Changes that alter how existing code is interpreted are listed here. 
+These sections also note how to migrate to supported syntax.</p>
+<h2 id="migrate-from-7xx">Migrate from 7.x.x<a class="headerlink" href="#migrate-from-7xx" title="Permanent link">&para;</a></h2>
+<h3 id="input-syntax-is-deprecated"><code>?{}</code> Input syntax is deprecated<a class="headerlink" href="#input-syntax-is-deprecated" title="Permanent link">&para;</a></h3>
+<p><a href="new-ui-mode.html">UI mode</a> replaces the two places a document used to keep its own input values — a <code>?{6}</code> field, and the <code>#{2; 3}</code> list that fed those fields into an <code>#include</code>:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="nv">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="p">{</span><span class="m">6</span><span class="p">}</span><span class="nv">m</span>
+<span class="k">#include</span><span class="w"> </span><span class="nv">beam</span><span class="p">.</span><span class="nv">cpd</span><span class="w"> </span><span class="k">#</span><span class="p">{</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">}</span>
 </code></pre></div>
-<p>An included file can include others in turn, and those can include more — the chain is followed automatically.</p>
-<p>Include chains can go up to 20 levels deep.</p>
-<h2 id="include-vs-read"><code>#include</code> vs <code>#read</code><a class="headerlink" href="#include-vs-read" title="Permanent link">&para;</a></h2>
-<p>Both bring in outside content, but they do different jobs:</p>
+<h4 id="what-breaks">What breaks<a class="headerlink" href="#what-breaks" title="Permanent link">&para;</a></h4>
+<p>Both forms still parse without errors, but the values are ignored and no input fields get created.
+The <a href="new-linter.html">linter</a> flags them as warnings — <code>CPD-3419</code> for a <code>?{}</code> field, <code>CPD-1103</code> for the <code>#include</code> list.
+This syntax will throw an error in a future update instead of being ignored, so it is recommended to migrate to the new #UI syntax.</p>
+<h4 id="how-to-update">How to update<a class="headerlink" href="#how-to-update" title="Permanent link">&para;</a></h4>
+<p>Declare the input with <code>#UI</code> and give it an ordinary value:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#</span><span class="nv">UI</span><span class="w"> </span><span class="nv">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6</span><span class="na">m</span>
+</code></pre></div>
+<p>Entering a value in the input form is stored in a <code>uiOverrides</code> entry on the first line of the CalcpadCE file, so the file keeps its own default values and they stay unchanged when input fields are updated.
+You never have to write that entry yourself, but it is plain text if you ever want to edit it.</p>
+<h3 id="dots-are-no-longer-allowed-as-part-of-a-variable-name">Dots are no longer allowed as part of a variable name<a class="headerlink" href="#dots-are-no-longer-allowed-as-part-of-a-variable-name" title="Permanent link">&para;</a></h3>
+<p>A dot after an identifier is now always element access. Names can no longer contain a dot.</p>
+<p>Previously the meaning of the dot depended on what happened to be in scope. 
+If the name to the left of it already held a vector or a matrix, the dot was element access; in every other case it was absorbed into the name.
+This produced unpredictable behavior in certain cases, which is why this change was made.</p>
+<h4 id="what-breaks_1">What breaks<a class="headerlink" href="#what-breaks_1" title="Permanent link">&para;</a></h4>
+<p>Only documents that used a dot inside a variable name. The errors are reported on the part of the name that follows the dot:</p>
 <table>
 <thead>
 <tr>
-<th></th>
-<th><code>#include</code></th>
-<th><code>#read</code></th>
+<th>Code</th>
+<th>Before</th>
+<th>Now</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>What it brings in</td>
-<td>A CalcpadCE file</td>
-<td>Data (CSV, Excel)</td>
+<td><code>F.max = 10</code></td>
+<td>Defines a variable named <code>F.max</code></td>
+<td><code>Undefined variable or units: "max".</code></td>
 </tr>
 <tr>
-<td>When it happens</td>
-<td>At parse time — the contents are inlined</td>
-<td>At run time — the data is loaded into a variable</td>
-</tr>
-<tr>
-<td>Result</td>
-<td>The included file becomes part of your document</td>
-<td>You get a matrix or vector variable to compute with</td>
+<td><code>a.1</code> where <code>a</code> is a scalar</td>
+<td>Reads a variable named <code>a.1</code></td>
+<td><code>Index target must be vector.</code></td>
 </tr>
 </tbody>
 </table>
-<h2 id="path-root-tokens-project-and-library">Path root tokens: <code>{project}</code> and <code>{library}</code><a class="headerlink" href="#path-root-tokens-project-and-library" title="Permanent link">&para;</a></h2>
-<p><code>{project}</code> and <code>{library}</code> are symbolic roots you can use as a prefix in <code>#include</code>, <code>#read</code>, <code>#write</code>/<code>#append</code>, and <code>&lt;img src="..."&gt;</code>, instead of a path specific to your machine:</p>
-<div class="language-text highlight"><pre><span></span><code>#ProjectPath C:/Jobs/1042
-#LibraryPath %APPDATA%/Calcpad/lib
-#include {library}/steel/aisc.cpd
-#read L from {project}/data/loads.csv
-#write R to {project}/out/results.csv
-'&lt;img src="{library}/logo.png"&gt;
+<p>Function names follow the same rules as variable names, so a definition like <code>f.g(x) = x</code> is no longer valid either.</p>
+<h4 id="how-to-update_1">How to update<a class="headerlink" href="#how-to-update_1" title="Permanent link">&para;</a></h4>
+<p>Rename with an underscore or a comma, both of which are still valid variable name characters:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="nv">F_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span>
+<span class="nv">a,1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">4</span>
 </code></pre></div>
-<ul>
-<li><code>#ProjectPath ...</code> — the job- or document-specific folder, useful for referencing files that may change from project to project.</li>
-<li><code>#LibraryPath ...</code> — a shared folder of reusable <code>.cpd</code>/<code>.txt</code> files, e.g. a firm-wide function or materials library. If you want a project specific library to prevent edits to a central library from breaking older files, this is easy to change in a single place.</li>
-</ul>
-<p>A relative value resolves against the folder of the file that declares it — so a module reached through <code>#include</code> that declares <code>#ProjectPath .</code> means <em>its own</em> folder, not the including document's.</p>
-<p><strong>Environment variables expand in every path, not just these two directives.</strong> <code>%VAR%</code> is expanded — on every platform, including macOS/Linux — in <code>#include</code>, <code>#read</code>/<code>#write</code>/<code>#append</code>, <code>&lt;img src="..."&gt;</code>, and a <code>#ProjectPath</code>/<code>#LibraryPath</code> value itself, whether or not a path-root token is involved:</p>
-<div class="language-text highlight"><pre><span></span><code>#LibraryPath %APPDATA%/Calcpad/lib
-#include %APPDATA%/Calcpad/scratch/notes.cpd
-</code></pre></div>
-<p><strong>Rules:</strong></p>
-<ul>
-<li><strong>One <code>#ProjectPath</code> and one <code>#LibraryPath</code> per document.</strong> A second declaration of the same root is an error. Make sure to define these in a <code>#local</code> scope for .cpd files you intend to <code>#include</code> elsewhere.</li>
-<li><strong>Declare before first use.</strong> An <code>#include</code> whose token is used above its declaration results in an error</li>
-<li><strong>The folder has to actually exist.</strong> A value that doesn't resolve to a real folder on disk is an error at the declaration</li>
-</ul>
-<h2 id="ui-overrides-and-includes"><code>#UI</code> overrides and includes<a class="headerlink" href="#ui-overrides-and-includes" title="Permanent link">&para;</a></h2>
-<p>A saved <code>uiOverrides</code> comment only takes effect on the <strong>first line of the file that carries it</strong> — a second one anywhere in the same file is ignored.</p>
-<ul>
-<li><strong>A <code>uiOverrides</code> comment inside an included file never reaches the document that includes it.</strong> The calculation engine treats any <code>uiOverrides</code> comment in an included file's content as if it sat inside that file's own <code>#local</code> block: it is stripped out.</li>
-<li><strong>Only the includer's own <code>uiOverrides</code> comment can override it instead</strong>, by targeting the rendered element after the preview is generated.</li>
-</ul>
-<p>This is deliberate behavior, as resolving an included module's own saved values automatically would prevent overriding it in the main calculation file.</p>
-<p><strong>To share entered values across several files, write them out as data instead of relying on <code>#include</code>:</strong></p>
-<p><strong>module.cpd:</strong>
-<div class="language-text highlight"><pre><span></span><code>#local
-#ProjectPath C:/path-to-my-project
-#UI sharedData = [1; 2|3; 4]
-#write sharedData to {project}/shared-inputs.csv
-#global
-'To read it automatically from the file calling the module:'
-#read M from {project}/shared-inputs.csv
-</code></pre></div></p>
-<p>As <code>#write</code> sits inside <code>#local</code>, it only runs when <code>shared/inputs.cpd</code> is opened by itself, so including this file elsewhere never re-triggers the write or input form.</p>
-<p><strong>calculation.cpd:</strong></p>
-<div class="language-text highlight"><pre><span></span><code>'This reads shared data that in input from a module without triggering the datagrid UI.
-#ProjectPath C:/path-to-my-project
-#include module.cpd
-</code></pre></div>
-<h2 id="path-root-token-user">Path root token: <code>{user}</code><a class="headerlink" href="#path-root-token-user" title="Permanent link">&para;</a></h2>
-<p><code>{user}</code> is a third root, usable anywhere <code>{project}</code>/<code>{library}</code> are — but unlike them, it needs no <code>#ProjectPath</code>/<code>#LibraryPath</code>-style declaration first. It always expands to the current OS user's home directory: <code>%USERPROFILE%</code> on Windows, <code>$HOME</code> on macOS/Linux.</p>
-<div class="language-text highlight"><pre><span></span><code>#include {user}/calcpad/lib/steel.cpd
-#read L from {user}/data/loads.csv
-'&lt;img src="{user}/logo.png"&gt;
-</code></pre></div>
-<p>It can also appear inside a <code>#ProjectPath</code>/<code>#LibraryPath</code> value itself:</p>
-<div class="language-text highlight"><pre><span></span><code>#LibraryPath {user}/calcpad/lib
-</code></pre></div>
-<h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="new-exports.html#portable-exports">Exports</a> · <a href="working-with-files.html">Working with Files</a> · <a href="programming.html">Programming</a></li>
-<li><a href="new-vscode-extension.html">Using the VS Code Extension</a> — path completion for <code>#include</code> and <code>#read</code></li>
-</ul>
 
 
 

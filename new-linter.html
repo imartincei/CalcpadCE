@@ -12,7 +12,7 @@
         <link rel="prev" href="new-includes.html">
       
       
-        <link rel="next" href="new-table-of-contents.html">
+        <link rel="next" href="new-ui-mode.html">
       
       
         
@@ -231,7 +231,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="new-vscode-extension.html" class="md-tabs__link">
+        <a href="new-selecting-calcpadce-deployment.html" class="md-tabs__link">
           
   
   
@@ -1130,6 +1130,34 @@
   
   
     <li class="md-nav__item">
+      <a href="new-selecting-calcpadce-deployment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Selecting a CalcpadCE Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="new-vscode-extension.html" class="md-nav__link">
         
   
@@ -1166,6 +1194,34 @@
     
   
     Desktop App
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-calcpadce-editor.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CalcpadCE Editor
   
 
     
@@ -1242,14 +1298,14 @@
   
   
     <li class="md-nav__item">
-      <a href="new-pdf-export.html" class="md-nav__link">
+      <a href="new-exports.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    PDF Export
+    Exports
   
 
     
@@ -1463,10 +1519,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#choosing-how-much-to-show-vs-code" class="md-nav__link">
+  <a href="#choosing-how-much-to-show" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Choosing how much to show (VS Code)
+        Choosing how much to show
       
     </span>
   </a>
@@ -1500,14 +1556,70 @@
   
   
     <li class="md-nav__item">
-      <a href="new-table-of-contents.html" class="md-nav__link">
+      <a href="new-ui-mode.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Table of Contents
+    UI Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-visibility-directives.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visibility Directives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="new-metadata-comments.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata Comments
   
 
     
@@ -1556,14 +1668,14 @@
   
   
     <li class="md-nav__item">
-      <a href="new-metadata-comments.html" class="md-nav__link">
+      <a href="migration-guide.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Metadata Comments
+    Migration Guide
   
 
     
@@ -3013,10 +3125,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#choosing-how-much-to-show-vs-code" class="md-nav__link">
+  <a href="#choosing-how-much-to-show" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Choosing how much to show (VS Code)
+        Choosing how much to show
       
     </span>
   </a>
@@ -3052,16 +3164,9 @@
 
 
 <h1 id="linter-and-diagnostics">Linter and Diagnostics<a class="headerlink" href="#linter-and-diagnostics" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p>Calcpad.Web only (web editor, desktop app, and VS Code extension). Not available in the standalone WPF desktop application for Windows.</p>
-</blockquote>
-<p>Calcpad.Web checks your document as you write and flags problems before you ever run it.
+<p>CalcpadCE checks your document as you write and flags problems before you ever run it.
 Each diagnostic has a short, stable code (like <code>CPD-3301</code>) so you can look up exactly what it means.</p>
-<p>Diagnostics appear:</p>
-<ul>
-<li>In <strong>VS Code</strong> — as squiggles in the editor and entries in the Problems panel.</li>
-<li>In the <strong>desktop and web editors</strong> — as colored marks (red for errors, yellow for warnings, blue for information) at the spot with the problem, and in the <strong>Problems</strong> panel.</li>
-</ul>
+<p>Diagnostics appear as squiggles in the editor and entries in the Problems panel.</p>
 <h2 id="diagnostic-codes">Diagnostic codes<a class="headerlink" href="#diagnostic-codes" title="Permanent link">&para;</a></h2>
 <p>Every diagnostic has a <code>CPD-</code> code.
 The tables below group them by the kind of problem.</p>
@@ -3084,6 +3189,11 @@ The tables below group them by the kind of problem.</p>
 <td>CPD-1102</td>
 <td>Error</td>
 <td>Missing <code>#include</code> filename</td>
+</tr>
+<tr>
+<td>CPD-1103</td>
+<td>Warning</td>
+<td>Deprecated <code>#include</code> input values</td>
 </tr>
 </tbody>
 </table>
@@ -3387,8 +3497,38 @@ The tables below group them by the kind of problem.</p>
 </tr>
 <tr>
 <td>CPD-3413</td>
-<td>Error</td>
+<td>Warning</td>
 <td>Invalid #settings JSON</td>
+</tr>
+<tr>
+<td>CPD-3414</td>
+<td>Warning</td>
+<td>Invalid PDF settings in a metadata comment</td>
+</tr>
+<tr>
+<td>CPD-3415</td>
+<td>Warning</td>
+<td>Invalid <code>#UI</code> format</td>
+</tr>
+<tr>
+<td>CPD-3416</td>
+<td>Warning</td>
+<td><code>uiOverrides</code> metadata comment not on the first line</td>
+</tr>
+<tr>
+<td>CPD-3417</td>
+<td>Warning</td>
+<td>Duplicate <code>uiOverrides</code> metadata comment</td>
+</tr>
+<tr>
+<td>CPD-3418</td>
+<td>Warning</td>
+<td><code>uiOverrides</code> sharing a comment with another key</td>
+</tr>
+<tr>
+<td>CPD-3419</td>
+<td>Warning</td>
+<td>Deprecated stored input value</td>
 </tr>
 </tbody>
 </table>
@@ -3410,15 +3550,16 @@ The tables below group them by the kind of problem.</p>
 </tbody>
 </table>
 <h2 id="suppressing-diagnostics-lint-ignore">Suppressing diagnostics (lint-ignore)<a class="headerlink" href="#suppressing-diagnostics-lint-ignore" title="Permanent link">&para;</a></h2>
-<p>To silence specific diagnostics in a section — for example, a prototype variable you haven't wired up yet — wrap it in <code>LintIgnore</code> / <code>EndLintIgnore</code> markers and list the codes to ignore:</p>
+<p>To silence specific diagnostics in a section, wrap it in <code>LintIgnore</code> / <code>EndLintIgnore</code> markers and list the codes to ignore:</p>
 <div class="language-text highlight"><pre><span></span><code>'&lt;!--{"LintIgnore": ["CPD-3301"]}--&gt;
 prototype_var = 5
 '&lt;!--{"EndLintIgnore": []}--&gt;
 </code></pre></div>
 <p>Leave the list empty (<code>"LintIgnore": []</code>) to suppress <em>all</em> diagnostics inside the region.</p>
 <p>These markers are one kind of <a href="new-metadata-comments.html">metadata comment</a>; the <strong>Properties</strong> panel tab can write them for you with a code picker.</p>
-<h2 id="choosing-how-much-to-show-vs-code">Choosing how much to show (VS Code)<a class="headerlink" href="#choosing-how-much-to-show-vs-code" title="Permanent link">&para;</a></h2>
-<p>The <code>calcpad.linter.minimumSeverity</code> setting (<code>error</code> | <code>warning</code> | <code>information</code>, default <code>information</code>) hides diagnostics below the level you choose — set it to <code>warning</code> to see only warnings and errors, or <code>error</code> for errors alone.</p>
+<h2 id="choosing-how-much-to-show">Choosing how much to show<a class="headerlink" href="#choosing-how-much-to-show" title="Permanent link">&para;</a></h2>
+<p>The <a href="new-settings.html#linter"><strong>Minimum Severity</strong></a> setting hides diagnostics below the level you choose.
+Set it to <code>warning</code> to see only warnings and errors, or <code>error</code> for errors alone.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="new-vscode-extension.html">Using the VS Code Extension</a> · <a href="new-desktop-app.html">Using the Desktop App</a></li>
