@@ -1,12 +1,12 @@
-# Backwards Compatibility
+# Migration Guide
 
 Most changes to CalcpadCE are additive, and documents written for an earlier version keep calculating unchanged.
 Changes that alter how existing code is interpreted are listed here. 
 These sections also note how to migrate to supported syntax.
 
-## 8.0.0
+## Migrate from 7.x.x
 
-### ? {} Input syntax is deprecated
+### `?{}` Input syntax is deprecated
 
 [UI mode](new-ui-mode.md) replaces the two places a document used to keep its own input values — a `?{6}` field, and the `#{2; 3}` list that fed those fields into an `#include`:
 
@@ -29,14 +29,16 @@ Declare the input with `#UI` and give it an ordinary value:
 #UI L = 6m
 ```
 
-Entering a value in the input form gets stored in a UIOverrides object at the top of the file, so the source code is now able to store default values that don't get changed when input fields are updated.
+Entering a value in the input form is stored in a `uiOverrides` entry on the first line of the CalcpadCE file, so the file keeps its own default values and they stay unchanged when input fields are updated.
+You never have to write that entry yourself, but it is plain text if you ever want to edit it.
 
 ### Dots are no longer allowed as part of a variable name
 
 A dot after an identifier is now always element access. Names can no longer contain a dot.
 
 Previously the meaning of the dot depended on what happened to be in scope. 
-If the name to the left of it already held a vector or a matrix, the dot was element access; in every other case it was absorbed into the name. This produced unpredictable behavior in certain cases, which is why this change was made.
+If the name to the left of it already held a vector or a matrix, the dot was element access; in every other case it was absorbed into the name.
+This produced unpredictable behavior in certain cases, which is why this change was made.
 
 #### What breaks
 

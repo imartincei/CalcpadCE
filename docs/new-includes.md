@@ -2,9 +2,9 @@
 
 `#include` and `#read` let you pull in other files, and both can follow chains of files.
 
-## Reusing code with `#include`
+## Reusing math with `#include`
 
-`#include` inlines another CalcpadCE file's source into your document at parse time, so you can keep shared constants, functions, and macros in one place and reuse them everywhere:
+`#include` inlines the contents of another CalcpadCE file into your document at parse time, so you can keep shared constants, functions, and macros in one place and reuse them everywhere:
 
 ```text
 #include shared/constants.cpd
@@ -21,9 +21,9 @@ Both bring in outside content, but they do different jobs:
 
 | | `#include` | `#read` |
 |--------|-----------|---------|
-| What it brings in | CalcpadCE source code | Data (CSV, Excel) |
-| When it happens | At parse time — the source is inlined | At run time — the data is loaded into a variable |
-| Result | The included code becomes part of your document | You get a matrix or vector variable to compute with |
+| What it brings in | A CalcpadCE file | Data (CSV, Excel) |
+| When it happens | At parse time — the contents are inlined | At run time — the data is loaded into a variable |
+| Result | The included file becomes part of your document | You get a matrix or vector variable to compute with |
 
 ## Path root tokens: `{project}` and `{library}`
 

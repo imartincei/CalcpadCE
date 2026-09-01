@@ -40,7 +40,7 @@ I(b; h) = b*h^3/12
 ```
 
 Filling in parameter and return types helps the [linter](new-linter.md) catch places where the function is called with the wrong kind of value.
-It also populates text when hovering over the name of the variable, function, macro, or custom unit in the code editor.
+It also populates text when hovering over the name of the variable, function, macro, or custom unit in the CalcpadCE editor.
 
 ## PDF export settings
 

@@ -27,7 +27,7 @@ The input form and the report each open as their own panel — see [Live preview
 
 Closing the form asks whether to save first; declining discards them.
 The report preview is not tied to the form: open it on its own to read the print layout beside the editor, and it stays open when the form closes.
-However, it is recommended to save and close the input form before making changes to the code.
+However, it is recommended to save and close the input form before making changes to the CalcpadCE file.
 
 ### Desktop App
 
@@ -56,7 +56,7 @@ The two directives split a document into the part that is filled in and the part
 #end post
 ```
 
-**Preview** is the suggested mode to write CalcpadCE code in: it shows everything at once, and it ignores input values so you see the default values of the document.
+**Preview** is the suggested mode to write your CalcpadCE file in: it shows everything at once, and it ignores input values so you see the default values of the document.
 
 Turning on the **Apply #UI Values in Preview** setting will render the preview with the input values applied.
 This can make debugging issues from values input into the form easier.
@@ -256,7 +256,7 @@ Saving input values writes them into a metadata comment at the top of the docume
 The keys are control identities: the variable name, a number indicating the order that variable appears in when it is re-defined (`L:1` is the first `L`), then a number representing the order it was re-defined inside a loop (`y:1:2`).
 A saved value replaces the right-hand side of its assignment in the form and in the report, so the report shows the numbers that were entered.
 Hand-writing an entry in the uiOverrides data works too, and the Properties tab can help make editing easier.
-This is useful if you changed the source code after applying inputs and need to re-map renamed variables or want to remove deleted entries.
+This is useful if you changed the CalcpadCE file after applying inputs and need to re-map renamed variables or want to remove deleted entries.
 
 See [Metadata Comments](new-metadata-comments.md) for the comment format itself.
 The comment has to be the **first line of the file** to take effect.
@@ -267,7 +267,7 @@ Saving is what makes them survive closing the document.
 
 ### Editing a document that has saved values
 
-Because a saved value is tied to a variable name and to which declaration of that name it is, **editing the source of a document can move or orphan the values already saved in it**.
+Because a saved value is tied to a variable name and to which declaration of that name it is, **editing a document can move or orphan the values already saved in it**.
 The document still calculates correctly — the risk is that a filled-in form comes back with a value on the wrong control, or with a control reset to the default value.
 
 The ordinal counts the `#UI` declarations of that name in the order the document runs them, so what matters is not where a line sits in the file but how many declarations of the same name come before it:
@@ -283,7 +283,7 @@ The ordinal counts the `#UI` declarations of that name in the order the document
 - **Moving, editing or deleting lines that declare *other* names** is safe. So is reordering, as
   long as the declarations that use the same name keep their relative order.
 
-If you plan to use #UI elements on a document where the source code can changge, the most stable arrangement is **one `#UI` declaration per variable name**.
+If you plan to use #UI elements on a document where the CalcpadCE file can change, the most stable arrangement is **one `#UI` declaration per variable name**.
 Give each input its own name instead of re-assigning one, and every key is `name:1`: it cannot be renumbered by anything you do elsewhere in the document, and only renaming or removing that input affects it.
 
 If a document's values do end up scrambled, the metadata comment is plain text: fix the keys by hand, or clear the `uiOverrides` entry to start the form from the document's own values again.

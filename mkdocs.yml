@@ -70,7 +70,7 @@ nav:
     - Visibility Directives: new-visibility-directives.md
     - Metadata Comments: new-metadata-comments.md
     - Running the Server: new-web-deployment.md
-    - Backwards Compatibility: backwards-compatibility.md
+    - Migration Guide: migration-guide.md
   - Quick Reference:
     - quick-reference.md
 

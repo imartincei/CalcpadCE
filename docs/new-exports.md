@@ -15,7 +15,7 @@ A plain "export to PDF" gives you the report.
 | **Report** *(default)* | `#pre` hidden, `#post` shown, entered `#UI` values applied | PDF, HTML, Word |
 | **Preview** | `#pre` and `#post` both shown, using the document's default `#UI` values. Gives the values entered into the input form when **Apply `#UI` Values in Preview** is on | PDF, HTML, Word |
 | **Input form** | Form view for inserting `#UI` input values, `#post` hidden, UI overrides applied instead of the document's defaults | PDF, HTML |
-| **Unwrapped** | The source with macros and `#include`s expanded | PDF, HTML |
+| **Unwrapped** | The CalcpadCE file with macros and `#include`s expanded | PDF, HTML |
 
 See [UI Mode](new-ui-mode.md) for `#pre`/`#post` and the input form, and [Settings](new-settings.md) for **Apply `#UI` Values in Preview**.
 
@@ -118,7 +118,7 @@ If a referenced file cannot be read, i.e. from a missing `.csv` or `#include`, t
 `#write` and `#append` will write next to the compiled file when it runs instead of the original write path. 
 Duplicate filenames get -1, -2 appended to the filename to keep them separate.
 
-Opening a compiled worksheet gives you the input form with the source locked.
+Opening a compiled worksheet gives you the input form with the CalcpadCE file locked.
 Values you enter can still be saved back into it: in the desktop app it saves like any other file, and in VS Code a compiled worksheet opens in its own editor where **Save** writes the entered values back.
 
 If the recipient has to read or edit the calculation rather than just fill it in, export a portable package instead.
