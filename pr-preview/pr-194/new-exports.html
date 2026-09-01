@@ -1652,14 +1652,14 @@
   
   
     <li class="md-nav__item">
-      <a href="backwards-compatibility.html" class="md-nav__link">
+      <a href="migration-guide.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Backwards Compatibility
+    Migration Guide
   
 
     
@@ -3164,7 +3164,7 @@ A plain "export to PDF" gives you the report.</p>
 </tr>
 <tr>
 <td><strong>Unwrapped</strong></td>
-<td>The source with macros and <code>#include</code>s expanded</td>
+<td>The CalcpadCE file with macros and <code>#include</code>s expanded</td>
 <td>PDF, HTML</td>
 </tr>
 </tbody>
@@ -3299,7 +3299,7 @@ It is a separate output rather than a rename: the file you have open keeps its o
 <p>If a referenced file cannot be read, i.e. from a missing <code>.csv</code> or <code>#include</code>, the export is stopped and an error is given.</p>
 <p><code>#write</code> and <code>#append</code> will write next to the compiled file when it runs instead of the original write path. 
 Duplicate filenames get -1, -2 appended to the filename to keep them separate.</p>
-<p>Opening a compiled worksheet gives you the input form with the source locked.
+<p>Opening a compiled worksheet gives you the input form with the CalcpadCE file locked.
 Values you enter can still be saved back into it: in the desktop app it saves like any other file, and in VS Code a compiled worksheet opens in its own editor where <strong>Save</strong> writes the entered values back.</p>
 <p>If the recipient has to read or edit the calculation rather than just fill it in, export a portable package instead.</p>
 <h3 id="export-portable-package">Export Portable Package<a class="headerlink" href="#export-portable-package" title="Permanent link">&para;</a></h3>

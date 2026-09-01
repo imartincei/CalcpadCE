@@ -1386,10 +1386,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#reusing-code-with-include" class="md-nav__link">
+  <a href="#reusing-math-with-include" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reusing code with #include
+        Reusing math with #include
       
     </span>
   </a>
@@ -1607,14 +1607,14 @@
   
   
     <li class="md-nav__item">
-      <a href="backwards-compatibility.html" class="md-nav__link">
+      <a href="migration-guide.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Backwards Compatibility
+    Migration Guide
   
 
     
@@ -2959,10 +2959,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#reusing-code-with-include" class="md-nav__link">
+  <a href="#reusing-math-with-include" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reusing code with #include
+        Reusing math with #include
       
     </span>
   </a>
@@ -3043,8 +3043,8 @@
 
 <h1 id="includes-and-file-reads">Includes and File Reads<a class="headerlink" href="#includes-and-file-reads" title="Permanent link">&para;</a></h1>
 <p><code>#include</code> and <code>#read</code> let you pull in other files, and both can follow chains of files.</p>
-<h2 id="reusing-code-with-include">Reusing code with <code>#include</code><a class="headerlink" href="#reusing-code-with-include" title="Permanent link">&para;</a></h2>
-<p><code>#include</code> inlines another CalcpadCE file's source into your document at parse time, so you can keep shared constants, functions, and macros in one place and reuse them everywhere:</p>
+<h2 id="reusing-math-with-include">Reusing math with <code>#include</code><a class="headerlink" href="#reusing-math-with-include" title="Permanent link">&para;</a></h2>
+<p><code>#include</code> inlines the contents of another CalcpadCE file into your document at parse time, so you can keep shared constants, functions, and macros in one place and reuse them everywhere:</p>
 <div class="language-text highlight"><pre><span></span><code>#include shared/constants.cpd
 #include shared/helpers.cpd
 </code></pre></div>
@@ -3063,17 +3063,17 @@
 <tbody>
 <tr>
 <td>What it brings in</td>
-<td>CalcpadCE source code</td>
+<td>A CalcpadCE file</td>
 <td>Data (CSV, Excel)</td>
 </tr>
 <tr>
 <td>When it happens</td>
-<td>At parse time — the source is inlined</td>
+<td>At parse time — the contents are inlined</td>
 <td>At run time — the data is loaded into a variable</td>
 </tr>
 <tr>
 <td>Result</td>
-<td>The included code becomes part of your document</td>
+<td>The included file becomes part of your document</td>
 <td>You get a matrix or vector variable to compute with</td>
 </tr>
 </tbody>

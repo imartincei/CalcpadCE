@@ -23,7 +23,7 @@
     
     
       
-        <title>Backwards Compatibility - CalcpadCE Documentation</title>
+        <title>Migration Guide - CalcpadCE Documentation</title>
       
     
     
@@ -75,7 +75,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#backwards-compatibility" class="md-skip">
+        <a href="#migration-guide" class="md-skip">
           Skip to content
         </a>
       
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Backwards Compatibility
+              Migration Guide
             
           </span>
         </div>
@@ -1510,7 +1510,7 @@
   <span class="md-ellipsis">
     
   
-    Backwards Compatibility
+    Migration Guide
   
 
     
@@ -1521,14 +1521,14 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="backwards-compatibility.html" class="md-nav__link md-nav__link--active">
+      <a href="migration-guide.html" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
     
   
-    Backwards Compatibility
+    Migration Guide
   
 
     
@@ -1554,27 +1554,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#800" class="md-nav__link">
+  <a href="#migrate-from-7xx" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8.0.0
+        Migrate from 7.x.x
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="8.0.0">
+    <nav class="md-nav" aria-label="Migrate from 7.x.x">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#input-syntax-is-deprecated" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ? {} Input syntax is deprecated
+        ?{} Input syntax is deprecated
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="? {} Input syntax is deprecated">
+    <nav class="md-nav" aria-label="?{} Input syntax is deprecated">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2988,27 +2988,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#800" class="md-nav__link">
+  <a href="#migrate-from-7xx" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8.0.0
+        Migrate from 7.x.x
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="8.0.0">
+    <nav class="md-nav" aria-label="Migrate from 7.x.x">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#input-syntax-is-deprecated" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ? {} Input syntax is deprecated
+        ?{} Input syntax is deprecated
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="? {} Input syntax is deprecated">
+    <nav class="md-nav" aria-label="?{} Input syntax is deprecated">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3099,12 +3099,12 @@
 
 
 
-<h1 id="backwards-compatibility">Backwards Compatibility<a class="headerlink" href="#backwards-compatibility" title="Permanent link">&para;</a></h1>
+<h1 id="migration-guide">Migration Guide<a class="headerlink" href="#migration-guide" title="Permanent link">&para;</a></h1>
 <p>Most changes to CalcpadCE are additive, and documents written for an earlier version keep calculating unchanged.
 Changes that alter how existing code is interpreted are listed here. 
 These sections also note how to migrate to supported syntax.</p>
-<h2 id="800">8.0.0<a class="headerlink" href="#800" title="Permanent link">&para;</a></h2>
-<h3 id="input-syntax-is-deprecated">? {} Input syntax is deprecated<a class="headerlink" href="#input-syntax-is-deprecated" title="Permanent link">&para;</a></h3>
+<h2 id="migrate-from-7xx">Migrate from 7.x.x<a class="headerlink" href="#migrate-from-7xx" title="Permanent link">&para;</a></h2>
+<h3 id="input-syntax-is-deprecated"><code>?{}</code> Input syntax is deprecated<a class="headerlink" href="#input-syntax-is-deprecated" title="Permanent link">&para;</a></h3>
 <p><a href="new-ui-mode.html">UI mode</a> replaces the two places a document used to keep its own input values — a <code>?{6}</code> field, and the <code>#{2; 3}</code> list that fed those fields into an <code>#include</code>:</p>
 <div class="language-calcpad highlight"><pre><span></span><code><span class="nv">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">?</span><span class="p">{</span><span class="m">6</span><span class="p">}</span><span class="nv">m</span>
 <span class="k">#include</span><span class="w"> </span><span class="nv">beam</span><span class="p">.</span><span class="nv">cpd</span><span class="w"> </span><span class="k">#</span><span class="p">{</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">}</span>
@@ -3117,11 +3117,13 @@ This syntax will throw an error in a future update instead of being ignored, so 
 <p>Declare the input with <code>#UI</code> and give it an ordinary value:</p>
 <div class="language-calcpad highlight"><pre><span></span><code><span class="k">#</span><span class="nv">UI</span><span class="w"> </span><span class="nv">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6</span><span class="na">m</span>
 </code></pre></div>
-<p>Entering a value in the input form gets stored in a UIOverrides object at the top of the file, so the source code is now able to store default values that don't get changed when input fields are updated.</p>
+<p>Entering a value in the input form is stored in a <code>uiOverrides</code> entry on the first line of the CalcpadCE file, so the file keeps its own default values and they stay unchanged when input fields are updated.
+You never have to write that entry yourself, but it is plain text if you ever want to edit it.</p>
 <h3 id="dots-are-no-longer-allowed-as-part-of-a-variable-name">Dots are no longer allowed as part of a variable name<a class="headerlink" href="#dots-are-no-longer-allowed-as-part-of-a-variable-name" title="Permanent link">&para;</a></h3>
 <p>A dot after an identifier is now always element access. Names can no longer contain a dot.</p>
 <p>Previously the meaning of the dot depended on what happened to be in scope. 
-If the name to the left of it already held a vector or a matrix, the dot was element access; in every other case it was absorbed into the name. This produced unpredictable behavior in certain cases, which is why this change was made.</p>
+If the name to the left of it already held a vector or a matrix, the dot was element access; in every other case it was absorbed into the name.
+This produced unpredictable behavior in certain cases, which is why this change was made.</p>
 <h4 id="what-breaks_1">What breaks<a class="headerlink" href="#what-breaks_1" title="Permanent link">&para;</a></h4>
 <p>Only documents that used a dot inside a variable name. The errors are reported on the part of the name that follows the dot:</p>
 <table>

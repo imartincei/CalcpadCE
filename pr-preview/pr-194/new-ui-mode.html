@@ -1835,14 +1835,14 @@
   
   
     <li class="md-nav__item">
-      <a href="backwards-compatibility.html" class="md-nav__link">
+      <a href="migration-guide.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Backwards Compatibility
+    Migration Guide
   
 
     
@@ -3516,7 +3516,7 @@ You can turn this behavior off with <strong>Open <code>#UI</code> Documents in I
 <p>The input form and the report each open as their own panel — see <a href="new-vscode-extension.html#live-preview">Live preview</a> for the buttons and commands that open them, and <a href="new-exports.html">Exports</a> for <strong>Print Report to PDF</strong>.</p>
 <p>Closing the form asks whether to save first; declining discards them.
 The report preview is not tied to the form: open it on its own to read the print layout beside the editor, and it stays open when the form closes.
-However, it is recommended to save and close the input form before making changes to the code.</p>
+However, it is recommended to save and close the input form before making changes to the CalcpadCE file.</p>
 <h3 id="desktop-app">Desktop App<a class="headerlink" href="#desktop-app" title="Permanent link">&para;</a></h3>
 <p><strong>Input</strong> takes over the window and hides the editor.
 Its toolbar also offers <strong>Report</strong> (the report beside the form), <strong>Save values</strong> (once you have changed something) and <strong>Exit input mode</strong>, which leaves you in <strong>Report</strong>.
@@ -3562,7 +3562,7 @@ In <strong>Input</strong> and <strong>Report</strong>, a <strong>Print PDF</stro
 '&lt;p&gt;Span used: 'L'&lt;/p&gt;
 #end post
 </code></pre></div>
-<p><strong>Preview</strong> is the suggested mode to write CalcpadCE code in: it shows everything at once, and it ignores input values so you see the default values of the document.</p>
+<p><strong>Preview</strong> is the suggested mode to write your CalcpadCE file in: it shows everything at once, and it ignores input values so you see the default values of the document.</p>
 <p>Turning on the <strong>Apply #UI Values in Preview</strong> setting will render the preview with the input values applied.
 This can make debugging issues from values input into the form easier.</p>
 <h2 id="writing-a-ui-line">Writing a <code>#UI</code> line<a class="headerlink" href="#writing-a-ui-line" title="Permanent link">&para;</a></h2>
@@ -3814,14 +3814,14 @@ Column widths and the grid's overall size are set by the preview script and are 
 <p>The keys are control identities: the variable name, a number indicating the order that variable appears in when it is re-defined (<code>L:1</code> is the first <code>L</code>), then a number representing the order it was re-defined inside a loop (<code>y:1:2</code>).
 A saved value replaces the right-hand side of its assignment in the form and in the report, so the report shows the numbers that were entered.
 Hand-writing an entry in the uiOverrides data works too, and the Properties tab can help make editing easier.
-This is useful if you changed the source code after applying inputs and need to re-map renamed variables or want to remove deleted entries.</p>
+This is useful if you changed the CalcpadCE file after applying inputs and need to re-map renamed variables or want to remove deleted entries.</p>
 <p>See <a href="new-metadata-comments.html">Metadata Comments</a> for the comment format itself.
 The comment has to be the <strong>first line of the file</strong> to take effect.
 See <a href="new-includes.html#ui-overrides-and-includes"><code>#UI</code> overrides and includes</a> for more information.</p>
 <p>Values do not have to be saved to be exported: an export made while the form is filled in uses what is currently entered.
 Saving is what makes them survive closing the document.</p>
 <h3 id="editing-a-document-that-has-saved-values">Editing a document that has saved values<a class="headerlink" href="#editing-a-document-that-has-saved-values" title="Permanent link">&para;</a></h3>
-<p>Because a saved value is tied to a variable name and to which declaration of that name it is, <strong>editing the source of a document can move or orphan the values already saved in it</strong>.
+<p>Because a saved value is tied to a variable name and to which declaration of that name it is, <strong>editing a document can move or orphan the values already saved in it</strong>.
 The document still calculates correctly — the risk is that a filled-in form comes back with a value on the wrong control, or with a control reset to the default value.</p>
 <p>The ordinal counts the <code>#UI</code> declarations of that name in the order the document runs them, so what matters is not where a line sits in the file but how many declarations of the same name come before it:</p>
 <ul>
@@ -3836,7 +3836,7 @@ The document still calculates correctly — the risk is that a filled-in form co
 <li><strong>Moving, editing or deleting lines that declare <em>other</em> names</strong> is safe. So is reordering, as
   long as the declarations that use the same name keep their relative order.</li>
 </ul>
-<p>If you plan to use #UI elements on a document where the source code can changge, the most stable arrangement is <strong>one <code>#UI</code> declaration per variable name</strong>.
+<p>If you plan to use #UI elements on a document where the CalcpadCE file can change, the most stable arrangement is <strong>one <code>#UI</code> declaration per variable name</strong>.
 Give each input its own name instead of re-assigning one, and every key is <code>name:1</code>: it cannot be renumbered by anything you do elsewhere in the document, and only renaming or removing that input affects it.</p>
 <p>If a document's values do end up scrambled, the metadata comment is plain text: fix the keys by hand, or clear the <code>uiOverrides</code> entry to start the form from the document's own values again.
 Editing the comment takes effect on the next render, and what it says replaces what is currently entered — including values typed into the form but not yet saved.</p>
