@@ -3,10 +3,14 @@ using Calcpad.Server.Services;
 using System.Net;
 using System.Runtime.InteropServices;
 
-// Auto-flush stdout so the parent process (VS Code extension) sees logs in real time
-// when stdio is piped (non-TTY), instead of waiting for buffer flush on exit.
-Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
-Console.SetError(new StreamWriter(Console.OpenStandardError()) { AutoFlush = true });
+// Non-blocking stdout/stderr: a host that stops draining our pipe must not be able to park the
+// threads writing to it. See ConsoleRelay for why an auto-flushing writer wedges the process.
+FileLogger.InstallConsoleRelay();
+
+// The hot endpoints are synchronous and do blocking I/O, so a burst consumes pool threads faster
+// than the default injection rate (~1-2/sec) replaces them.
+ThreadPool.GetMinThreads(out _, out var minIoThreads);
+ThreadPool.SetMinThreads(Math.Max(Environment.ProcessorCount * 4, 32), minIoThreads);
 
 // Set up global exception handling
 AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
@@ -85,7 +89,8 @@ try
             {
                 try
                 {
-                    _ = System.Diagnostics.Process.GetProcessById(watchedPid);
+                    // Disposed: undisposed, this leaks a native handle every 2s to the finalizer.
+                    using var parent = System.Diagnostics.Process.GetProcessById(watchedPid);
                 }
                 catch (ArgumentException)
                 {

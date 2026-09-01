@@ -1,13 +1,36 @@
+using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
 namespace Calcpad.Server
 {
+    /// <summary>
+    /// Process-wide log sink. Every request logs before doing any work, so a stall here wedges
+    /// every endpoint at once. Both outputs are therefore decoupled from the caller and from each
+    /// other — stdout via <see cref="ConsoleRelay"/>, the file via a bounded queue and its own
+    /// drain thread — so neither a stalled pipe nor a stalled disk can park a request thread, and
+    /// a stalled pipe still leaves us the log file. <see cref="LogCrash"/> is the exception: it
+    /// writes synchronously and fsyncs, to survive a kill the drain thread would not.
+    /// </summary>
     public static class FileLogger
     {
-        private static readonly object _lock = new object();
+        private const int FileQueueCapacity = 4096;
+        private const int FlushIntervalMs = 1000;
+
+        private static readonly BlockingCollection<string> _fileQueue = new(FileQueueCapacity);
+        private static readonly object _fileLock = new();
+        private static readonly ConsoleRelay _stdoutRelay = new(Console.OpenStandardOutput());
+        private static readonly ConsoleRelay _stderrRelay = new(Console.OpenStandardError());
+
         private static string? _logFilePath;
-        
+        private static FileStream? _stream;
+        private static bool _dirty;
+        private static int _fileDropped;
+        private static int _reportedConsoleDrops;
+        private static long _lastConsoleDropReportTicks;
+        private const int ConsoleDropReportIntervalMs = 5000;
+
         static FileLogger()
         {
             try
@@ -35,45 +58,59 @@ namespace Calcpad.Server
                 Directory.CreateDirectory(logsDir);
                 var timestamp = DateTime.Now.ToString("yyyyMMdd");
                 _logFilePath = Path.Combine(logsDir, $"CalcpadServer-{timestamp}.log");
-                
-                // Write initial log entry
-                WriteLog("INFO", "Logger initialized", $"Log file: {_logFilePath}");
             }
             catch (Exception ex)
             {
-                // If we can't initialize logging, try a fallback location
                 try
                 {
-                    _logFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), 
+                    _logFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                         $"CalcpadServer-{DateTime.Now:yyyyMMdd}.log");
-                    WriteLog("WARN", "Logger fallback location", $"Using desktop: {_logFilePath}, Error: {ex.Message}");
+                    QueueForFile(Format("WARN", "Logger fallback location", $"Error: {ex.Message}"));
                 }
                 catch
                 {
-                    // If all else fails, we'll just skip logging
                     _logFilePath = null;
                 }
             }
+
+            var drain = new Thread(FileDrainLoop)
+            {
+                IsBackground = true,
+                Name = "calcpad-log-writer",
+            };
+            drain.Start();
+
+            WriteLog("INFO", "Logger initialized", $"Log file: {_logFilePath}");
         }
-        
+
+        /// <summary>
+        /// Routes <see cref="Console"/> through the non-blocking relays. Call once at startup,
+        /// before anything else writes to the console.
+        /// </summary>
+        public static void InstallConsoleRelay()
+        {
+            Console.SetOut(new ConsoleRelayWriter(_stdoutRelay));
+            Console.SetError(new ConsoleRelayWriter(_stderrRelay));
+        }
+
         public static void LogInfo(string message, string? details = null)
         {
             WriteLog("INFO", message, details);
         }
-        
+
         public static void LogWarning(string message, string? details = null)
         {
             WriteLog("WARN", message, details);
         }
-        
+
         public static void LogError(string message, Exception? exception = null)
         {
-            var details = exception != null ? 
-                $"Exception: {exception.GetType().Name}\nMessage: {exception.Message}\nStackTrace: {exception.StackTrace}" : 
+            var details = exception != null ?
+                $"Exception: {exception.GetType().Name}\nMessage: {exception.Message}\nStackTrace: {exception.StackTrace}" :
                 null;
             WriteLog("ERROR", message, details);
         }
-        
+
         public static void LogCrash(Exception exception, string context = "Application")
         {
             var sb = new StringBuilder();
@@ -83,8 +120,7 @@ namespace Calcpad.Server
             sb.AppendLine($"Message: {exception.Message}");
             sb.AppendLine($"Stack Trace:");
             sb.AppendLine(exception.StackTrace);
-            
-            // Include inner exceptions
+
             var innerEx = exception.InnerException;
             var level = 1;
             while (innerEx != null)
@@ -97,72 +133,175 @@ namespace Calcpad.Server
                 innerEx = innerEx.InnerException;
                 level++;
             }
-            
-            sb.AppendLine($"=== END CRASH REPORT ===");
-            
-            WriteLog("CRASH", "Application crashed", sb.ToString());
 
-            // Console line is captured by the VS Code extension's stdout pipe
-            // and surfaced in the server debug channel. The full report is
-            // already in the file via WriteLog above.
+            sb.AppendLine($"=== END CRASH REPORT ===");
+
+            WriteDirect(Format("CRASH", "Application crashed", sb.ToString()));
+
             try { Console.WriteLine($"CRASH: {exception.Message} (details: {_logFilePath})"); }
             catch { /* Ignore console errors */ }
         }
 
+        /// <summary>
+        /// Writes <paramref name="body"/> straight to the log file, bypassing the queue, and
+        /// fsyncs. For diagnostics that must survive a hard kill or a wedged drain thread.
+        /// </summary>
+        public static void WriteDirect(string body)
+        {
+            if (string.IsNullOrEmpty(_logFilePath)) return;
+            try
+            {
+                lock (_fileLock)
+                {
+                    var stream = EnsureStream();
+                    if (stream == null) return;
+                    var bytes = Encoding.UTF8.GetBytes(body);
+                    stream.Write(bytes, 0, bytes.Length);
+                    stream.Flush(flushToDisk: true);
+                    _dirty = false;
+                }
+            }
+            catch { /* never throw from the logger */ }
+        }
+
         private static void WriteLog(string level, string message, string? details = null)
+        {
+            var entry = Format(level, message, details);
+            _stdoutRelay.Enqueue(entry);
+            QueueForFile(entry);
+        }
+
+        private static string Format(string level, string message, string? details)
         {
             var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
             var header = $"[{timestamp}] [{level}] {message}";
-            var logEntry = string.IsNullOrEmpty(details)
+            return string.IsNullOrEmpty(details)
                 ? header + Environment.NewLine
                 : header + Environment.NewLine + details + Environment.NewLine;
+        }
 
-            // Echo to stdout so the VS Code extension's stdout pipe surfaces every log entry in
-            // the server debug channel; the console is auto-flushed (see Program.cs), so entries
-            // appear in real time. Errors here are ignored — the file write below is the source
-            // of truth.
-            try { Console.Write(logEntry); } catch { /* console may be closed */ }
+        private static void QueueForFile(string entry)
+        {
+            if (string.IsNullOrEmpty(_logFilePath)) return;
+            if (!_fileQueue.TryAdd(entry))
+                Interlocked.Increment(ref _fileDropped);
+        }
 
-            if (string.IsNullOrEmpty(_logFilePath))
-                return;
-
-            try
+        private static void FileDrainLoop()
+        {
+            while (true)
             {
-                lock (_lock)
+                try
                 {
-                    var bytes = Encoding.UTF8.GetBytes(logEntry);
+                    if (_fileQueue.TryTake(out var entry, FlushIntervalMs))
+                    {
+                        AppendToFile(entry);
 
-                    // WriteThrough bypasses the OS write cache and Flush(true) calls
-                    // FlushFileBuffers, so entries survive even a hard process kill
-                    // (StackOverflow, FailFast). Cost: ~1ms per entry.
-                    using var fs = new FileStream(
-                        _logFilePath,
-                        FileMode.Append,
-                        FileAccess.Write,
-                        FileShare.Read,
-                        bufferSize: 4096,
-                        FileOptions.WriteThrough);
-                    fs.Write(bytes, 0, bytes.Length);
-                    fs.Flush(flushToDisk: true);
+                        var dropped = Interlocked.Exchange(ref _fileDropped, 0);
+                        if (dropped > 0)
+                            AppendToFile(Format("WARN", $"{dropped} log entries dropped — writer was not keeping up", null));
+
+                        ReportConsoleDrops();
+
+                        // Flush at the end of each burst rather than only when idle, so a hard
+                        // kill loses at most the entries still queued behind this one.
+                        if (_fileQueue.Count == 0) FlushFile();
+                    }
+                    else
+                    {
+                        ReportConsoleDrops();
+                        FlushFile();
+                    }
                 }
-            }
-            catch
-            {
-                // If logging fails, we can't do much about it
-                // Don't throw exceptions from the logger
+                catch { /* a dead drain thread silently loses all logging */ }
             }
         }
 
         /// <summary>
-        /// Forces all buffered log writes to disk. Call from shutdown handlers
-        /// (ProcessExit, etc.) to ensure final entries survive process termination.
+        /// Mirrors stdout-relay drops into the log file. A stalled pipe reader is exactly when
+        /// the relay's own in-band notice cannot be seen.
+        /// </summary>
+        private static void ReportConsoleDrops()
+        {
+            var total = _stdoutRelay.DroppedTotal;
+            if (total == _reportedConsoleDrops) return;
+            // Throttled: drops arrive in floods, and one warning per drain pass would itself
+            // become the bulk of the log.
+            if (Environment.TickCount64 - _lastConsoleDropReportTicks < ConsoleDropReportIntervalMs) return;
+            _lastConsoleDropReportTicks = Environment.TickCount64;
+            _reportedConsoleDrops = total;
+            AppendToFile(Format("WARN", $"{total} console line(s) dropped since start — stdout reader is not draining", null));
+        }
+
+        private static void AppendToFile(string entry)
+        {
+            lock (_fileLock)
+            {
+                var stream = EnsureStream();
+                if (stream == null) return;
+                var bytes = Encoding.UTF8.GetBytes(entry);
+                stream.Write(bytes, 0, bytes.Length);
+                _dirty = true;
+            }
+        }
+
+        private static void FlushFile()
+        {
+            lock (_fileLock)
+            {
+                if (!_dirty || _stream == null) return;
+                try
+                {
+                    _stream.Flush();
+                    _dirty = false;
+                }
+                catch { /* retried on the next tick */ }
+            }
+        }
+
+        private static FileStream? EnsureStream()
+        {
+            if (_stream != null) return _stream;
+            if (string.IsNullOrEmpty(_logFilePath)) return null;
+            try
+            {
+                // ReadWrite share so a second instance can hold an append handle the same day,
+                // matching the interleaving the old open-per-entry write allowed.
+                _stream = new FileStream(
+                    _logFilePath,
+                    FileMode.Append,
+                    FileAccess.Write,
+                    FileShare.ReadWrite,
+                    bufferSize: 16384,
+                    FileOptions.None);
+            }
+            catch
+            {
+                _stream = null;
+            }
+            return _stream;
+        }
+
+        /// <summary>
+        /// Drains anything still queued and forces it to disk. Call from shutdown handlers
+        /// (ProcessExit, etc.) so final entries survive process termination.
         /// </summary>
         public static void Flush()
         {
-            // WriteLog already opens/writes/flushes/closes per entry, so nothing
-            // is buffered between calls. This method exists so callers don't have
-            // to know that — and so behavior stays correct if we ever switch to a
-            // long-lived stream.
+            var deadline = Stopwatch.StartNew();
+            while (_fileQueue.Count > 0 && deadline.ElapsedMilliseconds < 2000)
+                Thread.Sleep(10);
+
+            lock (_fileLock)
+            {
+                if (_stream == null) return;
+                try
+                {
+                    _stream.Flush(flushToDisk: true);
+                    _dirty = false;
+                }
+                catch { /* best-effort */ }
+            }
         }
 
         public static string? GetLogFilePath() => _logFilePath;

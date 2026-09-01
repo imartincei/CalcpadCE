@@ -737,6 +737,21 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
         });
     }
 
+    // Relay task — owns every `server-log` emit so the readers below never do one. `emit`
+    // dispatches to the webview and can take arbitrarily long under load; doing it inline meant a
+    // busy UI stalled the reader, filled the child's 64KB stdout pipe, and blocked the .NET side
+    // in `Console.Write` — hanging the whole server with the app still responsive. The channel is
+    // bounded and lines are dropped rather than queued, since the tail buffer keeps them anyway.
+    let (log_tx, mut log_rx) = mpsc::channel::<ServerLogLine>(1024);
+    {
+        let app_for_log = app.clone();
+        tauri::async_runtime::spawn(async move {
+            while let Some(entry) = log_rx.recv().await {
+                let _ = app_for_log.emit("server-log", entry);
+            }
+        });
+    }
+
     // Stdout/stderr line readers — replaces the shell plugin's CommandEvent stream. Each stream
     // drains on its own task so a chatty stderr doesn't starve stdout, both feed the shared tail
     // buffer while scanning for Kestrel's "Now listening on:" marker, and both are type-erased to
@@ -750,6 +765,7 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
         app: AppHandle,
         tail: Arc<Mutex<String>>,
         saw_first: Arc<std::sync::atomic::AtomicBool>,
+        log_tx: mpsc::Sender<ServerLogLine>,
     ) {
         tauri::async_runtime::spawn(async move {
             let mut lines = BufReader::new(stream).lines();
@@ -767,13 +783,11 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
                             append_tail(&mut t, &line);
                             append_tail(&mut t, "\n");
                         }
-                        let _ = app.emit(
-                            "server-log",
-                            ServerLogLine {
-                                stream: label,
-                                line: line.clone(),
-                            },
-                        );
+                        // try_send, never send: blocking here is what wedges the sidecar.
+                        let _ = log_tx.try_send(ServerLogLine {
+                            stream: label,
+                            line: line.clone(),
+                        });
                         if let Some(url) = extract_listening_url(&line) {
                             let state: State<'_, ServerState> = app.state();
                             if let Ok(mut g) = state.url.lock() {
@@ -799,6 +813,7 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
             app.clone(),
             tail.clone(),
             saw_first_output.clone(),
+            log_tx.clone(),
         );
     }
     if let Some(s) = stderr {
@@ -810,6 +825,7 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
             app.clone(),
             tail.clone(),
             saw_first_output.clone(),
+            log_tx.clone(),
         );
     }
 

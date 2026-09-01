@@ -62,9 +62,7 @@ namespace Calcpad.Server.Services
 
             try
             {
-                Console.WriteLine($"=== CALCPAD SERVICE: Starting conversion, length: {calcpadContent.Length} ===");
                 FileLogger.LogInfo("Starting conversion", $"Content length: {calcpadContent.Length}, Has settings: {settings != null}, Force unwrapped: {forceUnwrappedCode}, For print: {forPrint}");
-                FileLogger.LogInfo("Content preview:", calcpadContent.Substring(0, Math.Min(200, calcpadContent.Length)));
 
                 // 1. Use Calcpad.Core settings directly (defaults are set in constructors).
                 //    Per-file overrides now come from the #settings directive, handled in Core.

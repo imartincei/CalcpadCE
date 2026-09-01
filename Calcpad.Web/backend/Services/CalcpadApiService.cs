@@ -33,11 +33,10 @@ namespace Calcpad.Server.Services
 
             // Caches ContentResolver's staged-content output across lint/highlight/definitions/
             // symbol-at-position for the same content, singleton so entries survive across requests.
+            // Budget is in flattened source lines, not entries — see ContentResolutionCache.
             builder.Services.AddMemoryCache(options =>
             {
-                options.SizeLimit = int.TryParse(
-                    Environment.GetEnvironmentVariable("CALCPAD_CONTENT_CACHE_SIZE_LIMIT"), out var limit)
-                    ? limit : 100;
+                options.SizeLimit = ContentResolutionCache.ResolveSizeLimit();
             });
             builder.Services.AddSingleton<ContentResolutionCache>();
 
@@ -154,6 +153,14 @@ namespace Calcpad.Server.Services
         /// </summary>
         public static WebApplication ConfigureApp(WebApplication app)
         {
+            // Outermost, so the in-flight set covers the whole pipeline.
+            HangWatchdog.Start();
+            app.Use(async (context, next) =>
+            {
+                using (HangWatchdog.Track($"{context.Request.Method} {context.Request.Path}"))
+                    await next();
+            });
+
             app.Use(async (context, next) =>
             {
                 try
