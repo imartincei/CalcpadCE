@@ -286,12 +286,8 @@
         </span>
         <span class="status-output" @click="openBottomTab('output')">Output</span>
         <span class="spacer"></span>
-        <span
-          class="status-server"
-          :class="{ connected: serverConnected, disconnected: !serverConnected }"
-          :title="serverConnected ? 'Server connected' : 'Server disconnected'"
-        >
-          ● {{ serverConnected ? 'Connected' : 'Disconnected' }}
+        <span class="status-server" :class="serverStatus" :title="serverStatusTitle">
+          ● {{ serverStatusLabel }}
         </span>
       </div>
     </div>
@@ -564,6 +560,7 @@ import {
   MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
   type PreviewScrollState,
 } from 'calcpad-frontend'
+import type { ServerStatus } from './services/connection-monitor'
 
 export interface ProblemItem {
   severity: number
@@ -1426,7 +1423,21 @@ function gotoProblem(problem: ProblemItem): void {
   onGotoProblem.value?.(problem)
 }
 
-const serverConnected = ref(false)
+// Pushed in by main.ts's ConnectionMonitor; this component never probes the server itself.
+const serverStatus = ref<ServerStatus>('connecting')
+const serverStatusLabel = computed(() =>
+  serverStatus.value === 'connected' ? 'Connected'
+    : serverStatus.value === 'connecting' ? 'Starting…'
+      : 'Disconnected')
+const serverStatusTitle = computed(() =>
+  serverStatus.value === 'connected' ? 'Server connected'
+    : serverStatus.value === 'connecting' ? 'Server starting…'
+      : 'Server disconnected — use Server ▸ Restart Server')
+
+function setServerStatus(status: ServerStatus): void {
+  serverStatus.value = status
+}
+
 const sidebarVisible = ref(true)
 const previewVisible = ref(false)
 // Groups with an in-flight preview render; drives the "Calculating…" overlay.
@@ -2219,20 +2230,6 @@ function setProblems(groupId: string, markers: ProblemItem[]): void {
 }
 
 onMounted(async () => {
-  const checkHealth = async () => {
-    try {
-      const bridge = (window as any).calcpadBridge
-      if (bridge) {
-        serverConnected.value = await bridge.api.checkHealth()
-      }
-    } catch {
-      serverConnected.value = false
-    }
-  }
-
-  setTimeout(checkHealth, 1000)
-  setInterval(checkHealth, 30000)
-
   document.addEventListener('mousedown', onDocumentInteractionForTabMenu)
   document.addEventListener('keydown', onDocumentInteractionForTabMenu)
   window.addEventListener('message', onPreviewWindowMessage)
@@ -2350,6 +2347,7 @@ defineExpose({
   isPreviewVisible,
   setPreviewHtml,
   setPreviewLoading,
+  setServerStatus,
   setPreviewTheme,
   scrollPreviewToSourceLine,
   isPreviewFrameSource,

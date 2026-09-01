@@ -82,7 +82,7 @@ try
 
     if (parentPid is int watchedPid)
     {
-        FileLogger.LogInfo("Parent PID watchdog enabled", watchedPid.ToString());
+        FileLogger.LogVerbose("Parent PID watchdog enabled", watchedPid.ToString());
         _ = Task.Run(async () =>
         {
             while (true)
@@ -142,7 +142,7 @@ try
             }
             catch (Exception ex)
             {
-                FileLogger.LogInfo("watchdog error", ex.Message);
+                FileLogger.LogWarning("watchdog error", ex.Message);
             }
 
             // Environment.Exit bypasses ApplicationStopping callbacks, so
@@ -169,7 +169,7 @@ try
         // Kestrel rejects "localhost:0" with "Dynamic port binding is not
         // supported when binding to localhost" — must be the loopback IP.
         forwardedArgs = forwardedArgs.Concat(new[] { "--urls", "http://127.0.0.1:0" }).ToArray();
-        FileLogger.LogInfo("No explicit URL or port set", "defaulting to http://127.0.0.1:0 (random free port)");
+        FileLogger.LogVerbose("No explicit URL or port set", "defaulting to http://127.0.0.1:0 (random free port)");
     }
     else if (!hasExplicitUrls)
     {
@@ -194,10 +194,15 @@ try
     }
 
     FileLogger.LogInfo("Starting console application", serverUrl);
-    Console.WriteLine($"Calcpad Server starting at {serverUrl}");
-    Console.WriteLine("Press Ctrl+C to stop the server.");
-    Console.WriteLine($"API Documentation: {serverUrl}/swagger");
-    Console.WriteLine($"Sample Client: Open sample-client.html in a browser");
+
+    // Only for an interactive run, where this is the only thing telling the user the URL.
+    // Under Tauri and VS Code stdout is a pipe feeding an Output panel, where it is just noise.
+    if (!Console.IsOutputRedirected)
+    {
+        Console.WriteLine($"Calcpad Server starting at {serverUrl}");
+        Console.WriteLine("Press Ctrl+C to stop the server.");
+        Console.WriteLine($"API Documentation: {serverUrl}/swagger");
+    }
 
     var cts = new CancellationTokenSource();
 
@@ -224,8 +229,8 @@ try
 
     // Log ASP.NET Core lifetime transitions so graceful-shutdown progress is visible.
     var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
-    lifetime.ApplicationStopping.Register(() => FileLogger.LogInfo("ApplicationStopping"));
-    lifetime.ApplicationStopped.Register(() => FileLogger.LogInfo("ApplicationStopped"));
+    lifetime.ApplicationStopping.Register(() => FileLogger.LogVerbose("ApplicationStopping"));
+    lifetime.ApplicationStopped.Register(() => FileLogger.LogVerbose("ApplicationStopped"));
 
     // The startup check above validates the URL string handed to UseUrls, which is the intent
     // rather than the outcome — a Kestrel:Endpoints section in appsettings.json overrides
@@ -305,7 +310,7 @@ try
     }
     catch (OperationCanceledException)
     {
-        Console.WriteLine("Shutting down...");
+        if (!Console.IsOutputRedirected) Console.WriteLine("Shutting down...");
         await app.StopAsync();
     }
 

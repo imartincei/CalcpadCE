@@ -1797,6 +1797,7 @@ export async function activate(context: vscode.ExtensionContext) {
                         settingsManager.setLocalServerUrl(serverUrl);
                         apiClient.setBaseUrl(serverUrl);
                         apiClient.setAuthToken(serverManager!.getAuthToken());
+                        void apiClient.setServerLogLevel(settingsManager.getExtra('serverLogLevel', 'warning'));
                         outputChannel.appendLine(`Local server started at ${serverUrl}`);
                         void refreshAllComponents();
                     }).catch((err) => {
@@ -2070,6 +2071,9 @@ export async function activate(context: vscode.ExtensionContext) {
         const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
         if (!editor) return;
         await refreshPreviewPanels(editor.document);
+    };
+    vueUiProvider.onServerLogLevelChanged = (level: string) => {
+        void sharedApiClient?.setServerLogLevel(level);
     };
     // Rendered on demand rather than served from the cache: this is what the Properties
     // tab asks when it has no answer or wants a fresh one, and the cache is only as new
@@ -2356,6 +2360,7 @@ export async function activate(context: vscode.ExtensionContext) {
             settingsManager.setLocalServerUrl(serverUrl);
             apiClient.setBaseUrl(serverUrl);
             apiClient.setAuthToken(serverManager.getAuthToken());
+            void apiClient.setServerLogLevel(settingsManager.getExtra('serverLogLevel', 'warning'));
             outputChannel.appendLine(`${tag} Server restarted at ${serverUrl}`);
             return true;
         } catch (err) {

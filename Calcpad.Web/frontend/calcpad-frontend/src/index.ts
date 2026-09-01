@@ -49,10 +49,12 @@ export {
     validatePdfValue,
 } from './types/pdf-settings';
 
-export type { CalcpadSettings, CalcpadExtras, CalcpadSettingsBlob, WriteMode } from './types/settings';
+export type { CalcpadSettings, CalcpadExtras, CalcpadSettingsBlob, WriteMode, ServerLogLevel } from './types/settings';
 export {
     WRITE_MODE_OPTIONS,
     coerceWriteMode,
+    SERVER_LOG_LEVEL_OPTIONS,
+    coerceServerLogLevel,
     writesAllowed,
     getDefaultSettings,
     getDefaultExtras,

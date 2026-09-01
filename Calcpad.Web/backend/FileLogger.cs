@@ -6,6 +6,18 @@ using System.Text;
 namespace Calcpad.Server
 {
     /// <summary>
+    /// Verbosity of a log entry. Ordered most-severe-first so filtering is a single
+    /// <c>&gt;</c> test against <see cref="FileLogger.MinLevel"/>.
+    /// </summary>
+    public enum LogLevel
+    {
+        Error = 0,
+        Warning = 1,
+        Information = 2,
+        Verbose = 3,
+    }
+
+    /// <summary>
     /// Process-wide log sink. Every request logs before doing any work, so a stall here wedges
     /// every endpoint at once. Both outputs are therefore decoupled from the caller and from each
     /// other — stdout via <see cref="ConsoleRelay"/>, the file via a bounded queue and its own
@@ -23,6 +35,11 @@ namespace Calcpad.Server
         private static readonly ConsoleRelay _stdoutRelay = new(Console.OpenStandardOutput());
         private static readonly ConsoleRelay _stderrRelay = new(Console.OpenStandardError());
 
+        // A field initializer, not the static ctor body: this has to be set before the ctor
+        // logs its own first entry.
+        private static readonly string? _rawEnvLevel = Environment.GetEnvironmentVariable("CALCPAD_LOG_LEVEL");
+        private static volatile LogLevel _minLevel = ParseLevel(_rawEnvLevel) ?? LogLevel.Warning;
+
         private static string? _logFilePath;
         private static FileStream? _stream;
         private static bool _dirty;
@@ -30,6 +47,39 @@ namespace Calcpad.Server
         private static int _reportedConsoleDrops;
         private static long _lastConsoleDropReportTicks;
         private const int ConsoleDropReportIntervalMs = 5000;
+
+        /// <summary>
+        /// Entries more verbose than this are dropped. Set from <c>CALCPAD_LOG_LEVEL</c> at
+        /// startup and from the <c>/api/calcpad/log-level</c> endpoint at runtime.
+        /// </summary>
+        public static LogLevel MinLevel
+        {
+            get => _minLevel;
+            set => _minLevel = value;
+        }
+
+        public static readonly string[] LevelNames = ["error", "warning", "information", "verbose"];
+
+        /// <summary>
+        /// Maps a level name to a <see cref="LogLevel"/>, accepting common aliases. Null when
+        /// nothing matched, so callers choose their own default.
+        /// </summary>
+        public static LogLevel? ParseLevel(string? value) => value?.Trim().ToLowerInvariant() switch
+        {
+            "verbose" or "trace" or "debug" or "all" => LogLevel.Verbose,
+            "information" or "info" => LogLevel.Information,
+            "warning" or "warn" => LogLevel.Warning,
+            "error" or "err" or "critical" or "fatal" or "none" or "off" => LogLevel.Error,
+            _ => null,
+        };
+
+        private static string TagFor(LogLevel level) => level switch
+        {
+            LogLevel.Error => "ERROR",
+            LogLevel.Warning => "WARN",
+            LogLevel.Information => "INFO",
+            _ => "TRACE",
+        };
 
         static FileLogger()
         {
@@ -80,7 +130,12 @@ namespace Calcpad.Server
             };
             drain.Start();
 
-            WriteLog("INFO", "Logger initialized", $"Log file: {_logFilePath}");
+            // Warning, so a typo in CALCPAD_LOG_LEVEL is still visible at the default level.
+            if (!string.IsNullOrWhiteSpace(_rawEnvLevel) && ParseLevel(_rawEnvLevel) is null)
+                LogWarning($"Unrecognized CALCPAD_LOG_LEVEL '{_rawEnvLevel}' — using {_minLevel}",
+                    $"Expected one of: {string.Join(", ", LevelNames)}");
+
+            LogVerbose("Logger initialized", $"Log file: {_logFilePath}, level: {_minLevel}");
         }
 
         /// <summary>
@@ -93,14 +148,19 @@ namespace Calcpad.Server
             Console.SetError(new ConsoleRelayWriter(_stderrRelay));
         }
 
+        public static void LogVerbose(string message, string? details = null)
+        {
+            WriteLog(LogLevel.Verbose, message, details);
+        }
+
         public static void LogInfo(string message, string? details = null)
         {
-            WriteLog("INFO", message, details);
+            WriteLog(LogLevel.Information, message, details);
         }
 
         public static void LogWarning(string message, string? details = null)
         {
-            WriteLog("WARN", message, details);
+            WriteLog(LogLevel.Warning, message, details);
         }
 
         public static void LogError(string message, Exception? exception = null)
@@ -108,7 +168,7 @@ namespace Calcpad.Server
             var details = exception != null ?
                 $"Exception: {exception.GetType().Name}\nMessage: {exception.Message}\nStackTrace: {exception.StackTrace}" :
                 null;
-            WriteLog("ERROR", message, details);
+            WriteLog(LogLevel.Error, message, details);
         }
 
         public static void LogCrash(Exception exception, string context = "Application")
@@ -164,9 +224,14 @@ namespace Calcpad.Server
             catch { /* never throw from the logger */ }
         }
 
-        private static void WriteLog(string level, string message, string? details = null)
+        /// <summary>
+        /// The single funnel for level-bearing entries, and so the only place the filter lives.
+        /// <see cref="LogCrash"/> and <see cref="WriteDirect"/> bypass it deliberately.
+        /// </summary>
+        private static void WriteLog(LogLevel level, string message, string? details = null)
         {
-            var entry = Format(level, message, details);
+            if (level > _minLevel) return;
+            var entry = Format(TagFor(level), message, details);
             _stdoutRelay.Enqueue(entry);
             QueueForFile(entry);
         }

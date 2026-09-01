@@ -244,6 +244,18 @@ export class CalcpadApiClient {
         return this.get<SnippetsResponse>('/api/calcpad/snippets', 'Snippets');
     }
 
+    /**
+     * Server-side log verbosity. Applies to the running process immediately, so it is pushed
+     * again whenever the panel mounts — the server may have restarted since it was last set.
+     */
+    public async setServerLogLevel(level: string): Promise<{ level: string } | null> {
+        return this.post<{ level: string }>('/api/calcpad/log-level', { level }, 'LogLevel');
+    }
+
+    public async getServerLogLevel(): Promise<{ level: string; available: string[] } | null> {
+        return this.get<{ level: string; available: string[] }>('/api/calcpad/log-level', 'LogLevel');
+    }
+
     public async prettify(
         content: string,
         indentUnit?: string,
@@ -386,11 +398,12 @@ export class CalcpadApiClient {
         return this.withSupersession(opts?.key, task);
     }
 
-    public async checkHealth(): Promise<boolean> {
+    /** Liveness probe. Answered from inside the pipeline, so a bound-but-wedged server fails it. */
+    public async checkHealth(timeoutMs: number = 5000): Promise<boolean> {
         try {
-            const response = await fetch(this.baseUrl + '/api/calcpad/snippets', {
+            const response = await fetch(this.baseUrl + '/api/calcpad/health', {
                 headers: this.authHeaders(),
-                signal: AbortSignal.timeout(5000),
+                signal: AbortSignal.timeout(timeoutMs),
             });
             return response.ok;
         } catch {

@@ -5,6 +5,7 @@ import pkg from '../package.json';
 import CalcpadAppVue from 'calcpad-frontend/vue/components/CalcpadApp.vue';
 import { initMessaging } from 'calcpad-frontend/vue/services/messaging';
 import { MessageBridge } from './services/message-bridge';
+import { ConnectionMonitor } from './services/connection-monitor';
 import { buildApiSettings } from 'calcpad-frontend/types/settings';
 import {
     findMetadataCommentBlock,
@@ -1322,6 +1323,13 @@ async function bootstrap(): Promise<void> {
         appInstance.appendOutput(stream === 'stderr' ? 'error' : 'info', line, 'server');
     }
     pendingServerRawLogs.length = 0;
+    const connectionMonitor = new ConnectionMonitor({
+        probe: (timeoutMs: number) => activeBridge.api.checkHealth(timeoutMs),
+        onStatusChanged: (status) => appInstance.setServerStatus(status),
+        onRecovered: () => { void runRefresh('Server reconnected — refreshing…'); },
+        log: (msg: string) => appInstance.appendOutput('info', `[Server] ${msg}`),
+    });
+
     if (serverManager) {
         serverManager.setLogger({
             appendLine: (msg: string) => appInstance.appendOutput('info', msg),
@@ -1339,7 +1347,28 @@ async function bootstrap(): Promise<void> {
                 'Use Server → Restart Server to try again.');
             if (crashOutput) appInstance.appendOutput('error', crashOutput);
         };
+        // 'running' only means Rust saw a bound port, so confirm with a probe before going green.
+        serverManager.onStatusChanged = (state, detail) => {
+            switch (state) {
+                case 'starting': connectionMonitor.markConnecting(detail ?? 'starting'); break;
+                case 'running': connectionMonitor.notifyMaybeUp(); break;
+                case 'stopped': connectionMonitor.markStopped(detail ?? 'stopped'); break;
+            }
+        };
     }
+
+    // serverManager.start() ran before the callbacks above existed, so seed from what it knows.
+    // markStopped leaves polling suspended, which is right: only a user restart can help.
+    if (serverManager && !serverManager.isRunning) {
+        connectionMonitor.markStopped('server did not start');
+    } else {
+        connectionMonitor.start();
+    }
+
+    // A hidden webview throttles timers hard, so the poll can be well stale on restore.
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') connectionMonitor.probeSoon();
+    });
 
     // Problems panel: markers can change for any group's model (background
     // lint). Dispatch to whichever group owns the affected resource.
@@ -1431,18 +1460,25 @@ async function bootstrap(): Promise<void> {
     // Manual refresh: re-lint with current settings, refresh definitions/
     // headings, redraw previews, and re-extract Export-tab plots. Called from
     // the Server > Refresh menu item and the editor's Run action.
-    async function runRefresh(): Promise<void> {
-        appInstance.appendOutput('info', 'Refreshing…');
-        for (const g of groups.values()) {
-            await g.diagnostics?.refresh();
-            await refreshDefinitionsFor(g);
-            if (appInstance.isPreviewVisible()) await refreshPreviewFor(g);
+    let refreshInFlight = false;
+    async function runRefresh(reason: string = 'Refreshing…'): Promise<void> {
+        if (refreshInFlight) return;
+        refreshInFlight = true;
+        appInstance.appendOutput('info', reason);
+        try {
+            for (const g of groups.values()) {
+                await g.diagnostics?.refresh();
+                await refreshDefinitionsFor(g);
+                if (appInstance.isPreviewVisible()) await refreshPreviewFor(g);
+            }
+            activeBridge.refreshHeadings();
+            // Refresh the Export tab's plot list — it caches independently of the
+            // preview and would otherwise show stale plots until the user clicks
+            // "Refresh Plots" manually.
+            window.dispatchEvent(new MessageEvent('message', { data: { type: 'getPlots' } }));
+        } finally {
+            refreshInFlight = false;
         }
-        activeBridge.refreshHeadings();
-        // Refresh the Export tab's plot list — it caches independently of the
-        // preview and would otherwise show stale plots until the user clicks
-        // "Refresh Plots" manually.
-        window.dispatchEvent(new MessageEvent('message', { data: { type: 'getPlots' } }));
     }
 
     appInstance.onResultModeChanged = (mode: ResultMode) => {
@@ -2438,6 +2474,7 @@ async function bootstrap(): Promise<void> {
                 }
             } finally {
                 if (isExiting) {
+                    connectionMonitor.stop();
                     // Rust owns sidecar shutdown (kill-on-exit hook). This
                     // dispose only tears down TS event listeners.
                     if (serverManager) {

@@ -22,6 +22,18 @@ namespace Calcpad.Server.Services
                 ContentRootPath = AppContext.BaseDirectory
             });
 
+            // ASP.NET's own console provider writes through Console.Out, which
+            // InstallConsoleRelay has replaced — so its output reaches stdout and the hosts'
+            // Output panels without ever passing FileLogger's filter. At Information that is a
+            // "Request starting"/"Request finished" pair per request, as much noise as our own
+            // logging, so it tracks MinLevel too.
+            //
+            // Microsoft.Hosting.Lifetime is pinned back: it logs "Now listening on: <url>",
+            // which the Tauri host sniffs (extract_listening_url) as its fallback when the port
+            // file is unreadable. Raising the floor without this silently removes that path.
+            builder.Logging.SetMinimumLevel(FrameworkLevelFor(FileLogger.MinLevel));
+            builder.Logging.AddFilter("Microsoft.Hosting.Lifetime", Microsoft.Extensions.Logging.LogLevel.Information);
+
             builder.Services.AddControllers()
                 .AddApplicationPart(typeof(CalcpadApiService).Assembly);
             builder.Services.AddEndpointsApiExplorer();
@@ -54,12 +66,27 @@ namespace Calcpad.Server.Services
             return builder;
         }
 
+        /// <summary>
+        /// Our verbosity mapped onto the framework's. Only read at startup — the framework
+        /// caches filters per (provider, category), so a later <see cref="FileLogger.MinLevel"/>
+        /// change does not reach it.
+        /// </summary>
+        private static Microsoft.Extensions.Logging.LogLevel FrameworkLevelFor(LogLevel level) => level switch
+        {
+            LogLevel.Verbose => Microsoft.Extensions.Logging.LogLevel.Debug,
+            LogLevel.Information => Microsoft.Extensions.Logging.LogLevel.Information,
+            LogLevel.Warning => Microsoft.Extensions.Logging.LogLevel.Warning,
+            _ => Microsoft.Extensions.Logging.LogLevel.Error,
+        };
+
         internal const string CorsPolicyName = "CalcpadHosts";
 
         /// <summary>
         /// Header carrying the per-launch token that <see cref="RequireApiToken"/> checks.
         /// </summary>
         internal const string ApiTokenHeader = "X-Calcpad-Token";
+
+        private const string HealthPath = "/api/calcpad/health";
 
         /// <summary>
         /// Per-launch shared secret, handed to us by the host that spawned this process.
@@ -157,6 +184,12 @@ namespace Calcpad.Server.Services
             HangWatchdog.Start();
             app.Use(async (context, next) =>
             {
+                // Tracking the poll would refresh the stall clock forever and hide a real hang.
+                if (context.Request.Path.Equals(HealthPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    await next();
+                    return;
+                }
                 using (HangWatchdog.Track($"{context.Request.Method} {context.Request.Path}"))
                     await next();
             });
@@ -262,10 +295,10 @@ namespace Calcpad.Server.Services
 
             var serverUrl = cliUrls ?? GetServerUrl();
 
-            FileLogger.LogInfo("Configuring server URLs", serverUrl);
+            FileLogger.LogVerbose("Configuring server URLs", serverUrl);
             builder.WebHost.UseUrls(serverUrl);
 
-            FileLogger.LogInfo("Building application");
+            FileLogger.LogVerbose("Building application");
             var app = builder.Build();
 
             ConfigureApp(app);

@@ -514,6 +514,24 @@
             </button>
           </div>
 
+          <div v-show="rowVisible('diagnostics', 'serverLogLevel')" class="setting-group">
+            <label for="serverLogLevel">
+              Server Log Level:
+              <span class="setting-info" :title="serverLogLevelDetail">&#9432;</span>
+            </label>
+            <select
+              id="serverLogLevel"
+              v-model="serverLogLevel"
+              @change="updateServerLogLevel"
+            >
+              <option
+                v-for="opt in SERVER_LOG_LEVEL_OPTIONS"
+                :key="opt.value"
+                :value="opt.value"
+              >{{ opt.label }}</option>
+            </select>
+          </div>
+
           <div v-if="versionConfig.isWebOrDesktop" v-show="rowVisible('diagnostics', 'maxOutputLines')" class="setting-group">
             <label for="maxOutputLines">
               Max Output Lines (per channel):
@@ -633,7 +651,7 @@ import { ref, watch, computed, reactive } from 'vue'
 import type { WritableComputedRef } from 'vue'
 import type { PdfSettings, Settings, ThemeInfo, VersionConfig } from '../types'
 import { DEFAULT_PDF_SETTINGS, DEFAULT_VERSION_CONFIG } from '../types'
-import { getDefaultSettings, METADATA_SETTINGS_KEYS, validateSettingValue, SETTINGS_PATH } from '../../types/settings'
+import { getDefaultSettings, METADATA_SETTINGS_KEYS, validateSettingValue, SETTINGS_PATH, SERVER_LOG_LEVEL_OPTIONS } from '../../types/settings'
 import { PDF_SETTING_KEYS, validatePdfValue } from '../../types/pdf-settings'
 import { specForKey } from '../../types/catalog'
 import {
@@ -657,6 +675,7 @@ interface Props {
   initialEnablePreviewUiOverrides?: boolean
   initialDarkBackground?: string
   initialLinterMinSeverity?: string
+  initialServerLogLevel?: string
   initialMaxOutputLines?: number
   initialMaxPreviewSize?: number
   initialMaxPreviewConsoleMessages?: number
@@ -683,6 +702,7 @@ const props = withDefaults(defineProps<Props>(), {
   initialEnablePreviewUiOverrides: false,
   initialDarkBackground: '#1a1a2e',
   initialLinterMinSeverity: 'information',
+  initialServerLogLevel: 'warning',
   initialMaxOutputLines: 1000,
   initialMaxPreviewSize: DEFAULT_PREVIEW_SIZE_MB,
   initialMaxPreviewConsoleMessages: DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT,
@@ -709,6 +729,7 @@ const emit = defineEmits<{
   updatePreviewUiOverrides: [enabled: boolean]
   updateDarkBackground: [color: string]
   updateLinterMinSeverity: [severity: string]
+  updateServerLogLevel: [level: string]
   updateMaxOutputLines: [value: number]
   updateMaxPreviewSize: [value: number]
   updateMaxPreviewConsoleMessages: [value: number]
@@ -794,6 +815,10 @@ const enableAutoInputMode = ref(props.initialEnableAutoInputMode)
 const enablePreviewUiOverrides = ref(props.initialEnablePreviewUiOverrides)
 const darkBackground = ref(props.initialDarkBackground)
 const linterMinSeverity = ref(props.initialLinterMinSeverity)
+const serverLogLevel = ref(props.initialServerLogLevel)
+const serverLogLevelDetail = computed(() =>
+  SERVER_LOG_LEVEL_OPTIONS.find(o => o.value === serverLogLevel.value)?.detail ?? ''
+)
 const maxOutputLines = ref(props.initialMaxOutputLines)
 const maxPreviewSizeMB = ref(props.initialMaxPreviewSize)
 const maxPreviewConsoleMessages = ref(props.initialMaxPreviewConsoleMessages)
@@ -892,6 +917,7 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
     title: 'Diagnostics',
     rows: {
       logsFolder: 'open logs folder crash dump',
+      serverLogLevel: 'server log level verbosity error warning information verbose noisy quiet logging',
       maxOutputLines: 'max output lines channel',
       maxPreviewSize: 'max preview size memory limit mb blocked too large',
       maxPreviewConsoleMessages: 'max preview console messages javascript js log flood suppressed'
@@ -1034,6 +1060,10 @@ const resetDarkBackground = () => {
 
 const updateLinterMinSeverity = () => {
   emit('updateLinterMinSeverity', linterMinSeverity.value)
+}
+
+const updateServerLogLevel = () => {
+  emit('updateServerLogLevel', serverLogLevel.value)
 }
 
 const updateMaxOutputLines = () => {
@@ -1192,6 +1222,13 @@ watch(
   () => props.initialLinterMinSeverity,
   (newValue) => {
     linterMinSeverity.value = newValue
+  }
+)
+
+watch(
+  () => props.initialServerLogLevel,
+  (newValue) => {
+    serverLogLevel.value = newValue
   }
 )
 

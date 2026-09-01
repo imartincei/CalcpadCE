@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceServerLogLevel } from 'calcpad-frontend';
 import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse, SettingsValues, UiDirectiveData, UiControl } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
@@ -24,6 +24,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     public getSourceEditor?: () => vscode.TextEditor | undefined;
     public onPreviewThemeChanged?: () => void | Promise<void>;
     public onSettingsChanged?: () => void | Promise<void>;
+    public onServerLogLevelChanged?: (level: string) => void;
     /** Real highlighter definitions for a document URI, used to resolve metadata context. */
     public getDefinitions?: (documentUri: string) => DefinitionsResponse | undefined;
     /**
@@ -175,6 +176,11 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 
                 case 'updateLinterMinSeverity':
                     this._settingsManager.setExtra('linterMinSeverity', data.severity);
+                    break;
+
+                case 'updateServerLogLevel':
+                    this._settingsManager.setExtra('serverLogLevel', data.level);
+                    this.onServerLogLevelChanged?.(data.level);
                     break;
 
                 case 'updateWriteMode':
@@ -466,6 +472,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             enablePreviewUiOverrides: sm.getExtraBool('previewUiOverrides', false),
             darkBackground: sm.getExtra('darkBackground', '#1e1e1e'),
             linterMinSeverity: sm.getExtra('linterMinSeverity', 'information'),
+            serverLogLevel: coerceServerLogLevel(sm.getExtra('serverLogLevel', 'warning')),
             writeMode: sm.getWriteMode(),
             maxPreviewSizeMB: sm.getExtraNumber('maxPreviewSizeMB', DEFAULT_PREVIEW_SIZE_MB),
             maxPreviewConsoleMessages: sm.getExtraNumber(

@@ -27,13 +27,17 @@ Any attempt to bind to a non-loopback host (`0.0.0.0`, a LAN address, a domain n
 ## Health check
 
 ```
+GET  /api/calcpad/health          → { "status": "ok" }
 GET  /api/calcpad/pdf/health      → { "status": "ok", "service": "calcpad-pdf", ... }
 ```
+
+`/health` is process liveness — it does no work, writes no log line, and is safe to poll. `/pdf/health` is the Chromium readiness check for PDF export.
 
 ## Endpoints
 
 Documented in [API_SCHEMA.md](API_SCHEMA.md). Summary:
 
+- `GET  /api/calcpad/health` — liveness probe; does no work and writes no log line
 - `POST /api/calcpad/convert` — Calcpad source to HTML (`?unwrap=true` for the expanded source)
 - `POST /api/calcpad/docx`, `/pdf` — document export (`/pdf/health` for readiness, `/pdf/browser` and `/pdf/browser/install` for the Chromium dependency)
 - `GET  /api/calcpad/sample` — sample document
@@ -46,6 +50,7 @@ Documented in [API_SCHEMA.md](API_SCHEMA.md). Summary:
 - `POST /api/calcpad/cpdz/decode`, `/cpdz/encode` — compiled `.cpdz` worksheets
 - `POST /api/calcpad/portable/bundle`, `/portable/package` — self-contained worksheet and ZIP export
 - `GET  /api/calcpad/debug-crash` — deliberately crash the server (Development only)
+- `GET  /api/calcpad/log-level`, `POST /api/calcpad/log-level` — read and set log verbosity at runtime
 
 ## Configuration
 
@@ -57,7 +62,11 @@ Documented in [API_SCHEMA.md](API_SCHEMA.md). Summary:
 | `CALCPAD_HOST` | `127.0.0.1` | Host part of the bind URL |
 | `CALCPAD_API_TOKEN` | *(unset — unauthenticated)* | Required in `X-Calcpad-Token` on every `/api` request when set |
 | `CALCPAD_DETACHED` | *(unset)* | `1` disables the stdin-EOF watchdog and the default port file |
-| `CALCPAD_CONTENT_CACHE_SIZE_LIMIT` | `100` | Entries in the resolved-content cache |
+| `CALCPAD_LOG_LEVEL` | `warning` | Startup verbosity: `error`, `warning`, `information` or `verbose`. Change it at runtime via `POST /api/calcpad/log-level` |
+| `CALCPAD_LOG_DIR` | *(executable-adjacent `logs/`)* | Where `CalcpadServer-{date}.log` is written. Hosts set this when the install dir is read-only |
+| `CALCPAD_HANG_THRESHOLD_SECONDS` | `60` | How long without a completed request before the hang watchdog reports |
+| `CALCPAD_HANG_DUMP` | *(unset)* | `1` also spawns `createdump` on a detected hang |
+| `CALCPAD_CONTENT_CACHE_SIZE_LIMIT` | `50000` | Flattened source lines budgeted across the resolved-content cache |
 | `BROWSER_PATH` | *(auto-detect)* | Chromium-family executable used for PDF export |
 | `ALLOW_CHROMIUM_DOWNLOAD` | `false` | Lets the render path download Chromium on its own |
 

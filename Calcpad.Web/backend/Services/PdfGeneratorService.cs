@@ -286,7 +286,7 @@ namespace Calcpad.Server.Services
                 }
 
                 var executablePath = await ResolveBrowserPathAsync().ConfigureAwait(false);
-                FileLogger.LogInfo("Launching browser", executablePath);
+                FileLogger.LogVerbose("Launching browser", executablePath);
 
                 try
                 {
@@ -363,7 +363,7 @@ namespace Calcpad.Server.Services
             var systemBrowser = FindSystemBrowser();
             if (systemBrowser != null)
             {
-                FileLogger.LogInfo("Auto-detected system browser", systemBrowser);
+                FileLogger.LogVerbose("Auto-detected system browser", systemBrowser);
                 return systemBrowser;
             }
 
@@ -371,7 +371,7 @@ namespace Calcpad.Server.Services
             var downloaded = FindDownloadedChromium();
             if (downloaded != null)
             {
-                FileLogger.LogInfo("Using downloaded ChromeHeadlessShell", downloaded);
+                FileLogger.LogVerbose("Using downloaded ChromeHeadlessShell", downloaded);
                 return downloaded;
             }
 
@@ -379,7 +379,7 @@ namespace Calcpad.Server.Services
             if (IsDownloadAllowed())
                 return await DownloadChromiumAsync().ConfigureAwait(false);
 
-            FileLogger.LogWarning("WARNING: no Chromium-family browser found for PDF export", null);
+            FileLogger.LogWarning("No Chromium-family browser found for PDF export", null);
             throw new BrowserUnavailableException(
                 "No Chromium-family browser was found. Install Chrome, Edge or Chromium, set BrowserPath, or download the bundled Chromium.");
         }

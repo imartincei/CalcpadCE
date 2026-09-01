@@ -82,6 +82,39 @@ export function coerceWriteMode(raw: string | undefined | null): WriteMode {
 }
 
 /**
+ * Verbosity of the Calcpad server's own logging, mirroring the levels in FileLogger.cs. Pushed
+ * to the server over /api/calcpad/log-level; it is a server-side setting, not a client one.
+ */
+export type ServerLogLevel = 'error' | 'warning' | 'information' | 'verbose';
+
+export const SERVER_LOG_LEVEL_OPTIONS: { value: ServerLogLevel; label: string; detail: string }[] = [
+    {
+        value: 'error',
+        label: 'Error',
+        detail: 'Only failures. Crash and hang reports are always written regardless of this setting.',
+    },
+    {
+        value: 'warning',
+        label: 'Warning',
+        detail: 'Failures plus recoverable problems, such as a missing browser for PDF export. The default, and quiet during normal editing.',
+    },
+    {
+        value: 'information',
+        label: 'Information',
+        detail: 'Adds one-off lifecycle events: startup, the bound URL, shutdown, and browser downloads.',
+    },
+    {
+        value: 'verbose',
+        label: 'Verbose',
+        detail: 'Adds a line per request. Useful when diagnosing a specific worksheet, noisy otherwise, since editing sends requests continuously.',
+    },
+];
+
+export function coerceServerLogLevel(raw: string | undefined | null): ServerLogLevel {
+    return SERVER_LOG_LEVEL_OPTIONS.some(o => o.value === raw) ? raw as ServerLogLevel : 'warning';
+}
+
+/**
  * Whether a render may run `#write`/`#append`, decided from the API's own two flags: `forPrint`
  * is the report layout and `enableUi` is the input form. They never both hold — the server clears
  * `enableUi` for a report — so the three cases below are exhaustive.

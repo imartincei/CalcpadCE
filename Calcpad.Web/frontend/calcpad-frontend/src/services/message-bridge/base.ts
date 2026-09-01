@@ -7,7 +7,7 @@ import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, Definit
 import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
 import type { UiDirectiveData } from '../../text/ui-directive';
 import type { DefinitionsResponse, ExportVariant } from '../../types/api';
-import { getDefaultSettings, buildApiSettings, coerceWriteMode, writesAllowed } from '../../types/settings';
+import { getDefaultSettings, buildApiSettings, coerceWriteMode, coerceServerLogLevel, writesAllowed } from '../../types/settings';
 import type { CalcpadSettings, WriteMode } from '../../types/settings';
 import { resolveStoredPdfSettings, resolveEffectivePdfSettings } from '../../types/pdf-settings';
 import type { PdfSettings } from '../../types/pdf-settings';
@@ -313,6 +313,11 @@ export abstract class BaseMessageBridge {
                 this.setExtraSetting('linterMinSeverity', message.severity);
                 this.postToVue({ type: 'linterMinSeverityChanged', severity: message.severity });
                 break;
+            case 'updateServerLogLevel':
+                this.setExtraSetting('serverLogLevel', message.level);
+                this.postToVue({ type: 'serverLogLevelChanged', level: message.level });
+                void this.apiClient.setServerLogLevel(message.level);
+                break;
             case 'updateMaxOutputLines':
                 this.setExtraSetting('maxOutputLines', String(message.value));
                 this.postToVue({ type: 'maxOutputLinesChanged', value: message.value });
@@ -501,6 +506,9 @@ export abstract class BaseMessageBridge {
 
     protected async handleGetSettings(): Promise<void> {
         const extras = await this.buildSettingsResponseExtras();
+        // The server may have started before us, or restarted after a crash, so it does not
+        // necessarily hold the level the user chose. Re-pushing here is idempotent.
+        void this.apiClient.setServerLogLevel(coerceServerLogLevel(this.getExtraSetting('serverLogLevel')));
         this.postToVue({
             type: 'settingsResponse',
             settings: this.settings,
@@ -514,6 +522,7 @@ export abstract class BaseMessageBridge {
             enableAutoInputMode: this.getExtraSetting('autoInputMode') !== 'false',
             enablePreviewUiOverrides: this.previewAppliesUiOverrides(),
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
+            serverLogLevel: coerceServerLogLevel(this.getExtraSetting('serverLogLevel')),
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
             maxPreviewSizeMB: Number(this.getExtraSetting('maxPreviewSizeMB')) || DEFAULT_PREVIEW_SIZE_MB,
             maxPreviewConsoleMessages: Number(this.getExtraSetting('maxPreviewConsoleMessages'))
