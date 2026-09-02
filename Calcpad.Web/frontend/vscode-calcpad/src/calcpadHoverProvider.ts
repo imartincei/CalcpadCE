@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import { CalcpadDefinitionsService } from './calcpadDefinitionsService';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 import { buildBuiltinDocMarkdown, extractFunctionName } from './calcpadBuiltinDocs';
@@ -17,12 +18,12 @@ import type {
 export class CalcpadHoverProvider implements vscode.HoverProvider {
     private definitionsService: CalcpadDefinitionsService;
     private insertManager: CalcpadInsertManager;
-    private outputChannel: vscode.OutputChannel;
+    private outputChannel: ILogger;
 
     constructor(
         definitionsService: CalcpadDefinitionsService,
         insertManager: CalcpadInsertManager,
-        outputChannel: vscode.OutputChannel
+        outputChannel: ILogger
     ) {
         this.definitionsService = definitionsService;
         this.insertManager = insertManager;
@@ -51,25 +52,25 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
         if (definitions) {
             const macro = definitions.macros.find(m => m.name === word);
             if (macro) {
-                this.outputChannel.appendLine('[Hover] Macro: ' + word);
+                this.outputChannel.appendLine('[Hover] Macro: ' + word, 'verbose');
                 return new vscode.Hover(this.buildMacroHover(macro), wordRange);
             }
 
             const func = definitions.functions.find(f => f.name === word);
             if (func) {
-                this.outputChannel.appendLine('[Hover] Function: ' + word);
+                this.outputChannel.appendLine('[Hover] Function: ' + word, 'verbose');
                 return new vscode.Hover(this.buildFunctionHover(func), wordRange);
             }
 
             const variable = definitions.variables.find(v => v.name === word);
             if (variable) {
-                this.outputChannel.appendLine('[Hover] Variable: ' + word);
+                this.outputChannel.appendLine('[Hover] Variable: ' + word, 'verbose');
                 return new vscode.Hover(this.buildVariableHover(variable), wordRange);
             }
 
             const unit = definitions.customUnits.find(u => u.name === word);
             if (unit) {
-                this.outputChannel.appendLine('[Hover] Custom unit: ' + word);
+                this.outputChannel.appendLine('[Hover] Custom unit: ' + word, 'verbose');
                 return new vscode.Hover(this.buildCustomUnitHover(unit), wordRange);
             }
         }
@@ -81,7 +82,7 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
                 return extractFunctionName(item.tag) === word;
             });
             if (builtin) {
-                this.outputChannel.appendLine('[Hover] Built-in function: ' + word);
+                this.outputChannel.appendLine('[Hover] Built-in function: ' + word, 'verbose');
                 return new vscode.Hover(buildBuiltinDocMarkdown(builtin), wordRange);
             }
         }
@@ -217,7 +218,7 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
     static register(
         definitionsService: CalcpadDefinitionsService,
         insertManager: CalcpadInsertManager,
-        outputChannel: vscode.OutputChannel
+        outputChannel: ILogger
     ): vscode.Disposable {
         const provider = new CalcpadHoverProvider(definitionsService, insertManager, outputChannel);
         return vscode.languages.registerHoverProvider(

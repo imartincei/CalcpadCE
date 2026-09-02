@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import * as path from 'path';
 import * as fs from 'fs';
 import { BaseServerManager } from './baseServerManager';
-import { VSCodeLogger } from './adapters';
 import {
     NUGET_HOSTS,
     assertAllowedUrl,
@@ -130,7 +130,7 @@ function getPlatformNativeInfo(): PlatformNativeInfo | null {
  */
 export class CalcpadServerManager extends BaseServerManager implements vscode.Disposable {
     private extensionPath: string;
-    private outputChannel: vscode.OutputChannel;
+    private outputChannel: ILogger;
 
     /**
      * @param outputChannel Server debug channel — receives stdout (verbose server output).
@@ -138,15 +138,15 @@ export class CalcpadServerManager extends BaseServerManager implements vscode.Di
      */
     constructor(
         extensionPath: string,
-        outputChannel: vscode.OutputChannel,
+        outputChannel: ILogger,
         dotnetPath: string = 'dotnet',
-        mainOutputChannel?: vscode.OutputChannel
+        mainOutputChannel?: ILogger
     ) {
         super(
             extensionPath,
-            new VSCodeLogger(outputChannel),
+            outputChannel,
             dotnetPath,
-            mainOutputChannel ? new VSCodeLogger(mainOutputChannel) : undefined
+            mainOutputChannel
         );
         this.extensionPath = extensionPath;
         this.outputChannel = outputChannel;

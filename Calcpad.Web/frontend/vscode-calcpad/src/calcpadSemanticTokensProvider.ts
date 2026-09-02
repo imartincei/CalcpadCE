@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import * as path from 'path';
 import {
     CalcpadApiClient,
@@ -21,20 +22,20 @@ export const semanticTokensLegend = new vscode.SemanticTokensLegend(
  * via CalcpadApiClient from calcpad-frontend.
  */
 export class CalcpadSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider {
-    private debugChannel: vscode.OutputChannel;
+    private debugChannel: ILogger;
     private apiClient: CalcpadApiClient;
     private fileSystem = new VSCodeFileSystem();
     private requestId = 0;
     private _onDidChangeSemanticTokens = new vscode.EventEmitter<void>();
     public readonly onDidChangeSemanticTokens = this._onDidChangeSemanticTokens.event;
 
-    constructor(apiClient: CalcpadApiClient, debugChannel: vscode.OutputChannel) {
+    constructor(apiClient: CalcpadApiClient, debugChannel: ILogger) {
         this.apiClient = apiClient;
         this.debugChannel = debugChannel;
     }
 
     public refresh(): void {
-        this.debugChannel.appendLine('[Highlight] Manual refresh triggered');
+        this.debugChannel.appendLine('[Highlight] Manual refresh triggered', 'verbose');
         this._onDidChangeSemanticTokens.fire();
     }
 
@@ -46,10 +47,10 @@ export class CalcpadSemanticTokensProvider implements vscode.DocumentSemanticTok
         const reqId = ++this.requestId;
         const startTime = Date.now();
 
-        this.debugChannel.appendLine('[Highlight #' + reqId + '] Request started for ' + document.fileName + ' (' + content.length + ' chars)');
+        this.debugChannel.appendLine('[Highlight #' + reqId + '] Request started for ' + document.fileName + ' (' + content.length + ' chars)', 'verbose');
 
         if (!content.trim()) {
-            this.debugChannel.appendLine('[Highlight #' + reqId + '] Skipped - empty document');
+            this.debugChannel.appendLine('[Highlight #' + reqId + '] Skipped - empty document', 'verbose');
             return null;
         }
 
@@ -61,16 +62,16 @@ export class CalcpadSemanticTokensProvider implements vscode.DocumentSemanticTok
             });
 
             if (cancellationToken.isCancellationRequested) {
-                this.debugChannel.appendLine('[Highlight #' + reqId + '] Cancelled after ' + (Date.now() - startTime) + 'ms');
+                this.debugChannel.appendLine('[Highlight #' + reqId + '] Cancelled after ' + (Date.now() - startTime) + 'ms', 'verbose');
                 return null;
             }
 
             if (!tokens) {
-                this.debugChannel.appendLine('[Highlight #' + reqId + '] No tokens returned after ' + (Date.now() - startTime) + 'ms');
+                this.debugChannel.appendLine('[Highlight #' + reqId + '] No tokens returned after ' + (Date.now() - startTime) + 'ms', 'verbose');
                 return null;
             }
 
-            this.debugChannel.appendLine('[Highlight #' + reqId + '] Received ' + tokens.length + ' tokens in ' + (Date.now() - startTime) + 'ms');
+            this.debugChannel.appendLine('[Highlight #' + reqId + '] Received ' + tokens.length + ' tokens in ' + (Date.now() - startTime) + 'ms', 'verbose');
 
             const builder = new vscode.SemanticTokensBuilder(semanticTokensLegend);
 
@@ -93,10 +94,10 @@ export class CalcpadSemanticTokensProvider implements vscode.DocumentSemanticTok
                 }
             }
 
-            this.debugChannel.appendLine('[Highlight #' + reqId + '] Built ' + validCount + ' semantic tokens, total time: ' + (Date.now() - startTime) + 'ms');
+            this.debugChannel.appendLine('[Highlight #' + reqId + '] Built ' + validCount + ' semantic tokens, total time: ' + (Date.now() - startTime) + 'ms', 'verbose');
             return builder.build();
         } catch (error) {
-            this.debugChannel.appendLine('[Highlight #' + reqId + '] Error after ' + (Date.now() - startTime) + 'ms: ' + (error instanceof Error ? error.message : 'Unknown error'));
+            this.debugChannel.appendLine('[Highlight #' + reqId + '] Error after ' + (Date.now() - startTime) + 'ms: ' + (error instanceof Error ? error.message : 'Unknown error'), 'verbose');
             return null;
         }
     }

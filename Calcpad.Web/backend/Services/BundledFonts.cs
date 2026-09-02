@@ -37,7 +37,7 @@ namespace Calcpad.Server.Services
                 LoadFromFilesystem(map);
                 LoadFromEmbeddedResources(map);
 
-                FileLogger.LogInfo("Bundled fonts loaded", map.Count == 0 ? "(none)" : string.Join(", ", map.Keys));
+                FileLogger.LogVerbose("Bundled fonts loaded", map.Count == 0 ? "(none)" : string.Join(", ", map.Keys));
                 _cachedDataUrls = map;
                 return _cachedDataUrls;
             }

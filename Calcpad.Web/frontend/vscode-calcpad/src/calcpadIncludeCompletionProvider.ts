@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import * as path from 'path';
 import * as os from 'os';
 import {
@@ -18,10 +19,10 @@ import { expandEnvVars } from './calcpadLocationResolver';
 import type { CalcpadDefinitionsService } from './calcpadDefinitionsService';
 
 export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemProvider {
-    private outputChannel: vscode.OutputChannel;
+    private outputChannel: ILogger;
     private definitionsService: CalcpadDefinitionsService;
 
-    constructor(definitionsService: CalcpadDefinitionsService, outputChannel: vscode.OutputChannel) {
+    constructor(definitionsService: CalcpadDefinitionsService, outputChannel: ILogger) {
         this.definitionsService = definitionsService;
         this.outputChannel = outputChannel;
     }
@@ -41,7 +42,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
 
         const { directive, pathStartCol } = parsed;
 
-        this.outputChannel.appendLine(`[INCLUDE COMPLETION] Triggered on line: "${lineText}" (directive: #${directive})`);
+        this.outputChannel.appendLine(`[INCLUDE COMPLETION] Triggered on line: "${lineText}" (directive: #${directive})`, 'verbose');
 
         // Strip any trailing options (@sheet, type=, sep=) from the partial path for completion
         let partialPath = parsed.partialPath;
@@ -50,7 +51,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
             partialPath = partialPath.substring(0, atIndex);
         }
 
-        this.outputChannel.appendLine(`[INCLUDE COMPLETION] Partial path: "${partialPath}"`);
+        this.outputChannel.appendLine(`[INCLUDE COMPLETION] Partial path: "${partialPath}"`, 'verbose');
 
         const documentDir = path.dirname(document.uri.fsPath);
         const homeDir = os.homedir();
@@ -84,7 +85,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
         });
         this.outputChannel.appendLine(
             `[INCLUDE COMPLETION] Resolved roots: project="${resolvedRoots.project || '(none)'}" library="${resolvedRoots.library || '(none)'}"`
-        );
+        , 'verbose');
 
         try {
             const tokenKind = getPathRootTokenKind(partialPath);
@@ -95,7 +96,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
                 const tokenText = partialPath.slice(0, USER_TOKEN.length);
                 let rest = partialPath.slice(tokenText.length);
                 if (rest.startsWith('/') || rest.startsWith('\\')) rest = rest.slice(1);
-                this.outputChannel.appendLine(`[INCLUDE COMPLETION] Inside {user} root, relative path: "${rest}"`);
+                this.outputChannel.appendLine(`[INCLUDE COMPLETION] Inside {user} root, relative path: "${rest}"`, 'verbose');
                 await this.addEntriesFromDirectory(
                     homeDir, rest, extensions, replaceRange,
                     document.uri.fsPath, completionItems, addedEntries, token,
@@ -109,7 +110,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
                     const tokenText = partialPath.slice(0, PATH_ROOT_TOKEN[tokenKind].length);
                     let rest = partialPath.slice(tokenText.length);
                     if (rest.startsWith('/') || rest.startsWith('\\')) rest = rest.slice(1);
-                    this.outputChannel.appendLine(`[INCLUDE COMPLETION] Inside ${tokenKind} root, relative path: "${rest}"`);
+                    this.outputChannel.appendLine(`[INCLUDE COMPLETION] Inside ${tokenKind} root, relative path: "${rest}"`, 'verbose');
                     await this.addEntriesFromDirectory(
                         root, rest, extensions, replaceRange,
                         document.uri.fsPath, completionItems, addedEntries, token,
@@ -118,7 +119,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
                 }
             } else if (partialPath.includes('/') || partialPath.includes('\\')) {
                 // User is navigating local subdirectories (path has separators but isn't a token)
-                this.outputChannel.appendLine(`[INCLUDE COMPLETION] Navigating local subdirectory`);
+                this.outputChannel.appendLine(`[INCLUDE COMPLETION] Navigating local subdirectory`, 'verbose');
 
                 await this.addEntriesFromDirectory(
                     documentDir, partialPath, extensions, replaceRange,
@@ -127,7 +128,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
                 );
             } else {
                 // Root level - show local files/folders + declared roots + workspace folders
-                this.outputChannel.appendLine(`[INCLUDE COMPLETION] Root level - searching local + declared roots + workspace`);
+                this.outputChannel.appendLine(`[INCLUDE COMPLETION] Root level - searching local + declared roots + workspace`, 'verbose');
 
                 await this.addEntriesFromDirectory(
                     documentDir, partialPath, extensions, replaceRange,
@@ -168,7 +169,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
                     if (folderNorm === docDirNorm || rootNorms.includes(folderNorm)) {
                         continue;
                     }
-                    this.outputChannel.appendLine(`[INCLUDE COMPLETION] Also searching workspace folder: ${folderPath}`);
+                    this.outputChannel.appendLine(`[INCLUDE COMPLETION] Also searching workspace folder: ${folderPath}`, 'verbose');
                     await this.addEntriesFromDirectory(
                         folderPath, '', extensions, replaceRange,
                         document.uri.fsPath, completionItems, addedEntries, token,
@@ -177,9 +178,9 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
                 }
             }
 
-            this.outputChannel.appendLine(`[INCLUDE COMPLETION] Returning ${completionItems.length} items (isIncomplete=true)`);
+            this.outputChannel.appendLine(`[INCLUDE COMPLETION] Returning ${completionItems.length} items (isIncomplete=true)`, 'verbose');
         } catch (error) {
-            this.outputChannel.appendLine(`[INCLUDE COMPLETION ERROR] ${error}`);
+            this.outputChannel.appendLine(`[INCLUDE COMPLETION ERROR] ${error}`, 'verbose');
         }
 
         // Return as incomplete so VS Code re-invokes the provider on each keystroke
@@ -212,13 +213,13 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
             searchDir = baseDir;
         }
 
-        this.outputChannel.appendLine(`[INCLUDE COMPLETION]   Reading directory: ${searchDir} (pathPrefix="${pathPrefix}", libraryPrefix="${libraryPrefix}")`);
+        this.outputChannel.appendLine(`[INCLUDE COMPLETION]   Reading directory: ${searchDir} (pathPrefix="${pathPrefix}", libraryPrefix="${libraryPrefix}")`, 'verbose');
 
         let entries: [string, vscode.FileType][];
         try {
             entries = await vscode.workspace.fs.readDirectory(vscode.Uri.file(searchDir));
         } catch (err) {
-            this.outputChannel.appendLine(`[INCLUDE COMPLETION]   Could not read directory: ${searchDir} (${err})`);
+            this.outputChannel.appendLine(`[INCLUDE COMPLETION]   Could not read directory: ${searchDir} (${err})`, 'verbose');
             return;
         }
 
@@ -226,7 +227,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
             return;
         }
 
-        this.outputChannel.appendLine(`[INCLUDE COMPLETION]   Found ${entries.length} entries in ${searchDir}`);
+        this.outputChannel.appendLine(`[INCLUDE COMPLETION]   Found ${entries.length} entries in ${searchDir}`, 'verbose');
 
         // Insert workspace-folder entries with absolute paths so #include
         // resolves regardless of the current file's location.
@@ -309,7 +310,7 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
         }
     }
 
-    public static register(definitionsService: CalcpadDefinitionsService, outputChannel: vscode.OutputChannel): vscode.Disposable {
+    public static register(definitionsService: CalcpadDefinitionsService, outputChannel: ILogger): vscode.Disposable {
         const provider = new CalcpadIncludeCompletionProvider(definitionsService, outputChannel);
         return vscode.languages.registerCompletionItemProvider(
             ['calcpad', 'plaintext'],

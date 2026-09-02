@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import {
     CalcpadSnippetService,
     CalcpadApiClient,
@@ -6,7 +7,6 @@ import {
     InsertDataTree,
     SnippetsLoadedCallback,
 } from 'calcpad-frontend';
-import { VSCodeLogger } from './adapters';
 
 export type { InsertItem, InsertDataTree, SnippetsLoadedCallback };
 
@@ -17,8 +17,8 @@ export type { InsertItem, InsertDataTree, SnippetsLoadedCallback };
 export class CalcpadInsertManager {
     private snippetService: CalcpadSnippetService;
 
-    constructor(apiClient: CalcpadApiClient, outputChannel: vscode.OutputChannel) {
-        const logger = new VSCodeLogger(outputChannel);
+    constructor(apiClient: CalcpadApiClient, outputChannel: ILogger) {
+        const logger = outputChannel;
         this.snippetService = new CalcpadSnippetService(apiClient, logger);
     }
 

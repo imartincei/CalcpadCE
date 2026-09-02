@@ -54,7 +54,7 @@ namespace Calcpad.Server.Services
         {
             if (string.IsNullOrWhiteSpace(calcpadContent))
             {
-                FileLogger.LogWarning("Convert called with empty content");
+                FileLogger.LogVerbose("Convert called with empty content");
                 throw new ArgumentException("Content cannot be null or empty", nameof(calcpadContent));
             }
 
@@ -62,9 +62,7 @@ namespace Calcpad.Server.Services
 
             try
             {
-                Console.WriteLine($"=== CALCPAD SERVICE: Starting conversion, length: {calcpadContent.Length} ===");
-                FileLogger.LogInfo("Starting conversion", $"Content length: {calcpadContent.Length}, Has settings: {settings != null}, Force unwrapped: {forceUnwrappedCode}, For print: {forPrint}");
-                FileLogger.LogInfo("Content preview:", calcpadContent.Substring(0, Math.Min(200, calcpadContent.Length)));
+                FileLogger.LogVerbose("Starting conversion", $"Content length: {calcpadContent.Length}, Has settings: {settings != null}, Force unwrapped: {forceUnwrappedCode}, For print: {forPrint}");
 
                 // 1. Use Calcpad.Core settings directly (defaults are set in constructors).
                 //    Per-file overrides now come from the #settings directive, handled in Core.
@@ -154,7 +152,7 @@ namespace Calcpad.Server.Services
 
                 // 6. Apply HTML wrapper with theme support
                 var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);
-                FileLogger.LogInfo("Conversion completed successfully", $"Output length: {finalHtml.Length}");
+                FileLogger.LogVerbose("Conversion completed successfully", $"Output length: {finalHtml.Length}");
 
                 return (finalHtml, openXmlExpressions, errors);
             }
@@ -477,7 +475,7 @@ tan_angle = tan(angle°)";
                 {
                     using var reader = new StreamReader(stream);
                     var template = reader.ReadToEnd();
-                    FileLogger.LogInfo("Loaded HTML template from embedded resource");
+                    FileLogger.LogVerbose("Loaded HTML template from embedded resource");
                     return template;
                 }
                 
@@ -486,7 +484,7 @@ tan_angle = tan(angle°)";
                 if (File.Exists(templatePath))
                 {
                     var template = File.ReadAllText(templatePath);
-                    FileLogger.LogInfo("Loaded HTML template from file system", templatePath);
+                    FileLogger.LogVerbose("Loaded HTML template from file system", templatePath);
                     return template;
                 }
                 

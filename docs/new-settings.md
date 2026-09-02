@@ -105,6 +105,15 @@ The lowest severity surfaced as a diagnostic.
 ## Diagnostics
 
 - **Open Logs Folder** — opens the folder holding server logs and the most recent crash dump.
+- **Log Level** — how much detail is logged, from *Error* (least) to *Verbose* (most), defaulting to **Warning**. One setting covers everything: the server's log file and the editor's own Output channels.
+
+  | Level | What is logged |
+  | --- | --- |
+  | Error | Only failures |
+  | Warning *(default)* | Failures plus potential problems, such as a missing browser for PDF export |
+  | Information | Adds events: startup, the bound URL, server restarts, shutdown, etc. |
+  | Verbose | Adds a line per request, on both the server and the editor. Useful for tracing problems |
+
 - **Max Output Lines (per channel)** *(web/desktop)* — 10–100000, default 1000. Number of lines retained in each Output panel channel before older lines are dropped. Lower values reduce memory use and keep the UI responsive when logs are noisy.
 - **Max Preview Size (MB)** — 1–256, default 24. A document that renders to more HTML than this is not shown; the preview shows a **Preview blocked** page giving the render's size and the limit instead. Showing it risks running the app out of memory. PDF, HTML, and Word export are unaffected as they don't go through the preview. Raise it to preview a very large document anyway.
 - **Max Preview Console Messages** — 10–100000, default 500. How many console lines one preview render may relay before the rest are dropped. Lines go to the **Preview Console** output channel in the desktop app and to the **CalcpadCE Webview Console** channel in VS Code. A worksheet whose scripts log in a loop can otherwise flood the channel.

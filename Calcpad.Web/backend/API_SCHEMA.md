@@ -30,9 +30,11 @@ Launches that do not set the variable (a `dotnet run` during development, the sa
 
 ## Table of Contents
 
+- [GET /health](#get-health)
 - [POST /convert](#post-convert)
 - [GET /sample](#get-sample)
 - [GET /debug-crash](#get-debug-crash)
+- [GET /log-level, POST /log-level](#get-log-level-post-log-level)
 - [POST /pdf](#post-pdf)
 - [GET /pdf/health](#get-pdfhealth)
 - [GET /pdf/browser](#get-pdfbrowser)
@@ -51,6 +53,25 @@ Launches that do not set the variable (a `dotnet run` during development, the sa
 - [GET /snippets](#get-snippets)
 - [Usage Notes](#usage-notes)
 - [Environment Variables](#environment-variables)
+
+---
+
+## GET /health
+
+Liveness probe. Answered from inside the MVC pipeline, so a server that is bound but wedged
+(thread-pool starvation, a deadlock) fails it.
+
+Does no work, logs nothing of its own, and is excluded from the hang watchdog's completed-request
+accounting, so polling it costs nothing and masks nothing. At `verbose` the framework's own
+request logging covers it like any other route. Requires `X-Calcpad-Token` like every
+other `/api` route. For the Chromium readiness of PDF export see [GET /pdf/health](#get-pdfhealth).
+
+**Response:**
+```json
+{
+  "status": "ok"
+}
+```
 
 ---
 
@@ -153,6 +174,48 @@ Deliberately crashes the server, to verify which failure paths `FileLogger` actu
 | mode | `background-thread` | `throw`, `background-thread`, `unobserved-task`, `stackoverflow`, `accessviolation`, `failfast`, or `exit` |
 
 **Response:** `202 Accepted` with `{ mode, note }` for the modes that schedule a crash, `400` for an unknown mode, or no response at all for the modes that terminate the process immediately.
+
+---
+
+## GET /log-level, POST /log-level
+
+Reads and sets the server's log verbosity for the running process. Unlike `debug-crash` this is
+served in every environment — quieting a shipped server is the point — and is covered by the
+`X-Calcpad-Token` check like any other `/api` route.
+
+Levels, least to most verbose: `error`, `warning` (the default), `information`, `verbose`.
+`verbose` adds a line per request, so it is noisy during normal editing, since the editor sends
+requests continuously. Crash and hang reports are written regardless of the level.
+
+**GET response:**
+```json
+{
+  "level": "warning",
+  "available": ["error", "warning", "information", "verbose"]
+}
+```
+
+**POST request:**
+```json
+{
+  "level": "verbose"
+}
+```
+
+Common aliases are accepted (`warn`, `info`, `trace`, `debug`, `off`). `off` maps to `error`, not
+to silence.
+
+**POST response:** `200` with `{ level }`, or `400` with `{ error, message, available }` for a level
+that does not parse. The level applies immediately and is not persisted — a restart returns to
+`CALCPAD_LOG_LEVEL`, or to `warning`.
+
+ASP.NET's own logging obeys this too: the framework's providers are replaced with one that writes
+through `FileLogger`, so a change here takes effect on framework entries without a restart and
+they reach `CalcpadServer-{date}.log` alongside Calcpad's own. Framework entries are far denser
+than ours at the same nominal level, so its `Information` and `Debug` are both reported at
+`verbose`, and its `Trace` is dropped. Kestrel's `Now listening on: <url>` is the one exception,
+emitted at every level because the desktop host reads the bound URL out of stdout when the port
+file is unavailable.
 
 ---
 
@@ -1013,7 +1076,11 @@ GET /api/calcpad/snippets?category=Functions/Trigonometric
 | `CALCPAD_ENABLE_HTTPS` | `false` | Serves `https` instead of `http`. Only applies on the `CALCPAD_PORT` path |
 | `CALCPAD_API_TOKEN` | *(unset — unauthenticated)* | Per-launch token required in `X-Calcpad-Token` |
 | `CALCPAD_DETACHED` | *(unset)* | `1` disables the stdin-EOF watchdog and the default port file, so the server outlives its parent |
-| `CALCPAD_CONTENT_CACHE_SIZE_LIMIT` | `100` | Entries kept in the resolved-content cache shared by lint/highlight/definitions |
+| `CALCPAD_LOG_LEVEL` | `warning` | Startup verbosity: `error`, `warning`, `information` or `verbose`. Covers ASP.NET's own logs too. Change it at runtime via [POST /log-level](#get-log-level-post-log-level); both hosts pass the user's setting here so startup entries honour it as well |
+| `CALCPAD_LOG_DIR` | *(executable-adjacent `logs/`)* | Where `CalcpadServer-{date}.log` is written. Hosts set this when the install directory is read-only |
+| `CALCPAD_HANG_THRESHOLD_SECONDS` | `60` | Seconds without a completed request before the hang watchdog writes a report |
+| `CALCPAD_HANG_DUMP` | *(unset)* | `1` also spawns `createdump` when a hang is detected |
+| `CALCPAD_CONTENT_CACHE_SIZE_LIMIT` | `50000` | Flattened source lines budgeted across the resolved-content cache shared by lint/highlight/definitions |
 | `BROWSER_PATH` | *(auto-detect)* | Chromium-family executable for PDF export. Also `BrowserPath` in `appsettings.json` |
 | `ALLOW_CHROMIUM_DOWNLOAD` | `false` | Lets the render path download Chromium on its own. Also `AllowChromiumDownload` in `appsettings.json` |
 

@@ -35,6 +35,12 @@ namespace Calcpad.Server.Controllers
             _environment = environment;
         }
 
+        /// <summary>
+        /// Liveness probe. Does no work and writes no log line, since clients poll it.
+        /// </summary>
+        [HttpGet("health")]
+        public IActionResult Health() => Ok(new { status = "ok" });
+
         [HttpPost("convert")]
         public IActionResult ConvertToHtml(
             [FromBody] CalcpadRequest request, CancellationToken cancellationToken, [FromQuery] bool unwrap = false)
@@ -275,6 +281,44 @@ namespace Calcpad.Server.Controllers
         private static IActionResult Recurse(int depth) => Recurse(depth + 1);
 
         /// <summary>
+        /// The server's current log verbosity. Reveals a <c>CALCPAD_LOG_LEVEL</c> set outside
+        /// the app, and lets a client show the effective level rather than its own stored one.
+        /// </summary>
+        [HttpGet("log-level")]
+        public IActionResult GetLogLevel()
+        {
+            return Ok(new
+            {
+                level = FileLogger.MinLevel.ToString().ToLowerInvariant(),
+                available = FileLogger.LevelNames
+            });
+        }
+
+        /// <summary>
+        /// Sets log verbosity for the running process. Not gated to Development — quieting a
+        /// shipped server is the point — and the token check covers it like any /api route.
+        /// </summary>
+        [HttpPost("log-level")]
+        public IActionResult SetLogLevel([FromBody] LogLevelRequest request)
+        {
+            var parsed = FileLogger.ParseLevel(request?.Level);
+            if (parsed is null)
+            {
+                return BadRequest(new
+                {
+                    error = "Unknown log level",
+                    message = $"'{request?.Level}' is not a log level.",
+                    available = FileLogger.LevelNames
+                });
+            }
+
+            FileLogger.MinLevel = parsed.Value;
+            // After the assignment, so raising the level records itself.
+            FileLogger.LogInfo("Log level changed", parsed.Value.ToString());
+            return Ok(new { level = parsed.Value.ToString().ToLowerInvariant() });
+        }
+
+        /// <summary>
         /// Generate PDF from HTML content using Playwright and PDFsharp.
         /// </summary>
         [HttpPost("pdf")]
@@ -285,11 +329,11 @@ namespace Calcpad.Server.Controllers
                 if (string.IsNullOrWhiteSpace(request.Html))
                     return BadRequest(new { error = "HTML content is required" });
 
-                FileLogger.LogInfo("PDF generation request received", $"HTML length: {request.Html.Length}");
+                FileLogger.LogVerbose("PDF generation request received", $"HTML length: {request.Html.Length}");
 
                 var pdfBytes = await _pdfService.GeneratePdfAsync(request.Html, request.Options);
 
-                FileLogger.LogInfo("PDF generated successfully", $"Size: {pdfBytes.Length} bytes");
+                FileLogger.LogVerbose("PDF generated successfully", $"Size: {pdfBytes.Length} bytes");
 
                 return File(pdfBytes, "application/pdf", "document.pdf");
             }
@@ -384,7 +428,7 @@ namespace Calcpad.Server.Controllers
                 writer.Convert(html, ms);
                 var bytes = ms.ToArray();
 
-                FileLogger.LogInfo("DOCX generated successfully", $"Size: {bytes.Length} bytes");
+                FileLogger.LogVerbose("DOCX generated successfully", $"Size: {bytes.Length} bytes");
                 return File(
                     bytes,
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -416,7 +460,7 @@ namespace Calcpad.Server.Controllers
                 // A stale request whose client already gave up shouldn't do this work at all.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                FileLogger.LogInfo("Highlight request received", $"Length: {request.Content.Length}");
+                FileLogger.LogVerbose("Highlight request received", $"Length: {request.Content.Length}");
 
                 var tokenizer = new CalcpadTokenizer();
 
@@ -480,7 +524,7 @@ namespace Calcpad.Server.Controllers
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                FileLogger.LogInfo("Lint request received", "Length: " + request.Content.Length);
+                FileLogger.LogVerbose("Lint request received", "Length: " + request.Content.Length);
 
                 var linter = new CalcpadLinter();
 
@@ -535,7 +579,7 @@ namespace Calcpad.Server.Controllers
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                FileLogger.LogInfo("Definitions request received", "Length: " + request.Content.Length);
+                FileLogger.LogVerbose("Definitions request received", "Length: " + request.Content.Length);
 
                 var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
 
@@ -710,7 +754,7 @@ namespace Calcpad.Server.Controllers
         {
             try
             {
-                FileLogger.LogInfo("Snippets request received", "Category: " + (category ?? "all"));
+                FileLogger.LogVerbose("Snippets request received", "Category: " + (category ?? "all"));
 
                 SnippetItem[] snippets;
                 if (string.IsNullOrWhiteSpace(category))
@@ -850,6 +894,12 @@ namespace Calcpad.Server.Controllers
     {
         /// <summary>Prettified source code</summary>
         public string Content { get; set; } = string.Empty;
+    }
+
+    public class LogLevelRequest
+    {
+        /// <summary>One of error, warning, information, verbose. Common aliases accepted.</summary>
+        public string? Level { get; set; }
     }
 
     public class CalcpadRequest
