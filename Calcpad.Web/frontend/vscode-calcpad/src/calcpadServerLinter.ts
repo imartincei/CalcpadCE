@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import * as path from 'path';
 import {
     CalcpadLintService,
     CalcpadApiClient,
     LintDiagnostic,
 } from 'calcpad-frontend';
-import { VSCodeLogger } from './adapters';
 import { CalcpadSettingsManager } from './calcpadSettings';
 
 /**
@@ -16,11 +16,11 @@ import { CalcpadSettingsManager } from './calcpadSettings';
 export class CalcpadServerLinter {
     private diagnosticCollection: vscode.DiagnosticCollection;
     private lintService: CalcpadLintService;
-    private logger: VSCodeLogger;
+    private logger: ILogger;
 
-    constructor(apiClient: CalcpadApiClient, debugChannel: vscode.OutputChannel) {
+    constructor(apiClient: CalcpadApiClient, debugChannel: ILogger) {
         this.diagnosticCollection = vscode.languages.createDiagnosticCollection('calcpad');
-        this.logger = new VSCodeLogger(debugChannel);
+        this.logger = debugChannel;
         this.lintService = new CalcpadLintService(apiClient, this.logger);
     }
 
@@ -34,7 +34,7 @@ export class CalcpadServerLinter {
 
         try {
             const sourceFilePath = document.uri.fsPath;
-            const lintResponse = await this.lintService.lintContent(content, sourceFilePath, document.uri.toString());
+            const lintResponse = await this.lintService.lintContent(content, sourceFilePath, `lint:${document.uri.toString()}`);
 
             if (lintResponse) {
                 const diagnostics = this.convertToDiagnostics(lintResponse.diagnostics);

@@ -22,17 +22,15 @@ namespace Calcpad.Server.Services
                 ContentRootPath = AppContext.BaseDirectory
             });
 
-            // ASP.NET's console provider writes through Console.Out, which InstallConsoleRelay
-            // has replaced, so its output reaches the hosts' Output panels without passing
-            // FileLogger's filter — it has to track MinLevel too.
+            // One sink for framework and our own entries alike, so both obey MinLevel and both
+            // reach the log file. Everything is let through to the provider: it consults MinLevel
+            // per entry, whereas a filter here would be cached and freeze the level at startup.
             //
             // A catch-all rule, not SetMinimumLevel: that applies only when no rule matches, and
-            // appsettings.json's Logging:LogLevel:Default is such a rule, so it would always win.
-            //
-            // Microsoft.Hosting.Lifetime is pinned back for "Now listening on: <url>", which the
-            // Tauri host sniffs (extract_listening_url) when the port file is unreadable.
-            builder.Logging.AddFilter((string?)null, FrameworkLevelFor(FileLogger.MinLevel));
-            builder.Logging.AddFilter("Microsoft.Hosting.Lifetime", Microsoft.Extensions.Logging.LogLevel.Information);
+            // an appsettings Logging:LogLevel:Default is such a rule, so it would always win.
+            builder.Logging.ClearProviders();
+            builder.Logging.AddProvider(new FileLoggerProvider());
+            builder.Logging.AddFilter((string?)null, Microsoft.Extensions.Logging.LogLevel.Trace);
 
             builder.Services.AddControllers()
                 .AddApplicationPart(typeof(CalcpadApiService).Assembly);
@@ -65,18 +63,6 @@ namespace Calcpad.Server.Services
 
             return builder;
         }
-
-        /// <summary>
-        /// Our verbosity mapped onto the framework's. Startup only: the framework caches filters
-        /// per (provider, category), so a later <see cref="FileLogger.MinLevel"/> change misses.
-        /// </summary>
-        private static Microsoft.Extensions.Logging.LogLevel FrameworkLevelFor(LogLevel level) => level switch
-        {
-            LogLevel.Verbose => Microsoft.Extensions.Logging.LogLevel.Debug,
-            LogLevel.Information => Microsoft.Extensions.Logging.LogLevel.Information,
-            LogLevel.Warning => Microsoft.Extensions.Logging.LogLevel.Warning,
-            _ => Microsoft.Extensions.Logging.LogLevel.Error,
-        };
 
         internal const string CorsPolicyName = "CalcpadHosts";
 
@@ -226,7 +212,9 @@ namespace Calcpad.Server.Services
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            // No UseHttpsRedirection: Program.cs refuses any non-loopback binding and the hosts
+            // always spawn us on http, so there is never an https port to redirect to — the
+            // middleware only ever logged "Failed to determine the https port" once per launch.
             app.UseCors(CorsPolicyName);
             RequireApiToken(app);
 

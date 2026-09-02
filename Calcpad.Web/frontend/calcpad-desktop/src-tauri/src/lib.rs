@@ -543,6 +543,24 @@ fn resolve_log_dir(app: &AppHandle) -> Option<PathBuf> {
     Some(dir)
 }
 
+/// The saved log level, read straight from the settings file the frontend writes.
+///
+/// The frontend re-pushes the level over `/api/calcpad/log-level` once it loads, but that is far
+/// too late for the server's own startup entries — without this, choosing Verbose still loses
+/// everything up to the first bind. Unreadable or unrecognised leaves it to the server's default.
+fn stored_log_level(app: &AppHandle) -> Option<String> {
+    let path = app
+        .path()
+        .app_data_dir()
+        .ok()?
+        .join("settings")
+        .join("active-settings.json");
+    let bytes = std::fs::read(path).ok()?;
+    let parsed: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
+    let level = parsed.get("extras")?.get("logLevel")?.as_str()?;
+    matches!(level, "error" | "warning" | "information" | "verbose").then(|| level.to_string())
+}
+
 #[tauri::command]
 fn log_dir(app: AppHandle) -> Result<String, String> {
     resolve_log_dir(&app)
@@ -612,6 +630,9 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
         .stderr(Stdio::piped());
     if let Some(dir) = &log_dir {
         command.env("CALCPAD_LOG_DIR", dir);
+    }
+    if let Some(level) = stored_log_level(app) {
+        command.env("CALCPAD_LOG_LEVEL", level);
     }
     // Every /api route on the child requires this header value, passed via env rather than argv
     // (see api_token()). ASPNETCORE_ENVIRONMENT is pinned because the child inherits our whole

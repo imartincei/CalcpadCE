@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import {
     buildInsertSnippet,
     hasSnippetPlaceholders,
@@ -52,9 +53,9 @@ function toVscodeCompletion(data: CompletionData): vscode.CompletionItem {
 export class CalcpadCompletionProvider implements vscode.CompletionItemProvider {
     private insertManager: CalcpadInsertManager;
     private definitionsService: CalcpadDefinitionsService;
-    private outputChannel: vscode.OutputChannel;
+    private outputChannel: ILogger;
 
-    constructor(definitionsService: CalcpadDefinitionsService, insertManager: CalcpadInsertManager, outputChannel: vscode.OutputChannel) {
+    constructor(definitionsService: CalcpadDefinitionsService, insertManager: CalcpadInsertManager, outputChannel: ILogger) {
         this.insertManager = insertManager;
         this.definitionsService = definitionsService;
         this.outputChannel = outputChannel;
@@ -85,14 +86,14 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
         const wordRange = document.getWordRangeAtPosition(position);
         const word = wordRange ? document.getText(wordRange) : '';
 
-        this.outputChannel.appendLine('[COMPLETION] Word: "' + word + '" at position ' + position.line + ':' + position.character);
+        this.outputChannel.appendLine('[COMPLETION] Word: "' + word + '" at position ' + position.line + ':' + position.character, 'verbose');
 
         // Ensure snippets are loaded
         if (!this.insertManager.isLoaded()) {
             try {
                 await this.insertManager.loadSnippets();
             } catch (error) {
-                this.outputChannel.appendLine('[COMPLETION] Failed to load snippets: ' + error);
+                this.outputChannel.appendLine('[COMPLETION] Failed to load snippets: ' + error, 'verbose');
             }
         }
 
@@ -121,7 +122,7 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
             }
 
         } catch (error) {
-            this.outputChannel.appendLine('[COMPLETION ERROR] ' + error);
+            this.outputChannel.appendLine('[COMPLETION ERROR] ' + error, 'verbose');
         }
 
         // Add built-in content from insert manager — only snippets that define a keyword
@@ -140,7 +141,7 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
             }
         }
 
-        this.outputChannel.appendLine(`[COMPLETION] Returning ${completionItems.length} items`);
+        this.outputChannel.appendLine(`[COMPLETION] Returning ${completionItems.length} items`, 'verbose');
         return completionItems;
     }
 
@@ -467,7 +468,7 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
     /**
      * Register the completion provider
      */
-    public static register(definitionsService: CalcpadDefinitionsService, insertManager: CalcpadInsertManager, outputChannel: vscode.OutputChannel): vscode.Disposable {
+    public static register(definitionsService: CalcpadDefinitionsService, insertManager: CalcpadInsertManager, outputChannel: ILogger): vscode.Disposable {
         const provider = new CalcpadCompletionProvider(definitionsService, insertManager, outputChannel);
         return vscode.languages.registerCompletionItemProvider(
             ['calcpad', 'plaintext'], // Language selector

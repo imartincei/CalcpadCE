@@ -2,7 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { join } from '@tauri-apps/api/path';
 import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
-import { buildCrashRecord } from 'calcpad-frontend';
+import { buildCrashRecord, type ILogger, type CalcpadLogLevel, type ServerLifecycleState } from 'calcpad-frontend';
 
 /**
  * Manages the client-side view of the Calcpad.Server lifecycle. The actual
@@ -24,9 +24,7 @@ const START_TIMEOUT_MS = 30_000;
 // never hit the give-up threshold.
 const STABLE_RESET_MS = 30_000;
 
-export interface ServerManagerLogger {
-    appendLine(message: string): void;
-}
+export type ServerManagerLogger = ILogger;
 
 interface ServerCrashPayload {
     code: number | null;
@@ -37,13 +35,6 @@ interface ServerLogPayload {
     stream: 'stdout' | 'stderr';
     line: string;
 }
-
-/**
- * What Rust has told us about the sidecar process. A crash collapses into `starting` when a retry
- * is scheduled and `stopped` when the streak is exhausted — that distinction lives here because
- * this class owns the crash counter.
- */
-export type ServerLifecycleState = 'starting' | 'running' | 'stopped';
 
 export class TauriServerManager {
     private url = '';
@@ -89,7 +80,7 @@ export class TauriServerManager {
         // channel; time out after START_TIMEOUT_MS to avoid a wedged boot.
         const startedAt = performance.now();
         const t = () => Math.round(performance.now() - startedAt);
-        this.log(`[timing] start() called`);
+        this.log(`[timing] start() called`, 'verbose');
         this.onStatusChanged?.('starting', 'boot');
         let resolveReady: ((url: string) => void) | null = null;
         let rejectReady: ((err: Error) => void) | null = null;
@@ -101,7 +92,7 @@ export class TauriServerManager {
         try {
             this.token = await invoke<string>('server_token');
         } catch (err) {
-            this.log(`server_token invoke failed — API calls will be rejected: ${err instanceof Error ? err.message : String(err)}`);
+            this.log(`server_token invoke failed — API calls will be rejected: ${err instanceof Error ? err.message : String(err)}`, 'error');
         }
 
         try {
@@ -109,16 +100,16 @@ export class TauriServerManager {
                 this.url = evt.payload;
                 this._isRunning = true;
                 this.scheduleStabilityReset();
-                this.log(`[timing] server-url event received ${t()}ms after start()`);
+                this.log(`[timing] server-url event received ${t()}ms after start()`, 'verbose');
                 this.log(`Server ready at ${this.url}`);
                 this.onUrlChanged?.(this.url);
                 this.onStatusChanged?.('running', this.url);
                 resolveReady?.(this.url);
                 resolveReady = null;
             });
-            this.log(`[timing] server-url listener ready at ${t()}ms`);
+            this.log(`[timing] server-url listener ready at ${t()}ms`, 'verbose');
         } catch (err) {
-            this.log(`[timing] server-url listener FAILED at ${t()}ms: ${err instanceof Error ? err.message : String(err)}`);
+            this.log(`[timing] server-url listener FAILED at ${t()}ms: ${err instanceof Error ? err.message : String(err)}`, 'verbose');
             throw err;
         }
 
@@ -128,7 +119,7 @@ export class TauriServerManager {
             // Crash before the stability window elapsed — the streak stands.
             this.clearStabilityReset();
             this._crashCount++;
-            this.log(`Server crashed (code=${evt.payload.code ?? 'unknown'}) — attempt ${this._crashCount}/${MAX_AUTO_RESTARTS}`);
+            this.log(`Server crashed (code=${evt.payload.code ?? 'unknown'}) — attempt ${this._crashCount}/${MAX_AUTO_RESTARTS}`, 'error');
             void this.writeCrashRecord(evt.payload);
             if (this._crashCount < MAX_AUTO_RESTARTS) {
                 this.onStatusChanged?.('starting', `crashed, retry ${this._crashCount}/${MAX_AUTO_RESTARTS}`);
@@ -144,7 +135,7 @@ export class TauriServerManager {
         });
 
         this.unlistenStartupError = await listen<string>('server-startup-error', (evt) => {
-            this.log(`Server failed to start: ${evt.payload}`);
+            this.log(`Server failed to start: ${evt.payload}`, 'error');
             this.onStatusChanged?.('stopped', evt.payload);
             this.onStartupBlocked?.(evt.payload);
             rejectReady?.(new Error(evt.payload));
@@ -152,14 +143,14 @@ export class TauriServerManager {
             resolveReady = null;
         });
 
-        this.log(`[timing] all listeners ready at ${t()}ms`);
+        this.log(`[timing] all listeners ready at ${t()}ms`, 'verbose');
 
         // Rust starts spawning the sidecar in setup() before our listeners
         // registered, so first check if the URL is already known — otherwise
         // wait for the server-url event to fire.
         try {
             const current = await invoke<string | null>('server_url');
-            this.log(`[timing] server_url invoke returned "${current ?? 'null'}" at ${t()}ms`);
+            this.log(`[timing] server_url invoke returned "${current ?? 'null'}" at ${t()}ms`, 'verbose');
             if (current) {
                 this.url = current;
                 this._isRunning = true;
@@ -169,18 +160,18 @@ export class TauriServerManager {
                 return;
             }
         } catch (err) {
-            this.log(`[timing] server_url invoke failed at ${t()}ms: ${err instanceof Error ? err.message : String(err)}`);
+            this.log(`[timing] server_url invoke failed at ${t()}ms: ${err instanceof Error ? err.message : String(err)}`, 'verbose');
         }
 
-        this.log(`[timing] awaiting server-url event race at ${t()}ms`);
+        this.log(`[timing] awaiting server-url event race at ${t()}ms`, 'verbose');
         const timeout = new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error(`server did not report a URL within ${START_TIMEOUT_MS}ms`)), START_TIMEOUT_MS),
         );
         try {
             await Promise.race([ready, timeout]);
-            this.log(`[timing] race resolved at ${t()}ms`);
+            this.log(`[timing] race resolved at ${t()}ms`, 'verbose');
         } catch (err) {
-            this.log(`[timing] race REJECTED at ${t()}ms: ${err instanceof Error ? err.message : String(err)}`);
+            this.log(`[timing] race REJECTED at ${t()}ms: ${err instanceof Error ? err.message : String(err)}`, 'verbose');
             throw err;
         }
     }
@@ -190,7 +181,7 @@ export class TauriServerManager {
         try {
             await invoke('stop_server');
         } catch (err) {
-            this.log(`stop_server invoke failed: ${err instanceof Error ? err.message : String(err)}`);
+            this.log(`stop_server invoke failed: ${err instanceof Error ? err.message : String(err)}`, 'error');
         }
         this._isRunning = false;
         this.url = '';
@@ -212,7 +203,7 @@ export class TauriServerManager {
             this.log(`Server restarted at ${newUrl}`);
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
-            this.log(`restart_server invoke failed: ${msg}`);
+            this.log(`restart_server invoke failed: ${msg}`, 'error');
             this._isRunning = false;
             this.url = '';
             this.onStatusChanged?.('stopped', msg);
@@ -238,7 +229,7 @@ export class TauriServerManager {
             this._isRunning = false;
             this.url = '';
             this._crashCount++;
-            this.log(`Auto-restart failed: ${msg} — attempt ${this._crashCount}/${MAX_AUTO_RESTARTS}`);
+            this.log(`Auto-restart failed: ${msg} — attempt ${this._crashCount}/${MAX_AUTO_RESTARTS}`, 'error');
             if (this._crashCount < MAX_AUTO_RESTARTS) {
                 this.onStatusChanged?.('starting', `retry ${this._crashCount}/${MAX_AUTO_RESTARTS}`);
                 setTimeout(() => { void this.autoRestart(); }, AUTO_RESTART_DELAY_MS);
@@ -255,7 +246,7 @@ export class TauriServerManager {
         this._stableTimer = setTimeout(() => {
             this._stableTimer = null;
             if (this._crashCount > 0) {
-                this.log(`Server stable for ${STABLE_RESET_MS / 1000}s — resetting crash streak`);
+                this.log(`Server stable for ${STABLE_RESET_MS / 1000}s — resetting crash streak`, 'verbose');
                 this._crashCount = 0;
             }
         }, STABLE_RESET_MS);
@@ -297,9 +288,9 @@ export class TauriServerManager {
                 reportJson,
             });
             await writeTextFile(await join(dir, 'last-crash.txt'), record);
-            this.log(`Crash record written to ${dir}/last-crash.txt`);
+            this.log(`Crash record written to ${dir}/last-crash.txt`, 'verbose');
         } catch (err) {
-            this.log(`Could not write crash record: ${err instanceof Error ? err.message : String(err)}`);
+            this.log(`Could not write crash record: ${err instanceof Error ? err.message : String(err)}`, 'warning');
         }
     }
 
@@ -321,7 +312,7 @@ export class TauriServerManager {
         this.unlistenLog = null;
     }
 
-    private log(message: string): void {
-        this.logger.appendLine(`[ServerManager] ${message}`);
+    private log(message: string, level: CalcpadLogLevel = 'information'): void {
+        this.logger.appendLine(`[ServerManager] ${message}`, level);
     }
 }

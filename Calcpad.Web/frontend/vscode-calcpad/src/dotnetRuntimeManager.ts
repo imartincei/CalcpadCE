@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import * as path from 'path';
 import * as fs from 'fs';
 import { execFile, execSync } from 'child_process';
@@ -49,9 +50,9 @@ function getPlatformRuntimeInfo(): PlatformRuntimeInfo | null {
 }
 
 export class DotnetRuntimeManager {
-    private outputChannel: vscode.OutputChannel;
+    private outputChannel: ILogger;
 
-    constructor(outputChannel: vscode.OutputChannel) {
+    constructor(outputChannel: ILogger) {
         this.outputChannel = outputChannel;
     }
 

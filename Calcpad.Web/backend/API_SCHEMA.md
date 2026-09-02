@@ -61,8 +61,9 @@ Launches that do not set the variable (a `dotnet run` during development, the sa
 Liveness probe. Answered from inside the MVC pipeline, so a server that is bound but wedged
 (thread-pool starvation, a deadlock) fails it.
 
-Does no work, writes no log line, and is excluded from the hang watchdog's completed-request
-accounting, so polling it costs nothing and masks nothing. Requires `X-Calcpad-Token` like every
+Does no work, logs nothing of its own, and is excluded from the hang watchdog's completed-request
+accounting, so polling it costs nothing and masks nothing. At `verbose` the framework's own
+request logging covers it like any other route. Requires `X-Calcpad-Token` like every
 other `/api` route. For the Chromium readiness of PDF export see [GET /pdf/health](#get-pdfhealth).
 
 **Response:**
@@ -208,9 +209,13 @@ to silence.
 that does not parse. The level applies immediately and is not persisted — a restart returns to
 `CALCPAD_LOG_LEVEL`, or to `warning`.
 
-> Applies to Calcpad's own logging only. ASP.NET's framework logs are filtered once at startup
-> from `CALCPAD_LOG_LEVEL`, because the framework caches its log filters per category; to see
-> framework request lines, set the variable at launch rather than calling this endpoint.
+ASP.NET's own logging obeys this too: the framework's providers are replaced with one that writes
+through `FileLogger`, so a change here takes effect on framework entries without a restart and
+they reach `CalcpadServer-{date}.log` alongside Calcpad's own. Framework entries are far denser
+than ours at the same nominal level, so its `Information` and `Debug` are both reported at
+`verbose`, and its `Trace` is dropped. Kestrel's `Now listening on: <url>` is the one exception,
+emitted at every level because the desktop host reads the bound URL out of stdout when the port
+file is unavailable.
 
 ---
 
@@ -1071,7 +1076,7 @@ GET /api/calcpad/snippets?category=Functions/Trigonometric
 | `CALCPAD_ENABLE_HTTPS` | `false` | Serves `https` instead of `http`. Only applies on the `CALCPAD_PORT` path |
 | `CALCPAD_API_TOKEN` | *(unset — unauthenticated)* | Per-launch token required in `X-Calcpad-Token` |
 | `CALCPAD_DETACHED` | *(unset)* | `1` disables the stdin-EOF watchdog and the default port file, so the server outlives its parent |
-| `CALCPAD_LOG_LEVEL` | `warning` | Startup verbosity: `error`, `warning`, `information` or `verbose`. Also sets the floor for ASP.NET's own logs. Change Calcpad's own at runtime via [POST /log-level](#get-log-level-post-log-level) |
+| `CALCPAD_LOG_LEVEL` | `warning` | Startup verbosity: `error`, `warning`, `information` or `verbose`. Covers ASP.NET's own logs too. Change it at runtime via [POST /log-level](#get-log-level-post-log-level); both hosts pass the user's setting here so startup entries honour it as well |
 | `CALCPAD_LOG_DIR` | *(executable-adjacent `logs/`)* | Where `CalcpadServer-{date}.log` is written. Hosts set this when the install directory is read-only |
 | `CALCPAD_HANG_THRESHOLD_SECONDS` | `60` | Seconds without a completed request before the hang watchdog writes a report |
 | `CALCPAD_HANG_DUMP` | *(unset)* | `1` also spawns `createdump` when a hang is detected |

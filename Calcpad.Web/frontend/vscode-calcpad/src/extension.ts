@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { pdfResponseError, isBrowserNotFound, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript } from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -213,7 +213,7 @@ async function maybeAutoEnterInputMode(document: vscode.TextDocument): Promise<v
     if (!CalcpadSettingsManager.getInstance(extensionContext).getExtraBool('autoInputMode', true)) return;
     if (!documentHasUiDirectives(document.getText())) return;
 
-    outputChannel.appendLine(`[UI] Input mode opened for ${document.uri.fsPath} (#UI document)`);
+    outputChannel.appendLine(`[UI] Input mode opened for ${document.uri.fsPath} (#UI document)`, 'verbose');
     await showPreview('ui', undefined, true);
 }
 
@@ -228,13 +228,55 @@ async function refreshPreviewPanels(document: vscode.TextDocument): Promise<void
 let linter: CalcpadServerLinter;
 let definitionsService: CalcpadDefinitionsService;
 let serverManager: CalcpadServerManager | undefined;
-let outputChannel: vscode.OutputChannel;
+let outputChannel: VSCodeLogger;
 let calcpadOutputHtmlChannel: vscode.OutputChannel;
 let calcpadWebviewConsoleChannel: vscode.OutputChannel;
 let extensionContext: vscode.ExtensionContext;
 let vueUiProvider: CalcpadVueUIProvider | undefined;
 // Set in activate(); the module-level export commands need it outside that scope.
 let sharedApiClient: CalcpadApiClient | undefined;
+
+const NO_SERVER_MESSAGE = 'No CalcpadCE server available — the bundled server did not start '
+    + 'and no remote server URL is configured.';
+
+/** Settles once the server URL is known to be either available or unobtainable. */
+let settleServerUrl: (() => void) | undefined;
+const serverUrlSettled = new Promise<void>((resolve) => { settleServerUrl = resolve; });
+
+/**
+ * The effective server URL, waiting out a local server that is still starting. Empty only when
+ * there is genuinely nothing to talk to — no bundled server and no remote URL configured.
+ *
+ * `activate()` deliberately does not block on the server: resolving .NET and binding a port take
+ * seconds, and the resolver may prompt. Until then `getServerUrl()` is empty, so anything that
+ * rendered in that window — a restored `.cpdz` editor, a preview opened straight away — failed
+ * with "Server URL not configured", which reads like a misconfiguration rather than a server
+ * that has simply not finished starting.
+ */
+async function resolveServerUrl(timeoutMs: number = 30_000): Promise<string> {
+    const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
+    const url = settingsManager.getServerUrl();
+    if (url) return url;
+    // The timeout is a backstop for a path that settles neither way; every failure branch in
+    // activate() settles, so a server that cannot start does not hold a render for the full wait.
+    let timer: NodeJS.Timeout | undefined;
+    await Promise.race([
+        serverUrlSettled,
+        new Promise<void>((resolve) => { timer = setTimeout(resolve, timeoutMs); }),
+    ]);
+    if (timer) clearTimeout(timer);
+    return settingsManager.getServerUrl();
+}
+
+/**
+ * Applies the level to this extension host's own channels and to the server, which keeps its own
+ * copy. Called on activation and whenever the setting changes, so both sides stay in step.
+ */
+function applyLogLevel(raw: string | undefined | null): void {
+    const level = coerceLogLevel(raw);
+    setLogLevel(level);
+    void sharedApiClient?.setServerLogLevel(level);
+}
 
 /**
  * Auth headers for the handful of requests that bypass the shared client and
@@ -392,7 +434,7 @@ async function buildImageCache(
             const mimeType = IMAGE_MIME_MAP[ext];
 
             if (!mimeType) {
-                outputChannel.appendLine(`[IMAGE CACHE] Skipping unsupported image type: ${src}`);
+                outputChannel.appendLine(`[IMAGE CACHE] Skipping unsupported image type: ${src}`, 'warning');
                 continue;
             }
 
@@ -402,15 +444,15 @@ async function buildImageCache(
             cache[src] = `data:${mimeType};base64,${b64}`;
             inlined += imageData.length;
 
-            outputChannel.appendLine(`[IMAGE CACHE] Cached: ${src} (${imageData.length} bytes)`);
+            outputChannel.appendLine(`[IMAGE CACHE] Cached: ${src} (${imageData.length} bytes)`, 'verbose');
         } catch (error) {
-            outputChannel.appendLine(`[IMAGE CACHE] Could not read image: ${src} (${error instanceof Error ? error.message : 'Unknown error'})`);
+            outputChannel.appendLine(`[IMAGE CACHE] Could not read image: ${src} (${error instanceof Error ? error.message : 'Unknown error'})`, 'warning');
         }
     }
 
     if (skipped) {
         outputChannel.appendLine(
-            `[IMAGE CACHE] Budget of ${formatSize(maxTotalBytes ?? 0)} reached — ${skipped} image(s) left unembedded`);
+            `[IMAGE CACHE] Budget of ${formatSize(maxTotalBytes ?? 0)} reached — ${skipped} image(s) left unembedded`, 'warning');
     }
 
     return cache;
@@ -769,8 +811,8 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
     if (enableUi && !standalone) uiPanelDocKey = docKey;
 
     const mode = enableUi ? 'ui' : forPrint ? 'report' : unwrapped ? 'unwrapped' : 'wrapped';
-    outputChannel.appendLine(`Starting updatePreviewContent (${mode})...`);
-    outputChannel.appendLine(`Content length: ${content.length} characters`);
+    outputChannel.appendLine(`Starting updatePreviewContent (${mode})...`, 'verbose');
+    outputChannel.appendLine(`Content length: ${content.length} characters`, 'verbose');
 
     // Update panel title with current file name
     const activeEditor = standalone ? undefined : (vscode.window.activeTextEditor ?? previewSourceEditor);
@@ -784,7 +826,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
 
     // Check if content is empty
     if (!content || content.trim().length === 0) {
-        outputChannel.appendLine('Content is empty - showing empty state');
+        outputChannel.appendLine('Content is empty - showing empty state', 'verbose');
         const emptyTheme = getEffectivePreviewTheme();
         const c = emptyTheme === 'light'
             ? { fg: '#6e6e6e', bg: '#ffffff', link: '#0066cc' }
@@ -837,21 +879,17 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
 
     const endPreviewLoading = showPreviewLoading(panel);
     try {
-        outputChannel.appendLine('Getting settings...');
+        outputChannel.appendLine('Getting settings...', 'verbose');
         const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
 
         const settings = await settingsManager.getApiSettings();
-        const apiBaseUrl = settingsManager.getServerUrl();
+        const apiBaseUrl = await resolveServerUrl();
 
-        if (!apiBaseUrl) {
-            outputChannel.appendLine('ERROR: Server URL not configured');
-            throw new Error('Server URL not configured');
-        }
-        outputChannel.appendLine(`Server URL: ${apiBaseUrl}`);
-        outputChannel.appendLine(`Settings retrieved: ${JSON.stringify(settings)}`);
+        if (!apiBaseUrl) throw new Error(NO_SERVER_MESSAGE);
+        outputChannel.appendLine(`Server URL: ${apiBaseUrl}`, 'verbose');
 
         const endpoint = unwrapped ? '/api/calcpad/convert?unwrap=true' : '/api/calcpad/convert';
-        outputChannel.appendLine(`Making API call to ${endpoint}...`);
+        outputChannel.appendLine(`Making API call to ${endpoint}...`, 'verbose');
 
         const theme = getEffectivePreviewTheme();
         const requestBody = JSON.stringify({
@@ -899,7 +937,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         if (!response.ok) {
             throw new Error(`Server returned ${response.status}`);
         }
-        outputChannel.appendLine('API call successful');
+        outputChannel.appendLine('API call successful', 'verbose');
 
         vueUiProvider?.updateConvertErrors(parseConvertErrorHeader(response));
 
@@ -915,7 +953,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
                 .getExtraNumber('maxPreviewSizeMB', DEFAULT_PREVIEW_SIZE_MB));
         if (apiResponse.length > sizeLimit) {
             outputChannel.appendLine(
-                `Preview blocked: render is ${formatSize(apiResponse.length)}, limit is ${formatSize(sizeLimit)}`);
+                `Preview blocked: render is ${formatSize(apiResponse.length)}, limit is ${formatSize(sizeLimit)}`, 'warning');
             const notice = previewLimitNoticeHtml({
                 chars: apiResponse.length,
                 limitChars: sizeLimit,
@@ -941,7 +979,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         calcpadOutputHtmlChannel.clear();
         calcpadOutputHtmlChannel.appendLine(truncateForOutput(extractBodyHtml(apiResponse), MAX_HTML_MIRROR_CHARS));
 
-        outputChannel.appendLine(`HTML Length: ${apiResponse.length} characters`);
+        outputChannel.appendLine(`HTML Length: ${apiResponse.length} characters`, 'verbose');
 
         // Build image cache: read local image files and convert to base64 data URIs.
         // An untitled document has no folder to join a relative src against, but Core
@@ -998,10 +1036,10 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // to an opaque origin inside the shell, which holds the only handle to VS Code.
         renderIntoShell(panel, frameHtml, { background: previewBackground() });
 
-        outputChannel.appendLine('Preview document pushed to the shell (sandboxed frame)');
+        outputChannel.appendLine('Preview document pushed to the shell (sandboxed frame)', 'verbose');
 
     } catch (error) {
-        outputChannel.appendLine(`ERROR in updatePreviewContent: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        outputChannel.appendLine(`ERROR in updatePreviewContent: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
         const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
         const errorApiBaseUrl = settingsManager.getServerUrl();
         const endpoint = unwrapped ? 'convert?unwrap=true' : 'convert';
@@ -1047,8 +1085,8 @@ async function renderForExport(
     forceWrite = false,
 ): Promise<{ html: string; errors: CalcpadError[] }> {
     const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
-    const apiBaseUrl = settingsManager.getServerUrl();
-    if (!apiBaseUrl) throw new Error('Server URL not configured');
+    const apiBaseUrl = await resolveServerUrl();
+    if (!apiBaseUrl) throw new Error(NO_SERVER_MESSAGE);
 
     if (!documentContent || documentContent.trim().length === 0) {
         throw new Error('Document is empty. Please add some CalcpadCE content first.');
@@ -1095,9 +1133,8 @@ async function generatePdfToFile(
     variant: ExportVariant = 'report',
     progress?: vscode.Progress<{ increment?: number; message?: string }>
 ): Promise<void> {
-    const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
-    const apiBaseUrl = settingsManager.getServerUrl();
-    if (!apiBaseUrl) throw new Error('Server URL not configured');
+    const apiBaseUrl = await resolveServerUrl();
+    if (!apiBaseUrl) throw new Error(NO_SERVER_MESSAGE);
 
     progress?.report({ increment: 20, message: 'Converting to HTML...' });
 
@@ -1194,7 +1231,7 @@ async function runPdfExportCommand(variant: ExportVariant = 'report'): Promise<v
             return;
         } catch (error) {
             const msg = error instanceof Error ? error.message : String(error);
-            outputChannel.appendLine(`[PDF] ${msg}`);
+            outputChannel.appendLine(`[PDF] ${msg}`, 'warning');
 
             if (attempt === 0 && isBrowserNotFound(error) && await offerChromiumDownload(error.downloadSizeMb)) {
                 continue;
@@ -1228,14 +1265,13 @@ async function offerChromiumDownload(downloadSizeMb: number): Promise<boolean> {
     );
 
     if (choice === undefined) {
-        outputChannel.appendLine(`[PDF] Export cancelled — no browser available. ${advice}`);
+        outputChannel.appendLine(`[PDF] Export cancelled — no browser available. ${advice}`, 'warning');
         return false;
     }
 
-    const settingsManager = CalcpadSettingsManager.getInstance(extensionContext);
-    const apiBaseUrl = settingsManager.getServerUrl();
+    const apiBaseUrl = await resolveServerUrl();
     if (!apiBaseUrl) {
-        vscode.window.showErrorMessage('Server URL not configured');
+        vscode.window.showErrorMessage(NO_SERVER_MESSAGE);
         return false;
     }
 
@@ -1245,11 +1281,11 @@ async function offerChromiumDownload(downloadSizeMb: number): Promise<boolean> {
             title: 'Downloading headless Chromium (one time)...',
             cancellable: false
         }, () => installPdfBrowser(apiBaseUrl, apiAuthHeaders()));
-        outputChannel.appendLine(`[PDF] Chromium installed: ${installedPath}`);
+        outputChannel.appendLine(`[PDF] Chromium installed: ${installedPath}`, 'information');
         return true;
     } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        outputChannel.appendLine(`[PDF] Chromium download failed: ${msg}`);
+        outputChannel.appendLine(`[PDF] Chromium download failed: ${msg}`, 'warning');
         vscode.window.showErrorMessage(`Chromium download failed: ${msg}. ${advice}`);
         return false;
     }
@@ -1284,7 +1320,7 @@ async function writeDataFiles() {
             vscode.window.showWarningMessage(message);
     } catch (error) {
         const msg = error instanceof Error ? error.message : 'Unknown error';
-        outputChannel.appendLine(`ERROR in writeDataFiles: ${msg}`);
+        outputChannel.appendLine(`ERROR in writeDataFiles: ${msg}`, 'error');
         vueUiProvider?.writeFilesResult(false, `Failed to write the document's output: ${msg}`);
         vscode.window.showErrorMessage(`Failed to write the document's output: ${msg}`);
     }
@@ -1326,7 +1362,7 @@ async function saveSourceHtml(variant: ExportVariant = 'report') {
         }
     } catch (error) {
         const msg = error instanceof Error ? error.message : 'Unknown error';
-        outputChannel.appendLine(`ERROR in saveSourceHtml: ${msg}`);
+        outputChannel.appendLine(`ERROR in saveSourceHtml: ${msg}`, 'error');
         vscode.window.showErrorMessage(`Failed to save HTML: ${msg}`);
     }
 }
@@ -1346,9 +1382,9 @@ async function saveDocx(variant: ExportVariant = 'report') {
         return;
     }
     try {
-        const apiBaseUrl = settingsManager.getServerUrl();
+        const apiBaseUrl = await resolveServerUrl();
         if (!apiBaseUrl) {
-            vscode.window.showErrorMessage('Server URL not configured');
+            vscode.window.showErrorMessage(NO_SERVER_MESSAGE);
             return;
         }
 
@@ -1385,7 +1421,7 @@ async function saveDocx(variant: ExportVariant = 'report') {
         }
     } catch (error) {
         const msg = error instanceof Error ? error.message : 'Unknown error';
-        outputChannel.appendLine(`ERROR in saveDocx: ${msg}`);
+        outputChannel.appendLine(`ERROR in saveDocx: ${msg}`, 'error');
         vscode.window.showErrorMessage(`Failed to save Word document: ${msg}`);
     }
 }
@@ -1442,7 +1478,7 @@ async function saveAsCompiled() {
         vscode.window.showInformationMessage(`Compiled worksheet saved to ${saveUri.fsPath}`);
     } catch (error) {
         const msg = error instanceof Error ? error.message : 'Unknown error';
-        outputChannel.appendLine(`ERROR in saveAsCompiled: ${msg}`);
+        outputChannel.appendLine(`ERROR in saveAsCompiled: ${msg}`, 'error');
         vscode.window.showErrorMessage(`Failed to save compiled worksheet: ${msg}`);
     }
 }
@@ -1481,7 +1517,7 @@ async function exportPortable() {
             const reasons = packaged?.errors ?? ['The server is not running'];
             // A collision or a list of unreadable references runs to several lines, which a
             // notification swallows: the first goes in the toast, the rest to the log.
-            outputChannel.appendLine(`ERROR in exportPortable:\n${reasons.join('\n')}`);
+            outputChannel.appendLine(`ERROR in exportPortable:\n${reasons.join('\n')}`, 'error');
             const choice = await vscode.window.showErrorMessage(
                 `Cannot package this worksheet: ${reasons[0]}`,
                 'Show Details');
@@ -1494,7 +1530,7 @@ async function exportPortable() {
             `Portable package saved to ${saveUri.fsPath} — ${packaged.bundled.length} reference(s) bundled`);
     } catch (error) {
         const msg = error instanceof Error ? error.message : 'Unknown error';
-        outputChannel.appendLine(`ERROR in exportPortable: ${msg}`);
+        outputChannel.appendLine(`ERROR in exportPortable: ${msg}`, 'error');
         vscode.window.showErrorMessage(`Failed to export the portable package: ${msg}`);
     }
 }
@@ -1509,7 +1545,7 @@ function documentHasMacros(text: string): boolean {
 // Jump the source editor to a 1-based line.
 function navigateEditorToLine(sourceEditor: vscode.TextEditor, line: number) {
     const lineIndex = Math.max(0, line - 1);
-    outputChannel.appendLine(`Navigating to source line ${line}`);
+    outputChannel.appendLine(`Navigating to source line ${line}`, 'verbose');
     const position = new vscode.Position(lineIndex, 0);
     const selection = new vscode.Selection(position, position);
     sourceEditor.selection = selection;
@@ -1718,35 +1754,77 @@ export async function activate(context: vscode.ExtensionContext) {
         extensionContext = context;
         
         // Create output channel for debugging
-        outputChannel = vscode.window.createOutputChannel('CalcpadCE Extension');
-        outputChannel.appendLine('CalcPad extension activated');
+        outputChannel = new VSCodeLogger(vscode.window.createOutputChannel('CalcpadCE Extension'));
 
         // Create dedicated output channels for HTML
         calcpadOutputHtmlChannel = vscode.window.createOutputChannel('CalcpadCE Output HTML');
         calcpadWebviewConsoleChannel = vscode.window.createOutputChannel('CalcpadCE Webview Console');
 
         // Create debug channel for linter/highlighter
-        const serverDebugChannel = vscode.window.createOutputChannel('CalcpadCE Server Debug');
+        const serverDebugChannel = new VSCodeLogger(vscode.window.createOutputChannel('CalcpadCE Server Debug'));
 
-        outputChannel.appendLine('Initializing settings manager...');
         const settingsManager = CalcpadSettingsManager.getInstance(context);
+        // Before the first line is written, so every channel honours the stored level from the
+        // start. sharedApiClient is still unset; the server gets its copy in applyServerUrl below.
+        setLogLevel(coerceLogLevel(settingsManager.getExtra('logLevel')));
+        outputChannel.appendLine('CalcPad extension activated', 'information');
 
         // Create shared API client (uses remote URL initially, switches to local when server starts)
-        const apiClient = new CalcpadApiClient(
-            settingsManager.getServerUrl(),
-            new VSCodeLogger(serverDebugChannel)
-        );
+        const apiClient = new CalcpadApiClient(settingsManager.getServerUrl(), serverDebugChannel);
         sharedApiClient = apiClient;
+
+        // Continuous liveness, surfaced as the coloured dot in the CalcpadCE view title. The
+        // server manager pushes lifecycle transitions in; the poll is the backstop for what it
+        // cannot see — a wedged server, or one another window restarted underneath us.
+        const connectionMonitor = new ConnectionMonitor({
+            probe: (timeoutMs) => apiClient.checkHealth(timeoutMs),
+            onStatusChanged: (status) => {
+                void vscode.commands.executeCommand('setContext', 'calcpad.serverStatus', status);
+            },
+            onRecovered: () => { void refreshAllComponents(); },
+            log: (message) => serverDebugChannel.appendLine(`[Server] ${message}`, 'information'),
+        });
+        void vscode.commands.executeCommand('setContext', 'calcpad.serverStatus', 'connecting');
+        context.subscriptions.push({ dispose: () => connectionMonitor.stop() });
+        // Extension-host timers are throttled while the window is in the background, so the
+        // last poll can be well stale by the time the user looks at the dot again.
+        context.subscriptions.push(vscode.window.onDidChangeWindowState((e) => {
+            if (e.focused) connectionMonitor.probeSoon();
+        }));
+
+        /** Nothing local will report to us: poll whatever remote URL is configured, if any. */
+        const monitorRemoteOnly = (reason: string) => {
+            // Whether or not a remote URL is configured, this is the final answer for this
+            // window, so anything waiting on a URL can stop waiting.
+            settleServerUrl?.();
+            if (settingsManager.getServerUrl()) connectionMonitor.start();
+            else connectionMonitor.markStopped(reason);
+        };
+
+        // Point every consumer at the server the manager just brought up. Raised on a fresh
+        // start, on adopting another window's server, and after an auto-restart — which picks a
+        // new port, so skipping it would leave the client addressing a dead one.
+        const applyServerUrl = (serverUrl: string) => {
+            settingsManager.setLocalServerUrl(serverUrl);
+            settleServerUrl?.();
+            apiClient.setBaseUrl(serverUrl);
+            apiClient.setAuthToken(serverManager?.getAuthToken() ?? null);
+            // The server may have started before us, or restarted since, so it does not
+            // necessarily hold the level the user chose. Re-pushing here is idempotent.
+            void apiClient.setServerLogLevel(getLogLevel());
+            // No probe kicked off here: the manager raises 'running' right after this, and
+            // that is what promotes the dot to green.
+        };
 
         // Start bundled server if available
         const serverMode = settingsManager.getSettings().server.mode || 'auto';
-        outputChannel.appendLine(`Server mode: ${serverMode}`);
+        outputChannel.appendLine(`Server mode: ${serverMode}`, 'verbose');
 
         if (serverMode === 'auto' || serverMode === 'local') {
             const dllExists = CalcpadServerManager.dllExists(context.extensionPath);
             const appHostExists = CalcpadServerManager.appHostExists(context.extensionPath);
-            outputChannel.appendLine(`Bundled DLL exists: ${dllExists}`);
-            outputChannel.appendLine(`Bundled apphost exists: ${appHostExists}`);
+            outputChannel.appendLine(`Bundled DLL exists: ${dllExists}`, 'verbose');
+            outputChannel.appendLine(`Bundled apphost exists: ${appHostExists}`, 'verbose');
 
             if (dllExists) {
                 const configuredDotnetPath = settingsManager.getExtra('dotnetPath', 'dotnet');
@@ -1762,20 +1840,23 @@ export async function activate(context: vscode.ExtensionContext) {
                 dotnetPromise.then((resolvedDotnetPath) => {
                     if (!resolvedDotnetPath) {
                         if (serverMode === 'local') {
-                            outputChannel.appendLine('.NET runtime not available, server cannot start');
+                            outputChannel.appendLine('.NET runtime not available, server cannot start', 'warning');
                         } else {
-                            outputChannel.appendLine('.NET runtime not available, falling back to remote API');
+                            outputChannel.appendLine('.NET runtime not available, falling back to remote API', 'warning');
                         }
+                        monitorRemoteOnly('no .NET runtime');
                         return;
                     }
 
                     if (appHostExists) {
-                        outputChannel.appendLine('Using bundled apphost (self-contained, no system dotnet required)');
+                        outputChannel.appendLine('Using bundled apphost (self-contained, no system dotnet required)', 'verbose');
                     } else {
-                        outputChannel.appendLine(`Using dotnet at: ${resolvedDotnetPath}`);
+                        outputChannel.appendLine(`Using dotnet at: ${resolvedDotnetPath}`, 'verbose');
                     }
                     serverManager = new CalcpadServerManager(context.extensionPath, serverDebugChannel, resolvedDotnetPath, outputChannel);
                     context.subscriptions.push(serverManager);
+                    serverManager.onUrlChanged = applyServerUrl;
+                    serverManager.onStatusChanged = (state, detail) => connectionMonitor.applyLifecycle(state, detail);
 
                     // Notify user when server crashes repeatedly
                     serverManager.onCrashExhausted = (crashOutput: string) => {
@@ -1793,16 +1874,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
                     // Start the server in the background so activation isn't blocked
                     serverManager.start().then(() => {
-                        const serverUrl = serverManager!.getBaseUrl();
-                        settingsManager.setLocalServerUrl(serverUrl);
-                        apiClient.setBaseUrl(serverUrl);
-                        apiClient.setAuthToken(serverManager!.getAuthToken());
-                        void apiClient.setServerLogLevel(settingsManager.getExtra('serverLogLevel', 'warning'));
-                        outputChannel.appendLine(`Local server started at ${serverUrl}`);
+                        outputChannel.appendLine(`Local server started at ${serverManager!.getBaseUrl()}`, 'information');
                         void refreshAllComponents();
                     }).catch((err) => {
                         const message = err instanceof Error ? err.message : String(err);
-                        outputChannel.appendLine(`Failed to start local server: ${message}`);
+                        outputChannel.appendLine(`Failed to start local server: ${message}`, 'warning');
+                        // Not every branch below reaches monitorRemoteOnly, and a render waiting
+                        // on a URL should not sit out its timeout once the answer is known.
+                        settleServerUrl?.();
                         // Keep `serverManager` around when Windows blocked the exe —
                         // the user can unblock the file and click refresh to retry.
                         // Discarding it here would leave refresh with nothing to call.
@@ -1837,29 +1916,37 @@ export async function activate(context: vscode.ExtensionContext) {
                                     if (choice === 'Show Output') serverDebugChannel.show();
                                 });
                             } else {
-                                outputChannel.appendLine(`Falling back to remote API at ${remoteUrl}`);
+                                outputChannel.appendLine(`Falling back to remote API at ${remoteUrl}`, 'information');
+                                // The manager reported 'stopped' on its way out, which suspends
+                                // polling; the remote server is a different one to watch.
+                                monitorRemoteOnly('bundled server failed');
                             }
                         }
                     });
                 }).catch((err) => {
                     const message = err instanceof Error ? err.message : String(err);
-                    outputChannel.appendLine(`Dotnet resolution failed: ${message}`);
+                    outputChannel.appendLine(`Dotnet resolution failed: ${message}`, 'warning');
+                    monitorRemoteOnly('dotnet resolution failed');
                 });
             } else if (serverMode === 'local') {
                 vscode.window.showErrorMessage('CalcpadCE: Server mode is "local" but CalcpadServer.dll was not found in the extension.');
+                monitorRemoteOnly('no bundled server');
             } else {
-                outputChannel.appendLine('No bundled DLL found, using remote API');
+                outputChannel.appendLine('No bundled DLL found, using remote API', 'information');
+                monitorRemoteOnly('no bundled server');
             }
+        } else {
+            monitorRemoteOnly('remote server mode');
         }
 
-        outputChannel.appendLine('Initializing linter...');
+        outputChannel.appendLine('Initializing linter...', 'verbose');
         linter = new CalcpadServerLinter(apiClient, serverDebugChannel);
 
-        outputChannel.appendLine('Initializing definitions service...');
+        outputChannel.appendLine('Initializing definitions service...', 'verbose');
         definitionsService = new CalcpadDefinitionsService(apiClient, serverDebugChannel);
 
         // Initialize semantic token provider
-        outputChannel.appendLine('Initializing semantic token provider...');
+        outputChannel.appendLine('Initializing semantic token provider...', 'verbose');
         const semanticTokensProvider = new CalcpadSemanticTokensProvider(apiClient, serverDebugChannel);
         const semanticTokensDisposable = vscode.languages.registerDocumentSemanticTokensProvider(
             { language: 'calcpad' },
@@ -1868,67 +1955,67 @@ export async function activate(context: vscode.ExtensionContext) {
         );
 
         // Initialize operator replacer
-        outputChannel.appendLine('Initializing operator replacer...');
+        outputChannel.appendLine('Initializing operator replacer...', 'verbose');
         const operatorReplacer = new OperatorReplacer(outputChannel);
         const operatorReplacerDisposable = operatorReplacer.registerDocumentChangeListener(context);
 
         // Initialize auto-indenter
-        outputChannel.appendLine('Initializing auto-indenter...');
+        outputChannel.appendLine('Initializing auto-indenter...', 'verbose');
         const autoIndenter = new AutoIndenter(outputChannel);
         const autoIndenterDisposable = autoIndenter.registerDocumentChangeListener(context);
 
         // Initialize image inserter
-        outputChannel.appendLine('Initializing image inserter...');
+        outputChannel.appendLine('Initializing image inserter...', 'verbose');
         const imageInserter = new ImageInserter(outputChannel);
         const imagePasteDisposable = imageInserter.registerPasteProvider();
         const imageInsertCommandDisposable = imageInserter.registerInsertCommand();
 
         // Initialize comment formatter
-        outputChannel.appendLine('Initializing comment formatter...');
+        outputChannel.appendLine('Initializing comment formatter...', 'verbose');
         const commentFormatter = new CommentFormatter(outputChannel);
         const commentFormatterDisposables = commentFormatter.registerCommands();
 
         // Initialize insert manager (snippet service)
-        outputChannel.appendLine('Initializing insert manager...');
+        outputChannel.appendLine('Initializing insert manager...', 'verbose');
         const insertManager = new CalcpadInsertManager(apiClient, outputChannel);
 
         // Initialize quick typer (uses snippet data for quick type map)
-        outputChannel.appendLine('Initializing quick typer...');
+        outputChannel.appendLine('Initializing quick typer...', 'verbose');
         const quickTyper = new QuickTyper(outputChannel, insertManager);
         const quickTyperDisposable = quickTyper.registerDocumentChangeListener(context);
 
         // Initialize autocomplete provider
-        outputChannel.appendLine('Initializing autocomplete provider...');
+        outputChannel.appendLine('Initializing autocomplete provider...', 'verbose');
         const completionProviderDisposable = CalcpadCompletionProvider.register(definitionsService, insertManager, outputChannel);
 
         // Initialize #include file completion provider
-        outputChannel.appendLine('Initializing include file completion provider...');
+        outputChannel.appendLine('Initializing include file completion provider...', 'verbose');
         const includeCompletionDisposable = CalcpadIncludeCompletionProvider.register(definitionsService, outputChannel);
 
         // Initialize definition provider (Go to Definition)
-        outputChannel.appendLine('Initializing definition provider...');
+        outputChannel.appendLine('Initializing definition provider...', 'verbose');
         const definitionProviderDisposable = CalcpadDefinitionProvider.register(apiClient, definitionsService, outputChannel);
 
         // Initialize #include link provider (always-underlined, clickable paths)
-        outputChannel.appendLine('Initializing include link provider...');
+        outputChannel.appendLine('Initializing include link provider...', 'verbose');
         const includeLinkProviderDisposable = CalcpadIncludeLinkProvider.register(definitionsService, outputChannel);
 
         // Initialize reference provider (Find All References)
-        outputChannel.appendLine('Initializing reference provider...');
+        outputChannel.appendLine('Initializing reference provider...', 'verbose');
         const referenceProviderDisposable = CalcpadReferenceProvider.register(apiClient, outputChannel);
 
         // Initialize rename provider (F2 Rename Symbol)
-        outputChannel.appendLine('Initializing rename provider...');
+        outputChannel.appendLine('Initializing rename provider...', 'verbose');
         const renameProviderDisposable = CalcpadRenameProvider.register(apiClient, outputChannel);
 
         // Initialize hover provider (Hover Tooltips)
-        outputChannel.appendLine('Initializing hover provider...');
+        outputChannel.appendLine('Initializing hover provider...', 'verbose');
         const hoverProviderDisposable = CalcpadHoverProvider.register(definitionsService, insertManager, outputChannel);
 
         // Initialize the compiled worksheet editor (.cpdz opens as an input form, with
         // the report available beside it). Both of its panels are standalone: there is no
         // text editor behind a .cpdz for a preview to be *of*.
-        outputChannel.appendLine('Initializing compiled worksheet editor...');
+        outputChannel.appendLine('Initializing compiled worksheet editor...', 'verbose');
         compiledEditor = CalcpadCompiledEditorProvider.register(
             apiClient,
             uiOverrides,
@@ -1954,19 +2041,19 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     async function _doProcessDocument(document: vscode.TextDocument) {
-        outputChannel.appendLine('[processDocument] Processing document: ' + document.uri.fsPath);
+        outputChannel.appendLine('[processDocument] Processing document: ' + document.uri.fsPath, 'verbose');
 
         // Run linting and definitions in parallel
         const [, definitions] = await Promise.all([
             linter.lintDocument(document),
             definitionsService.refreshDefinitions(document).catch((error: unknown) => {
-                outputChannel.appendLine('Error fetching definitions: ' + error);
+                outputChannel.appendLine('Error fetching definitions: ' + error, 'warning');
                 return null;
             }),
         ]);
 
         if (definitions) {
-            outputChannel.appendLine('[processDocument] Found ' + definitions.macros.length + ' macros, ' + definitions.variables.length + ' variables, ' + definitions.functions.length + ' functions, ' + definitions.customUnits.length + ' custom units');
+            outputChannel.appendLine('[processDocument] Found ' + definitions.macros.length + ' macros, ' + definitions.variables.length + ' variables, ' + definitions.functions.length + ' functions, ' + definitions.customUnits.length + ' custom units', 'verbose');
 
             vueUiProvider?.updateVariables({
                 macros: definitions.macros.map(m => ({
@@ -2012,25 +2099,25 @@ export async function activate(context: vscode.ExtensionContext) {
                 }))
             });
         } else {
-            outputChannel.appendLine('[processDocument] No definitions returned from server');
+            outputChannel.appendLine('[processDocument] No definitions returned from server', 'verbose');
         }
     }
 
     // Centralized refresh function for when settings change
     async function refreshAllComponents() {
-        outputChannel.appendLine('[Settings] Refreshing all components after settings change');
+        outputChannel.appendLine('[Settings] Refreshing all components after settings change', 'verbose');
 
         // Use the effective server URL (local if running, remote otherwise)
         const effectiveUrl = settingsManager.getServerUrl();
         apiClient.setBaseUrl(effectiveUrl);
-        outputChannel.appendLine(`[Settings] Using server URL: ${effectiveUrl}`);
+        outputChannel.appendLine(`[Settings] Using server URL: ${effectiveUrl}`, 'verbose');
 
         // Reload snippets from server
         try {
             await insertManager.reloadSnippets();
-            outputChannel.appendLine('[Settings] Snippets reloaded');
+            outputChannel.appendLine('[Settings] Snippets reloaded', 'verbose');
         } catch (error) {
-            outputChannel.appendLine('[Settings] Failed to reload snippets: ' + error);
+            outputChannel.appendLine('[Settings] Failed to reload snippets: ' + error, 'warning');
         }
 
         // Refresh semantic tokens for all visible editors
@@ -2049,10 +2136,10 @@ export async function activate(context: vscode.ExtensionContext) {
         // Refresh preview(s) if open
         if (activeEditor && (wrappedPanel || unwrappedPanel || uiPanel || uiReportPanel)) {
             await refreshPreviewPanels(activeEditor.document);
-            outputChannel.appendLine('[Settings] Preview refreshed');
+            outputChannel.appendLine('[Settings] Preview refreshed', 'verbose');
         }
 
-        outputChannel.appendLine('[Settings] All components refreshed');
+        outputChannel.appendLine('[Settings] All components refreshed', 'information');
     }
 
     vueUiProvider = new CalcpadVueUIProvider(context.extensionUri, context, settingsManager, insertManager);
@@ -2072,8 +2159,8 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!editor) return;
         await refreshPreviewPanels(editor.document);
     };
-    vueUiProvider.onServerLogLevelChanged = (level: string) => {
-        void sharedApiClient?.setServerLogLevel(level);
+    vueUiProvider.onLogLevelChanged = (level: string) => {
+        applyLogLevel(level);
     };
     // Rendered on demand rather than served from the cache: this is what the Properties
     // tab asks when it has no answer or wants a fresh one, and the cache is only as new
@@ -2087,7 +2174,7 @@ export async function activate(context: vscode.ExtensionContext) {
             uiControls.set(editor.document.uri.toString(), controls);
             return controls;
         } catch (e) {
-            outputChannel.appendLine('[UI controls] Render failed: ' + e);
+            outputChannel.appendLine('[UI controls] Render failed: ' + e, 'warning');
             return null;
         }
     };
@@ -2123,10 +2210,10 @@ export async function activate(context: vscode.ExtensionContext) {
             // while the message box asks about its values. Cancel leaves it open.
             if (!await discardUiValues(uiPanelDocKey, true)) return;
             uiPanel.dispose();
-            outputChannel.appendLine('[UI] Input mode disabled');
+            outputChannel.appendLine('[UI] Input mode disabled', 'information');
             return;
         }
-        outputChannel.appendLine('[UI] Input mode enabled');
+        outputChannel.appendLine('[UI] Input mode enabled', 'information');
         await showPreview('ui');
         // Opened after the form and while it holds focus, so Beside puts the
         // report in the column to its right rather than replacing it.
@@ -2325,9 +2412,9 @@ export async function activate(context: vscode.ExtensionContext) {
     void maybePromptInstall(context);
 
     const stopServerCommand = vscode.commands.registerCommand('calcpad.stopServer', async () => {
-        outputChannel.appendLine('[Stop] Manual server stop triggered');
+        outputChannel.appendLine('[Stop] Manual server stop triggered', 'information');
         if (!serverManager) {
-            outputChannel.appendLine('[Stop] No serverManager available');
+            outputChannel.appendLine('[Stop] No serverManager available', 'warning');
             vscode.window.showInformationMessage('CalcpadCE server is not configured.');
             return;
         }
@@ -2337,7 +2424,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const wasRunning = serverManager.isRunning;
         try {
             await serverManager.stop();
-            outputChannel.appendLine(`[Stop] Server stopped successfully (wasRunning=${wasRunning})`);
+            outputChannel.appendLine(`[Stop] Server stopped successfully (wasRunning=${wasRunning})`, 'information');
             vscode.window.showInformationMessage(
                 wasRunning
                     ? 'CalcpadCE server stopped. Use the refresh button to restart.'
@@ -2345,7 +2432,7 @@ export async function activate(context: vscode.ExtensionContext) {
             );
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
-            outputChannel.appendLine(`[Stop] Server stop failed: ${msg}`);
+            outputChannel.appendLine(`[Stop] Server stop failed: ${msg}`, 'warning');
             vscode.window.showErrorMessage(`CalcpadCE: Failed to stop server: ${msg}`);
         }
     });
@@ -2356,16 +2443,11 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!serverManager) return true;
         try {
             await serverManager.restart();
-            const serverUrl = serverManager.getBaseUrl();
-            settingsManager.setLocalServerUrl(serverUrl);
-            apiClient.setBaseUrl(serverUrl);
-            apiClient.setAuthToken(serverManager.getAuthToken());
-            void apiClient.setServerLogLevel(settingsManager.getExtra('serverLogLevel', 'warning'));
-            outputChannel.appendLine(`${tag} Server restarted at ${serverUrl}`);
+            outputChannel.appendLine(`${tag} Server restarted at ${serverManager.getBaseUrl()}`, 'information');
             return true;
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
-            outputChannel.appendLine(`${tag} Server restart failed: ${msg}`);
+            outputChannel.appendLine(`${tag} Server restart failed: ${msg}`, 'warning');
             if (/Windows blocked the executable|EACCES|EPERM/i.test(msg)) {
                 vscode.window.showErrorMessage(
                     `CalcPad: Windows is still blocking Calcpad.Server.exe.\n${serverManager.getExecutablePath()}\n` +
@@ -2387,31 +2469,41 @@ export async function activate(context: vscode.ExtensionContext) {
         await processDocument(activeEditor.document);
         semanticTokensProvider.refresh();
         schedulePreviewUpdate();
-        outputChannel.appendLine(`${tag} Document re-linted, re-highlighted, and preview re-rendered`);
+        outputChannel.appendLine(`${tag} Document re-linted, re-highlighted, and preview re-rendered`, 'verbose');
     };
 
     const runPreviewCommand = vscode.commands.registerCommand('calcpad.runPreview', async () => {
-        outputChannel.appendLine('[Run] Run preview triggered');
+        outputChannel.appendLine('[Run] Run preview triggered', 'information');
 
         // Only restart when the server is actually down — running should not
         // cost a respawn. Use refresh for an unconditional restart.
         if (serverManager && (!serverManager.isRunning || !(await apiClient.checkHealth()))) {
-            outputChannel.appendLine('[Run] Server unavailable, attempting restart...');
+            outputChannel.appendLine('[Run] Server unavailable, attempting restart...', 'warning');
             if (!await restartServer('[Run]')) return;
         }
 
         await runPreview('[Run]');
     });
 
-    const refreshDocumentCommand = vscode.commands.registerCommand('calcpad.refreshDocument', async () => {
-        outputChannel.appendLine('[Refresh] Manual server restart triggered');
+    const refreshDocument = async (): Promise<void> => {
+        outputChannel.appendLine('[Refresh] Manual server restart triggered', 'information');
         if (!serverManager) {
             vscode.window.showInformationMessage('CalcpadCE server is not configured.');
             return;
         }
         if (!await restartServer('[Refresh]')) return;
         await runPreview('[Refresh]');
-    });
+    };
+
+    // The restart button carries the health dot in its icon, and a menu item cannot recolour its
+    // own, so there is one command per state and the `calcpad.serverStatus` context key picks
+    // which appears. All four restart: only the icon and the tooltip differ.
+    const refreshDocumentCommands = [
+        'calcpad.refreshDocument',
+        'calcpad.refreshDocumentConnected',
+        'calcpad.refreshDocumentConnecting',
+        'calcpad.refreshDocumentDisconnected',
+    ].map(id => vscode.commands.registerCommand(id, refreshDocument));
 
     const prettifyDocumentCommand = vscode.commands.registerCommand('vscode-calcpad.prettifyDocument', async () => {
         const editor = vscode.window.activeTextEditor;
@@ -2446,7 +2538,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
-            outputChannel.appendLine('[Prettify] Error: ' + msg);
+            outputChannel.appendLine('[Prettify] Error: ' + msg, 'warning');
             vscode.window.showErrorMessage('CalcpadCE: prettify failed — ' + msg);
         }
     });
@@ -2458,12 +2550,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // Process document on open
     const onDidOpenTextDocument = vscode.workspace.onDidOpenTextDocument(document => {
-        processDocument(document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e));
+        processDocument(document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
     });
 
     // Process document on save
     const onDidSaveTextDocument = vscode.workspace.onDidSaveTextDocument(document => {
-        processDocument(document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e));
+        processDocument(document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
     });
 
     // Lint on document change (with debouncing)
@@ -2475,7 +2567,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
             lintTimeout = setTimeout(() => {
                 invalidateUiControls(event.document);
-                processDocument(event.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e));
+                processDocument(event.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
             }, 500);
             // Only schedule preview update when auto-run is on. Otherwise the
             // preview updates only when the panel is (re)opened or the user
@@ -2519,7 +2611,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 schedulePreviewUpdate();
             }
             // Update Variables tab
-            processDocument(editor.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e));
+            processDocument(editor.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
             // Last, and after the cancel path above returns: a switch the user backed out of
             // must not open anything.
             await maybeAutoEnterInputMode(editor.document);
@@ -2548,7 +2640,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const onDidChangeConfiguration = vscode.workspace.onDidChangeConfiguration(async event => {
         // Check if any calcpad settings changed
         if (event.affectsConfiguration('calcpad')) {
-            outputChannel.appendLine('[Settings] Calcpad settings changed - triggering refresh');
+            outputChannel.appendLine('[Settings] Calcpad settings changed - triggering refresh', 'information');
             await refreshAllComponents();
         }
     });
@@ -2565,7 +2657,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (activeDocument) void maybeAutoEnterInputMode(activeDocument);
     }
 
-        outputChannel.appendLine('Registering subscriptions...');
+        outputChannel.appendLine('Registering subscriptions...', 'verbose');
         context.subscriptions.push(
             disposable,
             previewCommand,
@@ -2587,7 +2679,7 @@ export async function activate(context: vscode.ExtensionContext) {
             compiledEditor,
             refreshVariablesCommand,
             runPreviewCommand,
-            refreshDocumentCommand,
+            ...refreshDocumentCommands,
             stopServerCommand,
             exportToPdfCommand,
             prettifyDocumentCommand,
@@ -2623,12 +2715,12 @@ export async function activate(context: vscode.ExtensionContext) {
             installJuliaMonoDisposable
         );
         
-        outputChannel.appendLine('CalcPad extension activation completed successfully');
+        outputChannel.appendLine('CalcPad extension activation completed successfully', 'information');
         
     } catch (error) {
         console.error('CalcPad extension activation failed:', error);
         if (outputChannel) {
-            outputChannel.appendLine(`FATAL ERROR during activation: ${error}`);
+            outputChannel.appendLine(`FATAL ERROR during activation: ${error}`, 'error');
         }
         // Still try to show the error to user
         vscode.window.showErrorMessage(`CalcpadCE extension failed to activate: ${error instanceof Error ? error.message : 'Unknown error'}`);

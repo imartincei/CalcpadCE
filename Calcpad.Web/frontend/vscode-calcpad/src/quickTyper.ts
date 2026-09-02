@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import { findQuickTypeReplacement } from 'calcpad-frontend';
 import type { CalcpadInsertManager } from './calcpadInsertManager';
 import { CalcpadSettingsManager } from './calcpadSettings';
@@ -8,11 +9,11 @@ import { CalcpadSettingsManager } from './calcpadSettings';
  * The quick type map is built dynamically from server-provided snippet data.
  */
 export class QuickTyper {
-    private outputChannel: vscode.OutputChannel;
+    private outputChannel: ILogger;
     private insertManager: CalcpadInsertManager;
     private quickTypeMap: Map<string, string> = new Map();
 
-    constructor(outputChannel: vscode.OutputChannel, insertManager: CalcpadInsertManager) {
+    constructor(outputChannel: ILogger, insertManager: CalcpadInsertManager) {
         this.outputChannel = outputChannel;
         this.insertManager = insertManager;
 

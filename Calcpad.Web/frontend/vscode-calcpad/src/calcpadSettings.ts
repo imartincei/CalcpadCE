@@ -18,6 +18,7 @@ import {
     writesAllowed,
 } from 'calcpad-frontend';
 import type { WriteMode } from 'calcpad-frontend';
+import { VSCodeLogger } from './adapters';
 
 export type { CalcpadSettings, CalcpadExtras };
 
@@ -34,11 +35,11 @@ const ACTIVE_PRESET_KEY = 'calcpad-active-preset';
 const HOTKEYS_WORKSPACE_KEY = 'enableFormattingHotkeys';
 const HOTKEYS_EXTRA_KEY = 'formattingHotkeys';
 
-let _outputChannel: vscode.OutputChannel | undefined;
+let _outputChannel: VSCodeLogger | undefined;
 
-function getOutputChannel(): vscode.OutputChannel {
+function getOutputChannel(): VSCodeLogger {
     if (!_outputChannel) {
-        _outputChannel = vscode.window.createOutputChannel('CalcpadCE Settings');
+        _outputChannel = new VSCodeLogger(vscode.window.createOutputChannel('CalcpadCE Settings'));
     }
     return _outputChannel;
 }
@@ -178,10 +179,10 @@ export class CalcpadSettingsManager {
         const apiSettings = buildApiSettings(this._settings);
 
         const outputChannel = getOutputChannel();
-        outputChannel.appendLine('API settings being sent:');
-        outputChannel.appendLine(`  Local Server URL: ${this._localServerUrl ?? '(none)'}`);
-        outputChannel.appendLine(`  Remote Server URL: ${this._settings.server.url}`);
-        outputChannel.appendLine(`  Effective Server URL: ${this.getServerUrl()}`);
+        outputChannel.appendLine('API settings being sent:', 'verbose');
+        outputChannel.appendLine(`  Local Server URL: ${this._localServerUrl ?? '(none)'}`, 'verbose');
+        outputChannel.appendLine(`  Remote Server URL: ${this._settings.server.url}`, 'verbose');
+        outputChannel.appendLine(`  Effective Server URL: ${this.getServerUrl()}`, 'verbose');
 
         return apiSettings;
     }
@@ -232,7 +233,7 @@ export class CalcpadSettingsManager {
         try {
             await fs.promises.mkdir(path.dirname(presetPath), { recursive: true });
             await fs.promises.writeFile(presetPath, JSON.stringify(blob, null, 4), 'utf8');
-            getOutputChannel().appendLine(`[Settings] savePreset -> "${name}" file="${presetPath}"`);
+            getOutputChannel().appendLine(`[Settings] savePreset -> "${name}" file="${presetPath}"`, 'verbose');
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
             return { ok: false, message: `Failed to write preset: ${msg}` };
@@ -248,10 +249,10 @@ export class CalcpadSettingsManager {
      */
     public async loadPreset(name: string): Promise<void> {
         if (!this.isValidPresetName(name)) {
-            getOutputChannel().appendLine(`[Settings] loadPreset refused invalid name "${name}"`);
+            getOutputChannel().appendLine(`[Settings] loadPreset refused invalid name "${name}"`, 'warning');
             return;
         }
-        getOutputChannel().appendLine(`[Settings] loadPreset("${name}") — was active="${this._activePresetName}"`);
+        getOutputChannel().appendLine(`[Settings] loadPreset("${name}") — was active="${this._activePresetName}"`, 'verbose');
         await this.readPresetInto(name);
         await this.setActivePresetName(name);
         await this.saveActiveSettings();
@@ -267,7 +268,7 @@ export class CalcpadSettingsManager {
             await vscode.env.openExternal(vscode.Uri.file(dir));
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
-            getOutputChannel().appendLine(`[Settings] Failed to open settings folder: ${msg}`);
+            getOutputChannel().appendLine(`[Settings] Failed to open settings folder: ${msg}`, 'warning');
         }
     }
 
@@ -318,7 +319,7 @@ export class CalcpadSettingsManager {
                 await fs.promises.writeFile(defaultPath, JSON.stringify(blob, null, 4), 'utf8');
             } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
-                getOutputChannel().appendLine(`[Settings] Could not refresh default.json: ${msg}`);
+                getOutputChannel().appendLine(`[Settings] Could not refresh default.json: ${msg}`, 'warning');
             }
         }
     }
@@ -345,12 +346,12 @@ export class CalcpadSettingsManager {
      */
     private async loadFromDisk(): Promise<void> {
         if (!this._context) {
-            getOutputChannel().appendLine(`[Settings] loadFromDisk skipped — no context yet`);
+            getOutputChannel().appendLine(`[Settings] loadFromDisk skipped — no context yet`, 'verbose');
             return;
         }
         await this.ensureSettingsFolder();
         this._activePresetName = this.loadActivePresetName();
-        getOutputChannel().appendLine(`[Settings] loadFromDisk — active-preset="${this._activePresetName}"`);
+        getOutputChannel().appendLine(`[Settings] loadFromDisk — active-preset="${this._activePresetName}"`, 'verbose');
 
         const loaded = await this.readActiveSettings();
         if (!loaded) {
@@ -383,7 +384,7 @@ export class CalcpadSettingsManager {
                 const msg = err instanceof Error ? err.message : String(err);
                 getOutputChannel().appendLine(
                     `[Settings] readActiveSettings failed for ${activePath}: ${msg}`
-                );
+                , 'verbose');
             }
             return false;
         }
@@ -414,7 +415,7 @@ export class CalcpadSettingsManager {
             const msg = err instanceof Error ? err.message : String(err);
             getOutputChannel().appendLine(
                 `[Settings] readPresetInto("${name}") failed, falling back to defaults: ${msg}`
-            );
+            , 'verbose');
             this._settings = getDefaultSettings();
             this._extras = getDefaultExtras();
         }
@@ -430,7 +431,7 @@ export class CalcpadSettingsManager {
             await fs.promises.writeFile(activePath, JSON.stringify(blob, null, 4), 'utf8');
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
-            getOutputChannel().appendLine(`[Settings] Failed to write ${activePath}: ${msg}`);
+            getOutputChannel().appendLine(`[Settings] Failed to write ${activePath}: ${msg}`, 'warning');
         }
     }
 
@@ -448,7 +449,7 @@ export class CalcpadSettingsManager {
                 await workspace.update(HOTKEYS_WORKSPACE_KEY, desired, vscode.ConfigurationTarget.Global);
             } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
-                getOutputChannel().appendLine(`[Settings] Could not mirror ${HOTKEYS_WORKSPACE_KEY}: ${msg}`);
+                getOutputChannel().appendLine(`[Settings] Could not mirror ${HOTKEYS_WORKSPACE_KEY}: ${msg}`, 'warning');
             }
         }
     }

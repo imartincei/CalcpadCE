@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import { CalcpadApiClient, SymbolAtPositionResponse, parseDirectiveLine } from 'calcpad-frontend';
-import { VSCodeLogger, VSCodeFileSystem } from './adapters';
+import { VSCodeFileSystem } from './adapters';
 import { resolveSymbolLocation, resolveIncludeDirectiveLocation, resolveDocumentPathRoots } from './calcpadLocationResolver';
 import type { CalcpadDefinitionsService } from './calcpadDefinitionsService';
 
@@ -12,15 +13,15 @@ import type { CalcpadDefinitionsService } from './calcpadDefinitionsService';
 export class CalcpadDefinitionProvider implements vscode.DefinitionProvider {
     private apiClient: CalcpadApiClient;
     private definitionsService: CalcpadDefinitionsService;
-    private outputChannel: vscode.OutputChannel;
-    private logger: VSCodeLogger;
+    private outputChannel: ILogger;
+    private logger: ILogger;
     private fileSystem: VSCodeFileSystem;
 
-    constructor(apiClient: CalcpadApiClient, definitionsService: CalcpadDefinitionsService, outputChannel: vscode.OutputChannel) {
+    constructor(apiClient: CalcpadApiClient, definitionsService: CalcpadDefinitionsService, outputChannel: ILogger) {
         this.apiClient = apiClient;
         this.definitionsService = definitionsService;
         this.outputChannel = outputChannel;
-        this.logger = new VSCodeLogger(outputChannel);
+        this.logger = outputChannel;
         this.fileSystem = new VSCodeFileSystem();
     }
 
@@ -40,22 +41,22 @@ export class CalcpadDefinitionProvider implements vscode.DefinitionProvider {
 
         const sym = await this.fetchSymbol(document, position);
         if (!sym) {
-            this.outputChannel.appendLine('[Definition] No symbol at cursor position');
+            this.outputChannel.appendLine('[Definition] No symbol at cursor position', 'verbose');
             return null;
         }
 
-        this.outputChannel.appendLine('[Definition] Looking for definition of: ' + sym.symbolName);
+        this.outputChannel.appendLine('[Definition] Looking for definition of: ' + sym.symbolName, 'verbose');
 
         const definition = sym.locations.find(loc => loc.isAssignment);
         if (!definition) {
-            this.outputChannel.appendLine('[Definition] No definition (assignment) found for: ' + sym.symbolName);
+            this.outputChannel.appendLine('[Definition] No definition (assignment) found for: ' + sym.symbolName, 'verbose');
             return null;
         }
 
         this.outputChannel.appendLine(
             `[Definition] Found definition at line ${definition.line}, col ${definition.column}` +
             (definition.sourceFile ? ` in ${definition.sourceFile}` : '')
-        );
+        , 'verbose');
 
         return resolveSymbolLocation(document, definition, this.fileSystem, this.outputChannel, '[Definition]');
     }
@@ -84,7 +85,7 @@ export class CalcpadDefinitionProvider implements vscode.DefinitionProvider {
         } catch (error) {
             this.outputChannel.appendLine(
                 '[Definition] Error resolving symbol: ' + (error instanceof Error ? error.message : 'Unknown error')
-            );
+            , 'verbose');
             return null;
         }
     }
@@ -92,7 +93,7 @@ export class CalcpadDefinitionProvider implements vscode.DefinitionProvider {
     static register(
         apiClient: CalcpadApiClient,
         definitionsService: CalcpadDefinitionsService,
-        outputChannel: vscode.OutputChannel
+        outputChannel: ILogger
     ): vscode.Disposable {
         const provider = new CalcpadDefinitionProvider(apiClient, definitionsService, outputChannel);
         return vscode.languages.registerDefinitionProvider(

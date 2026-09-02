@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import { parseDirectiveLine } from 'calcpad-frontend';
 import { VSCodeFileSystem } from './adapters';
 import { resolveIncludeDirectiveLocation, resolveDocumentPathRoots } from './calcpadLocationResolver';
@@ -14,7 +15,7 @@ export class CalcpadIncludeLinkProvider implements vscode.DocumentLinkProvider {
 
     constructor(
         private definitionsService: CalcpadDefinitionsService,
-        private outputChannel: vscode.OutputChannel,
+        private outputChannel: ILogger,
     ) {
         this.fileSystem = new VSCodeFileSystem();
     }
@@ -44,7 +45,7 @@ export class CalcpadIncludeLinkProvider implements vscode.DocumentLinkProvider {
         return links;
     }
 
-    static register(definitionsService: CalcpadDefinitionsService, outputChannel: vscode.OutputChannel): vscode.Disposable {
+    static register(definitionsService: CalcpadDefinitionsService, outputChannel: ILogger): vscode.Disposable {
         return vscode.languages.registerDocumentLinkProvider(
             { language: 'calcpad' },
             new CalcpadIncludeLinkProvider(definitionsService, outputChannel),

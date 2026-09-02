@@ -82,12 +82,13 @@ export function coerceWriteMode(raw: string | undefined | null): WriteMode {
 }
 
 /**
- * Verbosity of the Calcpad server's own logging, mirroring the levels in FileLogger.cs. Pushed
- * to the server over /api/calcpad/log-level; it is a server-side setting, not a client one.
+ * Verbosity of Calcpad's logging, mirroring the levels in FileLogger.cs. It governs both sides:
+ * pushed to the server over /api/calcpad/log-level, and applied locally to what the editor writes
+ * to its own output channels.
  */
-export type ServerLogLevel = 'error' | 'warning' | 'information' | 'verbose';
+export type CalcpadLogLevel = 'error' | 'warning' | 'information' | 'verbose';
 
-export const SERVER_LOG_LEVEL_OPTIONS: { value: ServerLogLevel; label: string; detail: string }[] = [
+export const LOG_LEVEL_OPTIONS: { value: CalcpadLogLevel; label: string; detail: string }[] = [
     {
         value: 'error',
         label: 'Error',
@@ -96,22 +97,22 @@ export const SERVER_LOG_LEVEL_OPTIONS: { value: ServerLogLevel; label: string; d
     {
         value: 'warning',
         label: 'Warning',
-        detail: 'Failures plus recoverable problems, such as a missing browser for PDF export. The default, and quiet during normal editing.',
+        detail: 'Failures plus recoverable problems, such as a missing browser for PDF export. The default, and silent during normal editing.',
     },
     {
         value: 'information',
         label: 'Information',
-        detail: 'Adds one-off lifecycle events: startup, the bound URL, shutdown, and browser downloads.',
+        detail: 'Adds one-off events: startup, the bound URL, server restarts, shutdown, and browser downloads.',
     },
     {
         value: 'verbose',
         label: 'Verbose',
-        detail: 'Adds a line per request. Useful when diagnosing a specific worksheet, noisy otherwise, since editing sends requests continuously.',
+        detail: 'Adds a line per request, on both the server and the editor. Useful when diagnosing a specific worksheet, noisy otherwise, since editing sends requests continuously.',
     },
 ];
 
-export function coerceServerLogLevel(raw: string | undefined | null): ServerLogLevel {
-    return SERVER_LOG_LEVEL_OPTIONS.some(o => o.value === raw) ? raw as ServerLogLevel : 'warning';
+export function coerceLogLevel(raw: string | undefined | null): CalcpadLogLevel {
+    return LOG_LEVEL_OPTIONS.some(o => o.value === raw) ? raw as CalcpadLogLevel : 'warning';
 }
 
 /**

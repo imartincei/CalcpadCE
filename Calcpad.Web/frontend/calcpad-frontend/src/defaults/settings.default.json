@@ -45,7 +45,7 @@
         "autoInputMode": true,
         "previewUiOverrides": false,
         "linterMinSeverity": "information",
-        "serverLogLevel": "warning",
+        "logLevel": "warning",
         "maxOutputLines": 1000,
         "maxPreviewSizeMB": 24,
         "maxPreviewConsoleMessages": 500,

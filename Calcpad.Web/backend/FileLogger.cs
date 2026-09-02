@@ -157,6 +157,17 @@ namespace Calcpad.Server
             WriteLog(LogLevel.Warning, message, details);
         }
 
+        /// <summary>
+        /// Emits at Information regardless of <see cref="MinLevel"/>. Only for the bound-URL line
+        /// the hosts parse out of stdout to locate a random-port server.
+        /// </summary>
+        public static void LogAlways(string message, string? details = null)
+        {
+            var entry = Format("INFO", message, details);
+            _stdoutRelay.Enqueue(entry);
+            QueueForFile(entry);
+        }
+
         public static void LogError(string message, Exception? exception = null)
         {
             var details = exception != null ?

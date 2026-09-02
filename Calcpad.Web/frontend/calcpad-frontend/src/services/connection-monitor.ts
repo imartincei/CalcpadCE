@@ -2,13 +2,19 @@
  * Tracks whether the Calcpad server is answering, and reports recoveries so the app can
  * re-render against a server that just came back.
  *
- * The host pushes lifecycle transitions in (markConnecting / markStopped / notifyMaybeUp) and an
+ * The host pushes lifecycle transitions in (applyLifecycle, or the marks it delegates to) and an
  * adaptive poll is the backstop for what the host can't see — a hang, or a process that died
- * without the Rust layer noticing. Only the probe promotes a state to `connected`: a bound port
- * proves Kestrel is listening, not that the pipeline answers.
+ * without the process supervisor noticing. Only the probe promotes a state to `connected`: a
+ * bound port proves Kestrel is listening, not that the pipeline answers.
  */
 
 export type ServerStatus = 'connected' | 'connecting' | 'disconnected';
+
+/**
+ * What the host has told us about the server process. A crash collapses into `starting` when a
+ * retry is scheduled and `stopped` when the streak is exhausted — the host owns that counter.
+ */
+export type ServerLifecycleState = 'starting' | 'running' | 'stopped';
 
 export interface ConnectionMonitorOptions {
     probe: (timeoutMs: number) => Promise<boolean>;
@@ -83,6 +89,15 @@ export class ConnectionMonitor {
         this.setStatus('disconnected', reason);
         this.suspended = true;
         this.clearTimer();
+    }
+
+    /** A host lifecycle report, mapped onto the three states. */
+    applyLifecycle(state: ServerLifecycleState, detail?: string): void {
+        switch (state) {
+            case 'starting': this.markConnecting(detail ?? 'starting'); break;
+            case 'running': this.notifyMaybeUp(); break;
+            case 'stopped': this.markStopped(detail ?? 'stopped'); break;
+        }
     }
 
     /** The host believes a port is bound. Probes to confirm before going green. */

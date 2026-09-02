@@ -54,7 +54,7 @@ Documented in [API_SCHEMA.md](API_SCHEMA.md). Summary:
 
 ## Configuration
 
-`appsettings.json` carries logging configuration and the bind URL. There are no JWT, Auth, Storage, or S3 sections on this branch.
+`appsettings.json` carries the browser settings and the bind URL. It has no `Logging` section: verbosity comes from `CALCPAD_LOG_LEVEL` and `POST /api/calcpad/log-level`, which govern the framework's logging as well as Calcpad's. There are no JWT, Auth, Storage, or S3 sections on this branch.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -62,7 +62,7 @@ Documented in [API_SCHEMA.md](API_SCHEMA.md). Summary:
 | `CALCPAD_HOST` | `127.0.0.1` | Host part of the bind URL |
 | `CALCPAD_API_TOKEN` | *(unset — unauthenticated)* | Required in `X-Calcpad-Token` on every `/api` request when set |
 | `CALCPAD_DETACHED` | *(unset)* | `1` disables the stdin-EOF watchdog and the default port file |
-| `CALCPAD_LOG_LEVEL` | `warning` | Startup verbosity: `error`, `warning`, `information` or `verbose`. Change it at runtime via `POST /api/calcpad/log-level` |
+| `CALCPAD_LOG_LEVEL` | `warning` | Startup verbosity: `error`, `warning`, `information` or `verbose`. Covers ASP.NET's own logs too. Change it at runtime via `POST /api/calcpad/log-level` |
 | `CALCPAD_LOG_DIR` | *(executable-adjacent `logs/`)* | Where `CalcpadServer-{date}.log` is written. Hosts set this when the install dir is read-only |
 | `CALCPAD_HANG_THRESHOLD_SECONDS` | `60` | How long without a completed request before the hang watchdog reports |
 | `CALCPAD_HANG_DUMP` | *(unset)* | `1` also spawns `createdump` on a detected hang |

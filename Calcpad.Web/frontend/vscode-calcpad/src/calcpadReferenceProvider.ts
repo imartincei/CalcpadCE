@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import { CalcpadApiClient, SymbolAtPositionResponse } from 'calcpad-frontend';
-import { VSCodeLogger, VSCodeFileSystem } from './adapters';
+import { VSCodeFileSystem } from './adapters';
 import { resolveSymbolLocation } from './calcpadLocationResolver';
 
 /**
@@ -10,14 +11,14 @@ import { resolveSymbolLocation } from './calcpadLocationResolver';
  */
 export class CalcpadReferenceProvider implements vscode.ReferenceProvider {
     private apiClient: CalcpadApiClient;
-    private outputChannel: vscode.OutputChannel;
-    private logger: VSCodeLogger;
+    private outputChannel: ILogger;
+    private logger: ILogger;
     private fileSystem: VSCodeFileSystem;
 
-    constructor(apiClient: CalcpadApiClient, outputChannel: vscode.OutputChannel) {
+    constructor(apiClient: CalcpadApiClient, outputChannel: ILogger) {
         this.apiClient = apiClient;
         this.outputChannel = outputChannel;
-        this.logger = new VSCodeLogger(outputChannel);
+        this.logger = outputChannel;
         this.fileSystem = new VSCodeFileSystem();
     }
 
@@ -29,17 +30,17 @@ export class CalcpadReferenceProvider implements vscode.ReferenceProvider {
     ): Promise<vscode.Location[] | null> {
         const sym = await this.fetchSymbol(document, position);
         if (!sym) {
-            this.outputChannel.appendLine('[References] No symbol at cursor position');
+            this.outputChannel.appendLine('[References] No symbol at cursor position', 'verbose');
             return null;
         }
 
-        this.outputChannel.appendLine('[References] Finding references for: ' + sym.symbolName);
+        this.outputChannel.appendLine('[References] Finding references for: ' + sym.symbolName, 'verbose');
 
         const filtered = context.includeDeclaration
             ? sym.locations
             : sym.locations.filter(loc => !loc.isAssignment);
 
-        this.outputChannel.appendLine(`[References] Found ${filtered.length} reference(s) (${sym.locations.length} total)`);
+        this.outputChannel.appendLine(`[References] Found ${filtered.length} reference(s) (${sym.locations.length} total)`, 'verbose');
 
         const results: vscode.Location[] = [];
         for (const loc of filtered) {
@@ -61,14 +62,14 @@ export class CalcpadReferenceProvider implements vscode.ReferenceProvider {
         } catch (error) {
             this.outputChannel.appendLine(
                 '[References] Error resolving symbol: ' + (error instanceof Error ? error.message : 'Unknown error')
-            );
+            , 'verbose');
             return null;
         }
     }
 
     static register(
         apiClient: CalcpadApiClient,
-        outputChannel: vscode.OutputChannel
+        outputChannel: ILogger
     ): vscode.Disposable {
         const provider = new CalcpadReferenceProvider(apiClient, outputChannel);
         return vscode.languages.registerReferenceProvider(

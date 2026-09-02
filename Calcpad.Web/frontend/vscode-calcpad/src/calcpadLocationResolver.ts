@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import * as path from 'path';
 import * as os from 'os';
 import type { SymbolLocation } from 'calcpad-frontend';
@@ -42,13 +43,13 @@ export async function resolveIncludeDirectiveLocation(
     document: vscode.TextDocument,
     rawPath: string,
     fileSystem: VSCodeFileSystem,
-    outputChannel: vscode.OutputChannel,
+    outputChannel: ILogger,
     logPrefix: string,
     roots: ResolvedPathRoots = resolveDocumentPathRoots(document),
 ): Promise<vscode.Location | null> {
     const { expanded: tokenExpanded, ok } = expandPathRootToken(rawPath.trim(), roots, os.homedir());
     if (!ok) {
-        outputChannel.appendLine(`${logPrefix} Include target's path root is not declared: ${rawPath}`);
+        outputChannel.appendLine(`${logPrefix} Include target's path root is not declared: ${rawPath}`, 'verbose');
         return null;
     }
     const expanded = expandEnvVars(tokenExpanded);
@@ -58,23 +59,23 @@ export async function resolveIncludeDirectiveLocation(
     const documentDir = path.dirname(document.uri.fsPath);
     const relativeResolved = path.resolve(documentDir, expanded);
     if (await fileSystem.exists(relativeResolved)) {
-        outputChannel.appendLine(`${logPrefix} Resolved include via document dir: ${relativeResolved}`);
+        outputChannel.appendLine(`${logPrefix} Resolved include via document dir: ${relativeResolved}`, 'verbose');
         return new vscode.Location(vscode.Uri.file(relativeResolved), start);
     }
 
     if (path.isAbsolute(expanded) && await fileSystem.exists(expanded)) {
-        outputChannel.appendLine(`${logPrefix} Resolved include via absolute path: ${expanded}`);
+        outputChannel.appendLine(`${logPrefix} Resolved include via absolute path: ${expanded}`, 'verbose');
         return new vscode.Location(vscode.Uri.file(expanded), start);
     }
 
     const pattern = '**/' + expanded.replace(/\\/g, '/');
     const foundFiles = await vscode.workspace.findFiles(pattern, '**/node_modules/**', 1);
     if (foundFiles.length > 0) {
-        outputChannel.appendLine(`${logPrefix} Resolved include via workspace search: ${foundFiles[0].fsPath}`);
+        outputChannel.appendLine(`${logPrefix} Resolved include via workspace search: ${foundFiles[0].fsPath}`, 'verbose');
         return new vscode.Location(foundFiles[0], start);
     }
 
-    outputChannel.appendLine(`${logPrefix} Include target not found: ${rawPath} (tried ${relativeResolved} and workspace search)`);
+    outputChannel.appendLine(`${logPrefix} Include target not found: ${rawPath} (tried ${relativeResolved} and workspace search)`, 'verbose');
     return null;
 }
 
@@ -89,7 +90,7 @@ export async function resolveSymbolLocation(
     document: vscode.TextDocument,
     loc: SymbolLocation,
     fileSystem: VSCodeFileSystem,
-    outputChannel: vscode.OutputChannel,
+    outputChannel: ILogger,
     logPrefix: string,
 ): Promise<vscode.Location | null> {
     const line = Math.max(0, loc.line);
@@ -105,17 +106,17 @@ export async function resolveSymbolLocation(
     const documentDir = path.dirname(document.uri.fsPath);
     const relativeResolved = path.resolve(documentDir, loc.sourceFile);
     if (await fileSystem.exists(relativeResolved)) {
-        outputChannel.appendLine(`${logPrefix} Resolved include via document dir: ${relativeResolved}`);
+        outputChannel.appendLine(`${logPrefix} Resolved include via document dir: ${relativeResolved}`, 'verbose');
         return new vscode.Location(vscode.Uri.file(relativeResolved), range);
     }
 
     const pattern = '**/' + loc.sourceFile;
     const foundFiles = await vscode.workspace.findFiles(pattern, '**/node_modules/**', 1);
     if (foundFiles.length > 0) {
-        outputChannel.appendLine(`${logPrefix} Resolved include via workspace search: ${foundFiles[0].fsPath}`);
+        outputChannel.appendLine(`${logPrefix} Resolved include via workspace search: ${foundFiles[0].fsPath}`, 'verbose');
         return new vscode.Location(foundFiles[0], range);
     }
 
-    outputChannel.appendLine(`${logPrefix} Source file not found: ${loc.sourceFile} (tried ${relativeResolved} and workspace search)`);
+    outputChannel.appendLine(`${logPrefix} Source file not found: ${loc.sourceFile} (tried ${relativeResolved} and workspace search)`, 'verbose');
     return null;
 }
