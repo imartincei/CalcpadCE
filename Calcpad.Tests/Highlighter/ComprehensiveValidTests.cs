@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using Calcpad.Highlighter.Linter.Models;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     public class ComprehensiveValidTests : IClassFixture<HighlighterLinterFixture>
     {

@@ -3,7 +3,7 @@ using Calcpad.Highlighter.ContentResolution;
 using Calcpad.Highlighter.Linter;
 using Calcpad.Highlighter.Linter.Models;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     /// <summary>
     /// Core unwraps a matrix·vector product to a vector (IValue.EvaluateOperator), so the type

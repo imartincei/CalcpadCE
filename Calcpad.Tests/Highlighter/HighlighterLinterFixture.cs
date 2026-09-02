@@ -6,7 +6,7 @@ using Calcpad.Highlighter.Linter;
 using Calcpad.Highlighter.Linter.Models;
 
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     public class HighlighterLinterFixture
     {
@@ -18,7 +18,7 @@ namespace Calcpad.Tests.HighlighterTests
         public HighlighterLinterFixture()
         {
             var assemblyDir = Path.GetDirectoryName(typeof(HighlighterLinterFixture).Assembly.Location)!;
-            BaseDir = Path.Combine(assemblyDir, "HighlighterTests");
+            BaseDir = Path.Combine(assemblyDir, "Highlighter");
             ValidDir = Path.Combine(BaseDir, "valid");
             ErrorsDir = Path.Combine(BaseDir, "errors");
 

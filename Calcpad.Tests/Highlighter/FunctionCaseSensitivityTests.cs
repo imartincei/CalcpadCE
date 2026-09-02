@@ -3,7 +3,7 @@ using Calcpad.Highlighter.ContentResolution;
 using Calcpad.Highlighter.Linter;
 using Calcpad.Highlighter.Linter.Models;
 
-namespace Calcpad.Tests.HighlighterTests
+namespace Calcpad.Tests.Highlighter
 {
     /// <summary>
     /// Core stores user-defined functions/variables case-sensitively (StringComparer.Ordinal),

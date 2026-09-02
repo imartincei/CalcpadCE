@@ -21,3 +21,6 @@ protected = 200
 
 ' CPD-3414: Outer scope assignment to undefined
 $Repeat{undefined_outer ← 5 @ k = 1 : 3}
+
+' CPD-3419: Deprecated stored input value
+L = ?{6}m

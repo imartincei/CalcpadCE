@@ -49,4 +49,19 @@ public class RecursiveMacroTests
         Assert.False(hasErrors);
         Assert.Contains("1 + 1 + 1", expanded);
     }
+
+    [Fact]
+    public async Task ConcurrentParsers_DoNotShareMacroTable()
+    {
+        var tasks = Enumerable.Range(0, 32).Select(i => Task.Run(() =>
+        {
+            var macroParser = new MacroParser();
+            var source = $"#def only{i}$ = {i}\nonly{i}$\n";
+            var hasErrors = macroParser.Parse(source, out var expanded, null, 0, false);
+            Assert.False(hasErrors);
+            Assert.Contains(i.ToString(), expanded);
+        }));
+
+        await Task.WhenAll(tasks);
+    }
 }

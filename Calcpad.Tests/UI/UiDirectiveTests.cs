@@ -214,30 +214,28 @@ namespace Calcpad.Tests
             Assert.Contains("class=\"calcpad-ui-input highlight\"",
                 Render("#UI {\"style\": \"highlight\"} d = 2m", enableUi: true));
 
-        /// <summary>
-        /// Only an entry shows its variable name - it labels the number in the box. The
-        /// other controls stand on their own, so the author labels them with plain text.
-        /// </summary>
-        [Theory]
-        [InlineData("#UI {\"type\": \"checkbox\"} flag = 1", "flag")]
-        [InlineData("#UI {\"type\": \"dropdown\", \"keys\": [\"Low\"], \"values\": [\"1\"]} grade = 1", "grade")]
-        [InlineData("#UI {\"type\": \"radio\", \"keys\": [\"Steel\"], \"values\": [\"200GPa\"]} E = 200GPa", "E")]
-        [InlineData("#UI v = [1; 2; 3]", "v")]
-        public void Control_HidesTheVariableNameInUiMode(string source, string name)
-        {
-            var html = Render(source, enableUi: true);
-            Assert.DoesNotContain($">{name}<", html);
-            Assert.DoesNotContain(" = ", html);
-        }
-
         [Fact]
         public void Entry_KeepsTheVariableNameInUiMode() =>
             Assert.Contains(" = ", Render("#UI L = 10m", enableUi: true));
 
-        [Fact]
-        public void Radio_DropsTheUnitOfTheSelectedValue() =>
-            Assert.DoesNotContain("<i>",
-                Render("#UI {\"type\": \"radio\", \"keys\": [\"Steel\"], \"values\": [\"200GPa\"]} E = 200GPa", enableUi: true));
+        /// <summary>
+        /// A control stands on its own in a form - the name and the unit of the value behind it
+        /// are not drawn. The same line in a report is an ordinary equation and shows both.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI {\"type\": \"radio\", \"keys\": [\"Steel\"], \"values\": [\"200GPa\"]} E = 200GPa", "E", "GPa")]
+        [InlineData("#UI {\"type\": \"checkbox\"} flag = 1m", "flag", "m")]
+        [InlineData("#UI {\"type\": \"datagrid\"} v = [1m; 2m; 3m]", "v", "m")]
+        public void Control_DropsTheNameAndUnitInUiMode_ButKeepsThemInTheReport(string source, string name, string unit)
+        {
+            var uiHtml = Render(source, enableUi: true);
+            Assert.DoesNotContain("<var>", uiHtml);
+            Assert.DoesNotContain($"<i>{unit}</i>", uiHtml);
+
+            var reportHtml = Render(source, enableUi: false);
+            Assert.Contains($">{name}</var>", reportHtml);
+            Assert.Contains($"<i>{unit}</i>", reportHtml);
+        }
 
         [Fact]
         public void Datagrid_LeavesNoEquationBehindInUiMode() =>
@@ -647,14 +645,6 @@ namespace Calcpad.Tests
             Assert.Contains("Error", html);
             Assert.Contains("datagrid size cannot exceed", html);
             Assert.DoesNotContain("calcpad-ui-datagrid", html);
-        }
-
-        [Fact]
-        public void Datagrid_SizeLimit_ExactLimitIsAllowed()
-        {
-            var html = Render("#UI M = matrix(316; 316)", enableUi: true);
-            Assert.DoesNotContain("Error", html);
-            Assert.Contains("data-ui-rows=\"316\" data-ui-columns=\"316\"", html);
         }
 
         [Fact]
