@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import * as path from 'path';
 import { writeUiOverrides } from 'calcpad-frontend';
 import type { CalcpadApiClient, UiOverrideStore } from 'calcpad-frontend';
@@ -59,14 +60,14 @@ export class CalcpadCompiledEditorProvider
         private readonly _apiClient: CalcpadApiClient,
         private readonly _uiOverrides: UiOverrideStore,
         private readonly _renderPanel: RenderPanel,
-        private readonly _log: vscode.OutputChannel,
+        private readonly _log: ILogger,
     ) {}
 
     public static register(
         apiClient: CalcpadApiClient,
         uiOverrides: UiOverrideStore,
         renderPanel: RenderPanel,
-        log: vscode.OutputChannel,
+        log: ILogger,
     ): CalcpadCompiledEditorProvider {
         const provider = new CalcpadCompiledEditorProvider(apiClient, uiOverrides, renderPanel, log);
         provider._registration = vscode.window.registerCustomEditorProvider(

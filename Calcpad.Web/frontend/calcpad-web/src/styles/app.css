@@ -114,11 +114,16 @@ select option {
     font-size: 12px;
     background: rgba(0, 0, 0, 0.35);
     border-radius: 2px;
+    -webkit-user-select: none;
     user-select: none;
 }
 
 .status-bar .status-server.connected {
     color: #6bd66b;
+}
+
+.status-bar .status-server.connecting {
+    color: #ffcc66;
 }
 
 .status-bar .status-server.disconnected {
@@ -273,6 +278,7 @@ select option {
     overflow-y: hidden;
     flex-shrink: 0;
     height: 30px;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -454,6 +460,7 @@ select option {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    -webkit-user-select: none;
     user-select: none;
     border-right: 1px solid var(--vscode-widget-border, #1e1e1e);
     transition: background 0.15s;
@@ -925,6 +932,7 @@ select option {
     color: var(--vscode-statusBar-foreground, #fff);
     font-size: 12px;
     cursor: pointer;
+    -webkit-user-select: none;
     user-select: none;
 }
 

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import {
     HTML_INLINE,
@@ -19,9 +20,9 @@ type CommentFormatSetting = 'html' | 'markdown' | 'auto';
  * Supports HTML and Markdown modes via the calcpad.commentFormat setting.
  */
 export class CommentFormatter {
-    private outputChannel: vscode.OutputChannel;
+    private outputChannel: ILogger;
 
-    constructor(outputChannel: vscode.OutputChannel) {
+    constructor(outputChannel: ILogger) {
         this.outputChannel = outputChannel;
     }
 

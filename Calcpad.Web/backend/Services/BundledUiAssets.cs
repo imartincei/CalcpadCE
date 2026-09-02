@@ -70,7 +70,7 @@ namespace Calcpad.Server.Services
                 }
                 else
                 {
-                    FileLogger.LogInfo("Bundled UI assets loaded", $"{sb.Length} chars");
+                    FileLogger.LogVerbose("Bundled UI assets loaded", $"{sb.Length} chars");
                     _cachedHeadMarkup = sb.ToString();
                 }
                 return _cachedHeadMarkup;

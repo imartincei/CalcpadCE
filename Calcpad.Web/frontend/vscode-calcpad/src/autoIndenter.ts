@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import {
     shouldIncreaseIndent,
     shouldDecreaseIndent,
@@ -12,9 +13,9 @@ import {
  * Logic is provided by calcpad-frontend; this class handles VS Code event wiring.
  */
 export class AutoIndenter {
-    private outputChannel: vscode.OutputChannel;
+    private outputChannel: ILogger;
 
-    constructor(outputChannel: vscode.OutputChannel) {
+    constructor(outputChannel: ILogger) {
         this.outputChannel = outputChannel;
     }
 

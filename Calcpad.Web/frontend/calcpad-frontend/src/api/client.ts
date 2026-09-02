@@ -24,6 +24,15 @@ import type { SnippetsResponse } from '../types/snippets';
 /** Request header carrying the server's per-launch token. Must match the backend's constant. */
 export const API_TOKEN_HEADER = 'X-Calcpad-Token';
 
+/**
+ * How long a request waits for a base URL before giving up. Covers a cold start: the VS Code
+ * extension has to resolve a .NET runtime, which may prompt, before the server binds a port.
+ */
+const BASE_URL_WAIT_MS = 30_000;
+
+/** What the endpoints that report to the user directly say when no server ever arrived. */
+const NO_SERVER_ERROR = 'No CalcpadCE server is available.';
+
 /** Mirrors the backend's own loopback test (`Program.IsLoopbackHost`). */
 function isLoopbackUrl(url: string): boolean {
     try {
@@ -49,13 +58,28 @@ export class CalcpadApiClient {
     private keySeq = new Map<string, number>();
     private keyAbort = new Map<string, AbortController>();
 
+    // Resolves as soon as a base URL exists. The VS Code extension builds this client during
+    // activation, well before the bundled server has bound a port, so requests can arrive while
+    // `baseUrl` is still empty.
+    private readonly baseUrlReady: Promise<void>;
+    private signalBaseUrlReady?: () => void;
+    // Set once the wait below has run out, so a host with no server at all fails the next
+    // request straight away instead of parking every keystroke's lint for the full timeout.
+    private baseUrlUnavailable = false;
+
     constructor(baseUrl: string, logger?: ILogger) {
         this.baseUrl = baseUrl;
         this.logger = logger;
+        this.baseUrlReady = new Promise<void>((resolve) => { this.signalBaseUrlReady = resolve; });
+        if (baseUrl) this.signalBaseUrlReady?.();
     }
 
     public setBaseUrl(url: string): void {
         this.baseUrl = url;
+        if (url) {
+            this.baseUrlUnavailable = false;
+            this.signalBaseUrlReady?.();
+        }
     }
 
     public getBaseUrl(): string {
@@ -84,6 +108,34 @@ export class CalcpadApiClient {
 
     private jsonHeaders(): Record<string, string> {
         return { 'Content-Type': 'application/json', ...this.authHeaders() };
+    }
+
+    /**
+     * The full URL for `endpoint`, waiting for a base URL to arrive if the server is still
+     * starting. Without this a request issued during activation fetches the relative
+     * `/api/calcpad/lint`, which fails with "Failed to parse URL from ..." — a confusing way
+     * to say the server is not up yet.
+     *
+     * Null means no server ever arrived, and the caller reports a failed request as usual. That
+     * verdict then sticks until a URL does arrive, so a host with no server at all does not park
+     * each keystroke's lint for the full timeout.
+     */
+    private async resolveUrl(endpoint: string, tag: string): Promise<string | null> {
+        if (this.baseUrl) return this.baseUrl + endpoint;
+        if (this.baseUrlUnavailable) return null;
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        await Promise.race([
+            this.baseUrlReady,
+            new Promise<void>((resolve) => { timer = setTimeout(resolve, BASE_URL_WAIT_MS); }),
+        ]);
+        clearTimeout(timer);
+        if (this.baseUrl) return this.baseUrl + endpoint;
+        // Everything waiting hits this together, so only the first one reports it.
+        if (!this.baseUrlUnavailable) {
+            this.baseUrlUnavailable = true;
+            this.logger?.appendLine(`[${tag}] No server URL — request skipped`, 'warning');
+        }
+        return null;
     }
 
     /**
@@ -175,7 +227,9 @@ export class CalcpadApiClient {
     ): Promise<PortableBundleResult> {
         return (async () => {
             try {
-                const response = await fetch(`${this.baseUrl}/api/calcpad/portable/bundle`, {
+                const url = await this.resolveUrl('/api/calcpad/portable/bundle', 'BundlePortable');
+                if (url === null) return { errors: [NO_SERVER_ERROR] };
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: this.jsonHeaders(),
                     body: JSON.stringify({ content, sourceFilePath }),
@@ -184,7 +238,7 @@ export class CalcpadApiClient {
                 const body = await response.json().catch(() => null);
                 if (response.ok && typeof body?.content === 'string') return { content: body.content, errors: [] };
 
-                this.logger?.appendLine(`[BundlePortable] Server returned ${response.status}`);
+                this.logger?.appendLine(`[BundlePortable] Server returned ${response.status}`, 'warning');
                 const messages: unknown = body?.messages;
                 return {
                     errors: Array.isArray(messages) && messages.length
@@ -210,7 +264,9 @@ export class CalcpadApiClient {
     ): Promise<PortablePackageResult> {
         return (async () => {
             try {
-                const response = await fetch(`${this.baseUrl}/api/calcpad/portable/package`, {
+                const url = await this.resolveUrl('/api/calcpad/portable/package', 'PackagePortable');
+                if (url === null) return { bundled: [], errors: [NO_SERVER_ERROR] };
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: this.jsonHeaders(),
                     body: JSON.stringify({ content, sourceFilePath }),
@@ -225,7 +281,7 @@ export class CalcpadApiClient {
                     errors: [],
                 };
 
-                this.logger?.appendLine(`[PackagePortable] Server returned ${response.status}`);
+                this.logger?.appendLine(`[PackagePortable] Server returned ${response.status}`, 'warning');
                 const messages: unknown = body?.messages;
                 return {
                     bundled: [],
@@ -242,6 +298,18 @@ export class CalcpadApiClient {
 
     public async snippets(): Promise<SnippetsResponse | null> {
         return this.get<SnippetsResponse>('/api/calcpad/snippets', 'Snippets');
+    }
+
+    /**
+     * Server-side log verbosity. Applies to the running process immediately, so it is pushed
+     * again whenever the panel mounts — the server may have restarted since it was last set.
+     */
+    public async setServerLogLevel(level: string): Promise<{ level: string } | null> {
+        return this.post<{ level: string }>('/api/calcpad/log-level', { level }, 'LogLevel');
+    }
+
+    public async getServerLogLevel(): Promise<{ level: string; available: string[] } | null> {
+        return this.get<{ level: string; available: string[] }>('/api/calcpad/log-level', 'LogLevel');
     }
 
     public async prettify(
@@ -276,7 +344,8 @@ export class CalcpadApiClient {
         opts?: { key?: string; write?: boolean },
     ): Promise<ArrayBuffer | ConvertResult | null> {
         return this.withSupersession(opts?.key, async (signal) => {
-            const url = this.baseUrl + '/api/calcpad/convert';
+            const url = await this.resolveUrl('/api/calcpad/convert', 'Convert');
+            if (url === null) return null;
             try {
                 const response = await fetch(url, {
                     method: 'POST',
@@ -319,7 +388,8 @@ export class CalcpadApiClient {
         opts?: { forPrint?: boolean; uiOverrides?: Record<string, string>; write?: boolean },
     ): Promise<ArrayBuffer | null> {
         return (async () => {
-            const url = this.baseUrl + '/api/calcpad/docx';
+            const url = await this.resolveUrl('/api/calcpad/docx', 'Docx');
+            if (url === null) return null;
             try {
                 const response = await fetch(url, {
                     method: 'POST',
@@ -355,7 +425,8 @@ export class CalcpadApiClient {
         opts?: { key?: string; write?: boolean },
     ): Promise<ConvertResult | null> {
         return this.withSupersession(opts?.key, async (signal) => {
-            const url = this.baseUrl + '/api/calcpad/convert?unwrap=true';
+            const url = await this.resolveUrl('/api/calcpad/convert?unwrap=true', 'ConvertUnwrapped');
+            if (url === null) return null;
             try {
                 const response = await fetch(url, {
                     method: 'POST',
@@ -386,11 +457,14 @@ export class CalcpadApiClient {
         return this.withSupersession(opts?.key, task);
     }
 
-    public async checkHealth(): Promise<boolean> {
+    /** Liveness probe. Answered from inside the pipeline, so a bound-but-wedged server fails it. */
+    public async checkHealth(timeoutMs: number = 5000): Promise<boolean> {
+        // Never waits: this is the liveness probe, and no URL is already the answer.
+        if (!this.baseUrl) return false;
         try {
-            const response = await fetch(this.baseUrl + '/api/calcpad/snippets', {
+            const response = await fetch(this.baseUrl + '/api/calcpad/health', {
                 headers: this.authHeaders(),
-                signal: AbortSignal.timeout(5000),
+                signal: AbortSignal.timeout(timeoutMs),
             });
             return response.ok;
         } catch {
@@ -400,9 +474,10 @@ export class CalcpadApiClient {
 
     private post<T>(endpoint: string, body: unknown, tag: string, key?: string): Promise<T | null> {
         return this.withSupersession(key, async (signal) => {
-            const url = this.baseUrl + endpoint;
+            const url = await this.resolveUrl(endpoint, tag);
+            if (url === null) return null;
             try {
-                this.logger?.appendLine(`[${tag}] Sending request to server...`);
+                this.logger?.appendLine(`[${tag}] Sending request to server...`, 'verbose');
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: this.jsonHeaders(),
@@ -410,7 +485,7 @@ export class CalcpadApiClient {
                     signal: combineSignals(AbortSignal.timeout(30000), signal),
                 });
                 if (!response.ok) {
-                    this.logger?.appendLine(`[${tag}] Server returned ${response.status}`);
+                    this.logger?.appendLine(`[${tag}] Server returned ${response.status}`, 'warning');
                     return null;
                 }
                 const data: T = await response.json();
@@ -423,15 +498,16 @@ export class CalcpadApiClient {
     }
 
     private async get<T>(endpoint: string, tag: string): Promise<T | null> {
-        const url = this.baseUrl + endpoint;
+        const url = await this.resolveUrl(endpoint, tag);
+        if (url === null) return null;
         try {
-            this.logger?.appendLine(`[${tag}] Sending request to server...`);
+            this.logger?.appendLine(`[${tag}] Sending request to server...`, 'verbose');
             const response = await fetch(url, {
                 headers: this.authHeaders(),
                 signal: AbortSignal.timeout(30000),
             });
             if (!response.ok) {
-                this.logger?.appendLine(`[${tag}] Server returned ${response.status}`);
+                this.logger?.appendLine(`[${tag}] Server returned ${response.status}`, 'warning');
                 return null;
             }
             const data: T = await response.json();
@@ -444,12 +520,18 @@ export class CalcpadApiClient {
 
     private logError(tag: string, error: unknown): void {
         if (!this.logger) return;
+        // AbortError and TimeoutError are both DOMExceptions from an aborted signal, but they
+        // mean opposite things: withSupersession raises the first on every keystroke when a newer
+        // request replaces this one, while only the second is a server that never answered.
         if (error instanceof DOMException && error.name === 'AbortError') {
-            this.logger.appendLine(`[${tag}] Request timed out`);
+            this.logger.appendLine(`[${tag}] Superseded by a newer request`, 'verbose');
+        } else if (error instanceof DOMException && error.name === 'TimeoutError') {
+            this.logger.appendLine(`[${tag}] Request timed out`, 'warning');
         } else if (error instanceof TypeError && error.message.includes('fetch')) {
-            this.logger.appendLine(`[${tag}] Server connection refused`);
+            // Routine while the server is restarting; the connection monitor reports the outage.
+            this.logger.appendLine(`[${tag}] Server connection refused`, 'verbose');
         } else {
-            this.logger.appendLine(`[${tag}] Error: ${error instanceof Error ? error.message : String(error)}`);
+            this.logger.appendLine(`[${tag}] Error: ${error instanceof Error ? error.message : String(error)}`, 'warning');
         }
     }
 }

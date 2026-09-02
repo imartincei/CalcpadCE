@@ -3,8 +3,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 import { spawn, execSync, ChildProcess } from 'child_process';
-import type { ILogger } from 'calcpad-frontend';
-import { decodeExitCode, buildCrashRecord, API_TOKEN_HEADER } from 'calcpad-frontend';
+import type { ILogger, ServerLifecycleState, CalcpadLogLevel } from 'calcpad-frontend';
+import { decodeExitCode, buildCrashRecord, API_TOKEN_HEADER, getLogLevel } from 'calcpad-frontend';
 
 interface LockFileContents {
     pid: number;
@@ -12,6 +12,8 @@ interface LockFileContents {
     startedAt: number;
     /** Per-launch token the server requires on `/api` routes. Absent in a pre-token lock. */
     token?: string;
+    /** Set only on the pre-spawn placeholder, whose `pid` is an extension host, not a server. */
+    starting?: true;
 }
 
 /** Lock files carry the API token, so nobody but this user may read one. */
@@ -65,6 +67,16 @@ export class BaseServerManager {
     public onCrashExhausted?: (crashOutput: string) => void;
 
     /**
+     * The server we are now talking to, whether we spawned it, adopted a peer's, or came back
+     * from an auto-restart. Every start picks a fresh port, so a listener that skips this ends
+     * up addressing a dead one.
+     */
+    public onUrlChanged?: (newUrl: string) => void;
+
+    /** Always raised after onUrlChanged, so a listener may assume the new URL is already applied. */
+    public onStatusChanged?: (state: ServerLifecycleState, detail?: string) => void;
+
+    /**
      * @param logger    Server debug channel — receives stdout (verbose server output).
      * @param mainLogger Main extension log — receives stderr only. Falls back to `logger` if omitted.
      */
@@ -75,6 +87,12 @@ export class BaseServerManager {
         this.dotnetPath = dotnetPath;
         this.lockFilePath = path.join(basePath, 'bin', '.calcpad-server.lock');
         this.startCrashWatcher();
+    }
+
+    /** Announces a server this window can now talk to. URL first, so a status listener may use it. */
+    private announceRunning(): void {
+        this.onUrlChanged?.(this.getBaseUrl());
+        this.onStatusChanged?.('running', this.getBaseUrl());
     }
 
     /**
@@ -110,8 +128,12 @@ export class BaseServerManager {
     /**
      * Read the lock file and verify the recorded server is alive and healthy.
      * Returns the lock contents if reusable, or null if the lock is missing/stale.
+     *
+     * @param replaceUnhealthy Kill an alive-but-unhealthy server and drop its lock. Only safe
+     * from `start()`: while waiting on a peer, the server the lock names is one that is still
+     * booting and legitimately not answering yet.
      */
-    private async tryReuseExistingServer(): Promise<LockFileContents | null> {
+    private async tryReuseExistingServer(replaceUnhealthy: boolean = false): Promise<LockFileContents | null> {
         const lock = this.readLockFile();
         if (!lock) {
             if (fs.existsSync(this.lockFilePath)) this.removeLockFile();
@@ -121,26 +143,51 @@ export class BaseServerManager {
         try {
             process.kill(lock.pid, 0);
         } catch {
-            this.log(`Lock file references dead PID ${lock.pid} — ignoring`);
+            this.log(`Lock file references dead PID ${lock.pid} — ignoring`, 'verbose');
             this.removeLockFile();
             return null;
         }
 
-        try {
-            const response = await fetch(`http://localhost:${lock.port}/api/calcpad/snippets`, {
-                headers: lock.token ? { [API_TOKEN_HEADER]: lock.token } : {},
-                signal: AbortSignal.timeout(2000)
-            });
-            if (!response.ok) {
-                this.log(`Existing server at port ${lock.port} unhealthy (HTTP ${response.status}) — ignoring`);
-                return null;
+        const why = await this.probeLockedServer(lock);
+        if (why) {
+            // Alive but not answering: wedged, or an orphan too old to know /health. It is no
+            // use to any window, so replace it rather than leaving peers to time out on it —
+            // but confirm first, since one missed probe can just be a server under load.
+            if (replaceUnhealthy && !lock.starting
+                && await this.probeLockedServer(lock) && this.stillNamesSameServer(lock)) {
+                this.log(`Existing server at port ${lock.port} failed two health checks (${why}) — replacing it`, 'warning');
+                this.killByPid(lock.pid);
+                this.removeLockFile();
+            } else {
+                this.log(`Existing server at port ${lock.port} failed its health check (${why}) — ignoring`, 'verbose');
             }
-        } catch (err) {
-            this.log(`Existing server at port ${lock.port} unreachable: ${err instanceof Error ? err.message : String(err)}`);
             return null;
         }
 
         return lock;
+    }
+
+    /**
+     * True when the lock on disk still names the server we just probed. Re-read because the
+     * probes take seconds, and a peer that finishes spawning meanwhile replaces its placeholder —
+     * whose `pid` is that window's extension host, not something to kill.
+     */
+    private stillNamesSameServer(lock: LockFileContents): boolean {
+        const current = this.readLockFile();
+        return !!current && !current.starting && current.pid === lock.pid && current.port === lock.port;
+    }
+
+    /** Null when the locked server answers its health probe, otherwise why it did not. */
+    private async probeLockedServer(lock: LockFileContents): Promise<string | null> {
+        try {
+            const response = await fetch(`http://localhost:${lock.port}/api/calcpad/health`, {
+                headers: lock.token ? { [API_TOKEN_HEADER]: lock.token } : {},
+                signal: AbortSignal.timeout(2000)
+            });
+            return response.ok ? null : `HTTP ${response.status}`;
+        } catch (err) {
+            return err instanceof Error ? err.message : String(err);
+        }
     }
 
     /**
@@ -152,15 +199,17 @@ export class BaseServerManager {
             this.log('Server is already running');
             return;
         }
+        this.onStatusChanged?.('starting', 'start');
 
         // Reuse an existing server from another VS Code window if one is alive.
-        const existing = await this.tryReuseExistingServer();
+        const existing = await this.tryReuseExistingServer(true);
         if (existing) {
             this.port = existing.port;
             this.authToken = existing.token ?? null;
             this._owned = false;
             this._isRunning = true;
             this.log(`Reusing existing server (PID ${existing.pid}) at port ${existing.port}`);
+            this.announceRunning();
             return;
         }
 
@@ -183,10 +232,11 @@ export class BaseServerManager {
         const placeholderLock: LockFileContents = {
             pid: process.pid,  // extension host PID — used by peers to detect if spawner died
             port: candidatePort,
-            startedAt: Date.now()
+            startedAt: Date.now(),
+            starting: true
         };
         if (!this.tryClaimLockExclusive(placeholderLock)) {
-            this.log('Another window is spawning the server — waiting to adopt it...');
+            this.log('Another window is spawning the server — waiting to adopt it...', 'verbose');
             const adopted = await this.waitForPeerServer(20000);
             if (adopted) {
                 this.port = adopted.port;
@@ -194,9 +244,10 @@ export class BaseServerManager {
                 this._owned = false;
                 this._isRunning = true;
                 this.log(`Adopted peer-spawned server (PID ${adopted.pid}) at port ${adopted.port}`);
+                this.announceRunning();
                 return;
             }
-            this.log('Timed out waiting for peer server — reclaiming lock and spawning our own');
+            this.log('Timed out waiting for peer server — reclaiming lock and spawning our own', 'warning');
             this.removeLockFile();
             this.tryClaimLockExclusive(placeholderLock);
         }
@@ -221,7 +272,7 @@ export class BaseServerManager {
             try {
                 fs.chmodSync(exePath, 0o755);
             } catch (err) {
-                this.log(`Warning: could not chmod ${exeName}: ${err instanceof Error ? err.message : String(err)}`);
+                this.log(`Warning: could not chmod ${exeName}: ${err instanceof Error ? err.message : String(err)}`, 'warning');
             }
             // createdump is invoked by the .NET runtime on crash; without +x
             // the runtime aborts startup on some distros.
@@ -264,6 +315,9 @@ export class BaseServerManager {
             // ASPNETCORE_ENVIRONMENT=Development exported would otherwise get
             // Swagger and the debug-crash endpoint on a shipped extension.
             ASPNETCORE_ENVIRONMENT: 'Production',
+            // The client re-pushes this over /api/calcpad/log-level once it connects, which is
+            // far too late for the server's own startup entries.
+            CALCPAD_LOG_LEVEL: getLogLevel(),
         };
 
         // The apphost probes the standard install locations and PATH, so it cannot find a
@@ -295,7 +349,7 @@ export class BaseServerManager {
         this._spawnFailed = false;
         this._spawnFailedCode = null;
         this._processClosed = false;
-        this.log(`Spawned via ${useAppHost ? 'apphost' : 'dotnet'} (PID ${this.serverProcess.pid}, detached)`);
+        this.log(`Spawned via ${useAppHost ? 'apphost' : 'dotnet'} (PID ${this.serverProcess.pid}, detached)`, 'verbose');
 
         // Rewrite the lock with the actual child PID (replacing our host-PID placeholder).
         if (this.serverProcess.pid) {
@@ -308,16 +362,18 @@ export class BaseServerManager {
         }
 
         // stdout → server debug channel only. Not buffered, not surfaced in crash messages.
+        // Passed through at 'error' rather than filtered again: the server has already applied
+        // the same level at the source, and re-filtering here would drop the crash tail.
         this.serverProcess.stdout?.on('data', (data: Buffer) => {
             const text = data.toString().trim();
-            this.logger.appendLine(`[ServerManager] [stdout] ${text}`);
+            this.logger.appendLine(`[ServerManager] [stdout] ${text}`, 'error');
         });
 
         // stderr → main extension log + crash buffer. These are the lines we actually
         // want visible to the user and included in crash reports.
         this.serverProcess.stderr?.on('data', (data: Buffer) => {
             const text = data.toString().trim();
-            this.mainLogger.appendLine(`[ServerManager] [stderr] ${text}`);
+            this.mainLogger.appendLine(`[ServerManager] [stderr] ${text}`, 'error');
             this._lastCrashOutput.push(text);
             if (this._lastCrashOutput.length > 20) {
                 this._lastCrashOutput.shift();
@@ -336,7 +392,7 @@ export class BaseServerManager {
         // user has to unblock the file in Explorer and click Refresh.
         this.serverProcess.on('error', (err: NodeJS.ErrnoException) => {
             const code = err.code ?? '';
-            this.log(`[error] Failed to start server: ${err.message}${code ? ` (${code})` : ''}`);
+            this.log(`[error] Failed to start server: ${err.message}${code ? ` (${code})` : ''}`, 'error');
             this._spawnFailed = true;
             this._spawnFailedCode = code;
             this._isRunning = false;
@@ -377,16 +433,18 @@ export class BaseServerManager {
                 this._restartCount++;
                 if (this._restartCount < BaseServerManager.MAX_RESTARTS) {
                     this.log(`Unexpected exit — attempting restart ${this._restartCount}/${BaseServerManager.MAX_RESTARTS} in 2 seconds...`);
+                    this.onStatusChanged?.('starting', `crashed, retry ${this._restartCount}/${BaseServerManager.MAX_RESTARTS}`);
                     setTimeout(() => {
                         if (!this._disposed) {
                             this.start().catch(err => {
-                                this.log(`Restart failed: ${err instanceof Error ? err.message : String(err)}`);
+                                this.log(`Restart failed: ${err instanceof Error ? err.message : String(err)}`, 'error');
                             });
                         }
                     }, 2000);
                 } else {
                     const crashOutput = this._lastCrashOutput.join('\n');
-                    this.log(`Server crashed ${this._restartCount} times — auto-restart disabled. Use refresh to restart manually.`);
+                    this.log(`Server crashed ${this._restartCount} times — auto-restart disabled. Use refresh to restart manually.`, 'error');
+                    this.onStatusChanged?.('stopped', 'auto-restart exhausted');
                     this.onCrashExhausted?.(crashOutput);
                 }
             }
@@ -398,6 +456,7 @@ export class BaseServerManager {
             this._isRunning = true;
             this._lastCrashOutput = [];
             this.log(`Server is ready at ${serverUrl}`);
+            this.announceRunning();
         } catch (err) {
             // If the spawn failed (Windows blocked the .exe, dotnet missing, etc.) the
             // child PID is unknown and the placeholder lock still holds the extension
@@ -406,6 +465,9 @@ export class BaseServerManager {
             if (this._spawnFailed) {
                 this.removeLockFile();
             }
+            // Nothing retries from here: the exit handler stands down while _startingUp,
+            // and the auto-restart path's own start() lands here too.
+            this.onStatusChanged?.('stopped', err instanceof Error ? err.message : String(err));
             throw err;
         } finally {
             this._startingUp = false;
@@ -434,7 +496,7 @@ export class BaseServerManager {
             const lock = this.readLockFile();
             if (lock) {
                 if (lock.pid === process.pid) {
-                    this.log(`Discarding stale placeholder lock (our own PID ${lock.pid}, no child to kill)`);
+                    this.log(`Discarding stale placeholder lock (our own PID ${lock.pid}, no child to kill)`, 'verbose');
                 } else {
                     this.log(`Stopping shared server (PID ${lock.pid})`);
                     this.killByPid(lock.pid);
@@ -443,10 +505,11 @@ export class BaseServerManager {
             } else if (fs.existsSync(this.lockFilePath)) {
                 // Present but unreadable or out of range — nothing safe to kill,
                 // and leaving it would make every peer wait on a phantom server.
-                this.log('Discarding unusable lock file');
+                this.log('Discarding unusable lock file', 'verbose');
                 this.removeLockFile();
             }
             this._isRunning = false;
+            this.onStatusChanged?.('stopped', 'stopped by user');
             return;
         }
 
@@ -480,6 +543,7 @@ export class BaseServerManager {
 
         this.removeLockFile();
         this.log('Server stopped');
+        this.onStatusChanged?.('stopped', 'stopped by user');
     }
 
     /**
@@ -577,7 +641,7 @@ export class BaseServerManager {
         try {
             fs.writeFileSync(this.lockFilePath, JSON.stringify(lock), { encoding: 'utf-8', mode: LOCK_FILE_MODE });
         } catch (err) {
-            this.log(`Warning: Could not write lock file: ${err instanceof Error ? err.message : String(err)}`);
+            this.log(`Warning: Could not write lock file: ${err instanceof Error ? err.message : String(err)}`, 'warning');
         }
     }
 
@@ -593,7 +657,7 @@ export class BaseServerManager {
             if (err && typeof err === 'object' && 'code' in err && (err as { code: string }).code === 'EEXIST') {
                 return false;
             }
-            this.log(`Warning: Could not claim lock file: ${err instanceof Error ? err.message : String(err)}`);
+            this.log(`Warning: Could not claim lock file: ${err instanceof Error ? err.message : String(err)}`, 'warning');
             return false;
         }
     }
@@ -665,7 +729,7 @@ export class BaseServerManager {
     }
 
     private async waitForReady(serverUrl: string, maxAttempts: number = 60, intervalMs: number = 500): Promise<void> {
-        const healthUrl = `${serverUrl}/api/calcpad/snippets`;
+        const healthUrl = `${serverUrl}/api/calcpad/health`;
 
         for (let i = 0; i < maxAttempts; i++) {
             // Fail fast if the server process has fully closed (stdio drained).
@@ -730,8 +794,8 @@ export class BaseServerManager {
         }
     }
 
-    private log(message: string): void {
-        this.logger.appendLine(`[ServerManager] ${message}`);
+    private log(message: string, level: CalcpadLogLevel = 'information'): void {
+        this.logger.appendLine(`[ServerManager] ${message}`, level);
     }
 
     /**
@@ -773,7 +837,7 @@ export class BaseServerManager {
             fs.writeFileSync(file, record, 'utf-8');
             this.mainLogger.appendLine(`[ServerManager] Crash record written: ${file}`);
         } catch (err) {
-            this.log(`Warning: could not write crash record: ${err instanceof Error ? err.message : String(err)}`);
+            this.log(`Warning: could not write crash record: ${err instanceof Error ? err.message : String(err)}`, 'warning');
         }
     }
 

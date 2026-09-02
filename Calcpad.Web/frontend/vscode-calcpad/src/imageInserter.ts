@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
 import * as path from 'path';
 import {
     IMAGE_EXTENSIONS,
@@ -17,9 +18,9 @@ const IMAGE_FILE_FILTERS: Record<string, string[]> = {
  * Images are inserted as Calcpad comment lines with HTML img tags: '<img src="...">
  */
 export class ImageInserter {
-    private outputChannel: vscode.OutputChannel;
+    private outputChannel: ILogger;
 
-    constructor(outputChannel: vscode.OutputChannel) {
+    constructor(outputChannel: ILogger) {
         this.outputChannel = outputChannel;
     }
 
@@ -313,7 +314,7 @@ export class ImageInserter {
 class CalcpadImagePasteProvider implements vscode.DocumentPasteEditProvider {
     constructor(
         private imageInserter: ImageInserter,
-        private outputChannel: vscode.OutputChannel
+        private outputChannel: ILogger
     ) {}
 
     async provideDocumentPasteEdits(

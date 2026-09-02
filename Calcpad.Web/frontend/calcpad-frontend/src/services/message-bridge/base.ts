@@ -7,7 +7,8 @@ import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, Definit
 import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
 import type { UiDirectiveData } from '../../text/ui-directive';
 import type { DefinitionsResponse, ExportVariant } from '../../types/api';
-import { getDefaultSettings, buildApiSettings, coerceWriteMode, writesAllowed } from '../../types/settings';
+import { getDefaultSettings, buildApiSettings, coerceWriteMode, coerceLogLevel, writesAllowed } from '../../types/settings';
+import { setLogLevel } from '../log-level';
 import type { CalcpadSettings, WriteMode } from '../../types/settings';
 import { resolveStoredPdfSettings, resolveEffectivePdfSettings } from '../../types/pdf-settings';
 import type { PdfSettings } from '../../types/pdf-settings';
@@ -313,6 +314,11 @@ export abstract class BaseMessageBridge {
                 this.setExtraSetting('linterMinSeverity', message.severity);
                 this.postToVue({ type: 'linterMinSeverityChanged', severity: message.severity });
                 break;
+            case 'updateLogLevel':
+                this.setExtraSetting('logLevel', message.level);
+                this.postToVue({ type: 'logLevelChanged', level: message.level });
+                this.applyLogLevel(message.level);
+                break;
             case 'updateMaxOutputLines':
                 this.setExtraSetting('maxOutputLines', String(message.value));
                 this.postToVue({ type: 'maxOutputLinesChanged', value: message.value });
@@ -499,8 +505,18 @@ export abstract class BaseMessageBridge {
         }
     }
 
+    /** Applies the level to this process and pushes it to the server, which holds its own copy. */
+    protected applyLogLevel(raw: string | undefined | null): void {
+        const level = coerceLogLevel(raw);
+        setLogLevel(level);
+        void this.apiClient.setServerLogLevel(level);
+    }
+
     protected async handleGetSettings(): Promise<void> {
         const extras = await this.buildSettingsResponseExtras();
+        // The server may have started before us, or restarted after a crash, so it does not
+        // necessarily hold the level the user chose. Re-pushing here is idempotent.
+        this.applyLogLevel(this.getExtraSetting('logLevel'));
         this.postToVue({
             type: 'settingsResponse',
             settings: this.settings,
@@ -514,6 +530,7 @@ export abstract class BaseMessageBridge {
             enableAutoInputMode: this.getExtraSetting('autoInputMode') !== 'false',
             enablePreviewUiOverrides: this.previewAppliesUiOverrides(),
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
+            logLevel: coerceLogLevel(this.getExtraSetting('logLevel')),
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
             maxPreviewSizeMB: Number(this.getExtraSetting('maxPreviewSizeMB')) || DEFAULT_PREVIEW_SIZE_MB,
             maxPreviewConsoleMessages: Number(this.getExtraSetting('maxPreviewConsoleMessages'))

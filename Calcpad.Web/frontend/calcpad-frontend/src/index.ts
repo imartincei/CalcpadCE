@@ -49,10 +49,12 @@ export {
     validatePdfValue,
 } from './types/pdf-settings';
 
-export type { CalcpadSettings, CalcpadExtras, CalcpadSettingsBlob, WriteMode } from './types/settings';
+export type { CalcpadSettings, CalcpadExtras, CalcpadSettingsBlob, WriteMode, CalcpadLogLevel } from './types/settings';
 export {
     WRITE_MODE_OPTIONS,
     coerceWriteMode,
+    LOG_LEVEL_OPTIONS,
+    coerceLogLevel,
     writesAllowed,
     getDefaultSettings,
     getDefaultExtras,
@@ -98,6 +100,14 @@ export type { PdfBrowserStatus } from './api/pdf-browser';
 export { CalcpadLintService } from './services/linter';
 export { CalcpadDefinitionsService } from './services/definitions';
 export { CalcpadSnippetService } from './services/snippets';
+export { setLogLevel, getLogLevel, shouldLog, DISPLAY_LOG_LEVEL, toDisplayLogLevel } from './services/log-level';
+export type { DisplayLogLevel } from './services/log-level';
+export { ConnectionMonitor } from './services/connection-monitor';
+export type {
+    ServerStatus,
+    ServerLifecycleState,
+    ConnectionMonitorOptions,
+} from './services/connection-monitor';
 export {
     SEMANTIC_TOKEN_TYPES,
     TOKEN_TYPE_MAP,

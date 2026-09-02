@@ -6,6 +6,7 @@ import CalcpadAppVue from 'calcpad-frontend/vue/components/CalcpadApp.vue';
 import { initMessaging } from 'calcpad-frontend/vue/services/messaging';
 import { MessageBridge } from './services/message-bridge';
 import { buildApiSettings } from 'calcpad-frontend/types/settings';
+import { ConnectionMonitor, setLogLevel, coerceLogLevel } from 'calcpad-frontend';
 import {
     findMetadataCommentBlock,
     serializeMetadataComment,
@@ -47,7 +48,8 @@ import { registerFormatDocumentProvider } from './editor/format-document';
 import { setActiveDocumentKeyResolver, getActiveDocumentKey, type EditorBridge } from './editor/bridge';
 import { EditorGroup } from './editor/editor-group';
 import type { TabManager } from './tabs/tab-manager';
-import type { UiControl } from 'calcpad-frontend';
+import { toDisplayLogLevel } from 'calcpad-frontend';
+import type { UiControl, CalcpadLogLevel, DisplayLogLevel } from 'calcpad-frontend';
 import './editor/vscode-variables.css';
 import 'calcpad-frontend/vue/styles/base.css';
 import './styles/app.css';
@@ -177,7 +179,7 @@ async function bootstrap(): Promise<void> {
     let serverManager: import('./services/server-manager').TauriServerManager | null = null;
     // Server-manager log lines that arrive before the Output panel mounts
     // get buffered here, then flushed when appInstance is ready.
-    const pendingServerLogs: string[] = [];
+    const pendingServerLogs: { msg: string; level?: CalcpadLogLevel }[] = [];
     // Raw stdout/stderr lines from the Calcpad.Server sidecar (Rust's
     // `server-log` event), buffered the same way for the same reason.
     const pendingServerRawLogs: { line: string; stream: 'stdout' | 'stderr' }[] = [];
@@ -188,14 +190,14 @@ async function bootstrap(): Promise<void> {
         // its URL and surfaces crashes to the Output panel.
         const { TauriServerManager } = await import('./services/server-manager');
         serverManager = new TauriServerManager({
-            appendLine: (msg: string) => pendingServerLogs.push(msg),
+            appendLine: (msg: string, level?: CalcpadLogLevel) => pendingServerLogs.push({ msg, level }),
         });
         serverManager.onServerLog = (line: string, stream: 'stdout' | 'stderr') => {
             pendingServerRawLogs.push({ line, stream });
         };
 
         serverManager.onStartupBlocked = (details: string) => {
-            pendingServerLogs.push(`Server did not start — ${details}`);
+            pendingServerLogs.push({ msg: `Server did not start — ${details}`, level: 'error' });
             void showServerBlockedDialog(details);
         };
 
@@ -203,7 +205,7 @@ async function bootstrap(): Promise<void> {
             await serverManager.start();
         } catch (err) {
             const msg = err instanceof Error ? (err.stack ?? err.message) : String(err);
-            pendingServerLogs.push(`[bootstrap] Server failed to start: ${msg}`);
+            pendingServerLogs.push({ msg: `[bootstrap] Server failed to start: ${msg}`, level: 'error' });
             console.error('[bootstrap] Server failed to start:', err);
         }
         serverUrl = serverManager.getBaseUrl() || '';
@@ -254,6 +256,9 @@ async function bootstrap(): Promise<void> {
     // settings asynchronously, so wait for it; the web bridge is synchronous.
     if (tauriBridge) await tauriBridge.ready;
     setAppTheme(coerceAppTheme(activeBridge.getStoredColorTheme()));
+    // Before the buffered startup lines are flushed into the Output panel below, so they are
+    // filtered against the level the user actually chose rather than the default.
+    setLogLevel(coerceLogLevel((activeBridge as unknown as EditorBridge).getExtraSetting('logLevel')));
 
     const WORD_WRAP_KEY = 'calcpad.wordWrap';
     const initialWordWrap: 'on' | 'off' =
@@ -1206,7 +1211,7 @@ async function bootstrap(): Promise<void> {
 
     const wrap = (
         orig: (...args: any[]) => void,
-        level: 'info' | 'debug' | 'warn' | 'error',
+        level: DisplayLogLevel,
     ) => (...args: any[]) => {
         orig.apply(console, args);
         // Monaco's ConsoleLogger emits styled `%c INFO`/`%c  ERR` lines whose CSS
@@ -1221,12 +1226,27 @@ async function bootstrap(): Promise<void> {
     console.warn = wrap(origWarn, 'warn');
     console.error = wrap(origError, 'error');
 
+    // Monaco cancels superseded provider work — completions, semantic tokens, hovers — on
+    // essentially every keystroke, and unwinds it by rejecting with a CancellationError
+    // ("Canceled: Canceled"). That is control flow, not a failure, and Monaco exports
+    // isCancellationError for exactly this; VS Code's own error handler drops them the same way.
+    // AbortError is the fetch-side equivalent, raised by our own superseded requests.
+    const isCancellation = (reason: unknown): boolean =>
+        reason instanceof DOMException ? reason.name === 'AbortError'
+            : reason instanceof Error && reason.name === 'Canceled' && reason.message === 'Canceled';
+
+    // Stack included: without it a bare "Canceled: Canceled" gives nothing to trace it back to.
+    const describeError = (reason: unknown): string =>
+        reason instanceof Error ? (reason.stack ?? `${reason.name}: ${reason.message}`) : String(reason);
+
     // Also capture unhandled errors
     window.addEventListener('error', (e) => {
+        if (isCancellation(e.error)) return;
         appInstance.appendOutput('error', `Uncaught: ${e.message} (${e.filename}:${e.lineno})`);
     });
     window.addEventListener('unhandledrejection', (e) => {
-        appInstance.appendOutput('error', `Unhandled rejection: ${e.reason}`);
+        if (isCancellation(e.reason)) return;
+        appInstance.appendOutput('error', `Unhandled rejection: ${describeError(e.reason)}`);
     });
 
     // Messages posted from the preview iframes (App.vue:injectPreviewConsole /
@@ -1250,7 +1270,7 @@ async function bootstrap(): Promise<void> {
         // tagged with the originating group.
         if (data.type === 'previewConsole') {
             if (!fromPreview) return;
-            const level: 'info' | 'warn' | 'error' | 'debug' =
+            const level: DisplayLogLevel =
                 data.level === 'warn' ? 'warn'
                 : data.level === 'error' ? 'error'
                 : data.level === 'debug' ? 'debug'
@@ -1316,15 +1336,22 @@ async function bootstrap(): Promise<void> {
 
     // Flush any server-manager log lines buffered before the Output panel mounted,
     // then redirect future ones straight into the panel.
-    for (const msg of pendingServerLogs) appInstance.appendOutput('info', msg);
+    for (const { msg, level } of pendingServerLogs) appInstance.appendOutput(toDisplayLogLevel(level), msg);
     pendingServerLogs.length = 0;
     for (const { line, stream } of pendingServerRawLogs) {
         appInstance.appendOutput(stream === 'stderr' ? 'error' : 'info', line, 'server');
     }
     pendingServerRawLogs.length = 0;
+    const connectionMonitor = new ConnectionMonitor({
+        probe: (timeoutMs: number) => activeBridge.api.checkHealth(timeoutMs),
+        onStatusChanged: (status) => appInstance.setServerStatus(status),
+        onRecovered: () => { void runRefresh('Server reconnected — refreshing…'); },
+        log: (msg: string) => appInstance.appendOutput('info', `[Server] ${msg}`),
+    });
+
     if (serverManager) {
         serverManager.setLogger({
-            appendLine: (msg: string) => appInstance.appendOutput('info', msg),
+            appendLine: (msg: string, level?: CalcpadLogLevel) => appInstance.appendOutput(toDisplayLogLevel(level), msg),
         });
         serverManager.onServerLog = (line: string, stream: 'stdout' | 'stderr') => {
             appInstance.appendOutput(stream === 'stderr' ? 'error' : 'info', line, 'server');
@@ -1339,7 +1366,22 @@ async function bootstrap(): Promise<void> {
                 'Use Server → Restart Server to try again.');
             if (crashOutput) appInstance.appendOutput('error', crashOutput);
         };
+        // 'running' only means Rust saw a bound port, so applyLifecycle probes before going green.
+        serverManager.onStatusChanged = (state, detail) => connectionMonitor.applyLifecycle(state, detail);
     }
+
+    // serverManager.start() ran before the callbacks above existed, so seed from what it knows.
+    // markStopped leaves polling suspended, which is right: only a user restart can help.
+    if (serverManager && !serverManager.isRunning) {
+        connectionMonitor.markStopped('server did not start');
+    } else {
+        connectionMonitor.start();
+    }
+
+    // A hidden webview throttles timers hard, so the poll can be well stale on restore.
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') connectionMonitor.probeSoon();
+    });
 
     // Problems panel: markers can change for any group's model (background
     // lint). Dispatch to whichever group owns the affected resource.
@@ -1428,21 +1470,35 @@ async function bootstrap(): Promise<void> {
     // mounted, so seed it with the mode the session came up in.
     syncInputMode();
 
-    // Manual refresh: re-lint with current settings, refresh definitions/
-    // headings, redraw previews, and re-extract Export-tab plots. Called from
-    // the Server > Refresh menu item and the editor's Run action.
-    async function runRefresh(): Promise<void> {
-        appInstance.appendOutput('info', 'Refreshing…');
-        for (const g of groups.values()) {
-            await g.diagnostics?.refresh();
-            await refreshDefinitionsFor(g);
-            if (appInstance.isPreviewVisible()) await refreshPreviewFor(g);
+    // Manual refresh: re-lint, refresh definitions/headings, redraw previews, and re-extract
+    // Export-tab plots. From the Server > Refresh menu, the Run action, and on reconnect.
+    let refreshInFlight = false;
+    let refreshQueued = false;
+    async function runRefresh(reason: string = 'Refreshing…'): Promise<void> {
+        // Coalesced rather than dropped: the reconnect refresh has no user to retry it, and
+        // rendering against the server it just replaced is what it exists to correct.
+        if (refreshInFlight) {
+            refreshQueued = true;
+            return;
         }
-        activeBridge.refreshHeadings();
-        // Refresh the Export tab's plot list — it caches independently of the
-        // preview and would otherwise show stale plots until the user clicks
-        // "Refresh Plots" manually.
-        window.dispatchEvent(new MessageEvent('message', { data: { type: 'getPlots' } }));
+        refreshInFlight = true;
+        appInstance.appendOutput('info', reason);
+        try {
+            for (const g of groups.values()) {
+                await g.diagnostics?.refresh();
+                await refreshDefinitionsFor(g);
+                if (appInstance.isPreviewVisible()) await refreshPreviewFor(g);
+            }
+            activeBridge.refreshHeadings();
+            // The Export tab's plot list caches independently of the preview.
+            window.dispatchEvent(new MessageEvent('message', { data: { type: 'getPlots' } }));
+        } finally {
+            refreshInFlight = false;
+        }
+        if (refreshQueued) {
+            refreshQueued = false;
+            await runRefresh(reason);
+        }
     }
 
     appInstance.onResultModeChanged = (mode: ResultMode) => {
@@ -2438,6 +2494,7 @@ async function bootstrap(): Promise<void> {
                 }
             } finally {
                 if (isExiting) {
+                    connectionMonitor.stop();
                     // Rust owns sidecar shutdown (kill-on-exit hook). This
                     // dispose only tears down TS event listeners.
                     if (serverManager) {

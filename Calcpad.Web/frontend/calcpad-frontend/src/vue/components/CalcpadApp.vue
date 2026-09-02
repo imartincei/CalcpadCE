@@ -85,6 +85,7 @@
         :initial-enable-preview-ui-overrides="enablePreviewUiOverrides"
         :initial-dark-background="darkBackground"
         :initial-linter-min-severity="linterMinSeverity"
+        :initial-log-level="logLevel"
         :initial-max-output-lines="maxOutputLines"
         :initial-max-preview-size="maxPreviewSizeMB"
         :initial-max-preview-console-messages="maxPreviewConsoleMessages"
@@ -109,6 +110,7 @@
         @update-preview-ui-overrides="handleUpdatePreviewUiOverrides"
         @update-dark-background="handleUpdateDarkBackground"
         @update-linter-min-severity="handleUpdateLinterMinSeverity"
+        @update-log-level="handleUpdateLogLevel"
         @update-max-output-lines="handleUpdateMaxOutputLines"
         @update-max-preview-size="handleUpdateMaxPreviewSize"
         @update-max-preview-console-messages="handleUpdateMaxPreviewConsoleMessages"
@@ -254,6 +256,7 @@ const enableAutoInputMode = ref(true)
 const enablePreviewUiOverrides = ref(false)
 const darkBackground = ref('#1e1e1e')
 const linterMinSeverity = ref('information')
+const logLevel = ref('warning')
 const maxOutputLines = ref(1000)
 const maxPreviewSizeMB = ref(DEFAULT_PREVIEW_SIZE_MB)
 const maxPreviewConsoleMessages = ref(DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT)
@@ -546,6 +549,11 @@ const handleUpdateLinterMinSeverity = (severity: string) => {
   postMessage({ type: 'updateLinterMinSeverity', severity })
 }
 
+const handleUpdateLogLevel = (level: string) => {
+  logLevel.value = level
+  postMessage({ type: 'updateLogLevel', level })
+}
+
 const handleUpdateMaxOutputLines = (value: number) => {
   maxOutputLines.value = value
   postMessage({ type: 'updateMaxOutputLines', value })
@@ -705,6 +713,7 @@ const handleMessage = (event: MessageEvent) => {
       if (typeof message.enablePreviewUiOverrides === 'boolean') enablePreviewUiOverrides.value = message.enablePreviewUiOverrides
       darkBackground.value = message.darkBackground || '#1e1e1e'
       linterMinSeverity.value = message.linterMinSeverity || 'information'
+      logLevel.value = message.logLevel || 'warning'
       writeMode.value = coerceWriteMode(message.writeMode)
       if (typeof message.maxOutputLines === 'number' && message.maxOutputLines >= 10) {
         maxOutputLines.value = message.maxOutputLines

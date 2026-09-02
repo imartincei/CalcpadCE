@@ -2,16 +2,17 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel } from 'calcpad-frontend';
 import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse, SettingsValues, UiDirectiveData, UiControl } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
+import { VSCodeLogger } from './adapters';
 
 export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'calcpadVueUI';
 
     private _view?: vscode.WebviewView;
-    private _outputChannel: vscode.OutputChannel;
+    private _outputChannel: VSCodeLogger;
     private _cachedPlots: ExtractedPlot[] = [];
     private _cachedHtml: string = '';
     private _inputMode = false;
@@ -24,6 +25,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     public getSourceEditor?: () => vscode.TextEditor | undefined;
     public onPreviewThemeChanged?: () => void | Promise<void>;
     public onSettingsChanged?: () => void | Promise<void>;
+    public onLogLevelChanged?: (level: string) => void;
     /** Real highlighter definitions for a document URI, used to resolve metadata context. */
     public getDefinitions?: (documentUri: string) => DefinitionsResponse | undefined;
     /**
@@ -41,12 +43,12 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         private readonly _settingsManager: CalcpadSettingsManager,
         private readonly _insertManager: CalcpadInsertManager
     ) {
-        this._outputChannel = vscode.window.createOutputChannel('CalcpadCE Vue');
-        this._outputChannel.appendLine('CalcPad Vue UI Provider initialized');
+        this._outputChannel = new VSCodeLogger(vscode.window.createOutputChannel('CalcpadCE Vue'));
+        this._outputChannel.appendLine('CalcPad Vue UI Provider initialized', 'verbose');
 
         // Register callback to refresh UI when snippets are loaded from server
         this._insertManager.onSnippetsLoaded(() => {
-            this._outputChannel.appendLine('Snippets loaded - refreshing Vue UI');
+            this._outputChannel.appendLine('Snippets loaded - refreshing Vue UI', 'verbose');
             this._sendInitialData();
         });
     }
@@ -57,7 +59,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         _token: vscode.CancellationToken,
     ) {
         this._view = webviewView;
-        this._outputChannel.appendLine('Resolving Vue webview view');
+        this._outputChannel.appendLine('Resolving Vue webview view', 'verbose');
 
         webviewView.webview.options = {
             // Allow scripts in the webview
@@ -68,11 +70,11 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         };
 
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
-        this._outputChannel.appendLine('Webview HTML set');
+        this._outputChannel.appendLine('Webview HTML set', 'verbose');
 
         // Handle messages from the webview
         webviewView.webview.onDidReceiveMessage(async (data) => {
-            this._outputChannel.appendLine(`Received message: ${data.type}`);
+            this._outputChannel.appendLine(`Received message: ${data.type}`, 'verbose');
             switch (data.type) {
                 case 'insertText':
                     const insertEditor = vscode.window.activeTextEditor;
@@ -177,6 +179,11 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     this._settingsManager.setExtra('linterMinSeverity', data.severity);
                     break;
 
+                case 'updateLogLevel':
+                    this._settingsManager.setExtra('logLevel', data.level);
+                    this.onLogLevelChanged?.(data.level);
+                    break;
+
                 case 'updateWriteMode':
                     this._settingsManager.setExtra('writeMode', coerceWriteMode(data.mode));
                     break;
@@ -224,10 +231,10 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     try { fs.mkdirSync(logsDir, { recursive: true }); } catch { /* best-effort */ }
                     try {
                         await vscode.env.openExternal(vscode.Uri.file(logsDir));
-                        this._outputChannel.appendLine(`Opened logs folder: ${logsDir}`);
+                        this._outputChannel.appendLine(`Opened logs folder: ${logsDir}`, 'verbose');
                     } catch (err) {
                         const msg = err instanceof Error ? err.message : String(err);
-                        this._outputChannel.appendLine(`Failed to open logs folder: ${msg}`);
+                        this._outputChannel.appendLine(`Failed to open logs folder: ${msg}`, 'warning');
                         vscode.window.showErrorMessage(`Could not open logs folder: ${msg}`);
                     }
                     break;
@@ -332,12 +339,12 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     break;
 
                 case 'refreshDocument':
-                    this._outputChannel.appendLine('[Vue UI] Run preview requested');
+                    this._outputChannel.appendLine('[Vue UI] Run preview requested', 'verbose');
                     vscode.commands.executeCommand('calcpad.runPreview');
                     break;
 
                 case 'prettifyDocument':
-                    this._outputChannel.appendLine('[Vue UI] Prettify document requested');
+                    this._outputChannel.appendLine('[Vue UI] Prettify document requested', 'verbose');
                     vscode.commands.executeCommand('vscode-calcpad.prettifyDocument');
                     break;
 
@@ -382,7 +389,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     break;
 
                 case 'debug':
-                    this._outputChannel.appendLine(`[Vue Debug] ${data.message}`);
+                    this._outputChannel.appendLine(`[Vue Debug] ${data.message}`, 'verbose');
                     break;
             }
         });
@@ -431,13 +438,13 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             try {
                 await this._insertManager.loadSnippets();
             } catch (error) {
-                this._outputChannel.appendLine('[Vue UI] Failed to load snippets: ' + error);
+                this._outputChannel.appendLine('[Vue UI] Failed to load snippets: ' + error, 'warning');
             }
         }
 
         // Send insert items as flat array
         const insertItems = this._insertManager.getAllItems();
-        this._outputChannel.appendLine('Sending ' + insertItems.length + ' insert items');
+        this._outputChannel.appendLine('Sending ' + insertItems.length + ' insert items', 'verbose');
         this._view.webview.postMessage({
             type: 'insertDataResponse',
             items: insertItems
@@ -466,6 +473,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             enablePreviewUiOverrides: sm.getExtraBool('previewUiOverrides', false),
             darkBackground: sm.getExtra('darkBackground', '#1e1e1e'),
             linterMinSeverity: sm.getExtra('linterMinSeverity', 'information'),
+            logLevel: coerceLogLevel(sm.getExtra('logLevel', 'warning')),
             writeMode: sm.getWriteMode(),
             maxPreviewSizeMB: sm.getExtraNumber('maxPreviewSizeMB', DEFAULT_PREVIEW_SIZE_MB),
             maxPreviewConsoleMessages: sm.getExtraNumber(
@@ -562,7 +570,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 
     public updateVariables(data: { macros: any[], variables: any[], functions: any[], customUnits: any[] }) {
         if (this._view) {
-            this._outputChannel.appendLine(`Updating variables: ${data.macros.length} macros, ${data.variables.length} variables, ${data.functions.length} functions, ${data.customUnits.length} custom units`);
+            this._outputChannel.appendLine(`Updating variables: ${data.macros.length} macros, ${data.variables.length} variables, ${data.functions.length} functions, ${data.customUnits.length} custom units`, 'verbose');
             this._view.webview.postMessage({
                 type: 'updateVariables',
                 data: data
@@ -756,8 +764,8 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'out', 'CalcpadVuePanel', 'main.js'));
         const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'out', 'CalcpadVuePanel', 'main.css'));
 
-        this._outputChannel.appendLine(`Script URI: ${scriptUri.toString()}`);
-        this._outputChannel.appendLine(`Style URI: ${styleUri.toString()}`);
+        this._outputChannel.appendLine(`Script URI: ${scriptUri.toString()}`, 'verbose');
+        this._outputChannel.appendLine(`Style URI: ${styleUri.toString()}`, 'verbose');
 
         // Use a nonce to only allow a specific script to be run.
         const nonce = getNonce();

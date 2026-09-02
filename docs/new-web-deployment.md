@@ -77,7 +77,7 @@ The full request/response schema lives at [Calcpad.Web/backend/API_SCHEMA.md](ht
 
 `/convert` and `/docx` take a document request:
 
-- `content` — the CalcpadCE source code
+- `content` — the contents of the CalcpadCE file
 - `settings` — math / plot / unit configuration
 - `theme` — `"light"` or `"dark"`
 - `sourceFilePath` — the document's file path, used to resolve relative `#include` and `#read` paths against the file's folder

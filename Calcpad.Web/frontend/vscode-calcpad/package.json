@@ -411,6 +411,30 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "calcpad.refreshDocumentConnected",
+        "title": "CalcpadCE: Restart Server (server connected)",
+        "icon": {
+          "light": "media/restart-connected-light.svg",
+          "dark": "media/restart-connected-dark.svg"
+        }
+      },
+      {
+        "command": "calcpad.refreshDocumentConnecting",
+        "title": "CalcpadCE: Restart Server (server starting\u2026)",
+        "icon": {
+          "light": "media/restart-connecting-light.svg",
+          "dark": "media/restart-connecting-dark.svg"
+        }
+      },
+      {
+        "command": "calcpad.refreshDocumentDisconnected",
+        "title": "CalcpadCE: Restart Server (server disconnected)",
+        "icon": {
+          "light": "media/restart-disconnected-light.svg",
+          "dark": "media/restart-disconnected-dark.svg"
+        }
+      },
+      {
         "command": "calcpad.stopServer",
         "title": "Stop CalcpadCE Server",
         "icon": "$(debug-stop)"
@@ -492,14 +516,38 @@
           "group": "navigation@1"
         },
         {
-          "command": "calcpad.refreshDocument",
-          "when": "view == calcpadVueUI",
+          "command": "calcpad.refreshDocumentConnected",
+          "when": "view == calcpadVueUI && calcpad.serverStatus == 'connected'",
+          "group": "navigation@2"
+        },
+        {
+          "command": "calcpad.refreshDocumentConnecting",
+          "when": "view == calcpadVueUI && calcpad.serverStatus == 'connecting'",
+          "group": "navigation@2"
+        },
+        {
+          "command": "calcpad.refreshDocumentDisconnected",
+          "when": "view == calcpadVueUI && calcpad.serverStatus == 'disconnected'",
           "group": "navigation@2"
         },
         {
           "command": "calcpad.stopServer",
           "when": "view == calcpadVueUI",
           "group": "navigation@3"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "calcpad.refreshDocumentConnected",
+          "when": "false"
+        },
+        {
+          "command": "calcpad.refreshDocumentConnecting",
+          "when": "false"
+        },
+        {
+          "command": "calcpad.refreshDocumentDisconnected",
+          "when": "false"
         }
       ],
       "editor/context": [
