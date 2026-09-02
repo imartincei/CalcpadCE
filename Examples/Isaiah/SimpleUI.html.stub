@@ -1,0 +1,24 @@
+<div class="calcpad-output">
+ <!--{"uiOverrides":{"x:1":"25"}}-->
+ <p>Simple Test</p>
+ <p>
+  <span class="eq">
+   <var>x</var>
+   = 5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>x</var>
+   = 5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   =
+   <var>x</var>
+   · 5 = 5 · 5 = 25
+  </span>
+ </p>
+</div>

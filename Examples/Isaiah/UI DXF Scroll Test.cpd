@@ -1,5 +1,31 @@
-'<!--DXF Drawing Module - Renders to static image via dxf-viewer-->'
-'<!-- Multi-diagram model: window.dxfDrawings is a dictionary keyed by diagram id; window.dxfCurrentDrawingId is the active id. initDXF creates a new entry and sets it active; addLayer/setLayer/draw* use the current id (so callers do not need to thread the id through every draw call). renderDXF captures its diagram synchronously and suffixes DOM ids with the id, so multiple diagrams can coexist on a page. -->
+"Scroll Anchoring Test - #UI with an asynchronously rendered drawing
+'<p>Every #UI edit re-renders the whole document. The drawing below is not part of that
+'render: its script imports a viewer from a CDN, draws to a canvas and only makes the
+'image visible once all of that has finished - seconds after the page has loaded. Until
+'then the image occupies no height at all.</p>
+'<p><b>What to check.</b> Scroll so a line of the filler text sits exactly at the top of
+'the preview, then change one of the inputs. That line must stay where it is, both
+'through the re-render and at the moment the drawing appears. Changing <b>Height</b>
+'changes the drawing aspect ratio, so the image comes back a different height - the
+'case a remembered scroll offset can never get right.</p>
+
+'<h3>Inputs above the drawing</h3>
+
+#UI {"type": "entry"} 'Width'width = 10
+#UI {"type": "entry"} 'Height'height = 8
+#UI {"type": "entry"} 'Image width (px)'imgWidth = 800
+#UI {"type": "dropdown", "keys": ["Red", "Blue", "Green"], "values": ["1", "5", "3"]} 'Border colour'border = 1
+
+'<h3>Filler</h3>
+'<p>Enough text above the drawing that the top of the viewport lands in the middle of it,
+'and enough below that the page can be scrolled past the drawing entirely.</p>
+
+#repeat 40
+	'<p>Filler line - the anchor the restore has to land back on.</p>
+#loop
+
+'<h3>Drawing</h3>
+
 #def initDXF$(unit$; id$)
 	#val
 	'<script type="module">
@@ -8,7 +34,6 @@
 	'window.dxfDrawings["id$"] = new Drawing();
 	'window.dxfDrawings["id$"].setUnits("unit$");
 	'window.dxfDrawings["id$"].addLineType("DASHED", "---- ", [0.5, -0.5]);
-	'window.dxfDrawings["id$"].addLineType("DOTTED", ". ", [0.1, -0.1]);
 	'window.dxfCurrentDrawingId = "id$";
 	'</script>
 #end def
@@ -31,69 +56,22 @@
 	'</script>
 #end def
 '
-#def drawLines$(lines$)
-	'<!--Rows: Lines, Columns: X1, Y1, X2, Y2-->'
-	'<script type="module">
-	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId];
-	#for iζ = 1 : n_rows(lines$)
-		'if (d) { d.drawLine('lines$.(iζ; 1)', 'lines$.(iζ; 2)', 'lines$.(iζ; 3)', 'lines$.(iζ; 4)'); }
-	#loop
-	'}
-	'</script>
-#end def
-'
-#def drawRect$(x$; y$; width$; height$)
-	'<script type="module">
-	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId];
-	'if (d) {
-	'  const x = 'x$', y = 'y$', w = 'width$', h = 'height$';
-	'  d.drawLine(x, y, x + w, y);
-	'  d.drawLine(x + w, y, x + w, y + h);
-	'  d.drawLine(x + w, y + h, x, y + h);
-	'  d.drawLine(x, y + h, x, y);
-	'} }
-	'</script>
-#end def
-'
 #def drawCircle$(cx$; cy$; radius$)
 	'<script type="module">
 	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawCircle('cx$', 'cy$', 'radius$'); } }
 	'</script>
 #end def
 '
-#def drawCircles$(circles$)
-	'<!--Rows: Circles, Columns: cx, cy, radius-->'
-	'<script type="module">
-	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId];
-	#for iζ = 1 : n_rows(circles$)
-		'if (d) { d.drawCircle('circles$.(iζ; 1)', 'circles$.(iζ; 2)', 'circles$.(iζ; 3)'); }
-	#loop
-	'}
-	'</script>
-#end def
-'
-#def drawArc$(cx$; cy$; radius$; startAngle$; endAngle$)
-	'<script type="module">
-	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawArc('cx$', 'cy$', 'radius$', 'startAngle$', 'endAngle$'); } }
-	'</script>
-#end def
-'
 #def renderDXF$(imgWidth$; id$)
 	'<div id="dxf-render-container-id$" style="position:fixed; left:-9999px; top:0; width:1px; height:1px; overflow:hidden;"></div>
-	'<!-- Hidden but still in flow, with the canvas's square ratio, so the box is the right
-	'     size from first layout. display:none would take no space and everything below
-	'     would jump when the drawing arrives, seconds after load. -->
-	'<img id="dxf-output-img-id$" style="visibility:hidden; width:'imgWidth$'px; max-width:100%; margin-top:30px; border:2px solid #ddd; border-radius:8px; background:#fff;" />
+	'<img id="dxf-output-img-id$" style="visibility:hidden; aspect-ratio:1/1; width:'imgWidth$'px; max-width:100%; margin-top:30px; border:2px solid #ddd; border-radius:8px; background:#fff;" />
 	'<div style="margin-top:20px; padding:15px; background:#f8d7da; border-radius:4px; color:#721c24; display:none;" id="dxf-error-message-id$">
 	'  <strong>Error:</strong> <span id="dxf-error-text-id$"></span>
 	'</div>
-	'<script>console.log("PLAIN SCRIPT TEST id$");</script>
 	'<script type="module">
-	'console.log("MODULE SCRIPT START id$");
 	'import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/+esm";
 	'import * as DxfViewerModule from "https://cdn.jsdelivr.net/npm/dxf-viewer@1.0.46/+esm";
 	'const DxfViewer = DxfViewerModule.default || DxfViewerModule.DxfViewer;
-	'console.log("DXF render script loaded id$, DxfViewer:", typeof DxfViewer);
 	'
 	'const dxfId = "id$";
 	'const drawing = window.dxfDrawings && window.dxfDrawings[dxfId];
@@ -121,12 +99,8 @@
 	'    preserveDrawingBuffer: true
 	'  });
 	'
-	'  const dxfString = drawing.toDxfString();
-	'  console.log(dxfString);
-	'  const blob = new Blob([dxfString], { type: "application/dxf" });
+	'  const blob = new Blob([drawing.toDxfString()], { type: "application/dxf" });
 	'  const url = URL.createObjectURL(blob);
-	'
-	'  console.log("Loading DXF " + dxfId + "...");
 	'  await viewer.Load({ url: url });
 	'  URL.revokeObjectURL(url);
 	'
@@ -144,8 +118,7 @@
 	'  }
 	'  viewer.Render();
 	'
-	'  const canvas = viewer.GetCanvas();
-	'  const dataUrl = canvas.toDataURL("image/png");
+	'  const dataUrl = viewer.GetCanvas().toDataURL("image/png");
 	'  const img = document.getElementById("dxf-output-img-" + dxfId);
 	'  await new Promise(function(resolve) {
 	'    img.onload = resolve;
@@ -161,73 +134,51 @@
 	'}
 	'
 	'setTimeout(async function() {
-	'  console.log("setTimeout fired for " + dxfId + ", drawing:", !!drawing);
 	'  try {
 	'    await renderToImage();
 	'  } catch(err) {
 	'    console.error("Failed to render DXF " + dxfId + ":", err);
 	'    showError(err.message);
-	'    const failedImg = document.getElementById("dxf-output-img-" + dxfId);
-	'    if (failedImg) {
-	'      failedImg.style.display = "none";
-	'      failedImg.dataset.dxfReady = "failed";
-	'    }
 	'  }
 	'}, 100);
 	'</script>
 	#equ
 #end def
 #local
-'Define drawing dimensions
-width = 10
-height = 8
 
-'Initialize DXF drawing with units
-initDXF$(Inches; sample)
+initDXF$(Inches; scrolltest)
 
-'Create a layer for border lines (ACI color 1 = Red)
-addLayer$(BORDER; 1; CONTINUOUS)
+addLayer$(BORDER; border; CONTINUOUS)
 setLayer$(BORDER)
 
-'Draw a border around the drawing
 drawLine$(0; 0; width; 0)
 drawLine$(width; 0; width; height)
 drawLine$(width; height; 0; height)
 drawLine$(0; height; 0; 0)
 
-'Create a layer for diagonal lines (ACI color 5 = Blue)
 addLayer$(DIAGONAL; 5; DASHED)
 setLayer$(DIAGONAL)
 
-'Draw diagonal lines
 drawLine$(0; 0; width; height)
 drawLine$(width; 0; 0; height)
 
-'Create a layer for custom geometry (ACI color 4 = Cyan)
-addLayer$(CUSTOM; 4; CONTINUOUS)
-setLayer$(CUSTOM)
+drawCircle$(width/2; height/2; min(width; height)/4)
 
-'Draw a rectangle in the middle
-x1 = 3
-y1 = 2
-x2 = 7
-y2 = 6
+renderDXF$(imgWidth; scrolltest)
 
-drawRect$(x1; y1; x2 - x1; y2 - y1)
+'<h3>Inputs below the drawing</h3>
+'<p>Editing these is the harder case: the drawing above them is still re-rendering when
+'the replacement document loads, so everything here starts life at the wrong offset.</p>
 
-'Draw an X inside the rectangle
-lines = [x1; y1; x2; y2|x2; y1; x1; y2]
-drawLines$(lines)
+#UI {"type": "entry"} 'Scale'scale = 1
+#UI {"type": "checkbox"} 'Include diagonals'diagonals = 1
+#UI {"type": "datagrid", "columnHeaders": ["x", "y"], "rowHeaders": ["A", "B", "C"]} points = [0; 0 | 5; 4 | 10; 8]
 
-'Create a layer for circles (ACI color 3 = Green)
-addLayer$(CIRCLES; 3; CONTINUOUS)
-setLayer$(CIRCLES)
+area = width*height*scale^2
+perimeter = 2*(width + height)*scale
 
-'Draw a circle in the center of the rectangle
-cx = (x1 + x2)/2
-cy = (y1 + y2)/2
-radius = 1
-drawCircle$(cx; cy; radius)
+'<h3>Trailing filler</h3>
 
-'Render the DXF as image (width in pixels)
-renderDXF$(800; sample)
+#repeat 30
+	'<p>Trailing filler line.</p>
+#loop

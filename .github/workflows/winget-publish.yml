@@ -1,8 +1,8 @@
 name: Publish to WinGet
 
+# Manual-only while the release is in beta and no Windows installer is published;
+# the `release` trigger comes back once installers ship.
 on:
-  release:
-    types: [released]
   workflow_dispatch:
     inputs:
       tag:
@@ -17,5 +17,5 @@ jobs:
         with:
           identifier: Imartincei.CalcpadCE
           installers-regex: '\.exe$'
-          release-tag: ${{ inputs.tag || github.event.release.tag_name }}
+          release-tag: ${{ inputs.tag }}
           token: ${{ secrets.WINGET_PKGS_TOKEN }}

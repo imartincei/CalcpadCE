@@ -1,4 +1,4 @@
-name: Build Web Installer
+name: Build Desktop (Windows)
 
 on:
   workflow_call:
@@ -8,7 +8,7 @@ on:
         type: string
 
 jobs:
-  build-web-installer:
+  build-desktop-windows:
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -43,15 +43,26 @@ jobs:
           npm ci --prefix Calcpad.Web/frontend/calcpad-web
           npm ci --prefix Calcpad.Web/frontend/calcpad-desktop
 
-      - name: Build desktop installers (Tauri)
+      # Installers (msi/nsis) ship once the release is out of beta.
+      # - name: Build desktop installers (Tauri)
+      #   working-directory: Calcpad.Web/frontend/calcpad-desktop
+      #   shell: pwsh
+      #   run: ./build-desktop.ps1
+
+      - name: Build portable
         working-directory: Calcpad.Web/frontend/calcpad-desktop
         shell: pwsh
-        run: ./build-desktop.ps1
+        run: ./build-portable.ps1
 
-      - name: Upload installer artifacts
+      - name: Stage artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path artifacts -Force | Out-Null
+          Copy-Item Calcpad.Web/frontend/calcpad-desktop/src-tauri/target/portable/CalcpadCE-portable-win64.zip `
+            -Destination "artifacts/CalcpadCE-portable-${{ inputs.version }}.zip"
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          path: |
-            Calcpad.Web/frontend/calcpad-desktop/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
-            Calcpad.Web/frontend/calcpad-desktop/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+          path: artifacts/*
           archive: false
