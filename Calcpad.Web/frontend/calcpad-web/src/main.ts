@@ -48,7 +48,8 @@ import { registerFormatDocumentProvider } from './editor/format-document';
 import { setActiveDocumentKeyResolver, getActiveDocumentKey, type EditorBridge } from './editor/bridge';
 import { EditorGroup } from './editor/editor-group';
 import type { TabManager } from './tabs/tab-manager';
-import type { UiControl, CalcpadLogLevel } from 'calcpad-frontend';
+import { toDisplayLogLevel } from 'calcpad-frontend';
+import type { UiControl, CalcpadLogLevel, DisplayLogLevel } from 'calcpad-frontend';
 import './editor/vscode-variables.css';
 import 'calcpad-frontend/vue/styles/base.css';
 import './styles/app.css';
@@ -178,13 +179,6 @@ async function bootstrap(): Promise<void> {
     let serverManager: import('./services/server-manager').TauriServerManager | null = null;
     // Server-manager log lines that arrive before the Output panel mounts
     // get buffered here, then flushed when appInstance is ready.
-    /** The shared log level onto appendOutput's four display levels. */
-    const displayLevel = (level?: CalcpadLogLevel): 'info' | 'warn' | 'error' | 'debug' =>
-        level === 'error' ? 'error'
-            : level === 'warning' ? 'warn'
-                : level === 'verbose' ? 'debug'
-                    : 'info';
-
     const pendingServerLogs: { msg: string; level?: CalcpadLogLevel }[] = [];
     // Raw stdout/stderr lines from the Calcpad.Server sidecar (Rust's
     // `server-log` event), buffered the same way for the same reason.
@@ -1217,7 +1211,7 @@ async function bootstrap(): Promise<void> {
 
     const wrap = (
         orig: (...args: any[]) => void,
-        level: 'info' | 'debug' | 'warn' | 'error',
+        level: DisplayLogLevel,
     ) => (...args: any[]) => {
         orig.apply(console, args);
         // Monaco's ConsoleLogger emits styled `%c INFO`/`%c  ERR` lines whose CSS
@@ -1276,7 +1270,7 @@ async function bootstrap(): Promise<void> {
         // tagged with the originating group.
         if (data.type === 'previewConsole') {
             if (!fromPreview) return;
-            const level: 'info' | 'warn' | 'error' | 'debug' =
+            const level: DisplayLogLevel =
                 data.level === 'warn' ? 'warn'
                 : data.level === 'error' ? 'error'
                 : data.level === 'debug' ? 'debug'
@@ -1342,7 +1336,7 @@ async function bootstrap(): Promise<void> {
 
     // Flush any server-manager log lines buffered before the Output panel mounted,
     // then redirect future ones straight into the panel.
-    for (const { msg, level } of pendingServerLogs) appInstance.appendOutput(displayLevel(level), msg);
+    for (const { msg, level } of pendingServerLogs) appInstance.appendOutput(toDisplayLogLevel(level), msg);
     pendingServerLogs.length = 0;
     for (const { line, stream } of pendingServerRawLogs) {
         appInstance.appendOutput(stream === 'stderr' ? 'error' : 'info', line, 'server');
@@ -1357,7 +1351,7 @@ async function bootstrap(): Promise<void> {
 
     if (serverManager) {
         serverManager.setLogger({
-            appendLine: (msg: string, level?: CalcpadLogLevel) => appInstance.appendOutput(displayLevel(level), msg),
+            appendLine: (msg: string, level?: CalcpadLogLevel) => appInstance.appendOutput(toDisplayLogLevel(level), msg),
         });
         serverManager.onServerLog = (line: string, stream: 'stdout' | 'stderr') => {
             appInstance.appendOutput(stream === 'stderr' ? 'error' : 'info', line, 'server');

@@ -111,16 +111,17 @@ export class CalcpadApiClient {
     }
 
     /**
-     * The base URL, waiting for one to arrive if the server is still starting. Without this a
-     * request issued during activation fetches the relative `/api/calcpad/lint`, which fails with
-     * "Failed to parse URL from ..." — a confusing way to say the server is not up yet.
+     * The full URL for `endpoint`, waiting for a base URL to arrive if the server is still
+     * starting. Without this a request issued during activation fetches the relative
+     * `/api/calcpad/lint`, which fails with "Failed to parse URL from ..." — a confusing way
+     * to say the server is not up yet.
      *
      * Null means no server ever arrived, and the caller reports a failed request as usual. That
      * verdict then sticks until a URL does arrive, so a host with no server at all does not park
      * each keystroke's lint for the full timeout.
      */
-    private async resolveBaseUrl(tag: string): Promise<string | null> {
-        if (this.baseUrl) return this.baseUrl;
+    private async resolveUrl(endpoint: string, tag: string): Promise<string | null> {
+        if (this.baseUrl) return this.baseUrl + endpoint;
         if (this.baseUrlUnavailable) return null;
         let timer: ReturnType<typeof setTimeout> | undefined;
         await Promise.race([
@@ -128,7 +129,7 @@ export class CalcpadApiClient {
             new Promise<void>((resolve) => { timer = setTimeout(resolve, BASE_URL_WAIT_MS); }),
         ]);
         clearTimeout(timer);
-        if (this.baseUrl) return this.baseUrl;
+        if (this.baseUrl) return this.baseUrl + endpoint;
         // Everything waiting hits this together, so only the first one reports it.
         if (!this.baseUrlUnavailable) {
             this.baseUrlUnavailable = true;
@@ -226,9 +227,9 @@ export class CalcpadApiClient {
     ): Promise<PortableBundleResult> {
         return (async () => {
             try {
-                const base = await this.resolveBaseUrl('BundlePortable');
-                if (base === null) return { errors: [NO_SERVER_ERROR] };
-                const response = await fetch(`${base}/api/calcpad/portable/bundle`, {
+                const url = await this.resolveUrl('/api/calcpad/portable/bundle', 'BundlePortable');
+                if (url === null) return { errors: [NO_SERVER_ERROR] };
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: this.jsonHeaders(),
                     body: JSON.stringify({ content, sourceFilePath }),
@@ -263,9 +264,9 @@ export class CalcpadApiClient {
     ): Promise<PortablePackageResult> {
         return (async () => {
             try {
-                const base = await this.resolveBaseUrl('PackagePortable');
-                if (base === null) return { bundled: [], errors: [NO_SERVER_ERROR] };
-                const response = await fetch(`${base}/api/calcpad/portable/package`, {
+                const url = await this.resolveUrl('/api/calcpad/portable/package', 'PackagePortable');
+                if (url === null) return { bundled: [], errors: [NO_SERVER_ERROR] };
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: this.jsonHeaders(),
                     body: JSON.stringify({ content, sourceFilePath }),
@@ -343,9 +344,8 @@ export class CalcpadApiClient {
         opts?: { key?: string; write?: boolean },
     ): Promise<ArrayBuffer | ConvertResult | null> {
         return this.withSupersession(opts?.key, async (signal) => {
-            const base = await this.resolveBaseUrl('Convert');
-            if (base === null) return null;
-            const url = base + '/api/calcpad/convert';
+            const url = await this.resolveUrl('/api/calcpad/convert', 'Convert');
+            if (url === null) return null;
             try {
                 const response = await fetch(url, {
                     method: 'POST',
@@ -388,9 +388,8 @@ export class CalcpadApiClient {
         opts?: { forPrint?: boolean; uiOverrides?: Record<string, string>; write?: boolean },
     ): Promise<ArrayBuffer | null> {
         return (async () => {
-            const base = await this.resolveBaseUrl('Docx');
-            if (base === null) return null;
-            const url = base + '/api/calcpad/docx';
+            const url = await this.resolveUrl('/api/calcpad/docx', 'Docx');
+            if (url === null) return null;
             try {
                 const response = await fetch(url, {
                     method: 'POST',
@@ -426,9 +425,8 @@ export class CalcpadApiClient {
         opts?: { key?: string; write?: boolean },
     ): Promise<ConvertResult | null> {
         return this.withSupersession(opts?.key, async (signal) => {
-            const base = await this.resolveBaseUrl('ConvertUnwrapped');
-            if (base === null) return null;
-            const url = base + '/api/calcpad/convert?unwrap=true';
+            const url = await this.resolveUrl('/api/calcpad/convert?unwrap=true', 'ConvertUnwrapped');
+            if (url === null) return null;
             try {
                 const response = await fetch(url, {
                     method: 'POST',
@@ -476,9 +474,8 @@ export class CalcpadApiClient {
 
     private post<T>(endpoint: string, body: unknown, tag: string, key?: string): Promise<T | null> {
         return this.withSupersession(key, async (signal) => {
-            const base = await this.resolveBaseUrl(tag);
-            if (base === null) return null;
-            const url = base + endpoint;
+            const url = await this.resolveUrl(endpoint, tag);
+            if (url === null) return null;
             try {
                 this.logger?.appendLine(`[${tag}] Sending request to server...`, 'verbose');
                 const response = await fetch(url, {
@@ -501,9 +498,8 @@ export class CalcpadApiClient {
     }
 
     private async get<T>(endpoint: string, tag: string): Promise<T | null> {
-        const base = await this.resolveBaseUrl(tag);
-        if (base === null) return null;
-        const url = base + endpoint;
+        const url = await this.resolveUrl(endpoint, tag);
+        if (url === null) return null;
         try {
             this.logger?.appendLine(`[${tag}] Sending request to server...`, 'verbose');
             const response = await fetch(url, {

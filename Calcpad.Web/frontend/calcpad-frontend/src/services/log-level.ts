@@ -14,6 +14,28 @@ const RANK: Record<CalcpadLogLevel, number> = {
     verbose: 3,
 };
 
+/**
+ * How a log level is shown in an Output panel — the four labels the panels print and filter
+ * their rows by. Narrower than {@link CalcpadLogLevel}, which is what callers log at.
+ */
+export type DisplayLogLevel = 'info' | 'warn' | 'error' | 'debug';
+
+/** {@link DisplayLogLevel} onto the shared log level, which is what filtering is keyed on. */
+export const DISPLAY_LOG_LEVEL: Record<DisplayLogLevel, CalcpadLogLevel> = {
+    error: 'error',
+    warn: 'warning',
+    info: 'information',
+    debug: 'verbose',
+};
+
+/** The shared log level onto its display level. */
+export function toDisplayLogLevel(level?: CalcpadLogLevel): DisplayLogLevel {
+    return level === 'error' ? 'error'
+        : level === 'warning' ? 'warn'
+            : level === 'verbose' ? 'debug'
+                : 'info';
+}
+
 let current: CalcpadLogLevel = 'warning';
 
 export function setLogLevel(level: CalcpadLogLevel): void {

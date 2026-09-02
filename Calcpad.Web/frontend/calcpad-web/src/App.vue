@@ -554,6 +554,7 @@ import {
   scrollAnchorScript,
   consoleRelayGuardScript,
   shouldLog,
+  DISPLAY_LOG_LEVEL,
   truncateForOutput,
   BACK_BUFFER_CLEAR_CHARS,
   MAX_HTML_MIRROR_CHARS,
@@ -561,7 +562,7 @@ import {
   MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
   type PreviewScrollState,
   type ServerStatus,
-  type CalcpadLogLevel,
+  type DisplayLogLevel,
 } from 'calcpad-frontend'
 
 export interface ProblemItem {
@@ -1524,16 +1525,8 @@ function setMaxOutputLines(n: number): void {
   for (const ch of ['app', 'preview', 'server', 'html'] as OutputChannel[]) trimChannel(ch)
 }
 
-/** Our four display levels onto the shared log level, which is what the filter is keyed on. */
-const OUTPUT_LEVEL_MAP: Record<'info' | 'warn' | 'error' | 'debug', CalcpadLogLevel> = {
-  error: 'error',
-  warn: 'warning',
-  info: 'information',
-  debug: 'verbose',
-}
-
 function appendOutput(
-  level: 'info' | 'warn' | 'error' | 'debug',
+  level: DisplayLogLevel,
   message: string,
   channel: OutputChannel = 'app',
   groupId?: string,
@@ -1541,7 +1534,7 @@ function appendOutput(
   // Only the diagnostic channels are filtered. 'preview' and 'html' carry the worksheet's own
   // output, which the user asked for by running it and which no log level should swallow.
   const diagnostic = channel === 'app' || channel === 'server'
-  if (diagnostic && !shouldLog(OUTPUT_LEVEL_MAP[level])) return
+  if (diagnostic && !shouldLog(DISPLAY_LOG_LEVEL[level])) return
   const now = new Date()
   const time = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
   const labels: Record<string, string> = { info: 'INFO', warn: 'WARN', error: 'ERROR', debug: 'DEBUG' }

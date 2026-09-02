@@ -100,7 +100,8 @@ export type { PdfBrowserStatus } from './api/pdf-browser';
 export { CalcpadLintService } from './services/linter';
 export { CalcpadDefinitionsService } from './services/definitions';
 export { CalcpadSnippetService } from './services/snippets';
-export { setLogLevel, getLogLevel, shouldLog } from './services/log-level';
+export { setLogLevel, getLogLevel, shouldLog, DISPLAY_LOG_LEVEL, toDisplayLogLevel } from './services/log-level';
+export type { DisplayLogLevel } from './services/log-level';
 export { ConnectionMonitor } from './services/connection-monitor';
 export type {
     ServerStatus,
