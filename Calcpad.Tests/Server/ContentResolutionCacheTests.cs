@@ -57,6 +57,9 @@ public class ContentResolutionCacheTests
         var cachedAgain = cache.GetOrResolve(mainContent, mainPath);
         Assert.Same(first, cachedAgain); // no change yet - still a cache hit
 
+        // ContentResolutionCache trusts a cached entry for RevalidateIntervalMs (500) before it
+        // re-checks its includes, so the edit has to land outside that window to be noticed.
+        Thread.Sleep(700);
         temp.Write("inc.cpd", "b = 2\n");
         var afterIncludeEdit = cache.GetOrResolve(mainContent, mainPath);
 

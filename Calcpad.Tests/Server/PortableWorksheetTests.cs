@@ -32,7 +32,7 @@ public class PortableWorksheetTests
         var result = dir.Build(source);
 
         Assert.Empty(result.Errors);
-        Assert.Equal(source, Rewritten(result));
+        Assert.Equal(Lf(source), Rewritten(result));
     }
 
     [Fact]
@@ -63,10 +63,10 @@ public class PortableWorksheetTests
             """ + "\n");
 
         Assert.Empty(result.Errors);
-        Assert.Equal("""
+        Assert.Equal(Lf("""
             #write A to results-1.csv
             #write B to results-2.csv
-            """ + "\n", Rewritten(result));
+            """) + "\n", Rewritten(result));
     }
 
     /// <summary>
@@ -84,10 +84,10 @@ public class PortableWorksheetTests
             """ + "\n");
 
         Assert.Empty(result.Errors);
-        Assert.Equal("""
+        Assert.Equal(Lf("""
             #write A to results-1.csv
             #write B to results.csv
-            """ + "\n", Rewritten(result));
+            """) + "\n", Rewritten(result));
     }
 
     [Fact]
@@ -101,10 +101,10 @@ public class PortableWorksheetTests
             """ + "\n");
 
         Assert.Empty(result.Errors);
-        Assert.Equal("""
+        Assert.Equal(Lf("""
             #write R to results.csv
             #append R to results.csv
-            """ + "\n", Rewritten(result));
+            """) + "\n", Rewritten(result));
     }
 
     [Fact]
@@ -194,7 +194,11 @@ public class PortableWorksheetTests
 
     // PortableWorksheet.Build always adds one trailing blank line when the source ends with a
     // newline — a pre-existing quirk of its line splitting, unrelated to what these tests check.
-    private static string Rewritten(PortableWorksheet.Result result) => result.Content.TrimEnd('\n') + "\n";
+    private static string Rewritten(PortableWorksheet.Result result) => Lf(result.Content).TrimEnd('\n') + "\n";
+
+    // A raw string literal carries this file's own line endings, which are CRLF on a Windows
+    // checkout, while Build always emits LF. Expected values have to be normalized to match.
+    private static string Lf(string text) => text.Replace("\r\n", "\n");
 
     /// <summary>A folder to build a worksheet against, with a path to resolve includes from.</summary>
     private sealed class WorksheetDir : IDisposable
