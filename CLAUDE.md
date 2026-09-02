@@ -1,2 +1,2 @@
-- Do not use code comments unless you are doing something abnormal. You can use shorter comments as needed, but only include them where it actually explains something that is hard to determine from just reading the code.
-- You can use summary around functions in C# or similar for other languages.
+- Use code comments sparingly.
+- Do not write long code comments. Take the comment you were going to write and reduce it by 75%.
