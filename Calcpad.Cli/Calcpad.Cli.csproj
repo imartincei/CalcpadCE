@@ -33,7 +33,10 @@
       CopyToOutputDirectory="PreserveNewest"
       TargetPath="Examples/%(RecursiveDir)%(Filename)%(Extension)" />
     <Content Include="Syntax/**/*" CopyToPublishDirectory="PreserveNewest" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="Fonts/*" CopyToPublishDirectory="PreserveNewest" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="$(FontsDir)*.ttf;$(FontsDir)*.otf;$(FontsDir)*-LICENSE"
+      CopyToPublishDirectory="PreserveNewest"
+      CopyToOutputDirectory="PreserveNewest"
+      TargetPath="Fonts/%(Filename)%(Extension)" />
     <Content Include="Settings.xml" CopyToPublishDirectory="PreserveNewest" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

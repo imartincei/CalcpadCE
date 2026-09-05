@@ -9,7 +9,7 @@
 <p>Axial stiffness - <span class="eq"><var>EA</var> = <var>E</var> · <var>A</var> = 210 <i>GPa</i> · 3.14 <i>cm</i><sup class="unit">2</sup> = 65973.4 <i>kN</i></span></p>
 <p>Vertical force - <span class="eq"><var>F</var><sub>y</sub> = 20 <i>kN</i></span></p>
 <!-- SVG drawing macros (lines, points, dimension marks and rotated text) included by the nonlinear truss worksheets to render undeformed and deformed configurations side by side. -->
- <svg style="font-family: Georgia Pro; font-size:8px; width:450pt; height:150pt" version="1.1" viewbox="-50 -50 300 100" xmlns="http://www.w3.org/2000/svg">
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:450pt; height:150pt" version="1.1" viewbox="-50 -50 300 100" xmlns="http://www.w3.org/2000/svg">
   <line style="stroke:black; stroke-width:1.5; fill:none" x1="0" x2="100" y1="0" y2="0">
   </line>
   <line style="stroke:black; stroke-width:1.5; fill:none" x1="100" x2="200" y1="0" y2="0">
@@ -948,7 +948,7 @@ circle.Series3 {fill:CornflowerBlue;}
    <i>kN</i>
   </span>
  </p>
- <svg style="font-family: Georgia Pro; font-size:8px; width:450pt; height:150pt" version="1.1" viewbox="-50 -50 300 113.45" xmlns="http://www.w3.org/2000/svg">
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:450pt; height:150pt" version="1.1" viewbox="-50 -50 300 113.45" xmlns="http://www.w3.org/2000/svg">
   <polygon points="0,0 0,-32 -2.56,-22.4 2.56,-22.4 0,-32" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
   </polygon>
   <polygon points="200,0 200,-32 197.44,-22.4 202.56,-22.4 200,-32" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
