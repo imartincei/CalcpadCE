@@ -141,7 +141,7 @@
    </td>
    <td>
     <style>.thin{stroke:goldenrod; stroke-width:1; fill:none;} .thick{stroke:steelblue; stroke-width:1.5; fill:none;} .ball{stroke:steelblue; stroke-width:0.5;  fill:url(#ball);} .solid{stroke:black; stroke-width:1; fill:#eee;} .load{stroke:steelblue; stroke-width:1; fill:steelblue;}</style>
-    <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+    <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
      <defs>
       <radialgradient cx="35%" cy="35%" id="ball">
        <stop offset="0%" stop-color="lightcyan">
@@ -3172,7 +3172,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-1" points='"'>
        </polyline>
        '
@@ -3467,7 +3467,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-2" points='"'>
        </polyline>
        '
@@ -3762,7 +3762,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-3" points='"'>
        </polyline>
        '
@@ -4057,7 +4057,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-4" points='"'>
        </polyline>
        '
@@ -4352,7 +4352,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-5" points='"'>
        </polyline>
        '
@@ -4647,7 +4647,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-6" points='"'>
        </polyline>
        '
@@ -4942,7 +4942,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-7" points='"'>
        </polyline>
        '
@@ -5237,7 +5237,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-8" points='"'>
        </polyline>
        '
@@ -5532,7 +5532,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-9" points='"'>
        </polyline>
        '
@@ -5828,7 +5828,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-10" points='"'>
        </polyline>
        '
@@ -6124,7 +6124,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-11" points='"'>
        </polyline>
        '
@@ -6420,7 +6420,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-12" points='"'>
        </polyline>
        '
@@ -6716,7 +6716,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-13" points='"'>
        </polyline>
        '
@@ -7012,7 +7012,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-14" points='"'>
        </polyline>
        '
@@ -7308,7 +7308,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-15" points='"'>
        </polyline>
        '
@@ -7604,7 +7604,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-16" points='"'>
        </polyline>
        '
@@ -7900,7 +7900,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-17" points='"'>
        </polyline>
        '
@@ -8196,7 +8196,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-18" points='"'>
        </polyline>
        '
@@ -8464,7 +8464,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-19" points='"'>
        </polyline>
        '
@@ -8735,7 +8735,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-20" points='"'>
        </polyline>
        '
@@ -9006,7 +9006,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-21" points='"'>
        </polyline>
        '
@@ -9277,7 +9277,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-22" points='"'>
        </polyline>
        '
@@ -9548,7 +9548,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-23" points='"'>
        </polyline>
        '
@@ -9819,7 +9819,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-24" points='"'>
        </polyline>
        '
@@ -10090,7 +10090,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-25" points='"'>
        </polyline>
        '
@@ -10361,7 +10361,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-26" points='"'>
        </polyline>
        '
@@ -10632,7 +10632,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-27" points='"'>
        </polyline>
        '
@@ -10906,7 +10906,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-28" points='"'>
        </polyline>
        '
@@ -11181,7 +11181,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-29" points='"'>
        </polyline>
        '
@@ -11458,7 +11458,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-30" points='"'>
        </polyline>
        '
@@ -11735,7 +11735,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-31" points='"'>
        </polyline>
        '
@@ -12012,7 +12012,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-32" points='"'>
        </polyline>
        '
@@ -12289,7 +12289,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-33" points='"'>
        </polyline>
        '
@@ -12566,7 +12566,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-34" points='"'>
        </polyline>
        '
@@ -12843,7 +12843,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-35" points='"'>
        </polyline>
        '
@@ -13108,7 +13108,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-36" points='"'>
        </polyline>
        '
@@ -13376,7 +13376,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-37" points='"'>
        </polyline>
        '
@@ -13644,7 +13644,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-38" points='"'>
        </polyline>
        '
@@ -13915,7 +13915,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-39" points='"'>
        </polyline>
        '
@@ -14186,7 +14186,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-40" points='"'>
        </polyline>
        '
@@ -14458,7 +14458,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-41" points='"'>
        </polyline>
        '
@@ -14732,7 +14732,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-42" points='"'>
        </polyline>
        '
@@ -15006,7 +15006,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-43" points='"'>
        </polyline>
        '
@@ -15280,7 +15280,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-44" points='"'>
        </polyline>
        '
@@ -15554,7 +15554,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-45" points='"'>
        </polyline>
        '
@@ -15828,7 +15828,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-46" points='"'>
        </polyline>
        '
@@ -16102,7 +16102,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-47" points='"'>
        </polyline>
        '
@@ -16376,7 +16376,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-48" points='"'>
        </polyline>
        '
@@ -16650,7 +16650,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-49" points='"'>
        </polyline>
        '
@@ -16924,7 +16924,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-50" points='"'>
        </polyline>
        '
@@ -17198,7 +17198,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-51" points='"'>
        </polyline>
        '
@@ -17472,7 +17472,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-52" points='"'>
        </polyline>
        '
@@ -17746,7 +17746,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-53" points='"'>
        </polyline>
        '
@@ -18020,7 +18020,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-54" points='"'>
        </polyline>
        '
@@ -18294,7 +18294,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-55" points='"'>
        </polyline>
        '
@@ -18587,7 +18587,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-56" points='"'>
        </polyline>
        '
@@ -18881,7 +18881,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-57" points='"'>
        </polyline>
        '
@@ -19178,7 +19178,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-58" points='"'>
        </polyline>
        '
@@ -19446,7 +19446,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-59" points='"'>
        </polyline>
        '
@@ -19714,7 +19714,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-60" points='"'>
        </polyline>
        '
@@ -19982,7 +19982,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-61" points='"'>
        </polyline>
        '
@@ -20250,7 +20250,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-62" points='"'>
        </polyline>
        '
@@ -20518,7 +20518,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-63" points='"'>
        </polyline>
        '
@@ -20786,7 +20786,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-64" points='"'>
        </polyline>
        '
@@ -21054,7 +21054,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-65" points='"'>
        </polyline>
        '
@@ -21322,7 +21322,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-66" points='"'>
        </polyline>
        '
@@ -21590,7 +21590,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-67" points='"'>
        </polyline>
        '
@@ -21858,7 +21858,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-68" points='"'>
        </polyline>
        '
@@ -22126,7 +22126,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-69" points='"'>
        </polyline>
        '
@@ -22394,7 +22394,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-70" points='"'>
        </polyline>
        '
@@ -22662,7 +22662,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-71" points='"'>
        </polyline>
        '
@@ -22930,7 +22930,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-72" points='"'>
        </polyline>
        '
@@ -23198,7 +23198,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-73" points='"'>
        </polyline>
        '
@@ -23466,7 +23466,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-74" points='"'>
        </polyline>
        '
@@ -23734,7 +23734,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-75" points='"'>
        </polyline>
        '
@@ -24002,7 +24002,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-76" points='"'>
        </polyline>
        '
@@ -24270,7 +24270,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-77" points='"'>
        </polyline>
        '
@@ -24538,7 +24538,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-78" points='"'>
        </polyline>
        '
@@ -24806,7 +24806,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-79" points='"'>
        </polyline>
        '
@@ -25074,7 +25074,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-80" points='"'>
        </polyline>
        '
@@ -25343,7 +25343,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-81" points='"'>
        </polyline>
        '
@@ -25614,7 +25614,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-82" points='"'>
        </polyline>
        '
@@ -25885,7 +25885,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-83" points='"'>
        </polyline>
        '
@@ -26156,7 +26156,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-84" points='"'>
        </polyline>
        '
@@ -26427,7 +26427,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-85" points='"'>
        </polyline>
        '
@@ -26699,7 +26699,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-86" points='"'>
        </polyline>
        '
@@ -26973,7 +26973,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-87" points='"'>
        </polyline>
        '
@@ -27247,7 +27247,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-88" points='"'>
        </polyline>
        '
@@ -27521,7 +27521,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-89" points='"'>
        </polyline>
        '
@@ -27795,7 +27795,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-90" points='"'>
        </polyline>
        '
@@ -28069,7 +28069,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-91" points='"'>
        </polyline>
        '
@@ -28343,7 +28343,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-92" points='"'>
        </polyline>
        '
@@ -28617,7 +28617,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-93" points='"'>
        </polyline>
        '
@@ -28891,7 +28891,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-94" points='"'>
        </polyline>
        '
@@ -29165,7 +29165,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-95" points='"'>
        </polyline>
        '
@@ -29439,7 +29439,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-96" points='"'>
        </polyline>
        '
@@ -29713,7 +29713,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-97" points='"'>
        </polyline>
        '
@@ -29987,7 +29987,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-98" points='"'>
        </polyline>
        '
@@ -30261,7 +30261,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-99" points='"'>
        </polyline>
        '
@@ -30535,7 +30535,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-100" points='"'>
        </polyline>
        '
@@ -30809,7 +30809,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-101" points='"'>
        </polyline>
        '
@@ -31083,7 +31083,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-102" points='"'>
        </polyline>
        '
@@ -31357,7 +31357,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-103" points='"'>
        </polyline>
        '
@@ -31631,7 +31631,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-104" points='"'>
        </polyline>
        '
@@ -31905,7 +31905,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-105" points='"'>
        </polyline>
        '
@@ -32179,7 +32179,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-106" points='"'>
        </polyline>
        '
@@ -32453,7 +32453,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-107" points='"'>
        </polyline>
        '
@@ -32727,7 +32727,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-108" points='"'>
        </polyline>
        '
@@ -33001,7 +33001,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-109" points='"'>
        </polyline>
        '
@@ -33275,7 +33275,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-110" points='"'>
        </polyline>
        '
@@ -33549,7 +33549,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-111" points='"'>
        </polyline>
        '
@@ -33823,7 +33823,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-112" points='"'>
        </polyline>
        '
@@ -34097,7 +34097,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-113" points='"'>
        </polyline>
        '
@@ -34371,7 +34371,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-114" points='"'>
        </polyline>
        '
@@ -34645,7 +34645,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-115" points='"'>
        </polyline>
        '
@@ -34919,7 +34919,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-116" points='"'>
        </polyline>
        '
@@ -35193,7 +35193,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-117" points='"'>
        </polyline>
        '
@@ -35467,7 +35467,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-118" points='"'>
        </polyline>
        '
@@ -35741,7 +35741,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-119" points='"'>
        </polyline>
        '
@@ -36015,7 +36015,7 @@ circle.Series4 {fill:#f0d000;}
       </svg>
      </td>
      <td>
-      <svg style="font-family: Georgia Pro; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
+      <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:240pt; height:250pt;margin-left:-10pt;" version="1.1" viewbox="-110 -200 220 400" xmlns="http://www.w3.org/2000/svg">
        <polyline class="trace" id="trace-120" points='"'>
        </polyline>
        '
