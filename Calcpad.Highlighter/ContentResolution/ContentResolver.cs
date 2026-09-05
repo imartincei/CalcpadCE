@@ -12,7 +12,7 @@ namespace Calcpad.Highlighter.ContentResolution
     /// Stage 2: Include/read resolution and macro collection
     /// Stage 3: Macro expansion and definition collection
     ///
-    /// The caller (Calcpad.Wpf or Calcpad.Server) pre-fetches include/read file contents
+    /// The caller (Calcpad.Server) pre-fetches include/read file contents
     /// and passes them as a dictionary. This class handles all processing internally.
     /// </summary>
     public partial class ContentResolver

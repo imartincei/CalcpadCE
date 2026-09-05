@@ -27,10 +27,6 @@ Read `reference/architecture-and-testing.md` for the directory structure, key cl
 
 ### Project Dependency Graph
 ```
-Calcpad.Wpf (Desktop UI)
-├── Calcpad.Core  ← YOU ARE HERE
-└── Calcpad.OpenXml (Export)
-
 Calcpad.Cli (Command Line)
 ├── Calcpad.Core  ← YOU ARE HERE
 ├── Calcpad.OpenXml
@@ -48,7 +44,6 @@ Calcpad.Server (Web API)
 |---------|---------|-------------------|
 | **Calcpad.Highlighter** | Linting/tokenization | Must sync function names, parameter counts |
 | **PyCalcpad** | Python/API wrapper | Exposes Core's Calculator and Parser |
-| **Calcpad.Wpf** | Desktop UI | Primary consumer of Core |
 | **Calcpad.OpenXml** | Document export | Uses Core's output for rendering |
 
 ## Adding New Built-in Functions

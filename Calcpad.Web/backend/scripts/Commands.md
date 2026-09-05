@@ -16,7 +16,3 @@ docker compose up --build
 ## Build Slim Bundle (no platform runtimes)
 
 ./scripts/build-slim-bundle.sh
-
-## Build Wpf
-
-dotnet build Calcpad.Wpf\Calcpad.wpf.csproj

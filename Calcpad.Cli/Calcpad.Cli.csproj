@@ -118,6 +118,4 @@
     </PostRemoveScript>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)..\build\wkhtmltopdf.targets" />
-
 </Project>

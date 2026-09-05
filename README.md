@@ -104,15 +104,44 @@ If you are planning a major feature, we recommend opening a Discussion first to 
 
 ## 🛠️ Building the Source Code
 
-Download and install the [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0).
+Download and install the [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0), [Node.js](https://nodejs.org/) 22+ and [Rust](https://rustup.rs/).
+
+The desktop app is a [Tauri](https://tauri.app/) shell around the CalcpadCE web frontend, with the calculation server bundled as a sidecar.
+Install the frontend dependencies, stage the sidecar, then start it:
 
 ```shell
 git clone https://github.com/imartincei/CalcpadCE.git
-cd CalcpadCE
-dotnet build Calcpad.Wpf
+cd CalcpadCE/Calcpad.Web/frontend/calcpad-frontend
+npm install
+cd ../calcpad-desktop
+npm install
+./stage-sidecar.sh
+npx tauri dev
 ```
 
-Run the application by starting the built EXE: `Calcpad.Wpf\bin\Debug\net10.0-windows\CalcpadCE.exe`.
+On Windows use `.\stage-sidecar.ps1` instead.
+To produce installers for your platform, run `./build-desktop.sh` (or `.\build-desktop.ps1`) from the same directory.
+
+The command line interpreter builds on its own with `dotnet build Calcpad.Cli` from the repository root.
+
+### VS Code Tasks
+
+The repository ships tasks for the common builds — run them from **Terminal → Run Task…** (`Ctrl+Shift+P` → *Tasks: Run Task*).
+They pick the right script for your platform automatically.
+
+| Task | What it does |
+| ---- | ------------ |
+| `Frontend: Install All Dependencies` | `npm install` across the frontend library, web editor, extension and desktop app |
+| `Desktop: Stage Sidecar` | Publishes `Calcpad.Server` and stages it as the Tauri sidecar (run before `tauri dev`) |
+| `Desktop: Dev` | Starts `tauri dev` with hot reload, staging the sidecar first |
+| `Desktop: Bundle All` | Builds every installer format configured for your platform |
+| `Desktop: Build Portable (Windows)` | Builds the Windows portable bundle |
+| `Server: Build (.NET)` | Builds the `Calcpad.Server` backend |
+| `Web: Dev Server` | Runs the browser editor against a Vite dev server |
+| `Extension: Compile` | Builds the VS Code extension and deploys the server into it |
+| `Tests: Run` | Runs `Calcpad.Tests` |
+
+The `Desktop: Dev (Tauri)` and `Server: Debug (.NET)` launch configurations are available under **Run and Debug**.
 
 ## 📄 License & Credits
 
@@ -125,6 +154,5 @@ All subsequent modifications and additions are Copyright (c) 2026 CalcpadCE Cont
 This project uses some additional third party components, software and design. They are re-distributed free of charge, under the license conditions, provided by the respective authors.
 
 1. The new and beautiful icons are created using [icons8.com](https://icons8.com/).  
-2. The pdf export was made possible thanks to the [wkhtmltopdf.org](https://wkhtmltopdf.org/) project.  
-3. Some symbols are displayed, using the Jost* font family by [indestructible type*](https://indestructibletype.com/), under the [SIL open font license](https://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web).
+2. Some symbols are displayed, using the Jost* font family by [indestructible type*](https://indestructibletype.com/), under the [SIL open font license](https://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web).
 Square brackets are slightly modified to suit the application needs.

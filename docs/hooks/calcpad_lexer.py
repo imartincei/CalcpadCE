@@ -6,7 +6,7 @@ to highlight ```calcpad fenced blocks in narrative documentation pages.
 
 Token categories are derived from:
   - Calcpad.Cli/Syntax/Sublime/calcpad.sublime-syntax (regex patterns)
-  - Calcpad.Wpf/HighLighter.cs (canonical operator/keyword sets)
+  - Calcpad.Highlighter/Tokenizer/CalcpadTokenizer.cs (canonical operator/keyword sets)
   - Calcpad.Core/Calculator/{Calculator,RealCalculator,VectorCalculator,
     MatrixCalculator}.cs (canonical built-in function names)
 """

@@ -33,12 +33,8 @@ Load the reference file relevant to your task — don't read all up front.
 
 ### Project Dependency Graph
 ```
-Calcpad.Wpf (Desktop UI)
-├── Calcpad.Core (Math Engine)
-└── Calcpad.OpenXml (Export)
-
 Calcpad.Cli (Command Line)
-├── Calcpad.Core
+├── Calcpad.Core (Math Engine)
 ├── Calcpad.OpenXml
 └── PyCalcpad (API wrapper)
     ├── Calcpad.Core

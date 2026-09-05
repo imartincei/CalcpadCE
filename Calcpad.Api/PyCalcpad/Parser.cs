@@ -34,6 +34,9 @@ namespace PyCalcpad
                 outputFileName = Path.ChangeExtension(inputFileName, "." + outputFileName);
 
             var ext = Path.GetExtension(outputFileName);
+            if (ext == ".pdf")
+                throw new NotSupportedException("PDF export is not currently available. It is planned for a future release. In the meantime, use the CalcpadCE desktop app to export PDF, or run the standalone CalcpadCE server if you need PDF export as a background task.");
+
             var path = Path.GetDirectoryName(inputFileName);
             if (!string.IsNullOrWhiteSpace(path))
                 Directory.SetCurrentDirectory(path);
@@ -66,8 +69,6 @@ namespace PyCalcpad
                 converter.ToHtml(htmlResult, outputFileName);
             else if (ext == ".docx")
                 converter.ToOpenXml(htmlResult, outputFileName, parser.OpenXmlExpressions);
-            else if (ext == ".pdf")
-                converter.ToPdf(htmlResult, outputFileName);
             else
                 return false;
 

@@ -2,17 +2,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Wpf: Run",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "Wpf: Build",
-            "program": "${workspaceFolder}/Calcpad.Wpf/bin/Debug/net10.0-windows/CalcpadCE.exe",
-            "args": [],
-            "cwd": "${workspaceFolder}/Calcpad.Wpf",
-            "console": "internalConsole",
-            "stopAtEntry": false
-        },
-        {
             "name": "Server: Debug (.NET)",
             "type": "coreclr",
             "request": "launch",

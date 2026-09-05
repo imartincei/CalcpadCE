@@ -100,4 +100,7 @@
   <data name="InvalidOutputExtensionMustBeHtmlDocxOrPdf" xml:space="preserve">
     <value>Invalid output extension.. Must be 'html', 'docx' or 'pdf'.</value>
   </data>
+  <data name="PdfExportNotAvailable" xml:space="preserve">
+    <value>PDF export is not currently available in the CLI. It is planned for a future release. In the meantime, use the CalcpadCE desktop app to export PDF, or run the standalone CalcpadCE server if you need PDF export as a background task.</value>
+  </data>
 </root>

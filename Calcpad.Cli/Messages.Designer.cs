@@ -124,6 +124,15 @@ namespace Calcpad.Cli {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to PDF export is not currently available in the CLI. It is planned for a future release. In the meantime, use the CalcpadCE desktop app to export PDF, or run the standalone CalcpadCE server if you need PDF export as a background task.
+        /// </summary>
+        internal static string PdfExportNotAvailable {
+            get {
+                return ResourceManager.GetString("PdfExportNotAvailable", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Press any key when ready..
         /// </summary>
         internal static string Press_Any_Key_When_Ready {
