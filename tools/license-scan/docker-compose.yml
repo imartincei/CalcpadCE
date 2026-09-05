@@ -1,0 +1,89 @@
+# FOSSology stack for generating THIRD-PARTY-NOTICES.
+#
+#   ./harvest.sh                 # build the corpus to scan
+#   docker compose up -d         # first boot takes ~2-4 min (schema + license refs)
+#   xdg-open http://localhost:8081/repo/   # login: fossy / fossy
+#
+# Upstream fossology 4.7.1 compose, but using the published image and binding
+# to loopback. ./corpus mounts at /tmp/corpus in both containers for
+# "Upload -> From Server": /tmp is the stock UploadFromServerWhitelist value,
+# and the scheduler needs the mount because the upload agent reads it, not web.
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fossology
+      POSTGRES_USER: fossy
+      POSTGRES_PASSWORD: fossy
+      # SQL_ASCII: FOSSology stores raw bytes and fails UTF-8 validation.
+      # --data-checksums: detect torn pages instead of serving corrupt rows.
+      # Applies at first init only.
+      POSTGRES_INITDB_ARGS: "-E SQL_ASCII --data-checksums"
+    command:
+      # Postgres defaults, stated explicitly so they stay reviewable.
+      - postgres
+      - -c
+      - fsync=on
+      - -c
+      - full_page_writes=on
+      - -c
+      - synchronous_commit=on
+      # Keep WAL replay after an unclean stop short.
+      - -c
+      - checkpoint_timeout=60s
+    # Postgres "fast shutdown". Already the image default; pinned so a base
+    # image change cannot downgrade it to a SIGTERM smart shutdown that waits
+    # for clients and gets SIGKILLed mid-checkpoint.
+    stop_signal: SIGINT
+    # Docker's 10s default is the usual shutdown-corruption cause.
+    stop_grace_period: 5m
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fossy -d fossology"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  scheduler:
+    image: fossology/fossology:4.7.1
+    command: scheduler
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: &fossology-db
+      FOSSOLOGY_DB_HOST: db
+      FOSSOLOGY_DB_NAME: fossology
+      FOSSOLOGY_DB_USER: fossy
+      FOSSOLOGY_DB_PASSWORD: fossy
+    # Half-written uploads leave DB rows pointing at missing files.
+    stop_grace_period: 2m
+    volumes:
+      - repository:/srv/fossology/repository/
+      - ./corpus:/tmp/corpus:ro
+
+  web:
+    image: fossology/fossology:4.7.1
+    command: web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      scheduler:
+        condition: service_started
+    environment:
+      <<: *fossology-db
+      FOSSOLOGY_SCHEDULER_HOST: scheduler
+    stop_grace_period: 30s
+    ports:
+      - "127.0.0.1:8081:80"
+    volumes:
+      - repository:/srv/fossology/repository/
+      - ./corpus:/tmp/corpus:ro
+
+volumes:
+  database:
+  repository:
