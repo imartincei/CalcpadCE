@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
     <Version>7.6.6-preview</Version>
+    <FontsDir>$(MSBuildThisFileDirectory)Resources\Fonts\</FontsDir>
   </PropertyGroup>
 </Project>

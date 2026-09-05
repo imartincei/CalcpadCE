@@ -151,8 +151,11 @@ This project builds upon the tremendous foundational work of the original Calcpa
 Copyright (c) 2014-2026 Ned Ganchovski.
 All subsequent modifications and additions are Copyright (c) 2026 CalcpadCE Contributors.
 
-This project uses some additional third party components, software and design. They are re-distributed free of charge, under the license conditions, provided by the respective authors.
+This project uses some additional third-party components, software and design.
+They are re-distributed free of charge, under the license conditions, provided by the respective authors.
 
-1. The new and beautiful icons are created using [icons8.com](https://icons8.com/).  
-2. Some symbols are displayed, using the Jost* font family by [indestructible type*](https://indestructibletype.com/), under the [SIL open font license](https://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web).
-Square brackets are slightly modified to suit the application needs.
+1. The new and beautiful icons are created using [icons8.com](https://icons8.com/).
+2. Some symbols are displayed, using the Jost\* font family by [indestructible type\*](https://indestructibletype.com/), under the [SIL open font license](https://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web). Square brackets are slightly modified to suit the application needs.
+3. The web, desktop and VS Code editors use the [JuliaMono](https://github.com/cormullion/juliamono) font by cormullion as their default typeface, under the [SIL open font license](https://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web).
+4. Calculation output is rendered with the [DejaVu Serif Condensed](https://dejavu-fonts.github.io/) font by the DejaVu fonts team, under the [DejaVu Fonts License](https://dejavu-fonts.github.io/License.html) (a Bitstream Vera derivative).
+5. Interactive datagrids in the preview are powered by [jspreadsheet-ce](https://github.com/jspreadsheet/ce) and [jsuites](https://github.com/jsuites/jsuites) by Paul Hodel, under the [MIT license](https://opensource.org/licenses/MIT).

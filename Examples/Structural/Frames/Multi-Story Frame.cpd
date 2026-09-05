@@ -106,7 +106,7 @@ h = n_st*h_st
 W = 100*n_b
 k_w = W/w
 H = h*k_w + 100*(1 - n_st/20)
-#def svg$ = '<svg viewbox="'-1m*k_w' '-2.5m*k_w' '(w + 4m)*k_w' '(h + 5m)*k_w'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-family: Georgia Pro; font-size:8px; width:'W + 120'pt; height:'H + 80'pt">
+#def svg$ = '<svg viewbox="'-1m*k_w' '-2.5m*k_w' '(w + 4m)*k_w' '(h + 5m)*k_w'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-family: DejaVu Serif Condensed; font-size:8px; width:'W + 120'pt; height:'H + 80'pt">
 #def thin_style$ = style = "stroke:green; stroke-width:1; fill:none"
 #def thick_style$ = style = "stroke:green; stroke-width:2; fill:none"
 k_q = 0.4*m/kN

@@ -32,6 +32,35 @@ Declare the input with `#UI` and give it an ordinary value:
 Entering a value in the input form is stored in a `uiOverrides` entry on the first line of the CalcpadCE file, so the file keeps its own default values and they stay unchanged when input fields are updated.
 You never have to write that entry yourself, but it is plain text if you ever want to edit it.
 
+### The report font changed from Georgia Pro to DejaVu Serif Condensed
+
+Georgia Pro could not be redistributed, so it was not ideal as a font that needed shipped over the web.
+Output now uses [DejaVu Serif Condensed](https://dejavu-fonts.github.io/), which ships with CalcpadCE and is embedded in every report.
+
+#### What breaks
+
+Only the report appearance changes, nothing about the calculation process is different.
+Equations are about 1% wider and lines 3% taller.
+DejaVu Serif also has no Light or SemiBold, so bold text and `∑`, `∏`, `∫` render heavier.
+
+#### How to update
+
+To restore the old look where Georgia Pro is installed, insert the **Report Fonts** snippet — Insert panel, under **CSS**:
+
+That snippet also contains examples to change font sizes, so here is a condensed version that just changes the font back if you have it installed already:
+
+```calcpad
+#val
+'<style>
+'  .eq, input[type="text"], table.matrix,
+'  .eq small var, .eq small i {
+'    font-family: "Georgia Pro", "Century Schoolbook", "Times New Roman", Times, serif;
+'  }
+'  .nary { font-family: "Georgia Pro Light", "Georgia Pro", serif; font-weight: 300; }
+'</style>
+#end val
+```
+
 ### Dots are no longer allowed as part of a variable name
 
 A dot after an identifier is now always element access. Names can no longer contain a dot.
