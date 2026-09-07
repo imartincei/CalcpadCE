@@ -1,14 +1,13 @@
-## 🛡️ Installation Note (Windows SmartScreen)
+## 🛡️ Windows SmartScreen Note
 
-Because CalcpadCE is a new, community-driven project, Windows SmartScreen flags the installer as an unrecognized app.
+Because CalcpadCE is a new, community-driven project, Windows SmartScreen flags `CalcpadCE.exe` as an unrecognized app.
 This is normal for new open-source software.
 To proceed, simply click "More info" and then "Run anyway".
 
 ## 🧪 Beta Note
 
 CalcpadCE ${VERSION} is a beta release. No Windows installer is published yet.
-Download the portable zip below, extract it anywhere, and run `CalcpadCE.exe`. Installers and `winget` support will return once the release
-leaves beta.
+Download the portable zip below, extract it anywhere, and run `CalcpadCE.exe`.
 
 ## Downloads
 
