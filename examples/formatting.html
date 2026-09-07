@@ -3285,18 +3285,19 @@
 </div>
 
 <h2 id="beam-design-with-markdown">Beam Design with Markdown<a class="headerlink" href="#beam-design-with-markdown" title="Permanent link">&para;</a></h2>
-<p>Full RC beam design check to <a href="https://en.wikipedia.org/wiki/Eurocode_2">Eurocode 2</a>, authored entirely in Markdown mode with page breaks for a print-ready report.</p>
+<p>{"uiOverrides":{"b:1":"400"}}</p>
 <div class="example-grid">
 <figure>
 <figcaption>Code:</figcaption>
-<div class="highlight"><pre><span></span><code><span class="k">#def</span><span class="w"> </span><span class="nv">page_break$</span><span class="w"> </span><span class="o">=</span> '&lt;p style="break-after:page;"&gt;&lt;/p&gt;
+<div class="highlight"><pre><span></span><code><span class="c1">'&lt;!-- Full RC beam design check to [Eurocode 2](https://en.wikipedia.org/wiki/Eurocode_2), authored entirely in Markdown mode with page breaks for a print-ready report. --&gt;</span>
+<span class="k">#def</span><span class="w"> </span><span class="nv">page_break$</span><span class="w"> </span><span class="o">=</span> '&lt;p style="break-after:page;"&gt;&lt;/p&gt;
 <span class="k">#md on</span>
 <span class="c1">'## RC Beam Design to Eurocode 2</span>
 <span class="c1">'---</span>
 <span class="c1">'### Input data</span>
 <span class="c1">'#### Beam and cross section dimensions</span>
-<span class="c1">'Beam length -'</span><span class="nv">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="na">m</span>
-<span class="c1">'Cross section dimensions: height -'</span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">700</span><span class="na">mm</span><span class="w"> </span>_
+<span class="k">#</span><span class="nv">UI</span><span class="w"> </span><span class="c1">'Beam length -'</span><span class="nv">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="na">m</span>
+<span class="k">#</span><span class="nv">UI</span><span class="w"> </span><span class="c1">'Cross section dimensions: height -'</span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">700</span><span class="na">mm</span><span class="w"> </span>_
 <span class="c1">', width -'</span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">250</span><span class="na">mm</span>
 <span class="c1">'#### Loads</span>
 <span class="c1">'Uniformly distributed load -'</span><span class="nv">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">12</span><span class="na">kN</span><span class="o">÷</span><span class="nv">m</span><span class="c1">'(total, factored)</span>
@@ -3374,7 +3375,8 @@
 </figure>
 <figure class="example-output">
 <figcaption>Rendered Output:</figcaption>
-<div class="calcpad-output"><!-- Full RC beam design check to [Eurocode 2](https://en.wikipedia.org/wiki/Eurocode_2), authored entirely in Markdown mode with page breaks for a print-ready report. --> 
+<div class="calcpad-output"><!--{"uiOverrides":{"b:1":"400"}}--> 
+<!-- Full RC beam design check to [Eurocode 2](https://en.wikipedia.org/wiki/Eurocode_2), authored entirely in Markdown mode with page breaks for a print-ready report. --> 
 <div class="calcpad-h2">RC Beam Design to Eurocode 2</div>
 
 <p><hr />
