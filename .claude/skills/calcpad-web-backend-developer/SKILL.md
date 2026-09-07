@@ -28,8 +28,8 @@ Load the reference file relevant to your task — don't read both up front.
 
 | When working on... | Read |
 |--------------------|------|
-| Request/response models, CalcpadService, PdfGeneratorService, Highlighter integration, client file cache | `reference/models-and-services.md` |
-| Directory tree, env vars, external deps, curl/Swagger testing, deployment | `reference/structure-config-deploy.md` |
+| Request/response models, CalcpadService, PdfGeneratorService, ContentResolutionCache, Highlighter integration | `reference/models-and-services.md` |
+| Directory tree, binding/port behavior, env vars, external deps, curl/Swagger testing, deployment | `reference/structure-config-deploy.md` |
 
 ## Solution Context
 
@@ -54,36 +54,46 @@ All endpoints are under `POST /api/calcpad/` unless noted.
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| `convert` | POST | Convert Calcpad source to wrapped HTML |
-| `convert-unwrapped` | POST | Convert to unwrapped HTML with data-text links |
-| `debug-raw-code` | POST | Get raw macro-expanded code |
+| `convert` | POST | Convert Calcpad source to HTML (`?unwrap=true` for the expanded source with data-text links) |
+| `docx` | POST | Generate a Word document from source |
 | `sample` | GET | Fetch sample Calcpad content |
 | `pdf` | POST | Generate PDF from HTML |
 | `pdf/health` | GET | PDF service health check |
-| `refresh-cache` | POST | Clear remote content cache |
-| `resolve-content` | POST | Resolve includes and remote content |
+| `pdf/browser` | GET | Which browser PDF export would use |
+| `pdf/browser/install` | POST | Download the bundled headless Chromium |
 | `highlight` | POST | Get syntax highlighting tokens |
 | `highlight-line` | POST | Highlight a single line |
 | `lint` | POST | Lint code and return diagnostics |
 | `definitions` | POST | Extract variable/function/macro definitions |
-| `find-references` | POST | Find all references to symbols |
+| `symbol-at-position` | POST | The symbol under a cursor and all its occurrences |
+| `prettify` | POST | Re-indent Calcpad source |
 | `snippets` | GET | Get autocomplete snippet data |
+| `cpdz/decode`, `cpdz/encode` | POST | Compiled `.cpdz` worksheets |
+| `portable/bundle`, `portable/package` | POST | Self-contained worksheet, and ZIP export |
+| `debug-crash` | GET | Deliberately crash the server (Development only) |
+
+The canonical schema is [../../../Calcpad.Web/backend/API_SCHEMA.md](../../../Calcpad.Web/backend/API_SCHEMA.md).
 
 ## Adding a New API Endpoint
 
 1. **Add to CalcpadController:**
 ```csharp
 [HttpPost("new-endpoint")]
-public async Task<IActionResult> NewEndpoint([FromBody] NewRequest request)
+public IActionResult NewEndpoint([FromBody] NewRequest request, CancellationToken cancellationToken)
 {
     try
     {
         if (string.IsNullOrWhiteSpace(request.Content))
             return BadRequest("Content is required");
 
-        var fileCache = DecodeClientFileCache(request.ClientFileCache);
-        var result = _calcpadService.ProcessAsync(request, fileCache);
-        return Ok(result);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
+        return Ok(new NewResponse { /* ... */ });
+    }
+    catch (OperationCanceledException)
+    {
+        return StatusCode(499);   // superseded by a newer request, not an error
     }
     catch (Exception ex)
     {
@@ -93,9 +103,10 @@ public async Task<IActionResult> NewEndpoint([FromBody] NewRequest request)
 }
 ```
 
-2. **Create request/response models** in Models/ (see `reference/models-and-services.md` for existing shapes)
-3. **Implement service logic** in Services/
+2. **Add request/response models** inline at the bottom of CalcpadController.cs, following the existing ones — `Models/` holds only the PDF request (see `reference/models-and-services.md`)
+3. **Implement service logic** in Services/, and register it in `CalcpadApiService.ConfigureBuilder` if it needs DI
 4. **Add corresponding frontend API method** in `calcpad-frontend/src/api/client.ts`
+5. **Document it** in `Calcpad.Web/backend/API_SCHEMA.md` — that file is the canonical schema and the frontend types are written against it
 
 ## Workflow
 
@@ -105,5 +116,5 @@ public async Task<IActionResult> NewEndpoint([FromBody] NewRequest request)
 4. **Implement service logic** - Business logic in Services/
 5. **Add models** - Request/response in Models/
 6. **Update frontend client** - Add corresponding method in `calcpad-frontend/src/api/client.ts`
-7. **Test** - Use curl, Swagger UI, or the web editor
-8. **Docker** - Verify Dockerfile builds correctly if deployment-related
+7. **Test** - Use curl, Swagger UI (Development only), or the web editor
+8. **Update API_SCHEMA.md** - Anything that changes a request or response shape

@@ -604,7 +604,7 @@
             "problemMatcher": []
         },
 
-        // ── Version Bump (calcpad-frontend + calcpad-desktop + vscode-calcpad kept in sync) ──
+        // ── Version Bump (frontend packages + Directory.Build.props kept in sync) ──
         {
             "label": "Version: Bump Patch",
             "type": "process",

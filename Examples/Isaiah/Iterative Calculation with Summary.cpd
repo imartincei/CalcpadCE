@@ -2,20 +2,17 @@
 hide$hideOutput = 0unhide$
 'Input Vector
 v1 = [1; 2; 3]
-hide$
+#hide
 'Result Vector
 v2 = vector(len(v1))
-unhide$
+#end hide
 #for i = 1 : len(v1)
-	hide$
-	#if i ≡ 2
-		hideOutput = 1
-	#end if
-	unhide$
-	hideC$(hideOutput ≡ 1)
-	'Calculations showing first iteration
+	#hide i > 2
+	#val
+	'Calculations showing iteration 'i' 
+	#end val
 	v2.i = v1.i*2
-	unhideC$(hideOutput ≡ 1)
+	#end hide
 #loop
 'Final results for each iteration
 v2

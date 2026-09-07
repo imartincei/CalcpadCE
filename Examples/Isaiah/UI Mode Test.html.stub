@@ -1,0 +1,801 @@
+<div class="calcpad-output">
+ <!--{"uiOverrides":{"L:1":"20","W:1":"15","n:1":"14","P:1":"12","q:1":"5","v:1":"[4; 5; 6]","M:1":"[1; 2; 3 | 4; 4; 6]","Z:1":"[0; 0; 1; 0; 0]","G:1":"[0; 0; 0; 0 | 0; 0; 0; 0 | 0; 0; 0; 1]","c:1":"4","G:2":"[1; 0; 0; 0; 0; 0; 12 | 0; 0; 0; 0; 0; 0; 0 | 0; 0; 0; 0; 0; 0; 0 | 0; 0; 0; 0; 0; 0; 0 | 0; 0; 0; 0; 0; 0; 0]","r:1":"3","flag:1":"0","grade:1":"2","E:1":"25GPa","load:1":"123","E2:1":"124","y:1:1":"4","y:1:2":"5","y:1:3":"6"}}-->
+ <h3>UI Mode Test File</h3>
+ <p>Exercises every #UI JSON property, #UI inside macros/conditionals/loops, and the two documented error cases.</p>
+ <p>
+ </p>
+ <h3>1. Every #UI JSON property</h3>
+ <p>
+ </p>
+ <p>CSS classes for "style" / "reportStyle"</p>
+ <style>.calcpad-ui-input.highlight { background-color: #eeeeee; border: 1px solid #aaaaaa; }  .calcpad-ui-dropdown.primary { font-weight: 600; }  .calcpad-ui-radio.compact .calcpad-ui-radio-label { margin-right: 4px; }  .calcpad-ui-checkbox.switch { accent-color: #2a8f3f; }  .calcpad-ui-datagrid.bordered { border: 2px solid #444444; }  p.boxed { border: 1px solid #cccccc; padding: 2px 4px; }</style>
+ <p>
+ </p>
+ <p>type - auto-detected as "entry"</p>
+ <p>
+  <span class="eq">
+   <var>L</var>
+   = 10
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>L</var>
+   = 10
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>type - explicit "entry"</p>
+ <p>
+  <span class="eq">
+   <var>W</var>
+   = 5
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>W</var>
+   = 5
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>mode - explicit "number" (the only accepted value)</p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   = 4
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   = 4
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>style - class applied only in UI mode</p>
+ <p>
+  <span class="eq">
+   <var>depth</var>
+   = 2
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>depth</var>
+   = 2
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>reportStyle - class applied only when the report is rendered</p>
+ <p class="boxed">
+  <span class="eq">
+   <var>P</var>
+   = 25
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   = 25
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>style and reportStyle together</p>
+ <p class="boxed">
+  <span class="eq">
+   <var>q</var>
+   = 3
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>q</var>
+   = 3
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>type "datagrid" - shape auto-detected from a vector literal</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   =
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   =
+   <b class="b0">[</b>
+   1 2 3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>type "datagrid" - shape auto-detected from a matrix literal</p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">|</span>
+   4; 5; 6
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>type "datagrid" - shape auto-detected from vector()/matrix() constructors</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   =
+   <b>vector</b>
+   ( 5 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   =
+   <b class="b0">[</b>
+   0 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>G</var>
+   </b>
+   =
+   <b>matrix</b>
+   ( 3; 4 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>G</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>Custom rows/cols</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   = 5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   = 6
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>G</var>
+   </b>
+   =
+   <b>matrix</b>
+   (
+   <var>r</var>
+   ;
+   <var>c</var>
+   )  =
+   <b>matrix</b>
+   ( 5; 6 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>G</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>type "datagrid" - explicit rows, columns, columnHeaders, rowHeaders</p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>T</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   0; 0; 0
+   <span class="b0">|</span>
+   0; 0; 0
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>T</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>type "dropdown" with keys and values</p>
+ <p>
+  <span class="eq">
+   <var>grade</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>grade</var>
+   = 1
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>type "radio" with keys and values</p>
+ <p>
+  <span class="eq">
+   <var>E</var>
+   = 200
+   <i>GPa</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>E</var>
+   = 200
+   <i>GPa</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>type "checkbox" toggles between 1 and 0</p>
+ <p>
+  Flag
+  <span class="eq">
+   <var>flag</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>flag</var>
+   = 1
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>2. #UI inside a macro</h3>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>load</var>
+   = 10
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>M</var>
+   =
+   <span class="dvc">
+    <var>load</var>
+    · 6
+    <i>m</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    8
+   </span>
+   =
+   <span class="dvc">
+    10
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    · 6
+    <i>m</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    8
+   </span>
+   = 7.5
+   <i>kNm</i>
+  </span>
+ </p>
+ <p>Midspan moment for span = 6 and load = 10 is M = 7.5</p>
+ <p>
+ </p>
+ <h3>3. #UI inside conditionals and loops</h3>
+ <p>
+ </p>
+ <p>Conditional - only the taken branch renders a control</p>
+ <p>
+  <span class="eq">
+   <var>useSteel</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>E2</var>
+   = 200
+   <i>GPa</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>E2</var>
+   = 200
+   <i>GPa</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>Loop - one control instance per pass</p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   = 2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   = 2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   = 2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   = 2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   = 2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   = 2
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>4. #UI around an expression without assignment - errors in UI mode</h3>
+ <p>Expected error: "The #UI keyword requires a variable assignment."</p>
+ <p>
+ </p>
+ <p class="err">
+  Error in "#UI {"type": "entry"}" on line [
+  <a data-text="108" href="#0">108</a>
+  ]: The #UI keyword requires a variable assignment.
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <h3>5. #UI assigned an expression rather than a value - errors in both modes</h3>
+ <p>
+  Expected error: "#UI directives do not support expressions." A control overwrites the
+  <p>right hand side with whatever was entered, so only a value, a vector or a matrix can be</p>
+  <p>annotated. Reported by the linter as well.</p>
+ </p>
+ <p>
+ </p>
+ <p class="err">
+  Error in "#UI {"type": "entry"} k = max(E2)" on line [
+  <a data-text="115" href="#0">115</a>
+  ]: #UI directives do not support expressions.
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   =
+   <b>max</b>
+   (
+   <var>E2</var>
+   )  =
+   <b>max</b>
+   ( 200
+   <i>GPa</i>
+   )  = 200
+   <i>GPa</i>
+  </span>
+ </p>
+ <p class="err">
+  Error in "#UI {"type": "entry"} k2 = 2*E2" on line [
+  <a data-text="116" href="#0">116</a>
+  ]: #UI directives do not support expressions.
+ </p>
+ <p>
+  <span class="eq">
+   <var>k2</var>
+   = 2 ·
+   <var>E2</var>
+   = 2 · 200
+   <i>GPa</i>
+   = 400
+   <i>GPa</i>
+  </span>
+ </p>
+ <p class="err">
+  Error in "#UI k3 = [1; sqrt(4)]" on line [
+  <a data-text="117" href="#0">117</a>
+  ]: #UI directives do not support expressions.
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    k3
+   </var>
+   =
+   <span class="b0">[</span>
+   1;
+   <span class="o0">
+    <span class="r">√</span>
+    4
+   </span>
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2
+   <b class="b0">]</b>
+  </span>
+ </p>
+</div>

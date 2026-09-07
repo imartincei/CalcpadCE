@@ -1,4 +1,5 @@
 <div class="calcpad-output">
+ <!--{"uiOverrides":{"b:1":"400"}}-->
  <!-- Full RC beam design check to [Eurocode 2](https://en.wikipedia.org/wiki/Eurocode_2), authored entirely in Markdown mode with page breaks for a print-ready report. -->
  <h2>RC Beam Design to Eurocode 2</h2>
  <p>

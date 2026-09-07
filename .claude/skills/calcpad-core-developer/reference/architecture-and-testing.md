@@ -5,13 +5,16 @@
 ```
 Calcpad.Core/
 ├── BaseTypes/
-│   ├── Complex.cs         - Complex number type
-│   ├── Real.cs            - Real number wrapper
+│   ├── IValue.cs          - Common interface for scalar/vector/matrix values
+│   ├── IScalarValue.cs    - Real/complex scalar abstraction
+│   ├── RealValue.cs       - Real scalar (value + units)
+│   ├── ComplexValue.cs    - Complex scalar
+│   ├── Complex.cs         - Complex arithmetic primitive
 │   ├── Parameter.cs       - Function parameters
 │   ├── Variable.cs        - Variable storage
-│   └── Unit.cs            - Unit of measurement
+│   └── Unit.cs            - Unit of measurement (internal)
 ├── Calculator/
-│   ├── Calculator.cs      - Abstract base calculator
+│   ├── Calculator.cs      - Abstract base (internal)
 │   ├── RealCalculator.cs  - Real number operations
 │   ├── ComplexCalculator.cs - Complex operations
 │   ├── MatrixCalculator.cs  - Matrix operations
@@ -21,26 +24,33 @@ Calcpad.Core/
 │   ├── ColumnMatrix.cs    - Column vector as matrix
 │   ├── DiagonalMatrix.cs  - Diagonal matrix
 │   ├── SymmetricMatrix.cs - Symmetric matrix
-│   ├── LowerTriangularMatrix.cs
-│   └── UpperTriangularMatrix.cs
+│   ├── LowerTriangularMatrix.cs / UpperTriangularMatrix.cs
+│   └── HpMatrix/, hpMatrix/ - High-performance (unitless) matrix variants
 ├── Vector/
-│   └── Vector.cs          - Vector operations
+│   ├── Vector.cs          - Base vector type
+│   ├── ColumnVector.cs / RowVector.cs
+│   ├── LargeVector.cs     - Sparse/large storage
+│   └── HpVector.cs        - High-performance (unitless) vector
 ├── Parsers/
 │   ├── MathParser/        - Main expression parser
-│   └── ExpressionParser/  - Sub-expression handling
+│   ├── ExpressionParser/  - Document-level parsing (directives, output, HtmlResult)
+│   ├── MacroParser.cs     - #include and #def macro expansion
+│   ├── PlotParser.cs, ChartParser.cs, MapParser.cs - $Plot / $Map parsing
+│   └── UnitsParser.cs     - Unit expression parsing
 ├── Plotter/
 │   ├── Plotter.cs         - 2D plotting engine
 │   ├── MapPlotter.cs      - 2D color map plotting
-│   └── ChartPlotter.cs    - Chart generation
+│   ├── ChartPlotter.cs    - Chart generation
+│   └── SvgDrawing.cs, SvgPoint.cs - Vector output
 ├── Output/
-│   └── OutputWriter.cs    - Result formatting
-├── Networking/
-│   └── (Network utilities)
-├── Solver/
-│   └── Solver.cs          - Equation solving
-└── Validator/
-    └── Validator.cs       - Input validation
-```
+│   ├── OutputWriter.cs    - Abstract result formatting
+│   └── HtmWriter.cs, TextWriter.cs, XmlWriter.cs - Per-target writers
+├── Solver.cs              - Iterative/numerical methods behind $Root, $Find, $Integral, ...
+├── Settings.cs            - Settings / MathSettings / PlotSettings
+├── CalcpadError.cs, Exceptions.cs, MathParserException.cs - Error types
+├── PathRoots.cs           - {project} / {library} / {user} resolution
+├── ImageReferences.cs, Container.cs, DirectiveDto.cs, ExtensionMethods.cs
+└── Messages.resx (+ .bg, .zh) - Localized diagnostic messages
 
 ## Key Classes
 
@@ -53,12 +63,17 @@ The core expression parser. Handles:
 - Unit conversions
 
 ### Calculator Classes
+`Calculator` is `internal abstract` and dispatches by operator/function *index*, not by name — name resolution happens in the parser:
+
 ```csharp
-// Abstract base
-public abstract class Calculator
+internal abstract class Calculator
 {
-    public abstract Value Evaluate(string expression);
-    public abstract void SetVariable(string name, Value value);
+    internal abstract IScalarValue EvaluateOperator(long index, in IScalarValue a, in IScalarValue b);
+    internal abstract IScalarValue EvaluateFunction(long index, in IScalarValue a);
+    internal abstract IScalarValue EvaluateFunction2(long index, in IScalarValue a, in IScalarValue b);
+    internal abstract IValue EvaluateFunction3(long index, in IValue a, in IValue b, in IValue c);
+    internal abstract IScalarValue EvaluateMultiFunction(long index, IScalarValue[] a);
+    internal abstract IScalarValue EvaluateInterpolation(long index, IScalarValue[] a);
 }
 
 // RealCalculator - sin, cos, tan, log, exp, sqrt, etc.
@@ -68,15 +83,7 @@ public abstract class Calculator
 ```
 
 ### Unit System
-Units are defined with conversion factors to base SI units:
-```csharp
-public class Unit
-{
-    public string Name { get; }
-    public double Factor { get; }      // Conversion to base
-    public int[] Dimensions { get; }   // [length, mass, time, current, temp, amount, luminosity]
-}
-```
+`Unit` is `internal` and holds a per-dimension exponent/factor pair rather than a single scale plus an integer dimension vector — it carries a `double[] _factors` alongside the dimension powers, so non-integer exponents and scaled bases (kg, not g) work. Read `BaseTypes/Unit.cs` before changing unit arithmetic; do not assume the simplified `{ Name, Factor, int[] Dimensions }` shape.
 
 ## Matrix Type Hierarchy
 
@@ -137,19 +144,21 @@ Uses SkiaSharp for rendering to PNG/SVG.
 
 ### Unit Tests
 ```bash
-cd Calcpad.Tests
-dotnet test
+dotnet test Calcpad.Tests/Calcpad.Tests.csproj
+
+# One area
+dotnet test Calcpad.Tests/Calcpad.Tests.csproj --filter "FullyQualifiedName~Matrices"
 ```
 
-Tests cover: expression parsing, function evaluation, unit conversions, matrix operations.
+xUnit. Suites: `ExpressionParser/`, `Scalars/`, `Vectors/`, `Matrices/`, `Macros/`, `Filepaths/`, `UI/`, `Server/`, `Highlighter/`.
 
 ### Integration Testing via Linux Dev Server
 ```bash
-# Start the dev server (runs on port 9420)
-./scripts/Calcpad.Server/restart-dev-server.sh
+# Start the dev server (pins port 9420; a bare `dotnet run` gets a random port instead)
+Calcpad.Web/backend/scripts/restart-dev-server.sh
 ```
 
-See [Calcpad.Server/API_SCHEMA.md](../../Calcpad.Server/API_SCHEMA.md) for full API documentation.
+See [Calcpad.Web/backend/API_SCHEMA.md](../../../Calcpad.Web/backend/API_SCHEMA.md) for full API documentation.
 
 **POST /api/calcpad/convert** - Test calculations:
 ```bash

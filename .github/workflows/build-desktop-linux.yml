@@ -1,0 +1,110 @@
+name: Build Desktop (Linux)
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  build-desktop-linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-22.04
+            triple: x86_64-unknown-linux-gnu
+            arch: x86_64
+          - runner: ubuntu-22.04-arm
+            triple: aarch64-unknown-linux-gnu
+            arch: aarch64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.triple }}
+
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: Calcpad.Web/frontend/calcpad-desktop/src-tauri
+
+      - name: Install Tauri system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            librsvg2-dev \
+            libayatana-appindicator3-dev \
+            libxdo-dev \
+            libssl-dev \
+            patchelf \
+            file \
+            wget
+
+      - name: Set version
+        run: node Calcpad.Web/frontend/scripts/bump-versions.mjs set ${{ inputs.version }}
+
+      - name: Install frontend dependencies
+        run: |
+          npm ci --prefix Calcpad.Web/frontend/calcpad-frontend
+          npm ci --prefix Calcpad.Web/frontend/calcpad-web
+          npm ci --prefix Calcpad.Web/frontend/calcpad-desktop
+
+      - name: Build desktop bundles (Tauri)
+        working-directory: Calcpad.Web/frontend/calcpad-desktop
+        run: |
+          chmod +x build-desktop.sh
+          ./build-desktop.sh
+
+      # The PKGBUILD packages the tree build-desktop.sh just produced and has no
+      # build() stage, so an Arch userland with base-devel and --nodeps is enough.
+      - name: Build Arch package
+        if: matrix.arch == 'x86_64'
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/build" \
+            -e PKGDIR=/build/Calcpad.Web/frontend/calcpad-desktop/packaging/arch \
+            -e HOST_OWNER="$(id -u):$(id -g)" \
+            archlinux:base-devel bash -c '
+              set -e
+              useradd -m builder
+              chown -R builder "$PKGDIR"
+              cd "$PKGDIR"
+              sudo -u builder -H makepkg -f --nodeps
+              chown -R "$HOST_OWNER" "$PKGDIR"
+            '
+
+      - name: Stage artifacts
+        run: |
+          bundle="Calcpad.Web/frontend/calcpad-desktop/src-tauri/target/${{ matrix.triple }}/release/bundle"
+          mkdir -p artifacts
+          cp "$bundle"/deb/*.deb "artifacts/CalcpadCE-desktop-${{ inputs.version }}-${{ matrix.arch }}.deb"
+          cp "$bundle"/rpm/*.rpm "artifacts/CalcpadCE-desktop-${{ inputs.version }}-${{ matrix.arch }}.rpm"
+          cp "$bundle"/appimage/*.AppImage "artifacts/CalcpadCE-desktop-${{ inputs.version }}-${{ matrix.arch }}.AppImage"
+          if [ "${{ matrix.arch }}" = x86_64 ]; then
+            cp Calcpad.Web/frontend/calcpad-desktop/packaging/arch/*.pkg.tar.zst \
+              "artifacts/CalcpadCE-desktop-${{ inputs.version }}-x86_64.pkg.tar.zst"
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          path: artifacts/*
+          archive: false
