@@ -44,18 +44,18 @@
          button's click handler runs. -->
     <div
       v-if="contextMenu"
-      class="tree-context-menu"
+      class="calcpad-context-menu"
       :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
       @mousedown.stop
       @click.stop
     >
-      <button class="tree-context-item" @click="onOpenContainingFolder">
+      <button class="calcpad-context-item" @click="onOpenContainingFolder">
         Open Containing Folder
       </button>
-      <button class="tree-context-item" @click="onCopyFullPath">
+      <button class="calcpad-context-item" @click="onCopyFullPath">
         Copy Full Path
       </button>
-      <button class="tree-context-item" @click="onCopyRelativePath">
+      <button class="calcpad-context-item" @click="onCopyRelativePath">
         Copy Relative Path
       </button>
     </div>
@@ -67,6 +67,7 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import type { FileNode } from '../types'
 import FileTreeNode from './FileTreeNode.vue'
 import type { ContextMenuPayload } from './FileTreeNode.vue'
+import { writeClipboard } from '../services/clipboard'
 
 interface Props {
   openedFolder: string | null
@@ -220,23 +221,6 @@ const relativePathFor = (fullPath: string): string => {
   return fullPath
 }
 
-const writeClipboard = async (text: string) => {
-  try {
-    await navigator.clipboard.writeText(text)
-  } catch {
-    // Fallback: legacy execCommand path. The webview should support the
-    // Clipboard API in Tauri, so this is a safety net only.
-    const ta = document.createElement('textarea')
-    ta.value = text
-    ta.style.position = 'fixed'
-    ta.style.left = '-9999px'
-    document.body.appendChild(ta)
-    ta.select()
-    try { document.execCommand('copy') } catch { /* ignore */ }
-    document.body.removeChild(ta)
-  }
-}
-
 const onOpenContainingFolder = () => {
   const menu = contextMenu.value
   if (!menu) return
@@ -261,10 +245,15 @@ const onCopyRelativePath = async () => {
 
 <style scoped>
 .files-tab {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   padding: 4px 0;
 }
 
 .files-empty {
+  flex: 0 0 auto;
   padding: 16px;
   text-align: center;
   color: var(--vscode-descriptionForeground);
@@ -272,7 +261,7 @@ const onCopyRelativePath = async () => {
 
 .files-empty-message {
   margin: 0 0 12px 0;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
 }
 
 .files-open-btn {
@@ -282,7 +271,7 @@ const onCopyRelativePath = async () => {
   border: none;
   border-radius: 2px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
 }
 
 .files-open-btn:hover {
@@ -296,14 +285,11 @@ const onCopyRelativePath = async () => {
   padding: 4px 8px;
   gap: 6px;
   border-bottom: 1px solid var(--vscode-widget-border);
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   text-transform: uppercase;
   color: var(--vscode-sideBarSectionHeader-foreground, var(--vscode-foreground));
   background: var(--vscode-sideBarSectionHeader-background, var(--vscode-editor-background));
-  /* Pin header while the tree scrolls. */
-  position: sticky;
-  top: 0;
-  z-index: 2;
+  flex: 0 0 auto;
 }
 
 .files-folder-name {
@@ -352,7 +338,7 @@ const onCopyRelativePath = async () => {
   color: var(--vscode-textLink-foreground);
   border: none;
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   padding: 2px 6px;
   text-transform: none;
 }
@@ -362,11 +348,12 @@ const onCopyRelativePath = async () => {
 }
 
 .files-show-all {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   color: var(--vscode-descriptionForeground);
   cursor: pointer;
   user-select: none;
@@ -385,36 +372,11 @@ const onCopyRelativePath = async () => {
 }
 
 .file-tree {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 4px 0;
 }
 
-.tree-context-menu {
-  position: fixed;
-  z-index: 1000;
-  min-width: 180px;
-  padding: 4px 0;
-  background: var(--vscode-menu-background, var(--vscode-editor-background));
-  color: var(--vscode-menu-foreground, var(--vscode-foreground));
-  border: 1px solid var(--vscode-menu-border, var(--vscode-widget-border));
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.tree-context-item {
-  display: block;
-  width: 100%;
-  padding: 5px 14px;
-  text-align: left;
-  background: transparent;
-  color: inherit;
-  border: none;
-  cursor: pointer;
-  font-size: 12px;
-  font-family: inherit;
-}
-
-.tree-context-item:hover {
-  background: var(--vscode-menu-selectionBackground, var(--vscode-list-hoverBackground));
-  color: var(--vscode-menu-selectionForeground, inherit);
-}
 </style>

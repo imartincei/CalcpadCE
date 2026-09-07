@@ -1,5 +1,16 @@
 /* Base styles for CalcpadVuePanel */
 
+/* Not in calcpad-web's vscode-variables.css: the VS Code webview imports only
+   this file, and unlike the --vscode-* vars these are not injected by the host. */
+:root {
+  --calcpad-font-size-xxs: 9px;
+  --calcpad-font-size-xs: 11px;
+  --calcpad-font-size-sm: 12px;
+  --calcpad-font-size-md: 13px;
+  --calcpad-font-size-lg: 14px;
+  --calcpad-font-size-xl: 16px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -11,6 +22,18 @@ body {
   font-size: var(--vscode-font-size);
   color: var(--vscode-foreground);
   background: var(--vscode-editor-background);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.monaco-editor,
+.preview-pane,
+input,
+textarea,
+select,
+[contenteditable] {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 #app {
@@ -65,7 +88,7 @@ body {
 .settings-container h3 {
   margin: 16px 0 8px 0;
   color: var(--vscode-sideBarSectionHeader-foreground);
-  font-size: 13px;
+  font-size: var(--calcpad-font-size-lg);
   font-weight: bold;
   border-bottom: 1px solid var(--vscode-panel-border);
   padding-bottom: 4px;
@@ -82,7 +105,7 @@ body {
 .setting-group label {
   display: block;
   margin-bottom: 4px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-input-foreground);
   font-weight: normal;
 }
@@ -96,7 +119,7 @@ body {
   border: 1px solid var(--vscode-input-border);
   color: var(--vscode-input-foreground);
   border-radius: 3px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
 }
 
 .setting-group input[type="checkbox"] {
@@ -119,7 +142,7 @@ body {
   color: var(--vscode-button-secondaryForeground);
   border-radius: 3px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   margin-top: 16px;
 }
 
@@ -155,7 +178,7 @@ body {
 
 .expand-icon {
   transition: transform 0.2s;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
 }
 
 .variables-content {
@@ -185,20 +208,20 @@ body {
 
 .variable-name {
   font-weight: 600;
-  font-size: 13px;
+  font-size: var(--calcpad-font-size-lg);
   color: var(--vscode-symbolIcon-variableForeground);
   margin-bottom: 4px;
 }
 
 .variable-type {
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   color: var(--vscode-descriptionForeground);
   margin-bottom: 4px;
 }
 
 .variable-content {
   font-family: var(--vscode-editor-font-family);
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   background: var(--vscode-textCodeBlock-background);
   padding: 4px 6px;
   border-radius: 2px;
@@ -209,7 +232,7 @@ body {
 }
 
 .variable-source {
-  font-size: 10px;
+  font-size: var(--calcpad-font-size-xs);
   color: var(--vscode-descriptionForeground);
   margin-top: 4px;
 }
@@ -299,7 +322,7 @@ body {
   padding: 6px 12px;
   border-radius: 3px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
 }
 
 .s3-filters button:hover {
@@ -327,13 +350,13 @@ body {
 
 .s3-file-name {
   font-weight: bold;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   margin-bottom: 4px;
   word-break: break-word;
 }
 
 .s3-file-meta {
-  font-size: 10px;
+  font-size: var(--calcpad-font-size-xs);
   color: var(--vscode-descriptionForeground);
 }
 
@@ -344,7 +367,7 @@ body {
 .s3-tag {
   background: var(--vscode-badge-background);
   color: var(--vscode-badge-foreground);
-  font-size: 9px;
+  font-size: var(--calcpad-font-size-xxs);
   padding: 2px 4px;
   border-radius: 2px;
   margin-right: 4px;
@@ -363,7 +386,7 @@ body {
   padding: 4px 8px;
   border-radius: 3px;
   cursor: pointer;
-  font-size: 10px;
+  font-size: var(--calcpad-font-size-xs);
 }
 
 .form-group {
@@ -373,7 +396,7 @@ body {
 .form-group label {
   display: block;
   margin-bottom: 4px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
 }
 
 .form-group input {
@@ -383,7 +406,37 @@ body {
   border: 1px solid var(--vscode-input-border);
   color: var(--vscode-input-foreground);
   border-radius: 3px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
+}
+
+.calcpad-context-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 180px;
+  padding: 4px 0;
+  background: var(--vscode-menu-background);
+  color: var(--vscode-menu-foreground);
+  border: 1px solid var(--vscode-menu-border);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.calcpad-context-item {
+  display: block;
+  width: 100%;
+  padding: 5px 14px;
+  text-align: left;
+  background: transparent;
+  color: inherit;
+  border: none;
+  cursor: pointer;
+  font-size: var(--calcpad-font-size-md);
+  font-family: inherit;
+}
+
+.calcpad-context-item:hover {
+  background: var(--vscode-menu-selectionBackground);
+  color: var(--vscode-menu-selectionForeground);
 }
 
 /* Common button styles */
@@ -394,7 +447,7 @@ body {
   padding: 6px 12px;
   border-radius: 3px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   font-family: var(--vscode-font-family);
   transition: background-color 0.2s ease;
 }
@@ -415,7 +468,7 @@ body {
   color: var(--vscode-input-foreground);
   padding: 6px 8px;
   border-radius: 3px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   font-family: var(--vscode-font-family);
 }
 

@@ -30,7 +30,7 @@ select {
     border: 1px solid var(--vscode-dropdown-border, #3c3c3c);
     border-radius: 2px;
     padding: 2px 6px;
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
     cursor: pointer;
 }
 select:focus {
@@ -101,7 +101,7 @@ select option {
     padding: 4px 12px;
     background: var(--vscode-titleBar-activeBackground, #3c3c3c);
     border-bottom: 1px solid var(--vscode-widget-border);
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
     min-height: 32px;
 }
 
@@ -111,7 +111,7 @@ select option {
 
 .status-bar .status-server {
     padding: 1px 8px;
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
     background: rgba(0, 0, 0, 0.35);
     border-radius: 2px;
     -webkit-user-select: none;
@@ -127,7 +127,7 @@ select option {
 }
 
 .status-bar .status-server.disconnected {
-    color: #ff6b6b;
+    color: #ffb3b3;
 }
 
 .toolbar-btn {
@@ -135,7 +135,7 @@ select option {
     color: var(--vscode-button-secondaryForeground, #ccc);
     border: none;
     padding: 2px 8px;
-    font-size: 11px;
+    font-size: var(--calcpad-font-size-sm);
     cursor: pointer;
     border-radius: 2px;
 }
@@ -192,7 +192,7 @@ select option {
     border: none;
     border-left: 1px solid var(--vscode-tab-border, #252526);
     cursor: pointer;
-    font-size: 11px;
+    font-size: var(--calcpad-font-size-sm);
 }
 .group-close:hover {
     background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1));
@@ -234,7 +234,7 @@ select option {
     gap: 14px;
     background: rgba(255, 255, 255, 0.7);
     color: #333;
-    font-size: 14px;
+    font-size: var(--calcpad-font-size-lg);
     pointer-events: none;
 }
 .preview-loading-overlay.preview-dark {
@@ -258,7 +258,7 @@ select option {
 }
 
 .panel-scope {
-    font-size: 10px;
+    font-size: var(--calcpad-font-size-xs);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--vscode-descriptionForeground, #888);
@@ -309,7 +309,7 @@ select option {
     color: var(--vscode-tab-inactiveForeground, #969696);
     border-right: 1px solid var(--vscode-tab-border, #252526);
     cursor: pointer;
-    font-size: 13px;
+    font-size: var(--calcpad-font-size-lg);
     white-space: nowrap;
     max-width: 240px;
     box-sizing: border-box;
@@ -345,7 +345,7 @@ select option {
     border: none;
     border-radius: 3px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: var(--calcpad-font-size-sm);
     line-height: 1;
 }
 
@@ -361,7 +361,7 @@ select option {
     height: 18px;
     margin-right: 4px;
     color: var(--vscode-tab-activeForeground, #ffffff);
-    font-size: 10px;
+    font-size: var(--calcpad-font-size-xs);
     line-height: 1;
     pointer-events: none;
 }
@@ -376,7 +376,7 @@ select option {
     color: var(--vscode-tab-inactiveForeground, #969696);
     border: none;
     cursor: pointer;
-    font-size: 16px;
+    font-size: var(--calcpad-font-size-xl);
 }
 
 .tab-new:hover {
@@ -405,7 +405,7 @@ select option {
     color: inherit;
     border: none;
     cursor: pointer;
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
     font-family: inherit;
 }
 
@@ -442,8 +442,9 @@ select option {
 #vue-sidebar {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
+    /* The panel scrolls internally; a scroller here would run the thumb up
+       over the tab and activity bars. */
+    overflow: hidden;
 }
 
 .sidebar-toggle {
@@ -469,7 +470,7 @@ select option {
     background: var(--vscode-toolbar-hoverBackground, #2a2d2e);
 }
 .sidebar-rail-icon {
-    font-size: 14px;
+    font-size: var(--calcpad-font-size-lg);
     line-height: 1;
 }
 .sidebar-rail.collapsed {
@@ -563,7 +564,7 @@ select option {
 .preview-find-input {
     width: 180px;
     padding: 3px 6px;
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
     font-family: inherit;
     background: var(--vscode-input-background, #3c3c3c);
     color: var(--vscode-input-foreground, #cccccc);
@@ -579,7 +580,7 @@ select option {
 .preview-find-count {
     min-width: 34px;
     text-align: center;
-    font-size: 11px;
+    font-size: var(--calcpad-font-size-sm);
     opacity: 0.8;
 }
 
@@ -590,7 +591,7 @@ select option {
     border: none;
     border-radius: 2px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
     line-height: 1;
 }
 
@@ -610,7 +611,7 @@ select option {
     padding: 4px 12px;
     background: var(--vscode-titleBar-activeBackground, #3c3c3c);
     border-bottom: 1px solid var(--vscode-widget-border);
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
     min-height: 32px;
 }
 
@@ -668,7 +669,7 @@ select option {
     border: none;
     border-bottom: 2px solid transparent;
     color: var(--vscode-panelTitle-inactiveForeground, #888);
-    font-size: 11px;
+    font-size: var(--calcpad-font-size-sm);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 6px 8px;
@@ -688,7 +689,7 @@ select option {
     background: var(--vscode-dropdown-background, #3c3c3c);
     color: var(--vscode-dropdown-foreground, #cccccc);
     border: 1px solid var(--vscode-dropdown-border, #3c3c3c);
-    font-size: 11px;
+    font-size: var(--calcpad-font-size-sm);
     padding: 2px 6px;
     margin-left: 8px;
     border-radius: 2px;
@@ -716,7 +717,7 @@ select option {
     border-radius: 4px;
     padding: 16px 18px 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-    font-size: 13px;
+    font-size: var(--calcpad-font-size-lg);
 }
 .modal-title {
     font-weight: 600;
@@ -738,7 +739,7 @@ select option {
     padding: 4px 12px;
     border-radius: 2px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
 }
 .modal-btn:hover {
     background: var(--vscode-button-secondaryHoverBackground, #45494e);
@@ -771,16 +772,16 @@ select option {
     border-color: var(--vscode-focusBorder, #007fd4);
 }
 .quick-pick-option-label {
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
 }
 .quick-pick-option-detail {
-    font-size: 11px;
+    font-size: var(--calcpad-font-size-sm);
     color: var(--vscode-descriptionForeground, #858585);
     margin-top: 2px;
 }
 
 .problems-badge {
-    font-size: 10px;
+    font-size: var(--calcpad-font-size-xs);
     padding: 0 5px;
     border-radius: 8px;
     min-width: 18px;
@@ -807,7 +808,7 @@ select option {
     flex: 1;
     overflow-y: auto;
     font-family: var(--vscode-editor-font-family, 'Cascadia Code', Consolas, monospace);
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
 }
 
 .problem-row {
@@ -828,7 +829,7 @@ select option {
     flex-shrink: 0;
     width: 16px;
     text-align: center;
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
 }
 
 .problem-icon.lintError {
@@ -853,13 +854,13 @@ select option {
 .problem-code {
     flex-shrink: 0;
     color: var(--vscode-descriptionForeground, #888);
-    font-size: 11px;
+    font-size: var(--calcpad-font-size-sm);
 }
 
 .problem-location {
     flex-shrink: 0;
     color: var(--vscode-descriptionForeground, #888);
-    font-size: 11px;
+    font-size: var(--calcpad-font-size-sm);
 }
 
 .problems-empty {
@@ -874,7 +875,7 @@ select option {
     flex: 1;
     overflow-y: auto;
     font-family: var(--vscode-editor-font-family, 'Cascadia Code', Consolas, monospace);
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
 }
 
 .output-row {
@@ -930,7 +931,7 @@ select option {
     height: 22px;
     background: var(--vscode-statusBar-background, #007acc);
     color: var(--vscode-statusBar-foreground, #fff);
-    font-size: 12px;
+    font-size: var(--calcpad-font-size-md);
     cursor: pointer;
     -webkit-user-select: none;
     user-select: none;
@@ -963,11 +964,11 @@ select option {
 }
 
 .status-icon.lintError {
-    color: #ff8080;
+    color: #ffc9c9;
 }
 
 .status-icon.warning {
-    color: #ffcc66;
+    color: #ffd980;
 }
 
 .status-icon.info {
@@ -975,6 +976,6 @@ select option {
 }
 
 .status-text {
-    font-size: 11px;
+    font-size: var(--calcpad-font-size-sm);
     opacity: 0.8;
 }

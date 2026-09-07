@@ -34,6 +34,7 @@
 
     <div v-show="!versionConfig.isDesktop || activeView === 'calcpad'" class="calcpad-view" :class="{ split: isSplit }">
     <div v-for="(pane, paneIndex) in panes" :key="pane.id" class="calcpad-pane">
+    <div class="tab-bar">
     <div class="tab-container">
       <button
         v-for="tab in tabs"
@@ -51,6 +52,7 @@
         @click="isSplit ? closePane(paneIndex) : splitPane()"
         v-html="isSplit ? CLOSE_ICON : SPLIT_ICON"
       ></button>
+    </div>
     </div>
 
     <p v-if="tabUnavailable(pane.activeTab)" class="unavailable-note">{{ INPUT_MODE_NOTE }}</p>
@@ -831,24 +833,40 @@ onUnmounted(() => {
 
 <style scoped>
 .calcpad-vue-ui {
-  /* Natural document flow inside the parent, avoiding flex-column edge cases where a wrapped
-   * .tab-container can render on top of .tab-content. min-height (not height) so the box grows
-   * to the full content height and the sticky .activity-icons bar stays stuck. */
-  min-height: 100%;
-  display: block;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   font-family: var(--vscode-font-family);
   font-size: var(--vscode-font-size);
   color: var(--vscode-foreground);
   background: var(--vscode-editor-background);
 }
 
+.calcpad-vue-ui > .files-tab {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.calcpad-view {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.calcpad-pane {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .activity-icons {
   display: flex;
   gap: 0;
   padding: 4px 4px;
-  position: sticky;
-  top: 0;
-  z-index: 2;
+  flex: 0 0 auto;
   border-bottom: 1px solid var(--vscode-widget-border);
   background: var(--vscode-activityBar-background, var(--vscode-editor-background));
 }
@@ -885,44 +903,20 @@ onUnmounted(() => {
   display: block;
 }
 
-/* Split mode: the view becomes a vertical flex column of independently
- * scrolling panes. The root switches to height:100% so panes fill the sidebar
- * where the host gives it a definite height (calcpad-web/desktop); in the VS
- * Code webview (body-scroll, no definite height) it degrades to natural flow
- * with both panes fully expanded. */
-.calcpad-vue-ui.split {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.calcpad-vue-ui.split .calcpad-view {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.calcpad-view.split {
-  display: flex;
-  flex-direction: column;
-}
-
-.calcpad-view.split .calcpad-pane {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow-y: auto;
-}
-
 .calcpad-view.split .calcpad-pane + .calcpad-pane {
   border-top: 2px solid var(--vscode-widget-border);
+}
+
+/* Block wrapper, not a flex item: a wrapping flex container is measured at
+ * max-content as a column flex item, so it gets a one-row height and clips the
+ * rows it wraps onto. CSS Grid tracks size it the same wrong way. */
+.tab-bar {
+  flex: 0 0 auto;
 }
 
 .tab-container {
   display: flex;
   flex-wrap: wrap;
-  /* Sticky so the tab strip stays visible while .tab-content scrolls. */
-  position: sticky;
-  top: 0;
-  z-index: 1;
   border-bottom: 1px solid var(--vscode-widget-border);
   background: var(--vscode-editor-background);
 }
@@ -933,7 +927,7 @@ onUnmounted(() => {
   background: transparent;
   color: var(--vscode-tab-inactiveForeground);
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   font-weight: normal;
   border-radius: 0;
   transition: all 0.2s ease;
@@ -982,8 +976,10 @@ onUnmounted(() => {
 }
 
 .tab-content {
-  /* Natural-flow content area — grows with its content. The parent
-   * (#vue-sidebar) handles overflow scrolling for the whole panel. */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 0;
 }
 
@@ -993,9 +989,10 @@ onUnmounted(() => {
 
 /* Sits outside .tab-content so it stays legible while the tab itself is dimmed. */
 .unavailable-note {
+  flex: 0 0 auto;
   margin: 0;
   padding: 8px 12px;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   font-style: italic;
   color: var(--vscode-descriptionForeground);
   border-bottom: 1px solid var(--vscode-widget-border);

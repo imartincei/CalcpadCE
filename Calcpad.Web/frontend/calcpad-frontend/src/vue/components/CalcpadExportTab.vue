@@ -295,7 +295,7 @@ function formatSize(bytes: number): string {
   align-items: center;
   gap: 6px;
   margin: 0 0 8px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   opacity: 0.85;
@@ -305,7 +305,7 @@ function formatSize(bytes: number): string {
 
 .expand-icon {
   transition: transform 0.2s;
-  font-size: 10px;
+  font-size: var(--calcpad-font-size-xs);
 }
 
 .expand-icon.collapsed {
@@ -331,7 +331,7 @@ function formatSize(bytes: number): string {
 .export-group-title {
   display: inline-block;
   margin: 0 0 6px;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   opacity: 0.8;
@@ -345,7 +345,7 @@ function formatSize(bytes: number): string {
 .setting-group label {
   display: block;
   margin-bottom: 4px;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
 }
 
 .setting-info {
@@ -356,7 +356,7 @@ function formatSize(bytes: number): string {
 .setting-group select {
   width: 100%;
   padding: 3px 4px;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   background: var(--vscode-input-background);
   color: var(--vscode-input-foreground);
   border: 1px solid var(--vscode-input-border, rgba(128, 128, 128, 0.3));
@@ -365,7 +365,7 @@ function formatSize(bytes: number): string {
 
 .write-result {
   margin: 8px 0 0;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   opacity: 0.85;
 }
 
@@ -375,7 +375,7 @@ function formatSize(bytes: number): string {
 
 .empty {
   margin: 8px 0 0;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   opacity: 0.7;
 }
 
@@ -413,14 +413,14 @@ function formatSize(bytes: number): string {
 }
 
 .plot-name {
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .plot-size {
-  font-size: 10px;
+  font-size: var(--calcpad-font-size-xs);
   opacity: 0.7;
 }
 
@@ -430,7 +430,7 @@ function formatSize(bytes: number): string {
   border: none;
   padding: 4px 10px;
   border-radius: 2px;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   cursor: pointer;
 }
 

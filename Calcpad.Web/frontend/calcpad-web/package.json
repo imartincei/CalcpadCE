@@ -9,7 +9,8 @@
     "build": "vite build",
     "build:desktop": "vite build --mode desktop",
     "build:watch": "vite build --watch",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:contrast": "node ../scripts/check-contrast.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

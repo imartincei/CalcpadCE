@@ -461,7 +461,7 @@ watch(
   border: 1px solid var(--vscode-input-border);
   color: var(--vscode-input-foreground);
   border-radius: 3px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   font-family: var(--vscode-font-family);
 }
 
@@ -486,7 +486,7 @@ watch(
   cursor: pointer;
   background: var(--vscode-sideBar-background);
   font-weight: bold;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   user-select: none;
 }
 
@@ -496,7 +496,7 @@ watch(
 
 .symbols-palette-arrow {
   display: inline-block;
-  font-size: 8px;
+  font-size: var(--calcpad-font-size-xxs);
   transition: transform 0.2s ease;
 }
 
@@ -519,7 +519,7 @@ watch(
   padding: 3px 6px;
   cursor: pointer;
   user-select: none;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   font-weight: 600;
   color: var(--vscode-descriptionForeground);
 }
@@ -530,7 +530,7 @@ watch(
 
 .symbol-group-arrow {
   display: inline-block;
-  font-size: 8px;
+  font-size: var(--calcpad-font-size-xxs);
   transition: transform 0.2s ease;
 }
 
@@ -560,7 +560,7 @@ watch(
   border: 1px solid var(--vscode-widget-border);
   border-radius: 2px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--calcpad-font-size-lg);
   color: var(--vscode-editor-foreground);
   line-height: 1;
 }
@@ -582,7 +582,7 @@ watch(
   border: none;
   border-radius: 3px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   font-family: var(--vscode-font-family);
 }
 
@@ -620,18 +620,18 @@ watch(
 .item-display {
   font-weight: bold;
   color: var(--vscode-editor-foreground);
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   font-family: monospace;
 }
 
 .item-description {
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   color: var(--vscode-descriptionForeground);
   margin-top: 2px;
 }
 
 .item-category {
-  font-size: 10px;
+  font-size: var(--calcpad-font-size-xs);
   color: var(--vscode-descriptionForeground);
   margin-top: 2px;
   opacity: 0.7;
@@ -657,7 +657,7 @@ watch(
   padding: 4px 8px;
   border-radius: 3px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
 }
 
 .collapse-btn:hover {
@@ -700,7 +700,7 @@ watch(
   border: 1px solid var(--vscode-widget-border);
   border-radius: 3px;
   font-weight: bold;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   position: relative;
 }
 
@@ -735,7 +735,7 @@ watch(
   border: 1px solid var(--vscode-widget-border);
   border-radius: 2px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   color: var(--vscode-editor-foreground);
   text-align: left;
 }

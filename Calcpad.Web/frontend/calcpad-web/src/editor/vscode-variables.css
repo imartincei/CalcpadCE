@@ -43,7 +43,7 @@
     /* Input controls */
     --vscode-input-background: #3c3c3c;
     --vscode-input-foreground: #cccccc;
-    --vscode-input-border: #3c3c3c;
+    --vscode-input-border: #767676;
 
     /* Buttons */
     --vscode-button-background: #0e639c;
@@ -56,12 +56,12 @@
 
     /* Checkbox */
     --vscode-checkbox-background: #3c3c3c;
-    --vscode-checkbox-border: #3c3c3c;
+    --vscode-checkbox-border: #767676;
 
     /* Dropdown */
     --vscode-dropdown-background: #3c3c3c;
     --vscode-dropdown-foreground: #cccccc;
-    --vscode-dropdown-border: #3c3c3c;
+    --vscode-dropdown-border: #767676;
     --vscode-dropdown-listBackground: #252526;
 
     /* Lists */
@@ -134,6 +134,30 @@
 
     /* Symbol icons */
     --vscode-symbolIcon-variableForeground: #6B9FFF;
+
+    /* Scrollbars */
+    --vscode-scrollbarSlider-background: rgba(121, 121, 121, 0.4);
+    --vscode-scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
+    --vscode-scrollbarSlider-activeBackground: rgba(191, 191, 191, 0.4);
+
+    /* Links */
+    --vscode-textLink-foreground: #4FC1FF;
+    --vscode-textLink-activeForeground: #4FC1FF;
+
+    /* Context menus */
+    --vscode-menu-background: #252526;
+    --vscode-menu-foreground: #cccccc;
+    --vscode-menu-border: #454545;
+    --vscode-menu-selectionBackground: #094771;
+    --vscode-menu-selectionForeground: #ffffff;
+    --vscode-menu-separatorBackground: #454545;
+
+    --vscode-icon-foreground: #c5c5c5;
+    --vscode-sideBarSectionHeader-background: #252526;
+    --vscode-inputValidation-errorBorder: #be1100;
+    --vscode-editorError-foreground: #f48771;
+    --vscode-progressBar-background: #0e70c0;
+    --vscode-toolbar-activeBackground: rgba(255, 255, 255, 0.18);
 }
 
 /* VS Code Light+ palette. Selected via <html data-theme="light">. */
@@ -148,7 +172,7 @@
 
     --vscode-input-background: #ffffff;
     --vscode-input-foreground: #616161;
-    --vscode-input-border: #cecece;
+    --vscode-input-border: #8a8a8a;
 
     --vscode-button-background: #007acc;
     --vscode-button-foreground: #ffffff;
@@ -159,11 +183,11 @@
     --vscode-button-secondaryHoverBackground: #4c5561;
 
     --vscode-checkbox-background: #ffffff;
-    --vscode-checkbox-border: #cecece;
+    --vscode-checkbox-border: #8a8a8a;
 
     --vscode-dropdown-background: #ffffff;
     --vscode-dropdown-foreground: #616161;
-    --vscode-dropdown-border: #cecece;
+    --vscode-dropdown-border: #8a8a8a;
     --vscode-dropdown-listBackground: #ffffff;
 
     --vscode-list-hoverBackground: #e8e8e8;
@@ -178,7 +202,7 @@
     --vscode-tab-activeBorder: #005fb8;
     --vscode-tab-activeBorderTop: #005fb8;
     --vscode-tab-inactiveBackground: #ececec;
-    --vscode-tab-inactiveForeground: #808080;
+    --vscode-tab-inactiveForeground: #616161;
     --vscode-tab-hoverBackground: #ffffff;
     --vscode-tab-hoverForeground: #333333;
     --vscode-tab-border: #f3f3f3;
@@ -222,4 +246,25 @@
     --vscode-gitDecoration-modifiedResourceForeground: #895503;
 
     --vscode-symbolIcon-variableForeground: #007acc;
+
+    --vscode-scrollbarSlider-background: rgba(100, 100, 100, 0.4);
+    --vscode-scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
+    --vscode-scrollbarSlider-activeBackground: rgba(0, 0, 0, 0.6);
+
+    --vscode-textLink-foreground: #006AB1;
+    --vscode-textLink-activeForeground: #006AB1;
+
+    --vscode-menu-background: #ffffff;
+    --vscode-menu-foreground: #3b3b3b;
+    --vscode-menu-border: #c8c8c8;
+    --vscode-menu-selectionBackground: #0060c0;
+    --vscode-menu-selectionForeground: #ffffff;
+    --vscode-menu-separatorBackground: #d4d4d4;
+
+    --vscode-icon-foreground: #3b3b3b;
+    --vscode-sideBarSectionHeader-background: #f3f3f3;
+    --vscode-inputValidation-errorBorder: #be1100;
+    --vscode-editorError-foreground: #e51400;
+    --vscode-progressBar-background: #0e70c0;
+    --vscode-toolbar-activeBackground: rgba(166, 166, 166, 0.31);
 }
