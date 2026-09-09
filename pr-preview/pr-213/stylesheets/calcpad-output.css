@@ -1,4 +1,4 @@
-/* Styles for Calcpad rendered output embedded in the docs.
+﻿/* Styles for Calcpad rendered output embedded in the docs.
    This is copied from template.html.
    All rules are scoped to .calcpad-output via @scope to avoid
    clashing with MkDocs Material's own heading and table styles. */
@@ -15,43 +15,29 @@
     }
 
     @font-face {
-        font-family: 'Georgia Pro';
-        src: url('../media/GeorgiaPro-Regular.ttf') format('truetype');
+        font-family: 'DejaVu Serif Condensed';
+        src: url('../media/DejaVuSerifCondensed.ttf') format('truetype');
         font-weight: normal;
         font-style: normal;
     }
 
     @font-face {
-        font-family: 'Georgia Pro';
-        src: url('../media/GeorgiaPro-Italic.ttf') format('truetype');
+        font-family: 'DejaVu Serif Condensed';
+        src: url('../media/DejaVuSerifCondensed-Italic.ttf') format('truetype');
         font-weight: normal;
         font-style: italic;
     }
 
     @font-face {
-        font-family: 'Georgia Pro';
-        src: url('../media/GeorgiaPro-SemiBold.ttf') format('truetype');
-        font-weight: 600;
-        font-style: normal;
-    }
-
-    @font-face {
-        font-family: 'Georgia Pro';
-        src: url('../media/GeorgiaPro-SemiBoldItalic.ttf') format('truetype');
-        font-weight: 600;
-        font-style: italic;
-    }
-
-    @font-face {
-        font-family: 'Georgia Pro';
-        src: url('../media/GeorgiaPro-Bold.ttf') format('truetype');
+        font-family: 'DejaVu Serif Condensed';
+        src: url('../media/DejaVuSerifCondensed-Bold.ttf') format('truetype');
         font-weight: bold;
         font-style: normal;
     }
 
     @font-face {
-        font-family: 'Georgia Pro';
-        src: url('../media/GeorgiaPro-BoldItalic.ttf') format('truetype');
+        font-family: 'DejaVu Serif Condensed';
+        src: url('../media/DejaVuSerifCondensed-BoldItalic.ttf') format('truetype');
         font-weight: bold;
         font-style: italic;
     }
@@ -119,7 +105,8 @@
     .eq,
     input[type="text"],
     table.matrix {
-        font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+        font-family: 'DejaVu Serif Condensed', 'Century Schoolbook', 'Times New Roman', Times, serif;
+        font-variant-numeric: lining-nums tabular-nums;
     }
 
     .eq var {
@@ -168,12 +155,12 @@
     }
 
     .eq small var {
-        font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+        font-family: 'DejaVu Serif Condensed', 'Century Schoolbook', 'Times New Roman', Times, serif;
         font-size: 8.5pt;
     }
 
     .eq small i {
-        font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+        font-family: 'DejaVu Serif Condensed', 'Century Schoolbook', 'Times New Roman', Times, serif;
         font-size: 6pt;
     }
 
@@ -646,7 +633,7 @@
     .nary {
         color: #C080F0;
         font-size: 240%;
-        font-family: Georgia Pro Light, serif;
+        font-family: 'DejaVu Serif Condensed', serif;
         font-weight: 200;
         line-height: 70%;
         display: block;
