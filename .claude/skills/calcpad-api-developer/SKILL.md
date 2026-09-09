@@ -47,23 +47,28 @@ Calcpad.Cli (Command Line)
 
 ```
 Calcpad.Api/
-└── PyCalcpad/
-    ├── Calculator.cs      # Main calculation API
-    ├── Parser.cs          # Expression parsing interface
-    ├── Reader.cs          # File reading utilities
-    ├── Converter.cs       # Data type conversions
-    ├── Settings.cs        # Configuration object
-    ├── MathSettings.cs    # Math-specific settings
-    ├── PlotSettings.cs    # Plotting configuration
-    └── PyCalcpad.csproj
+├── PyCalcpad/
+│   ├── Calculator.cs      # Expression evaluation (wraps MathParser)
+│   ├── Parser.cs          # Document parsing + file conversion (wraps ExpressionParser)
+│   ├── Reader.cs          # internal — file reading, #include, highlighted-source fallback
+│   ├── Converter.cs       # internal — HtmlResult → html/docx/pdf output
+│   ├── Settings.cs        # Settings { Math, Plot, Units }
+│   ├── MathSettings.cs    # Math settings + TrigUnits enum
+│   ├── PlotSettings.cs    # Plot settings + ColorScales / LightDirections enums
+│   ├── Program.cs         # Console entry point; Program.AppPath anchors doc/ assets
+│   ├── zip.cs             # Archive helper
+│   ├── doc/, Fonts/       # HTML worksheet template and bundled fonts
+│   └── PyCalcpad.csproj
+└── PyCalcpad*.py          # Python-side samples (Convert, Eval, Parse, Run, Wrapper)
 ```
 
 ## Public API (summary)
 
-- **Calculator** — main entry point: `Eval`, `Run`, `SetVariable`, `GetVariable`, `Clear`
-- **Parser** — low-level: `Parse`, `IsValid`, `GetVariables`, `GetFunctions`
-- **Settings / MathSettings / PlotSettings** — configuration with sensible defaults
-- **Converter** — static data type conversions (`ToDouble`, `ToArray`, `ToMatrix`, `FromArray`)
+- **Calculator** — expression level: `Calculator(MathSettings)`, `Eval`, `Run`, `SetVariable`
+- **Parser** — document level: `Settings` field, `Parse` (→ HTML), `Convert` (file → html/docx/pdf)
+- **Settings / MathSettings / PlotSettings** — plain settings objects, converted to their `Calcpad.Core` counterparts at the boundary
+
+`Converter` and `Reader` are `internal` — they serve `Parser.Convert`, not consumers.
 
 Full signatures, usage examples, and Core integration are in `reference/api-surface.md`.
 
@@ -83,6 +88,9 @@ Full signatures, usage examples, and Core integration are in `reference/api-surf
 2. Create the wrapper method with XML documentation
 3. Add to the appropriate class
 
+### Adding a Setting
+A new setting must land in three places or it is silently ignored: the PyCalcpad settings class, the `Convert*Settings` mapper in `Calculator.cs` / `Parser.cs`, and the `Calcpad.Core` counterpart.
+
 ### Adding a New Settings Class
 Follow the pattern of `MathSettings` / `PlotSettings` with sensible defaults and XML docs.
 
@@ -93,5 +101,5 @@ Follow the pattern of `MathSettings` / `PlotSettings` with sensible defaults and
 3. **Load `reference/api-surface.md`** for existing patterns and Core integration
 4. **Create the wrapper** - Simple, documented, error-handled
 5. **Add settings if needed** - Configuration for advanced use
-6. **Write tests** - Verify behavior
+6. **Verify behavior** - There is no test project for PyCalcpad; exercise it through the Python samples (`PyCalcpadEval.py`, `PyCalcpadConvert.py`, ...) or a scratch console call
 7. **Document** - XML comments and examples

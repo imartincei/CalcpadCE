@@ -5,13 +5,18 @@
 ```
 Calcpad.Highlighter/
 ├── ContentResolution/
-│   ├── ContentResolver.cs          - 3-stage content processing
-│   └── ContentResolverResult.cs    - Result structures
+│   ├── ContentResolver.cs          - 3-stage content processing (partial class)
+│   ├── ContentResolver.Stage1.cs   - Includes
+│   ├── ContentResolver.Stage2.cs   - Macros
+│   ├── ContentResolver.Stage3.cs   - Definitions + type tracking
+│   ├── ContentResolverResult.cs    - Result structures
+│   └── SymbolResolver.cs           - Cursor position → symbol + every occurrence
 ├── Tokenizer/
-│   ├── CalcpadTokenizer.cs         - Tokenization engine
+│   ├── CalcpadTokenizer.cs         - Tokenization engine (partial: .Comments, .Definitions,
+│   │                                 .Helpers, .MacroCollection, .Macros, .Parsing, .TypeResolution)
 │   └── Models/
 │       ├── Token.cs                - Token structure
-│       ├── TokenType.cs            - 15 token types
+│       ├── TokenType.cs            - 29 token types (0 None … 28 SettingsJson)
 │       └── TokenizerResult.cs
 ├── Linter/
 │   ├── CalcpadLinter.cs            - Main orchestrator
@@ -21,18 +26,21 @@ Calcpad.Highlighter/
 │   │   ├── ErrorCodes.cs           - CPD-xxxx error codes
 │   │   └── FunctionSignatures.cs   - Function registry with types
 │   ├── Models/
-│   │   ├── CalcpadType.cs          - Type enum (Value, Vector, Matrix, etc.)
+│   │   ├── CalcpadType.cs          - Type enum (Value, Vector, Matrix, CustomUnit, ...)
 │   │   ├── FunctionSignature.cs    - Function metadata
 │   │   ├── VariableInfo.cs         - Variable/function metadata
-│   │   ├── Stage1Context.cs        - Stage 1 linter context
-│   │   ├── Stage2Context.cs        - Stage 2 linter context
-│   │   └── Stage3Context.cs        - Stage 3 linter context
+│   │   ├── DefinitionMetadata.cs   - Descriptions/types from metadata comments
+│   │   ├── LinterDiagnostic.cs / LinterResult.cs / LinterSeverity.cs
+│   │   ├── LintIgnoreRegion.cs     - Suppression regions
+│   │   └── Stage1Context.cs / Stage2Context.cs / Stage3Context.cs / StageContext.cs
 │   ├── Helpers/
 │   │   ├── TypeTracker.cs          - Type inference engine
 │   │   ├── TokenizedLineProvider.cs - Token caching
 │   │   ├── LineParser.cs           - Line parsing utilities
+│   │   ├── ParameterParser.cs      - Parameter list parsing
 │   │   ├── SourceMapper.cs         - Maps lines across stages
-│   │   └── ControlBlockHelper.cs   - Control flow validation
+│   │   ├── DirectiveState.cs / DirectiveJsonReporter.cs - Metadata directive plumbing
+│   │   └── CalcpadCharacterHelpers.cs / ParsingHelpers.cs / DiagnosticExtensions.cs
 │   └── Validators/
 │       ├── Stage1/IncludeValidator.cs
 │       ├── Stage2/MacroValidator.cs
@@ -41,11 +49,28 @@ Calcpad.Highlighter/
 │           ├── NamingValidator.cs       - Variable names
 │           ├── UsageValidator.cs        - Undefined checks
 │           ├── SemanticValidator.cs     - Operators/commands
-│           └── FunctionTypeValidator.cs - Parameter types
-└── Tests/
-    ├── LinterTestRunner.cs         - Test harness
-    └── Samples/                    - Test .cpd files
+│           ├── FunctionTypeValidator.cs - Parameter types
+│           ├── CommandBlockValidator.cs - $Inline/$Block/$While contents
+│           ├── FormatValidator.cs       - Format specifiers
+│           ├── HtmlCommentValidator.cs  - Metadata comment directives
+│           ├── SettingsValidator.cs     - #Settings / settings directives
+│           └── UiValidator.cs           - #UI control directives
+├── HtmlComment/
+│   ├── HtmlCommentParser.cs        - Metadata comment parsing
+│   └── PdfSettingsDto.cs           - Shared with the backend's PDF request
+├── Prettifier/
+│   ├── CalcpadPrettifier.cs        - Control-block-aware re-indent
+│   └── PrettifierOptions.cs
+├── Parsing/                        - Allocation-light text primitives
+│   ├── CharClassifier.cs / LineEnumerator.cs / SplitEnumerator.cs / TextSpan.cs
+└── Snippets/
+    ├── SnippetRegistry.cs          - Autocomplete catalog
+    ├── Data/                       - Snippet definitions by category
+    └── Models/
 ```
+
+Tests live in `Calcpad.Tests/Highlighter/` (xUnit), not under this project — see `testing.md`.
+
 
 ## Type System
 

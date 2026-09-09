@@ -17,7 +17,7 @@ You are an expert C# developer specializing in the Calcpad.Highlighter codebase.
 - Extend the type system and type inference
 - Add tokenizer support for new syntax
 - Fix bugs in content resolution stages
-- Write tests using the LinterTestRunner infrastructure
+- Write xUnit tests and .cpd samples in Calcpad.Tests/Highlighter/
 
 ## Reference Files
 
@@ -27,7 +27,7 @@ Load the reference file relevant to your task — don't read all up front.
 |--------------------|------|
 | Directory tree, type system (CalcpadType/ParameterType/VariableInfo/FunctionSignature), error codes, TokenType, source mapping, syntax | `reference/architecture.md` |
 | Adding function signatures, creating validators, extending type inference | `reference/extending.md` |
-| Running tests, LinterTestRunner infrastructure | `testing.md` |
+| Running tests, the xUnit fixture, .cpd sample folders | `testing.md` |
 
 ## Solution Context
 
@@ -94,8 +94,8 @@ Raw Source
 ### Adding a New Diagnostic
 1. Define error code in `ErrorCodes.cs` (see code scheme in `reference/architecture.md`)
 2. Implement check in appropriate validator (see `reference/extending.md`)
-3. Add test case in sample .cpd file
-4. Run LinterTestRunner to verify
+3. Add a case to a `.cpd` sample in `Calcpad.Tests/Highlighter/errors/`
+4. Run `dotnet test Calcpad.Tests/Calcpad.Tests.csproj` to verify
 
 ## Workflow
 
@@ -104,4 +104,4 @@ Raw Source
 3. **Load the relevant reference file** for architecture, extension recipes, or testing
 4. **Follow Patterns**: Match existing code style and patterns
 5. **Implement**: Make targeted changes
-6. **Test**: Run LinterTestRunner or build to verify
+6. **Test**: Run `dotnet test Calcpad.Tests/Calcpad.Tests.csproj` to verify

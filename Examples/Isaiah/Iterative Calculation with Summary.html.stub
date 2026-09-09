@@ -22,33 +22,7 @@
    <b class="b0">]</b>
   </span>
  </p>
- <div style="display:none">
-  <p>Result Vector</p>
-  <p>
-   <span class="eq">
-    <var>
-     <span class="vec">⃗</span>
-     v2
-    </var>
-    =
-    <b>vector</b>
-    (
-    <b>len</b>
-    (
-    <var>
-     <span class="vec">⃗</span>
-     v1
-    </var>
-    )  )  =
-    <b class="b0">[</b>
-    0 0 0
-    <b class="b0">]</b>
-   </span>
-  </p>
- </div>
- <div style="display:none">
- </div>
- <p>Calculations showing first iteration</p>
+ Calculations showing iteration 1
  <p>
   <span class="eq">
    <var>
@@ -65,54 +39,23 @@
    · 2 = 1 · 2 = 2
   </span>
  </p>
- <div style="display:none">
-  <p>
-   <span class="eq">
-    <var>hideOutput</var>
-    = 1
-   </span>
-  </p>
- </div>
- <div style="display:none">
-  <p>Calculations showing first iteration</p>
-  <p>
-   <span class="eq">
-    <var>
-     <span class="vec">⃗</span>
-     v2
-    </var>
-    <sub>2</sub>
-    =
-    <var>
-     <span class="vec">⃗</span>
-     v1
-    </var>
-    <sub>2</sub>
-    · 2 = 2 · 2 = 4
-   </span>
-  </p>
- </div>
- <div style="display:none">
- </div>
- <div style="display:none">
-  <p>Calculations showing first iteration</p>
-  <p>
-   <span class="eq">
-    <var>
-     <span class="vec">⃗</span>
-     v2
-    </var>
-    <sub>3</sub>
-    =
-    <var>
-     <span class="vec">⃗</span>
-     v1
-    </var>
-    <sub>3</sub>
-    · 2 = 3 · 2 = 6
-   </span>
-  </p>
- </div>
+ Calculations showing iteration 2
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v2
+   </var>
+   <sub>2</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    v1
+   </var>
+   <sub>2</sub>
+   · 2 = 2 · 2 = 4
+  </span>
+ </p>
  <p>Final results for each iteration</p>
  <p>
   <span class="eq">
