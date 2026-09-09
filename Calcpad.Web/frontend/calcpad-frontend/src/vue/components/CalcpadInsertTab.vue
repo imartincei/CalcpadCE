@@ -217,7 +217,7 @@ const buildTreeFromItems = (items: InsertItem[]): TreeNode => {
 // Markup snippets insert long, multi-line code. Their buttons show the friendly
 // name and the tooltip carries the code — the reverse of every other category,
 // where the tag itself is short enough to be the button text.
-const MARKUP_CATEGORIES = new Set(['HTML', 'Metadata Properties', 'SVG', 'Markdown'])
+const MARKUP_CATEGORIES = new Set(['HTML', 'Metadata Properties', 'SVG', 'Markdown', 'CSS'])
 
 const isMarkupItem = (item: InsertItem): boolean =>
   MARKUP_CATEGORIES.has((item.categoryPath ?? '').split(' > ')[0])

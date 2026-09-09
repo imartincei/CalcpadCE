@@ -1,0 +1,2497 @@
+<div class="calcpad-output">
+ <!-- Exercises every text-bearing CSS class in template.html, for comparing candidate main serif fonts. -->
+ <h1>Font Rendering Tests</h1>
+ <p>
+  Every construct below maps to a CSS class the template styles. Sections marked
+  <b>serif</b>
+  use the main math font; the rest are here as contrast.
+ </p>
+ <p>
+  Symbol inventory, in the main font:
+  <span class="eq">· ∕ × ÷ ∈ ∞ √ ∑ ∏ ∫ ⋮ ⋯ ⋱ ° ‰ ± ≤ ≥ ≠ ≈ → ⃗</span>
+ </p>
+ <p>
+ </p>
+ <h2>1. Symbol palette</h2>
+ <p>
+  Every character the editor palette can insert
+  <p>
+   (
+   <code>Calcpad.Highlighter/Snippets/Data/SymbolSnippets.cs</code>
+   ), first in the body
+  </p>
+  <p>font, then in the equation font.</p>
+ </p>
+ <p>Greek lower case: α β γ δ ε ζ η θ ϑ ι κ λ μ ν ξ ο π ρ ς σ τ υ φ χ ψ ω</p>
+ <p>
+  <span class="eq">α β γ δ ε ζ η θ ϑ ι κ λ μ ν ξ ο π ρ ς σ τ υ φ χ ψ ω</span>
+ </p>
+ <p>Greek upper case: Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω</p>
+ <p>
+  <span class="eq">Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω</span>
+ </p>
+ <p>Special: ° ′ ″ ‴ ⁗ ø Ø ϕ ‰ ‱ ∡ ℓ</p>
+ <p>
+  <span class="eq">° ′ ″ ‴ ⁗ ø Ø ϕ ‰ ‱ ∡ ℓ</span>
+ </p>
+ <p>
+ </p>
+ <h3>Palette characters as variables, with subscripts and units</h3>
+ <p>
+  <span class="eq">
+   <var>α</var>
+   <sub>t</sub>
+   = 12 · 10
+   <sup>-6</sup>
+   = 1.2×10
+   <sup>-5</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>β</var>
+   <sub>1</sub>
+   = 0.85
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>γ</var>
+   <sub>c</sub>
+   = 25
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+    <sup class="unit">3</sup>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>δ</var>
+   <sub>max</sub>
+   = 12.5
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>ε</var>
+   <sub>cu</sub>
+   = 0.0035
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>θ</var>
+   <sub>p</sub>
+   = 30°
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>λ</var>
+   <sub>rel</sub>
+   = 0.85
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>μ</var>
+   <sub>s</sub>
+   = 0.3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>ν</var>
+   = 0.2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>ρ</var>
+   <sub>s</sub>
+   = 7850
+   <span class="dvc">
+    <i>kg</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+    <sup class="unit">3</sup>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>σ</var>
+   <sub>Ed</sub>
+   = 235
+   <i>MPa</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>τ</var>
+   <sub>Rd</sub>
+   = 1.35
+   <i>MPa</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>φ</var>
+   <sub>ø</sub>
+   = 16
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>ψ</var>
+   <sub>0</sub>
+   = 0.7
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>ω</var>
+   <sub>n</sub>
+   = 377
+   <span class="dvc">
+    <i>rad</i>
+    <span class="dvl">
+    </span>
+    <i>s</i>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>Δ</var>
+   <sub>L</sub>
+   = 3.2
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>Γ</var>
+   <sub>0</sub>
+   = 1.15
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>Σ</var>
+   <sub>A</sub>
+   = 4520
+   <i>mm</i>
+   <sup class="unit">2</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>Φ</var>
+   <sub>k</sub>
+   = 0.9
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>Ω</var>
+   <sub>r</sub>
+   = 2.5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>ϕ</var>
+   <sub>n</sub>
+   = 0.75
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>ℓ</var>
+   <sub>eff</sub>
+   = 5.8
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>2. Variables, units and functions</h2>
+ <p>
+  <span class="eq">
+   <var>L</var>
+   = 6.4
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 300
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   = 550
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>E</var>
+   = 200
+   <i>GPa</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>q</var>
+   = 18.5
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>c</sub>
+   =
+   <var>b</var>
+   ·
+   <var>h</var>
+   = 300
+   <i>mm</i>
+   · 550
+   <i>mm</i>
+   = 165000
+   <i>mm</i>
+   <sup class="unit">2</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>y</sub>
+   =
+   <span class="dvc">
+    <var>b</var>
+    ·
+    <var>h</var>
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   =
+   <span class="dvc">
+    300
+    <i>mm</i>
+    ·  ( 550
+    <i>mm</i>
+    )
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   = 4159375000
+   <i>mm</i>
+   <sup class="unit">4</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>W</var>
+   <sub>el</sub>
+   =
+   <span class="dvc down">
+    <var>I</var>
+    <sub>y</sub>
+    <span class="dvl">
+    </span>
+    <span class="dvc">
+     <var>h</var>
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </span>
+   =
+   <span class="dvc down">
+    4159375000
+    <i>mm</i>
+    <sup class="unit">4</sup>
+    <span class="dvl">
+    </span>
+    <span class="dvc">
+     550
+     <i>mm</i>
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </span>
+   = 15125000
+   <i>mm</i>
+   <sup class="unit">3</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>M</var>
+   <sub>Ed</sub>
+   =
+   <span class="dvc">
+    <var>q</var>
+    ·
+    <var>L</var>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    8
+   </span>
+   =
+   <span class="dvc">
+    18.5
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    ·  ( 6.4
+    <i>m</i>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    8
+   </span>
+   = 94.72
+   <i>kNm</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>σ</var>
+   <sub>max</sub>
+   =
+   <span class="dvc">
+    <var>M</var>
+    <sub>Ed</sub>
+    <span class="dvl">
+    </span>
+    <var>W</var>
+    <sub>el</sub>
+   </span>
+   =
+   <span class="dvc">
+    94.72
+    <i>kNm</i>
+    <span class="dvl">
+    </span>
+    15125000
+    <i>mm</i>
+    <sup class="unit">3</sup>
+   </span>
+   = 6262.48
+   <i>kPa</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   )  =
+   <b>sin</b>
+   (
+   <var>x</var>
+   )
+   <sup>2</sup>
+   +
+   <b>cos</b>
+   (
+   <var>x</var>
+   )
+   <sup>2</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>g</var>
+   <sub>1</sub>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )  =
+   <b>atan2</b>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   <span class="b1">)</span>
+   =
+   <var>f</var>
+   <span class="b1">(</span>
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   <span class="b1">)</span>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>g</var>
+   <sub>1</sub>
+   ( 3; 4 )  = 53.13
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>3. Numerals — lining and tabular figures</h2>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>1</sub>
+   = 1234567890
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>2</sub>
+   = 0.000123
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>3</sub>
+   = 1 · 10
+   <sup>-6</sup>
+   = 10
+   <sup>-6</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>4</sub>
+   = 6.02 · 10
+   <sup>23</sup>
+   = 6.02×10
+   <sup>23</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>5</sub>
+   = -98765.4
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>6</sub>
+   = 1010101010
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>T</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   1111.11; 2222.22; 3333.33
+   <span class="b0">|</span>
+   4444.44; 5555.55; 6666.66
+   <span class="b0">|</span>
+   7777.77; 8888.88; 9999.99
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1111.11</span>
+     <span class="td">2222.22</span>
+     <span class="td">3333.33</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4444.44</span>
+     <span class="td">5555.55</span>
+     <span class="td">6666.66</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7777.77</span>
+     <span class="td">8888.88</span>
+     <span class="td">9999.99</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>4. Fractions</h2>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   <sub>1</sub>
+   = 3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   <sub>1</sub>
+   = 5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   <sub>1</sub>
+   = 7
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>d</var>
+   <sub>1</sub>
+   = 11
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>1</sub>
+   =
+   <span class="dvc">
+    <var>a</var>
+    <sub>1</sub>
+    +
+    <var>b</var>
+    <sub>1</sub>
+    <span class="dvl">
+    </span>
+    <var>c</var>
+    <sub>1</sub>
+    +
+    <var>d</var>
+    <sub>1</sub>
+   </span>
+   =
+   <span class="dvc">
+    3 + 5
+    <span class="dvl">
+    </span>
+    7 + 11
+   </span>
+   = 0.444
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>2</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       2
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   ÷
+   <span class="b2">(</span>
+   <span class="dvc up">
+    1 −
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 −
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </span>
+   <span class="b2">)</span>
+   = -3.2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>3</sub>
+   =
+   <span class="dvc">
+    <span class="dvc">
+     <var>q</var>
+     ·
+     <var>L</var>
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     8 ·
+     <var>E</var>
+     ·
+     <var>I</var>
+     <sub>y</sub>
+    </span>
+    ·
+    <span class="b1">(</span>
+    1 +
+    <span class="dvc">
+     <var>b</var>
+     <span class="dvl">
+     </span>
+     <var>h</var>
+    </span>
+    <span class="b1">)</span>
+    <span class="dvl">
+    </span>
+    1 −
+    <span class="dvc">
+     <var>b</var>
+     <span class="dvl">
+     </span>
+     2 ·
+     <var>h</var>
+    </span>
+   </span>
+   =
+   <span class="dvc">
+    <span class="dvc">
+     18.5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     ·  ( 6.4
+     <i>m</i>
+     )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     8 · 200
+     <i>GPa</i>
+     · 4159375000
+     <i>mm</i>
+     <sup class="unit">4</sup>
+    </span>
+    ·
+    <span class="b1">(</span>
+    1 +
+    <span class="dvc">
+     300
+     <i>mm</i>
+     <span class="dvl">
+     </span>
+     550
+     <i>mm</i>
+    </span>
+    <span class="b1">)</span>
+    <span class="dvl">
+    </span>
+    1 −
+    <span class="dvc">
+     300
+     <i>mm</i>
+     <span class="dvl">
+     </span>
+     2 · 550
+     <i>mm</i>
+    </span>
+   </span>
+   = 0.000242
+   <i>m</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>5. Roots</h2>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   <sub>1</sub>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    2
+   </span>
+   = 1.41
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   <sub>2</sub>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>b</var>
+    <sup>2</sup>
+    +
+    <var>h</var>
+    <sup>2</sup>
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    ( 300
+    <i>mm</i>
+    )
+    <sup>2</sup>
+    +  ( 550
+    <i>mm</i>
+    )
+    <sup>2</sup>
+   </span>
+   = 626.5
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   <sub>3</sub>
+   =
+   <small class="nth">3</small>
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+     <sub>c</sub>
+    </span>
+   </span>
+   =
+   <small class="nth">3</small>
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     4159375000
+     <i>mm</i>
+     <sup class="unit">4</sup>
+     <span class="dvl">
+     </span>
+     165000
+     <i>mm</i>
+     <sup class="unit">2</sup>
+    </span>
+   </span>
+   = 29.32
+   <i>mm</i>
+   <sup class="unit">0.667</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   <sub>4</sub>
+   =
+   <small class="nth">4</small>
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>σ</var>
+     <sub>max</sub>
+     <span class="dvl">
+     </span>
+     <var>E</var>
+    </span>
+   </span>
+   =
+   <small class="nth">4</small>
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     6262.48
+     <i>kPa</i>
+     <span class="dvl">
+     </span>
+     200
+     <i>GPa</i>
+    </span>
+   </span>
+   = 0.0748
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   <sub>5</sub>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    1 +
+    <span class="o0">
+     <span class="r">√</span>
+     1 +
+     <span class="o0">
+      <span class="r">√</span>
+      1 +
+      <span class="o0">
+       <span class="r">√</span>
+       2
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.61
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   <sub>6</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>a</var>
+     <sub>1</sub>
+     +
+     <var>b</var>
+     <sub>1</sub>
+     <span class="dvl">
+     </span>
+     <var>c</var>
+     <sub>1</sub>
+     +
+     <var>d</var>
+     <sub>1</sub>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     3 + 5
+     <span class="dvl">
+     </span>
+     7 + 11
+    </span>
+   </span>
+   = 0.667
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   <sub>7</sub>
+   =
+   <small class="nth">5</small>
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     <span class="b2">(</span>
+     <span class="dvc up">
+      1 +
+      <span class="dvc down">
+       1
+       <span class="dvl">
+       </span>
+       1 +
+       <span class="dvc">
+        1
+        <span class="dvl">
+        </span>
+        2
+       </span>
+      </span>
+     </span>
+     <span class="b2">)</span>
+     ÷
+     <span class="b1">(</span>
+     1 −
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+     <span class="b1">)</span>
+    </span>
+   </span>
+   = 1.2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   <sub>8</sub>
+   =
+   <span class="o3">
+    <span class="r3">
+    </span>
+    <span class="dvc up">
+     <span class="b3">(</span>
+     <span class="dvc up">
+      1 +
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       1 +
+       <span class="dvc">
+        1
+        <span class="dvl">
+        </span>
+        1 +
+        <span class="dvc">
+         1
+         <span class="dvl">
+         </span>
+         2
+        </span>
+       </span>
+      </span>
+     </span>
+     <span class="b3">)</span>
+     ÷
+     <span class="b3">(</span>
+     <span class="dvc up">
+      1 +
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       1 +
+       <span class="dvc">
+        1
+        <span class="dvl">
+        </span>
+        1 +
+        <span class="dvc">
+         1
+         <span class="dvl">
+         </span>
+         3
+        </span>
+       </span>
+      </span>
+     </span>
+     <span class="b3">)</span>
+    </span>
+   </span>
+   = 1.01
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>6. Powers and superscripts</h2>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>1</sub>
+   = 2
+   <sup>10</sup>
+   = 1024
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>2</sub>
+   =
+   <span class="dvc">
+    <var>E</var>
+    ·
+    <var>A</var>
+    <sub>c</sub>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <var>L</var>
+    <sup>3</sup>
+   </span>
+   =
+   <span class="dvc">
+    200
+    <i>GPa</i>
+    ·  ( 165000
+    <i>mm</i>
+    <sup class="unit">2</sup>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    ( 6.4
+    <i>m</i>
+    )
+    <sup>3</sup>
+   </span>
+   = 20771
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>3</sub>
+   = 10
+   <sup>-6</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>4</sub>
+   =  ( 1 +
+   <var>β</var>
+   <sub>1</sub>
+   )
+   <sup>
+    <var>a</var>
+    <sub>1</sub>
+    +
+    <var>b</var>
+    <sub>1</sub>
+   </sup>
+   =  ( 1 + 0.85 )
+   <sup>3 + 5</sup>
+   = 137.21
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>5</sub>
+   =
+   <span class="dvc">
+    <var>A</var>
+    <sub>c</sub>
+    <sup>2</sup>
+    ·
+    <var>I</var>
+    <sub>y</sub>
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    <var>W</var>
+    <sub>el</sub>
+    <sup>4</sup>
+   </span>
+   =
+   <span class="dvc">
+    ( 165000
+    <i>mm</i>
+    <sup class="unit">2</sup>
+    )
+    <sup>2</sup>
+    ·  ( 4159375000
+    <i>mm</i>
+    <sup class="unit">4</sup>
+    )
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    ( 15125000
+    <i>mm</i>
+    <sup class="unit">3</sup>
+    )
+    <sup>4</sup>
+   </span>
+   = 37434375000
+   <i>mm</i>
+   <sup class="unit">4</sup>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>7. Brackets, absolute value and vertical growth</h2>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>1</sub>
+   =
+   <b class="b0">|</b>
+   -
+   <var>σ</var>
+   <sub>max</sub>
+   <b class="b0">|</b>
+   =
+   <b class="b0">|</b>
+   -6262.48
+   <i>kPa</i>
+   <b class="b0">|</b>
+   = 6262.48
+   <i>kPa</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>2</sub>
+   =
+   <span class="b1">|</span>
+   <span class="dvc">
+    <var>a</var>
+    <sub>1</sub>
+    +
+    <var>b</var>
+    <sub>1</sub>
+    <span class="dvl">
+    </span>
+    <var>c</var>
+    <sub>1</sub>
+    −
+    <var>d</var>
+    <sub>1</sub>
+   </span>
+   <span class="b1">|</span>
+   =
+   <span class="b1">|</span>
+   <span class="dvc">
+    3 + 5
+    <span class="dvl">
+    </span>
+    7 − 11
+   </span>
+   <span class="b1">|</span>
+   = 2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>3</sub>
+   =
+   <span class="b1">(</span>
+   1 +
+   <span class="dvc">
+    <var>a</var>
+    <sub>1</sub>
+    +
+    <var>b</var>
+    <sub>1</sub>
+    <span class="dvl">
+    </span>
+    <var>c</var>
+    <sub>1</sub>
+    +
+    <var>d</var>
+    <sub>1</sub>
+   </span>
+   <span class="b1">)</span>
+   ·
+   <span class="b1">(</span>
+   1 −
+   <span class="dvc">
+    <var>b</var>
+    <sub>1</sub>
+    +
+    <var>c</var>
+    <sub>1</sub>
+    <span class="dvl">
+    </span>
+    <var>d</var>
+    <sub>1</sub>
+    +
+    <var>a</var>
+    <sub>1</sub>
+   </span>
+   <span class="b1">)</span>
+   =
+   <span class="b1">(</span>
+   1 +
+   <span class="dvc">
+    3 + 5
+    <span class="dvl">
+    </span>
+    7 + 11
+   </span>
+   <span class="b1">)</span>
+   ·
+   <span class="b1">(</span>
+   1 −
+   <span class="dvc">
+    5 + 7
+    <span class="dvl">
+    </span>
+    11 + 3
+   </span>
+   <span class="b1">)</span>
+   = 0.206
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>4</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    <span class="b3">(</span>
+    <span class="dvc up">
+     1 + 1 ÷
+     <span class="b3">(</span>
+     <span class="dvc up">
+      1 +
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       1 +
+       <span class="dvc">
+        1
+        <span class="dvl">
+        </span>
+        1 +
+        <span class="dvc">
+         1
+         <span class="dvl">
+         </span>
+         2
+        </span>
+       </span>
+      </span>
+     </span>
+     <span class="b3">)</span>
+    </span>
+    <span class="b3">)</span>
+    ÷
+    <span class="b3">(</span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       1 +
+       <span class="dvc">
+        1
+        <span class="dvl">
+        </span>
+        3
+       </span>
+      </span>
+     </span>
+    </span>
+    <span class="b3">)</span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">2</sup>
+   = 1.07
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>8. N-ary operators — ∑ ∏ ∫</h2>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   <sub>1</sub>
+   =
+   <span class="dvr">
+    <small>100</small>
+    <span class="nary">∑</span>
+    <small>
+     <var>i</var>
+     = 1
+    </small>
+   </span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>i</var>
+    <sup>2</sup>
+   </span>
+   = 1.63
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>7</sub>
+   = 10
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   <sub>2</sub>
+   =
+   <span class="dvr">
+    <small>10</small>
+    <span class="nary">∑</span>
+    <small>
+     <var>i</var>
+     = 1
+    </small>
+   </span>
+   <span class="dvc">
+    <var>i</var>
+    ·
+    <var>L</var>
+    <span class="dvl">
+    </span>
+    <var>n</var>
+    <sub>7</sub>
+   </span>
+   = 35.2
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   <sub>1</sub>
+   =
+   <span class="dvr">
+    <small>8</small>
+    <span class="nary">∏</span>
+    <small>
+     <var>i</var>
+     = 1
+    </small>
+   </span>
+   <span class="b1">(</span>
+   1 +
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>i</var>
+   </span>
+   <span class="b1">)</span>
+   = 9
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   <sub>2</sub>
+   =
+   <span class="dvr">
+    <small>12</small>
+    <span class="nary">∏</span>
+    <small>
+     <var>i</var>
+     = 2
+    </small>
+   </span>
+   <span class="dvc">
+    <var>i</var>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <var>i</var>
+    <sup>2</sup>
+    − 1
+   </span>
+   = 1.85
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>J</var>
+   <sub>1</sub>
+   =
+   <span class="dvr">
+    <small>
+     <var>π</var>
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>0</small>
+   </span>
+   <b>sin</b>
+   (
+   <var>x</var>
+   )
+   <sup>2</sup>
+   d
+   <var>x</var>
+   = 0.00315
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>J</var>
+   <sub>2</sub>
+   =
+   <span class="dvr">
+    <small>3</small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>-3</small>
+   </span>
+   <span class="dvc">
+    <b>exp</b>
+    ( - (
+    <var>x</var>
+    <sup>2</sup>
+    )  )
+    <span class="dvl">
+    </span>
+    <span class="o0">
+     <span class="r">√</span>
+     <var>π</var>
+    </span>
+   </span>
+   d
+   <var>x</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>J</var>
+   <sub>3</sub>
+   =
+   <span class="dvr">
+    <small>6.4</small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>0</small>
+   </span>
+   <span class="dvc">
+    18.5 ·
+    <var>x</var>
+    ·  ( 6.4 −
+    <var>x</var>
+    )
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   d
+   <var>x</var>
+   = 404.14
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>9. Vectors and matrices</h2>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   =
+   <span class="b0">[</span>
+   1; 2; 3; 4; 5
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 3 4 5
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    w
+   </var>
+   =
+   <span class="b0">[</span>
+   1.5; -2.5; 3.5; -4.5; 5.5
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1.5 -2.5 3.5 -4.5 5.5
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   <small class="nth">⊙</small>
+   <var>
+    <span class="vec">⃗</span>
+    w
+   </var>
+   =
+   <b class="b0">[</b>
+   1.5 -5 10.5 -18 27.5
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">|</span>
+   4; 5; 6
+   <span class="b0">|</span>
+   7; 8; 9
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   2; 0; 0
+   <span class="b0">|</span>
+   0; 2; 0
+   <span class="b0">|</span>
+   0; 0; 2
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">2</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   ·
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">4</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">10</span>
+     <span class="td">12</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">14</span>
+     <span class="td">16</span>
+     <span class="td">18</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <b>identity</b>
+   ( 5 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    D
+   </var>
+   =
+   <b>range</b>
+   ( 1; 24; 1 )  =
+   <b class="b0">[</b>
+   1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+   <span title="3 elements skipped.">...</span>
+   24
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    u
+   </var>
+   =
+   <span class="b0">[</span>
+   12.5; -7.25; 0.5; 108; -0.0625
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   12.5 -7.25 0.5 108 -0.0625
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>norm</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    u
+   </var>
+   )  = 108.96
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>10. Conditions, loops and blocks</h2>
+ <p>
+  <span class="eq">
+   <var>η</var>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>t</var>
+   <sub>i</sub>
+   =
+   <span class="dvc">
+    <var>i</var>
+    ·
+    <var>L</var>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   =
+   <span class="dvc">
+    1 · 6.4
+    <i>m</i>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   = 2.13
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>t</var>
+   <sub>i</sub>
+   =
+   <span class="dvc">
+    <var>i</var>
+    ·
+    <var>L</var>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   =
+   <span class="dvc">
+    2 · 6.4
+    <i>m</i>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   = 4.27
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>t</var>
+   <sub>i</sub>
+   =
+   <span class="dvc">
+    <var>i</var>
+    ·
+    <var>L</var>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   =
+   <span class="dvc">
+    3 · 6.4
+    <i>m</i>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   = 6.4
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>m</var>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>m</var>
+   =
+   <var>m</var>
+   + 1 = 0 + 1 = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>m</var>
+   =
+   <var>m</var>
+   + 1 = 1 + 1 = 2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>m</var>
+   =
+   <var>m</var>
+   + 1 = 2 + 1 = 3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   <sub>1</sub>
+   =
+   <span class="cond">$Root</span>
+   {
+   <var>x</var>
+   <sup>2</sup>
+   − 2 = 0;
+   <var>x</var>
+   ∈ [0; 2]} = 1.41
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   <sub>2</sub>
+   =
+   <span class="cond">$Find</span>
+   {
+   <b>sin</b>
+   (
+   <var>x</var>
+   )  − 0.5;
+   <var>x</var>
+   ∈ [0;
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ]} = 1.57
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   <sub>3</sub>
+   =
+   <span class="b1">
+   </span>
+   <span class="dvc">
+    <em>d</em>
+    <span class="dvl">
+    </span>
+    <em>d</em>
+    <var>x</var>
+   </span>
+   <var>x</var>
+   <sup>3</sup>
+   − 2 ·
+   <var>x</var>
+   <span class="b1">|</span>
+   <span class="low">
+    <em>x</em>
+    = 1.5
+   </span>
+   = 4.75
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   <sub>4</sub>
+   =
+   <span class="cond">$Repeat</span>
+   {
+   <var>y</var>
+   =
+   <var>y</var>
+   +
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>i</var>
+    <sup>2</sup>
+   </span>
+   <span class="cond">for</span>
+   <var>i</var>
+   = 1...6} = 1.49
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>11. Solver blocks</h2>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>1</sub>
+   =
+   <small class="arr">🞀</small>
+   <span class="block">
+    <var>u</var>
+    = 3
+    <br/>
+    <var>w</var>
+    <sub>2</sub>
+    = 4
+    <br/>
+    <span class="o0">
+     <span class="r">√</span>
+     <var>u</var>
+     <sup>2</sup>
+     +
+     <var>w</var>
+     <sub>2</sub>
+     <sup>2</sup>
+    </span>
+   </span>
+   = 5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>2</sub>
+   =
+   <small class="arr">🞀</small>
+   <span class="block">
+    <var>u</var>
+    = 5;
+    <var>u</var>
+    <sup>2</sup>
+   </span>
+   = 25
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>12. Inline conditionals — brace ladder</h2>
+ <p>
+  Brace height (
+  <code>.c1</code>
+  …
+  <code>.c8</code>
+  ) grows with the branch count.
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   <sub>a</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvcs">
+    <span class="c1">{</span>
+    <span class="dvs">
+     if
+     <var>x</var>
+     &gt; 0:
+     <span class="o0">
+      <span class="r">√</span>
+      <var>x</var>
+     </span>
+     <br/>
+     else: 0
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   <sub>b</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvcs">
+    <span class="c2">{</span>
+    <span class="dvs">
+     if
+     <var>x</var>
+     &lt; 1: 1
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 2: 2
+     <br/>
+     else: 0
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   <sub>c</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvcs">
+    <span class="c3">{</span>
+    <span class="dvs">
+     if
+     <var>x</var>
+     &gt; 0:
+     <span class="b2">(</span>
+     <span class="dvc up">
+      1 +
+      <span class="dvc down">
+       1
+       <span class="dvl">
+       </span>
+       1 +
+       <span class="dvc">
+        1
+        <span class="dvl">
+        </span>
+        2
+       </span>
+      </span>
+     </span>
+     <span class="b2">)</span>
+     ÷
+     <span class="b1">(</span>
+     1 −
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+     <span class="b1">)</span>
+     <br/>
+     else: 0
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   <sub>d</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvcs">
+    <span class="c4">{</span>
+    <span class="dvs">
+     if
+     <var>x</var>
+     &lt; 1: 1
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 2: 2
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 3: 3
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 4: 4
+     <br/>
+     else: 0
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   <sub>e</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvcs">
+    <span class="c5">{</span>
+    <span class="dvs">
+     if
+     <var>x</var>
+     &lt; 1: 1
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 2: 2
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 3: 3
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 4: 4
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 5: 5
+     <br/>
+     else: 0
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   <sub>f</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvcs">
+    <span class="c6">{</span>
+    <span class="dvs">
+     if
+     <var>x</var>
+     &lt; 1: 1
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 2: 2
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 3: 3
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 4: 4
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 5: 5
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 6: 6
+     <br/>
+     else: 0
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   <sub>g</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvcs">
+    <span class="c7">{</span>
+    <span class="dvs">
+     if
+     <var>x</var>
+     &lt; 1: 1
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 2: 2
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 3: 3
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 4: 4
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 5: 5
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 6: 6
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 7: 7
+     <br/>
+     else: 0
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   <sub>h</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvcs">
+    <span class="c8">{</span>
+    <span class="dvs">
+     if
+     <var>x</var>
+     &lt; 1: 1
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 2: 2
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 3: 3
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 4: 4
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 5: 5
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 6: 6
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 7: 7
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 8: 8
+     <br/>
+     else: 0
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   <sub>a</sub>
+   ( 2.25 )  = 1.5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   <sub>g</sub>
+   ( 3.5 )  = 4
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>13. Special values</h2>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>1</sub>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    0
+   </span>
+   =
+   <span class="err">+∞</span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>2</sub>
+   =
+   <span class="dvc">
+    0
+    <span class="dvl">
+    </span>
+    0
+   </span>
+   =
+   <span class="err">Undefined</span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>3</sub>
+   = 1 · 10
+   <sup>308</sup>
+   · 10 =
+   <span class="err">+∞</span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>14. Raw HTML classes</h2>
+ <div class="side">
+  <p>Side note, floated right at half width, in the body sans font.</p>
+ </div>
+ <div class="indent">
+  <p>
+   Indented block, as emitted for unwrapped
+   <code>#if</code>
+   and
+   <code>#for</code>
+   bodies.
+  </p>
+ </div>
+ <p class="ref">Ref: EN 1992-1-1, 6.1</p>
+ <p class="ok">Utilisation 0.72 &lt; 1.00 — OK</p>
+ <table class="bordered">
+  <tr>
+   <th>Section</th>
+   <th>
+    A
+    <sub>c</sub>
+   </th>
+   <th>
+    I
+    <sub>y</sub>
+   </th>
+  </tr>
+  <tr>
+   <td>300×550</td>
+   <td>165000 mm²</td>
+   <td>4.16·10⁹ mm⁴</td>
+  </tr>
+  <tr>
+   <td>300×450</td>
+   <td>135000 mm²</td>
+   <td>2.28·10⁹ mm⁴</td>
+  </tr>
+ </table>
+ <ul>
+  <li>
+   List item with
+   <code>inline code</code>
+   and a
+   <kbd>Ctrl+G</kbd>
+   key.
+  </li>
+  <li>Second item.</li>
+ </ul>
+ <h4>Heading level 4</h4>
+ <h5>Heading level 5</h5>
+ <h6>Heading level 6</h6>
+</div>

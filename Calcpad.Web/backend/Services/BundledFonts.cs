@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 
 namespace Calcpad.Server.Services
@@ -12,13 +12,19 @@ namespace Calcpad.Server.Services
     /// </summary>
     internal static class BundledFonts
     {
-        // Filename -> CSS font-family name(s) it should be registered as via @font-face.
+        private readonly record struct FontFace(string Family, string? Weight = null, string? Style = null);
+
+        // Filename -> the @font-face rule(s) it should be registered as.
         // Files bundled but not listed here still land in window.__calcpadFonts, just without a rule.
-        private static readonly Dictionary<string, string[]> FontFamilyNames =
+        private static readonly Dictionary<string, FontFace[]> FontFaces =
             new(StringComparer.OrdinalIgnoreCase)
             {
-                ["Jost-100-Hairline.otf"] = ["Jost* Hairline"],
-                ["Jost-200-Thin.otf"] = ["Jost* Thin"],
+                ["Jost-100-Hairline.otf"] = [new("Jost* Hairline")],
+                ["Jost-200-Thin.otf"] = [new("Jost* Thin")],
+                ["DejaVuSerifCondensed.woff2"] = [new("DejaVu Serif Condensed", "normal", "normal")],
+                ["DejaVuSerifCondensed-Italic.woff2"] = [new("DejaVu Serif Condensed", "normal", "italic")],
+                ["DejaVuSerifCondensed-Bold.woff2"] = [new("DejaVu Serif Condensed", "bold", "normal")],
+                ["DejaVuSerifCondensed-BoldItalic.woff2"] = [new("DejaVu Serif Condensed", "bold", "italic")],
             };
 
         private static IReadOnlyDictionary<string, string>? _cachedDataUrls;
@@ -76,7 +82,7 @@ namespace Calcpad.Server.Services
 
         /// <summary>
         /// Returns a <c>&lt;style&gt;</c> tag with an <c>@font-face</c> rule for
-        /// every bundled font listed in <see cref="FontFamilyNames"/>, or an
+        /// every bundled font listed in <see cref="FontFaces"/>, or an
         /// empty string if none apply.
         /// </summary>
         public static string GetFontFaceStyleTag()
@@ -87,12 +93,15 @@ namespace Calcpad.Server.Services
             var sb = new StringBuilder();
             foreach (var (fileName, dataUrl) in fonts)
             {
-                if (!FontFamilyNames.TryGetValue(fileName, out var familyNames)) continue;
+                if (!FontFaces.TryGetValue(fileName, out var faces)) continue;
                 var format = FormatForFont(fileName);
-                foreach (var familyName in familyNames)
+                foreach (var face in faces)
                 {
-                    sb.Append("@font-face{font-family:\"").Append(CssEscape(familyName))
-                      .Append("\";src:url(").Append(dataUrl).Append(") format(\"").Append(format).Append("\");}");
+                    sb.Append("@font-face{font-family:\"").Append(CssEscape(face.Family))
+                      .Append("\";src:url(").Append(dataUrl).Append(") format(\"").Append(format).Append("\")");
+                    if (face.Weight is not null) sb.Append(";font-weight:").Append(face.Weight);
+                    if (face.Style is not null) sb.Append(";font-style:").Append(face.Style);
+                    sb.Append(";}");
                 }
             }
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>CalcpadCE</title>
@@ -43,7 +43,8 @@
         a:hover { background-color: #e9f6ff;}
 
         .eq, input[type="text"], table.matrix {
-            font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+            font-family: 'DejaVu Serif Condensed', 'Century Schoolbook', 'Times New Roman', Times, serif;
+            font-variant-numeric: lining-nums tabular-nums;
         }
 
             .eq var {
@@ -81,12 +82,12 @@
             }
 
                 .eq small var {
-                    font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+                    font-family: 'DejaVu Serif Condensed', 'Century Schoolbook', 'Times New Roman', Times, serif;
                     font-size: 8.5pt;
                 }
 
                 .eq small i {
-                    font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+                    font-family: 'DejaVu Serif Condensed', 'Century Schoolbook', 'Times New Roman', Times, serif;
                     font-size: 6pt;
                 }
 
@@ -462,13 +463,13 @@
         }
 
         .nary {
-            color: #E000D0;
+            color: #C080F0;
             font-size: 240%;
-            font-family: Corbel Light, sans-serif;
+            font-family: 'DejaVu Serif Condensed', serif;
             font-weight: 200;
-            line-height: 80%;
+            line-height: 70%;
             display: block;
-            margin: -1pt 1pt 3pt 1pt;
+            margin: 0 1pt 2.5pt 1pt;
         }
 
         .dvc.down {
@@ -810,6 +811,10 @@
 
         .dark-theme .eq i {
             color: #4ec9b0; /* Teal for functions in dark mode */
+        }
+
+        .dark-theme .nary {
+            color: #C991F2;
         }
 
         .dark-theme .cond {

@@ -16,6 +16,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="$(FontsDir)*.ttf;$(FontsDir)*.otf;$(FontsDir)*-LICENSE"
+      CopyToPublishDirectory="PreserveNewest"
+      CopyToOutputDirectory="PreserveNewest"
+      Link="Fonts\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Calcpad.Core\Calcpad.Core.csproj" />
     <ProjectReference Include="..\..\Calcpad.OpenXml\Calcpad.OpenXml.csproj" />
   </ItemGroup>

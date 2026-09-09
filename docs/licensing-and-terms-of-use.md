@@ -26,3 +26,6 @@ They are re-distributed free of charge, under the license conditions, provided b
 1. The new and beautiful icons are created using [icons8.com](https://icons8.com/).
 2. The pdf export was made possible thanks to the [wkhtmltopdf.org](https://wkhtmltopdf.org/) project.
 3. Some symbols are displayed, using the Jost\* font family by [indestructible type\*](https://indestructibletype.com/), under the [SIL open font license](https://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web). Square brackets are slightly modified to suit the application needs.
+4. The web, desktop and VS Code editors use the [JuliaMono](https://github.com/cormullion/juliamono) font by cormullion as their default typeface, under the [SIL open font license](https://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web).
+5. Calculation output is rendered with the [DejaVu Serif Condensed](https://dejavu-fonts.github.io/) font by the DejaVu fonts team, under the [DejaVu Fonts License](https://dejavu-fonts.github.io/License.html) (a Bitstream Vera derivative).
+6. Interactive datagrids in the preview are powered by [jspreadsheet-ce](https://github.com/jspreadsheet/ce) and [jsuites](https://github.com/jsuites/jsuites) by Paul Hodel, under the [MIT license](https://opensource.org/licenses/MIT).
