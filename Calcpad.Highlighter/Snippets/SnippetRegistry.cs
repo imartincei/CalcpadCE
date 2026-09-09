@@ -57,6 +57,7 @@ namespace Calcpad.Highlighter.Snippets
             allItems.AddRange(UnitSnippets.Items);
             allItems.AddRange(FormatStringSnippets.Items);
             allItems.AddRange(HtmlSnippets.Items);
+            allItems.AddRange(CssSnippets.Items);
             allItems.AddRange(MarkdownSnippets.Items);
             allItems.AddRange(SymbolSnippets.Items);
 

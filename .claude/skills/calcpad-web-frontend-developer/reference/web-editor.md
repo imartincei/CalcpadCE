@@ -42,6 +42,8 @@ server: {
 },
 ```
 
+The backend only listens on 9420 when it was started with `CALCPAD_PORT=9420` (or `--urls`) — otherwise it takes a random port. For dev, either pin the port or point `VITE_SERVER_URL` at whatever the server printed.
+
 ## Tauri Build
 `tauri.conf.json`'s `build.frontendDist` points at `../../calcpad-web/dist` and `beforeBuildCommand` runs `npm run build` in `calcpad-web` before bundling — no env-var toggle needed.
 

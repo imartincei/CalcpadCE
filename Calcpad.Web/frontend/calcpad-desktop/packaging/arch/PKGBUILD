@@ -1,4 +1,4 @@
-# Maintainer: Isaiah Martin <isaiah.m@cornerstoneaec.com>
+# Maintainer: Isaiah Martin <isaiahmartin22k@outlook.com>
 #
 # Packages the tree that build-desktop.sh already produced, so the resulting
 # .pkg.tar.zst comes from the same build as the .deb and .rpm rather than a

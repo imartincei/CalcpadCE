@@ -39,7 +39,7 @@ y_2 = y_1 + L_2*cos(θ_02)
 δ_y = -2*δ
 y_g1 = y_1 - δ_y + R
 y_g2 = y_2 - δ_y + R
-#def svg$ = '<svg viewbox="'-W/2' '-H' 'W' '2*H'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-family: Georgia Pro; font-size:14px; width:'W+20'pt; height:'H+50'pt;margin-left:-10pt;">
+#def svg$ = '<svg viewbox="'-W/2' '-H' 'W' '2*H'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-family: DejaVu Serif Condensed; font-size:14px; width:'W+20'pt; height:'H+50'pt;margin-left:-10pt;">
 #def thin_style$ = class="thin"
 #def thick_style$ = class="thick"
 #def ball_style$ = class="ball"

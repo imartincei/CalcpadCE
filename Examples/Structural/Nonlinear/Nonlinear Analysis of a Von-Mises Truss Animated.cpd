@@ -20,7 +20,7 @@ W = 2*(L + 6*k)
 Y = H
 F_y,max = 2500kN
 v_max = abs(2.26*h)
-#def svg$ = '<svg viewbox="'-6*k' 'Y' 'W' 'abs(H)'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-family: Georgia Pro; font-size:7px; width:'420'pt; height:'400*abs(H)/L'pt">
+#def svg$ = '<svg viewbox="'-6*k' 'Y' 'W' 'abs(H)'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-family: DejaVu Serif Condensed; font-size:7px; width:'420'pt; height:'400*abs(H)/L'pt">
 #def thin_style$ = style="stroke:darkcyan; stroke-width:1; fill:none;"
 #def dash_style$ = style="stroke:#ddd; stroke-width:1; stroke-dasharray: 7 3; fill:none;"
 #def ghost_style$ = style="stroke:#ddd; stroke-width:1; fill:white;"

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -45,10 +45,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="template.html" />
-    <Content Include="Fonts\**\*.*">
+    <Content Include="$(FontsDir)Jost-*.otf;$(FontsDir)web\DejaVuSerifCondensed*.woff2;$(FontsDir)*-LICENSE" Link="Fonts\%(Filename)%(Extension)">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Fonts\**\*.*" />
+    <EmbeddedResource Include="$(FontsDir)Jost-*.otf;$(FontsDir)web\DejaVuSerifCondensed*.woff2;$(FontsDir)*-LICENSE" Link="Fonts\%(Filename)%(Extension)" />
     <Content Include="UiAssets\**\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

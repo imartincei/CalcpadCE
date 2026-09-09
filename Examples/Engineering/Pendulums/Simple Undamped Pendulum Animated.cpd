@@ -27,7 +27,7 @@ y = L*cos(θ_0)
 δ_x = 0.25*δ
 δ_y = -2*δ
 y_g = y - δ_y + R
-#def svg$ = '<svg viewbox="'-60 - W/2' '-H-20' 'W + 120' '2*H + 40'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-family: Georgia Pro; font-size:14px; width:'W'pt; height:'H + 50'pt; margin-left:20pt;">
+#def svg$ = '<svg viewbox="'-60 - W/2' '-H-20' 'W + 120' '2*H + 40'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-family: DejaVu Serif Condensed; font-size:14px; width:'W'pt; height:'H + 50'pt; margin-left:20pt;">
 #def thin_style$ = style="stroke:goldenrod; stroke-width:1; fill:none"
 #def thick_style$ = style="stroke:steelblue; stroke-width:2; fill:none"
 #def ball_style$ = style="stroke:steelblue; stroke-width:0.5;  fill:url(#ball)"

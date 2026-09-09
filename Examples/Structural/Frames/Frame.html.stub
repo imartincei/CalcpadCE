@@ -547,7 +547,7 @@
   </span>
  </p>
  <h4>Scheme of the structure</h4>
- <svg style="font-family: Georgia Pro; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
   <polygon points="0,150 0,30 -10,30 -10,150" style="stroke:magenta; stroke-width:1; stroke-opacity:0.3; fill:magenta; fill-opacity:0.1;">
   </polygon>
   <text text-anchor="middle" transform="rotate(-90,-15,90)" x="-15" y="90">qx=10</text>
@@ -3122,7 +3122,7 @@
  <p>
   <strong>Axial forces diagram, kN</strong>
  </p>
- <svg style="font-family: Georgia Pro; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
   <use href="#frame">
   </use>
   <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="15" y1="150" y2="150">
@@ -3321,7 +3321,7 @@
  <p>
   <strong>Shear forces diagram, kN</strong>
  </p>
- <svg style="font-family: Georgia Pro; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
   <use href="#frame">
   </use>
   <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="-2.36" y1="150" y2="150">
@@ -3520,7 +3520,7 @@
  <p>
   <strong>Bending moments diagram, kNm</strong>
  </p>
- <svg style="font-family: Georgia Pro; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
   <use href="#frame">
   </use>
   <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="0" y1="150" y2="150">
@@ -4195,7 +4195,7 @@
   </span>
  </p>
  <p>Deformed shape, mm</p>
- <svg style="font-family: Georgia Pro; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
   <use href="#frame" style="opacity:0.4;">
   </use>
   <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="0" y1="150" y2="150">

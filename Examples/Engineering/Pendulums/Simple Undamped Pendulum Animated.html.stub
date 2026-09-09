@@ -58,7 +58,7 @@
     <h4>Theoretical solution for large rotations</h4>
    </td>
    <td>
-    <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+    <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
      <defs>
       <radialgradient cx="35%" cy="35%" id="ball">
        <stop offset="0%" stop-color="lightcyan">
@@ -1790,7 +1790,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-2.4" y1="0" y2="-124.98">
@@ -1917,7 +1917,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-3.3" y1="0" y2="-124.96">
@@ -2044,7 +2044,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-5.16" y1="0" y2="-124.89">
@@ -2171,7 +2171,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-8.5" y1="0" y2="-124.71">
@@ -2298,7 +2298,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-14.28" y1="0" y2="-124.18">
@@ -2425,7 +2425,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-24.09" y1="0" y2="-122.66">
@@ -2552,7 +2552,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-40.4" y1="0" y2="-118.29">
@@ -2679,7 +2679,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-66.11" y1="0" y2="-106.09">
@@ -2806,7 +2806,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-100.7" y1="0" y2="-74.06">
@@ -2933,7 +2933,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-124.95" y1="0" y2="-3.6">
@@ -3060,7 +3060,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-82.85" y1="0" y2="93.6">
@@ -3187,7 +3187,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="39.38" y1="0" y2="118.63">
@@ -3314,7 +3314,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="119.96" y1="0" y2="35.15">
@@ -3441,7 +3441,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="113.8" y1="0" y2="-51.72">
@@ -3568,7 +3568,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="79.06" y1="0" y2="-96.82">
@@ -3695,7 +3695,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="49.28" y1="0" y2="-114.88">
@@ -3822,7 +3822,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="29.58" y1="0" y2="-121.45">
@@ -3949,7 +3949,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="17.55" y1="0" y2="-123.76">
@@ -4076,7 +4076,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="10.42" y1="0" y2="-124.57">
@@ -4203,7 +4203,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="6.26" y1="0" y2="-124.84">
@@ -4330,7 +4330,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="3.9" y1="0" y2="-124.94">
@@ -4457,7 +4457,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="2.66" y1="0" y2="-124.97">
@@ -4584,7 +4584,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="2.2" y1="0" y2="-124.98">
@@ -4711,7 +4711,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="2.37" y1="0" y2="-124.98">
@@ -4838,7 +4838,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="3.23" y1="0" y2="-124.96">
@@ -4965,7 +4965,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="5.02" y1="0" y2="-124.9">
@@ -5092,7 +5092,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="8.26" y1="0" y2="-124.73">
@@ -5219,7 +5219,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="13.86" y1="0" y2="-124.23">
@@ -5346,7 +5346,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="23.39" y1="0" y2="-122.79">
@@ -5473,7 +5473,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="39.24" y1="0" y2="-118.68">
@@ -5600,7 +5600,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="64.36" y1="0" y2="-107.15">
@@ -5727,7 +5727,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="98.67" y1="0" y2="-76.74">
@@ -5854,7 +5854,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="124.69" y1="0" y2="-8.79">
@@ -5981,7 +5981,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="87.97" y1="0" y2="88.81">
@@ -6108,7 +6108,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-32.24" y1="0" y2="120.77">
@@ -6235,7 +6235,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-118.1" y1="0" y2="40.95">
@@ -6362,7 +6362,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-115.45" y1="0" y2="-47.93">
@@ -6489,7 +6489,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-81.04" y1="0" y2="-95.18">
@@ -6616,7 +6616,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-50.69" y1="0" y2="-114.26">
@@ -6743,7 +6743,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-30.46" y1="0" y2="-121.23">
@@ -6870,7 +6870,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-18.08" y1="0" y2="-123.69">
@@ -6997,7 +6997,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-10.73" y1="0" y2="-124.54">
@@ -7124,7 +7124,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-6.44" y1="0" y2="-124.83">
@@ -7251,7 +7251,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-4" y1="0" y2="-124.94">
@@ -7378,7 +7378,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-2.71" y1="0" y2="-124.97">
@@ -7505,7 +7505,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-2.21" y1="0" y2="-124.98">
@@ -7632,7 +7632,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-2.35" y1="0" y2="-124.98">
@@ -7759,7 +7759,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-3.16" y1="0" y2="-124.96">
@@ -7886,7 +7886,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-4.9" y1="0" y2="-124.9">
@@ -8013,7 +8013,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-8.04" y1="0" y2="-124.74">
@@ -8140,7 +8140,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-13.49" y1="0" y2="-124.27">
@@ -8267,7 +8267,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-22.76" y1="0" y2="-122.91">
@@ -8394,7 +8394,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-38.2" y1="0" y2="-119.02">
@@ -8521,7 +8521,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-62.78" y1="0" y2="-108.09">
@@ -8648,7 +8648,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-96.78" y1="0" y2="-79.11">
@@ -8775,7 +8775,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-124.27" y1="0" y2="-13.48">
@@ -8902,7 +8902,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-92.41" y1="0" y2="84.17">
@@ -9029,7 +9029,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="25.49" y1="0" y2="122.37">
@@ -9156,7 +9156,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="116.1" y1="0" y2="46.32">
@@ -9283,7 +9283,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="116.89" y1="0" y2="-44.28">
@@ -9410,7 +9410,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="82.88" y1="0" y2="-93.57">
@@ -9537,7 +9537,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="52.02" y1="0" y2="-113.66">
@@ -9664,7 +9664,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="31.3" y1="0" y2="-121.02">
@@ -9791,7 +9791,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="18.59" y1="0" y2="-123.61">
@@ -9918,7 +9918,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="11.03" y1="0" y2="-124.51">
@@ -10045,7 +10045,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="6.61" y1="0" y2="-124.83">
@@ -10172,7 +10172,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="4.09" y1="0" y2="-124.93">
@@ -10299,7 +10299,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="2.76" y1="0" y2="-124.97">
@@ -10426,7 +10426,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="2.22" y1="0" y2="-124.98">
@@ -10553,7 +10553,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="2.33" y1="0" y2="-124.98">
@@ -10680,7 +10680,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="3.11" y1="0" y2="-124.96">
@@ -10807,7 +10807,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="4.79" y1="0" y2="-124.91">
@@ -10934,7 +10934,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="7.84" y1="0" y2="-124.75">
@@ -11061,7 +11061,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="13.15" y1="0" y2="-124.31">
@@ -11188,7 +11188,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="22.19" y1="0" y2="-123.01">
@@ -11315,7 +11315,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="37.27" y1="0" y2="-119.31">
@@ -11442,7 +11442,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="61.35" y1="0" y2="-108.91">
@@ -11569,7 +11569,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="95.04" y1="0" y2="-81.2">
@@ -11696,7 +11696,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="123.74" y1="0" y2="-17.7">
@@ -11823,7 +11823,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="96.25" y1="0" y2="79.76">
@@ -11950,7 +11950,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-19.19" y1="0" y2="123.52">
@@ -12077,7 +12077,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-114.01" y1="0" y2="51.26">
@@ -12204,7 +12204,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-118.15" y1="0" y2="-40.81">
@@ -12331,7 +12331,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-84.59" y1="0" y2="-92.03">
@@ -12458,7 +12458,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-53.28" y1="0" y2="-113.08">
@@ -12585,7 +12585,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-32.1" y1="0" y2="-120.81">
@@ -12712,7 +12712,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-19.06" y1="0" y2="-123.54">
@@ -12839,7 +12839,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-11.31" y1="0" y2="-124.49">
@@ -12966,7 +12966,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-6.77" y1="0" y2="-124.82">
@@ -13093,7 +13093,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-4.18" y1="0" y2="-124.93">
@@ -13220,7 +13220,7 @@ circle.Series4 {fill:#f0d000;}
     </circle>
    </g>
   </svg>
-  <svg style="font-family: Georgia Pro; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
+  <svg style="font-family: DejaVu Serif Condensed; font-size:14px; width:150pt; height:180pt; margin-left:20pt;" version="1.1" viewbox="-135 -150 270 300" xmlns="http://www.w3.org/2000/svg">
    <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
    </polygon>
    <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-2.8" y1="0" y2="-124.97">

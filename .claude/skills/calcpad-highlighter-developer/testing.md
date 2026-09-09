@@ -2,119 +2,112 @@
 
 ## Test Project (Unit Tests)
 
-The test project is located at `Calcpad.Highlighter/Tests/Tests.csproj`.
+Highlighter tests are xUnit tests in **`Calcpad.Tests/Highlighter/`** (project: `Calcpad.Tests/Calcpad.Tests.csproj`, .NET 10, xunit 2.9.3). There is no standalone console test runner.
 
 **Running tests:**
 ```bash
-# Run all sample tests (Samples/ folder)
-dotnet run --project Calcpad.Highlighter/Tests/Tests.csproj
+# Every test in the solution
+dotnet test Calcpad.Tests/Calcpad.Tests.csproj
 
-# Run a single sample file
-dotnet run --project Calcpad.Highlighter/Tests/Tests.csproj -- --file your_test.cpd
+# Just the highlighter tests
+dotnet test Calcpad.Tests/Calcpad.Tests.csproj --filter "FullyQualifiedName~Calcpad.Tests.Highlighter"
 
-# Or with Samples/ prefix (both work)
-dotnet run --project Calcpad.Highlighter/Tests/Tests.csproj -- --file Samples/your_test.cpd
+# One test class
+dotnet test Calcpad.Tests/Calcpad.Tests.csproj --filter "FullyQualifiedName~SymbolResolverTests"
 
-# Run all comprehensive tests
-dotnet run --project Calcpad.Highlighter/Tests/Tests.csproj -- --folder comprehensive
-
-# Run only error tests
-dotnet run --project Calcpad.Highlighter/Tests/Tests.csproj -- --folder comprehensive/errors
-
-# Run a single comprehensive test file
-dotnet run --project Calcpad.Highlighter/Tests/Tests.csproj -- --file comprehensive/basics.cpd
-
-# Output is written to test-output.log in the target folder
+# One .cpd sample, through the data-driven theory
+dotnet test Calcpad.Tests/Calcpad.Tests.csproj --filter "DisplayName~vectors.cpd"
 ```
 
-**Notes:**
-- The test runner automatically finds folders relative to the assembly location
-- You can run tests from anywhere in the solution - no need to cd into specific directories
-- When using `--file`, you can provide just the filename or include the folder prefix
-- When using `--folder`, only top-level .cpd files in that folder are run (not subdirectories)
+## HighlighterLinterFixture
 
-The test runner is an executable that runs all sample files through the linter and reports diagnostics. It is NOT an xUnit test project - it's a console app that exercises the linter.
-
-## Using LinterTestRunner
-
-The `LinterTestRunner` class in `Calcpad.Highlighter/Tests/LinterTestRunner.cs` is the main test harness.
+`Calcpad.Tests/Highlighter/HighlighterLinterFixture.cs` is the shared harness, injected via `IClassFixture<HighlighterLinterFixture>`. It exposes `ValidDir`, `ErrorsDir`, an `IncludeFiles` dictionary of every `.cpd` under the test folder (so `#include` resolves in-memory), and:
 
 ```csharp
-// The runner will:
-// 1. Load all .cpd files from Tests/Samples/
-// 2. Run through all 3 content resolution stages
-// 3. Tokenize
-// 4. Lint
-// 5. Output diagnostics with line mappings to test-output.log
+public LinterResult LintFile(string fullPath);
+// reads the file → ContentResolver.GetStagedContent(content, IncludeFiles)
+// → LintIgnoreRegionParser.ExtractRegions → CalcpadLinter.Lint(staged, ignoreRegions)
 ```
+
+The `.cpd` files are copied to the output directory by the csproj, so the fixture locates them relative to the assembly.
 
 ## Test File Structure
 
-Create .cpd files in `Calcpad.Highlighter/Tests/Samples/`:
+`.cpd` sample files live in two folders and are picked up automatically by data-driven theories — adding a file adds a test case, no registration needed.
+
+- **`Calcpad.Tests/Highlighter/valid/`** — must produce **zero** Error-level diagnostics (`ComprehensiveValidTests`)
+- **`Calcpad.Tests/Highlighter/errors/`** — must produce the expected diagnostic codes (`ComprehensiveErrorTests`)
 
 ```calcpad
 "Test: My Feature"
 'Description of what this tests'
 
-' Valid cases
 x = 5
 y = x + 1
 
-' Error cases (comments describe expected errors)
 z = undefined_var  ' Should trigger CPD-3301
 ```
 
 ## Testing Workflow
 
-When testing new features or bug fixes:
-
-1. **Create a test .cpd file** in `Calcpad.Highlighter/Tests/Samples/` with the specific syntax you're testing
-2. **Run the test file individually** to see detailed output:
+1. **Add a `.cpd` sample** to `valid/` (should lint clean) or `errors/` (should produce specific codes), or write a focused xUnit test class for behavior a sample can't express
+2. **Run it:**
    ```bash
-   dotnet run --project Calcpad.Highlighter/Tests/Tests.csproj -- --file YourTest.cpd
+   dotnet test Calcpad.Tests/Calcpad.Tests.csproj --filter "DisplayName~YourTest.cpd"
    ```
-3. **Check the output** for token types, diagnostics, and any errors
-4. **Iterate** on your implementation based on the test results
+3. **Read the assertion message** — the valid/error theories print the offending code, line, and message
+4. **Iterate** on the validator or tokenizer
 
 ## Key Test Files
 
-- `Calcpad.Highlighter/Tests/LinterTestRunner.cs` - Main test harness (entry point)
-- `Calcpad.Highlighter/Tests/TestFileProvider.cs` - Loads test files
-- `Calcpad.Highlighter/Tests/QuickTest.cs` - Quick ad-hoc testing
-- `Calcpad.Highlighter/Tests/Samples/` - Ad-hoc / targeted test .cpd files
-- `Calcpad.Highlighter/Tests/comprehensive/` - Comprehensive feature tests (one test per line)
-- `Calcpad.Highlighter/Tests/comprehensive/errors/` - Error tests split by CPD code category
+- `Calcpad.Tests/Highlighter/HighlighterLinterFixture.cs` - Shared fixture (resolution + lint pipeline)
+- `Calcpad.Tests/Highlighter/ComprehensiveValidTests.cs` - Every `valid/*.cpd` must be error-free
+- `Calcpad.Tests/Highlighter/ComprehensiveErrorTests.cs` - Every `errors/*.cpd` must report its codes
+- `Calcpad.Tests/Highlighter/SymbolResolverTests.cs` - Cursor → symbol → occurrences
+- `Calcpad.Tests/Highlighter/DefinitionClassificationTests.cs`, `MetadataReturnTypeTests.cs`, `ElementWiseFunctionTypeTests.cs` - Type inference
+- `Calcpad.Tests/Highlighter/HTMLCommentTests.cs`, `PdfMetadataHighlighterTests.cs`, `SettingsDirectiveHighlighterTests.cs`, `UiDirectiveHighlighterTests.cs` - Metadata comment directives
+- `Calcpad.Tests/Highlighter/valid/` - Feature samples, one concern per file
+- `Calcpad.Tests/Highlighter/errors/` - Error samples split by CPD code category
 
 ## Comprehensive Test Structure
 
 ```
-comprehensive/
-├── basics.cpd              Scalars, operators, constants, arrow assignment
-├── complex_numbers.cpd     Complex literals, arithmetic, functions, phasor
-├── vectors.cpd             All vector functions (create, structural, data, find, lookup, math)
-├── matrices.cpd            All matrix functions (create, structural, data, lookup, math, decomp, solvers, FFT)
-├── functions.cpd           Custom defs, all built-in (trig, hyp, log, rounding, integer, complex, aggregate, conditional)
-├── units.cpd               SI, Imperial, dimensionless, angle, electrical, custom units, conversion
-├── control_flow.cpd        #if/#else if/#else, #for, #while, #repeat, #break, #continue, nesting
-├── macros.cpd              Inline/multiline #def macros, $ params, control flow in macros
-├── commands.cpd            $Root, $Find, $Sup, $Inf, $Area, $Integral, $Slope, $Sum, $Product, $Repeat, $While, $Block, $Inline, $Plot, $Map
-├── output_control.cpd      #hide/#show/#pre/#post, #val/#equ/#noc, #nosub/#novar/#varsub, #round, #format, #split/#wrap, #md, #const
-├── HTML.cpd                HTML elements, CSS, JavaScript, SVG graphics, macro-generated HTML
-├── modules.cpd             #include, #local, #global, using imported functions/macros/units
-├── data_exchange.cpd       #read from, #write to, #append to, @range, TYPE=, SEP=
-├── naming.cpd              Greek letters, underscore subscripts, Unicode sub/superscripts, primes, special chars
-├── type_inference.cpd      Scalar/vector/matrix return types, HP types, element access, Various type
-├── line_continuation.cpd   Explicit _ and implicit ;|&@:({[ continuation, command blocks
-├── advanced.cpd            Cross-feature integration: imported macros in loops, units in command blocks, nested macro calls
-├── import.cpd              Module target for #include (exports constants, functions, units, macros)
-├── data.csv                CSV data for #read tests
+Calcpad.Tests/Highlighter/
+├── valid/
+│   ├── basics.cpd              Scalars, operators, constants, arrow assignment
+│   ├── complex_numbers.cpd     Complex literals, arithmetic, functions, phasor
+│   ├── vectors.cpd             All vector functions (create, structural, data, find, lookup, math)
+│   ├── matrices.cpd            All matrix functions (create, structural, data, lookup, math, decomp, solvers, FFT)
+│   ├── functions.cpd           Custom defs, all built-in (trig, hyp, log, rounding, integer, complex, aggregate, conditional)
+│   ├── units.cpd               SI, Imperial, dimensionless, angle, electrical, custom units, conversion
+│   ├── control_flow.cpd        #if/#else if/#else, #for, #while, #repeat, #break, #continue, nesting
+│   ├── macros.cpd              Inline/multiline #def macros, $ params, control flow in macros
+│   ├── nested_macros.cpd       Nested macro expansion, and nestedMacro*.cpd include targets
+│   ├── commands.cpd            $Root, $Find, $Sup, $Inf, $Area, $Integral, $Slope, $Sum, $Product, $Repeat, $While, $Block, $Inline, $Plot, $Map
+│   ├── output_control.cpd      #hide/#show/#pre/#post, #val/#equ/#noc, #nosub/#novar/#varsub, #round, #format, #split/#wrap, #md, #const
+│   ├── HTML.cpd                HTML elements, CSS, JavaScript, SVG graphics, macro-generated HTML
+│   ├── markdown.cpd            #md regions
+│   ├── ui.cpd                  #UI control directives
+│   ├── modules.cpd             #include, #local, #global, using imported functions/macros/units
+│   ├── include.cpd             Include resolution against import.cpd
+│   ├── data_exchange.cpd       #read from, #write to, #append to, @range, TYPE=, SEP=
+│   ├── naming.cpd              Greek letters, underscore subscripts, Unicode sub/superscripts, primes, special chars
+│   ├── type_inference.cpd      Scalar/vector/matrix return types, HP types, element access, Various type
+│   ├── reassignment.cpd        Type changes across reassignment
+│   ├── line_continuation.cpd   Explicit _ and implicit ;|&@:({[ continuation, command blocks
+│   ├── advanced.cpd            Cross-feature integration: imported macros in loops, units in command blocks, nested macro calls
+│   ├── import.cpd              Module target for #include (exports constants, functions, units, macros)
+│   └── data.csv                CSV data for #read tests
 └── errors/
-    ├── include_errors.cpd  CPD-11xx (malformed include, missing filename)
-    ├── macro_errors.cpd    CPD-22xx (duplicate, no $, invalid name, nested, unmatched, dup param)
-    ├── balance_errors.cpd  CPD-31xx (unmatched parens, brackets, braces, control blocks)
-    ├── naming_errors.cpd   CPD-32xx (keyword conflict, unit shadow, constant conflict, no params)
-    ├── usage_errors.cpd    CPD-33xx (undefined var/func/macro/unit, wrong params, type mismatch)
-    └── semantic_errors.cpd CPD-34xx (invalid operator, unknown directive, # in command block, incomplete expr)
+    ├── include_errors.cpd          CPD-11xx (malformed include, missing filename)
+    ├── macro_errors.cpd            CPD-22xx (duplicate, no $, invalid name, nested, unmatched, dup param)
+    ├── complex_macro_errors.cpd    CPD-22xx in nested/parameterized macros
+    ├── balance_errors.cpd          CPD-31xx (unmatched parens, brackets, braces, control blocks)
+    ├── naming_errors.cpd           CPD-32xx (keyword conflict, unit shadow, constant conflict, no params)
+    ├── usage_errors.cpd            CPD-33xx (undefined var/func/macro/unit, wrong params, type mismatch)
+    ├── reassignment_errors.cpd     CPD-33xx from type changes across reassignment
+    ├── semantic_errors.cpd         CPD-34xx (invalid operator, unknown directive, # in command block, incomplete expr)
+    └── ui_errors.cpd               #UI directive diagnostics
 ```
 
 ## Testing via Linux Dev Server
@@ -122,11 +115,11 @@ comprehensive/
 For integration testing through the API, use the Linux dev server:
 
 ```bash
-# Start the dev server (runs on port 9420)
-./scripts/Calcpad.Server/restart-dev-server.sh
+# Start the dev server (pins port 9420; a bare `dotnet run` gets a random port instead)
+Calcpad.Web/backend/scripts/restart-dev-server.sh
 ```
 
-See [Calcpad.Server/API_SCHEMA.md](../../Calcpad.Server/API_SCHEMA.md) for full API documentation.
+See [Calcpad.Web/backend/API_SCHEMA.md](../../../Calcpad.Web/backend/API_SCHEMA.md) for full API documentation.
 
 ### Linter Endpoint
 
@@ -149,7 +142,9 @@ Response includes error counts and diagnostics:
       "endColumn": 17,
       "code": "CPD-3301",
       "message": "Undefined variable: 'undefined_var'",
-      "severity": "error"
+      "severity": "error",
+      "severityId": 0,
+      "source": "Calcpad Linter"
     }
   ]
 }
@@ -175,16 +170,19 @@ curl -X POST http://localhost:9420/api/calcpad/definitions \
 
 ### Testing with Include Files
 
+The API resolves includes off disk — there is no `includeFiles` payload. Write the included file, then pass `sourceFilePath` so relative paths resolve against its folder:
+
 ```bash
+mkdir -p /tmp/cpd && echo 'helperFunc(x) = x * 2' > /tmp/cpd/helper.cpd
 curl -X POST http://localhost:9420/api/calcpad/lint \
   -H "Content-Type: application/json" \
   -d '{
     "content": "#include helper.cpd\na = helperFunc(5)",
-    "includeFiles": {
-      "helper.cpd": "helperFunc(x) = x * 2"
-    }
+    "sourceFilePath": "/tmp/cpd/main.cpd"
   }'
 ```
+
+The in-memory `includeFiles` dictionary exists only in the unit-test fixture, via the `ContentResolver.GetStagedContent(content, files)` overload.
 
 ### Convert Endpoint (Runtime Validation)
 
