@@ -31,27 +31,6 @@
          the template untouched. -->
     <div class="work-area" :class="{ 'ui-mode': uiModeFullscreen }">
     <div class="editor-pane">
-      <div v-show="!uiModeFullscreen" class="editor-toolbar" @contextmenu.prevent>
-        <span class="spacer"></span>
-        <button
-          class="toolbar-btn"
-          @click="onRunPreview"
-          title="Run preview (Ctrl+Alt+X)"
-        >
-          ▶ Run
-        </button>
-        <button
-          class="toolbar-btn"
-          @click="onToggleSplit"
-          :title="isSplit ? 'Merge editor groups' : 'Split editor down (Ctrl+\\)'"
-        >
-          {{ isSplit ? 'Unsplit' : 'Split ⬓' }}
-        </button>
-        <button class="toolbar-btn" @click="togglePreview" title="Preview HTML">
-          {{ previewVisible ? 'Hide Preview' : 'Preview' }}
-        </button>
-      </div>
-
       <!-- Editor groups, stacked top/bottom. One group normally; two when split. -->
       <div class="editor-groups">
         <template v-for="(group, gi) in groups" :key="group.id">
@@ -99,6 +78,38 @@
               </div>
               <button class="tab-new" title="New tab (Ctrl+T)" @click="onNewTab(group.id)">+</button>
               <span class="spacer"></span>
+              <!-- Gated on the first group: .tab-strip is inside the v-for over groups,
+                   so an ungated cluster renders twice when split. -->
+              <div v-if="gi === 0 && !uiModeFullscreen" class="tab-actions">
+                <button
+                  class="tab-action"
+                  @click="onRunPreview"
+                  title="Run preview (Ctrl+Alt+X)"
+                  aria-label="Run preview"
+                >
+                  <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>
+                </button>
+                <button
+                  class="tab-action"
+                  :class="{ active: isSplit }"
+                  @click="onToggleSplit"
+                  :title="isSplit ? 'Merge editor groups' : 'Split editor down (Ctrl+\\)'"
+                  :aria-label="isSplit ? 'Merge editor groups' : 'Split editor down'"
+                  :aria-pressed="isSplit"
+                >
+                  <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2.5" y="2.5" width="11" height="11" rx="1"/><line x1="2.5" y1="8" x2="13.5" y2="8"/></svg>
+                </button>
+                <button
+                  class="tab-action"
+                  :class="{ active: previewVisible }"
+                  @click="togglePreview"
+                  :title="previewVisible ? 'Hide the results pane' : 'Show the results pane (Ctrl+P)'"
+                  :aria-label="previewVisible ? 'Hide the results pane' : 'Show the results pane'"
+                  :aria-pressed="previewVisible"
+                >
+                  <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2.5" y="2.5" width="11" height="11" rx="1"/><line x1="9" y1="2.5" x2="9" y2="13.5"/><path d="M9.5 3h4v10h-4z" fill="currentColor" stroke="none" opacity="0.5"/></svg>
+                </button>
+              </div>
               <button
                 v-if="isSplit && gi > 0"
                 class="group-close"
@@ -106,7 +117,25 @@
                 @click="onCloseGroup(group.id)"
               >✕</button>
             </div>
-            <div v-show="!uiModeFullscreen" class="editor-container" :ref="el => setEditorRef(group.id, el)"></div>
+            <!-- Wrapper only so the reveal button can be anchored to the top of the
+                 code area: .editor-group starts at the tab strip, whose height changes
+                 when the tabs overflow. -->
+            <div v-show="!uiModeFullscreen" class="editor-area">
+              <div class="editor-container" :ref="el => setEditorRef(group.id, el)"></div>
+              <button
+                v-if="!sidebarVisible && gi === 0"
+                class="editor-sidebar-reveal"
+                @click="toggleSidebar"
+                title="Show the sidebar (Ctrl+Shift+B)"
+                aria-label="Show the sidebar"
+              >
+                <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2">
+                  <rect x="2.5" y="2.5" width="11" height="11" rx="1"/>
+                  <line x1="6.5" y1="2.5" x2="6.5" y2="13.5"/>
+                  <polyline points="9.5,5.5 12,8 9.5,10.5"/>
+                </svg>
+              </button>
+            </div>
           </div>
           <!-- Horizontal divider between the two stacked groups. -->
           <div
@@ -545,7 +574,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
 import {
   extractBodyHtml,
   isCompiledPath,
@@ -564,6 +593,7 @@ import {
   type ServerStatus,
   type DisplayLogLevel,
 } from 'calcpad-frontend'
+import type { ResultMode, WorkspaceLayout } from './services/workspace-state'
 
 export interface ProblemItem {
   severity: number
@@ -576,13 +606,6 @@ export interface ProblemItem {
   endLineNumber: number
   endColumn: number
 }
-
-/**
- * What the results pane shows: 'preview' (the document as written), 'unwrapped' (the source
- * listing with macros and includes resolved), 'ui' (`#UI` lines as interactive controls,
- * `#post` hidden) and 'report' (the print layout with entered `#UI` values applied).
- */
-export type ResultMode = 'preview' | 'unwrapped' | 'ui' | 'report'
 
 // Result mode is shared across both groups. `onGotoProblem` targets the
 // active group's editor (main.ts resolves it).
@@ -1442,7 +1465,7 @@ function setServerStatus(status: ServerStatus): void {
 }
 
 const sidebarVisible = ref(true)
-const previewVisible = ref(false)
+const previewVisible = ref(true)
 // Groups with an in-flight preview render; drives the "Calculating…" overlay.
 const previewLoadingGroups = ref(new Set<string>())
 const previewLoading = computed(() => previewLoadingGroups.value.size > 0)
@@ -1569,6 +1592,30 @@ function showOutput(channel: OutputChannel = 'app'): void {
 
 function toggleSidebar(): void {
   sidebarVisible.value = !sidebarVisible.value
+}
+
+const onLayoutChanged = ref<((layout: WorkspaceLayout) => void) | null>(null)
+
+// Watched rather than reported from each toggle: the resize handle, the bottom
+// panel's own ✕ and its tab buttons all flip these directly.
+watch([sidebarVisible, previewVisible, bottomPanelOpen, activeBottomTab], () => {
+  onLayoutChanged.value?.({
+    sidebarVisible: sidebarVisible.value,
+    previewVisible: previewVisible.value,
+    bottomPanelOpen: bottomPanelOpen.value,
+    activeBottomTab: activeBottomTab.value,
+  })
+})
+
+/**
+ * Restore a persisted layout. Assigns the refs directly, bypassing `togglePreview`'s
+ * input-mode guard — there is no session to leave yet.
+ */
+function setLayout(layout: WorkspaceLayout): void {
+  sidebarVisible.value = layout.sidebarVisible
+  previewVisible.value = layout.previewVisible
+  bottomPanelOpen.value = layout.bottomPanelOpen
+  activeBottomTab.value = layout.activeBottomTab
 }
 
 // ---- Sidebar drag-to-resize ----
@@ -2351,6 +2398,8 @@ defineExpose({
   // panels / preview
   toggleSidebar,
   togglePreview,
+  onLayoutChanged,
+  setLayout,
   isPreviewVisible,
   setPreviewHtml,
   setPreviewLoading,

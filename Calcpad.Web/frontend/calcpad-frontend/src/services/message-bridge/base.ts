@@ -400,6 +400,11 @@ export abstract class BaseMessageBridge {
                 this.setExtraSetting('editorFontFamily', message.family ?? '');
                 this.postToVue({ type: 'editorFontFamilyChanged', family: message.family ?? '' });
                 break;
+            // Only the calcpad-web/desktop host has a collapsible sidebar, and it is
+            // what listens for this event.
+            case 'hideSidebar':
+                window.dispatchEvent(new CustomEvent('calcpad-toggle-sidebar'));
+                break;
             case 'debug':
                 break;
         }

@@ -94,17 +94,6 @@ select option {
     flex-direction: column;
 }
 
-.editor-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 12px;
-    background: var(--vscode-titleBar-activeBackground, #3c3c3c);
-    border-bottom: 1px solid var(--vscode-widget-border);
-    font-size: var(--calcpad-font-size-md);
-    min-height: 32px;
-}
-
 .spacer {
     flex: 1;
 }
@@ -155,9 +144,55 @@ select option {
     margin-left: 8px;
 }
 
+.editor-area {
+    position: relative;
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
 .editor-container {
     flex: 1;
     min-height: 0;
+}
+
+/* Floats over the code rather than sitting in the status bar, where it was too easy
+ * to miss. Translucent until hover so it reads as an overlay and the line it covers
+ * stays legible. */
+.editor-sidebar-reveal {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: var(--vscode-editorWidget-background, #252526);
+    color: var(--vscode-tab-inactiveForeground, #969696);
+    border: 1px solid var(--vscode-widget-border, #454545);
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0.75;
+}
+
+.editor-sidebar-reveal svg {
+    width: 14px;
+    height: 14px;
+}
+
+.editor-sidebar-reveal:hover {
+    opacity: 1;
+    color: var(--vscode-tab-activeForeground, #ffffff);
+    background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1));
+}
+
+.editor-sidebar-reveal:focus-visible {
+    opacity: 1;
+    outline: 1px solid var(--vscode-focusBorder, #007acc);
+    outline-offset: 1px;
 }
 
 /* ---- Editor groups (split layout) ---- */
@@ -312,6 +347,7 @@ select option {
     font-size: var(--calcpad-font-size-lg);
     white-space: nowrap;
     max-width: 240px;
+    flex-shrink: 0;
     box-sizing: border-box;
     border-top: 1px solid transparent;
 }
@@ -371,6 +407,7 @@ select option {
     align-items: center;
     justify-content: center;
     width: 28px;
+    flex-shrink: 0;
     height: 100%;
     background: transparent;
     color: var(--vscode-tab-inactiveForeground, #969696);
@@ -382,6 +419,51 @@ select option {
 .tab-new:hover {
     background: var(--vscode-tab-hoverBackground, #2a2d2e);
     color: var(--vscode-tab-hoverForeground, #ffffff);
+}
+
+/* Run / Split / Preview at the tab strip's right edge. Sticky rather than merely
+ * right-aligned: the strip is a horizontal scroller, so an ordinary flex item
+ * scrolls out of reach as soon as the tabs overflow. */
+.tab-actions {
+    position: sticky;
+    right: 0;
+    display: inline-flex;
+    align-items: stretch;
+    flex-shrink: 0;
+    background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
+    border-left: 1px solid var(--vscode-widget-border, #454545);
+}
+
+.tab-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    padding: 0;
+    background: transparent;
+    color: var(--vscode-tab-inactiveForeground, #969696);
+    border: none;
+    cursor: pointer;
+}
+
+.tab-action svg {
+    width: 14px;
+    height: 14px;
+}
+
+.tab-action:hover {
+    background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1));
+    color: var(--vscode-tab-hoverForeground, #ffffff);
+}
+
+/* Icon-only, so the ring is the only focus cue. */
+.tab-action:focus-visible {
+    outline: 1px solid var(--vscode-focusBorder, #007acc);
+    outline-offset: -2px;
+}
+
+.tab-action.active {
+    color: var(--vscode-tab-activeForeground, #ffffff);
 }
 
 .tab-context-menu {

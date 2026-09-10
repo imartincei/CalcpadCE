@@ -5,6 +5,7 @@ import pkg from '../package.json';
 import CalcpadAppVue from 'calcpad-frontend/vue/components/CalcpadApp.vue';
 import { initMessaging } from 'calcpad-frontend/vue/services/messaging';
 import { MessageBridge } from './services/message-bridge';
+import { WorkspaceStateStore, isResultMode, type ResultMode, type WorkspaceLayout } from './services/workspace-state';
 import { buildApiSettings } from 'calcpad-frontend/types/settings';
 import { ConnectionMonitor, setLogLevel, coerceLogLevel } from 'calcpad-frontend';
 import {
@@ -170,8 +171,6 @@ async function showServerBlockedDialog(details: string): Promise<void> {
     }
 }
 
-type ResultMode = 'preview' | 'unwrapped' | 'ui' | 'report';
-
 async function bootstrap(): Promise<void> {
     let serverUrl: string;
     let bridge: MessageBridge | null = null;
@@ -222,6 +221,8 @@ async function bootstrap(): Promise<void> {
     }
 
     const activeBridge = tauriBridge ?? bridge!;
+    // Last session's panes, result mode and open files, stored apart from the settings.
+    const workspace = await WorkspaceStateStore.load(isTauri);
 
     // Initialize the platform messaging (reads VITE_PLATFORM='web')
     initMessaging();
@@ -1023,6 +1024,25 @@ async function bootstrap(): Promise<void> {
         other?.editor.focus();
     }
 
+    // Set by the Tauri branch below; its absence marks a host that cannot quit.
+    let quitApplication: (() => Promise<void>) | null = null;
+
+    /**
+     * Settles the zero-tab state a close would otherwise leave behind: an emptied split
+     * group is merged away (closeGroup keeps the survivor, so emptying the top group
+     * promotes the bottom one), and emptying the only group quits — or on web, where
+     * there is nothing to quit, starts a fresh untitled document.
+     */
+    async function handleEmptyGroup(group: EditorGroup): Promise<void> {
+        if (group.tabs.count > 0) return;
+        if (groups.size > 1) {
+            await closeGroup(group.id);
+            return;
+        }
+        if (quitApplication) await quitApplication();
+        else group.tabs.newUntitled();
+    }
+
     appInstance.onSplitRequest = () => { void splitEditor(); };
     appInstance.onCloseGroupRequest = (groupId: string) => { void closeGroup(groupId); };
     appInstance.onGroupFocusRequest = (groupId: string) => {
@@ -1419,7 +1439,10 @@ async function bootstrap(): Promise<void> {
 
     appInstance.onTabActivate = (groupId: string, id: string) => { void activateTab(groupId, id); };
     appInstance.onTabCloseRequest = (groupId: string, id: string) => {
-        groups.get(groupId)?.tabs.close(id);
+        const g = groups.get(groupId);
+        if (!g) return;
+        g.tabs.close(id);
+        void handleEmptyGroup(g);
     };
     appInstance.onNewTabRequest = (groupId: string) => {
         groups.get(groupId)?.tabs.newUntitled();
@@ -1440,6 +1463,7 @@ async function bootstrap(): Promise<void> {
         const g = groups.get(groupId);
         if (!g) return;
         for (const t of g.tabs.all) g.tabs.close(t.id);
+        void handleEmptyGroup(g);
     };
 
     // Mount the CalcPad Vue sidebar. Desktop (Tauri) shows the Files view
@@ -1456,19 +1480,28 @@ async function bootstrap(): Promise<void> {
         switchView?: (id: string) => void;
     };
 
-    // Initialize the result mode from the saved extra setting (Tauri) or default (web).
-    // The key was `previewMode` and the rendered view was `wrapped`, so fall back to the
-    // old key and translate the old value — otherwise an existing install loses its mode.
-    const savedMode = editorBridge.getExtraSetting('resultMode')
-        ?? editorBridge.getExtraSetting('previewMode');
-    const restoredMode = savedMode === 'wrapped' ? 'preview' : savedMode;
-    if (restoredMode === 'preview' || restoredMode === 'unwrapped'
-        || restoredMode === 'ui' || restoredMode === 'report') {
-        appInstance.setResultMode(restoredMode);
-    }
-    // The restore above predates onResultModeChanged, and the sidebar has only just
-    // mounted, so seed it with the mode the session came up in.
+    // ---- Result mode and pane layout: restore, then keep persisted ----
+    // Installs from before the workspace store kept the mode in the settings extras, under
+    // `previewMode` with `wrapped` for what is now `preview`; carry that over once.
+    const legacyMode = workspace.isFresh
+        ? editorBridge.getExtraSetting('resultMode') ?? editorBridge.getExtraSetting('previewMode')
+        : undefined;
+    const restoredMode = legacyMode === 'wrapped' ? 'preview' : legacyMode;
+    appInstance.setResultMode(isResultMode(restoredMode) ? restoredMode : workspace.get().resultMode);
+
+    appInstance.setLayout(workspace.get().layout);
+    // Coming up visible is not a toggle, so onPreviewToggled never fires for it and
+    // nothing else would put the first render on screen.
+    if (appInstance.isPreviewVisible()) setTimeout(refreshAllPreviews, 50);
+    // Wired after the restore so it doesn't write the same values straight back.
+    appInstance.onLayoutChanged = (layout: WorkspaceLayout) => { workspace.update({ layout }); };
+
+    // The restores above predate onResultModeChanged, and the sidebar has only just
+    // mounted, so seed it with the mode and pane state the session came up in.
     syncInputMode();
+
+    // The sidebar's own hide button, relayed by the bridge's 'hideSidebar'.
+    window.addEventListener('calcpad-toggle-sidebar', () => { appInstance.toggleSidebar(); });
 
     // Manual refresh: re-lint, refresh definitions/headings, redraw previews, and re-extract
     // Export-tab plots. From the Server > Refresh menu, the Run action, and on reconnect.
@@ -1504,7 +1537,7 @@ async function bootstrap(): Promise<void> {
     appInstance.onResultModeChanged = (mode: ResultMode) => {
         // Not persisted when a #UI document chose it rather than the user: the session would
         // otherwise come back up in a form, whatever document is opened next.
-        if (!autoUiSwitchInFlight) editorBridge.setExtraSetting('resultMode', mode);
+        if (!autoUiSwitchInFlight) workspace.update({ resultMode: mode });
         refreshUiDirtyIndicator();
         syncInputMode();
         refreshAllPreviews();
@@ -1608,12 +1641,14 @@ async function bootstrap(): Promise<void> {
             { exit: processExit },
             tauriClipboard,
             { invoke: tauriInvoke },
+            { exists: fileExists },
         ] = await Promise.all([
             import('@tauri-apps/api/event'),
             import('@tauri-apps/api/window'),
             import('@tauri-apps/plugin-process'),
             import('@tauri-apps/plugin-clipboard-manager'),
             import('@tauri-apps/api/core'),
+            import('@tauri-apps/plugin-fs'),
         ]);
         invokeTauri = tauriInvoke;
         // Route Ctrl+Shift+V "Paste as Comment" through the same Tauri-native
@@ -1792,6 +1827,43 @@ async function bootstrap(): Promise<void> {
             if (detail?.path) void loadFile(detail.path);
         });
 
+        // ---- Session: reopen last launch's files ----
+        function captureSession(): void {
+            const openFiles: string[] = [];
+            for (const g of groups.values()) {
+                for (const t of g.tabs.all) {
+                    if (t.filePath && !openFiles.includes(t.filePath)) openFiles.push(t.filePath);
+                }
+            }
+            workspace.update({ openFiles, activeFile: activeGroup.tabs.activeTab?.filePath ?? '' });
+        }
+
+        /**
+         * Reopens last launch's files into the primary group. Deliberately not routed
+         * through loadFile, which would push every restored path back onto the
+         * recent-files list — rebuilding the native menu once per file — on every launch.
+         */
+        async function restoreSession(): Promise<void> {
+            for (const path of workspace.get().openFiles) {
+                // Files deleted or moved since last launch drop out of the session silently.
+                try {
+                    if (!await fileExists(path)) continue;
+                    tabs.openFile(path, await tauriBridge!.readFile(path));
+                } catch (err) {
+                    appInstance.appendOutput('debug', `Session restore skipped ${path}: ${err}`);
+                }
+            }
+            const activePath = workspace.get().activeFile;
+            const restored = activePath ? tabs.findByPath(activePath) : null;
+            if (restored) tabs.activate(restored.id);
+            // The first file replaces the seeded untitled tab in place, which is not an
+            // active-model change, so nothing else settles the mode for it.
+            applyCompiledWorksheetMode(activeGroup);
+            if (shouldAutoEnterUiMode(activeGroup)) autoEnterUiMode();
+        }
+
+        await restoreSession();
+
         // Drain any files handed to us at cold start by the OS's .cpd file
         // association. Runs after the listener above is wired so the bridge's
         // synchronous dispatch inside handleOpenFileByPath actually lands.
@@ -1929,6 +2001,11 @@ async function bootstrap(): Promise<void> {
             });
             group.tabs.onTabRemoved((tabId) => { void deleteDraft(tabId); });
 
+            // Registered here rather than beside captureSession so it starts only once
+            // restoreSession() has finished laying the session back out, and stops again
+            // once the exit path has taken its snapshot.
+            group.tabs.onTabsChanged(() => { if (!isExiting) captureSession(); });
+
             // Drag-drop file open — each dropped file opens/focuses a tab in
             // this group.
             const dropTarget = appInstance.getEditorContainer(group.id) as HTMLElement | null;
@@ -1959,10 +2036,18 @@ async function bootstrap(): Promise<void> {
         wireGroupTauri(primaryGroup);
         groupWireHooks.push(wireGroupTauri);
 
+        /**
+         * The user-initiated close. tryCloseTab itself deliberately does not settle: the
+         * unsplit and exit paths call it to drain a group they are already tearing down.
+         */
+        async function closeTabAndSettle(group: EditorGroup, id: string): Promise<void> {
+            if (await tryCloseTab(group, id)) await handleEmptyGroup(group);
+        }
+
         // Override tab-strip close actions with save-prompt-aware versions.
         appInstance.onTabCloseRequest = (groupId: string, id: string) => {
             const g = groups.get(groupId);
-            if (g) void tryCloseTab(g, id);
+            if (g) void closeTabAndSettle(g, id);
         };
 
         async function tryCloseTabsSequentially(group: EditorGroup, ids: string[]): Promise<void> {
@@ -1970,6 +2055,7 @@ async function bootstrap(): Promise<void> {
                 const ok = await tryCloseTab(group, id);
                 if (!ok) return;
             }
+            await handleEmptyGroup(group);
         }
 
         appInstance.onTabCloseOthersRequest = (groupId: string, id: string) => {
@@ -2217,7 +2303,7 @@ async function bootstrap(): Promise<void> {
 
                 case 'close-tab': {
                     const activeId = tabs.activeId;
-                    if (activeId) await tryCloseTab(activeGroup, activeId);
+                    if (activeId) await closeTabAndSettle(activeGroup, activeId);
                     break;
                 }
 
@@ -2450,7 +2536,7 @@ async function bootstrap(): Promise<void> {
             if (e.key === 'w' && !e.shiftKey && !e.altKey) {
                 e.preventDefault();
                 const id = activeGroup.tabs.activeId;
-                if (id) void tryCloseTab(activeGroup, id);
+                if (id) void closeTabAndSettle(activeGroup, id);
                 return;
             }
             // Ctrl+1..9 → activate Nth tab in the active group (Ctrl+9 = last).
@@ -2469,6 +2555,11 @@ async function bootstrap(): Promise<void> {
         async function tryExit(): Promise<void> {
             if (isExiting) return;        // re-entry guard (multiple X clicks)
             isExiting = true;
+
+            // Snapshot before the dirty-tab walk below closes anything; `isExiting` keeps
+            // those closes from overwriting it. Quitting by closing the last tab therefore
+            // records an empty session, while quitting with files open records them.
+            captureSession();
 
             try {
                 if (!await confirmLeaveUiDoc()) {
@@ -2501,11 +2592,16 @@ async function bootstrap(): Promise<void> {
                         try { await serverManager.dispose(); }
                         catch (e) { appInstance.appendOutput('debug', `serverManager.dispose() rejected: ${e}`); }
                     }
+                    // The store's own write is debounced, which processExit would outrun.
+                    try { await workspace.flush(); }
+                    catch (e) { appInstance.appendOutput('debug', `workspace.flush() rejected: ${e}`); }
                     appInstance.appendOutput('debug', 'Exit path: calling process.exit()');
                     void processExit(0);
                 }
             }
         }
+
+        quitApplication = tryExit;
 
         // Intercept the window close button so unsaved tabs get their save prompt
         // before Tauri tears down the webview. tryExit() calls processExit() on
@@ -2517,4 +2613,17 @@ async function bootstrap(): Promise<void> {
     }
 }
 
-bootstrap();
+// Nothing has mounted yet when bootstrap rejects, so an unhandled rejection here
+// leaves a blank window with a working native menu and no clue what failed.
+bootstrap().catch((err) => {
+    const detail = err instanceof Error ? (err.stack ?? err.message) : String(err);
+    const panel = document.createElement('pre');
+    panel.setAttribute('style', [
+        'position:fixed', 'inset:0', 'margin:0', 'padding:24px',
+        'background:#1e1e1e', 'color:#f48771',
+        'font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace',
+        'white-space:pre-wrap', 'overflow:auto', 'z-index:2147483647',
+    ].join(';'));
+    panel.textContent = `CalcpadCE failed to start.\n\n${detail}`;
+    document.body.appendChild(panel);
+});

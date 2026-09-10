@@ -6,17 +6,28 @@
   <div class="calcpad-vue-ui" :class="{ split: isSplit }" @contextmenu.prevent>
     <!-- Activity icons: only shown when the host app enables extra tabs (desktop).
          VS Code webview keeps a single Calcpad view. -->
-    <div v-if="versionConfig.isDesktop" class="activity-icons" role="tablist">
+    <div v-if="versionConfig.isDesktop" class="activity-icons">
+      <div class="activity-tabs" role="tablist">
+        <button
+          v-for="view in views"
+          :key="view.id"
+          :class="['activity-icon', { active: activeView === view.id }]"
+          :title="view.label"
+          :aria-label="view.label"
+          :aria-selected="activeView === view.id"
+          role="tab"
+          @click="switchView(view.id)"
+          v-html="view.icon"
+        ></button>
+      </div>
+      <!-- Sits on the bar that spans both views, since hiding takes both away. Showing
+           it again is the editor-area button's job — this bar goes with the sidebar. -->
       <button
-        v-for="view in views"
-        :key="view.id"
-        :class="['activity-icon', { active: activeView === view.id }]"
-        :title="view.label"
-        :aria-label="view.label"
-        :aria-selected="activeView === view.id"
-        role="tab"
-        @click="switchView(view.id)"
-        v-html="view.icon"
+        class="activity-icon activity-hide"
+        title="Hide the sidebar (Ctrl+Shift+B)"
+        aria-label="Hide the sidebar"
+        @click="hideSidebar()"
+        v-html="HIDE_SIDEBAR_ICON"
       ></button>
     </div>
 
@@ -45,13 +56,27 @@
       >
         {{ tab.label }}
       </button>
-      <button
-        class="pane-action"
-        :title="isSplit ? 'Close this panel' : 'Split panel'"
-        :aria-label="isSplit ? 'Close this panel' : 'Split panel'"
-        @click="isSplit ? closePane(paneIndex) : splitPane()"
-        v-html="isSplit ? CLOSE_ICON : SPLIT_ICON"
-      ></button>
+      <!-- Grouped so the pair wraps as a unit rather than splitting across rows at
+           the sidebar's minimum width (the second button is web-only). -->
+      <div class="pane-actions">
+        <button
+          class="pane-action"
+          :title="isSplit ? 'Close this panel' : 'Split panel'"
+          :aria-label="isSplit ? 'Close this panel' : 'Split panel'"
+          @click="isSplit ? closePane(paneIndex) : splitPane()"
+          v-html="isSplit ? CLOSE_ICON : SPLIT_ICON"
+        ></button>
+        <!-- Hides the whole sidebar, unlike .pane-action beside it, which splits or
+             closes one of its inner panes. -->
+        <button
+          v-if="versionConfig.isWeb && paneIndex === 0"
+          class="pane-action"
+          title="Hide the sidebar (Ctrl+Shift+B)"
+          aria-label="Hide the sidebar"
+          @click="hideSidebar()"
+          v-html="HIDE_SIDEBAR_ICON"
+        ></button>
+      </div>
     </div>
     </div>
 
@@ -233,8 +258,10 @@ const activeView = ref<string>('calcpad')
 const openedFolder = ref<string | null>(null)
 const fileTreeRoots = ref<FileNode[]>([])
 
-// Split icon (two stacked rows) and close icon for the per-pane action button.
+// Split icon (two stacked rows) and close icon for the per-pane action button;
+// hide-sidebar collapses the panel itself.
 const SPLIT_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="2" y1="8" x2="14" y2="8"/></svg>'
+const HIDE_SIDEBAR_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="6" y1="2" x2="6" y2="14"/><polyline points="11.5,5.5 9,8 11.5,10.5"/></svg>'
 const CLOSE_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" xmlns="http://www.w3.org/2000/svg"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>'
 
 // The side panel can be split into two panes, each with its own active tab.
@@ -390,6 +417,10 @@ const splitPane = () => {
 const closePane = (index: number) => {
   if (panes.value.length <= 1) return
   panes.value.splice(index, 1)
+}
+
+const hideSidebar = () => {
+  postMessage({ type: 'hideSidebar' })
 }
 
 const activateTab = (pane: Pane, tabId: string) => {
@@ -871,6 +902,20 @@ onUnmounted(() => {
   background: var(--vscode-activityBar-background, var(--vscode-editor-background));
 }
 
+/* The tablist holds only the view tabs; the hide button is not one of them. */
+.activity-tabs {
+  display: flex;
+}
+
+.activity-hide {
+  margin-left: auto;
+}
+
+.activity-hide :deep(svg) {
+  width: 20px;
+  height: 20px;
+}
+
 .activity-icon {
   display: inline-flex;
   align-items: center;
@@ -950,9 +995,14 @@ onUnmounted(() => {
   opacity: 0.5;
 }
 
-/* Split / close button pinned to the right end of the tab strip. */
-.pane-action {
+/* Split / close and hide-sidebar buttons, pinned to the right end of the tab strip. */
+.pane-actions {
   margin-left: auto;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.pane-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;

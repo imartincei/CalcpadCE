@@ -1341,6 +1341,19 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_log::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
+        // Applies the saved geometry after the window is created, so it wins over the
+        // config's `center: true`. StateFlags is spelled out rather than defaulted to
+        // all(): VISIBLE makes the plugin hide-then-show the window on restore, which is
+        // what the GNOME note in setup() below forbids and leaves the webview blank.
+        .plugin(
+            tauri_plugin_window_state::Builder::default()
+                .with_state_flags(
+                    tauri_plugin_window_state::StateFlags::SIZE
+                        | tauri_plugin_window_state::StateFlags::POSITION
+                        | tauri_plugin_window_state::StateFlags::MAXIMIZED,
+                )
+                .build(),
+        )
         .manage(ServerState::default())
         .manage(PendingLaunchFiles::default())
         .manage(MenuState::default())

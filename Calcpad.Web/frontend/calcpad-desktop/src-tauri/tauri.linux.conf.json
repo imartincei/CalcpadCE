@@ -1,6 +1,9 @@
 {
   "build": {
-    "beforeDevCommand": "rm -rf ../calcpad-web/dist && ./local-npm.sh --prefix ../calcpad-frontend run build && (./local-npm.sh --prefix ../calcpad-frontend run watch &) && ./local-npm.sh --prefix ../calcpad-web run build:watch",
+    "beforeDevCommand": {
+      "script": "rm -rf ../calcpad-web/dist && ./local-npm.sh --prefix ../calcpad-frontend run build && ./local-npm.sh --prefix ../calcpad-web run build && (./local-npm.sh --prefix ../calcpad-frontend run watch > /tmp/calcpad-frontend-watch.log 2>&1 &) && (./local-npm.sh --prefix ../calcpad-web run build:watch > /tmp/calcpad-web-watch.log 2>&1 &)",
+      "wait": true
+    },
     "beforeBuildCommand": "rm -rf ../calcpad-web/dist && ./local-npm.sh --prefix ../calcpad-frontend run build && ./local-npm.sh --prefix ../calcpad-web run build"
   },
   "bundle": {

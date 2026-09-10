@@ -342,11 +342,22 @@ export class TabManager {
      * user must explicitly save to reconcile.
      */
     openDraft(opts: { filePath: string | null; title: string; content: string }): string {
-        const tab = this.createTab({ title: opts.title, filePath: opts.filePath, content: opts.content });
+        // A draft for a file session restore already reopened takes that tab over, rather
+        // than adding a second tab for the same path.
+        const existing = opts.filePath
+            ? this.tabs.find(t => docFor(t.model).filePath === opts.filePath)
+            : undefined;
+        const tab = existing
+            ?? this.createTab({ title: opts.title, filePath: opts.filePath, content: opts.content });
+        const doc = docFor(tab.model);
         // Force dirty even though content matches the model's initial value:
         // set savedVersionId to a value the alternative-version-id can never
         // hit (it starts at 1 and only grows), so recomputeDirty sees a diff.
-        docFor(tab.model).savedVersionId = -1;
+        doc.savedVersionId = -1;
+        if (existing) {
+            tab.model.setValue(opts.content);
+            for (const l of doc.onChanged) l();
+        }
         tab.dirty = true;
         this.activate(tab.id);
         this.emit();
