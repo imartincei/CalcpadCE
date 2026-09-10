@@ -55,6 +55,7 @@ jobs:
             libxdo-dev \
             libssl-dev \
             patchelf \
+            xdg-utils \
             file \
             wget
 
@@ -103,8 +104,27 @@ jobs:
               "artifacts/CalcpadCE-desktop-${{ inputs.version }}-x86_64.pkg.tar.zst"
           fi
 
-      - name: Upload artifacts
+      - name: Upload deb
         uses: actions/upload-artifact@v7
         with:
-          path: artifacts/*
+          path: artifacts/CalcpadCE-desktop-${{ inputs.version }}-${{ matrix.arch }}.deb
+          archive: false
+
+      - name: Upload rpm
+        uses: actions/upload-artifact@v7
+        with:
+          path: artifacts/CalcpadCE-desktop-${{ inputs.version }}-${{ matrix.arch }}.rpm
+          archive: false
+
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v7
+        with:
+          path: artifacts/CalcpadCE-desktop-${{ inputs.version }}-${{ matrix.arch }}.AppImage
+          archive: false
+
+      - name: Upload Arch package
+        if: matrix.arch == 'x86_64'
+        uses: actions/upload-artifact@v7
+        with:
+          path: artifacts/CalcpadCE-desktop-${{ inputs.version }}-x86_64.pkg.tar.zst
           archive: false
