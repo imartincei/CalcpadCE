@@ -1,8 +1,10 @@
 {
   "name": "vscode-calcpad",
-  "displayName": "VS Code CalcpadCE",
-  "description": "Calculator extension for VS Code",
+  "displayName": "CalcpadCE for VS Code ",
+  "description": "Complete CalcpadCE editor and calculation engine for VS Code",
   "version": "8.0.0-beta1",
+  "author": "CalcpadCE Contributors",
+  "license": "MIT",
   "publisher": "imartincei",
   "repository": "https://github.com/imartincei/vscode-calcpad",
   "icon": "calcpad-icon.png",

@@ -11,48 +11,22 @@ permissions:
   contents: read
 
 jobs:
-  build-windows-installer:
-    uses: ./.github/workflows/build-windows-installer.yml
+  build-desktop-windows:
+    uses: ./.github/workflows/build-desktop-windows.yml
     with:
       version: ${{ inputs.version }}
 
-  build-windows-portable:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+  build-desktop-linux:
+    uses: ./.github/workflows/build-desktop-linux.yml
+    with:
+      version: ${{ inputs.version }}
 
-      - name: Setup .NET 10
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '10.0.x'
+  build-vscode-extension:
+    uses: ./.github/workflows/build-vscode-extension.yml
+    with:
+      version: ${{ inputs.version }}
 
-      - name: Cache wkhtmltopdf
-        uses: actions/cache@v4
-        with:
-          path: ~\AppData\Local\CalcpadCE\tools
-          key: wkhtmltopdf-0.12.6-1-win64
-
-      - name: Publish portable single-file
-        run: >
-          dotnet publish Calcpad.Wpf/Calcpad.wpf.csproj
-          -c Release
-          -r win-x64
-          --self-contained true
-          -p:Version=${{ inputs.version }}
-          -o "CalcpadCE-portable-${{ inputs.version }}"
-
-      - name: Create portable zip
-        shell: pwsh
-        run: Compress-Archive -Path CalcpadCE-portable-${{ inputs.version }} -DestinationPath "CalcpadCE-portable-${{ inputs.version }}.zip"
-
-      - name: Upload portable artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: CalcpadCE-portable-${{ inputs.version }}.zip
-          path: CalcpadCE-portable-${{ inputs.version }}.zip
-
-  build-deb:
+  build-cli-deb:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -88,13 +62,19 @@ jobs:
           -p:ExamplesContentDir=.pkg/Examples
           -p:RuntimeIdentifier=${{ matrix.rid }}
 
+      - name: Stage artifact
+        run: |
+          mkdir -p artifacts
+          cp Calcpad.Cli/bin/Release/net10.0/${{ matrix.rid }}/*.deb \
+            "artifacts/CalcpadCE-cli-${{ inputs.version }}-${{ matrix.rid }}.deb"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          path: Calcpad.Cli/bin/Release/net10.0/${{ matrix.rid }}/*.deb
+          path: artifacts/*
           archive: false
 
-  build-rpm:
+  build-cli-rpm:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -133,13 +113,55 @@ jobs:
           -p:ExamplesContentDir=.pkg/Examples
           -p:RuntimeIdentifier=${{ matrix.rid }}
 
+      - name: Stage artifact
+        run: |
+          mkdir -p artifacts
+          cp Calcpad.Cli/bin/Release/net10.0/${{ matrix.rid }}/*.rpm \
+            "artifacts/CalcpadCE-cli-${{ inputs.version }}-${{ matrix.rid }}.rpm"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          path: Calcpad.Cli/bin/Release/net10.0/${{ matrix.rid }}/*.rpm
+          path: artifacts/*
           archive: false
 
-  build-tarball:
+  build-cli-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache wkhtmltopdf
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\CalcpadCE\tools
+          key: wkhtmltopdf-0.12.6-1-win64
+
+      - name: Publish self-contained
+        run: >
+          dotnet publish Calcpad.Cli/Calcpad.Cli.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:Version=${{ inputs.version }}
+          -o "CalcpadCE-cli-${{ inputs.version }}-win-x64"
+
+      - name: Create zip
+        shell: pwsh
+        run: Compress-Archive -Path "CalcpadCE-cli-${{ inputs.version }}-win-x64" -DestinationPath "CalcpadCE-cli-${{ inputs.version }}-win-x64.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: '*.zip'
+          archive: false
+
+  build-cli-tarball:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -160,10 +182,10 @@ jobs:
           -r ${{ matrix.rid }}
           --self-contained true
           -p:Version=${{ inputs.version }}
-          -o "CalcpadCE-${{ inputs.version }}-${{ matrix.rid }}"
+          -o "CalcpadCE-cli-${{ inputs.version }}-${{ matrix.rid }}"
 
       - name: Create tarball
-        run: tar cjf "CalcpadCE-${{ inputs.version }}-${{ matrix.rid }}.tar.bz2" CalcpadCE-${{ inputs.version }}-${{ matrix.rid }}
+        run: tar cjf "CalcpadCE-cli-${{ inputs.version }}-${{ matrix.rid }}.tar.bz2" CalcpadCE-cli-${{ inputs.version }}-${{ matrix.rid }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7

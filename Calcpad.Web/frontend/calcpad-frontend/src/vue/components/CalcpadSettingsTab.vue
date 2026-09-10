@@ -640,7 +640,7 @@
       </div>
 
       <div v-if="appVersion" class="about-footer">
-        <span class="app-version">CalcpadCE Web v{{ appVersion }}</span>
+        <span class="app-version">CalcpadCE v{{ appVersion }}</span>
       </div>
     </div>
   </div>

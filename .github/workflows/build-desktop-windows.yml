@@ -1,0 +1,68 @@
+name: Build Desktop (Windows)
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  build-desktop-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: Calcpad.Web/frontend/calcpad-desktop/src-tauri
+
+      - name: Set version
+        run: node Calcpad.Web/frontend/scripts/bump-versions.mjs set ${{ inputs.version }}
+
+      - name: Install frontend dependencies
+        run: |
+          npm ci --prefix Calcpad.Web/frontend/calcpad-frontend
+          npm ci --prefix Calcpad.Web/frontend/calcpad-web
+          npm ci --prefix Calcpad.Web/frontend/calcpad-desktop
+
+      # Installers (msi/nsis) ship once the release is out of beta.
+      # - name: Build desktop installers (Tauri)
+      #   working-directory: Calcpad.Web/frontend/calcpad-desktop
+      #   shell: pwsh
+      #   run: ./build-desktop.ps1
+
+      - name: Build portable
+        working-directory: Calcpad.Web/frontend/calcpad-desktop
+        shell: pwsh
+        run: ./build-portable.ps1
+
+      - name: Stage artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path artifacts -Force | Out-Null
+          Copy-Item Calcpad.Web/frontend/calcpad-desktop/src-tauri/target/portable/CalcpadCE-portable-win64.zip `
+            -Destination "artifacts/CalcpadCE-portable-${{ inputs.version }}.zip"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          path: artifacts/*
+          archive: false

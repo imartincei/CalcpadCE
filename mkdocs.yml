@@ -27,6 +27,7 @@ theme:
     - content.code.copy
 
 hooks:
+  - docs/hooks/copy_fonts.py
   - docs/hooks/math_fix.py
   - docs/hooks/render_examples.py
 

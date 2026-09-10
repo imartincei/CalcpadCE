@@ -12,23 +12,28 @@ Rollup-bundled extension + Vue webview panel. Depends on calcpad-frontend.
 | `calcpadSemanticTokensProvider` | Server-based semantic highlighting |
 | `calcpadIncludeCompletionProvider` | File path completion for `#include` |
 
-## Commands (30+)
-Preview, PDF export, insert operations, formatting (bold/italic/heading/sub/super), comment toggle, and more. Defined in `package.json` contributes.commands.
+## Commands (40+)
+Preview, PDF/DOCX export, insert operations, formatting (bold/italic/heading/sub/super), comment toggle, `calcpad.stopServer`, and more. Defined in `package.json` contributes.commands.
 
 ## Custom Semantic Token Types
-`const`, `bracket`, `lineContinuation`, `localVariable`, `macroParameter`, `units`, `setting`, `controlBlockKeyword`, `endKeyword`, `command`, `include`, `filePath`, `dataExchangeKeyword`, `htmlComment`, `tag`, `htmlContent`, `javascript`, `css`, `svg`, `input`, `format`
+The legend is built from `SEMANTIC_TOKEN_TYPES` exported by **calcpad-frontend**, so the extension and the web editor stay in lockstep with the server's `TokenType` enum — never hardcode the list here. `mapTokenTypeToIndex` converts a server `typeId` to its legend index.
 
 ## Extension Settings
-```json
-{
-    "calcpad.settings": {
-        "math": { "decimals": 2, "degrees": true, ... },
-        "plot": { "isAdaptive": true, "screenScaleFactor": 1.0, ... },
-        "server": { "url": "http://localhost:9420", "mode": "auto" },
-        "units": "m"
-    }
-}
+Settings are **not** VS Code configuration entries. They live as JSON under the extension's `globalStorage/settings/`, managed by `CalcpadSettingsManager` (`src/calcpadSettings.ts`):
+
 ```
+<globalStorage>/settings/
+    active-settings.json   live state, written on every edit
+    default.json           pristine defaults, refreshed on activation
+    <name>.json            user-created presets, never written by the editor
+```
+
+The active preset's *name* is remembered in `globalState` for the dropdown label only; every edit lands in `active-settings.json` regardless.
+
+`calcpad.enableFormattingHotkeys` is the one real workspace setting, and only because keybinding `when` clauses can read nothing but `config.*`. It is mirrored from the JSON-backed `formattingHotkeys` extra.
+
+## Server Lifecycle
+`BaseServerManager` (`src/baseServerManager.ts`) picks a port, generates the `CALCPAD_API_TOKEN`, and spawns the bundled server with `--urls http://localhost:<port>`. A lock file lets a second window adopt an already-running server instead of spawning a second one, and carries the token so the adopting window can authenticate. `CALCPAD_DETACHED=1` is set so the server survives the window that spawned it. Readiness is polled against `/api/calcpad/snippets`.
 
 ## Adding a VS Code Command
 1. **Define in package.json** contributes.commands:
