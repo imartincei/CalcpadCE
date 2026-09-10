@@ -122,6 +122,14 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     break;
                 }
 
+                case 'showAlert': {
+                    const text = String(data.message ?? '');
+                    if (data.kind === 'error') { void vscode.window.showErrorMessage(text); }
+                    else if (data.kind === 'warning') { void vscode.window.showWarningMessage(text); }
+                    else { void vscode.window.showInformationMessage(text); }
+                    break;
+                }
+
                 case 'switchConfig':
                     await this._settingsManager.loadPreset(data.name);
                     webviewView.webview.postMessage(await this._buildSettingsResponse());

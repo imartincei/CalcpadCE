@@ -770,7 +770,12 @@ const handleMessage = (event: MessageEvent) => {
       if (Array.isArray(message.availableFonts)) availableFonts.value = message.availableFonts
       break
     case 'saveNamedConfigError':
-      window.alert(message.message || 'Failed to save settings.')
+      postMessage({
+        type: 'showAlert',
+        title: 'Settings',
+        message: message.message || 'Failed to save settings.',
+        kind: 'error',
+      })
       break
     case 'settingsReset':
       settings.value = message.settings

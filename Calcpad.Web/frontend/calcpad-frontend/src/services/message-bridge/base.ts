@@ -260,6 +260,9 @@ export abstract class BaseMessageBridge {
             case 'getInsertData':
                 this.handleGetInsertData();
                 break;
+            case 'showAlert':
+                void this.showAlert(message.title ?? 'CalcpadCE', message.message ?? '', message.kind ?? 'info');
+                break;
             case 'getSettings':
                 this.handleGetSettings();
                 break;
@@ -470,6 +473,10 @@ export abstract class BaseMessageBridge {
         this.postToVue({ type: 'exportError', message });
     }
     protected handlePlatformMessage(_message: any): boolean { return false; }
+    /** Hosts with a native dialog override this; the browser gets `alert`. */
+    protected async showAlert(_title: string, message: string, _kind: 'info' | 'warning' | 'error'): Promise<void> {
+        window.alert(message);
+    }
     protected onOpenLogsFolder(): void {
         console.warn('Open Logs Folder is only available in the desktop build — server logs live on the host running CalcPad.');
     }

@@ -55,7 +55,9 @@ export class TauriServerManager {
     public onStartupBlocked?: (details: string) => void;
     public onServerLog?: (line: string, stream: 'stdout' | 'stderr') => void;
 
-    constructor(logger: ServerManagerLogger) {
+    /** `autoRestartEnabled` is off in secondary windows: `server-crashed` is broadcast, so
+     *  every window would otherwise race to respawn the one sidecar. */
+    constructor(logger: ServerManagerLogger, private readonly autoRestartEnabled = true) {
         this.logger = logger;
     }
 
@@ -121,7 +123,9 @@ export class TauriServerManager {
             this._crashCount++;
             this.log(`Server crashed (code=${evt.payload.code ?? 'unknown'}) — attempt ${this._crashCount}/${MAX_AUTO_RESTARTS}`, 'error');
             void this.writeCrashRecord(evt.payload);
-            if (this._crashCount < MAX_AUTO_RESTARTS) {
+            if (!this.autoRestartEnabled) {
+                this.onStatusChanged?.('stopped', 'crashed');
+            } else if (this._crashCount < MAX_AUTO_RESTARTS) {
                 this.onStatusChanged?.('starting', `crashed, retry ${this._crashCount}/${MAX_AUTO_RESTARTS}`);
                 setTimeout(() => { void this.autoRestart(); }, AUTO_RESTART_DELAY_MS);
             } else {

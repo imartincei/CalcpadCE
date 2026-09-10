@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use tauri::menu::{IsMenuItem, Menu, MenuBuilder, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Emitter, Manager, RunEvent, State};
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 use tauri_plugin_fs::FsExt;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
@@ -28,6 +29,8 @@ static API_TOKEN: OnceLock<String> = OnceLock::new();
 const SIDECAR_EXE_UNIX: &str = "Calcpad.Server";
 const SIDECAR_EXE_WINDOWS: &str = "Calcpad.Server.exe";
 const PORT_READY_TIMEOUT_MS: u64 = 30_000;
+const MAIN_WINDOW_LABEL: &str = "main";
+const CANCEL_LABEL: &str = "Cancel";
 
 /// Files handed to us by the OS at launch (double-click on .cpd or .cpdz via the
 /// installed file associations). Populated in setup() from argv; drained by
@@ -35,6 +38,16 @@ const PORT_READY_TIMEOUT_MS: u64 = 30_000;
 /// race between Rust emitting and JS being ready to listen.
 #[derive(Default)]
 struct PendingLaunchFiles(Mutex<Vec<String>>);
+
+/// Label of the window that most recently took focus, so a menu click can be delivered
+/// to it alone. Tracked here because `get_focused_window` needs tauri's `unstable` feature.
+struct FocusedWindow(Mutex<String>);
+
+impl Default for FocusedWindow {
+    fn default() -> Self {
+        Self(Mutex::new(MAIN_WINDOW_LABEL.to_string()))
+    }
+}
 
 /// What the menu shows that the frontend owns. A menu item carries no mutable
 /// state of its own, so every change rebuilds the whole menu — which means each
@@ -472,6 +485,79 @@ fn set_recent_files(app: AppHandle, paths: Vec<String>) -> Result<(), String> {
         .lock()
         .expect("menu state mutex poisoned") = paths;
     refresh_menu(&app)
+}
+
+/// Labels of every open window. The frontend needs the count to tell whether it is the
+/// last window (and so owes the full exit), and the list to ask the others to close.
+#[tauri::command]
+fn window_labels(app: AppHandle) -> Vec<String> {
+    app.webview_windows().into_keys().collect()
+}
+
+/// Opens another window in this process — one sidecar, one store, one drafts dir. Cloning
+/// the configured window carries its CSP, min sizes and browser args over. Async because
+/// building a webview from a sync command deadlocks on Windows.
+#[tauri::command]
+async fn new_window(app: AppHandle) -> Result<String, String> {
+    let mut config = app
+        .config()
+        .app
+        .windows
+        .first()
+        .ok_or("no window configured")?
+        .clone();
+
+    let label = (2..)
+        .map(|n| format!("{MAIN_WINDOW_LABEL}-{n}"))
+        .find(|l| app.get_webview_window(l).is_none())
+        .expect("an unused window label exists");
+    config.label = label.clone();
+
+    tauri::WebviewWindowBuilder::from_config(&app, &config)
+        .map_err(|e| e.to_string())?
+        .build()
+        .map_err(|e| e.to_string())?;
+    Ok(label)
+}
+
+/// Native Save / Don't Save / Cancel prompt. The dialog plugin's JS API tops out at two
+/// buttons, so the three-way unsaved-changes question has to be asked from Rust.
+#[tauri::command]
+async fn confirm_three_way(
+    app: AppHandle,
+    window: tauri::Window,
+    title: String,
+    message: String,
+    yes_label: String,
+    no_label: String,
+) -> Result<String, String> {
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    let (yes, no) = (yes_label.clone(), no_label.clone());
+    app.dialog()
+        .message(message)
+        .title(title)
+        .kind(MessageDialogKind::Warning)
+        .parent(&window)
+        .buttons(MessageDialogButtons::YesNoCancelCustom(
+            yes_label,
+            no_label,
+            CANCEL_LABEL.to_string(),
+        ))
+        .show_with_result(move |res| {
+            let _ = tx.send(res);
+        });
+
+    let result = rx.await.map_err(|e| e.to_string())?;
+    // Linux reports the pressed button as Custom(label); dismissing via the window
+    // manager lands on Cancel.
+    Ok(match result {
+        tauri_plugin_dialog::MessageDialogResult::Yes
+        | tauri_plugin_dialog::MessageDialogResult::Ok => "yes".to_string(),
+        tauri_plugin_dialog::MessageDialogResult::No => "no".to_string(),
+        tauri_plugin_dialog::MessageDialogResult::Custom(s) if s == yes => "yes".to_string(),
+        tauri_plugin_dialog::MessageDialogResult::Custom(s) if s == no => "no".to_string(),
+        _ => "cancel".to_string(),
+    })
 }
 
 // Inside a linuxdeploy-generated AppImage, AppRun exports LD_LIBRARY_PATH so the bundled
@@ -1135,6 +1221,13 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         true,
         &[
             &MenuItem::with_id(app, "new", "New Tab", true, Some("CmdOrCtrl+N"))?,
+            &MenuItem::with_id(
+                app,
+                "new-window",
+                "New Window",
+                true,
+                Some("CmdOrCtrl+Shift+N"),
+            )?,
             &MenuItem::with_id(app, "open", "Open...", true, Some("CmdOrCtrl+O"))?,
             &open_recent,
             &sep()?,
@@ -1317,7 +1410,7 @@ pub fn run() {
     install_panic_hook();
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
-            if let Some(w) = app.get_webview_window("main") {
+            if let Some(w) = app.get_webview_window(MAIN_WINDOW_LABEL) {
                 let _ = w.show();
                 let _ = w.set_focus();
                 let _ = w.unminimize();
@@ -1325,7 +1418,11 @@ pub fn run() {
             for path in extract_launch_files(argv) {
                 // The OS handing us this path is the user's consent; no dialog ran.
                 allow_file_and_parent(app, &path);
-                let _ = app.emit("open-file-request", path.to_string_lossy().to_string());
+                let _ = app.emit_to(
+                    MAIN_WINDOW_LABEL,
+                    "open-file-request",
+                    path.to_string_lossy().to_string(),
+                );
             }
         }))
         .plugin(tauri_plugin_fs::init())
@@ -1356,6 +1453,7 @@ pub fn run() {
         )
         .manage(ServerState::default())
         .manage(PendingLaunchFiles::default())
+        .manage(FocusedWindow::default())
         .manage(MenuState::default())
         .invoke_handler(tauri::generate_handler![
             server_url,
@@ -1374,7 +1472,19 @@ pub fn run() {
             allow_document_dir,
             set_source_result_modes_visible,
             set_recent_files,
+            confirm_three_way,
+            window_labels,
+            new_window,
         ])
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::Focused(true) = event {
+                *window
+                    .state::<FocusedWindow>()
+                    .0
+                    .lock()
+                    .expect("focused window mutex poisoned") = window.label().to_string();
+            }
+        })
         .setup(|app| {
             // Pin the on-disk locations the panic hook + draft commands need.
             // app_data_dir is per-user and writable on all supported platforms.
@@ -1393,8 +1503,17 @@ pub fn run() {
             let menu = build_menu(app.handle())?;
             app.set_menu(menu)?;
             let handle_for_menu = app.handle().clone();
+            // Addressed to the focused window: the menu is app-wide, so a broadcast would
+            // run every click and accelerator in all of them at once.
             app.on_menu_event(move |_app, event| {
-                let _ = handle_for_menu.emit(
+                let target = handle_for_menu
+                    .state::<FocusedWindow>()
+                    .0
+                    .lock()
+                    .expect("focused window mutex poisoned")
+                    .clone();
+                let _ = handle_for_menu.emit_to(
+                    target,
                     "menu-click",
                     MenuClickPayload {
                         id: event.id().0.clone(),
@@ -1429,7 +1548,8 @@ pub fn run() {
                 tokio::time::sleep(Duration::from_millis(50)).await;
                 if let Ok(drafts) = draft_list() {
                     if !drafts.is_empty() {
-                        let _ = handle_for_drafts.emit("drafts-recovered", drafts);
+                        let _ =
+                            handle_for_drafts.emit_to(MAIN_WINDOW_LABEL, "drafts-recovered", drafts);
                     }
                 }
             });

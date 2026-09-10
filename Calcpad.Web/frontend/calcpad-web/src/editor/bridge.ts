@@ -16,6 +16,17 @@ export interface EditorBridge {
     setExtraSetting(key: string, value: string): void;
     /** Desktop overrides this with Tauri's native clipboard (WebKitGTK workaround); web falls back to the browser API. */
     readClipboardText?(): Promise<string>;
+    /** Native Save / Don't Save / Cancel prompt. Desktop only — web falls back to the in-app modal. */
+    confirmThreeWay?(opts: ConfirmThreeWayOptions): Promise<ConfirmChoice>;
+}
+
+export type ConfirmChoice = 'yes' | 'no' | 'cancel';
+
+export interface ConfirmThreeWayOptions {
+    title: string;
+    message: string;
+    yesLabel: string;
+    noLabel: string;
 }
 
 /**

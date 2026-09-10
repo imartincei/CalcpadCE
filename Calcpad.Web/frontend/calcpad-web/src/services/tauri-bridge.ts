@@ -1,6 +1,7 @@
 import * as monaco from 'monaco-editor';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { appDataDir } from '@tauri-apps/api/path';
 import {
     readTextFile,
@@ -16,7 +17,7 @@ import { openPath, revealItemInDir } from '@tauri-apps/plugin-opener';
 import { Store } from '@tauri-apps/plugin-store';
 import { platform } from '@tauri-apps/plugin-os';
 import { BaseMessageBridge, type ExportRequest } from 'calcpad-frontend/services/message-bridge/base';
-import { getActiveDocumentKey } from '../editor/bridge';
+import { getActiveDocumentKey, type ConfirmChoice, type ConfirmThreeWayOptions } from '../editor/bridge';
 import {
     getDefaultSettings,
     getDefaultExtras,
@@ -64,6 +65,7 @@ const STORE_FILE = 'storage.json';
 const ACTIVE_PRESET_KEY = 'calcpad-active-preset';
 const RECENT_FILES_KEY = 'calcpad-recent-files';
 const OPENED_FOLDER_KEY = 'calcpad-opened-folder';
+const LAST_DIALOG_DIR_KEY = 'calcpad-last-dialog-dir';
 const MAX_RECENT_FILES = 10;
 
 /** The `IFileSystem` reader `inlineImageSources` needs, over the Tauri fs plugin. */
@@ -124,14 +126,17 @@ export class TauriMessageBridge extends BaseMessageBridge {
             this._serverLogDir = '';
         }
         this._store = await Store.load(STORE_FILE);
+        this._lastDialogDir = (await this._store.get<string>(LAST_DIALOG_DIR_KEY)) ?? null;
         // The menu Rust built at setup() has no recents in it yet — this session's
         // first sync carries the list persisted by earlier ones.
         await this.syncRecentFilesMenu(await this.getRecentFiles());
         await this.loadSettingsFromStorage();
         await this.loadUserFonts();
+        // Scoped to this window: an unscoped listener answers every `emit_to` whatever
+        // its target, so a second window would open files meant for the first.
         await listen<string>('open-file-request', (evt) => {
             void this.handleOpenFileByPath(evt.payload);
-        });
+        }, { target: getCurrentWindow().label });
     }
 
     getExtraSetting(key: string): string | undefined {
@@ -161,6 +166,10 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     protected async afterResetSettings(): Promise<void> {
         await this.handleGetSettings();
+    }
+
+    protected async showAlert(title: string, message: string, kind: 'info' | 'warning' | 'error'): Promise<void> {
+        await dialogMessage(message, { title, kind, okLabel: 'OK' });
     }
 
     protected coerceColorTheme(raw: string | undefined | null): string {
@@ -510,6 +519,31 @@ export class TauriMessageBridge extends BaseMessageBridge {
     private rememberDialogDir(pathOrFile: string | null | undefined, isDirectory = false): void {
         if (!pathOrFile) return;
         this._lastDialogDir = isDirectory ? pathOrFile : pathDirname(pathOrFile) || pathOrFile;
+        void this.persistDialogDir(this._lastDialogDir);
+    }
+
+    /** So Open/Save dialogs still start where the user left off after a restart. */
+    private async persistDialogDir(dir: string): Promise<void> {
+        try {
+            await this._store?.set(LAST_DIALOG_DIR_KEY, dir);
+            await this._store?.save();
+        } catch {
+            /* stays in memory for this session */
+        }
+    }
+
+    async confirmThreeWay(opts: ConfirmThreeWayOptions): Promise<ConfirmChoice> {
+        try {
+            return await invoke<ConfirmChoice>('confirm_three_way', {
+                title: opts.title,
+                message: opts.message,
+                yesLabel: opts.yesLabel,
+                noLabel: opts.noLabel,
+            });
+        } catch {
+            // A dialog that never opened must not be read as consent to discard.
+            return 'cancel';
+        }
     }
 
     // ---- File operations (exposed for menu actions) ----
