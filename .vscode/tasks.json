@@ -67,6 +67,23 @@
             }
         },
         {
+            // Self-contained single-file Calcpad.Server.exe in
+            // publish/calcpad-server-portable/ — no .NET runtime required.
+            "label": "Server: Build Portable (Windows)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile", "-ExecutionPolicy", "Bypass",
+                "-File", "${workspaceFolder}\\Calcpad.Web\\backend\\scripts\\build-portable.ps1"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "Server: Build Slim Bundle",
             "type": "shell",
             "group": "build",
