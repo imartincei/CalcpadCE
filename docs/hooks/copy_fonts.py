@@ -10,7 +10,14 @@ from pathlib import Path
 
 _SOURCE = Path(__file__).resolve().parents[2] / "Resources" / "Fonts"
 _TARGET = Path(__file__).resolve().parents[1] / "media"
-_PATTERNS = ("DejaVuSerifCondensed*.ttf", "Jost-*.otf", "DejaVuSerif-LICENSE", "Jost-LICENSE")
+_PATTERNS = (
+    "DejaVuSerifCondensed*.ttf",
+    "Jost-*.otf",
+    "CalcpadCEVector.ttf",
+    "DejaVuSerif-LICENSE",
+    "Jost-LICENSE",
+    "CalcpadCEVector-LICENSE",
+)
 
 
 def on_config(config, **kwargs):
