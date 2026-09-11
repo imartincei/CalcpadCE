@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block extrahead %}
+  {{ super() }}
+  <script src="{{ 'javascripts/jquery-3.6.3.min.js' | url }}"></script>
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      $("body").on("click", ".fold > :first-child, .unfold > :first-child", function () {
+        var parent = $(this).parent();
+        if (parent.hasClass("fold")) {
+          parent.removeClass("fold").addClass("unfold");
+        } else {
+          parent.removeClass("unfold").addClass("fold");
+        }
+      });
+    });
+  </script>
+{% endblock %}
