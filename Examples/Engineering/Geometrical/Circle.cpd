@@ -2,21 +2,21 @@
 "Geometrical Properties of Circle
 '<div style="max-width:120mm"><img style="height:135pt;" alt="circle.png" class="side" src="../../Images/mechanics/sections/circle.png"></div>
 'Diameter
-d = ? {1}'%u
+d = ? {1}'m
 'Area
-A = π*d^2/4'%u<sup>2</sup>
+A = π*d^2/4'm<sup>2</sup>
 'Centroid
-'<p><i>z</i><sub>c</sub> ='y_c = d/2'%u</p>
+'<p><i>z</i><sub>c</sub> ='y_c = d/2'm</p>
 'Perimeter
-P = π*d'%u
+P = π*d'm
 'Second moments of area
-'<p><i>I</i><sub>z</sub> ='I_y = π*d^4/64'%u<sup>4</sup></p>
+'<p><i>I</i><sub>z</sub> ='I_y = π*d^4/64'm<sup>4</sup></p>
 'Polar moment of area
-I_x = 2*I_y'%u<sup>4</sup>
+I_x = 2*I_y'm<sup>4</sup>
 'Radii of gyration
-'<p><i>r</i><sub>z</sub> ='r_y = sqrt(I_y/A)'%u</p>
-r_x = sqr(I_x/A)'%u
+'<p><i>r</i><sub>z</sub> ='r_y = sqrt(I_y/A)'m</p>
+r_x = sqr(I_x/A)'m
 'Torsional constant
-I_t = π*d^4/32'%u<sup>4</sup>
+I_t = π*d^4/32'm<sup>4</sup>
 'Torsional section modulus
-W_t = 2*I_t/d'%u<sup>3</sup>
+W_t = 2*I_t/d'm<sup>3</sup>

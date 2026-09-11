@@ -2,16 +2,16 @@
 "Geometrical Properties of Rhombus
 '<div style="max-width:130mm"><img style="height:135pt;" alt="rombus.png" class="side" src="../../Images/mechanics/sections/rhombus.png"></div>
 'Diagonals length
-b = ? {1.414}'%u , 'd = ? {1.414}'%u
+b = ? {1.414}'m , 'd = ? {1.414}'m
 'Side length
-a = sqrt(b^2 + d^2)/2'%u
+a = sqrt(b^2 + d^2)/2'm
 'Area
 A = b*d/2' m<sup>2</sup>
 'Centroid
 y_c = b/2' m
 z_c = d/2' m
 'Perimeter
-P = 4*a'%u
+P = 4*a'm
 'Second moments of area
 I_y = b*d^3/48' m<sup>4</sup>
 I_z = d*b^3/48' m<sup>4</sup>

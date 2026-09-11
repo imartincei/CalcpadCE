@@ -189,22 +189,6 @@
           Units
         </h3>
         <div v-show="bodyVisible('units')" class="section-body">
-          <div v-show="rowVisible('units', 'units')" class="setting-group">
-            <label for="units">
-              Default Input Length Unit:
-              <span class="setting-info" title="Default length unit used for %u placeholders in input forms.">ⓘ</span>
-            </label>
-            <select
-              id="units"
-              v-model="localSettings.units"
-              @change="updateSettings"
-            >
-              <option value="m">m (meters)</option>
-              <option value="cm">cm (centimeters)</option>
-              <option value="mm">mm (millimeters)</option>
-            </select>
-          </div>
-
           <div v-show="rowVisible('units', 'isUs')" class="setting-group">
             <label for="nonMetricUnits">
               Non-Metric Units:
@@ -749,7 +733,7 @@ const emit = defineEmits<{
 const localSettings = ref<Settings>({ ...props.settings })
 
 // Ordered per-section key lists — METADATA_SETTINGS_KEYS' array order doesn't
-// group Math/Plot/Units contiguously (units/isUs sit mid-array, precision/tol
+// group Math/Plot/Units contiguously (isUs sits mid-array, precision/tol
 // sit at the end), so the render order is spelled out here instead of sliced.
 // Plot is split around screenScaleFactor/lightDirection, which have no
 // #settings-directive counterpart and so stay hardcoded, to keep the visible
@@ -869,7 +853,6 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
   units: {
     title: 'Units',
     rows: {
-      units: 'default input length unit meters centimeters millimeters',
       isUs: 'non-metric units us uk imperial customary'
     }
   },

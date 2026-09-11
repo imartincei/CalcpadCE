@@ -35,7 +35,6 @@ In VS Code, do not use VS Code's own settings editor.
 
 ## Units
 
-- **Default Input Length Unit** — `m` / `cm` / `mm`. Used for `%u` placeholders.
 - **Non-Metric Units** — **UK (Imperial)** or **US Customary**, defaulting to **US Customary**. Selects the definition of bare unit names that differ between the two systems (`gal`, `ton`, `cwt`, `pt`, `qt`, `bbl`, `tonf`, `therm`, etc).
 
 ## PDF Export

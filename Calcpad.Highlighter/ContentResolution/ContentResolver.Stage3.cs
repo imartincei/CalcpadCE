@@ -826,7 +826,7 @@ namespace Calcpad.Highlighter.ContentResolution
                     continue;
 
                 // Parameter names should not be treated as macro calls
-                var paramNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var paramNames = new HashSet<string>(StringComparer.Ordinal);
                 if (macroDef.Params != null)
                     foreach (var p in macroDef.Params)
                         paramNames.Add(p);

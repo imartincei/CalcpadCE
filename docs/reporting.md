@@ -16,53 +16,6 @@ Everything outside them is assumed to be math expressions.
 However, if you put any formulas inside comments, they will not be calculated or formatted.
 Since the final output is rendered to an Html document, you can use Html and CSS in comments to provide your calculation report with additional formatting.
 
-## Units in Comments
-
-Alternatively, to native units, you can enter all values to be unitless and then put the units in the comments.
-In this case, you will have to include all unit conversion factors in the equations.
-Also, there is an option to generate a selection box for length units - **m**, **cm** and **mm**. You only need to insert **%u** in comments wherever you want the units to appear.
-When the program generates the input form (see further) it checks whether **%u** exists somewhere in the code.
-If so, it automatically adds a unit selection combo box, at the top-right corner.
-When you change the units from the combo, they will be filled in all occurrences of **%u** in the code.
-You can try it below:
-
-| Markdown code | Html code | Output |
-|---|---|---|
-| `### Heading 3` | `<h3>Heading 3</h3>` | Heading 3 |
-| `#### Heading 4` | `<h4>Heading 4</h4>` | Heading 4 |
-| `##### Heading 5` | `<h5>Heading 5</h5>` | Heading 5 |
-| `###### Heading 6` | `<h6>Heading 6</h6>` | Heading 6 |
-| `---` (horizontal line) | `<hr/>` | **———————** |
-| `**Bold**` | `<strong>Bold</strong>` | **Bold** |
-| `*Italic*` | `<em>Italic</em>` | *Italic* |
-| `***Bold Italic***` | `<em><strong>Bold Italic</strong></em>` | ***Bold Italic*** |
-| `++Underlined++` | `<ins>Underlined</ins>` | <u>Underlined</u> |
-| `~~Struck through~~` | `<del>Struck through</del>` | <s>Struck through</s> |
-| `==Highlighted==` | `<mark>Highlighted</mark>` | Highlighted |
-| `x^superscript^` | `x<sup>superscript</sup>` | x<sup>superscript</sup> |
-| `x~subscript~` | `x<sub>subscript</sub>` | x<sub>subscript</sub> |
-| `` `Code` `` | `<code>Code</code>` | `Code` |
-| `[Link](https://mywebsite.com)` | `<a href="https://mywebsite.com">Link</a>` | [Link](https://mywebsite.com) |
-| `![Image](image.jpg)` | `<img src="image.jpg" alt="Image" />` | |
-| `> Blockquote 1`<br/>`>> Blockquote 2` | `<blockquote>Blockquote 1`<br/>`<blockquote>Blockquote 2`<br/>`</blockquote></blockquote>` | Blockquote 1, Blockquote 2 |
-
-When you run the calculations, the "Units" combo will disappear from the output.
-Only the units will remain as filled.
-The program will also create a variable *Units*, which will contain the conversion factor from the selected units to meters.
-Its value is 1, 100 and 1000 for m, mm and cm, respectively.
-You can use it for units conversion inside the calculations.
-For example, you can create a conditional block for displaying the selected units in the report:
-
-```calcpad
-#if *Units* ≡ 1  
-  'The selected units are meters  
-#else if *Units* ≡ 100  
-  'The selected units are centimeters  
-#else if *Units* ≡ 1000  
-  'The selected units are millimeters  
-#end if
-```
-
 ## Formatting with Html and CSS
 
 CalcpadCE can be used as a development platform for professional engineering programs.
