@@ -21,11 +21,25 @@ function resolve(label: AppThemeLabel): ResolvedTheme {
 function apply(resolved: ResolvedTheme): void {
     document.documentElement.dataset.theme = resolved;
     setCalcpadEditorTheme(resolved);
+    resolvedTheme = resolved;
+    for (const cb of listeners) cb(resolved);
 }
 
 let mql: MediaQueryList | null = null;
 let mqlListener: ((e: MediaQueryListEvent) => void) | null = null;
 let current: AppThemeLabel = 'System';
+let resolvedTheme: ResolvedTheme = 'dark';
+const listeners = new Set<(resolved: ResolvedTheme) => void>();
+
+/** The theme the app chrome is actually painted in, which is not `previewTheme`. */
+export function getResolvedAppTheme(): ResolvedTheme {
+    return resolvedTheme;
+}
+
+/** Fires on every resolved change, including an OS flip while the label is "System". */
+export function onAppThemeChanged(cb: (resolved: ResolvedTheme) => void): void {
+    listeners.add(cb);
+}
 
 /**
  * Apply the given color theme label, subscribing to OS color-scheme changes when called with

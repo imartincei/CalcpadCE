@@ -315,7 +315,7 @@
         </span>
         <span class="status-output" @click="openBottomTab('output')">Output</span>
         <span class="spacer"></span>
-        <span class="status-server" :class="serverStatus" :title="serverStatusTitle">
+        <span v-if="serverStatus !== 'connected'" class="status-server" :class="serverStatus" :title="serverStatusTitle">
           ● {{ serverStatusLabel }}
         </span>
       </div>
@@ -594,6 +594,8 @@ import {
   type DisplayLogLevel,
 } from 'calcpad-frontend'
 import type { ResultMode, WorkspaceLayout } from './services/workspace-state'
+
+const props = withDefaults(defineProps<{ isDesktop?: boolean }>(), { isDesktop: false })
 
 export interface ProblemItem {
   severity: number
@@ -1262,6 +1264,17 @@ function runFocusedPreviewClipboardAction(action: PreviewClipboardAction): boole
   return false
 }
 
+/** Opens the find bar when a preview frame holds focus. Returns false if none does. */
+function openFindInFocusedPreview(): boolean {
+  const focused = document.activeElement
+  for (const groupId of previewEls.keys()) {
+    if (frontFrame(groupId) !== focused) continue
+    openPreviewFind(groupId)
+    return true
+  }
+  return false
+}
+
 function onFindInPreview(): void {
   const groupId = previewContextMenu.value?.groupId
   closePreviewContextMenu()
@@ -1455,10 +1468,18 @@ const serverStatusLabel = computed(() =>
   serverStatus.value === 'connected' ? 'Connected'
     : serverStatus.value === 'connecting' ? 'Starting…'
       : 'Disconnected')
-const serverStatusTitle = computed(() =>
-  serverStatus.value === 'connected' ? 'Server connected'
-    : serverStatus.value === 'connecting' ? 'Server starting…'
-      : 'Server disconnected — use Server ▸ Restart Server')
+// Only the desktop build has the Server menu these name.
+const serverStatusTitle = computed(() => {
+  if (serverStatus.value === 'connected') return 'Server connected'
+  if (serverStatus.value === 'connecting') return 'Server starting…'
+  if (!props.isDesktop) return 'Server disconnected — reload the page to reconnect'
+  return [
+    'Server disconnected',
+    'Server ▸ Restart Server — start it again',
+    'Server ▸ Show Server Log — see why it stopped',
+    'Ctrl+Alt+X — refresh once it is back',
+  ].join('\n')
+})
 
 function setServerStatus(status: ServerStatus): void {
   serverStatus.value = status
@@ -2441,6 +2462,7 @@ defineExpose({
   onCopyTextRequest,
   onClipboardReadRequest,
   runFocusedPreviewClipboardAction,
+  openFindInFocusedPreview,
   onOpenFullHtmlRequest,
 })
 </script>

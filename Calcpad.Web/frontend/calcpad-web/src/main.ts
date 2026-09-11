@@ -27,7 +27,7 @@ import {
     type InlineImageBudget,
 } from 'calcpad-frontend';
 import { registerCalcpadLanguage, registerCalcpadTheme, remeasureEditorFontsWhenReady, resolveEditorFontFamily } from './editor/setup';
-import { setAppTheme, coerceAppTheme } from './editor/app-theme';
+import { setAppTheme, coerceAppTheme, getResolvedAppTheme, onAppThemeChanged } from './editor/app-theme';
 import { registerSemanticTokensProvider } from './editor/semantic-tokens';
 import { setupDiagnostics } from './editor/diagnostics';
 import { registerCompletionProvider } from './editor/completions';
@@ -245,7 +245,7 @@ async function bootstrap(): Promise<void> {
     (window as any).monaco = monaco;
 
     // Mount the main app layout
-    const app = createApp(App);
+    const app = createApp(App, { isDesktop: isTauri });
     const appInstance = app.mount('#app') as any;
 
     // Let the bridge prompt via the in-app quick-pick modal (image storage mode).
@@ -641,7 +641,7 @@ async function bootstrap(): Promise<void> {
         const theme = resolvePreviewTheme();
 
         if (!content.trim()) {
-            void appInstance.setPreviewHtml(group.id, getEmptyPreviewHtml(theme));
+            void appInstance.setPreviewHtml(group.id, getEmptyPreviewHtml(getResolvedAppTheme()));
             return;
         }
 
@@ -733,6 +733,10 @@ async function bootstrap(): Promise<void> {
             : result.html;
         await appInstance.setUiPrintHtml(group.id, html, uiDocKeyFor(group));
     }
+
+    // Nothing else re-renders on an app-theme switch: `updateColorTheme` only calls
+    // `applyColorTheme` and never announces `settingsChanged`.
+    onAppThemeChanged(() => refreshAllPreviews());
 
     function refreshAllPreviews(): void {
         // UI mode renders the active group only — the other has no iframe.
@@ -2279,6 +2283,9 @@ async function bootstrap(): Promise<void> {
             if (action === 'cut' || action === 'copy' || action === 'paste') {
                 if (appInstance.runFocusedPreviewClipboardAction(action)) return;
             }
+            // The menu accelerator beats the preview frame's own Ctrl+F handler, so the
+            // frame never sees the key and the host has to open the find bar for it.
+            if (action === 'find' && appInstance.openFindInFocusedPreview()) return;
             // Fallback for sidebar / preview / etc.
             const el = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
             if (action === 'paste') {
