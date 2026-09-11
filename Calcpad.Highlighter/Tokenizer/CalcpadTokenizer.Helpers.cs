@@ -80,30 +80,26 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// Checks if a StringBuilder contains a continued condition keyword without allocating a string.
-        /// Avoids the StringBuilder.ToString() allocation in the hot ParseSpace path.
+        /// Case-insensitive compare of the token builder against a lowercase keyword. Avoids the
+        /// StringBuilder.ToString() allocation in the hot ParseSpace path.
         /// </summary>
-        private static bool IsContinuedConditionBuilder(StringBuilder builder)
+        private static bool IsKeywordBuilder(StringBuilder builder, string keyword)
         {
-            var len = builder.Length;
-            if (len < 3 || builder[0] != '#')
+            if (builder.Length != keyword.Length)
                 return false;
 
-            if (len == 5 && builder[1] == 'e' && builder[2] == 'l' && builder[3] == 's' && builder[4] == 'e')
-                return true;
-            if (len == 5 && builder[1] == 'E' && builder[2] == 'L' && builder[3] == 'S' && builder[4] == 'E')
-                return true;
-            if (len == 4 && builder[1] == 'e' && builder[2] == 'n' && builder[3] == 'd')
-                return true;
-            if (len == 4 && builder[1] == 'E' && builder[2] == 'N' && builder[3] == 'D')
-                return true;
-            if (len == 3 && builder[1] == 'm' && builder[2] == 'd')
-                return true;
-            if (len == 3 && builder[1] == 'M' && builder[2] == 'D')
-                return true;
-
-            return false;
+            for (var i = 0; i < keyword.Length; ++i)
+            {
+                if (char.ToLowerInvariant(builder[i]) != keyword[i])
+                    return false;
+            }
+            return true;
         }
+
+        private static bool IsContinuedConditionBuilder(StringBuilder builder) =>
+            IsKeywordBuilder(builder, "#else") ||
+            IsKeywordBuilder(builder, "#end") ||
+            IsKeywordBuilder(builder, "#md");
 
         /// <summary>
         /// Checks if the current position in a data exchange line marks the end of a file path.

@@ -127,7 +127,7 @@ namespace Calcpad.Highlighter.Tokenizer.Models
         /// <summary>Format specifiers (e.g., :f2, :e3)</summary>
         Format = 27,
 
-        /// <summary>JSON payload following the #settings directive (`#settings {...}`).</summary>
+        /// <summary>JSON payload of the #settings and #UI directives (`#settings {...}`, `#UI {...} x = 1`).</summary>
         SettingsJson = 28,
 
         // [Future Reserved] 29-30 previously held StringFunction, StringTable.

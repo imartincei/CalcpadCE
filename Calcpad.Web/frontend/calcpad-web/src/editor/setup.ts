@@ -82,6 +82,8 @@ export function createCalcpadEditor(
         automaticLayout: true,
         minimap: { enabled: false },
         fontSize: options?.fontSize ?? 14,
+        // Monaco's default is round(1.35 x fontSize) ~19px, too tight (#212).
+        lineHeight: 22,
         fontFamily: resolveEditorFontFamily(options?.fontFamily),
         lineNumbers: 'on',
         renderWhitespace: 'none',

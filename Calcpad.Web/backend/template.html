@@ -693,7 +693,7 @@
         .code {
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 10pt;
-            background-color: #f8f8f8;
+            background-color: #ffffff;
             border: 1pt solid #ddd;
             border-radius: 4pt;
             padding: 1em;
@@ -704,7 +704,7 @@
         .line-text {
             margin: 0;
             padding: 0;
-            line-height: 1.15em;
+            line-height: 1.55em;
             white-space: pre-wrap;
         }
 
@@ -728,55 +728,121 @@
             background-color: transparent;
         }
 
-        /* Syntax highlighting colors */
+        /* Syntax highlighting: generated from calcpad-web/src/editor/theme.ts.
+           check-contrast.mjs asserts the two stay identical. */
         .code .comment {
-            color: #228B22; /* ForestGreen - text comments */
-        }
-
-        .code .include {
-            color: #FF1493; /* DeepPink - include comments */
-        }
-
-        .code .htmltag {
-            color: #9932CC; /* DarkOrchid - HTML tags in comments */
+            color: #008000;
         }
 
         .code .keyword {
-            color: #FF00FF; /* Magenta - keywords like #if, #def */
-        }
-
-        .code .command {
-            color: #FF00FF; /* Magenta - commands like $plot */
-        }
-
-        .code .variable {
-            color: #0000FF; /* Blue - variables */
-        }
-
-        .code .function {
-            color: #0000FF; /* Blue - functions */
-            font-weight: bold;
-        }
-
-        .code .number {
-            color: #000000; /* Black - constants/numbers */
+            color: #AF00DB;
         }
 
         .code .operator {
-            color: #DAA520; /* Goldenrod - operators */
-        }
-
-        .code .units {
-            color: #008B8B; /* DarkCyan - units */
+            color: #8A6A00;
         }
 
         .code .bracket {
-            color: #FF1493; /* DeepPink - brackets */
+            color: #D6006E;
         }
 
-        .code .error {
-            color: #DC143C; /* Crimson - errors */
-            background-color: #FFE1E1; /* Light red background */
+        .code .const {
+            color: #000000;
+        }
+
+        .code .lineContinuation {
+            color: #8A6A00;
+        }
+
+        .code .variable {
+            color: #0033CC;
+        }
+
+        .code .localVariable {
+            color: #2060CC;
+        }
+
+        .code .function {
+            color: #000000;
+            font-weight: bold;
+        }
+
+        .code .macro {
+            color: #8B008B;
+        }
+
+        .code .macroParameter {
+            color: #B01FB0;
+            font-style: italic;
+        }
+
+        .code .units {
+            color: #007D7D;
+        }
+
+        .code .setting {
+            color: #0070C1;
+        }
+
+        .code .settingsJson {
+            color: #0070C1;
+        }
+
+        .code .controlBlockKeyword {
+            color: #AF00DB;
+        }
+
+        .code .endKeyword {
+            color: #AF00DB;
+        }
+
+        .code .command {
+            color: #AF00DB;
+        }
+
+        .code .include {
+            color: #6A00D6;
+        }
+
+        .code .filePath {
+            color: #6A00D6;
+        }
+
+        .code .dataExchangeKeyword {
+            color: #AF00DB;
+        }
+
+        .code .htmlComment {
+            color: #5F6B7A;
+            font-style: italic;
+        }
+
+        .code .tag {
+            color: #9400B8;
+        }
+
+        .code .htmlContent {
+            color: #008000;
+        }
+
+        .code .javascript {
+            color: #8A6A00;
+        }
+
+        .code .css {
+            color: #0033CC;
+        }
+
+        .code .svg {
+            color: #007D7D;
+        }
+
+        .code .input {
+            color: #DB0000;
+        }
+
+        .code .format {
+            color: #61686F;
         }
 
         /* Dark theme styles. The theme class lands on <body>, but color-scheme
@@ -889,58 +955,123 @@
 
         /* Dark theme code syntax highlighting */
         .dark-theme .code {
-            background-color: #2d2d30;
+            background-color: #1e1e1e;
             border-color: #3e3e42;
         }
 
         .dark-theme .code .comment {
-            color: #6A9955; /* Green comments for dark mode */
-        }
-
-        .dark-theme .code .include {
-            color: #D7BA7D; /* Yellow/gold for includes in dark mode */
-        }
-
-        .dark-theme .code .htmltag {
-            color: #C586C0; /* Light purple for HTML tags in dark mode */
+            color: #57A64A;
         }
 
         .dark-theme .code .keyword {
-            color: #C586C0; /* Light purple for keywords in dark mode */
-        }
-
-        .dark-theme .code .command {
-            color: #C586C0; /* Light purple for commands in dark mode */
-        }
-
-        .dark-theme .code .variable {
-            color: #9CDCFE; /* Light blue for variables in dark mode */
-        }
-
-        .dark-theme .code .function {
-            color: #DCDCAA; /* Light yellow for functions in dark mode */
-            font-weight: bold;
-        }
-
-        .dark-theme .code .number {
-            color: #B5CEA8; /* Light green for numbers in dark mode */
+            color: #FF80FF;
         }
 
         .dark-theme .code .operator {
-            color: #D4D4D4; /* Light gray for operators in dark mode */
-        }
-
-        .dark-theme .code .units {
-            color: #4EC9B0; /* Teal for units in dark mode */
+            color: #ECC860;
         }
 
         .dark-theme .code .bracket {
-            color: #FFD700; /* Gold for brackets in dark mode */
+            color: #FF69B4;
         }
 
-        .dark-theme .code .error {
-            color: #F48771; /* Light red for errors in dark mode */
-            background-color: #3D2426; /* Dark red background */
+        .dark-theme .code .const {
+            color: #D4D4D4;
+        }
+
+        .dark-theme .code .lineContinuation {
+            color: #ECC860;
+        }
+
+        .dark-theme .code .variable {
+            color: #6B9FFF;
+        }
+
+        .dark-theme .code .localVariable {
+            color: #8BB4FF;
+        }
+
+        .dark-theme .code .function {
+            color: #D4D4D4;
+            font-weight: bold;
+        }
+
+        .dark-theme .code .macro {
+            color: #D355D3;
+        }
+
+        .dark-theme .code .macroParameter {
+            color: #E07BE0;
+            font-style: italic;
+        }
+
+        .dark-theme .code .units {
+            color: #00CED1;
+        }
+
+        .dark-theme .code .setting {
+            color: #4FC1FF;
+        }
+
+        .dark-theme .code .settingsJson {
+            color: #4FC1FF;
+        }
+
+        .dark-theme .code .controlBlockKeyword {
+            color: #FF80FF;
+        }
+
+        .dark-theme .code .endKeyword {
+            color: #FF80FF;
+        }
+
+        .dark-theme .code .command {
+            color: #FF80FF;
+        }
+
+        .dark-theme .code .include {
+            color: #A57ADB;
+        }
+
+        .dark-theme .code .filePath {
+            color: #A57ADB;
+        }
+
+        .dark-theme .code .dataExchangeKeyword {
+            color: #FF80FF;
+        }
+
+        .dark-theme .code .htmlComment {
+            color: #A0A0A0;
+            font-style: italic;
+        }
+
+        .dark-theme .code .tag {
+            color: #CC66FF;
+        }
+
+        .dark-theme .code .htmlContent {
+            color: #57A64A;
+        }
+
+        .dark-theme .code .javascript {
+            color: #ECC860;
+        }
+
+        .dark-theme .code .css {
+            color: #6B9FFF;
+        }
+
+        .dark-theme .code .svg {
+            color: #00CED1;
+        }
+
+        .dark-theme .code .input {
+            color: #FF5555;
+        }
+
+        .dark-theme .code .format {
+            color: #A9A9A9;
         }
 
         .dark-theme .line-num {

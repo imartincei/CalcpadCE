@@ -218,5 +218,41 @@ namespace Calcpad.Tests.Highlighter
         [Fact]
         public void UiIsARecognizedKeyword() =>
             Assert.DoesNotContain(Lint("#UI L = 10m\nL").Diagnostics, d => d.Code == "CPD-3403");
+
+        /// <summary>
+        /// The block shares the SettingsJson token with #settings so both colour the same, but
+        /// #UI's ends at the closing brace rather than at the end of the line.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI {\"type\": \"entry\"} L = 10m", "{\"type\": \"entry\"}")]
+        [InlineData("#ui {\"style\": \"highlight\"} depth = 2m", "{\"style\": \"highlight\"}")]
+        [InlineData("#UI {\"type\": \"datagrid\", \"columnHeaders\": [\"a\", \"b\"]} T = [1; 2 | 3; 4]",
+            "{\"type\": \"datagrid\", \"columnHeaders\": [\"a\", \"b\"]}")]
+        public void JsonBlock_IsASingleSettingsJsonToken(string source, string json)
+        {
+            var tokens = new CalcpadTokenizer().Tokenize(source).Tokens;
+            var token = Assert.Single(tokens, t => t.Type == TokenType.SettingsJson);
+            Assert.Equal(json, token.Text);
+        }
+
+        [Fact]
+        public void WithoutAJsonBlock_NoSettingsJsonToken() =>
+            Assert.DoesNotContain(new CalcpadTokenizer().Tokenize("#UI L = 10m").Tokens,
+                t => t.Type == TokenType.SettingsJson);
+
+        [Fact]
+        public void AfterTheJsonBlock_TheMatrixStillTokenizes()
+        {
+            var tokens = new CalcpadTokenizer().Tokenize(
+                "#UI {\"type\": \"datagrid\"} T = [1; 2 | 3; 4]").Tokens;
+            Assert.Contains(tokens, t => t.Type == TokenType.Variable && t.Text == "T");
+            Assert.Equal(4, tokens.Count(t => t.Type == TokenType.Const));
+        }
+
+        /// <summary>#UI's keys are not #settings' keys, so SettingsValidator must skip them.</summary>
+        [Fact]
+        public void JsonBlock_IsNotValidatedAgainstSettingsKeys() =>
+            Assert.DoesNotContain(Lint("#UI {\"type\": \"entry\"} L = 10m\nL").Diagnostics,
+                d => d.Code == "CPD-3413");
     }
 }

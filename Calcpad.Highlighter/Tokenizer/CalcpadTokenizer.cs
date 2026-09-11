@@ -64,6 +64,8 @@ namespace Calcpad.Highlighter.Tokenizer
             public bool IsInFunctionParams;         // True when inside function definition parentheses
             public bool IsDataExchangeKeyword;      // True for #read, #write, #append
             public bool ExpectingFilePath;          // True after #read/#write/#append keyword
+            public bool ExpectingUiJson;            // True after #UI, until the optional { block is seen or ruled out
+            public bool UiJsonBlock;                // True inside #UI's block, which ends at } rather than at end of line
             public bool IsAfterAtOrAmp;             // True after @ or & in command block
             public bool IsInCommandBlock;           // True when inside $Command{...}
 
@@ -194,6 +196,17 @@ namespace Calcpad.Highlighter.Tokenizer
                 if (_state.MacroArgs == 0)
                     ParseComment(c);
 
+                // #UI's block is optional, so only a '{' opens the mode.
+                if (_state.ExpectingUiJson && c != ' ')
+                {
+                    _state.ExpectingUiJson = false;
+                    if (c == '{')
+                    {
+                        _state.CurrentType = TokenType.SettingsJson;
+                        _state.UiJsonBlock = true;
+                    }
+                }
+
                 // Main parsing logic
                 if (_state.MacroArgs > 0)
                 {
@@ -283,6 +296,13 @@ namespace Calcpad.Highlighter.Tokenizer
                     // #settings {json} - consume the whole JSON payload as a single token;
                     // quotes, braces and colons all belong to the JSON, not to Calcpad syntax.
                     _builder.Append(c);
+                    // #UI's block ends at the first '}', as UiValidator also assumes.
+                    if (_state.UiJsonBlock && c == '}')
+                    {
+                        Append(TokenType.SettingsJson);
+                        _state.UiJsonBlock = false;
+                        _state.CurrentType = TokenType.None;
+                    }
                 }
                 else if (c == '$' && _builder.Length > 0)
                 {
@@ -591,7 +611,8 @@ namespace Calcpad.Highlighter.Tokenizer
                 type != TokenType.Css && type != TokenType.JavaScript &&
                 type != TokenType.Svg &&
                 type != TokenType.Keyword && type != TokenType.ControlBlockKeyword &&
-                type != TokenType.Bracket && type != TokenType.Operator)
+                type != TokenType.Bracket && type != TokenType.Operator &&
+                type != TokenType.SettingsJson)
             {
                 _beforeFirstCodeToken = false;
             }

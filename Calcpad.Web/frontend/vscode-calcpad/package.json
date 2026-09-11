@@ -143,6 +143,10 @@
       {
         "id": "format",
         "description": "Format specifiers"
+      },
+      {
+        "id": "settingsJson",
+        "description": "JSON payload of #settings and #UI"
       }
     ],
     "semanticTokenScopes": [
@@ -228,6 +232,9 @@
           ],
           "format": [
             "meta.format.calcpad"
+          ],
+          "settingsJson": [
+            "meta.embedded.block.json.calcpad"
           ]
         }
       }
@@ -756,9 +763,11 @@
       "editor.semanticTokenColorCustomizations": {
         "enabled": true,
         "rules": {
-          "const:calcpad": "#D4D4D4",
+          "comment:calcpad": "#57A64A",
+          "keyword:calcpad": "#FF80FF",
           "operator:calcpad": "#ECC860",
           "bracket:calcpad": "#FF69B4",
+          "const:calcpad": "#D4D4D4",
           "lineContinuation:calcpad": "#ECC860",
           "variable:calcpad": "#6B9FFF",
           "localVariable:calcpad": "#8BB4FF",
@@ -768,82 +777,70 @@
           },
           "macro:calcpad": "#D355D3",
           "macroParameter:calcpad": {
-            "foreground": "#C09BDB",
+            "foreground": "#E07BE0",
             "italic": true
           },
           "units:calcpad": "#00CED1",
           "setting:calcpad": "#4FC1FF",
-          "keyword:calcpad": "#FF80FF",
+          "settingsJson:calcpad": "#4FC1FF",
           "controlBlockKeyword:calcpad": "#FF80FF",
           "endKeyword:calcpad": "#FF80FF",
           "command:calcpad": "#FF80FF",
-          "include:calcpad": "#9B6BCC",
-          "filePath:calcpad": "#9B6BCC",
+          "include:calcpad": "#A57ADB",
+          "filePath:calcpad": "#A57ADB",
           "dataExchangeKeyword:calcpad": "#FF80FF",
-          "comment:calcpad": "#57A64A",
           "htmlComment:calcpad": {
-            "foreground": "#808B96",
+            "foreground": "#A0A0A0",
             "italic": true
           },
           "tag:calcpad": "#CC66FF",
-          "htmlContent:calcpad": "#6BBF5E",
+          "htmlContent:calcpad": "#57A64A",
           "javascript:calcpad": "#ECC860",
           "css:calcpad": "#6B9FFF",
           "svg:calcpad": "#00CED1",
           "input:calcpad": "#FF5555",
-          "format:calcpad": "#A9A9A9",
-          "stringVariable:calcpad": "#4EC9B0",
-          "stringFunction:calcpad": {
-            "foreground": "#4EC9B0",
-            "bold": true
-          },
-          "stringTable:calcpad": "#B5CEA8"
+          "format:calcpad": "#A9A9A9"
         },
         "[Default Light Modern][Default Light+][Default Light][Light+ (default light)][Light (Visual Studio)][Visual Studio Light][Quiet Light][Solarized Light][GitHub Light]": {
           "enabled": true,
           "rules": {
+            "comment:calcpad": "#008000",
+            "keyword:calcpad": "#AF00DB",
+            "operator:calcpad": "#8A6A00",
+            "bracket:calcpad": "#D6006E",
             "const:calcpad": "#000000",
-            "operator:calcpad": "#DAA520",
-            "bracket:calcpad": "#FF1493",
-            "lineContinuation:calcpad": "#DAA520",
-            "variable:calcpad": "#0000FF",
-            "localVariable:calcpad": "#0066CC",
+            "lineContinuation:calcpad": "#8A6A00",
+            "variable:calcpad": "#0033CC",
+            "localVariable:calcpad": "#2060CC",
             "function:calcpad": {
               "foreground": "#000000",
               "bold": true
             },
             "macro:calcpad": "#8B008B",
             "macroParameter:calcpad": {
-              "foreground": "#7B2FA0",
+              "foreground": "#B01FB0",
               "italic": true
             },
-            "units:calcpad": "#008B8B",
-            "setting:calcpad": "#0077AA",
-            "keyword:calcpad": "#FF00FF",
-            "controlBlockKeyword:calcpad": "#FF00FF",
-            "endKeyword:calcpad": "#FF00FF",
-            "command:calcpad": "#FF00FF",
-            "include:calcpad": "#4B0082",
-            "filePath:calcpad": "#4B0082",
-            "dataExchangeKeyword:calcpad": "#FF00FF",
-            "comment:calcpad": "#228B22",
+            "units:calcpad": "#007D7D",
+            "setting:calcpad": "#0070C1",
+            "settingsJson:calcpad": "#0070C1",
+            "controlBlockKeyword:calcpad": "#AF00DB",
+            "endKeyword:calcpad": "#AF00DB",
+            "command:calcpad": "#AF00DB",
+            "include:calcpad": "#6A00D6",
+            "filePath:calcpad": "#6A00D6",
+            "dataExchangeKeyword:calcpad": "#AF00DB",
             "htmlComment:calcpad": {
-              "foreground": "#6B7D8D",
+              "foreground": "#5F6B7A",
               "italic": true
             },
-            "tag:calcpad": "#9932CC",
-            "htmlContent:calcpad": "#2EA043",
-            "javascript:calcpad": "#B8860B",
-            "css:calcpad": "#0000CD",
-            "svg:calcpad": "#006400",
-            "input:calcpad": "#FF0000",
-            "format:calcpad": "#A9A9A9",
-            "stringVariable:calcpad": "#267F72",
-            "stringFunction:calcpad": {
-              "foreground": "#267F72",
-              "bold": true
-            },
-            "stringTable:calcpad": "#6B8E23"
+            "tag:calcpad": "#9400B8",
+            "htmlContent:calcpad": "#008000",
+            "javascript:calcpad": "#8A6A00",
+            "css:calcpad": "#0033CC",
+            "svg:calcpad": "#007D7D",
+            "input:calcpad": "#DB0000",
+            "format:calcpad": "#61686F"
           }
         }
       },

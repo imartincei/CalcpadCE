@@ -1,8 +1,8 @@
 import * as monaco from 'monaco-editor';
 
 /**
- * CalcPad dark theme for Monaco. Maps semantic token types to colors matching
- * the dark-mode color rules in the VS Code extension's package.json.
+ * CalcPad dark theme for Monaco, and the source of truth for the palette — the VS Code
+ * extension and backend/template.html copy it, and check-contrast.mjs asserts they match.
  */
 // `semanticHighlighting: true` is recognized by Monaco at runtime but isn't
 // in IStandaloneThemeData's public types, so we cast at the property level.
@@ -21,16 +21,17 @@ export const calcpadDarkTheme: monaco.editor.IStandaloneThemeData = {
         { token: 'localVariable', foreground: '8BB4FF' },
         { token: 'function', foreground: 'D4D4D4', fontStyle: 'bold' },
         { token: 'macro', foreground: 'D355D3' },
-        { token: 'macroParameter', foreground: 'E07BE0' },
+        { token: 'macroParameter', foreground: 'E07BE0', fontStyle: 'italic' },
         { token: 'units', foreground: '00CED1' },
         { token: 'setting', foreground: '4FC1FF' },
+        { token: 'settingsJson', foreground: '4FC1FF' },
         { token: 'controlBlockKeyword', foreground: 'FF80FF' },
         { token: 'endKeyword', foreground: 'FF80FF' },
         { token: 'command', foreground: 'FF80FF' },
         { token: 'include', foreground: 'A57ADB' },
         { token: 'filePath', foreground: 'A57ADB' },
         { token: 'dataExchangeKeyword', foreground: 'FF80FF' },
-        { token: 'htmlComment', foreground: 'A0A0A0' },
+        { token: 'htmlComment', foreground: 'A0A0A0', fontStyle: 'italic' },
         { token: 'tag', foreground: 'CC66FF' },
         { token: 'htmlContent', foreground: '57A64A' },
         { token: 'javascript', foreground: 'ECC860' },
@@ -48,13 +49,27 @@ export const calcpadDarkTheme: monaco.editor.IStandaloneThemeData = {
         'editor.inactiveSelectionBackground': '#3a3d41',
         'editorBracketMatch.background': '#0064001a',
         'editorBracketMatch.border': '#888888',
+        // Monaco cannot read CSS variables, so these repeat vscode-variables.css (:root).
+        // check-contrast.mjs asserts they stay in sync.
+        focusBorder: '#007fd4',
+        'editorWidget.background': '#252526',
+        'editorWidget.foreground': '#cccccc',
+        'editorWidget.border': '#454545',
+        'editorHoverWidget.background': '#252526',
+        'editorHoverWidget.foreground': '#cccccc',
+        'editorHoverWidget.border': '#454545',
+        'editorSuggestWidget.background': '#252526',
+        'editorSuggestWidget.foreground': '#cccccc',
+        'editorSuggestWidget.border': '#454545',
+        'input.background': '#3c3c3c',
+        'input.foreground': '#cccccc',
+        'input.border': '#767676',
     },
 };
 
 /**
- * CalcPad light theme for Monaco. Colors mirror the light-mode color rules
- * in the VS Code extension's package.json — same token roles as the dark
- * theme, retuned for contrast on a white background.
+ * CalcPad light theme for Monaco — the dark theme's token roles, as saturated as WCAG AA
+ * allows on white (#212). WPF's palette is more vivid only because most of it fails AA.
  */
 export const calcpadLightTheme: monaco.editor.IStandaloneThemeData = {
     base: 'vs',
@@ -63,31 +78,32 @@ export const calcpadLightTheme: monaco.editor.IStandaloneThemeData = {
     rules: [
         { token: 'comment', foreground: '008000' },
         { token: 'keyword', foreground: 'AF00DB' },
-        { token: 'operator', foreground: '795E26' },
-        { token: 'bracket', foreground: 'C71585' },
+        { token: 'operator', foreground: '8A6A00' },
+        { token: 'bracket', foreground: 'D6006E' },
         { token: 'const', foreground: '000000' },
-        { token: 'lineContinuation', foreground: '795E26' },
-        { token: 'variable', foreground: '0451A5' },
-        { token: 'localVariable', foreground: '2E5A9E' },
+        { token: 'lineContinuation', foreground: '8A6A00' },
+        { token: 'variable', foreground: '0033CC' },
+        { token: 'localVariable', foreground: '2060CC' },
         { token: 'function', foreground: '000000', fontStyle: 'bold' },
         { token: 'macro', foreground: '8B008B' },
-        { token: 'macroParameter', foreground: 'A040A0' },
-        { token: 'units', foreground: '0F8080' },
+        { token: 'macroParameter', foreground: 'B01FB0', fontStyle: 'italic' },
+        { token: 'units', foreground: '007D7D' },
         { token: 'setting', foreground: '0070C1' },
+        { token: 'settingsJson', foreground: '0070C1' },
         { token: 'controlBlockKeyword', foreground: 'AF00DB' },
         { token: 'endKeyword', foreground: 'AF00DB' },
         { token: 'command', foreground: 'AF00DB' },
-        { token: 'include', foreground: '6F42C1' },
-        { token: 'filePath', foreground: '6F42C1' },
+        { token: 'include', foreground: '6A00D6' },
+        { token: 'filePath', foreground: '6A00D6' },
         { token: 'dataExchangeKeyword', foreground: 'AF00DB' },
-        { token: 'htmlComment', foreground: '6A737D' },
-        { token: 'tag', foreground: '800080' },
+        { token: 'htmlComment', foreground: '5F6B7A', fontStyle: 'italic' },
+        { token: 'tag', foreground: '9400B8' },
         { token: 'htmlContent', foreground: '008000' },
-        { token: 'javascript', foreground: '795E26' },
-        { token: 'css', foreground: '0451A5' },
-        { token: 'svg', foreground: '0F8080' },
-        { token: 'input', foreground: 'CD3131' },
-        { token: 'format', foreground: '6A737D' },
+        { token: 'javascript', foreground: '8A6A00' },
+        { token: 'css', foreground: '0033CC' },
+        { token: 'svg', foreground: '007D7D' },
+        { token: 'input', foreground: 'DB0000' },
+        { token: 'format', foreground: '61686F' },
     ],
     colors: {
         'editor.background': '#ffffff',
@@ -98,5 +114,19 @@ export const calcpadLightTheme: monaco.editor.IStandaloneThemeData = {
         'editor.inactiveSelectionBackground': '#e5ebf1',
         'editorBracketMatch.background': '#0064001a',
         'editorBracketMatch.border': '#b9b9b9',
+        // Literals duplicated from vscode-variables.css (light block).
+        focusBorder: '#0090f1',
+        'editorWidget.background': '#f3f3f3',
+        'editorWidget.foreground': '#616161',
+        'editorWidget.border': '#c8c8c8',
+        'editorHoverWidget.background': '#f3f3f3',
+        'editorHoverWidget.foreground': '#616161',
+        'editorHoverWidget.border': '#c8c8c8',
+        'editorSuggestWidget.background': '#f3f3f3',
+        'editorSuggestWidget.foreground': '#616161',
+        'editorSuggestWidget.border': '#c8c8c8',
+        'input.background': '#ffffff',
+        'input.foreground': '#616161',
+        'input.border': '#8a8a8a',
     },
 };

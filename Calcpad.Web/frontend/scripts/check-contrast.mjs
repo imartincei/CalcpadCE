@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const VARS = resolve(root, 'calcpad-web/src/editor/vscode-variables.css');
 const THEME = resolve(root, 'calcpad-web/src/editor/theme.ts');
+const TEMPLATE = resolve(root, '../backend/template.html');
 
 const TEXT = 4.5;
 const NONTEXT = 3.0;
@@ -68,6 +69,23 @@ function readMonacoThemes() {
             .map(m => [m[1], '#' + m[2]]);
         const bg = body.match(/'editor\.background':\s*'(#[0-9a-fA-F]{6})'/);
         out[name] = { rules, background: bg ? bg[1] : (name === 'dark' ? '#1e1e1e' : '#ffffff') };
+    }
+    return out;
+}
+
+/**
+ * The `.code` palette of the unwrapped listing, which must be the Monaco palette verbatim --
+ * bare `.code .x` is light, `.dark-theme .code .x` is dark.
+ */
+function readListingPalette() {
+    const html = readFileSync(TEMPLATE, 'utf8');
+    const out = { dark: { rules: [] }, light: { rules: [] } };
+    for (const m of html.matchAll(/(\.dark-theme\s+)?\.code\s+\.([\w-]+)\s*\{\s*color:\s*(#[0-9a-fA-F]{6})/g))
+        out[m[1] ? 'dark' : 'light'].rules.push([m[2], m[3]]);
+    for (const [name, selector] of [['dark', '.dark-theme .code {'], ['light', '.code {']]) {
+        const at = html.indexOf(selector);
+        const bg = html.slice(at).match(/background-color:\s*(#[0-9a-fA-F]{6})/);
+        out[name].background = bg[1];
     }
     return out;
 }
@@ -146,6 +164,58 @@ for (const theme of ['dark', 'light']) {
     const { rules, background } = monaco[theme];
     if (!rules.length) failures.push(`${theme}: parsed no Monaco token rules from theme.ts`);
     for (const [token, fg] of rules) check(`${theme} monaco ${token}`, fg, background, TEXT);
+}
+
+// Monaco cannot read CSS variables, so theme.ts repeats the widget/input literals.
+const WIDGET_KEYS = [
+    ['focusBorder', '--vscode-focusBorder'],
+    ['editorWidget.background', '--vscode-editorWidget-background'],
+    ['editorWidget.foreground', '--vscode-editorWidget-foreground'],
+    ['editorWidget.border', '--vscode-editorWidget-border'],
+    ['editorHoverWidget.background', '--vscode-editorWidget-background'],
+    ['editorHoverWidget.foreground', '--vscode-editorWidget-foreground'],
+    ['editorHoverWidget.border', '--vscode-editorWidget-border'],
+    ['editorSuggestWidget.background', '--vscode-editorWidget-background'],
+    ['editorSuggestWidget.foreground', '--vscode-editorWidget-foreground'],
+    ['editorSuggestWidget.border', '--vscode-editorWidget-border'],
+    ['input.background', '--vscode-input-background'],
+    ['input.foreground', '--vscode-input-foreground'],
+    ['input.border', '--vscode-input-border'],
+];
+const themeSrc = readFileSync(THEME, 'utf8');
+for (const theme of ['dark', 'light']) {
+    const marker = theme === 'dark' ? 'calcpadDarkTheme' : 'calcpadLightTheme';
+    const body = themeSrc.slice(themeSrc.indexOf(marker));
+    for (const [key, cssVar] of WIDGET_KEYS) {
+        const m = body.match(new RegExp(`'?${key.replace('.', '\\.')}'?:\\s*'(#[0-9a-fA-F]{6})'`));
+        if (!m) {
+            failures.push(`${theme} theme.ts: missing colors['${key}']`);
+            continue;
+        }
+        const want = tokens[theme][cssVar] ?? tokens.dark[cssVar];
+        if (m[1].toLowerCase() !== want.toLowerCase())
+            failures.push(`${theme} theme.ts colors['${key}'] is ${m[1]}, but ${cssVar} is ${want}`);
+    }
+}
+
+// The unwrapped listing must render the editor's palette, not a near-copy of it.
+const listing = readListingPalette();
+for (const theme of ['dark', 'light']) {
+    const { rules, background } = listing[theme];
+    const editor = Object.fromEntries(monaco[theme].rules);
+    if (background !== monaco[theme].background)
+        failures.push(`${theme} .code background is ${background}, but editor.background is ${monaco[theme].background}`);
+    for (const [token, fg] of rules) {
+        check(`${theme} listing ${token}`, fg, background, TEXT);
+        if (editor[token] === undefined)
+            failures.push(`${theme} listing .${token}: no such token in theme.ts`);
+        else if (editor[token].toLowerCase() !== fg.toLowerCase())
+            failures.push(`${theme} listing .${token} is ${fg}, but theme.ts has ${editor[token]}`);
+    }
+    for (const token of Object.keys(editor)) {
+        if (!rules.some(([t]) => t === token))
+            failures.push(`${theme} listing: template.html has no .${token} rule`);
+    }
 }
 
 const width = checks.reduce((m, c) => Math.max(m, c.label.length), 0);

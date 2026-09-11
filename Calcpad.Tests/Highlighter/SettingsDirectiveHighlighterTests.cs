@@ -47,5 +47,24 @@ namespace Calcpad.Tests.Highlighter
             var result = Lint("#settings {\"nonsense\": 4}\nx = 1");
             Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3413");
         }
+
+        /// <summary>
+        /// Core matches keywords case-insensitively, so the payload directives must too -- these
+        /// spellings used to fall through and tokenize their payload as ordinary code.
+        /// </summary>
+        [Theory]
+        [InlineData("#Settings {\"decimals\": 4}", TokenType.SettingsJson)]
+        [InlineData("#SETTINGS {\"decimals\": 4}", TokenType.SettingsJson)]
+        [InlineData("#Include lib/beam.cpd", TokenType.Include)]
+        [InlineData("#Format 0.##", TokenType.Format)]
+        [InlineData("#ProjectPath work/proj", TokenType.FilePath)]
+        [InlineData("#LibraryPath work/lib", TokenType.FilePath)]
+        public void PayloadDirectives_AreMatchedCaseInsensitively(string source, TokenType payload) =>
+            Assert.Contains(new CalcpadTokenizer().Tokenize(source).Tokens, t => t.Type == payload);
+
+        [Fact]
+        public void DefDirective_IsMatchedCaseInsensitively() =>
+            Assert.Contains(new CalcpadTokenizer().Tokenize("#Def m$(a$)").Tokens,
+                t => t.Type == TokenType.Macro && t.Text == "m$");
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using Calcpad.Highlighter.Linter.Constants;
 using Calcpad.Highlighter.Linter.Helpers;
 using Calcpad.Highlighter.Tokenizer.Models;
@@ -7,6 +8,32 @@ namespace Calcpad.Highlighter.Tokenizer
 {
     public partial class CalcpadTokenizer
     {
+        private const string UiKeyword = "#ui";
+
+        /// <summary>
+        /// Directives whose remainder is a payload rather than an expression, and the token type
+        /// that payload takes. Matched case-insensitively, as Core's parsers match keywords.
+        /// #UI is absent: its block is optional, so <see cref="ParseSpace"/> only arms it.
+        /// </summary>
+        private static readonly (string Keyword, TokenType Payload)[] PayloadKeywords =
+        [
+            ("#include", TokenType.Include),
+            ("#format", TokenType.Format),
+            ("#settings", TokenType.SettingsJson),
+            ("#projectpath", TokenType.FilePath),
+            ("#librarypath", TokenType.FilePath),
+        ];
+
+        private static TokenType GetPayloadType(StringBuilder builder)
+        {
+            foreach (var (keyword, payload) in PayloadKeywords)
+            {
+                if (IsKeywordBuilder(builder, keyword))
+                    return payload;
+            }
+            return TokenType.None;
+        }
+
         private void ParseSpace(char c, int position)
         {
             if (_state.IsLeading)
@@ -22,76 +49,31 @@ namespace Calcpad.Highlighter.Tokenizer
                 // Flush any pending content first
                 if (_builder.Length > 0)
                 {
-                    var len = _builder.Length;
-                    if (len == 4 &&
-                        _builder[1] == 'd' &&
-                        _builder[2] == 'e' &&
-                        _builder[3] == 'f')
-                    {
+                    if (IsKeywordBuilder(_builder, "#def"))
                         _state.IsMacro = true;
-                    }
 
-                    var isInclude = false;
-                    var isFormat = false;
-                    var isSettings = false;
-                    var isPathRoot = false;
-                    if (_state.CurrentType == TokenType.Keyword)
-                    {
-                        isInclude = len == 8 &&
-                            _builder[1] == 'i' &&
-                            _builder[2] == 'n' &&
-                            _builder[3] == 'c';
-                        isFormat = len == 7 &&
-                            _builder[1] == 'f' &&
-                            _builder[2] == 'o' &&
-                            _builder[3] == 'r';
-                        isSettings = len == 9 &&
-                            _builder[1] == 's' &&
-                            _builder[2] == 'e' &&
-                            _builder[3] == 't';
-                        // Case-insensitive, unlike the checks above: #ProjectPath/#LibraryPath are
-                        // suggested to authors in PascalCase, so a case-sensitive check here would
-                        // silently miss the exact spelling this feature itself recommends.
-                        isPathRoot = len == 12 &&
-                            (_builder.ToString().Equals("#projectpath", StringComparison.OrdinalIgnoreCase) ||
-                             _builder.ToString().Equals("#librarypath", StringComparison.OrdinalIgnoreCase));
-                    }
+                    var isKeyword = _state.CurrentType == TokenType.Keyword;
+                    var payload = isKeyword ? GetPayloadType(_builder) : TokenType.None;
+                    var isUi = isKeyword && IsKeywordBuilder(_builder, UiKeyword);
 
+                    // Append clears the builder, so both checks above must precede it.
                     Append(_state.CurrentType);
 
-                    // Check if we should start parsing a file path
+                    // A payload or file path starts AFTER this space, so anchor it there.
                     if (_state.ExpectingFilePath && _state.IsDataExchangeKeyword)
                     {
                         _state.CurrentType = TokenType.FilePath;
-                        // Set start column to AFTER this space for the file path token
                         _state.TokenStartColumn = position + 1;
                     }
-                    else if (isInclude)
+                    else if (payload != TokenType.None)
                     {
-                        _state.CurrentType = TokenType.Include;
-                        // Set start column to AFTER this space for the include path token
-                        _state.TokenStartColumn = position + 1;
-                    }
-                    else if (isFormat)
-                    {
-                        _state.CurrentType = TokenType.Format;
-                        // Set start column to AFTER this space for the format specifier token
-                        _state.TokenStartColumn = position + 1;
-                    }
-                    else if (isSettings)
-                    {
-                        _state.CurrentType = TokenType.SettingsJson;
-                        // Set start column to AFTER this space for the JSON payload token
-                        _state.TokenStartColumn = position + 1;
-                    }
-                    else if (isPathRoot)
-                    {
-                        _state.CurrentType = TokenType.FilePath;
-                        // Set start column to AFTER this space for the path value token
+                        _state.CurrentType = payload;
                         _state.TokenStartColumn = position + 1;
                     }
                     else
                     {
+                        // #UI's block is optional, so the main loop opens it only if '{' follows.
+                        _state.ExpectingUiJson = isUi;
                         _state.CurrentType = TokenType.None;
                     }
                 }
