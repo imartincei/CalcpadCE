@@ -146,6 +146,22 @@
             <span class="sub-label">Report style class</span>
             <input type="text" v-model="model.ui.reportStyle" />
           </div>
+          <div class="sub-row">
+            <span class="sub-label" title="Off puts the unit in the control instead of leaving it in the document.">Keep the unit</span>
+            <select v-model="model.ui.forceUnits">
+              <option :value="''">(default: on)</option>
+              <option :value="true">On</option>
+              <option :value="false">Off</option>
+            </select>
+          </div>
+          <div class="sub-row">
+            <span class="sub-label" title="Accept any expression, written to the document verbatim. Turns 'Keep the unit' off.">Allow expressions</span>
+            <select v-model="model.ui.allowExpression">
+              <option :value="''">(default: off)</option>
+              <option :value="true">On</option>
+              <option :value="false">Off</option>
+            </select>
+          </div>
 
           <template v-if="model.ui.type === 'datagrid'">
             <div class="sub-row">
@@ -170,6 +186,22 @@
               <button class="icon-button" title="Remove" @click="model.ui.rowHeaders.splice(i, 1)">✕</button>
             </div>
             <button class="add-button" @click="model.ui.rowHeaders.push('')">+ Add row header</button>
+
+            <div class="sub-row">
+              <span class="sub-label" title="Pixels, or 100% to fill the line. Natural width when empty.">Grid width</span>
+              <input type="text" placeholder="100%" v-model="model.ui.width" />
+            </div>
+            <div class="sub-row">
+              <span class="sub-label">Row header width</span>
+              <input type="number" min="1" v-model.number="model.ui.rowHeaderWidth" />
+            </div>
+
+            <label>Column widths</label>
+            <div v-for="(_, i) in model.ui.columnWidths" :key="'cw' + i" class="list-row">
+              <input type="number" min="1" v-model.number="model.ui.columnWidths[i]" />
+              <button class="icon-button" title="Remove" @click="model.ui.columnWidths.splice(i, 1)">✕</button>
+            </div>
+            <button class="add-button" @click="model.ui.columnWidths.push('')">+ Add column width</button>
           </template>
 
           <template v-if="model.ui.type === 'dropdown' || model.ui.type === 'radio'">
@@ -348,10 +380,15 @@ const model = reactive({
     mode: '',
     style: '',
     reportStyle: '',
+    forceUnits: '' as boolean | '',
+    allowExpression: '' as boolean | '',
     rows: '' as number | '',
     columns: '' as number | '',
     columnHeaders: [] as string[],
     rowHeaders: [] as string[],
+    width: '' as string,
+    rowHeaderWidth: '' as number | '',
+    columnWidths: [] as (number | '')[],
     keys: [] as string[],
     values: [] as string[],
   },
@@ -583,10 +620,15 @@ function populate() {
   model.ui.mode = typeof uiData.mode === 'string' ? uiData.mode : ''
   model.ui.style = typeof uiData.style === 'string' ? uiData.style : ''
   model.ui.reportStyle = typeof uiData.reportStyle === 'string' ? uiData.reportStyle : ''
+  model.ui.forceUnits = typeof uiData.forceUnits === 'boolean' ? uiData.forceUnits : ''
+  model.ui.allowExpression = typeof uiData.allowExpression === 'boolean' ? uiData.allowExpression : ''
   model.ui.rows = typeof uiData.rows === 'number' ? uiData.rows : ''
   model.ui.columns = typeof uiData.columns === 'number' ? uiData.columns : ''
   model.ui.columnHeaders = Array.isArray(uiData.columnHeaders) ? uiData.columnHeaders.map(String) : []
   model.ui.rowHeaders = Array.isArray(uiData.rowHeaders) ? uiData.rowHeaders.map(String) : []
+  model.ui.width = uiData.width === undefined || uiData.width === null ? '' : String(uiData.width)
+  model.ui.rowHeaderWidth = typeof uiData.rowHeaderWidth === 'number' ? uiData.rowHeaderWidth : ''
+  model.ui.columnWidths = Array.isArray(uiData.columnWidths) ? uiData.columnWidths.map(Number) : []
   model.ui.keys = Array.isArray(uiData.keys) ? uiData.keys.map(String) : []
   model.ui.values = Array.isArray(uiData.values) ? uiData.values.map(String) : []
 
@@ -649,12 +691,20 @@ function onApply() {
     if (model.ui.mode) ui.mode = model.ui.mode
     if (model.ui.style.trim()) ui.style = model.ui.style.trim()
     if (model.ui.reportStyle.trim()) ui.reportStyle = model.ui.reportStyle.trim()
+    if (model.ui.forceUnits !== '') ui.forceUnits = model.ui.forceUnits
+    if (model.ui.allowExpression !== '') ui.allowExpression = model.ui.allowExpression
     if (model.ui.rows !== '') ui.rows = Number(model.ui.rows)
     if (model.ui.columns !== '') ui.columns = Number(model.ui.columns)
     const columnHeaders = model.ui.columnHeaders.filter(h => h.trim() !== '')
     if (columnHeaders.length) ui.columnHeaders = columnHeaders
     const rowHeaders = model.ui.rowHeaders.filter(h => h.trim() !== '')
     if (rowHeaders.length) ui.rowHeaders = rowHeaders
+    const width = model.ui.width.trim()
+    // A plain number stays a number; "100%" is the only string the directive takes.
+    if (width) ui.width = /^\d+$/.test(width) ? Number(width) : width
+    if (model.ui.rowHeaderWidth !== '') ui.rowHeaderWidth = Number(model.ui.rowHeaderWidth)
+    const columnWidths = model.ui.columnWidths.filter(w => w !== '').map(Number)
+    if (columnWidths.length) ui.columnWidths = columnWidths
     if (model.ui.keys.length) {
       ui.keys = model.ui.keys.slice()
       ui.values = model.ui.values.slice()

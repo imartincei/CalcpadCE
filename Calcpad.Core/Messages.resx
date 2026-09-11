@@ -616,6 +616,12 @@
   <data name="The_UI_0_has_1_entries_but_the_grid_has_2_3" xml:space="preserve">
     <value>#UI '{0}' has {1} entries but the grid has {2} {3}.</value>
   </data>
+  <data name="The_UI_0_does_not_apply_to_1" xml:space="preserve">
+    <value>#UI '{0}' does not apply to a {1}, which always replaces the whole value.</value>
+  </data>
+  <data name="The_UI_width_must_be_a_number_or_100_percent" xml:space="preserve">
+    <value>#UI 'width' must be a number of pixels or "100%".</value>
+  </data>
   <data name="Datagrid_size_cannot_exceed_0_cells" xml:space="preserve">
     <value>#UI datagrid size cannot exceed {0} cells. Use #Read to import larger data sets from a file instead.</value>
   </data>

@@ -1,0 +1,77 @@
+"Floor Load Takedown
+'<p>A worked takedown that exercises the parts of <b>#UI</b> built for input forms: grids seeded
+'from an expression, units carried through a grid of plain numbers, the width properties, and the
+'two properties that trade the guard rails for flexibility. Switch to Input mode to fill it in.</p>
+
+'<h3>1. A grid seeded from an expression</h3>
+
+'<p>A datagrid replaces its whole right hand side the moment it is edited, so it can be seeded
+'with any expression at all - not only a literal. That is what lets a blank schedule start at
+'something more useful than zeros; every cell below starts at 5&nbsp;kN/m&sup2;.</p>
+
+'<p>The cells hold plain numbers and the unit is kept aside - hover a cell to see it. It goes
+'back on when the grid writes its literal, so nothing downstream has to guess. Where the unit
+'matters at a glance it belongs in the header, and a header may contain a comma.</p>
+
+#UI {"type": "datagrid", "width": "100%", "rowHeaderWidth": 150, "columnWidths": [1, 1], "columnHeaders": ["Dead, kN/m²", "Live, kN/m²"], "rowHeaders": ["Roof", "Level 3", "Level 2", "Level 1"]} w = matrix(4; 2) + 5kN/m^2
+
+'<h3>2. Sizing</h3>
+
+'<p>A grid takes its natural width - the row header plus 80&nbsp;px a column - unless
+'<b>width</b> says otherwise. Above it is <b>"100%"</b>, with <b>columnWidths</b> read as ratios
+'and scaled to fit. Here the same shape is left to size itself, then pinned to 420&nbsp;px.</p>
+
+#UI {"type": "datagrid", "columnHeaders": ["Dead", "Live"], "rowHeaders": ["Roof", "L3", "L2", "L1"]} w_nat = matrix(4; 2)
+#UI {"type": "datagrid", "width": 420, "columnHeaders": ["Dead", "Live"], "rowHeaders": ["Roof", "L3", "L2", "L1"]} w_fix = matrix(4; 2)
+
+'<p>A grid of a single column is sized from its header rather than stretched across the page,
+'and a header that spills wraps instead of clipping.</p>
+
+#UI {"type": "datagrid", "columnHeaders": ["Reduction factor on the imposed load"], "rowHeaders": ["Roof", "L3", "L2", "L1"]} ψ = matrix(4; 1) + 1
+
+'<h5>Long names that should wrap</h5>'
+#UI {"type": "datagrid", "columnHeaders": ["This is a really long name for a column header and this absolutely should wrap the text and overflow properly"], "rowHeaders": ["Really long row header name that should also wrap", "L3"]} longNames = matrix(4; 1) + 1
+
+'<h3>3. Units typed into the cells</h3>
+
+'<p>With <b>forceUnits</b> off the units move into the cells, so each one carries its own -
+'which is what a schedule needs when it mixes point loads with pressures. Type
+'<b>2kN</b>, <b>0.5MN</b>, whatever suits the line.</p>
+
+#UI {"type": "datagrid", "forceUnits": false, "width": "100%", "rowHeaderWidth": 150, "columnHeaders": ["Load"], "rowHeaders": ["Plant deck", "Parapet", "Services"]} P = matrix(3; 1) + 2kN
+
+'<h3>4. Expressions in the cells</h3>
+
+'<p>With <b>allowExpression</b> a cell takes anything and it is written to the document as typed,
+'so a tributary width can be entered as <b>6m/2</b> and stay that way, rather than collapsing to
+'a number the next reader has to reverse-engineer. Nothing is checked as you type: an entry the
+'parser cannot read leaves the control in place and reports the error on the line below it.</p>
+
+#UI {"type": "datagrid", "allowExpression": true, "width": "100%", "rowHeaderWidth": 150, "columnHeaders": ["Tributary width"], "rowHeaders": ["Roof", "Level 3", "Level 2", "Level 1"]} b = matrix(4; 1) + 6m/2
+
+'<h3>5. The same two properties on an entry</h3>
+
+'<p>By default an entry edits the number and the unit stays in the document beside the box.</p>
+
+#UI L = 6m
+
+'<p>With <b>forceUnits</b> off the unit moves into the box, so the input can change its unit as
+'well as its magnitude - enter <b>250mm</b> or <b>0.25m</b>, whichever reads better.</p>
+
+#UI {"forceUnits": false} t = 200mm
+
+'<p>With <b>allowExpression</b> the box shows the expression as written rather than the number it
+'came to, so a factor built from its parts can be adjusted instead of flattened on first touch.</p>
+
+#UI {"allowExpression": true} γ_G = 1.25 + 0.10
+
+'<h3>6. The takedown</h3>
+
+g_k = sum(col(w; 1)*col(b; 1))
+q_k = sum(col(w; 2)*col(b; 1)*col(ψ; 1))
+G_k = g_k*L + sum(P)
+Q_k = q_k*L
+F_d = γ_G*G_k + 1.5*Q_k
+
+'<p>Design load carried into the column below, over a floor plate <b>L</b> long with a
+'<b>t</b> slab.</p>

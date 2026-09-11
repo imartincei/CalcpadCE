@@ -1735,6 +1735,24 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
+        // /   Looks up a localized string similar to #UI &apos;{0}&apos; does not apply to a {1}, which always replaces the whole value..
+        // / </summary>
+        public static string The_UI_0_does_not_apply_to_1 {
+            get {
+                return ResourceManager.GetString("The_UI_0_does_not_apply_to_1", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to #UI &apos;width&apos; must be a number of pixels or &quot;100%&quot;..
+        // / </summary>
+        public static string The_UI_width_must_be_a_number_or_100_percent {
+            get {
+                return ResourceManager.GetString("The_UI_width_must_be_a_number_or_100_percent", resourceCulture);
+            }
+        }
+
+        // / <summary>
         // /   Looks up a localized string similar to #UI datagrid size cannot exceed {0} cells. Use #Read to import larger data sets from a file instead..
         // / </summary>
         public static string Datagrid_size_cannot_exceed_0_cells {

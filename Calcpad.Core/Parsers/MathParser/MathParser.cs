@@ -188,6 +188,60 @@ namespace Calcpad.Core
                     _ => (0, 0)
                 };
 
+        /// <summary>
+        /// The cells of a vector/matrix variable, padded to <paramref name="rows"/> ×
+        /// <paramref name="cols"/>, with each cell's unit returned separately so a datagrid can
+        /// show bare numbers and put the unit back when it writes the literal. Null if the
+        /// variable is not a vector or a matrix.
+        /// </summary>
+        internal (string[][] Values, string[][] Units)? GetUiGridValues(string name, int rows, int cols)
+        {
+            if (!_variables.TryGetValue(name, out var v) || !v.IsInitialized)
+                return null;
+
+            Matrix matrix = v.Value switch
+            {
+                Vector vector => new Matrix(vector),
+                Matrix m => m,
+                _ => null
+            };
+            if (matrix is null)
+                return null;
+
+            var values = new string[rows][];
+            var units = new string[rows][];
+            for (var i = 0; i < rows; ++i)
+            {
+                values[i] = new string[cols];
+                units[i] = new string[cols];
+                for (var j = 0; j < cols; ++j)
+                {
+                    if (i < matrix.RowCount && j < matrix.ColCount)
+                    {
+                        var cell = matrix[i, j];
+                        values[i][j] = Math.Round(cell.D, _settings.Decimals).ToString(CultureInfo.InvariantCulture);
+                        units[i][j] = UnitInputText(cell.Units);
+                    }
+                    else
+                    {
+                        values[i][j] = "0";
+                        units[i][j] = string.Empty;
+                    }
+                }
+            }
+            return (values, units);
+        }
+
+        /// <summary>
+        /// A unit as the parser reads it back in. <see cref="Unit.Text"/> is written for display,
+        /// with '·' and '∕' for product and division - neither of which is an input operator.
+        /// </summary>
+        /// <summary>The result's unit as the parser reads it back in, empty when it has none.</summary>
+        internal string ResultUnitsInputText => UnitInputText(Units);
+
+        private static string UnitInputText(Unit units) =>
+            units is null ? string.Empty : units.Text.Replace('·', '*').Replace('∕', '/');
+
         internal Variable GetVariableRef(string name)
         {
             if (_variables.TryGetValue(name, out Variable v))

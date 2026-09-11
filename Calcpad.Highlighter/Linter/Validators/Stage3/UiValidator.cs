@@ -48,6 +48,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             }
 
             var jsonEnd = cursor;
+            UiDto properties = null;
             if (line[cursor] == '{')
             {
                 var braceEnd = line.IndexOf('}', cursor);
@@ -56,7 +57,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     Reporter(result, lineIndex, cursor, end).Warn(Messages.Improper_format_for_UI_keyword_Missing_closing_brace);
                     return;
                 }
-                if (!ValidateJson(line[cursor..(braceEnd + 1)], Reporter(result, lineIndex, cursor, braceEnd + 1)))
+                if (!ValidateJson(line[cursor..(braceEnd + 1)], Reporter(result, lineIndex, cursor, braceEnd + 1), out properties))
                     return;
 
                 jsonEnd = braceEnd + 1;
@@ -76,7 +77,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     reporter.Warn(Messages.Only_numbers_are_supported_by_the_UI_keyword);
                     return;
                 }
-                if (!UiSyntax.IsValue(rhs))
+                var type = UiSyntax.ResolveType(properties?.Type, rhs);
+                if (!UiSyntax.IsValue(rhs, type, properties?.AllowsExpression ?? false))
                 {
                     reporter.Warn(Messages.UI_directives_do_not_support_expressions);
                     return;
@@ -84,8 +86,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             }
         }
 
-        private static bool ValidateJson(string json, DirectiveJsonReporter reporter)
+        private static bool ValidateJson(string json, DirectiveJsonReporter reporter, out UiDto properties)
         {
+            properties = null;
             using (var doc = reporter.TryParse(json))
             {
                 if (doc is null)
@@ -94,7 +97,6 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 reporter.CheckKnownKeys(doc.RootElement, UiDto.KnownKeys.Contains, "#UI property");
             }
 
-            UiDto properties;
             try
             {
                 properties = UiDto.Parse(json);

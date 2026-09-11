@@ -6,10 +6,15 @@ export interface UiDirectiveData {
     mode?: string;
     style?: string;
     reportStyle?: string;
+    forceUnits?: boolean;
+    allowExpression?: boolean;
     rows?: number;
     columns?: number;
     columnHeaders?: string[];
     rowHeaders?: string[];
+    width?: number | string;
+    rowHeaderWidth?: number;
+    columnWidths?: number[];
     keys?: string[];
     values?: string[];
 }
@@ -138,7 +143,7 @@ export interface UiPropertyKey {
     key: string;
     label: string;
     detail: string;
-    type: 'string' | 'number' | 'enum';
+    type: 'string' | 'number' | 'enum' | 'boolean';
     options?: SettingOption[];
     min?: number;
 }
@@ -171,6 +176,16 @@ export const UI_PROPERTY_KEYS: UiPropertyKey[] = [
     },
     { key: 'style', label: 'Style class', detail: 'Extra CSS class applied to the input widget.', type: 'string' },
     { key: 'reportStyle', label: 'Report style class', detail: 'Extra CSS class applied in #post/report mode.', type: 'string' },
+    {
+        key: 'forceUnits', label: 'Keep the unit', type: 'boolean',
+        detail: 'On (default), the control edits the number and the unit stays in the document. Off, the control replaces the whole value and the unit is typed into it.',
+    },
+    {
+        key: 'allowExpression', label: 'Allow expressions', type: 'boolean',
+        detail: 'Accept any expression, written to the document verbatim. Turns "Keep the unit" off, since a formula cannot carry an appended unit.',
+    },
     { key: 'rows', label: 'Rows', detail: 'Datagrid row count (auto-detected when unset).', type: 'number', min: 0 },
     { key: 'columns', label: 'Columns', detail: 'Datagrid column count (auto-detected when unset).', type: 'number', min: 0 },
+    { key: 'width', label: 'Grid width', detail: 'Total datagrid width in pixels, or "100%" to fill the line. Natural width when unset.', type: 'string' },
+    { key: 'rowHeaderWidth', label: 'Row header width', detail: 'Width of the datagrid row header column, in pixels.', type: 'number', min: 1 },
 ];

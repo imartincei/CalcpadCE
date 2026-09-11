@@ -427,6 +427,12 @@ namespace Calcpad.Core
                         if (_isVal != 1)
                             AppendHtmlLineEnd(lineType, keyword == Keyword.If);
 
+                        if (_pendingUiError is not null)
+                        {
+                            _sb.Append(ErrHtml(_pendingUiError, _currentLine));
+                            _pendingUiError = null;
+                        }
+
                         if (EnableUi && HasUiControls)
                         {
                             foreach (var ui in _lineUiControls)
@@ -435,6 +441,7 @@ namespace Calcpad.Core
                                     try
                                     {
                                         ResolveDatagridShape(ui);
+                                        ResolveDatagridValues(ui);
                                         _sb.AppendLine(BuildUiDatagrid(ui));
                                     }
                                     catch (MathParserException ex)
@@ -593,12 +600,16 @@ namespace Calcpad.Core
                 var token = tokens[i];
                 if (token.Type == TokenTypes.Expression)
                 {
+                    UiPropertyMetadata ui = null;
+                    // What was actually parsed: a control's entered value replaces the right
+                    // hand side, and an error has to name that rather than the source.
+                    var expression = token.Value;
                     try
                     {
-                        var ui = TakeUiControl(token.Value);
+                        ui = TakeUiControl(token.Value);
                         var cacheID = ui is null ? token.CacheID : -1;
                         if (ui is not null)
-                            _parser.Parse(PrepareUiExpression(ui, token.Value));
+                            _parser.Parse(expression = PrepareUiExpression(ui, token.Value));
                         else if (cacheID < 0)
                         {
                             _parser.Parse(token.Value);
@@ -643,13 +654,23 @@ namespace Calcpad.Core
                     {
                         _parser.ResetStack();
                         string errText;
-                        if (!_calculate && token.Value.Contains('?'))
-                            errText = token.Value.Replace("?", "<input type=\"text\" size=\"2\" name=\"Var\">");
+                        if (!_calculate && expression.Contains('?'))
+                            errText = expression.Replace("?", "<input type=\"text\" size=\"2\" name=\"Var\">");
                         else
-                            errText = HttpUtility.HtmlEncode(token.Value);
+                            errText = HttpUtility.HtmlEncode(expression);
                         errText = FormatError(errText, ex.Message, _currentLine);
                         if (isOutput)
-                            _sb.Append($"<span class=\"err\"{Id(_currentLine)}>{errText}</span>");
+                        {
+                            // Keeping the control is what lets the user correct the value that
+                            // broke the line; the error goes below it rather than in its place.
+                            if (EnableUi && ui is not null && ui.Type != "datagrid")
+                            {
+                                _sb.Append($"<span class=\"eq\">{BuildUiControlFromSource(ui)}</span>");
+                                _pendingUiError = errText;
+                            }
+                            else
+                                _sb.Append($"<span class=\"err\"{Id(_currentLine)}>{errText}</span>");
+                        }
                         RecordError(_currentLine, ex.Message, Debug);
 
                         if (++_errorCount == 40)

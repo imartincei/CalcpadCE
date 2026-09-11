@@ -109,15 +109,21 @@ They share the line's JSON properties but are saved and overridden separately.
 | `mode` | string | all | Only `number` is currently accepted; string inputs are planned but not yet supported |
 | `style` | string | all | CSS class applied to the input element |
 | `reportStyle` | string | all | CSS class applied to the line in the report |
+| `forceUnits` | bool | entry, datagrid | Default `true`: the unit stays in the document and only the number is editable. `false` puts the unit in the control |
+| `allowExpression` | bool | entry, datagrid | Default `false`. `true` accepts any expression, written to the document as typed. Implies `forceUnits: false` |
 | `rows` | number | datagrid | Grid rows. Auto-detected when omitted |
 | `columns` | number | datagrid | Grid columns. Auto-detected when omitted |
 | `rowHeaders` | array | datagrid | Row header labels |
 | `columnHeaders` | array | datagrid | Column header labels |
+| `width` | number or `"100%"` | datagrid | Total grid width in pixels, or `"100%"` to fill the line. Natural width when omitted |
+| `rowHeaderWidth` | number | datagrid | Width of the row header column, in pixels. Default 50 |
+| `columnWidths` | array | datagrid | Column widths in pixels. May be shorter than the column count; the rest take the default 80 |
 | `keys` | array | dropdown, radio | The labels shown to the user |
 | `values` | array | dropdown, radio | The values substituted into the calculation, one per key |
 
 `keys` and `values` are both required for a drop-down or radio group, and must be the same length.
-Header arrays must not be longer than the grid dimension they label.
+Header and width arrays must not be longer than the grid dimension they describe.
+`forceUnits` and `allowExpression` are reported on a drop-down, radio group or checkbox, which always substitute the whole value from their own `values` anyway.
 
 You don't have to write JSON by hand — the [Properties tab](new-calcpad-panel.md#properties) has a form for it that fills in the fields that apply to the control type it detects.
 
@@ -131,6 +137,23 @@ The unit stays in the document beside the box, so only the number is editable; t
 ```text
 #UI L = 10m
 #UI {"type": "entry"} W = 5m
+```
+
+Two properties loosen that, at the cost of the simple, unit-safe input.
+
+`forceUnits: false` moves the unit into the box, so the whole value is editable and the entered one replaces the right-hand side outright — which is what lets an input change its unit as well as its magnitude.
+
+```text
+#UI {"forceUnits": false} q = 3kN/m
+```
+
+`allowExpression: true` goes further and accepts anything, writing it into the document as typed.
+The box shows the expression as written rather than the number it came to, so a formula stays a formula across edits.
+Nothing is validated as you type: an entry the parser cannot read leaves the control in place and reports the error on the line below it, the same as any other line.
+It implies `forceUnits: false` — a formula cannot carry an appended unit.
+
+```text
+#UI {"allowExpression": true} A = b*h
 ```
 
 ### `dropdown`: a list
@@ -171,14 +194,48 @@ The default whenever the right-hand side is a vector/matrix literal or a `vector
 
 Sizes computed from a variable or expression work too — `matrix(r; c)`, `matrix(len(x); len(y))` — the grid is sized from the value the line produced.
 
+A grid can use default values from any expression. 
+Whatever the line evaluates to fills the cells:
+
+```text
+#UI G = matrix(3; 3) + 5
+#UI H = vec2row(x)
+```
+
 Declaring `rows` and `columns` explicitly fits the literal to that shape: missing cells become `0`, extra ones are dropped.
 
 ```text
 #UI {"type": "datagrid", "rows": 2, "columns": 3, "columnHeaders": ["a", "b", "c"], "rowHeaders": ["r1", "r2"]} T = [0; 0; 0 | 0; 0; 0]
 ```
 
-The grid's size comes from the directive, so rows and columns cannot be inserted or deleted in the form.
-Every cell becomes an element of a matrix literal, so a cell holding text — typed or pasted in — is put back to `0`.
+The grid's size comes from the directive or default size, so rows and columns cannot be inserted or deleted in the form.
+
+#### Units in a grid
+
+By default the cells hold plain numbers and a cell holding anything else is put back to `0`.
+When a default value carries a unit, the unit is kept aside rather than shown.
+The cells stay numeric, hovering the cell shows the unit that will be applied in the report.
+So `U = matrix(2; 2)*5m` fills the grid with `5` and writes `[5m; 5m | 5m; 5m]`.
+
+It is also recommended to put units in column or row headers.
+
+`forceUnits: false` puts the units in the cells instead, so `5m` can be typed into one, and `allowExpression: true` accepts any expression in the cell.
+Note that this is still subject to the limitations of the calculation engine, putting a vector or matrix into a cell will throw an error.
+
+#### Sizing
+
+THe default grid width is the row header plus 80 pixels per column.
+`width` overrides that total — a number of pixels, or `"100%"` to fill the line.
+`rowHeaderWidth` and `columnWidths` set each row/column in the order they are declared.
+When the parts add up to more than table width, they are all scaled down together, keeping their relative sizes. 
+This means `columnWidths` can be written as plain ratios.
+
+```text
+#UI {"type": "datagrid", "width": "100%", "rowHeaderWidth": 140, "columnWidths": [2, 1, 1]} M = matrix(2; 3)
+```
+
+A grid of a single column is sized to its column header rather than stretched.
+Headers and cells wrap when their text spills, and the rows grow to fit.
 
 >Note:
 >Setting a datagrid with a row length of 1 will output a vector instead of matrix due to limitations in how vectors/matricies are input. This is planned to be fixed in a future version. As this is mostly an issue when dynamically defining row lengths from a variable, you can check if the row length is one and convert it to a matrix using vec2row() where this is an issue.
@@ -242,8 +299,8 @@ Also, several classes can be listed at once — `"style": "highlight wide"`
 ### Inside a datagrid
 
 A grid is a third-party widget, so a `style` class reaches its outer container but not the cells, headers or context menu inside it.
-Those are styled by a stylesheet that ships with the application, not from the document — see *Customizing the `#UI` Datagrid* from `DEVELOPER.md` in the Github repository files.
-Column widths and the grid's overall size are set by the preview script and are not adjustable from CSS at all.
+
+There is limited customization available using the datagrid properties, and more customization is planned.
 
 ## Saving what was entered
 

@@ -101,19 +101,33 @@ namespace Calcpad.Tests
         }
 
         /// <summary>
-        /// A control overwrites the right hand side with what was entered, so it can only
-        /// annotate a literal value - never something computed.
+        /// An entry rewrites the number in place, so it can only annotate a literal value -
+        /// never something computed.
         /// </summary>
         [Theory]
         [InlineData("#UI {\"type\": \"entry\"} k = sin(2)")]
         [InlineData("#UI k = 1 + 2")]
         [InlineData("#UI k = 2*L\nL = 1m")]
-        [InlineData("#UI v = [1; sqrt(4)]")]
         public void AssignedExpression_IsAnError(string source)
         {
             var html = Render(source, enableUi: true);
             Assert.Contains("do not support expressions", html);
             Assert.DoesNotContain("calcpad-ui", html);
+        }
+
+        /// <summary>
+        /// A grid replaces its whole right hand side when edited, and so does a control that
+        /// allows expressions, so neither needs a literal it can rewrite.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI v = [1; sqrt(4)]")]
+        [InlineData("#UI G = matrix(2; 2) + 1")]
+        [InlineData("#UI {\"allowExpression\": true} k = 1 + 2")]
+        public void AssignedExpression_IsAllowedWhereTheWholeValueIsReplaced(string source)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.DoesNotContain("do not support expressions", html);
+            Assert.Contains("calcpad-ui", html);
         }
 
         [Fact]
@@ -431,8 +445,101 @@ namespace Calcpad.Tests
             var html = Render(
                 "#UI {\"type\": \"datagrid\", \"columnHeaders\": [\"a\", \"b\"], \"rowHeaders\": [\"r1\"]} T = [1; 2]",
                 enableUi: true);
-            Assert.Contains("data-ui-col-headers=\"a,b\"", html);
-            Assert.Contains("data-ui-row-headers=\"r1\"", html);
+            Assert.Contains("data-ui-col-headers=\"[&quot;a&quot;,&quot;b&quot;]\"", html);
+            Assert.Contains("data-ui-row-headers=\"[&quot;r1&quot;]\"", html);
+        }
+
+        [Theory]
+        // No literal to read, so the cells come from the value the line produced.
+        [InlineData("#UI {\"type\": \"datagrid\"} G = matrix(2; 2) + 5", "5;5|5;5")]
+        [InlineData("#UI {\"type\": \"datagrid\"} Z = vector(3) + 2", "2;2;2")]
+        public void Datagrid_SeedsItsCellsFromTheComputedValue(string source, string values)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains($"data-ui-values=\"{values}\"", html);
+        }
+
+        [Fact]
+        public void Datagrid_KeepsTheUnitAsideWhenTheCellsAreNumbersOnly()
+        {
+            var html = Render("#UI {\"type\": \"datagrid\"} U = matrix(1; 2) + 5m", enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("data-ui-values=\"5;5\"", html);
+            Assert.Contains("data-ui-cell-units=\"[[&quot;m&quot;,&quot;m&quot;]]\"", html);
+        }
+
+        [Fact]
+        public void Datagrid_WritesTheUnitIntoTheCellsWhenTheUserTypesIt()
+        {
+            var html = Render("#UI {\"type\": \"datagrid\", \"forceUnits\": false} U = matrix(1; 2) + 5m", enableUi: true);
+            Assert.Contains("data-ui-values=\"5m;5m\"", html);
+            Assert.DoesNotContain("data-ui-cell-units", html);
+        }
+
+        [Fact]
+        public void Datagrid_EmitsTheDeclaredWidths()
+        {
+            var html = Render(
+                "#UI {\"type\": \"datagrid\", \"width\": \"100%\", \"rowHeaderWidth\": 140, \"columnWidths\": [2, 1]} T = [1; 2]",
+                enableUi: true);
+            Assert.Contains("data-ui-width=\"-1\"", html);
+            Assert.Contains("data-ui-row-header-width=\"140\"", html);
+            Assert.Contains("data-ui-column-widths=\"[2,1]\"", html);
+        }
+
+        [Fact]
+        public void Entry_ForceUnitsFalse_PutsTheUnitInTheBox()
+        {
+            var html = Render("#UI {\"forceUnits\": false} q = 3kN/m", enableUi: true);
+            Assert.Contains("data-ui-force-units=\"0\"", html);
+            Assert.Contains("value=\"3kN/m\"", html);
+            Assert.DoesNotContain("<i>kN", html);
+        }
+
+        [Fact]
+        public void Entry_ForceUnitsFalse_OverrideReplacesTheWholeValue()
+        {
+            var overrides = new Dictionary<string, string> { ["q"] = "4MN/m" };
+            var html = Render("#UI {\"forceUnits\": false} q = 3kN/m\nq", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("value=\"4MN/m\"", html);
+        }
+
+        [Fact]
+        public void Entry_AllowExpression_ShowsTheSourceNotTheResult()
+        {
+            var html = Render("#UI {\"allowExpression\": true} k = 1 + 2", enableUi: true);
+            Assert.Contains("data-ui-allow-expression=\"1\"", html);
+            Assert.Contains("value=\"1 + 2\"", html);
+        }
+
+        [Fact]
+        public void Entry_AllowExpression_KeepsTheControlWhenTheLineErrors()
+        {
+            var overrides = new Dictionary<string, string> { ["k"] = "1 +" };
+            var html = Render("#UI {\"allowExpression\": true} k = 1 + 2", enableUi: true, overrides);
+            Assert.Contains("class=\"calcpad-ui-input\"", html);
+            Assert.Contains("value=\"1 +\"", html);
+            Assert.Contains("<p class=\"err\"", html);
+        }
+
+        [Theory]
+        [InlineData("#UI {\"type\": \"dropdown\", \"keys\": [\"A\"], \"values\": [\"1\"], \"forceUnits\": false} x = 1", "forceUnits")]
+        [InlineData("#UI {\"type\": \"checkbox\", \"allowExpression\": true} x = 1", "allowExpression")]
+        public void ModeProperties_AreReportedOnTypesThatAlreadyReplaceTheValue(string source, string name)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.Contains($"'{name}' does not apply", html);
+        }
+
+        [Fact]
+        public void Datagrid_HeadersKeepTheirCommas()
+        {
+            var html = Render(
+                "#UI {\"type\": \"datagrid\", \"columnHeaders\": [\"Force, kN\", \"b\"]} T = [1; 2]",
+                enableUi: true);
+            Assert.Contains("data-ui-col-headers=\"[&quot;Force, kN&quot;,&quot;b&quot;]\"", html);
         }
 
         [Fact]

@@ -28,6 +28,31 @@ namespace Calcpad.Core
         public static bool IsCode(ReadOnlySpan<char> segment) =>
             !segment.IsEmpty && segment[0] != '\'' && segment[0] != '"';
 
+        /// <summary>The control type a directive renders: the declared one, or the shape of the right hand side.</summary>
+        public static string ResolveType(string declaredType, ReadOnlySpan<char> rhs) =>
+            declaredType ?? (IsDatagridRhs(rhs) ? "datagrid" : "entry");
+
+        public static bool IsDatagridRhs(ReadOnlySpan<char> rhs) =>
+            rhs.Length > 1 && rhs[0] == '[' && rhs[^1] == ']' ||
+            StartsWithFunction(rhs, "vector") ||
+            StartsWithFunction(rhs, "matrix");
+
+        public static bool StartsWithFunction(ReadOnlySpan<char> rhs, ReadOnlySpan<char> funcName)
+        {
+            if (!rhs.StartsWith(funcName, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            var rest = rhs[funcName.Length..].TrimStart();
+            return rest.Length > 0 && rest[0] == '(';
+        }
+
+        /// <summary>
+        /// A datagrid replaces the whole right hand side when edited, and so does any control
+        /// with 'allowExpression', so neither needs the literal to be a value it can rewrite.
+        /// </summary>
+        public static bool IsValue(ReadOnlySpan<char> rhs, string type, bool allowExpression) =>
+            type == "datagrid" || allowExpression || IsValue(rhs);
+
         public static bool IsValue(ReadOnlySpan<char> rhs)
         {
             rhs = rhs.Trim();

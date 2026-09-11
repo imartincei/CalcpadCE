@@ -123,9 +123,8 @@ namespace Calcpad.Tests.Highlighter
         [InlineData("#UI k = 2*E")]
         [InlineData("#UI k = E")]
         [InlineData("#UI k = 1 + 2")]
-        [InlineData("#UI v = [1; 2*E]")]
         [InlineData("#UI Z = 2*vector(3)")]
-        [InlineData("#UI G = matrix(2; 2) + 1")]
+        [InlineData("#UI {\"type\": \"entry\"} k = sin(2)")]
         public void AssignedExpression_IsReported(string source) =>
             Assert.Contains(Messages(source), m => m.Contains("do not support expressions"));
 
@@ -145,6 +144,12 @@ namespace Calcpad.Tests.Highlighter
         [InlineData("#UI G = matrix(r; c)")]
         [InlineData("#UI G = matrix(len(x); len(y))")]
         [InlineData("#UI '2&middot;<i>r</i> ='d = 1")]
+        // A grid replaces its whole right hand side when edited, so anything may seed it.
+        [InlineData("#UI v = [1; 2*E]")]
+        [InlineData("#UI G = matrix(2; 2) + 1")]
+        // So does any control that allows expressions.
+        [InlineData("#UI {\"allowExpression\": true} k = 1 + 2")]
+        [InlineData("#UI {\"allowExpression\": true} Z = 2*vector(3)")]
         public void AssignedValue_IsAccepted(string source) =>
             Assert.Empty(Messages(source));
 
