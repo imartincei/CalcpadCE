@@ -32,6 +32,25 @@ Declare the input with `#UI` and give it an ordinary value:
 Entering a value in the input form is stored in a `uiOverrides` entry on the first line of the CalcpadCE file, so the file keeps its own default values and they stay unchanged when input fields are updated.
 You never have to write that entry yourself, but it is plain text if you ever want to edit it.
 
+### `%u` in comments is removed
+
+A `%u` in a comment used to be replaced with the document's length unit, and a **m** / **cm** / **mm** combo box was added to the input form so the reader could switch every occurrence at once.
+The **Default Input Length Unit** setting that drove it, and the `Units` variable holding the matching conversion factor, are removed with it.
+
+#### What breaks
+
+`%u` is no longer substituted and renders literally as `%u` in the output, and no unit combo box is added.
+`#settings {"units": "..."}` is now an unknown key, and reading the `Units` variable is an undefined variable error.
+
+#### How to update
+
+Replace each `%u` with the unit the document actually uses.
+
+Where an equation used `Units` as a conversion factor, write the factor itself instead based on what `%u` was replaced with.
+
+This is a temporary loss of functionality. 
+Dynamic input units are coming in a future version via string variables, where the unit can be picked from a dropdown and assigned to a string variable you can reference anywhere else in the document.
+
 ### The report font changed from Georgia Pro to DejaVu Serif Condensed
 
 Georgia Pro could not be redistributed, so it was not ideal as a font that needed shipped over the web.

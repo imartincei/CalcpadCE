@@ -234,7 +234,7 @@ namespace Calcpad.Highlighter.Linter.Constants
         {
             "PlotWidth", "PlotHeight", "PlotStep", "PlotSVG", "PlotAdaptive",
             "PlotSmooth", "PlotShadows", "PlotLightDir", "PlotPalette",
-            "Precision", "Tol", "ReturnAngleUnits", "Units"
+            "Precision", "Tol", "ReturnAngleUnits"
         }.ToFrozenSet(System.StringComparer.Ordinal);
 
         /// <summary>

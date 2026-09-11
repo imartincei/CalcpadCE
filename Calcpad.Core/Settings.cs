@@ -13,7 +13,6 @@ namespace Calcpad.Core
         ZeroSmallMatrixElements,
         ShowHiddenOutput,
         MaxOutputCount,
-        Units,
         IsUs,
         VectorGraphics,
         ColorScale,
@@ -40,7 +39,6 @@ namespace Calcpad.Core
         public bool? ZeroSmallMatrixElements { get; set; }
         public bool? ShowHiddenOutput { get; set; }
         public int? MaxOutputCount { get; set; }
-        public string Units { get; set; }
         public bool? IsUs { get; set; }
         public bool? VectorGraphics { get; set; }
         public string ColorScale { get; set; }
@@ -79,7 +77,6 @@ namespace Calcpad.Core
     {
         public MathSettings Math { get; set; } = new();
         public PlotSettings Plot { get; set; } = new();
-        public string Units { get; set; } = "m";
         public bool IsUs { get; set; } = true;
     }
 

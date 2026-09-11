@@ -203,7 +203,6 @@ namespace Calcpad.Core
                             _lineCache[_currentLine] = new(null, keyword);
                     }
                 }
-                ApplyUnits(_sb, _calculate);
                 if (_currentLine == lineCount && (_calculate || !IsPaused))
                 {
                     var ifNotClosed = _condition.Id > 0 && !_condition.IsLoop;
@@ -510,7 +509,6 @@ namespace Calcpad.Core
                 _isVal = 0;
                 _outputModeStack.Clear();
                 _substitutionStack.Clear();
-                _parser.SetVariable("Units", new RealValue(UnitsFactor()));
                 _previousKeyword = Keyword.None;
                 _isMarkdownOn = false;
                 _uiVarCounts.Clear();
@@ -723,27 +721,5 @@ namespace Calcpad.Core
             }
             return s.ToString();
         }
-
-        private void ApplyUnits(StringBuilder sb, bool calculate)
-        {
-            string unitsHtml = calculate ?
-                Settings.Units :
-                string.Concat("<span class=\"Units\">", Settings.Units, "</span>");
-
-            long len = sb.Length;
-            sb.Replace("%u", unitsHtml);
-            if (calculate || sb.Length == len)
-                return;
-
-            sb.Insert(0, "<select id=\"Units\" name=\"Units\"><option value=\"m\"> m </option><option value=\"cm\"> cm </option><option value=\"mm\"> mm </option></select>");
-        }
-
-        private double UnitsFactor() => Settings.Units switch
-        {
-            "mm" => 1000,
-            "cm" => 100,
-            "m" => 1,
-            _ => 0
-        };
     }
 }

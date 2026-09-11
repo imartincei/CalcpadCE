@@ -2,26 +2,26 @@
 "Geometrical Properties of Channel Section
 '<div style="max-width:120mm"><img style="height:150pt;" alt="channel.png" class="side" src="../../Images/mechanics/sections/channel.png"></div>
 'Dimensions
-h = ? {20}'%u,'t_w = ? {1}'%u
-b_f = ? {10}'%u,'t_f = ? {2}'%u
+h = ? {20}'m,'t_w = ? {1}'m
+b_f = ? {10}'m,'t_f = ? {2}'m
 'Area
-A_w = h*t_w'%u<sup>2</sup>
-A_f = (b_f - t_w)*t_f'%u<sup>2</sup>
-A = A_w + 2*A_f '%u<sup>2</sup>
+A_w = h*t_w'm<sup>2</sup>
+A_f = (b_f - t_w)*t_f'm<sup>2</sup>
+A = A_w + 2*A_f 'm<sup>2</sup>
 'Centroid
-S_z = A_w*t_w/2 + A_f*(b_f+t_w)'%u<sup>3</sup>
-y_c = S_z/A'%u
-z_c = h/2'%u
+S_z = A_w*t_w/2 + A_f*(b_f+t_w)'m<sup>3</sup>
+y_c = S_z/A'm
+z_c = h/2'm
 'Perimeter
-P = 2*(h + 2*b_f - t_w)'%u
+P = 2*(h + 2*b_f - t_w)'m
 'Second moments of area
-I_y = (b_f*h^3 - (b_f - t_w)*(h - 2*t_f)^3)/12'%u<sup>4</sup>
-I_z_w = (h - 2*t_f)*t_w*(t_w^2/12 + (y_c - t_w/2)^2)'%u<sup>4</sup>
-I_z_f = t_f*b_f*(b_f^2/12 + (y_c - b_f/2)^2)'%u<sup>4</sup>
-I_z = I_z_w + 2*I_z_f'%u<sup>4</sup>
+I_y = (b_f*h^3 - (b_f - t_w)*(h - 2*t_f)^3)/12'm<sup>4</sup>
+I_z_w = (h - 2*t_f)*t_w*(t_w^2/12 + (y_c - t_w/2)^2)'m<sup>4</sup>
+I_z_f = t_f*b_f*(b_f^2/12 + (y_c - b_f/2)^2)'m<sup>4</sup>
+I_z = I_z_w + 2*I_z_f'm<sup>4</sup>
 'Polar moment of area
-I_x = I_y + I_z'%u<sup>4</sup>
+I_x = I_y + I_z'm<sup>4</sup>
 'Radii of gyration
-r_y = sqrt(I_y/A)'%u
-r_z = sqrt(I_z/A)'%u
-r_x = sqrt(I_x/A)'%u
+r_y = sqrt(I_y/A)'m
+r_z = sqrt(I_z/A)'m
+r_x = sqrt(I_x/A)'m

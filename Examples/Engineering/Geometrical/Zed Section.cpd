@@ -2,29 +2,29 @@
 "Geometrical Properties of Zed Section
 '<div style="max-width:120mm"><img style="height:150pt;" alt="zed.png" class="side" src="../../Images/mechanics/sections/zed.png"></div>
 'Dimensions
-h = ? {20}'%u,'t_w = ? {2}'%u
-b_f = ? {10}'%u,'t_f = ? {5}'%u
+h = ? {20}'m,'t_w = ? {2}'m
+b_f = ? {10}'m,'t_f = ? {5}'m
 'Area
-A_w = h*t_w'%u<sup>2</sup>
-A_f = (b_f - t_w)*t_f'%u<sup>2</sup>
-A = A_w + 2*A_f'%u<sup>2</sup>
+A_w = h*t_w'm<sup>2</sup>
+A_f = (b_f - t_w)*t_f'm<sup>2</sup>
+A = A_w + 2*A_f'm<sup>2</sup>
 'Centroid
-y_c = b_f - t_w/2'%u
-z_c = h/2'%u
+y_c = b_f - t_w/2'm
+z_c = h/2'm
 'Perimeter
-P = 2*(h + 2*b_f - t_w)'%u
+P = 2*(h + 2*b_f - t_w)'m
 'Second moments of area
-I_y = (b_f*h^3 - (b_f - t_w)*(h - 2*t_f)^3)/12'%u<sup>4</sup>
-I_z = ((h - 2*t_f)*t_w^3 + 2*t_f*b_f*(b_f^2 + 3*(b_f - t_w)^2))/12'%u<sup>4</sup>
-I_yz = -b_f*(h - t_f)*A_f/2'%u<sup>4</sup>
+I_y = (b_f*h^3 - (b_f - t_w)*(h - 2*t_f)^3)/12'm<sup>4</sup>
+I_z = ((h - 2*t_f)*t_w^3 + 2*t_f*b_f*(b_f^2 + 3*(b_f - t_w)^2))/12'm<sup>4</sup>
+I_yz = -b_f*(h - t_f)*A_f/2'm<sup>4</sup>
 'Principal moments of area
-I_1 = (I_y + I_z)/2 + sqrt((I_y - I_z)^2/4 + I_yz^2)'%u<sup>4</sup>
-I_2 = (I_y + I_z)/2 - sqrt((I_y - I_z)^2/4 + I_yz^2)'%u<sup>4</sup>
+I_1 = (I_y + I_z)/2 + sqrt((I_y - I_z)^2/4 + I_yz^2)'m<sup>4</sup>
+I_2 = (I_y + I_z)/2 - sqrt((I_y - I_z)^2/4 + I_yz^2)'m<sup>4</sup>
 'Angle of principal axis
 α_1 = atan((I_y - I_1)/I_yz)'<sup>о</sup>
 'Polar moment of area
-I_x=I_1+I_2'%u<sup>4</sup>
+I_x=I_1+I_2'm<sup>4</sup>
 'Radii of gyration
-r_y = sqr(I_y/A)'%u
-r_z = sqr(I_z/A)'%u
-r_x = sqr(I_x/A)'%u
+r_y = sqr(I_y/A)'m
+r_z = sqr(I_z/A)'m
+r_x = sqr(I_x/A)'m

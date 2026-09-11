@@ -567,7 +567,7 @@ namespace Calcpad.Highlighter.Snippets.Data
             },
             new SnippetItem
             {
-                Insert = "#settings {\"decimals\": 4, \"units\": \"cm\"}",
+                Insert = "#settings {\"decimals\": 4, \"substitute\": false}",
                 Description = "Override engine settings for subsequent lines via JSON. Use the Properties panel to see the available settings and edit them.",
                 Category = "Settings/Overrides",
                 KeywordType = "Keyword"

@@ -2,17 +2,17 @@
 "Geometrical Properties of Square
 '<div style="max-width:100mm"><img style="height:135pt;" alt="square.png" class="side" src="../../Images/mechanics/sections/square.png"></div>
 'Side length
-a= ? {1}'%u
+a= ? {1}'m
 'Area
-A = a^2'%u<sup>2</sup>
+A = a^2'm<sup>2</sup>
 'Centroid
-'<p><i>z</i><sub>c</sub> ='y_c = a/2'%u</p>
+'<p><i>z</i><sub>c</sub> ='y_c = a/2'm</p>
 'Perimeter
-P = 4*a'%u
+P = 4*a'm
 'Second moments of area
-'<p><i>I</i><sub>z</sub> ='I_y = a^4/12'%u<sup>4</sup></p>
+'<p><i>I</i><sub>z</sub> ='I_y = a^4/12'm<sup>4</sup></p>
 'Polar moment of area
-I_x=2*I_y'%u<sup>4</sup>
+I_x=2*I_y'm<sup>4</sup>
 'Radii of gyration
-'<p><i>r</i><sub>z</sub> ='r_y = sqrt(I_y/A)'%u</p>
-r_x = sqr(I_x/A)'%u
+'<p><i>r</i><sub>z</sub> ='r_y = sqrt(I_y/A)'m</p>
+r_x = sqr(I_x/A)'m

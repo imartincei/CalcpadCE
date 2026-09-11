@@ -203,14 +203,6 @@ class Settings:
     def Plot(self, value : PlotSettings):
         self._instance.Plot = value._instance
 
-    @property
-    def Units(self):
-        return self._instance.Units
-
-    @Units.setter
-    def Units(self, value : str):
-        self._instance.Units = value
-
 class Calculator:
     def __init__(self, settings):
         self._instance = Activator.CreateInstance(CalculatorType, settings._instance)

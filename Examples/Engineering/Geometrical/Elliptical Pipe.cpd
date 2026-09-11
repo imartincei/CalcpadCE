@@ -3,35 +3,35 @@
 '<div style="max-width:120mm"><img style="height:112pt;" alt="elliptical-pipe.png" class="side" src="../../Images/mechanics/sections/elliptical-pipe.png"></div>
 '(ellipse with elliptical hole)
 'Dimensions
-a = ? {20}'%u,'b = ? {10}'%u
-t = ? {2}'%u
-a_1 = a - t'%u
-b_1 = b - t'%u
+a = ? {20}'m,'b = ? {10}'m
+t = ? {2}'m
+a_1 = a - t'm
+b_1 = b - t'm
 'Area
-A = π*(a*b - a_1*b_1)'%u<sup>2</sup>
+A = π*(a*b - a_1*b_1)'m<sup>2</sup>
 'Centroid
-y_c = a'%u,'z_c = b'%u
+y_c = a'm,'z_c = b'm
 'Perimeter (approx.)
-P = π*(3*(a + b) - sqr((3*a + b)*(a + 3*b)))'%u
+P = π*(3*(a + b) - sqr((3*a + b)*(a + 3*b)))'m
 'Second moments of area
-I_y = π/4*(a*b^3 - a_1*b_1^3)'%u<sup>4</sup>
-I_z = π/4*(b*a^3 - b_1*a_1^3)'%u<sup>4</sup>
+I_y = π/4*(a*b^3 - a_1*b_1^3)'m<sup>4</sup>
+I_z = π/4*(b*a^3 - b_1*a_1^3)'m<sup>4</sup>
 'Polar moment of area
-I_x = I_y + I_z'%u<sup>4</sup>
+I_x = I_y + I_z'm<sup>4</sup>
 'Torsional constant
 #if '<!--'b < a'-->
 k = b_1/b
 #else
 k = a_1/a
 #end if
-I_t = π*a^3*b^3/(a^2 + b^2)*(1 - k^4)'%u<sup>4</sup>
+I_t = π*a^3*b^3/(a^2 + b^2)*(1 - k^4)'m<sup>4</sup>
 'Torsional section modulus
 #if '<!--'b < a'-->
-W_t = π*a*b^2/2*(1 - k^4)'%u<sup>3</sup>
+W_t = π*a*b^2/2*(1 - k^4)'m<sup>3</sup>
 #else
-W_t = π*b*a^2/2*(1 - k^4)'%u<sup>3</sup>
+W_t = π*b*a^2/2*(1 - k^4)'m<sup>3</sup>
 #end if
 'Radii of gyration
-r_y = sqrt(I_y/A)'%u
-r_z = sqrt(I_z/A)'%u
-r_x = sqrt(I_x/A)'%u
+r_y = sqrt(I_y/A)'m
+r_z = sqrt(I_z/A)'m
+r_x = sqrt(I_x/A)'m

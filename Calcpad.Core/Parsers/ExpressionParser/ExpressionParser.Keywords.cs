@@ -787,13 +787,6 @@ namespace Calcpad.Core
                     if (dto.MaxOutputCount.HasValue)
                         Settings.Math.MaxOutputCount = dto.MaxOutputCount.Value;
                     break;
-                case SettingKey.Units:
-                    if (dto.Units is not null)
-                    {
-                        Settings.Units = dto.Units;
-                        _parser.SetVariable("Units", new RealValue(UnitsFactor()));
-                    }
-                    break;
                 case SettingKey.IsUs:
                     if (dto.IsUs.HasValue)
                     {

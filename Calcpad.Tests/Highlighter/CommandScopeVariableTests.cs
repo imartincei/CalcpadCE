@@ -95,13 +95,6 @@ namespace Calcpad.Tests.Highlighter
         }
 
         [Fact]
-        public void UnitsSystemVariable_IsAlwaysDefined()
-        {
-            var src = "a = 5m\ny = a*Units\n";
-            Assert.Equal(0, Count(Lint(src), "CPD-3301"));
-        }
-
-        [Fact]
         public void LuDecomposition_DefinesIndPermutationVector()
         {
             var src =
