@@ -197,6 +197,7 @@
         @apply="handleApplyMetadata"
         @go-to-line="handleGoToLine"
         @refresh-ui-controls="handleRefreshUiControls"
+        @draft-dirty="handleMetadataDraftDirty"
       />
     </div>
     </div>
@@ -217,6 +218,7 @@ import CalcpadErrorsTab from './CalcpadErrorsTab.vue'
 import CalcpadMetadataTab from './CalcpadMetadataTab.vue'
 import { postMessage } from '../services/messaging'
 import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '../../text/metadata-comment'
+import { discardMetadataDraft } from '../metadata-drafts'
 import type { UiDirectiveData } from '../../text/ui-directive'
 import type { UiControl } from '../../services/ui-overrides'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
@@ -701,27 +703,34 @@ const handleRefreshUiControls = () => {
   postMessage({ type: 'getUiControls' })
 }
 
-const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: SettingsValues; ui?: UiDirectiveData }) => {
-  if (!metadataBlock.value) return
+// The panel's own block, not the last one pushed: an unsaved form stays on its target
+// while the cursor moves, so the two differ.
+const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: SettingsValues; ui?: UiDirectiveData; block: MetadataCommentBlock }) => {
+  const block = payload.block
+  if (!block) return
   // One message → one atomic edit covering the metadata comment, the
   // document-level #settings directive, and the #UI directive at the cursor,
   // so the writes can't race or shift each other's line numbers.
   postMessage({
     type: 'updateMetadata',
-    line: metadataBlock.value.line,
-    endLine: metadataBlock.value.endLine,
-    indent: metadataBlock.value.indent,
-    trailingQuote: metadataBlock.value.trailingQuote,
-    layout: metadataBlock.value.layout,
-    isNew: metadataBlock.value.isNew,
+    line: block.line,
+    endLine: block.endLine,
+    indent: block.indent,
+    trailingQuote: block.trailingQuote,
+    layout: block.layout,
+    isNew: block.isNew,
     data: payload.data,
     settings: payload.settings,
-    settingsLine: metadataBlock.value.settingsLine ?? null,
-    settingsEndLine: metadataBlock.value.settingsEndLine ?? metadataBlock.value.settingsLine ?? null,
-    settingsLayout: metadataBlock.value.settingsLayout,
+    settingsLine: block.settingsLine ?? null,
+    settingsEndLine: block.settingsEndLine ?? block.settingsLine ?? null,
+    settingsLayout: block.settingsLayout,
     ui: payload.ui,
-    uiLine: metadataBlock.value.uiDirective?.line ?? null,
+    uiLine: block.uiDirective?.line ?? null,
   })
+}
+
+const handleMetadataDraftDirty = (payload: { docKey: string; dirty: boolean }) => {
+  postMessage({ type: 'metadataDraftDirty', docKey: payload.docKey, dirty: payload.dirty })
 }
 
 // Message handler
@@ -821,6 +830,9 @@ const handleMessage = (event: MessageEvent) => {
       break
     case 'metadataContext':
       metadataBlock.value = message.block ?? null
+      break
+    case 'metadataDraftDiscard':
+      discardMetadataDraft(String(message.docKey ?? ''))
       break
     case 'uiControls':
       uiControls.value = Array.isArray(message.controls) ? message.controls : null

@@ -3,8 +3,19 @@
     <div class="metadata-container p-3">
       <h3 class="section-title">Properties</h3>
 
-      <template v-if="block">
-        <p v-if="!block.valid" class="warning">
+      <div v-if="boundBlock" class="bound-target" :class="kindClass">
+        <button
+          class="line-chip"
+          title="Go to this line"
+          @click="emit('go-to-line', boundBlock.line + 1)"
+        >Line {{ boundBlock.line + 1 }}</button>
+        <span v-if="targetKind" class="target-kind">{{ targetKind }}</span>
+        <span class="target-name" :title="targetName">{{ targetName }}</span>
+        <span v-if="dirty" class="dirty-mark" title="Unsaved changes - Apply or Reset">*</span>
+      </div>
+
+      <template v-if="boundBlock">
+        <p v-if="!boundBlock.valid" class="warning">
           This comment contains invalid JSON. Applying will replace it with the
           values below.
         </p>
@@ -281,7 +292,7 @@
 
         <div class="actions">
           <button class="primary-button" :disabled="hasErrors" :title="hasErrors ? 'Fix the highlighted fields before applying' : undefined" @click="onApply">Apply</button>
-          <button class="secondary-button" @click="populate">Reset</button>
+          <button class="secondary-button" @click="clearDraft">Reset</button>
         </div>
       </template>
     </div>
@@ -289,7 +300,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, watch } from 'vue'
+import { reactive, ref, computed, watch, onBeforeUnmount } from 'vue'
 import {
   FUNCTION_PARAM_TYPES,
   MACRO_PARAM_TYPES,
@@ -303,6 +314,8 @@ import type { MetadataSettingKey } from '../../types/catalog'
 import { UI_PROPERTY_KEYS } from '../../text/ui-directive'
 import type { UiDirectiveData } from '../../text/ui-directive'
 import { classifyUiOverrides } from '../../services/ui-overrides'
+import { getMetadataDraft, setMetadataDraft, clearMetadataDraft, metadataDraftDiscarded } from '../metadata-drafts'
+import type { MetadataDraft } from '../metadata-drafts'
 import type { UiControl, UiOverrideRow } from '../../services/ui-overrides'
 
 interface Props {
@@ -313,10 +326,14 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), { block: null, uiControls: null })
 
 const emit = defineEmits<{
-  'apply': [payload: { data: MetadataCommentData; settings: SettingsValues; ui?: UiDirectiveData }]
+  'apply': [payload: { data: MetadataCommentData; settings: SettingsValues; ui?: UiDirectiveData; block: MetadataCommentBlock }]
   'go-to-line': [line: number]
   'refresh-ui-controls': []
+  'draft-dirty': [payload: { docKey: string; dirty: boolean }]
 }>()
+
+/** The block the form is editing - not the one under the cursor while edits are held. */
+const boundBlock = ref<MetadataCommentBlock | null>(null)
 
 const functionTypes = FUNCTION_PARAM_TYPES
 const macroTypes = MACRO_PARAM_TYPES
@@ -362,9 +379,9 @@ const model = reactive({
 const added = reactive(new Set<string>())
 
 // When the host provides no context (non-VS Code), show every field.
-const noContext = computed(() => !props.block?.context)
+const noContext = computed(() => !boundBlock.value?.context)
 
-const defKind = computed<MetadataDefKind>(() => props.block?.context?.defKind ?? null)
+const defKind = computed<MetadataDefKind>(() => boundBlock.value?.context?.defKind ?? null)
 
 // Description documents a definition, so it's offered on any definition line
 // (variable, function, or macro) but hidden on generic lines unless added.
@@ -398,7 +415,7 @@ const showReturnType = computed(() =>
 // The End-region control only makes sense inside an open LintIgnore region, or
 // when this comment already carries an EndLintIgnore to stay editable.
 const showEndLint = computed(() =>
-  noContext.value || !!props.block?.context?.insideOpenLintRegion || model.endLintMode !== 'off')
+  noContext.value || !!boundBlock.value?.context?.insideOpenLintRegion || model.endLintMode !== 'off')
 
 // Settings and lint-ignore aren't tied to a definition, so they're hidden on
 // definition lines (where the panel documents the variable/function/macro) and
@@ -412,7 +429,7 @@ const showSettings = computed(() => true)
 // The #UI section only makes sense when the cursor sits on an actual #UI
 // line — unlike the comment/settings sections, there's nothing to synthesize
 // (a #UI line requires a pre-existing variable assignment).
-const uiBlock = computed(() => props.block?.uiDirective ?? null)
+const uiBlock = computed(() => boundBlock.value?.uiDirective ?? null)
 const showUi = computed(() => !!uiBlock.value)
 
 const uiTypeOptions = specForKey(UI_PROPERTY_KEYS, 'type')?.options ?? []
@@ -462,7 +479,7 @@ const showLint = computed(() =>
   || !isDefinition.value
   || model.startLintMode !== 'off'
   || model.endLintMode !== 'off'
-  || !!props.block?.context?.insideOpenLintRegion
+  || !!boundBlock.value?.context?.insideOpenLintRegion
   || added.has('lint'))
 
 // PDF settings configure the whole export, not the definition below the comment,
@@ -552,14 +569,102 @@ const hasSettingErrors = computed(() => model.settings.some(r => !!setting.error
 const hasPdfErrors = computed(() => model.pdf.some(r => !!pdf.error(r)))
 const hasErrors = computed(() => hasSettingErrors.value || hasPdfErrors.value || hasUiErrors.value)
 
+/** Everything the user can change; compared as text to tell edited from untouched. */
+function snapshot(): string {
+  return JSON.stringify({ model, added: [...added], showUiOverrides: showUiOverrides.value })
+}
+
+const baseline = ref('')
+const dirty = computed(() => snapshot() !== baseline.value)
+
+const KIND_LABELS: Record<string, string> = {
+  variable: 'Variable',
+  function: 'Function',
+  macro: 'Macro',
+}
+
+// Only set on a definition; a bare #settings/#UI line has no kind to name.
+const targetKind = computed(() => {
+  const ctx = boundBlock.value?.context
+  return ctx?.defName && ctx.defKind ? KIND_LABELS[ctx.defKind] : ''
+})
+
+const kindClass = computed(() => targetKind.value ? `kind-${defKind.value}` : '')
+
+const targetName = computed(() => {
+  const block = boundBlock.value
+  if (block?.context?.defName) return block.context.defName
+  if (block?.uiDirective) return '#UI'
+  if (block?.settingsLine != null) return '#settings'
+  return 'Document'
+})
+
+function reportDirty(docKey: string | undefined, value: boolean) {
+  if (docKey) emit('draft-dirty', { docKey, dirty: value })
+}
+
+watch(dirty, value => reportDirty(boundBlock.value?.docKey, value))
+
+/** Bind the form to a freshly pushed block, discarding nothing (the form is clean). */
+function bind(block: MetadataCommentBlock | null) {
+  boundBlock.value = block
+  lastSignature = blockSignature(block)
+  populate()
+  reportDirty(block?.docKey, false)
+}
+
+function restoreDraft(draft: MetadataDraft) {
+  const state = JSON.parse(draft.state)
+  Object.assign(model, state.model)
+  added.clear()
+  for (const id of state.added as string[]) added.add(id)
+  showUiOverrides.value = state.showUiOverrides
+  boundBlock.value = draft.block
+  baseline.value = draft.baseline
+  lastSignature = blockSignature(draft.block)
+  reportDirty(draft.block.docKey, true)
+}
+
+/** Park the current edits under the bound document, or drop a draft nothing changed. */
+function stash() {
+  const block = boundBlock.value
+  const key = block?.docKey
+  if (!key) return
+  const isDirty = dirty.value
+  if (isDirty) setMetadataDraft(key, { block, state: snapshot(), baseline: baseline.value })
+  else clearMetadataDraft(key)
+  reportDirty(key, isDirty)
+}
+
+/** Reset drops the draft and hands the form to the current cursor position. */
+function clearDraft() {
+  const key = boundBlock.value?.docKey
+  if (key) clearMetadataDraft(key)
+  bind(props.block)
+}
+
+/** Apply keeps the form as-is: it already holds what was written. */
+function acceptDraft() {
+  const key = boundBlock.value?.docKey
+  if (key) clearMetadataDraft(key)
+  baseline.value = snapshot()
+}
+
+// The host drops a document's draft when its file closes.
+watch(metadataDraftDiscarded, ({ docKey }) => {
+  if (docKey && docKey === boundBlock.value?.docKey) bind(props.block)
+})
+
+onBeforeUnmount(stash)
+
 function populate() {
   added.clear()
-  const data = props.block?.data ?? {}
+  const data = boundBlock.value?.data ?? {}
   model.desc = typeof data.desc === 'string' ? data.desc : ''
   model.paramTypes = Array.isArray(data.paramTypes) ? data.paramTypes.map(String) : []
   model.paramDesc = Array.isArray(data.paramDesc) ? data.paramDesc.map(String) : []
   model.returnType = typeof data.returnType === 'string' ? data.returnType : ''
-  const settings = props.block?.settings
+  const settings = boundBlock.value?.settings
   model.settings = settings && typeof settings === 'object'
     ? Object.entries(settings).map(([key, value]) => ({ key, value: String(value) }))
     : []
@@ -592,11 +697,13 @@ function populate() {
 
   // Pre-size the parameter rows to the definition's parameter count so the
   // form matches the signature without the user adding rows by hand.
-  const paramCount = props.block?.context?.paramCount ?? 0
+  const paramCount = boundBlock.value?.context?.paramCount ?? 0
   if (paramCount > 0) {
     while (model.paramTypes.length < paramCount) model.paramTypes.push('')
     while (model.paramDesc.length < paramCount) model.paramDesc.push('')
   }
+
+  baseline.value = snapshot()
 }
 
 // An array value maps to 'all' (empty) or 'specific' (codes); absent → 'off'.
@@ -661,7 +768,8 @@ function onApply() {
     }
   }
 
-  emit('apply', { data, settings, ui })
+  emit('apply', { data, settings, ui, block: boundBlock.value! })
+  acceptDraft()
 }
 
 // Identity of the target the form is bound to. Cursor jitter within the same
@@ -677,13 +785,38 @@ function blockSignature(b: MetadataCommentBlock | null | undefined): string {
 }
 
 let lastSignature = ''
+
+/** Follow the target's line as document edits move it, so Apply still lands on it. */
+function reanchor(block: MetadataCommentBlock | null) {
+  const bound = boundBlock.value
+  if (!block || !bound) return
+  const name = block.context?.defName
+  const same = name && bound.context?.defName ? name === bound.context.defName : block.line === bound.line
+  if (same) boundBlock.value = block
+}
+
 watch(
   () => props.block,
   (block) => {
+    const docKey = block?.docKey ?? ''
+    // A different document (or the first bind): park what's here, pick up its own draft.
+    if (!boundBlock.value || docKey !== (boundBlock.value.docKey ?? '')) {
+      stash()
+      const draft = getMetadataDraft(docKey)
+      if (draft) restoreDraft(draft)
+      else bind(block)
+      return
+    }
+
+    // Unsaved edits outrank the cursor: the form stays on its target until Apply or Reset.
+    if (dirty.value) {
+      reanchor(block)
+      return
+    }
+
     const sig = blockSignature(block)
     if (sig === lastSignature) return
-    lastSignature = sig
-    populate()
+    bind(block)
   },
   { immediate: true },
 )
@@ -714,6 +847,75 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   font-size: var(--calcpad-font-size-lg);
   font-weight: 600;
   color: var(--vscode-foreground);
+}
+
+.bound-target {
+  --target-color: var(--vscode-descriptionForeground);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  margin: 0 0 12px 0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border-left: 2px solid var(--target-color);
+  background: var(--vscode-textCodeBlock-background);
+  font-size: var(--calcpad-font-size-md);
+  transition: border-color 150ms ease;
+}
+
+.bound-target.kind-variable {
+  --target-color: var(--vscode-symbolIcon-variableForeground);
+}
+
+.bound-target.kind-function {
+  --target-color: var(--vscode-symbolIcon-functionForeground);
+}
+
+.bound-target.kind-macro {
+  --target-color: var(--vscode-symbolIcon-classForeground);
+}
+
+.line-chip {
+  flex: none;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--calcpad-font-size-sm);
+  cursor: pointer;
+}
+
+.line-chip:hover {
+  color: var(--vscode-textLink-foreground);
+  text-decoration: underline;
+}
+
+.target-kind {
+  flex: none;
+  color: var(--target-color);
+  opacity: 0.85;
+  font-size: var(--calcpad-font-size-sm);
+  font-style: italic;
+  transition: color 150ms ease;
+}
+
+.target-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--vscode-editor-font-family);
+  font-weight: 600;
+  color: var(--target-color);
+  transition: color 150ms ease;
+}
+
+.dirty-mark {
+  flex: none;
+  margin-left: auto;
+  color: var(--vscode-gitDecoration-modifiedResourceForeground);
+  font-weight: 700;
 }
 
 .section-desc {

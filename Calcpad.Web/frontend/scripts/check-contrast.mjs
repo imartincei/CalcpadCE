@@ -124,6 +124,14 @@ const PAIRS = [
     ['--vscode-sideBarSectionHeader-foreground', '--vscode-sideBar-background', TEXT],
     ['--vscode-badge-foreground', '--vscode-badge-background', TEXT],
     ['--vscode-editorWidget-foreground', '--vscode-editorWidget-background', TEXT],
+    // Symbol colours label real text (Variables list, Properties header), on the editor
+    // surface and on the code-block strip the Properties header sits in.
+    ['--vscode-symbolIcon-variableForeground', '--vscode-editor-background', TEXT],
+    ['--vscode-symbolIcon-functionForeground', '--vscode-editor-background', TEXT],
+    ['--vscode-symbolIcon-classForeground', '--vscode-editor-background', TEXT],
+    ['--vscode-symbolIcon-variableForeground', '--vscode-textCodeBlock-background', TEXT],
+    ['--vscode-symbolIcon-functionForeground', '--vscode-textCodeBlock-background', TEXT],
+    ['--vscode-symbolIcon-classForeground', '--vscode-textCodeBlock-background', TEXT],
     // Control affordances: borders and focus rings only need 3:1.
     ['--vscode-input-border', '--vscode-editor-background', NONTEXT],
     ['--vscode-checkbox-border', '--vscode-editor-background', NONTEXT],

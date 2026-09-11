@@ -2,11 +2,12 @@ import { CalcpadApiClient } from '../../api/client';
 import { CalcpadSnippetService } from '../snippets';
 import { CalcpadDefinitionsService } from '../definitions';
 import { parseHeadings } from '../headings';
-import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, buildDefinitionResolver, pdfSettingsFromDocument, hasMetadataContent } from '../../text/metadata-comment';
-import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, DefinitionResolver, SettingsValues } from '../../text/metadata-comment';
+import { serializeMetadataComment, serializeSettingsDirective, computeMetadataBlock, pdfSettingsFromDocument, hasMetadataContent } from '../../text/metadata-comment';
+import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, SettingsValues } from '../../text/metadata-comment';
+import { buildSourceDefinitionResolver } from '../../text/source-definitions';
 import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
 import type { UiDirectiveData } from '../../text/ui-directive';
-import type { DefinitionsResponse, ExportVariant } from '../../types/api';
+import type { ExportVariant } from '../../types/api';
 import { getDefaultSettings, buildApiSettings, coerceWriteMode, coerceLogLevel, writesAllowed } from '../../types/settings';
 import { setLogLevel } from '../log-level';
 import type { CalcpadSettings, WriteMode } from '../../types/settings';
@@ -122,6 +123,7 @@ export abstract class BaseMessageBridge {
     private _uiControlsProvider: (() => UiControl[] | null) | null = null;
     private _uiControlsSink: ((controls: UiControl[]) => void) | null = null;
     private _uiOverridesSink: ((overrides: Record<string, string>) => void) | null = null;
+    private _metadataDirtySink: ((docKey: string, dirty: boolean) => void) | null = null;
     private _cachedPlots: ExtractedPlot[] = [];
 
     constructor(serverUrl: string, logger?: ILogger) {
@@ -202,6 +204,11 @@ export abstract class BaseMessageBridge {
     /** Host injects a sink for the entered `#UI` values, so an edit made in the panel sticks. */
     setUiOverridesSink(fn: (overrides: Record<string, string>) => void): void {
         this._uiOverridesSink = fn;
+    }
+
+    /** Host injects a sink for the Properties panel's unsaved-draft flag, per document. */
+    setMetadataDirtySink(fn: (docKey: string, dirty: boolean) => void): void {
+        this._metadataDirtySink = fn;
     }
 
     /** Pushes the cached controls, so the panel follows document and cursor changes. */
@@ -384,6 +391,9 @@ export abstract class BaseMessageBridge {
             case 'updateMetadata':
                 this.handleUpdateMetadata(message);
                 break;
+            case 'metadataDraftDirty':
+                this._metadataDirtySink?.(String(message.docKey ?? ''), !!message.dirty);
+                break;
             case 'getUiControls':
                 this.handleGetUiControls();
                 break;
@@ -441,17 +451,14 @@ export abstract class BaseMessageBridge {
     protected abstract getVariablesOrigin(): string;
 
     /**
-     * The cached highlighter definitions for the active document, used to resolve
-     * definition kinds/param counts for the metadata panel. Subclasses key the
-     * definitions cache differently, so each supplies the correct lookup.
+     * Identifies the active document for the Properties panel's draft. Keyed per file where
+     * there is one, so the same file open in a split pane shares a single draft.
      */
-    protected abstract getActiveDefinitions(): DefinitionsResponse | undefined;
-
-    /** Definition resolver over the active document's real highlighter results. */
-    private definitionResolver(): DefinitionResolver {
-        const defs = this.getActiveDefinitions();
-        return buildDefinitionResolver(defs ?? { functions: [], macros: [], variables: [], customUnits: [] });
+    private getMetadataDocKey(): string {
+        const tabs = (window as { calcpadTabs?: { activeTab?: { id: string; filePath?: string | null } } }).calcpadTabs;
+        return tabs?.activeTab?.filePath || `tab:${tabs?.activeTab?.id ?? 'none'}`;
     }
+
     protected abstract generatePdfBytes(
         content: string,
         apiSettings: unknown,
@@ -1009,7 +1016,8 @@ export abstract class BaseMessageBridge {
         let block: MetadataCommentBlock | null = null;
         if (model && pos) {
             const lines = model.getValue().split(/\r?\n/);
-            block = computeMetadataBlock(lines, pos.lineNumber - 1, this.definitionResolver());
+            block = computeMetadataBlock(lines, pos.lineNumber - 1, buildSourceDefinitionResolver(lines));
+            if (block) block.docKey = this.getMetadataDocKey();
         }
         this.postToVue({ type: 'metadataContext', block });
         // Sent with the block so the panel's saved-values list follows the document the
@@ -1119,7 +1127,8 @@ export abstract class BaseMessageBridge {
         // repeated Apply edits in place instead of inserting a duplicate.
         const pos = editor.getPosition();
         const lines = model.getValue().split(/\r?\n/);
-        const block = pos ? computeMetadataBlock(lines, pos.lineNumber - 1, this.definitionResolver()) : null;
+        const block = pos ? computeMetadataBlock(lines, pos.lineNumber - 1, buildSourceDefinitionResolver(lines)) : null;
+        if (block) block.docKey = this.getMetadataDocKey();
         this.postToVue({ type: 'metadataContext', block });
     }
 

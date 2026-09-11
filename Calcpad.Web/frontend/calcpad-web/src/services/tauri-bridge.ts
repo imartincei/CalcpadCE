@@ -346,10 +346,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
         return 'desktop-editor';
     }
 
-    protected getActiveDefinitions() {
-        return this.definitionsService.getCachedDefinitions(getActiveDocumentKey());
-    }
-
     protected async buildSettingsResponseExtras(): Promise<Record<string, unknown>> {
         return {
             activeConfig: this._activePresetName,

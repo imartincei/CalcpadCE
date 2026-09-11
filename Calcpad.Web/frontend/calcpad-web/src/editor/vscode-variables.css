@@ -132,8 +132,11 @@
     --vscode-gitDecoration-addedResourceForeground: #57A64A;
     --vscode-gitDecoration-modifiedResourceForeground: #E2C08D;
 
-    /* Symbol icons */
+    /* Symbol icons. Macros ride on classForeground: it is the third hue VS Code's own
+       themes keep distinct from variable and function. */
     --vscode-symbolIcon-variableForeground: #6B9FFF;
+    --vscode-symbolIcon-functionForeground: #4EC9B0;
+    --vscode-symbolIcon-classForeground: #E07BE0;
 
     /* Scrollbars */
     --vscode-scrollbarSlider-background: rgba(121, 121, 121, 0.4);
@@ -245,7 +248,9 @@
     --vscode-gitDecoration-addedResourceForeground: #587c0c;
     --vscode-gitDecoration-modifiedResourceForeground: #895503;
 
-    --vscode-symbolIcon-variableForeground: #007acc;
+    --vscode-symbolIcon-variableForeground: #0067AD;
+    --vscode-symbolIcon-functionForeground: #0B6D5E;
+    --vscode-symbolIcon-classForeground: #8B008B;
 
     --vscode-scrollbarSlider-background: rgba(100, 100, 100, 0.4);
     --vscode-scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);

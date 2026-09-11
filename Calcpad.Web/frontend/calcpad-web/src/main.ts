@@ -4,6 +4,7 @@ import App from './App.vue';
 import pkg from '../package.json';
 import CalcpadAppVue from 'calcpad-frontend/vue/components/CalcpadApp.vue';
 import { initMessaging } from 'calcpad-frontend/vue/services/messaging';
+import { discardMetadataDraft } from 'calcpad-frontend/vue/metadata-drafts';
 import { MessageBridge } from './services/message-bridge';
 import { WorkspaceStateStore, isResultMode, type ResultMode, type WorkspaceLayout } from './services/workspace-state';
 import { buildApiSettings } from 'calcpad-frontend/types/settings';
@@ -11,7 +12,7 @@ import { ConnectionMonitor, setLogLevel, coerceLogLevel } from 'calcpad-frontend
 import {
     findMetadataCommentBlock,
     serializeMetadataComment,
-    buildDefinitionResolver,
+    buildSourceDefinitionResolver,
     UiOverrideStore,
     writeUiOverrides,
     extractUiControls,
@@ -375,6 +376,8 @@ async function bootstrap(): Promise<void> {
     const uiOverrides = new UiOverrideStore();
     // Documents whose in-memory values have not been written back yet.
     const uiOverridesDirty = new Set<string>();
+    // Documents with an unapplied Properties form, reported by the panel.
+    const metadataDirty = new Set<string>();
     // Controls each document's last input-form render produced, which is what tells the
     // Properties tab whether a saved value still applies to anything.
     const uiControls = new Map<string, UiControl[]>();
@@ -545,6 +548,11 @@ async function bootstrap(): Promise<void> {
     });
     activeBridge.setUiControlsProvider(() => uiControls.get(activeUiDocKey()) ?? null);
     activeBridge.setUiControlsSink((controls) => uiControls.set(activeUiDocKey(), controls));
+    activeBridge.setMetadataDirtySink((docKey, dirty) => {
+        if (dirty) metadataDirty.add(docKey);
+        else metadataDirty.delete(docKey);
+    });
+
     // An edit made in the Properties tab is an edit to the entered values, so the store
     // follows it - otherwise the next "Save values" would write the old ones back.
     activeBridge.setUiOverridesSink((overrides) => {
@@ -892,9 +900,7 @@ async function bootstrap(): Promise<void> {
                 // On a definition, the panel shows a virtual block from real
                 // highlighter results (correct params) and Apply creates the
                 // comment — no seeding, so definition line numbers stay valid.
-                const resolve = buildDefinitionResolver(
-                    editorBridge.definitions.getCachedDefinitions(docKeyFor(group))
-                    ?? { functions: [], macros: [], variables: [], customUnits: [] });
+                const resolve = buildSourceDefinitionResolver(model.getValue().split(/\r?\n/));
                 if (resolve(curLine - 1)) {
                     focusMetadata();
                     return;
@@ -1667,6 +1673,29 @@ async function bootstrap(): Promise<void> {
         return await leaveUiDoc();
     }
 
+    /** The Properties panel's draft key for a tab: its file, so split panes share one draft. */
+    function metadataDocKeyFor(group: EditorGroup, id: string): string {
+        return group.tabs.getFilePath(id) || `tab:${id}`;
+    }
+
+    /**
+     * A Properties form edited but not applied lives only in the panel, so closing the
+     * document it belongs to throws it away. Returns false when the user backs out.
+     */
+    async function confirmDiscardMetadataDraft(docKey: string, title: string): Promise<boolean> {
+        if (!metadataDirty.has(docKey)) return true;
+        const choice = await confirmThreeWay({
+            title: 'Unsaved properties',
+            message: `Discard the unapplied Properties changes to ${title}?`,
+            yesLabel: 'Discard',
+            noLabel: 'Keep Editing',
+        });
+        if (choice !== 'yes') return false;
+        metadataDirty.delete(docKey);
+        discardMetadataDraft(docKey);
+        return true;
+    }
+
     // Refresh all previews when the preview pane is first opened.
     appInstance.onPreviewToggled = (visible: boolean) => {
         syncInputMode();
@@ -1980,6 +2009,7 @@ async function bootstrap(): Promise<void> {
             if (!target) return true;
             // Closing the document the input form is showing takes its values away.
             if (group === activeGroup && id === group.tabs.activeId && !await confirmLeaveUiDoc()) return false;
+            if (!await confirmDiscardMetadataDraft(metadataDocKeyFor(group, id), target.title)) return false;
             // Activate the group + tab so the editor shows what's being asked about.
             if (activeGroup !== group) setActiveGroup(group);
             // Re-read the dirty flag: saving the input form's values above may have
@@ -2629,7 +2659,8 @@ async function bootstrap(): Promise<void> {
             const dirty: { group: EditorGroup; id: string }[] = [];
             for (const g of groups.values()) {
                 for (const t of g.tabs.all) {
-                    if (t.dirty) dirty.push({ group: g, id: t.id });
+                    // An unapplied Properties form is as much unsaved work as a dirty buffer.
+                    if (t.dirty || metadataDirty.has(metadataDocKeyFor(g, t.id))) dirty.push({ group: g, id: t.id });
                 }
             }
             for (const { group, id } of dirty) {

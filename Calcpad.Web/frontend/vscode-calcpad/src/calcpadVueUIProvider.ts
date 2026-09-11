@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel } from 'calcpad-frontend';
-import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, DefinitionResolver, DefinitionsResponse, SettingsValues, UiDirectiveData, UiControl } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildSourceDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel } from 'calcpad-frontend';
+import type { CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, SettingsValues, UiDirectiveData, UiControl } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 import { VSCodeLogger } from './adapters';
@@ -26,8 +26,6 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     public onPreviewThemeChanged?: () => void | Promise<void>;
     public onSettingsChanged?: () => void | Promise<void>;
     public onLogLevelChanged?: (level: string) => void;
-    /** Real highlighter definitions for a document URI, used to resolve metadata context. */
-    public getDefinitions?: (documentUri: string) => DefinitionsResponse | undefined;
     /**
      * Renders the active document as an input form and reports the controls it produced,
      * or null when it could not be rendered. The extension owns the api client and the
@@ -600,6 +598,11 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         this._view?.webview.postMessage({ type: 'metadataContext', block });
     }
 
+    /** Tell the panel to drop a document's unapplied Properties form. */
+    public discardMetadataDraft(docKey: string) {
+        this._view?.webview.postMessage({ type: 'metadataDraftDiscard', docKey });
+    }
+
     /**
      * Push the `#UI` controls of the active document's last input-form render. Null means
      * it has never been rendered as one, which is what makes the Properties tab withhold
@@ -617,13 +620,10 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         }
         const lines = editor.document.getText().split(/\r?\n/);
         const line = editor.selection.active.line;
-        return computeMetadataBlock(lines, line, this._definitionResolver(editor.document.uri.toString()));
-    }
-
-    /** Definition resolver over a document's real highlighter results. */
-    private _definitionResolver(documentUri: string): DefinitionResolver {
-        const defs = this.getDefinitions?.(documentUri);
-        return buildDefinitionResolver(defs ?? { functions: [], macros: [], variables: [], customUnits: [] });
+        const docKey = editor.document.uri.toString();
+        const block = computeMetadataBlock(lines, line, buildSourceDefinitionResolver(lines));
+        if (block) block.docKey = docKey;
+        return block;
     }
 
     /** Ask the panel to switch to a given tab id. */
@@ -749,7 +749,9 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         // Re-emit context (comment + refreshed settings) at the current cursor so a
         // repeated Apply edits in place instead of inserting a duplicate.
         const lines = editor.document.getText().split(/\r?\n/);
-        const block = computeMetadataBlock(lines, editor.selection.active.line, this._definitionResolver(editor.document.uri.toString()));
+        const docKey = editor.document.uri.toString();
+        const block = computeMetadataBlock(lines, editor.selection.active.line, buildSourceDefinitionResolver(lines));
+        if (block) block.docKey = docKey;
         this.updateMetadataContext(block);
     }
 
