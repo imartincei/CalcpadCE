@@ -4,8 +4,8 @@ using System.Text;
 namespace Calcpad.Server.Services
 {
     /// <summary>
-    /// Reads and writes the compiled <c>.cpdz</c> worksheet format, matching
-    /// <c>Calcpad.Wpf</c>'s <c>Zip</c> helper so files round-trip between the two. Two shapes
+    /// Reads and writes the compiled <c>.cpdz</c> worksheet format, matching the CLI's
+    /// <c>Zip</c> helper so files round-trip between the two. Two shapes
     /// exist — a raw deflate stream of the source text, and a ZIP archive (recognized by the
     /// <c>PK</c> signature) holding a deflated <c>code.cpd</c> entry plus referenced images —
     /// and encoding preserves whichever shape the original had.

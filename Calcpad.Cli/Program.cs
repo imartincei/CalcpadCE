@@ -367,6 +367,9 @@ namespace Calcpad.Cli
             var ext = Path.GetExtension(outFile);
             try
             {
+                if (ext == ".pdf")
+                    throw new NotSupportedException(Messages.PdfExportNotAvailable);
+
                 var path = Path.GetDirectoryName(fileName);
                 if (!string.IsNullOrWhiteSpace(path))
                     Directory.SetCurrentDirectory(path);
@@ -398,8 +401,6 @@ namespace Calcpad.Cli
                     converter.ToHtml(htmlResult, outFile);
                 else if (ext == ".docx")
                     converter.ToOpenXml(htmlResult, outFile, parser.OpenXmlExpressions);
-                else if (ext == ".pdf")
-                    converter.ToPdf(htmlResult, outFile);
                 else
                     WriteErrorAndWait(Messages.InvalidOutputExtensionMustBeHtmlDocxOrPdf);
 

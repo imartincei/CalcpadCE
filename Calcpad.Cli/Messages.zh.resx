@@ -100,4 +100,7 @@
   <data name="InvalidOutputExtensionMustBeHtmlDocxOrPdf" xml:space="preserve">
     <value>输出扩展名无效！必须是“html”、“docx”或“pdf”.</value>
   </data>
+  <data name="PdfExportNotAvailable" xml:space="preserve">
+    <value>命令行目前不支持导出 PDF。该功能计划在未来版本中提供。在此之前，请使用 CalcpadCE 桌面应用导出 PDF；如果需要将导出作为后台任务运行，请使用独立的 CalcpadCE 服务器。</value>
+  </data>
 </root>

@@ -1,5 +1,4 @@
 ﻿using Calcpad.OpenXml;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -42,47 +41,6 @@ namespace Calcpad.Cli
             if (!_isSilent && File.Exists(path))
                 Run(path);
         }
-        internal void ToPdf(string html, string path)
-        {
-            var htmlFile = Path.ChangeExtension(path, ".html");
-            File.WriteAllText(htmlFile, HtmlApplyWorksheet(html));
-
-            string wkhtmltopdfPath;
-
-            if (OperatingSystem.IsWindows())
-            {
-                wkhtmltopdfPath = Program.AppPath + "wkhtmltopdf.exe";
-            }
-            else
-            {
-                wkhtmltopdfPath = "/usr/bin/wkhtmltopdf";
-
-                if (!File.Exists("/usr/bin/wkhtmltopdf"))
-                {
-                    throw new DirectoryNotFoundException("wkhtmltopdf not found.");
-                }
-            }
-
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = wkhtmltopdfPath
-            };
-            const string s = " --enable-local-file-access --disable-smart-shrinking --page-size A4  --margin-bottom 15 --margin-left 15 --margin-right 10 --margin-top 15 ";
-            if (htmlFile.Contains(' ', StringComparison.Ordinal))
-                startInfo.Arguments = s + '\"' + htmlFile + "\" \"" + path + '\"';
-            else
-                startInfo.Arguments = s + htmlFile + " " + path;
-
-            startInfo.UseShellExecute = true;
-            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            var process = Process.Start(startInfo);
-            process?.WaitForExit();
-
-            File.Delete(htmlFile);
-            if (!_isSilent && File.Exists(path))
-                Run(path);
-        }
-
         private static void Run(string fileName)
         {
             Process process = new()

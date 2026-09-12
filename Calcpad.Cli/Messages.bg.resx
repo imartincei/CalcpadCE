@@ -100,4 +100,7 @@
   <data name="InvalidOutputExtensionMustBeHtmlDocxOrPdf" xml:space="preserve">
     <value>Невалидно изходно разширение.. Трябва да е 'html', 'docx' или 'pdf'.</value>
   </data>
+  <data name="PdfExportNotAvailable" xml:space="preserve">
+    <value>Експортирането в PDF не е налично в момента в командния ред. Планирано е за бъдеща версия. Междувременно използвайте настолното приложение CalcpadCE за експорт в PDF или стартирайте самостоятелния сървър CalcpadCE, ако имате нужда от експорт в PDF като фонова задача.</value>
+  </data>
 </root>
