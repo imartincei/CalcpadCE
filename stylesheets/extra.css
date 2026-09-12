@@ -187,8 +187,8 @@ span[title="Animated"] {
 }
 
 /* ---------------------------------------------------------------------------
-   Light-mode syntax highlighting palette — mirrors Calcpad.Wpf/HighLighter.cs
-   (Colors[] array). Slate (dark) mode keeps Material's bundled palette.
+   Light-mode syntax highlighting palette — mirrors the CalcpadCE editor's token
+   colors. Slate (dark) mode keeps Material's bundled palette.
 
    Token classes emitted by docs/hooks/calcpad_lexer.py:
      .k   Keyword          (#-directives)            -> Magenta
