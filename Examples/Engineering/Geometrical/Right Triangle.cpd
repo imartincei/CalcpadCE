@@ -2,28 +2,28 @@
 "Geometrical Properties of Right Triangle
 '<div style="max-width:120mm"><img style="height:127pt;" alt="right-triangle.png" class="side" src="../../Images/mechanics/sections/right-triangle.png"></div>
 'Side lengths
-a = ? {2}'%u,'b = ? {1}'%u
+a = ? {2}'m,'b = ? {1}'m
 'Area
-A = a*b/2'%u<sup>2</sup>
+A = a*b/2'm<sup>2</sup>
 'Perimeter
-P = a + b + sqr(a^2 + b^2)'%u<sup>2</sup>
+P = a + b + sqr(a^2 + b^2)'m<sup>2</sup>
 'Centroid
-y_c = a/3'%u
-z_c = b/3'%u
+y_c = a/3'm
+z_c = b/3'm
 'Second moments of area
-I_y = a*b^3/36'%u<sup>4</sup>
-I_z = a^3*b/36'%u<sup>4</sup>
-I_yz = -(a^2*b^2)/72'%u<sup>4</sup></p>
+I_y = a*b^3/36'm<sup>4</sup>
+I_z = a^3*b/36'm<sup>4</sup>
+I_yz = -(a^2*b^2)/72'm<sup>4</sup></p>
 'Principal area moments
-I_1 = (I_y + I_z)/2 + sqrt((I_y - I_z)^2/4 + I_yz^2)'%u<sup>4</sup>
-I_2 = (I_y + I_z)/2 - sqrt((I_y - I_z)^2/4 + I_yz^2)'%u<sup>4</sup>
+I_1 = (I_y + I_z)/2 + sqrt((I_y - I_z)^2/4 + I_yz^2)'m<sup>4</sup>
+I_2 = (I_y + I_z)/2 - sqrt((I_y - I_z)^2/4 + I_yz^2)'m<sup>4</sup>
 'Angle of principal axis
 α_1 = atan((I_y - I_1)/I_yz)'<sup>о</sup>
 'Polar moment of area
 I_x = I_y + I_z
 'Radii of gyration
-r_y = sqrt(I_y/A)'%u
-r_z = sqrt(I_z/A)'%u
-r_1 = sqr(I_1/A)'%u
-r_2 = sqr(I_2/A)'%u
-r_x = sqrt(I_x/A)'%u
+r_y = sqrt(I_y/A)'m
+r_z = sqrt(I_z/A)'m
+r_1 = sqr(I_1/A)'m
+r_2 = sqr(I_2/A)'m
+r_x = sqrt(I_x/A)'m

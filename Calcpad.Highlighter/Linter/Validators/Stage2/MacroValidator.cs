@@ -159,7 +159,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage2
             if (!string.IsNullOrWhiteSpace(paramsStr))
             {
                 var parameters = ParameterParser.ParseParameters(paramsStr); // splits by ';'
-                var seenParams = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var seenParams = new HashSet<string>(StringComparer.Ordinal); // params are case sensitive
 
                 foreach (var param in parameters)
                 {

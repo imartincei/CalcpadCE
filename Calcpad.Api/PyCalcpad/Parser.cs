@@ -78,7 +78,6 @@ namespace PyCalcpad
         private static Calcpad.Core.Settings ConvertSettings(Settings settings) =>
             new()
             {
-                Units = settings.Units,
                 Math = Calculator.ConvertMathSettings(settings.Math),
                 Plot = ConvertPlotSettings(settings.Plot),
             };

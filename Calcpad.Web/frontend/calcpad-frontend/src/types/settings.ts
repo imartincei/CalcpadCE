@@ -35,7 +35,6 @@ export interface CalcpadSettings {
         url: string;
         mode: 'auto' | 'local' | 'remote';
     };
-    units: string;
     isUs: boolean;
 }
 
@@ -145,7 +144,6 @@ export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
     { key: 'zeroSmallMatrixElements', label: 'Zero small matrix elements', detail: 'Display very small matrix/vector values as 0 instead of using scientific notation.', type: 'boolean', def: true },
     { key: 'showHiddenOutput', label: 'Show hidden output', detail: 'Ignore #hide so suppressed content is rendered anyway. For debugging.', type: 'boolean', def: false },
     { key: 'maxOutputCount', label: 'Max output count', detail: 'Maximum number of rows/columns shown for large matrices and vectors (5–100).', type: 'number', def: 20, min: 5, max: 100 },
-    { key: 'units', label: 'Default length unit', detail: 'Default length unit used for %u placeholders in input forms.', type: 'string', def: 'm' },
     { key: 'isUs', label: 'Non-metric units', detail: 'Selects US or UK definitions for bare unit names that differ between the two systems (gal, ton, cwt, pt, qt, bbl, tonf, therm, etc.).', type: 'boolean', def: true },
     { key: 'vectorGraphics', label: 'Vector graphics', detail: 'Renders plots as SVG (scalable, sharp at any zoom) instead of raster PNG images.', type: 'boolean', def: false },
     { key: 'colorScale', label: 'Plot color scale', detail: 'Plot color scale', type: 'enum', def: 'Rainbow', options: COLOR_SCALE_OPTIONS },
@@ -181,7 +179,7 @@ export const SETTINGS_PATH: Partial<Record<string, string>> = {
     substitute: 'math.substitute', formatEquations: 'math.formatEquations',
     zeroSmallMatrixElements: 'math.zeroSmallMatrixElements', showHiddenOutput: 'math.showHiddenOutput',
     maxOutputCount: 'math.maxOutputCount', precision: 'math.precision', tol: 'math.tol',
-    units: 'units', isUs: 'isUs', vectorGraphics: 'plot.vectorGraphics', colorScale: 'plot.colorScale',
+    isUs: 'isUs', vectorGraphics: 'plot.vectorGraphics', colorScale: 'plot.colorScale',
     smoothScale: 'plot.smoothScale', shadows: 'plot.shadows', adaptivePlot: 'plot.isAdaptive',
     plotWidth: 'plot.width', plotHeight: 'plot.height', plotStep: 'plot.step',
 };
@@ -406,7 +404,6 @@ export function buildApiSettings(settings: CalcpadSettings): unknown {
             colorScale: colorScaleToEnum(settings.plot.colorScale),
             lightDirection: lightDirectionToEnum(settings.plot.lightDirection)
         },
-        units: settings.units,
         isUs: settings.isUs
     };
 }

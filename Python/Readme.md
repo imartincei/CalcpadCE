@@ -30,7 +30,6 @@ The available classes and methods you can use in PyCalcpad.dll and PyCalcpadWrap
 &emsp;&emsp;```Settings()``` - creates a new 'Settings' object. Default values are assigned to all fields as specified further.  
 &emsp;&emsp;```Math : MathSettings``` = MathSettings() - reads/assigns the math settings field, which is an object of class 'MathSettings'.  
 &emsp;&emsp;```Plot : PlotSettings``` = PlotSettings() - reads/assigns the plot settings field, which is an object of class 'PlotSettings'.  
-&emsp;&emsp;```Units : str``` = 'm' - units that should replace %u in comments. For example, you can specify 'm', 'cm' or 'mm'.  
 
 ```class MathSettings:```  
 &emsp;&emsp;```MathSettings()``` - creates a new 'MathSettings' object. Default values are assigned to all fields as specified further.  
