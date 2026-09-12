@@ -677,17 +677,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#units-in-comments" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Units in Comments
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#formatting-with-html-and-css" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3020,17 +3009,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#units-in-comments" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Units in Comments
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#formatting-with-html-and-css" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3131,124 +3109,6 @@ Headings and comments can contain any symbols without restrictions.
 Everything outside them is assumed to be math expressions.
 However, if you put any formulas inside comments, they will not be calculated or formatted.
 Since the final output is rendered to an Html document, you can use Html and CSS in comments to provide your calculation report with additional formatting.</p>
-<h2 id="units-in-comments">Units in Comments<a class="headerlink" href="#units-in-comments" title="Permanent link">&para;</a></h2>
-<p>Alternatively, to native units, you can enter all values to be unitless and then put the units in the comments.
-In this case, you will have to include all unit conversion factors in the equations.
-Also, there is an option to generate a selection box for length units - <strong>m</strong>, <strong>cm</strong> and <strong>mm</strong>. You only need to insert <strong>%u</strong> in comments wherever you want the units to appear.
-When the program generates the input form (see further) it checks whether <strong>%u</strong> exists somewhere in the code.
-If so, it automatically adds a unit selection combo box, at the top-right corner.
-When you change the units from the combo, they will be filled in all occurrences of <strong>%u</strong> in the code.
-You can try it below:</p>
-<table>
-<thead>
-<tr>
-<th>Markdown code</th>
-<th>Html code</th>
-<th>Output</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>### Heading 3</code></td>
-<td><code>&lt;h3&gt;Heading 3&lt;/h3&gt;</code></td>
-<td>Heading 3</td>
-</tr>
-<tr>
-<td><code>#### Heading 4</code></td>
-<td><code>&lt;h4&gt;Heading 4&lt;/h4&gt;</code></td>
-<td>Heading 4</td>
-</tr>
-<tr>
-<td><code>##### Heading 5</code></td>
-<td><code>&lt;h5&gt;Heading 5&lt;/h5&gt;</code></td>
-<td>Heading 5</td>
-</tr>
-<tr>
-<td><code>###### Heading 6</code></td>
-<td><code>&lt;h6&gt;Heading 6&lt;/h6&gt;</code></td>
-<td>Heading 6</td>
-</tr>
-<tr>
-<td><code>---</code> (horizontal line)</td>
-<td><code>&lt;hr/&gt;</code></td>
-<td><strong>———————</strong></td>
-</tr>
-<tr>
-<td><code>**Bold**</code></td>
-<td><code>&lt;strong&gt;Bold&lt;/strong&gt;</code></td>
-<td><strong>Bold</strong></td>
-</tr>
-<tr>
-<td><code>*Italic*</code></td>
-<td><code>&lt;em&gt;Italic&lt;/em&gt;</code></td>
-<td><em>Italic</em></td>
-</tr>
-<tr>
-<td><code>***Bold Italic***</code></td>
-<td><code>&lt;em&gt;&lt;strong&gt;Bold Italic&lt;/strong&gt;&lt;/em&gt;</code></td>
-<td><strong><em>Bold Italic</em></strong></td>
-</tr>
-<tr>
-<td><code>++Underlined++</code></td>
-<td><code>&lt;ins&gt;Underlined&lt;/ins&gt;</code></td>
-<td><u>Underlined</u></td>
-</tr>
-<tr>
-<td><code>~~Struck through~~</code></td>
-<td><code>&lt;del&gt;Struck through&lt;/del&gt;</code></td>
-<td><s>Struck through</s></td>
-</tr>
-<tr>
-<td><code>==Highlighted==</code></td>
-<td><code>&lt;mark&gt;Highlighted&lt;/mark&gt;</code></td>
-<td>Highlighted</td>
-</tr>
-<tr>
-<td><code>x^superscript^</code></td>
-<td><code>x&lt;sup&gt;superscript&lt;/sup&gt;</code></td>
-<td>x<sup>superscript</sup></td>
-</tr>
-<tr>
-<td><code>x~subscript~</code></td>
-<td><code>x&lt;sub&gt;subscript&lt;/sub&gt;</code></td>
-<td>x<sub>subscript</sub></td>
-</tr>
-<tr>
-<td><code>`Code`</code></td>
-<td><code>&lt;code&gt;Code&lt;/code&gt;</code></td>
-<td><code>Code</code></td>
-</tr>
-<tr>
-<td><code>[Link](https://mywebsite.com)</code></td>
-<td><code>&lt;a href="https://mywebsite.com"&gt;Link&lt;/a&gt;</code></td>
-<td><a href="https://mywebsite.com">Link</a></td>
-</tr>
-<tr>
-<td><code>![Image](image.jpg)</code></td>
-<td><code>&lt;img src="image.jpg" alt="Image" /&gt;</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>&gt; Blockquote 1</code><br/><code>&gt;&gt; Blockquote 2</code></td>
-<td><code>&lt;blockquote&gt;Blockquote 1</code><br/><code>&lt;blockquote&gt;Blockquote 2</code><br/><code>&lt;/blockquote&gt;&lt;/blockquote&gt;</code></td>
-<td>Blockquote 1, Blockquote 2</td>
-</tr>
-</tbody>
-</table>
-<p>When you run the calculations, the "Units" combo will disappear from the output.
-Only the units will remain as filled.
-The program will also create a variable <em>Units</em>, which will contain the conversion factor from the selected units to meters.
-Its value is 1, 100 and 1000 for m, mm and cm, respectively.
-You can use it for units conversion inside the calculations.
-For example, you can create a conditional block for displaying the selected units in the report:</p>
-<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#if</span><span class="w"> </span><span class="o">*</span><span class="nv">Units</span><span class="o">*</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">1</span><span class="w">  </span>
-  <span class="c1">'The selected units are meters  </span>
-<span class="k">#else if</span><span class="w"> </span><span class="o">*</span><span class="nv">Units</span><span class="o">*</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">100</span><span class="w">  </span>
-  <span class="c1">'The selected units are centimeters  </span>
-<span class="k">#else if</span><span class="w"> </span><span class="o">*</span><span class="nv">Units</span><span class="o">*</span><span class="w"> </span><span class="o">≡</span><span class="w"> </span><span class="m">1000</span><span class="w">  </span>
-  <span class="c1">'The selected units are millimeters  </span>
-<span class="k">#end if</span>
-</code></pre></div>
 <h2 id="formatting-with-html-and-css">Formatting with Html and CSS<a class="headerlink" href="#formatting-with-html-and-css" title="Permanent link">&para;</a></h2>
 <p>CalcpadCE can be used as a development platform for professional engineering programs.
 If you are not going to do that, you can skip this chapter.</p>
