@@ -1,5 +1,6 @@
 # Harvested third-party payloads and scratch state -- regenerate with ./harvest.sh
 corpus/
+.cargo-home
 .nuget-packages/
 .work/
 

@@ -1,4 +1,4 @@
-# Generating THIRD-PARTY-NOTICES with FOSSology
+# Generating THIRD-PARTY-NOTICES
 
 FOSSology scans **file contents** for license text and copyright notices. It has
 no idea what NuGet or npm are, so it cannot read a `.csproj` and tell you what
@@ -10,7 +10,43 @@ The payoff for that extra step is that FOSSology reads what is *in* the packages
 rather than what their metadata *claims*. On this repo that difference is not
 academic — see [Findings](#findings).
 
+## What FOSSology is for here
+
+**FOSSology is a discovery tool, not the source of the notices file.** It exists
+to answer one question: *where does declared metadata lie?* Scanning several
+hundred packages by hand is not possible; scanning them with FOSSology is how
+the exceptions in [Findings](#findings) were found at all.
+
+What it is *not* is a thing this project clears exhaustively. The corpus runs to
+tens of thousands of files across ten components, and clearing each one in the
+Browse UI is not proportionate to a project this size. **We deliberately do not
+clear every resource.** Undecided findings are expected and are not a defect.
+
+So the notices file is built in two halves:
+
+| half | source | tool |
+|---|---|---|
+| the bulk — several hundred permissive dependencies | declared metadata | `generate-notices.sh` from `inventory.csv` |
+| the exceptions — copyleft, pass-through, mis-declared | FOSSology scan results | hand-written into `notices-preamble.md` |
+
+```bash
+./harvest.sh              # resolve dependencies -> corpus/inventory.csv
+./generate-notices.sh     # preamble + inventory -> THIRD-PARTY-NOTICES.md
+```
+
+`generate-notices.sh` copies `notices-preamble.md` verbatim, then appends the
+component listing grouped by licence. Edit the preamble, never the generated
+half. Rows the harvesters could not confirm as shipped (npm optional peers,
+cargo build-dependencies) are held in a separate section rather than listed as
+distributed.
+
+Re-run the FOSSology scan when dependencies change and diff the findings. A
+clean diff means nothing new needs a human.
+
 ## Quick start
+
+Needs `docker`, plus the `dotnet` SDK, `npm` and `cargo` on the host — the
+harvest resolves each closure with the real package managers.
 
 ```bash
 cd tools/license-scan
@@ -72,6 +108,30 @@ Use `inventory.csv` (written by `harvest.sh`, holds each package's *declared*
 license) as the cross-check: any package where the declared license and the
 scanned result disagree is exactly where to spend review time.
 
+## Don't clear every file by hand
+
+The corpus is ~14,600 files for the desktop component alone. Clearing that in
+the Browse UI is not a realistic job for a small team, and it is not what this
+tooling is for.
+
+Split the notices file in two:
+
+- **The bulk** — the several hundred MIT / Apache-2.0 / BSD dependencies.
+  Declared metadata is correct for these, and `inventory.csv` already holds it.
+  Generate that section from the CSV. Nobody audits whether you derived "MIT"
+  from a scan or from a manifest; they check that the component is named, the
+  licence is right, and the text is reproduced.
+- **The exceptions** — the handful of places where declared metadata *lies*, or
+  where an obligation exceeds attribution. Those are what FOSSology is for, and
+  on this repo it has already found them: DOMPurify's MPL inside `monaco-editor`,
+  SkiaSharp's vendored native stack, the stripped `jspreadsheet`/`jsuites`
+  banners, the MPL crates, the vendored-but-uncompiled libdbus C, and the
+  LGPL libraries bundled into the AppImage.
+
+That list is finite and now written down in [Findings](#findings). The expensive
+part of this exercise is done. Re-run the scan when dependencies change and diff
+the findings; a clean diff means nothing new needs review.
+
 ## Using the web UI
 
 The UI is at **<http://localhost:8081/repo/>** — the `/repo/` matters. Bare
@@ -113,6 +173,58 @@ no license in the report is still unconcluded.
 All ten components scanned. Not legal advice — this is the queue for whoever
 does the clearing pass.
 
+**Confirmed against a released artifact (not inferred):**
+
+`CalcpadCE.7.6.5.linux-x64.deb`, pulled from the public releases endpoint,
+contains **862 files and zero third-party attribution**. The only license text in
+it is `doc/LICENSE.TXT` — CalcpadCE's own 23-line MIT grant. Yet the package
+ships `libSkiaSharp.so`, whose upstream `THIRD-PARTY-NOTICES.txt` covers FTL,
+LGPL-2.1, MPL-1.1, IJG, libpng, zlib and ICU. That is a live compliance gap on a
+public release, not a hypothetical one.
+
+That artifact is the CLI line, and it is **framework-dependent**: its
+`runtimeconfig.json` declares a `Microsoft.NETCore.App 10.0.0` framework
+reference and it carries no runtime natives. `FRAMEWORK_PREFIXES` is right for
+it.
+
+**The 8.0 desktop bundles are a different story.** Pulled from CI
+(`gh api .../actions/artifacts/<id>/zip` — needs auth, 401 anonymously even
+though the repo is public):
+
+`CalcpadCE-desktop-8.0.0-beta1-x86_64.deb` — 394 files, **zero attribution**.
+It *is* self-contained: `libcoreclr.so`, `libclrjit.so`, `libhostfxr.so`,
+`libhostpolicy.so`, `System.Private.CoreLib.dll` and `createdump` all ship. Its
+`deps.json` pins the exact runtime to reproduce notices for:
+
+    runtimepack.Microsoft.NETCore.App.Runtime.linux-x64/10.0.12
+    runtimepack.Microsoft.AspNetCore.App.Runtime.linux-x64/10.0.12
+
+Note 10.0.12 — not the 10.0.11 ref pack nor a cached 10.0.9. Take framework
+notices from the version the artifact names, never from what the host happens to
+have.
+
+**The AppImage bundles an entire third-party stack this corpus does not model.**
+`CalcpadCE-desktop-8.0.0-beta1-x86_64.AppImage` holds 700 files and **211 shared
+objects**: 160 assorted system libraries, 33 GTK, 14 .NET runtime, 3 WebKitGTK,
+and `libSkiaSharp.so`. Attribution present: 17 Debian `copyright` files that
+`linuxdeploy` happened to copy, plus two font licences — roughly 8% coverage.
+`deb`/`rpm` declare these as system dependencies and bundle none of them, so this
+is an AppImage-only obligation.
+
+Two items from that stack need a decision:
+
+- **WebKitGTK is bundled.** WebKit is LGPL-2.1 (WebCore) plus BSD
+  (JavaScriptCore), so this is a relinking obligation on a confirmed-present
+  library — the same class as the SkiaSharp question, but no longer speculative.
+  **Escalate this one.**
+- **`libdbus-1.so.3` is bundled** (with its Debian `copyright` file). That makes
+  the AFL-2.1 / GPL-2.0-or-later dual licence live for the AppImage, and the
+  election has to be deliberate. Note this is the distro library, not the
+  vendored C in `libdbus-sys` — that one still never compiles.
+
+Also worth checking: only `DejaVuSerif-LICENSE` and `Jost-LICENSE` ship in the
+bundle. JuliaMono is absent, so the font list above may be stale for this target.
+
 **Vendored assets shipping without attribution:**
 
 - `jspreadsheet.min.js`, `jsuites.min.js`, `jspreadsheet.min.css` and
@@ -127,6 +239,16 @@ does the clearing pass.
 - JuliaMono carries a **Reserved Font Name**, so a modified copy may not keep
   the name. Jost declares no RFN, which is what makes the documented square
   bracket modifications safe. Worth confirming JuliaMono is unmodified.
+
+**MPL-2.0 in the Tauri shell's Rust tree:**
+
+- `cssparser`, `cssparser-macros`, `selectors`, `dtoa-short` and `option-ext`
+  all declare **MPL-2.0** and are normal (linked) dependencies on every target.
+  All five arrive through `tauri` itself (`tauri-utils` → `dom_query` for the
+  first four, `dirs` → `dirs-sys` for `option-ext`), so none can be dropped
+  without patching Tauri. Unlike the DOMPurify case below there is no dual
+  license to elect: MPL-2.0 is a file-level copyleft, so the notices file must
+  name each crate and point at the source for the exact version shipped.
 
 **Real, and missed entirely by declared metadata:**
 
@@ -151,6 +273,36 @@ does the clearing pass.
   bundle. `harvest.sh` now flags rows like this in the `note` column; do not
   list them without confirming they actually ship.
 
+**GPL-2.0-or-later / AFL-2.1 in the Rust tree — present but not shipped:**
+
+The desktop scan reports 199 `GPL-2.0-or-later` and 194 `AFL-2.1` findings. Every
+one traces to the **libdbus C source vendored inside `libdbus-sys` 0.2.7**, which
+itself declares only `Apache-2.0/MIT` — another declared-vs-actual mismatch.
+
+It does not ship. `libdbus-sys` resolves with features `default, pkg-config` on
+both Linux targets, **not** `vendored`, so its build script links the system
+`libdbus-1` and never compiles the bundled C. Bulk-reject that subtree in the
+Browse UI rather than clearing it file by file. Two caveats: re-check the feature
+set after any dependency bump that could turn `vendored` on, and confirm the
+AppImage target is not bundling `libdbus-1.so` (deb/rpm declare it as a system
+dependency, so those are fine).
+
+Crates are staged unpacked minus their root `tests/`, `benches/`, `examples/`,
+`fuzz/` and `ci/` directories — separate Cargo targets that are never linked into
+a dependent. That drops 4,124 files (18,727 → 14,603) with nothing else lost.
+
+It deliberately stops there. `cargo check` dep-info can name the exact set of
+`.rs` files rustc compiles (9,822 → 4,263 on the Linux target), but pruning to it
+would be wrong: of the 746 license files and 199 native C/C++ sources in the
+tree, dep-info contains **0** and **1** respectively. rustc never reads a
+`LICENSE`, and C compiled by a build script never reaches its dep-info — so
+filtering on "what rustc read" discards precisely the evidence a notices file is
+made of. Dep-info is a review hint, not a corpus filter.
+
+Vendored fallbacks that Cargo never builds (see the `libdbus-sys` finding above)
+therefore still reach the clearing queue. Feature resolution is the cross-check
+for those.
+
 **Likely false positives — still need explicit rejection in the UI:**
 
 - `GPL` on `libSkiaSharp.dll` / `libSkiaSharp.so` — `nomos` string-matching
@@ -171,8 +323,23 @@ notices file:
 |---|---|
 | `calcpad-core`, `calcpad-openxml`, `calcpad-highlighter` | libraries |
 | `calcpad-cli`, `calcpad-server`, `pycalcpad` | apps |
-| `calcpad-web-frontend`, `vscode-calcpad`, `calcpad-desktop` | npm, production deps only |
+| `calcpad-web-frontend`, `vscode-calcpad` | npm, production deps only |
+| `calcpad-desktop` | npm production deps **and** the Tauri shell's Rust crates |
 | `bundled-assets` | third-party files committed into the repo |
+
+`calcpad-desktop` is the one component that spans two ecosystems, so its
+archive has an `npm/` and a `cargo/` subtree. A component may list several
+`kind:path` specs joined by `;` in `COMPONENTS`; each stages into its own
+subdirectory and writes its own `inventory/<component>.<kind>.csv`.
+
+Crate selection is not just "everything in `Cargo.lock`". That lockfile is a
+flat union of every platform and every dependency kind, so `harvest.sh` runs
+`cargo metadata --filter-platform` once per triple CI actually builds
+(`x86_64-unknown-linux-gnu`, `aarch64-unknown-linux-gnu`,
+`x86_64-pc-windows-msvc`) and takes the union of those closures. Dev-dependencies
+are dropped; build-dependencies are kept but flagged in the `note` column, as is
+any crate that only one platform reaches. That takes 553 lock entries down to
+441 shipped crates.
 
 `bundled-assets` covers what no package manager knows about: the vendored
 `jspreadsheet`/`jsuites` bundles the backend serves via `BundledUiAssets.cs`,
@@ -187,8 +354,16 @@ Microsoft EULA rather than an OSS license.
 `Calcpad.Tests` is deliberately excluded — xunit and coverlet are build-time
 only and are not redistributed. Add it to `COMPONENTS` in `harvest.sh` if legal
 wants the test toolchain covered too. .NET reference and runtime packs are
-filtered out for the same reason (`FRAMEWORK_PREFIXES` in `harvest_lib.py`);
-that assumption breaks if you ever ship self-contained builds.
+filtered out for the same reason (`FRAMEWORK_PREFIXES` in `harvest_lib.py`).
+
+**That last filter is currently wrong for the desktop app.**
+`build-desktop.sh` calls `sync-bundled-server.mjs` without
+`--framework-dependent`, so the sidecar under `src-tauri/binaries/` is a
+**self-contained** publish — the whole .NET runtime is redistributed inside the
+installer. `FRAMEWORK_PREFIXES` strips exactly those packs from the corpus, so
+no scan covers the runtime the desktop bundle ships. Closing this means
+harvesting `calcpad-server` a second time with the filter off and the desktop
+RIDs pinned; it adds roughly 80 MB of payload per RID.
 
 ## Guarding against database corruption
 
@@ -232,6 +407,29 @@ Also in place, in `docker-compose.yml`:
   blows the grace period, and gets killed mid-checkpoint.
 - `fsync`, `full_page_writes`, `synchronous_commit` stated explicitly. These
   are the defaults; the point is that they are now visible and reviewable.
+
+### Re-uploading without losing clearing work
+
+Clearing decisions belong to an upload, so re-harvesting a component and
+uploading it again starts from nothing by default. The `reuser` agent is the fix:
+
+```bash
+./scan.sh calcpad-core --reuse        # from the previous upload of this component
+./scan.sh calcpad-core --reuse 3      # from upload 3 specifically
+```
+
+It matches files by **content hash plus filename, not full path**
+(`ReuserAgent.php`), so a re-harvest that only relocates files — such as the
+`csproj/` / `npm/` / `cargo/` nesting each component now stages into — carries
+every decision over. Only genuinely new or changed files come back unconcluded,
+which is exactly the set worth reviewing.
+
+Add `"reuse_enhanced":true` to the payload if you also want the slow diff-based
+matcher for files whose contents *did* change; for unchanged files it buys
+nothing.
+
+`--reuse` is the reason a version bump is cheap: bump a dependency, re-harvest,
+re-scan with `--reuse`, and the review queue is just the delta.
 
 ### Snapshots
 

@@ -4,6 +4,9 @@
 #   ./scan.sh calcpad-core                    upload + scan
 #   ./scan.sh calcpad-core --report readmeoss fetch the notices report too
 #   ./scan.sh --report readmeoss --only 2     just re-fetch a report for upload 2
+#   ./scan.sh calcpad-core --reuse            carry clearing decisions over from
+#                                             the previous upload of this component
+#   ./scan.sh calcpad-core --reuse 3          ...from upload 3 specifically
 #
 # Reports land in ./reports/. Formats: readmeoss (third-party notices),
 # spdx2 / spdx2tv / spdx3json (SPDX), cyclonedx, unifiedreport (xlsx), clixml.
@@ -17,15 +20,21 @@ cd "$(dirname "$(readlink -f "$0")")"
 readonly API="http://localhost:8081/repo/api/v1"
 readonly TOKEN_CACHE="$PWD/.token"
 readonly FOLDER_ID=1
+readonly GROUP="${FOSSOLOGY_USER:-fossy}"
 
 component=""
 report_format=""
 only_upload=""
+reuse_from=""
 
 while (($#)); do
   case "$1" in
     --report) report_format="${2:?--report needs a format}"; shift 2 ;;
     --only) only_upload="${2:?--only needs an upload id}"; shift 2 ;;
+    # The id is optional: bare --reuse finds the previous upload of this component.
+    --reuse)
+      if [[ ${2:-} =~ ^[0-9]+$ ]]; then reuse_from="$2"; shift 2
+      else reuse_from="auto"; shift; fi ;;
     -*) echo "unknown flag: $1" >&2; exit 1 ;;
     *) component="$1"; shift ;;
   esac
@@ -95,17 +104,36 @@ upload_component() {
   log "$name: upload id $UPLOAD_ID"
 }
 
+# The reuser matches on pfile (content hash) plus filename, not full path, so a
+# re-harvest that only moves files around still carries its decisions over.
+build_reuse() {
+  [[ -n $reuse_from ]] || return 0
+  if [[ $reuse_from == auto ]]; then
+    reuse_from="$(docker compose exec -T db psql -U fossy -d fossology -tAc \
+      "select upload_pk from upload where upload_filename = '$COMPONENT_NAME'
+       and upload_pk < $UPLOAD_ID order by upload_pk desc limit 1;" | tr -d '[:space:]')"
+    [[ -n $reuse_from ]] || { warn "no earlier upload of $COMPONENT_NAME to reuse" >&2; return 0; }
+  fi
+  log "reusing clearing decisions from upload $reuse_from" >&2
+  printf ',"reuse":{"reuse_upload":%s,"reuse_group":"%s","reuse_main":true,"reuse_copyright":true}' \
+    "$reuse_from" "$GROUP"
+}
+
 scan_upload() {
   log "scanning upload $UPLOAD_ID (nomos, monk, ojo, copyright, pkgagent)"
   # decider auto-concludes unambiguous cases; the rest need the Browse UI.
-  local response
+  local response reuse
+  reuse="$(build_reuse)"
   response="$(api -X POST "$API/jobs" -H 'Content-Type: application/json' \
     -H "folderId: $FOLDER_ID" -H "uploadId: $UPLOAD_ID" \
-    -d '{"analysis":{"bucket":false,"copyright_email_author":true,"ecc":false,
-         "keyword":false,"monk":true,"mimetype":false,"package":true,"reso":false,
-         "heritage":false,"nomos":true,"ojo":true},
-         "decider":{"nomos_monk":true,"bulk_reused":false,"new_scanner":false,
-         "ojo_decider":true}}')"
+    -d "$(cat <<JSON
+{"analysis":{"bucket":false,"copyright_email_author":true,"ecc":false,
+ "keyword":false,"monk":true,"mimetype":false,"package":true,"reso":false,
+ "heritage":false,"nomos":true,"ojo":true},
+ "decider":{"nomos_monk":true,"bulk_reused":false,"new_scanner":false,
+ "ojo_decider":true}$reuse}
+JSON
+)")"
   grep -q '"code":201' <<<"$response" || die "scan scheduling failed: $response"
   wait_for_jobs
   log "scan complete"
@@ -132,11 +160,13 @@ docker compose ps --status running --quiet web | grep -q . \
   || die "FOSSology is not running -- 'docker compose up -d' first"
 get_token
 
+# Set even with --only, so a re-fetched report keeps the component's filename.
+COMPONENT_NAME="$component"
+
 if [[ -n $only_upload ]]; then
   UPLOAD_ID="$only_upload"
 else
   [[ -n $component ]] || die "usage: ./scan.sh <component> [--report <format>]"
-  COMPONENT_NAME="$component"
   upload_component "$component"
   scan_upload
 fi
