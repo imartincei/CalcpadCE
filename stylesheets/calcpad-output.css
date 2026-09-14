@@ -42,6 +42,11 @@
         font-style: italic;
     }
 
+    @font-face {
+        font-family: 'CalcpadCE Vector';
+        src: url('../media/CalcpadCEVector.ttf') format('truetype');
+    }
+
     :scope {
         background-color: white;
         color: black;
@@ -735,19 +740,10 @@
     }
 
     .vec {
-        font-family: 'Cambria Math', serif;
+        font-family: 'CalcpadCE Vector', 'Cambria Math', serif;
         color: #8af;
         font-style: normal;
-        display: inline-block;
-        vertical-align: 2pt;
-        margin-left: 3pt;
-        margin-right: -7pt;
-    }
-
-    small .vec,
-    sup .vec {
-        margin-left: 2pt;
-        margin-right: -6pt;
+        vertical-align: 0.17em;
     }
 
     #Units {
