@@ -7,8 +7,6 @@ ARROW ABOVE, used to draw the over-arrow on vector variables in calculation
 output. It is renamed rather than shipped as "JuliaMono" because OFL 1.1 clause 3
 reserves that name for the original. No new Reserved Font Name is claimed.
 
-Regenerate it with .github/scripts/make_vector_subfont.py.
-
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
 https://openfontlicense.org
