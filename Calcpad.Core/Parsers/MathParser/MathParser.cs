@@ -178,16 +178,6 @@ namespace Calcpad.Core
             }
         }
 
-        internal (int Rows, int Columns) GetVariableShape(string name) =>
-            !_variables.TryGetValue(name, out var v) || !v.IsInitialized
-                ? (0, 0)
-                : v.Value switch
-                {
-                    Vector vector => (1, vector.Length),
-                    Matrix matrix => (matrix.RowCount, matrix.ColCount),
-                    _ => (0, 0)
-                };
-
         internal Variable GetVariableRef(string name)
         {
             if (_variables.TryGetValue(name, out Variable v))

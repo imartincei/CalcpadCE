@@ -386,6 +386,27 @@ namespace Calcpad.Highlighter.Snippets.Data
             },
             new SnippetItem
             {
+                Insert = "#UI {\"type\": \"datagrid\", \"width\": \"100%\", \"rowHeaderWidth\": 120, \"columnWidths\": [2, 1, 1]} M = matrix(2; 3)",
+                Description = "Sized grid. 'width' is the total in pixels or \"100%\" to fill the line; 'columnWidths' are shared out in proportion.",
+                Category = "UI Inputs",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#UI {\"forceUnits\": false} q = 3kN/m",
+                Description = "Put the unit in the input box, so the whole value - number and unit - is editable.",
+                Category = "UI Inputs",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#UI {\"allowExpression\": true} k = 2*L",
+                Description = "Accept any expression, written to the document as typed. The line's own errors report what it cannot read.",
+                Category = "UI Inputs",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
                 Insert = "#UI {\"type\": \"dropdown\", \"keys\": [\"Low\", \"High\"], \"values\": [\"1\", \"2\"]} x = 1",
                 Description = "Drop-down list. 'keys' are the labels shown, 'values' are substituted into the calculation.",
                 Category = "UI Inputs",

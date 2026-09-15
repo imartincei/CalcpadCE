@@ -21,8 +21,7 @@ It runs the CalcpadCE engine as a local server.
 - No MacOS support
 - No AI, terminal, Git, or extension integrations
 - Interface will look different on different operating systems
-- Limited window splitting and no multi-monitor support
-- Only one app instance can be active at once.
+- Limited window splitting
 
 ## CalcpadCE for VS Code
 

@@ -595,8 +595,8 @@
   <data name="The_UI_keyword_requires_a_variable_assignment" xml:space="preserve">
     <value>The #UI keyword requires a variable assignment.</value>
   </data>
-  <data name="UI_directives_do_not_support_expressions" xml:space="preserve">
-    <value>#UI directives do not support expressions.</value>
+  <data name="UI_expressions_require_allowExpression" xml:space="preserve">
+    <value>#UI does not support expressions unless 'allowExpression' is true.</value>
   </data>
   <data name="Only_numbers_are_supported_by_the_UI_keyword" xml:space="preserve">
     <value>Only numbers are supported by the #UI keyword.</value>
@@ -615,6 +615,21 @@
   </data>
   <data name="The_UI_0_has_1_entries_but_the_grid_has_2_3" xml:space="preserve">
     <value>#UI '{0}' has {1} entries but the grid has {2} {3}.</value>
+  </data>
+  <data name="The_UI_0_does_not_apply_to_1" xml:space="preserve">
+    <value>#UI '{0}' does not apply to a {1}, which always replaces the whole value.</value>
+  </data>
+  <data name="The_UI_datagrid_requires_a_vector_or_matrix_value" xml:space="preserve">
+    <value>#UI 'datagrid' requires a vector or matrix value.</value>
+  </data>
+  <data name="The_UI_0_cannot_hold_a_vector_or_matrix_value" xml:space="preserve">
+    <value>#UI '{0}' cannot hold a vector or matrix value. Use a datagrid.</value>
+  </data>
+  <data name="The_UI_0_only_applies_to_a_datagrid" xml:space="preserve">
+    <value>#UI '{0}' only applies to a datagrid.</value>
+  </data>
+  <data name="The_UI_width_must_be_a_number_or_a_percentage" xml:space="preserve">
+    <value>#UI 'width' must be a number of pixels or a percentage, e.g. "75%".</value>
   </data>
   <data name="Datagrid_size_cannot_exceed_0_cells" xml:space="preserve">
     <value>#UI datagrid size cannot exceed {0} cells. Use #Read to import larger data sets from a file instead.</value>

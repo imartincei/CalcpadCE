@@ -83,6 +83,8 @@ All panels:
 
 Right-click a preview → **View Webview Source HTML** to inspect the rendered HTML.
 
+To copy text out of a preview, select it and press **Ctrl+C**, or right-click → **Copy Selection**.
+
 ### Running on demand (Auto-Run off)
 
 When you turn **Settings → Auto-Run Preview** off, typing no longer re-renders the preview.

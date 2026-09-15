@@ -118,6 +118,14 @@ export function setShellLoading(panel: vscode.WebviewPanel, background: string, 
     if (session.ready) void panel.webview.postMessage({ type: 'cpdLoading', on });
 }
 
+// What was selected when the context menu last opened, for the Copy command it runs.
+let lastSelection = '';
+
+/** Puts the selection the last right-click carried on the clipboard. */
+export function copyPreviewSelection(): void {
+    if (lastSelection) void vscode.env.clipboard.writeText(lastSelection);
+}
+
 /**
  * The messages a preview frame sends about itself rather than about the document, handled for
  * every panel that hosts one so each keeps its own position. Returns whether the message was
@@ -155,6 +163,14 @@ export function handleFrameStateMessage(panel: vscode.WebviewPanel, message: any
         case 'openExternal': {
             const url = String(message.url ?? '');
             if (/^(https?|mailto):/i.test(url)) void vscode.env.openExternal(vscode.Uri.parse(url));
+            return true;
+        }
+        case 'previewCopy': {
+            void vscode.env.clipboard.writeText(String(message.text ?? ''));
+            return true;
+        }
+        case 'previewSelection': {
+            lastSelection = String(message.text ?? '');
             return true;
         }
         default:
@@ -208,6 +224,7 @@ const RELAYED = [
     'consoleMessage',
     'uiValueChange',
     'openExternal',
+    'previewCopy',
     'cpdScrollState',
     'cpdUiState',
 ];
@@ -425,7 +442,12 @@ function buildPreviewShell(options: ShellOptions): string {
                 if (slot !== front && FRONT_ONLY.indexOf(d.type) !== -1) return;
                 if (d.type === 'cpdFindResult') { renderCount(d.total, d.current); return; }
                 if (d.type === 'previewFindOpen') { openFind(); return; }
-                if (d.type === 'previewContextMenu') { raiseContextMenu(d.x, d.y); return; }
+                if (d.type === 'previewContextMenu') {
+                    // Stashed before the menu opens: the command it runs has no way back in.
+                    vscode.postMessage({ type: 'previewSelection', text: d.selection || '' });
+                    raiseContextMenu(d.x, d.y);
+                    return;
+                }
                 if (RELAYED.indexOf(d.type) !== -1) vscode.postMessage(d);
             }
 
@@ -564,7 +586,23 @@ export function getFrameAgentScript(options: AgentOptions = {}): string {
                     var t = e.target;
                     if (t && t.closest && t.closest('.jss_container, .calcpad-ui-datagrid')) return;
                     e.preventDefault();
-                    send({ type: 'previewContextMenu', x: e.clientX, y: e.clientY });
+                    send({ type: 'previewContextMenu', x: e.clientX, y: e.clientY, selection: selectedText() });
+                });
+
+                // The selection lives in this document, which the shell's opaque origin
+                // denies it any reach into - so VS Code's own Copy, which acts on the shell,
+                // has nothing to take. The text is handed out instead.
+                function selectedText() {
+                    var s = window.getSelection();
+                    return s ? String(s) : '';
+                }
+
+                document.addEventListener('keydown', function (e) {
+                    if (!(e.ctrlKey || e.metaKey) || (e.key !== 'c' && e.key !== 'C' && e.key !== 'Insert')) return;
+                    var text = selectedText();
+                    if (!text) return;
+                    e.preventDefault();
+                    send({ type: 'previewCopy', text: text });
                 });
 
                 // An anchor to an external target: the webview host intercepts navigation

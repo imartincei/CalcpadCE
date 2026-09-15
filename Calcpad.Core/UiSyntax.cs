@@ -28,6 +28,43 @@ namespace Calcpad.Core
         public static bool IsCode(ReadOnlySpan<char> segment) =>
             !segment.IsEmpty && segment[0] != '\'' && segment[0] != '"';
 
+        /// <summary>The control type a directive renders: the declared one, or the shape of the right hand side.</summary>
+        public static string ResolveType(string declaredType, ReadOnlySpan<char> rhs) =>
+            declaredType ?? (IsDatagridRhs(rhs) ? "datagrid" : "entry");
+
+        public static bool IsDatagridRhs(ReadOnlySpan<char> rhs) =>
+            rhs.Length > 1 && rhs[0] == '[' && rhs[^1] == ']' ||
+            StartsWithFunction(rhs, "vector") ||
+            StartsWithFunction(rhs, "matrix");
+
+        public static bool StartsWithFunction(ReadOnlySpan<char> rhs, ReadOnlySpan<char> funcName)
+        {
+            if (!rhs.StartsWith(funcName, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            var rest = rhs[funcName.Length..].TrimStart();
+            return rest.Length > 0 && rest[0] == '(';
+        }
+
+        /// <summary>A grid and an 'allowExpression' box both replace the right hand side whole.</summary>
+        public static bool IsValue(ReadOnlySpan<char> rhs, string type, bool allowExpression) =>
+            type == "datagrid" || allowExpression || IsValue(rhs);
+
+        /// <summary>
+        /// Why a declared type cannot render its value: a grid over a single value, or a scalar
+        /// control over a vector or matrix. Null when they agree, or the shape is not yet known.
+        /// </summary>
+        public static string TypeMismatch(string declaredType, ReadOnlySpan<char> rhs, bool allowExpression) =>
+            declaredType switch
+            {
+                "datagrid" when IsNumber(rhs.Trim()) =>
+                    Messages.The_UI_datagrid_requires_a_vector_or_matrix_value,
+                // A control editing the text as written holds the literal whatever its shape.
+                "entry" or "dropdown" or "radio" or "checkbox" when !allowExpression && IsDatagridRhs(rhs) =>
+                    string.Format(Messages.The_UI_0_cannot_hold_a_vector_or_matrix_value, declaredType),
+                _ => null
+            };
+
         public static bool IsValue(ReadOnlySpan<char> rhs)
         {
             rhs = rhs.Trim();

@@ -290,6 +290,10 @@
         "icon": "$(target)"
       },
       {
+        "command": "vscode-calcpad.copySelection",
+        "title": "Copy Selection"
+      },
+      {
         "command": "vscode-calcpad.viewWebviewSource",
         "title": "CalcpadCE: View Webview Source HTML"
       },
@@ -492,6 +496,11 @@
         }
       ],
       "webview/context": [
+        {
+          "command": "vscode-calcpad.copySelection",
+          "when": "webviewId == htmlPreview || webviewId == htmlPreviewUnwrapped || webviewId == htmlPreviewUi || webviewId == htmlPreviewUiReport || webviewId == calcpadCompiledReport",
+          "group": "1_copy"
+        },
         {
           "command": "vscode-calcpad.viewWebviewSource",
           "when": "webviewId == htmlPreview || webviewId == htmlPreviewUnwrapped",

@@ -154,6 +154,8 @@ namespace Calcpad.Server.Services
                             content.style.overflow = 'visible';
                             content.style.maxWidth = 'none';
                             content.style.maxHeight = 'none';
+                            // Set by the preview script only when the grid overflowed the page.
+                            content.style.width = '';
                         }
                         var wrapper = container.querySelector('.jss');
                         if (wrapper) {
@@ -164,7 +166,9 @@ namespace Calcpad.Server.Services
                         var table = container.querySelector('table');
                         if (!table) return;
 
-                        // Distribute column widths evenly across available page width
+                        // Widen the table to the page. The per-column widths live in the
+                        // <colgroup>, so the surplus is shared out across them and the grid
+                        // keeps the proportions the #UI directive asked for.
                         var pageWidth = document.body.clientWidth || 700;
                         table.style.tableLayout = 'fixed';
                         table.style.width = pageWidth + 'px';

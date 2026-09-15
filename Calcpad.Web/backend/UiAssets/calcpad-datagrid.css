@@ -11,13 +11,70 @@
    inside a comment: the whole of it is inlined into the head, ahead of the real
    tags, and extractBodyHtml goes looking for the first of those. */
 
+/* The container. jspreadsheet adds its own jss_container class to the element we emit, so
+   this is the grid's outer box - it should show nothing of itself. The library's own padding
+   and, when a height is set, an inline drop shadow are what make the box visible; the margin
+   matches the template's paragraphs so the grid sits in the flow like any other line. */
+
+/* The grid replaces its line's equation and is emitted after the paragraph, leaving that
+   paragraph empty - and an empty paragraph is still a line and a half of space above it. */
+p[data-ui-type="datagrid"]:empty {
+    display: none;
+}
+
+.calcpad-ui-datagrid {
+    display: block;
+    margin: 0.3em 0;
+    padding: 0;
+    border: 0;
+    background: none;
+}
+
+/* The library nests the content under .jtabs-content > .jss_container, so this cannot be a
+   child selector. Its padding is scrollable width the grid is sized without. */
+.calcpad-ui-datagrid .jss_content {
+    padding-right: 0;
+    padding-bottom: 0;
+    box-shadow: none !important;
+}
+
+/* Wrapping. The library sets white-space: nowrap on the table and repeats it on the body
+   cells, and packs them to line-height 1em. No overflow-wrap or word-break: a line breaks at
+   a space and never inside a word, so the script sizes each column to its longest word.
+   Row heights are never set from script, so the rows grow to fit. */
+
+.calcpad-ui-datagrid .jss_worksheet > thead > tr > td,
+.calcpad-ui-datagrid .jss_worksheet > tbody > tr > td,
+.calcpad-ui-datagrid .jss_worksheet > tbody > tr > td:first-child {
+    white-space: normal;
+    line-height: 1.3;
+    vertical-align: middle;
+    height: auto;
+}
+
+/* A word past the column's cap is cut off rather than laid over its neighbour. */
+.calcpad-ui-datagrid .jss_worksheet > tbody > tr > td {
+    overflow: hidden;
+}
+
+/* The header row cannot grow the way a body row can, so it is never clipped. */
+.calcpad-ui-datagrid .jss_worksheet > thead > tr > td {
+    overflow: visible;
+    text-overflow: clip;
+}
+
+/* The cell editor is sized to the cell, so it must not force a single line either. */
+.calcpad-ui-datagrid .jss_worksheet .editor {
+    white-space: normal;
+}
+
 /* Dark theme. jspreadsheet ships light only - white cells, #f3f3f3 headers,
    #ccc grid lines, black selection outlines - so every colour it sets has to be
    restated here. The palette is the template's: #1e1e1e page, #252526 surfaces,
    #3e3e42 borders, #d4d4d4 text. */
 
 .dark-theme .jss_worksheet {
-    background-color: #252526;
+    background-color: #1e1e1e;
     border-right-color: #3e3e42;
     border-bottom-color: #3e3e42;
 }
@@ -105,6 +162,10 @@
     background-color: transparent;
     color: #d4d4d4;
     box-shadow: none;
+}
+
+.dark-theme .calcpad-ui-datagrid .jss_content {
+    scrollbar-color: rgba(121, 121, 121, 0.4) transparent;
 }
 
 .dark-theme .jss_content::-webkit-scrollbar-track {

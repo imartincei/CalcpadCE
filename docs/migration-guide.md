@@ -50,6 +50,7 @@ Where an equation used `Units` as a conversion factor, write the factor itself i
 
 This is a temporary loss of functionality. 
 Dynamic input units are coming in a future version via string variables, where the unit can be picked from a dropdown and assigned to a string variable you can reference anywhere else in the document.
+There is also an option to input units with the number by setting "forceUnits:false" or "allowExpression:true", see [UI mode](new-ui-mode.md)
 
 ### The report font changed from Georgia Pro to DejaVu Serif Condensed
 

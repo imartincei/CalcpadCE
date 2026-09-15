@@ -740,7 +740,7 @@
  <p class="err">
   Error in "#UI {"type": "entry"} k = max(E2)" on line [
   <a data-text="115" href="#0">115</a>
-  ]: #UI directives do not support expressions.
+  ]: #UI does not support expressions unless 'allowExpression' is true.
  </p>
  <p>
   <span class="eq">
@@ -760,7 +760,7 @@
  <p class="err">
   Error in "#UI {"type": "entry"} k2 = 2*E2" on line [
   <a data-text="116" href="#0">116</a>
-  ]: #UI directives do not support expressions.
+  ]: #UI does not support expressions unless 'allowExpression' is true.
  </p>
  <p>
   <span class="eq">
@@ -772,11 +772,6 @@
    = 400
    <i>GPa</i>
   </span>
- </p>
- <p class="err">
-  Error in "#UI k3 = [1; sqrt(4)]" on line [
-  <a data-text="117" href="#0">117</a>
-  ]: #UI directives do not support expressions.
  </p>
  <p>
   <span class="eq">

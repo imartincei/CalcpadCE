@@ -27,7 +27,7 @@ import { DotnetRuntimeManager } from './dotnetRuntimeManager';
 import { VSCodeLogger, VSCodeFileSystem } from './adapters';
 import { expandEnvVars } from './calcpadLocationResolver';
 import { installJuliaMonoCommand, maybePromptInstall } from './installFont';
-import { renderIntoShell, setShellLoading, getFrameAgentScript, frameStateFor, handleFrameStateMessage, lastRenderedHtml } from './previewFrame';
+import { renderIntoShell, setShellLoading, getFrameAgentScript, frameStateFor, handleFrameStateMessage, lastRenderedHtml, copyPreviewSelection } from './previewFrame';
 
 // The wrapped ("regular") and unwrapped previews are independent panels that can
 // coexist: the unwrapped one is stacked directly below the regular one so the
@@ -2380,6 +2380,8 @@ export async function activate(context: vscode.ExtensionContext) {
     const webviewSourceRegistration = vscode.workspace.registerTextDocumentContentProvider(webviewSourceScheme, webviewSourceProvider);
     const webviewSourceUri = vscode.Uri.parse(`${webviewSourceScheme}:Webview Source.html`);
 
+    const copySelectionCommand = vscode.commands.registerCommand('vscode-calcpad.copySelection', copyPreviewSelection);
+
     const viewWebviewSourceCommand = vscode.commands.registerCommand('vscode-calcpad.viewWebviewSource', async () => {
         const inspectPanel = (unwrappedPanel && unwrappedPanel.active ? unwrappedPanel : wrappedPanel) ?? unwrappedPanel;
         if (!inspectPanel) {
@@ -2713,6 +2715,7 @@ export async function activate(context: vscode.ExtensionContext) {
             renameProviderDisposable,
             hoverProviderDisposable,
             insertManager,
+            copySelectionCommand,
             viewWebviewSourceCommand,
             webviewSourceRegistration,
             installJuliaMonoDisposable
