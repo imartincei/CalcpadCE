@@ -1,7 +1,10 @@
 {
   "build": {
-    "beforeDevCommand": "rm -rf ../calcpad-web/dist && ./local-npm.sh --prefix ../calcpad-frontend run build && (./local-npm.sh --prefix ../calcpad-frontend run watch &) && ./local-npm.sh --prefix ../calcpad-web run build:watch",
-    "beforeBuildCommand": "rm -rf ../calcpad-web/dist && ./local-npm.sh --prefix ../calcpad-frontend run build && ./local-npm.sh --prefix ../calcpad-web run build"
+    "beforeDevCommand": {
+      "script": "./dev-frontend.sh",
+      "wait": true
+    },
+    "beforeBuildCommand": "./build-frontend.sh"
   },
   "bundle": {
     "targets": ["deb", "rpm", "appimage"],

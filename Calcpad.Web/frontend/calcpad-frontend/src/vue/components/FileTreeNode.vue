@@ -79,7 +79,7 @@ const handleContextMenu = (e: MouseEvent) => {
   align-items: center;
   padding: 2px 8px 2px 0;
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--calcpad-font-size-lg);
   color: var(--vscode-foreground);
   gap: 4px;
   white-space: nowrap;
@@ -93,7 +93,7 @@ const handleContextMenu = (e: MouseEvent) => {
 .tree-arrow {
   display: inline-block;
   width: 12px;
-  font-size: 8px;
+  font-size: var(--calcpad-font-size-xxs);
   color: var(--vscode-icon-foreground, var(--vscode-foreground));
   transition: transform 0.15s ease;
   transform-origin: center;
@@ -109,7 +109,7 @@ const handleContextMenu = (e: MouseEvent) => {
 }
 
 .tree-icon {
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   flex-shrink: 0;
 }
 

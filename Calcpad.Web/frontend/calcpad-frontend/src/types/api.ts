@@ -167,8 +167,10 @@ export enum CalcpadTokenType {
     /** Format specifiers (e.g., :f2, :e3) */
     Format = 27,
 
-    // [Future Reserved] 28-30 used to hold StringVariable, StringFunction, StringTable
-    FutureReserved28 = 28,
+    /** JSON payload of the #settings and #UI directives */
+    SettingsJson = 28,
+
+    // [Future Reserved] 29-30 used to hold StringFunction, StringTable
     FutureReserved29 = 29,
     FutureReserved30 = 30
 }

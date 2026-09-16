@@ -6,17 +6,28 @@
   <div class="calcpad-vue-ui" :class="{ split: isSplit }" @contextmenu.prevent>
     <!-- Activity icons: only shown when the host app enables extra tabs (desktop).
          VS Code webview keeps a single Calcpad view. -->
-    <div v-if="versionConfig.isDesktop" class="activity-icons" role="tablist">
+    <div v-if="versionConfig.isDesktop" class="activity-icons">
+      <div class="activity-tabs" role="tablist">
+        <button
+          v-for="view in views"
+          :key="view.id"
+          :class="['activity-icon', { active: activeView === view.id }]"
+          :title="view.label"
+          :aria-label="view.label"
+          :aria-selected="activeView === view.id"
+          role="tab"
+          @click="switchView(view.id)"
+          v-html="view.icon"
+        ></button>
+      </div>
+      <!-- Sits on the bar that spans both views, since hiding takes both away. Showing
+           it again is the editor-area button's job — this bar goes with the sidebar. -->
       <button
-        v-for="view in views"
-        :key="view.id"
-        :class="['activity-icon', { active: activeView === view.id }]"
-        :title="view.label"
-        :aria-label="view.label"
-        :aria-selected="activeView === view.id"
-        role="tab"
-        @click="switchView(view.id)"
-        v-html="view.icon"
+        class="activity-icon activity-hide"
+        title="Hide the sidebar (Ctrl+Shift+B)"
+        aria-label="Hide the sidebar"
+        @click="hideSidebar()"
+        v-html="HIDE_SIDEBAR_ICON"
       ></button>
     </div>
 
@@ -34,6 +45,7 @@
 
     <div v-show="!versionConfig.isDesktop || activeView === 'calcpad'" class="calcpad-view" :class="{ split: isSplit }">
     <div v-for="(pane, paneIndex) in panes" :key="pane.id" class="calcpad-pane">
+    <div class="tab-bar">
     <div class="tab-container">
       <button
         v-for="tab in tabs"
@@ -44,13 +56,28 @@
       >
         {{ tab.label }}
       </button>
-      <button
-        class="pane-action"
-        :title="isSplit ? 'Close this panel' : 'Split panel'"
-        :aria-label="isSplit ? 'Close this panel' : 'Split panel'"
-        @click="isSplit ? closePane(paneIndex) : splitPane()"
-        v-html="isSplit ? CLOSE_ICON : SPLIT_ICON"
-      ></button>
+      <!-- Grouped so the pair wraps as a unit rather than splitting across rows at
+           the sidebar's minimum width (the second button is web-only). -->
+      <div class="pane-actions">
+        <button
+          class="pane-action"
+          :title="isSplit ? 'Close this panel' : 'Split panel'"
+          :aria-label="isSplit ? 'Close this panel' : 'Split panel'"
+          @click="isSplit ? closePane(paneIndex) : splitPane()"
+          v-html="isSplit ? CLOSE_ICON : SPLIT_ICON"
+        ></button>
+        <!-- Hides the whole sidebar, unlike .pane-action beside it, which splits or
+             closes one of its inner panes. -->
+        <button
+          v-if="versionConfig.isWeb && paneIndex === 0"
+          class="pane-action"
+          title="Hide the sidebar (Ctrl+Shift+B)"
+          aria-label="Hide the sidebar"
+          @click="hideSidebar()"
+          v-html="HIDE_SIDEBAR_ICON"
+        ></button>
+      </div>
+    </div>
     </div>
 
     <p v-if="tabUnavailable(pane.activeTab)" class="unavailable-note">{{ INPUT_MODE_NOTE }}</p>
@@ -170,6 +197,7 @@
         @apply="handleApplyMetadata"
         @go-to-line="handleGoToLine"
         @refresh-ui-controls="handleRefreshUiControls"
+        @draft-dirty="handleMetadataDraftDirty"
       />
     </div>
     </div>
@@ -190,6 +218,7 @@ import CalcpadErrorsTab from './CalcpadErrorsTab.vue'
 import CalcpadMetadataTab from './CalcpadMetadataTab.vue'
 import { postMessage } from '../services/messaging'
 import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '../../text/metadata-comment'
+import { discardMetadataDraft } from '../metadata-drafts'
 import type { UiDirectiveData } from '../../text/ui-directive'
 import type { UiControl } from '../../services/ui-overrides'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
@@ -231,8 +260,10 @@ const activeView = ref<string>('calcpad')
 const openedFolder = ref<string | null>(null)
 const fileTreeRoots = ref<FileNode[]>([])
 
-// Split icon (two stacked rows) and close icon for the per-pane action button.
+// Split icon (two stacked rows) and close icon for the per-pane action button;
+// hide-sidebar collapses the panel itself.
 const SPLIT_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="2" y1="8" x2="14" y2="8"/></svg>'
+const HIDE_SIDEBAR_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="6" y1="2" x2="6" y2="14"/><polyline points="11.5,5.5 9,8 11.5,10.5"/></svg>'
 const CLOSE_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" xmlns="http://www.w3.org/2000/svg"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>'
 
 // The side panel can be split into two panes, each with its own active tab.
@@ -388,6 +419,10 @@ const splitPane = () => {
 const closePane = (index: number) => {
   if (panes.value.length <= 1) return
   panes.value.splice(index, 1)
+}
+
+const hideSidebar = () => {
+  postMessage({ type: 'hideSidebar' })
 }
 
 const activateTab = (pane: Pane, tabId: string) => {
@@ -668,27 +703,34 @@ const handleRefreshUiControls = () => {
   postMessage({ type: 'getUiControls' })
 }
 
-const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: SettingsValues; ui?: UiDirectiveData }) => {
-  if (!metadataBlock.value) return
+// The panel's own block, not the last one pushed: an unsaved form stays on its target
+// while the cursor moves, so the two differ.
+const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: SettingsValues; ui?: UiDirectiveData; block: MetadataCommentBlock }) => {
+  const block = payload.block
+  if (!block) return
   // One message → one atomic edit covering the metadata comment, the
   // document-level #settings directive, and the #UI directive at the cursor,
   // so the writes can't race or shift each other's line numbers.
   postMessage({
     type: 'updateMetadata',
-    line: metadataBlock.value.line,
-    endLine: metadataBlock.value.endLine,
-    indent: metadataBlock.value.indent,
-    trailingQuote: metadataBlock.value.trailingQuote,
-    layout: metadataBlock.value.layout,
-    isNew: metadataBlock.value.isNew,
+    line: block.line,
+    endLine: block.endLine,
+    indent: block.indent,
+    trailingQuote: block.trailingQuote,
+    layout: block.layout,
+    isNew: block.isNew,
     data: payload.data,
     settings: payload.settings,
-    settingsLine: metadataBlock.value.settingsLine ?? null,
-    settingsEndLine: metadataBlock.value.settingsEndLine ?? metadataBlock.value.settingsLine ?? null,
-    settingsLayout: metadataBlock.value.settingsLayout,
+    settingsLine: block.settingsLine ?? null,
+    settingsEndLine: block.settingsEndLine ?? block.settingsLine ?? null,
+    settingsLayout: block.settingsLayout,
     ui: payload.ui,
-    uiLine: metadataBlock.value.uiDirective?.line ?? null,
+    uiLine: block.uiDirective?.line ?? null,
   })
+}
+
+const handleMetadataDraftDirty = (payload: { docKey: string; dirty: boolean }) => {
+  postMessage({ type: 'metadataDraftDirty', docKey: payload.docKey, dirty: payload.dirty })
 }
 
 // Message handler
@@ -737,7 +779,12 @@ const handleMessage = (event: MessageEvent) => {
       if (Array.isArray(message.availableFonts)) availableFonts.value = message.availableFonts
       break
     case 'saveNamedConfigError':
-      window.alert(message.message || 'Failed to save settings.')
+      postMessage({
+        type: 'showAlert',
+        title: 'Settings',
+        message: message.message || 'Failed to save settings.',
+        kind: 'error',
+      })
       break
     case 'settingsReset':
       settings.value = message.settings
@@ -783,6 +830,9 @@ const handleMessage = (event: MessageEvent) => {
       break
     case 'metadataContext':
       metadataBlock.value = message.block ?? null
+      break
+    case 'metadataDraftDiscard':
+      discardMetadataDraft(String(message.docKey ?? ''))
       break
     case 'uiControls':
       uiControls.value = Array.isArray(message.controls) ? message.controls : null
@@ -831,26 +881,56 @@ onUnmounted(() => {
 
 <style scoped>
 .calcpad-vue-ui {
-  /* Natural document flow inside the parent, avoiding flex-column edge cases where a wrapped
-   * .tab-container can render on top of .tab-content. min-height (not height) so the box grows
-   * to the full content height and the sticky .activity-icons bar stays stuck. */
-  min-height: 100%;
-  display: block;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   font-family: var(--vscode-font-family);
   font-size: var(--vscode-font-size);
   color: var(--vscode-foreground);
   background: var(--vscode-editor-background);
 }
 
+.calcpad-vue-ui > .files-tab {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.calcpad-view {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.calcpad-pane {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .activity-icons {
   display: flex;
   gap: 0;
   padding: 4px 4px;
-  position: sticky;
-  top: 0;
-  z-index: 2;
+  flex: 0 0 auto;
   border-bottom: 1px solid var(--vscode-widget-border);
   background: var(--vscode-activityBar-background, var(--vscode-editor-background));
+}
+
+/* The tablist holds only the view tabs; the hide button is not one of them. */
+.activity-tabs {
+  display: flex;
+}
+
+.activity-hide {
+  margin-left: auto;
+}
+
+.activity-hide :deep(svg) {
+  width: 20px;
+  height: 20px;
 }
 
 .activity-icon {
@@ -885,44 +965,20 @@ onUnmounted(() => {
   display: block;
 }
 
-/* Split mode: the view becomes a vertical flex column of independently
- * scrolling panes. The root switches to height:100% so panes fill the sidebar
- * where the host gives it a definite height (calcpad-web/desktop); in the VS
- * Code webview (body-scroll, no definite height) it degrades to natural flow
- * with both panes fully expanded. */
-.calcpad-vue-ui.split {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.calcpad-vue-ui.split .calcpad-view {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.calcpad-view.split {
-  display: flex;
-  flex-direction: column;
-}
-
-.calcpad-view.split .calcpad-pane {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow-y: auto;
-}
-
 .calcpad-view.split .calcpad-pane + .calcpad-pane {
   border-top: 2px solid var(--vscode-widget-border);
+}
+
+/* Block wrapper, not a flex item: a wrapping flex container is measured at
+ * max-content as a column flex item, so it gets a one-row height and clips the
+ * rows it wraps onto. CSS Grid tracks size it the same wrong way. */
+.tab-bar {
+  flex: 0 0 auto;
 }
 
 .tab-container {
   display: flex;
   flex-wrap: wrap;
-  /* Sticky so the tab strip stays visible while .tab-content scrolls. */
-  position: sticky;
-  top: 0;
-  z-index: 1;
   border-bottom: 1px solid var(--vscode-widget-border);
   background: var(--vscode-editor-background);
 }
@@ -933,7 +989,7 @@ onUnmounted(() => {
   background: transparent;
   color: var(--vscode-tab-inactiveForeground);
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   font-weight: normal;
   border-radius: 0;
   transition: all 0.2s ease;
@@ -956,9 +1012,14 @@ onUnmounted(() => {
   opacity: 0.5;
 }
 
-/* Split / close button pinned to the right end of the tab strip. */
-.pane-action {
+/* Split / close and hide-sidebar buttons, pinned to the right end of the tab strip. */
+.pane-actions {
   margin-left: auto;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.pane-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -982,8 +1043,10 @@ onUnmounted(() => {
 }
 
 .tab-content {
-  /* Natural-flow content area — grows with its content. The parent
-   * (#vue-sidebar) handles overflow scrolling for the whole panel. */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 0;
 }
 
@@ -993,9 +1056,10 @@ onUnmounted(() => {
 
 /* Sits outside .tab-content so it stays legible while the tab itself is dimmed. */
 .unavailable-note {
+  flex: 0 0 auto;
   margin: 0;
   padding: 8px 12px;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   font-style: italic;
   color: var(--vscode-descriptionForeground);
   border-bottom: 1px solid var(--vscode-widget-border);

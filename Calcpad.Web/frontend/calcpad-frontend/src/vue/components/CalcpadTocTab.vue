@@ -134,7 +134,7 @@ function toggleCollapse(index: number): void {
   background: var(--vscode-textCodeBlock-background);
   padding: 1px 4px;
   border-radius: 2px;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
 }
 
 .toc-list {
@@ -157,7 +157,7 @@ function toggleCollapse(index: number): void {
   justify-content: center;
   width: 16px;
   height: 16px;
-  font-size: 10px;
+  font-size: var(--calcpad-font-size-xs);
   color: var(--vscode-descriptionForeground);
   cursor: pointer;
   flex-shrink: 0;
@@ -179,7 +179,7 @@ function toggleCollapse(index: number): void {
 }
 
 .toc-level-badge {
-  font-size: 9px;
+  font-size: var(--calcpad-font-size-xxs);
   font-weight: 600;
   color: var(--vscode-descriptionForeground);
   background: var(--vscode-badge-background);
@@ -191,7 +191,7 @@ function toggleCollapse(index: number): void {
 }
 
 .toc-text {
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-foreground);
   white-space: nowrap;
   overflow: hidden;

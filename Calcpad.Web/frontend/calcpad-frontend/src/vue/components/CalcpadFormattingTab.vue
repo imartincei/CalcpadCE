@@ -102,13 +102,13 @@ function onPrettify() {
 
 .section-title {
   margin: 0 0 8px 0;
-  font-size: 13px;
+  font-size: var(--calcpad-font-size-lg);
   font-weight: 600;
   color: var(--vscode-foreground);
 }
 
 .section-desc {
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-descriptionForeground);
   margin: 0 0 16px 0;
   line-height: 1.5;
@@ -118,7 +118,7 @@ function onPrettify() {
   background: var(--vscode-textCodeBlock-background);
   padding: 1px 4px;
   border-radius: 2px;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
 }
 
 .form-row {
@@ -126,7 +126,7 @@ function onPrettify() {
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-foreground);
 }
 
@@ -140,7 +140,7 @@ function onPrettify() {
   color: var(--vscode-input-foreground);
   border: 1px solid var(--vscode-input-border, transparent);
   padding: 4px 6px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   font-family: var(--vscode-font-family);
   border-radius: 2px;
 }
@@ -170,7 +170,7 @@ function onPrettify() {
   color: var(--vscode-button-foreground);
   border: none;
   padding: 6px 14px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   font-family: var(--vscode-font-family);
   cursor: pointer;
   border-radius: 2px;

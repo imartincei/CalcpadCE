@@ -45,10 +45,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="template.html" />
-    <Content Include="$(FontsDir)Jost-*.otf;$(FontsDir)web\DejaVuSerifCondensed*.woff2;$(FontsDir)*-LICENSE" Link="Fonts\%(Filename)%(Extension)">
+    <Content Include="$(FontsDir)Jost-*.otf;$(FontsDir)web\DejaVuSerifCondensed*.woff2;$(FontsDir)web\CalcpadCEVector.woff2;$(FontsDir)*-LICENSE" Link="Fonts\%(Filename)%(Extension)">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="$(FontsDir)Jost-*.otf;$(FontsDir)web\DejaVuSerifCondensed*.woff2;$(FontsDir)*-LICENSE" Link="Fonts\%(Filename)%(Extension)" />
+    <EmbeddedResource Include="$(FontsDir)Jost-*.otf;$(FontsDir)web\DejaVuSerifCondensed*.woff2;$(FontsDir)web\CalcpadCEVector.woff2;$(FontsDir)*-LICENSE" Link="Fonts\%(Filename)%(Extension)" />
     <Content Include="UiAssets\**\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

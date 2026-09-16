@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json;
 using Calcpad.Core;
 using Calcpad.Highlighter.Linter.Helpers;
@@ -21,6 +22,10 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             for (int i = 0; i < stage3.Lines.Count; i++)
             {
                 if (!tokenProvider.IsCpdMode(i)) continue;
+
+                // #UI shares the SettingsJson token but not the key set, so skip its payload.
+                if (!stage3.Lines[i].AsSpan().TrimStart().StartsWith("#settings", StringComparison.OrdinalIgnoreCase))
+                    continue;
 
                 foreach (var token in tokenProvider.GetTokensForLine(i))
                 {

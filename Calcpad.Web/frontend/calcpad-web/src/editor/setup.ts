@@ -82,6 +82,7 @@ export function createCalcpadEditor(
         automaticLayout: true,
         minimap: { enabled: false },
         fontSize: options?.fontSize ?? 14,
+        lineHeight: 22,
         fontFamily: resolveEditorFontFamily(options?.fontFamily),
         lineNumbers: 'on',
         renderWhitespace: 'none',

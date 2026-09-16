@@ -39,6 +39,7 @@
               class="variable-item"
               :title="getMacroTooltip(macro)"
               @click="insertMacro(macro)"
+              @contextmenu.prevent.stop="openContextMenu($event, macro)"
             >
               <div class="variable-name">{{ macro.name }}</div>
               <div class="variable-type">Macro</div>
@@ -68,6 +69,7 @@
               class="variable-item"
               :title="getVariableTooltip(variable)"
               @click="insertVariable(variable.name)"
+              @contextmenu.prevent.stop="openContextMenu($event, variable)"
             >
               <div class="variable-name">{{ variable.name }}</div>
               <div class="variable-type">Variable</div>
@@ -97,6 +99,7 @@
               class="variable-item"
               :title="getFunctionTooltip(func)"
               @click="insertFunction(func)"
+              @contextmenu.prevent.stop="openContextMenu($event, func)"
             >
               <div class="variable-name">{{ func.name }}</div>
               <div class="variable-type">Function</div>
@@ -127,6 +130,7 @@
               class="variable-item"
               :title="getCustomUnitTooltip(unit)"
               @click="insertCustomUnit(unit)"
+              @contextmenu.prevent.stop="openContextMenu($event, unit)"
             >
               <div class="variable-name">.{{ unit.name }}</div>
               <div class="variable-type">Custom Unit</div>
@@ -137,11 +141,26 @@
         </div>
       </div>
     </div>
+    <div
+      v-if="contextMenu"
+      class="calcpad-context-menu"
+      :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
+      @mousedown.stop
+      @click.stop
+    >
+      <button class="calcpad-context-item" @click="onCopyName">Copy Name</button>
+      <button
+        v-if="contextMenu.definition"
+        class="calcpad-context-item"
+        @click="onCopyDefinition"
+      >Copy Definition</button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { writeClipboard } from '../services/clipboard'
 import type { VariablesData, VariableItem } from '../types'
 
 // Props
@@ -166,6 +185,59 @@ const emit = defineEmits<{
 }>()
 
 // State
+interface VariableContextMenu {
+  x: number
+  y: number
+  name: string
+  definition: string
+}
+
+const contextMenu = ref<VariableContextMenu | null>(null)
+
+const openContextMenu = (e: MouseEvent, item: VariableItem) => {
+  const parts = [item.params ? `Parameters: ${item.params}` : '', item.definition ?? '']
+  contextMenu.value = {
+    x: e.clientX,
+    y: e.clientY,
+    name: item.name,
+    definition: parts.filter(Boolean).join('\n'),
+  }
+}
+
+const closeContextMenu = () => {
+  contextMenu.value = null
+}
+
+const onDocumentInteraction = (e: MouseEvent | KeyboardEvent) => {
+  if (!contextMenu.value) return
+  if (e instanceof KeyboardEvent && e.key !== 'Escape') return
+  closeContextMenu()
+}
+
+onMounted(() => {
+  document.addEventListener('mousedown', onDocumentInteraction)
+  document.addEventListener('keydown', onDocumentInteraction)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', onDocumentInteraction)
+  document.removeEventListener('keydown', onDocumentInteraction)
+})
+
+const onCopyName = () => {
+  const m = contextMenu.value
+  if (!m) return
+  closeContextMenu()
+  void writeClipboard(m.name)
+}
+
+const onCopyDefinition = () => {
+  const m = contextMenu.value
+  if (!m) return
+  closeContextMenu()
+  void writeClipboard(m.definition)
+}
+
 const searchTerm = ref('')
 const collapsedSections = ref({
   macros: false,
@@ -453,7 +525,7 @@ watch(
   border: 1px solid var(--vscode-input-border);
   color: var(--vscode-input-foreground);
   border-radius: 3px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   font-family: var(--vscode-font-family);
 }
 
@@ -509,7 +581,7 @@ watch(
 
 .expand-icon {
   transition: transform 0.2s;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
 }
 
 .variables-content {
@@ -540,13 +612,13 @@ watch(
 
 .variable-name {
   font-weight: 600;
-  font-size: 13px;
+  font-size: var(--calcpad-font-size-lg);
   color: var(--vscode-symbolIcon-variableForeground);
   margin-bottom: 4px;
 }
 
 .variable-type {
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   color: var(--vscode-descriptionForeground);
   margin-bottom: 4px;
   font-style: italic;
@@ -554,7 +626,7 @@ watch(
 
 .variable-content {
   font-family: var(--vscode-editor-font-family);
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   background: var(--vscode-textCodeBlock-background);
   padding: 4px 6px;
   border-radius: 2px;
@@ -566,7 +638,7 @@ watch(
 }
 
 .variable-source {
-  font-size: 10px;
+  font-size: var(--calcpad-font-size-xs);
   color: var(--vscode-descriptionForeground);
   margin-top: 4px;
 }

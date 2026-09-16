@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { pdfResponseError, isBrowserNotFound, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor } from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -298,10 +298,9 @@ function updateMetadataContext(editor: vscode.TextEditor | undefined): void {
     if (editor && (editor.document.languageId === 'calcpad' || editor.document.languageId === 'plaintext')) {
         const lines = editor.document.getText().split(/\r?\n/);
         const line = editor.selection.active.line;
-        const resolve = buildDefinitionResolver(
-            definitionsService.getCachedDefinitions(editor.document.uri.toString())
-            ?? { functions: [], macros: [], variables: [], customUnits: [] });
-        block = computeMetadataBlock(lines, line, resolve);
+        const docKey = editor.document.uri.toString();
+        block = computeMetadataBlock(lines, line, buildSourceDefinitionResolver(lines));
+        if (block) block.docKey = docKey;
     }
     vscode.commands.executeCommand('setContext', 'calcpad.inMetadataComment', block !== null && !block.isNew);
     vueUiProvider?.updateMetadataContext(block);
@@ -2144,7 +2143,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     vueUiProvider = new CalcpadVueUIProvider(context.extensionUri, context, settingsManager, insertManager);
     vueUiProvider.getSourceEditor = () => vscode.window.activeTextEditor ?? previewSourceEditor;
-    vueUiProvider.getDefinitions = (uri: string) => definitionsService.getCachedDefinitions(uri);
     // Both fall back to previewSourceEditor: a setting is usually changed with the sidebar
     // focused while a *preview panel* holds the editor area, and a webview panel being active
     // means there is no activeTextEditor at all. Without the fallback the re-render these
@@ -2320,9 +2318,7 @@ export async function activate(context: vscode.ExtensionContext) {
         // On a definition, the panel shows a virtual block from real highlighter
         // results (correct params) and Apply creates the comment — no seeding, so
         // definition line numbers stay valid.
-        const resolve = buildDefinitionResolver(
-            definitionsService.getCachedDefinitions(doc.uri.toString())
-            ?? { functions: [], macros: [], variables: [], customUnits: [] });
+        const resolve = buildSourceDefinitionResolver(doc.getText().split(/\r?\n/));
         if (resolve(curLine)) {
             revealPanel();
             return;
@@ -2553,6 +2549,12 @@ export async function activate(context: vscode.ExtensionContext) {
         processDocument(document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
     });
 
+    // A closed document takes its unapplied Properties form with it. VS Code cannot veto
+    // a close, so the draft is dropped rather than offered back.
+    const onDidCloseTextDocument = vscode.workspace.onDidCloseTextDocument(document => {
+        vueUiProvider?.discardMetadataDraft(document.uri.toString());
+    });
+
     // Process document on save
     const onDidSaveTextDocument = vscode.workspace.onDidSaveTextDocument(document => {
         processDocument(document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
@@ -2691,6 +2693,7 @@ export async function activate(context: vscode.ExtensionContext) {
             serverDebugChannel,
             onDidChangeTextDocument,
             onDidOpenTextDocument,
+            onDidCloseTextDocument,
             onDidSaveTextDocument,
             onDidChangeActiveTextEditor,
             onDidChangeTabs,

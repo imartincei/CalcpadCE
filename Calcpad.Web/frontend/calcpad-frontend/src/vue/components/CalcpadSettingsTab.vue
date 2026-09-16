@@ -1284,7 +1284,11 @@ watch(
 .settings-toolbar {
   display: flex;
   gap: 6px;
-  padding: 12px 12px 0 12px;
+  padding: 12px;
+  /* Pinned above .settings-container, which scrolls under it. */
+  flex: 0 0 auto;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  background: var(--vscode-editor-background);
 }
 
 .search-input {
@@ -1294,7 +1298,7 @@ watch(
   border: 1px solid var(--vscode-input-border);
   color: var(--vscode-input-foreground);
   border-radius: 3px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   font-family: var(--vscode-font-family);
 }
 
@@ -1310,7 +1314,7 @@ watch(
   color: var(--vscode-button-secondaryForeground);
   border-radius: 3px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   white-space: nowrap;
 }
 
@@ -1321,7 +1325,8 @@ watch(
 .settings-container {
   padding: 12px;
   overflow-y: auto;
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .section-header {
@@ -1330,7 +1335,7 @@ watch(
   gap: 6px;
   margin: 12px 0 8px 0;
   color: var(--vscode-sideBarSectionHeader-foreground);
-  font-size: 13px;
+  font-size: var(--calcpad-font-size-lg);
   font-weight: bold;
   border-bottom: 1px solid var(--vscode-panel-border);
   padding-bottom: 4px;
@@ -1348,7 +1353,7 @@ watch(
 
 .expand-icon {
   transition: transform 0.2s;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
 }
 
 .expand-icon.collapsed {
@@ -1362,7 +1367,7 @@ watch(
 .setting-group label {
   display: block;
   margin-bottom: 4px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-input-foreground);
   font-weight: normal;
 }
@@ -1376,7 +1381,7 @@ watch(
   border: 1px solid var(--vscode-input-border);
   color: var(--vscode-input-foreground);
   border-radius: 3px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
 }
 
 .setting-group input[type="checkbox"] {
@@ -1408,7 +1413,7 @@ watch(
   color: var(--vscode-button-secondaryForeground);
   border-radius: 3px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   white-space: nowrap;
 }
 
@@ -1418,7 +1423,7 @@ watch(
 
 .setting-info {
   margin-left: 4px;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   color: var(--vscode-descriptionForeground);
   cursor: help;
 }
@@ -1431,7 +1436,7 @@ watch(
 .setting-error {
   display: block;
   margin-top: 4px;
-  font-size: 11px;
+  font-size: var(--calcpad-font-size-sm);
   color: var(--vscode-errorForeground, #f48771);
 }
 
@@ -1459,7 +1464,7 @@ watch(
   color: var(--vscode-button-secondaryForeground);
   border-radius: 3px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   margin-top: 16px;
 }
 
@@ -1475,7 +1480,7 @@ watch(
   color: var(--vscode-button-secondaryForeground);
   border-radius: 3px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
 }
 
 .diagnostics-button:hover {
@@ -1483,7 +1488,7 @@ watch(
 }
 
 .app-version {
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-descriptionForeground);
 }
 
@@ -1496,7 +1501,7 @@ watch(
 
 .no-results {
   padding: 16px 4px;
-  font-size: 12px;
+  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-descriptionForeground);
   text-align: center;
 }

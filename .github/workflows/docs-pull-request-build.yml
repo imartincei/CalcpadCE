@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/**'
       - 'Examples/**'
+      - 'Resources/Fonts/**'
       - 'docs/**'
       - 'mkdocs.yml'
 

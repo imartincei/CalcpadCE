@@ -1,4 +1,6 @@
 using Calcpad.Core;
+using Calcpad.Highlighter.Tokenizer;
+using Calcpad.Highlighter.Tokenizer.Models;
 using Calcpad.Server.Controllers;
 
 namespace Calcpad.Server.Services
@@ -234,15 +236,25 @@ tan_angle = tan(angle°)";
             var stringBuilder = new System.Text.StringBuilder();
             var lines = code.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
+            // One tokenizer pass over the whole listing: multi-line constructs need the state.
+            var lineTexts = new string[lines.Length];
+            var sourceLines = new string[lines.Length];
+            for (var l = 0; l < lines.Length; l++)
+            {
+                var v = lines[l].IndexOf('\v');
+                lineTexts[l] = v < 0 ? lines[l] : lines[l].Substring(0, v);
+                sourceLines[l] = v < 0 ? (l + 1).ToString() : lines[l].Substring(v + 1);
+            }
+            var tokensByLine = TokenizeListing(lineTexts);
+
             stringBuilder.AppendLine("<div class=\"code\">");
             var lineNumber = 0;
 
-            foreach (var line in lines)
+            for (var l = 0; l < lineTexts.Length; l++)
             {
                 ++lineNumber;
-                var i = line.IndexOf('\v');
-                var lineText = i < 0 ? line : line.Substring(0, i);
-                var sourceLine = i < 0 ? lineNumber.ToString() : line.Substring(i + 1);
+                var lineText = lineTexts[l];
+                var sourceLine = sourceLines[l];
 
                 // Format line number with proper padding
                 var lineNumText = lineNumber.ToString();
@@ -278,9 +290,7 @@ tan_angle = tan(angle°)";
                 }
                 else
                 {
-                    // Apply syntax highlighting like WPF version
-                    var highlightedLine = ApplySyntaxHighlighting(lineText);
-                    stringBuilder.Append(highlightedLine);
+                    stringBuilder.Append(HighlightLine(lineText, tokensByLine, l));
                 }
                 stringBuilder.AppendLine("</p>");
             }
@@ -301,165 +311,74 @@ tan_angle = tan(angle°)";
                     stringBuilder.Append(" ...");
                 
                 stringBuilder.AppendLine("</div>");
-                stringBuilder.AppendLine("<style>body {padding-top:1.1em;} .code p {margin:0; line-height:1.15em;}</style>");
+                stringBuilder.AppendLine("<style>body {padding-top:1.1em;} .code p {margin:0; line-height:1.55em;}</style>");
             }
             else
             {
-                stringBuilder.AppendLine("<style>.code p {margin:0; line-height:1.15em;}</style>");
+                stringBuilder.AppendLine("<style>.code p {margin:0; line-height:1.55em;}</style>");
             }
             
             return stringBuilder.ToString();
         }
 
-        private string ApplySyntaxHighlighting(string line)
+        // Names match the frontend's SEMANTIC_TOKEN_TYPES, so all three views share one palette.
+        private static readonly string[] TokenClasses = BuildTokenClasses();
+
+        private static string[] BuildTokenClasses()
         {
-            if (string.IsNullOrEmpty(line))
-                return "";
-
-            var result = new System.Text.StringBuilder();
-            var i = 0;
-            var len = line.Length;
-
-            while (i < len)
+            var types = Enum.GetValues<TokenType>();
+            var classes = new string[types.Max(t => (int)t) + 1];
+            foreach (var t in types)
             {
-                var c = line[i];
-                
-                // Comments (pink/magenta for includes, green for text, purple for HTML tags)
-                if (c == '\'' || c == '"')
-                {
-                    var commentEnd = FindCommentEnd(line, i);
-                    var commentText = line.Substring(i, commentEnd - i + 1);
-                    
-                    // Check if it's an include comment
-                    if (commentText.Contains("#include"))
-                        result.Append($"<span class=\"include\">{System.Web.HttpUtility.HtmlEncode(commentText)}</span>");
-                    // Check if it contains HTML tags
-                    else if (commentText.Contains("<") && commentText.Contains(">"))
-                        result.Append($"<span class=\"htmltag\">{System.Web.HttpUtility.HtmlEncode(commentText)}</span>");
-                    else
-                        result.Append($"<span class=\"comment\">{System.Web.HttpUtility.HtmlEncode(commentText)}</span>");
-                    
-                    i = commentEnd + 1;
-                    continue;
-                }
-                
-                // Keywords (magenta/pink)
-                if (c == '#')
-                {
-                    var keywordEnd = FindKeywordEnd(line, i);
-                    var keyword = line.Substring(i, keywordEnd - i + 1);
-                    result.Append($"<span class=\"keyword\">{System.Web.HttpUtility.HtmlEncode(keyword)}</span>");
-                    i = keywordEnd + 1;
-                    continue;
-                }
-                
-                // Commands (magenta)
-                if (c == '$')
-                {
-                    var commandEnd = FindCommandEnd(line, i);
-                    var command = line.Substring(i, commandEnd - i + 1);
-                    result.Append($"<span class=\"command\">{System.Web.HttpUtility.HtmlEncode(command)}</span>");
-                    i = commandEnd + 1;
-                    continue;
-                }
-                
-                // Numbers (black)
-                if (char.IsDigit(c))
-                {
-                    var numberEnd = FindNumberEnd(line, i);
-                    var number = line.Substring(i, numberEnd - i + 1);
-                    result.Append($"<span class=\"number\">{System.Web.HttpUtility.HtmlEncode(number)}</span>");
-                    i = numberEnd + 1;
-                    continue;
-                }
-                
-                // Variables and functions (blue)
-                if (char.IsLetter(c) || c == '_')
-                {
-                    var identifierEnd = FindIdentifierEnd(line, i);
-                    var identifier = line.Substring(i, identifierEnd - i + 1);
-                    
-                    // Check if it's followed by '(' to identify functions
-                    var isFunction = identifierEnd + 1 < len && line[identifierEnd + 1] == '(';
-                    if (isFunction)
-                        result.Append($"<span class=\"function\">{System.Web.HttpUtility.HtmlEncode(identifier)}</span>");
-                    else
-                        result.Append($"<span class=\"variable\">{System.Web.HttpUtility.HtmlEncode(identifier)}</span>");
-                    
-                    i = identifierEnd + 1;
-                    continue;
-                }
-                
-                // Operators (goldenrod)
-                if (IsOperator(c))
-                {
-                    result.Append($"<span class=\"operator\">{System.Web.HttpUtility.HtmlEncode(c)}</span>");
-                    i++;
-                    continue;
-                }
-                
-                // Default: just encode the character
-                result.Append(System.Web.HttpUtility.HtmlEncode(c));
-                i++;
+                var name = t.ToString();
+                classes[(int)t] = char.ToLowerInvariant(name[0]) + name[1..];
             }
+            classes[(int)TokenType.JavaScript] = "javascript";
+            return classes;
+        }
+
+        /// <summary>Falls back to no highlighting rather than failing an already-failing parse.</summary>
+        private static Dictionary<int, List<Token>> TokenizeListing(string[] lineTexts)
+        {
+            try
+            {
+                return new CalcpadTokenizer().Tokenize(string.Join('\n', lineTexts)).TokensByLine;
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogWarning("Tokenizing the unwrapped listing failed", ex.Message);
+                return [];
+            }
+        }
+
+        /// <summary>Slices the source line, not token.Text, so normalized glyphs list as written.</summary>
+        private static string HighlightLine(string line, Dictionary<int, List<Token>> tokensByLine, int lineIndex)
+        {
+            if (string.IsNullOrEmpty(line) || !tokensByLine.TryGetValue(lineIndex, out var tokens))
+                return System.Web.HttpUtility.HtmlEncode(line);
+
+            var result = new System.Text.StringBuilder(line.Length * 2);
+            var pos = 0;
+            foreach (var token in tokens)
+            {
+                var end = Math.Min(token.Column + token.Length, line.Length);
+                if (token.Type == TokenType.None || token.Column < pos || end <= token.Column)
+                    continue;
+
+                if (token.Column > pos)
+                    result.Append(System.Web.HttpUtility.HtmlEncode(line[pos..token.Column]));
+
+                result.Append("<span class=\"")
+                    .Append(TokenClasses[(int)token.Type])
+                    .Append("\">")
+                    .Append(System.Web.HttpUtility.HtmlEncode(line[token.Column..end]))
+                    .Append("</span>");
+                pos = end;
+            }
+            if (pos < line.Length)
+                result.Append(System.Web.HttpUtility.HtmlEncode(line[pos..]));
 
             return result.ToString();
-        }
-
-        private int FindCommentEnd(string line, int start)
-        {
-            var quote = line[start];
-            for (int i = start + 1; i < line.Length; i++)
-            {
-                if (line[i] == quote)
-                    return i;
-            }
-            return line.Length - 1;
-        }
-
-        private int FindKeywordEnd(string line, int start)
-        {
-            for (int i = start + 1; i < line.Length; i++)
-            {
-                if (char.IsWhiteSpace(line[i]))
-                    return i - 1;
-            }
-            return line.Length - 1;
-        }
-
-        private int FindCommandEnd(string line, int start)
-        {
-            for (int i = start + 1; i < line.Length; i++)
-            {
-                if (!char.IsLetterOrDigit(line[i]) && line[i] != '_')
-                    return i - 1;
-            }
-            return line.Length - 1;
-        }
-
-        private int FindNumberEnd(string line, int start)
-        {
-            for (int i = start + 1; i < line.Length; i++)
-            {
-                if (!char.IsDigit(line[i]) && line[i] != '.')
-                    return i - 1;
-            }
-            return line.Length - 1;
-        }
-
-        private int FindIdentifierEnd(string line, int start)
-        {
-            for (int i = start + 1; i < line.Length; i++)
-            {
-                if (!char.IsLetterOrDigit(line[i]) && line[i] != '_')
-                    return i - 1;
-            }
-            return line.Length - 1;
-        }
-
-        private bool IsOperator(char c)
-        {
-            return "!^/÷\\⦼*-+<>≤≥≡≠=∧∨⊕(){}[]|&@:;".Contains(c);
         }
 
         private static string LoadHtmlTemplate()

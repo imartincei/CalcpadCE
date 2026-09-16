@@ -4,13 +4,15 @@ import App from './App.vue';
 import pkg from '../package.json';
 import CalcpadAppVue from 'calcpad-frontend/vue/components/CalcpadApp.vue';
 import { initMessaging } from 'calcpad-frontend/vue/services/messaging';
+import { discardMetadataDraft } from 'calcpad-frontend/vue/metadata-drafts';
 import { MessageBridge } from './services/message-bridge';
+import { WorkspaceStateStore, isResultMode, type ResultMode, type WorkspaceLayout } from './services/workspace-state';
 import { buildApiSettings } from 'calcpad-frontend/types/settings';
 import { ConnectionMonitor, setLogLevel, coerceLogLevel } from 'calcpad-frontend';
 import {
     findMetadataCommentBlock,
     serializeMetadataComment,
-    buildDefinitionResolver,
+    buildSourceDefinitionResolver,
     UiOverrideStore,
     writeUiOverrides,
     extractUiControls,
@@ -26,7 +28,7 @@ import {
     type InlineImageBudget,
 } from 'calcpad-frontend';
 import { registerCalcpadLanguage, registerCalcpadTheme, remeasureEditorFontsWhenReady, resolveEditorFontFamily } from './editor/setup';
-import { setAppTheme, coerceAppTheme } from './editor/app-theme';
+import { setAppTheme, coerceAppTheme, getResolvedAppTheme, onAppThemeChanged } from './editor/app-theme';
 import { registerSemanticTokensProvider } from './editor/semantic-tokens';
 import { setupDiagnostics } from './editor/diagnostics';
 import { registerCompletionProvider } from './editor/completions';
@@ -170,10 +172,14 @@ async function showServerBlockedDialog(details: string): Promise<void> {
     }
 }
 
-type ResultMode = 'preview' | 'unwrapped' | 'ui' | 'report';
-
 async function bootstrap(): Promise<void> {
     let serverUrl: string;
+    // Secondary windows (File > New Window) share this process, the sidecar and the
+    // stores, so the main window owns everything there can only be one of.
+    let isPrimaryWindow = true;
+    let windowLabel = 'main';
+    // The bundle's version, not package.json's, on desktop.
+    let appVersion = pkg.version;
     let bridge: MessageBridge | null = null;
     let tauriBridge: import('./services/tauri-bridge').TauriMessageBridge | null = null;
     let serverManager: import('./services/server-manager').TauriServerManager | null = null;
@@ -185,13 +191,19 @@ async function bootstrap(): Promise<void> {
     const pendingServerRawLogs: { line: string; stream: 'stdout' | 'stderr' }[] = [];
 
     if (isTauri) {
+        windowLabel = (await import('@tauri-apps/api/window')).getCurrentWindow().label;
+        isPrimaryWindow = windowLabel === 'main';
+        try { appVersion = await (await import('@tauri-apps/api/app')).getVersion(); }
+        catch { /* falls back to package.json */ }
         // Tauri desktop: the Rust layer owns the Calcpad.Server sidecar
         // (spawn, kill on exit, port discovery). This manager just tracks
         // its URL and surfaces crashes to the Output panel.
         const { TauriServerManager } = await import('./services/server-manager');
+        // Only one window may auto-restart a crashed sidecar — `server-crashed` is
+        // broadcast, so both would race to respawn it.
         serverManager = new TauriServerManager({
             appendLine: (msg: string, level?: CalcpadLogLevel) => pendingServerLogs.push({ msg, level }),
-        });
+        }, isPrimaryWindow);
         serverManager.onServerLog = (line: string, stream: 'stdout' | 'stderr') => {
             pendingServerRawLogs.push({ line, stream });
         };
@@ -222,6 +234,8 @@ async function bootstrap(): Promise<void> {
     }
 
     const activeBridge = tauriBridge ?? bridge!;
+    // Last session's panes, result mode and open files, stored apart from the settings.
+    const workspace = await WorkspaceStateStore.load(isTauri);
 
     // Initialize the platform messaging (reads VITE_PLATFORM='web')
     initMessaging();
@@ -232,7 +246,7 @@ async function bootstrap(): Promise<void> {
     (window as any).monaco = monaco;
 
     // Mount the main app layout
-    const app = createApp(App);
+    const app = createApp(App, { isDesktop: isTauri });
     const appInstance = app.mount('#app') as any;
 
     // Let the bridge prompt via the in-app quick-pick modal (image storage mode).
@@ -362,6 +376,8 @@ async function bootstrap(): Promise<void> {
     const uiOverrides = new UiOverrideStore();
     // Documents whose in-memory values have not been written back yet.
     const uiOverridesDirty = new Set<string>();
+    // Documents with an unapplied Properties form, reported by the panel.
+    const metadataDirty = new Set<string>();
     // Controls each document's last input-form render produced, which is what tells the
     // Properties tab whether a saved value still applies to anything.
     const uiControls = new Map<string, UiControl[]>();
@@ -532,6 +548,11 @@ async function bootstrap(): Promise<void> {
     });
     activeBridge.setUiControlsProvider(() => uiControls.get(activeUiDocKey()) ?? null);
     activeBridge.setUiControlsSink((controls) => uiControls.set(activeUiDocKey(), controls));
+    activeBridge.setMetadataDirtySink((docKey, dirty) => {
+        if (dirty) metadataDirty.add(docKey);
+        else metadataDirty.delete(docKey);
+    });
+
     // An edit made in the Properties tab is an edit to the entered values, so the store
     // follows it - otherwise the next "Save values" would write the old ones back.
     activeBridge.setUiOverridesSink((overrides) => {
@@ -628,7 +649,7 @@ async function bootstrap(): Promise<void> {
         const theme = resolvePreviewTheme();
 
         if (!content.trim()) {
-            void appInstance.setPreviewHtml(group.id, getEmptyPreviewHtml(theme));
+            void appInstance.setPreviewHtml(group.id, getEmptyPreviewHtml(getResolvedAppTheme()));
             return;
         }
 
@@ -721,6 +742,10 @@ async function bootstrap(): Promise<void> {
         await appInstance.setUiPrintHtml(group.id, html, uiDocKeyFor(group));
     }
 
+    // Nothing else re-renders on an app-theme switch: `updateColorTheme` only calls
+    // `applyColorTheme` and never announces `settingsChanged`.
+    onAppThemeChanged(() => refreshAllPreviews());
+
     function refreshAllPreviews(): void {
         // UI mode renders the active group only — the other has no iframe.
         if (appInstance.getResultMode() === 'ui') {
@@ -767,6 +792,22 @@ async function bootstrap(): Promise<void> {
         refreshUiDirtyIndicator();
         syncInputMode();
         if (appInstance.isPreviewVisible()) void refreshPreviewFor(group);
+        refreshWindowTitle();
+    }
+
+    // Assigned in the Tauri branch; the browser tab title is all there is on web.
+    let setNativeTitle: ((title: string) => void) | null = null;
+
+    function refreshWindowTitle(): void {
+        const active = activeGroup?.tabs.activeTab;
+        // Extra windows are numbered from their `main-N` label so they can be told apart in
+        // the taskbar; the main window, and the single-window case, stay unmarked.
+        const suffix = isPrimaryWindow ? '' : ` (${windowLabel.slice('main-'.length)})`;
+        const title = active?.title
+            ? `${active.title} - CalcpadCE ${appVersion}${suffix}`
+            : `CalcpadCE ${appVersion}${suffix}`;
+        document.title = title;
+        setNativeTitle?.(title);
     }
 
     // ---- Per-group wiring (common to web + desktop) ----
@@ -859,9 +900,7 @@ async function bootstrap(): Promise<void> {
                 // On a definition, the panel shows a virtual block from real
                 // highlighter results (correct params) and Apply creates the
                 // comment — no seeding, so definition line numbers stay valid.
-                const resolve = buildDefinitionResolver(
-                    editorBridge.definitions.getCachedDefinitions(docKeyFor(group))
-                    ?? { functions: [], macros: [], variables: [], customUnits: [] });
+                const resolve = buildSourceDefinitionResolver(model.getValue().split(/\r?\n/));
                 if (resolve(curLine - 1)) {
                     focusMetadata();
                     return;
@@ -928,6 +967,7 @@ async function bootstrap(): Promise<void> {
         // Tab list -> App.vue tab strip for this group.
         group.tabs.onTabsChanged((snapshots) => {
             appInstance.setTabs(group.id, snapshots);
+            if (group === activeGroup) refreshWindowTitle();
         });
 
         // On tab switch within this group, re-emit markers + re-lint + repaint.
@@ -1021,6 +1061,35 @@ async function bootstrap(): Promise<void> {
         group.dispose();
         appInstance.removeGroup(groupId);
         other?.editor.focus();
+    }
+
+    // Set by the Tauri branch below; its absence marks a host that cannot quit.
+    let quitApplication: (() => Promise<void>) | null = null;
+
+    /** Native three-button prompt on desktop; the in-app modal on web. */
+    function confirmThreeWay(opts: {
+        title: string;
+        message: string;
+        yesLabel: string;
+        noLabel: string;
+    }): Promise<'yes' | 'no' | 'cancel'> {
+        return editorBridge.confirmThreeWay?.(opts) ?? appInstance.showConfirm(opts);
+    }
+
+    /**
+     * Settles the zero-tab state a close would otherwise leave behind: an emptied split
+     * group is merged away (closeGroup keeps the survivor, so emptying the top group
+     * promotes the bottom one), and emptying the only group quits — or on web, where
+     * there is nothing to quit, starts a fresh untitled document.
+     */
+    async function handleEmptyGroup(group: EditorGroup): Promise<void> {
+        if (group.tabs.count > 0) return;
+        if (groups.size > 1) {
+            await closeGroup(group.id);
+            return;
+        }
+        if (quitApplication) await quitApplication();
+        else group.tabs.newUntitled();
     }
 
     appInstance.onSplitRequest = () => { void splitEditor(); };
@@ -1419,7 +1488,10 @@ async function bootstrap(): Promise<void> {
 
     appInstance.onTabActivate = (groupId: string, id: string) => { void activateTab(groupId, id); };
     appInstance.onTabCloseRequest = (groupId: string, id: string) => {
-        groups.get(groupId)?.tabs.close(id);
+        const g = groups.get(groupId);
+        if (!g) return;
+        g.tabs.close(id);
+        void handleEmptyGroup(g);
     };
     appInstance.onNewTabRequest = (groupId: string) => {
         groups.get(groupId)?.tabs.newUntitled();
@@ -1440,6 +1512,7 @@ async function bootstrap(): Promise<void> {
         const g = groups.get(groupId);
         if (!g) return;
         for (const t of g.tabs.all) g.tabs.close(t.id);
+        void handleEmptyGroup(g);
     };
 
     // Mount the CalcPad Vue sidebar. Desktop (Tauri) shows the Files view
@@ -1450,25 +1523,36 @@ async function bootstrap(): Promise<void> {
         isDesktop: isTauri,
         isWebOrDesktop: true,
     };
-    const sidebarApp = createApp(CalcpadAppVue, { versionConfig, appVersion: pkg.version });
+    const sidebarApp = createApp(CalcpadAppVue, { versionConfig, appVersion });
     const sidebarInstance = sidebarApp.mount('#vue-sidebar') as {
         switchTab?: (id: string) => void;
         switchView?: (id: string) => void;
     };
 
-    // Initialize the result mode from the saved extra setting (Tauri) or default (web).
-    // The key was `previewMode` and the rendered view was `wrapped`, so fall back to the
-    // old key and translate the old value — otherwise an existing install loses its mode.
-    const savedMode = editorBridge.getExtraSetting('resultMode')
-        ?? editorBridge.getExtraSetting('previewMode');
-    const restoredMode = savedMode === 'wrapped' ? 'preview' : savedMode;
-    if (restoredMode === 'preview' || restoredMode === 'unwrapped'
-        || restoredMode === 'ui' || restoredMode === 'report') {
-        appInstance.setResultMode(restoredMode);
+    // ---- Result mode and pane layout: restore, then keep persisted ----
+    // Installs from before the workspace store kept the mode in the settings extras, under
+    // `previewMode` with `wrapped` for what is now `preview`; carry that over once.
+    const legacyMode = workspace.isFresh
+        ? editorBridge.getExtraSetting('resultMode') ?? editorBridge.getExtraSetting('previewMode')
+        : undefined;
+    const restoredMode = legacyMode === 'wrapped' ? 'preview' : legacyMode;
+    appInstance.setResultMode(isResultMode(restoredMode) ? restoredMode : workspace.get().resultMode);
+
+    appInstance.setLayout(workspace.get().layout);
+    // Coming up visible is not a toggle, so onPreviewToggled never fires for it and
+    // nothing else would put the first render on screen.
+    if (appInstance.isPreviewVisible()) setTimeout(refreshAllPreviews, 50);
+    // Wired after the restore so it doesn't write the same values straight back.
+    if (isPrimaryWindow) {
+        appInstance.onLayoutChanged = (layout: WorkspaceLayout) => { workspace.update({ layout }); };
     }
-    // The restore above predates onResultModeChanged, and the sidebar has only just
-    // mounted, so seed it with the mode the session came up in.
+
+    // The restores above predate onResultModeChanged, and the sidebar has only just
+    // mounted, so seed it with the mode and pane state the session came up in.
     syncInputMode();
+
+    // The sidebar's own hide button, relayed by the bridge's 'hideSidebar'.
+    window.addEventListener('calcpad-toggle-sidebar', () => { appInstance.toggleSidebar(); });
 
     // Manual refresh: re-lint, refresh definitions/headings, redraw previews, and re-extract
     // Export-tab plots. From the Server > Refresh menu, the Run action, and on reconnect.
@@ -1504,7 +1588,7 @@ async function bootstrap(): Promise<void> {
     appInstance.onResultModeChanged = (mode: ResultMode) => {
         // Not persisted when a #UI document chose it rather than the user: the session would
         // otherwise come back up in a form, whatever document is opened next.
-        if (!autoUiSwitchInFlight) editorBridge.setExtraSetting('resultMode', mode);
+        if (!autoUiSwitchInFlight) workspace.update({ resultMode: mode });
         refreshUiDirtyIndicator();
         syncInputMode();
         refreshAllPreviews();
@@ -1562,7 +1646,7 @@ async function bootstrap(): Promise<void> {
     async function leaveUiDoc(): Promise<boolean> {
         const docKey = activeUiDocKey();
         if (uiOverridesDirty.has(docKey)) {
-            const choice = await appInstance.showConfirm({
+            const choice = await confirmThreeWay({
                 title: 'Unsaved input values',
                 message: 'Save the values entered in the input form before exiting? They are discarded otherwise.',
                 yesLabel: 'Save',
@@ -1589,6 +1673,29 @@ async function bootstrap(): Promise<void> {
         return await leaveUiDoc();
     }
 
+    /** The Properties panel's draft key for a tab: its file, so split panes share one draft. */
+    function metadataDocKeyFor(group: EditorGroup, id: string): string {
+        return group.tabs.getFilePath(id) || `tab:${id}`;
+    }
+
+    /**
+     * A Properties form edited but not applied lives only in the panel, so closing the
+     * document it belongs to throws it away. Returns false when the user backs out.
+     */
+    async function confirmDiscardMetadataDraft(docKey: string, title: string): Promise<boolean> {
+        if (!metadataDirty.has(docKey)) return true;
+        const choice = await confirmThreeWay({
+            title: 'Unsaved properties',
+            message: `Discard the unapplied Properties changes to ${title}?`,
+            yesLabel: 'Discard',
+            noLabel: 'Keep Editing',
+        });
+        if (choice !== 'yes') return false;
+        metadataDirty.delete(docKey);
+        discardMetadataDraft(docKey);
+        return true;
+    }
+
     // Refresh all previews when the preview pane is first opened.
     appInstance.onPreviewToggled = (visible: boolean) => {
         syncInputMode();
@@ -1608,14 +1715,23 @@ async function bootstrap(): Promise<void> {
             { exit: processExit },
             tauriClipboard,
             { invoke: tauriInvoke },
+            { exists: fileExists },
         ] = await Promise.all([
             import('@tauri-apps/api/event'),
             import('@tauri-apps/api/window'),
             import('@tauri-apps/plugin-process'),
             import('@tauri-apps/plugin-clipboard-manager'),
             import('@tauri-apps/api/core'),
+            import('@tauri-apps/plugin-fs'),
         ]);
         invokeTauri = tauriInvoke;
+        // An unscoped listener answers every `emit_to` whatever its target, so anything
+        // addressed to one window has to name this window to stay out of the others.
+        const listenHere = <T>(event: string, handler: (e: { payload: T }) => void) =>
+            tauriListen<T>(event, handler, { target: windowLabel });
+        // The seeded group was wired before this branch ran, so kick the first native title.
+        setNativeTitle = (title: string) => { void getCurrentWindow().setTitle(title); };
+        refreshWindowTitle();
         // Route Ctrl+Shift+V "Paste as Comment" through the same Tauri-native
         // clipboard as the rest of the app (WebKitGTK workaround).
         editorBridge.readClipboardText = () => tauriClipboard.readText();
@@ -1720,13 +1836,13 @@ async function bootstrap(): Promise<void> {
             }
         }
 
-        await tauriListen<DraftInfo[]>('drafts-recovered', async (evt) => {
+        await listenHere<DraftInfo[]>('drafts-recovered', async (evt) => {
             const drafts = evt.payload;
             if (!drafts || drafts.length === 0) return;
             const summary = drafts
                 .map(d => `• ${d.filename}${d.filePath ? ` (${d.filePath})` : ''}`)
                 .join('\n');
-            const choice = await appInstance.showConfirm({
+            const choice = await confirmThreeWay({
                 title: 'Recover unsaved changes?',
                 message:
                     `CalcpadCE found ${drafts.length} unsaved draft${drafts.length === 1 ? '' : 's'} `
@@ -1792,10 +1908,51 @@ async function bootstrap(): Promise<void> {
             if (detail?.path) void loadFile(detail.path);
         });
 
+        // ---- Session: reopen last launch's files ----
+        function captureSession(): void {
+            const openFiles: string[] = [];
+            for (const g of groups.values()) {
+                for (const t of g.tabs.all) {
+                    if (t.filePath && !openFiles.includes(t.filePath)) openFiles.push(t.filePath);
+                }
+            }
+            workspace.update({ openFiles, activeFile: activeGroup.tabs.activeTab?.filePath ?? '' });
+        }
+
+        /**
+         * Reopens last launch's files into the primary group. Deliberately not routed
+         * through loadFile, which would push every restored path back onto the
+         * recent-files list — rebuilding the native menu once per file — on every launch.
+         */
+        async function restoreSession(): Promise<void> {
+            // A new window comes up empty, and never overwrites the main window's session.
+            if (!isPrimaryWindow) return;
+            for (const path of workspace.get().openFiles) {
+                // Files deleted or moved since last launch drop out of the session silently.
+                try {
+                    if (!await fileExists(path)) continue;
+                    tabs.openFile(path, await tauriBridge!.readFile(path));
+                } catch (err) {
+                    appInstance.appendOutput('debug', `Session restore skipped ${path}: ${err}`);
+                }
+            }
+            const activePath = workspace.get().activeFile;
+            const restored = activePath ? tabs.findByPath(activePath) : null;
+            if (restored) tabs.activate(restored.id);
+            // The first file replaces the seeded untitled tab in place, which is not an
+            // active-model change, so nothing else settles the mode for it.
+            applyCompiledWorksheetMode(activeGroup);
+            if (shouldAutoEnterUiMode(activeGroup)) autoEnterUiMode();
+        }
+
+        await restoreSession();
+
         // Drain any files handed to us at cold start by the OS's .cpd file
         // association. Runs after the listener above is wired so the bridge's
         // synchronous dispatch inside handleOpenFileByPath actually lands.
-        if (isTauri) {
+        // Only the main window drains them; a second window opened later would otherwise
+        // steal files the launch handed to the first.
+        if (isTauri && isPrimaryWindow) {
             try {
                 const pending = await tauriInvoke<string[]>('take_pending_launch_files');
                 for (const path of pending) await loadFile(path);
@@ -1852,13 +2009,14 @@ async function bootstrap(): Promise<void> {
             if (!target) return true;
             // Closing the document the input form is showing takes its values away.
             if (group === activeGroup && id === group.tabs.activeId && !await confirmLeaveUiDoc()) return false;
+            if (!await confirmDiscardMetadataDraft(metadataDocKeyFor(group, id), target.title)) return false;
             // Activate the group + tab so the editor shows what's being asked about.
             if (activeGroup !== group) setActiveGroup(group);
             // Re-read the dirty flag: saving the input form's values above may have
             // written the file already.
             if (group.tabs.isDirty(id) && group.tabs.isLastReference(id)) {
                 if (id !== group.tabs.activeId) group.tabs.activate(id);
-                const choice = await appInstance.showConfirm({
+                const choice = await confirmThreeWay({
                     title: 'Unsaved changes',
                     message: `Save changes to ${target.title} before closing?`,
                     yesLabel: 'Save',
@@ -1929,6 +2087,13 @@ async function bootstrap(): Promise<void> {
             });
             group.tabs.onTabRemoved((tabId) => { void deleteDraft(tabId); });
 
+            // Registered here rather than beside captureSession so it starts only once
+            // restoreSession() has finished laying the session back out, and stops again
+            // once the exit path has taken its snapshot.
+            if (isPrimaryWindow) {
+                group.tabs.onTabsChanged(() => { if (!isExiting) captureSession(); });
+            }
+
             // Drag-drop file open — each dropped file opens/focuses a tab in
             // this group.
             const dropTarget = appInstance.getEditorContainer(group.id) as HTMLElement | null;
@@ -1959,10 +2124,18 @@ async function bootstrap(): Promise<void> {
         wireGroupTauri(primaryGroup);
         groupWireHooks.push(wireGroupTauri);
 
+        /**
+         * The user-initiated close. tryCloseTab itself deliberately does not settle: the
+         * unsplit and exit paths call it to drain a group they are already tearing down.
+         */
+        async function closeTabAndSettle(group: EditorGroup, id: string): Promise<void> {
+            if (await tryCloseTab(group, id)) await handleEmptyGroup(group);
+        }
+
         // Override tab-strip close actions with save-prompt-aware versions.
         appInstance.onTabCloseRequest = (groupId: string, id: string) => {
             const g = groups.get(groupId);
-            if (g) void tryCloseTab(g, id);
+            if (g) void closeTabAndSettle(g, id);
         };
 
         async function tryCloseTabsSequentially(group: EditorGroup, ids: string[]): Promise<void> {
@@ -1970,6 +2143,7 @@ async function bootstrap(): Promise<void> {
                 const ok = await tryCloseTab(group, id);
                 if (!ok) return;
             }
+            await handleEmptyGroup(group);
         }
 
         appInstance.onTabCloseOthersRequest = (groupId: string, id: string) => {
@@ -2139,6 +2313,9 @@ async function bootstrap(): Promise<void> {
             if (action === 'cut' || action === 'copy' || action === 'paste') {
                 if (appInstance.runFocusedPreviewClipboardAction(action)) return;
             }
+            // The menu accelerator beats the preview frame's own Ctrl+F handler, so the
+            // frame never sees the key and the host has to open the find bar for it.
+            if (action === 'find' && appInstance.openFindInFocusedPreview()) return;
             // Fallback for sidebar / preview / etc.
             const el = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
             if (action === 'paste') {
@@ -2179,7 +2356,7 @@ async function bootstrap(): Promise<void> {
         }
 
         // Native menu clicks arrive as Tauri events emitted by the Rust menu handler.
-        await tauriListen<{ id: string }>('menu-click', async (evt) => {
+        await listenHere<{ id: string }>('menu-click', async (evt) => {
             const id: string = evt.payload.id;
 
             // Result mode picker (View → Result Mode: Preview/Unwrapped/Input/Report)
@@ -2215,9 +2392,14 @@ async function bootstrap(): Promise<void> {
                     tabs.newUntitled();
                     break;
 
+                case 'new-window':
+                    try { await tauriInvoke('new_window'); }
+                    catch (err) { appInstance.appendOutput('error', `Could not open a new window: ${err}`); }
+                    break;
+
                 case 'close-tab': {
                     const activeId = tabs.activeId;
-                    if (activeId) await tryCloseTab(activeGroup, activeId);
+                    if (activeId) await closeTabAndSettle(activeGroup, activeId);
                     break;
                 }
 
@@ -2450,7 +2632,7 @@ async function bootstrap(): Promise<void> {
             if (e.key === 'w' && !e.shiftKey && !e.altKey) {
                 e.preventDefault();
                 const id = activeGroup.tabs.activeId;
-                if (id) void tryCloseTab(activeGroup, id);
+                if (id) void closeTabAndSettle(activeGroup, id);
                 return;
             }
             // Ctrl+1..9 → activate Nth tab in the active group (Ctrl+9 = last).
@@ -2466,45 +2648,123 @@ async function bootstrap(): Promise<void> {
         // ---- Close-with-unsaved guard ----
         let isExiting = false;
 
-        async function tryExit(): Promise<void> {
+        // Only a wedged webview should ever reach this cap.
+        const CLOSE_WAIT_CAP_MS = 120_000;
+
+        /** Save prompts for everything unsaved in this window. False if the user cancelled. */
+        async function confirmWindowClose(): Promise<boolean> {
+            if (!await confirmLeaveUiDoc()) return false;
+            // One dirty tab at a time, like VS Code on window-close. Reuses tryCloseTab so
+            // the prompt copy and save-as fallback match a manual tab close.
+            const dirty: { group: EditorGroup; id: string }[] = [];
+            for (const g of groups.values()) {
+                for (const t of g.tabs.all) {
+                    // An unapplied Properties form is as much unsaved work as a dirty buffer.
+                    if (t.dirty || metadataDirty.has(metadataDocKeyFor(g, t.id))) dirty.push({ group: g, id: t.id });
+                }
+            }
+            for (const { group, id } of dirty) {
+                if (!await tryCloseTab(group, id)) return false;
+            }
+            return true;
+        }
+
+        async function ackWindowClose(ok: boolean): Promise<void> {
+            try {
+                const { emitTo } = await import('@tauri-apps/api/event');
+                await emitTo('main', 'calcpad-close-window-ack', {
+                    label: getCurrentWindow().label,
+                    ok,
+                });
+            } catch {
+                /* the main window is on its way out regardless */
+            }
+        }
+
+        /**
+         * The main window closing takes the others with it, so each is asked to run its own
+         * save prompts and then close itself. Waiting for them to disappear rather than for
+         * a deadline means a window still prompting is never torn down under the user.
+         */
+        async function closeSecondaryWindows(): Promise<boolean> {
+            const labels = (await tauriInvoke<string[]>('window_labels')).filter(l => l !== 'main');
+            if (labels.length === 0) return true;
+
+            let cancelled = false;
+            const unlisten = await listenHere<{ ok: boolean }>('calcpad-close-window-ack', (evt) => {
+                if (!evt.payload.ok) cancelled = true;
+            });
+            const { emitTo } = await import('@tauri-apps/api/event');
+            for (const label of labels) await emitTo(label, 'calcpad-close-window');
+
+            const deadline = Date.now() + CLOSE_WAIT_CAP_MS;
+            while (!cancelled && await windowCount() > 1 && Date.now() < deadline) {
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            unlisten();
+            return !cancelled;
+        }
+
+        /** The sidecar, the stores and the process belong to the window that goes last. */
+        async function shutdownProcess(): Promise<void> {
+            connectionMonitor.stop();
+            // Rust owns sidecar shutdown (kill-on-exit hook). This dispose only
+            // tears down TS event listeners.
+            if (serverManager) {
+                try { await serverManager.dispose(); }
+                catch (e) { appInstance.appendOutput('debug', `serverManager.dispose() rejected: ${e}`); }
+            }
+            // The store's own write is debounced, which processExit would outrun.
+            try { await workspace.flush(); }
+            catch (e) { appInstance.appendOutput('debug', `workspace.flush() rejected: ${e}`); }
+            appInstance.appendOutput('debug', 'Exit path: calling process.exit()');
+            void processExit(0);
+        }
+
+        async function windowCount(): Promise<number> {
+            try { return (await tauriInvoke<string[]>('window_labels')).length; }
+            catch { return 1; }
+        }
+
+        /**
+         * Close this window. A secondary window with others still open closes alone;
+         * the main window, and the last window standing, tear the process down.
+         */
+        async function tryExit(fromMainClose = false): Promise<void> {
             if (isExiting) return;        // re-entry guard (multiple X clicks)
             isExiting = true;
 
+            // Snapshot before the dirty-tab walk closes anything; `isExiting` keeps those
+            // closes from overwriting it, so quitting with files open records them.
+            if (isPrimaryWindow) captureSession();
+
             try {
-                if (!await confirmLeaveUiDoc()) {
+                if (!await confirmWindowClose()) {
+                    isExiting = false;
+                    if (fromMainClose) await ackWindowClose(false);
+                    return;
+                }
+                if (isPrimaryWindow && !await closeSecondaryWindows()) {
                     isExiting = false;
                     return;
                 }
-                // Walk every dirty tab across all groups one at a time, like VS
-                // Code does on window-close. Reuses tryCloseTab so the prompt
-                // copy + save-as fallback are identical to manual tab close.
-                const dirty: { group: EditorGroup; id: string }[] = [];
-                for (const g of groups.values()) {
-                    for (const t of g.tabs.all) {
-                        if (t.dirty) dirty.push({ group: g, id: t.id });
-                    }
-                }
-                for (const { group, id } of dirty) {
-                    const closed = await tryCloseTab(group, id);
-                    if (!closed) {
-                        // User cancelled — abort exit.
-                        isExiting = false;
-                        return;
-                    }
-                }
-            } finally {
-                if (isExiting) {
-                    connectionMonitor.stop();
-                    // Rust owns sidecar shutdown (kill-on-exit hook). This
-                    // dispose only tears down TS event listeners.
-                    if (serverManager) {
-                        try { await serverManager.dispose(); }
-                        catch (e) { appInstance.appendOutput('debug', `serverManager.dispose() rejected: ${e}`); }
-                    }
-                    appInstance.appendOutput('debug', 'Exit path: calling process.exit()');
-                    void processExit(0);
-                }
+            } catch (e) {
+                appInstance.appendOutput('debug', `Close prompts failed, closing anyway: ${e}`);
             }
+
+            if (!isPrimaryWindow && await windowCount() > 1) {
+                await getCurrentWindow().destroy();
+                return;
+            }
+            await shutdownProcess();
+        }
+
+        quitApplication = tryExit;
+
+        // The main window is closing and takes us with it — same path as our own X,
+        // which reports back if the user cancels.
+        if (!isPrimaryWindow) {
+            await listenHere('calcpad-close-window', () => { void tryExit(true); });
         }
 
         // Intercept the window close button so unsaved tabs get their save prompt
@@ -2517,4 +2777,17 @@ async function bootstrap(): Promise<void> {
     }
 }
 
-bootstrap();
+// Nothing has mounted yet when bootstrap rejects, so an unhandled rejection here
+// leaves a blank window with a working native menu and no clue what failed.
+bootstrap().catch((err) => {
+    const detail = err instanceof Error ? (err.stack ?? err.message) : String(err);
+    const panel = document.createElement('pre');
+    panel.setAttribute('style', [
+        'position:fixed', 'inset:0', 'margin:0', 'padding:24px',
+        'background:#1e1e1e', 'color:#f48771',
+        'font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace',
+        'white-space:pre-wrap', 'overflow:auto', 'z-index:2147483647',
+    ].join(';'));
+    panel.textContent = `CalcpadCE failed to start.\n\n${detail}`;
+    document.body.appendChild(panel);
+});

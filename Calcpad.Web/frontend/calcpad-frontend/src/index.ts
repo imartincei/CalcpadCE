@@ -270,9 +270,10 @@ export {
     settingsDirectiveOnLine,
     serializeSettingsDirective,
     pdfSettingsFromDocument,
-    buildDefinitionResolver,
     analyzeMetadataLine,
 } from './text/metadata-comment';
+export type { SourceDefinition } from './text/source-definitions';
+export { scanSourceDefinitions, buildSourceDefinitionResolver } from './text/source-definitions';
 export type {
     UiDirectiveData,
     UiDirectiveBlock,

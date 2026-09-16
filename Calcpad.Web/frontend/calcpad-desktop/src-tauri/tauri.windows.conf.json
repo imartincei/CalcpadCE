@@ -1,6 +1,9 @@
 {
   "build": {
-    "beforeDevCommand": "powershell -NoProfile -ExecutionPolicy Bypass -File build-frontend.ps1 -Watch",
+    "beforeDevCommand": {
+      "script": "powershell -NoProfile -ExecutionPolicy Bypass -File dev-frontend.ps1",
+      "wait": true
+    },
     "beforeBuildCommand": "powershell -NoProfile -ExecutionPolicy Bypass -File build-frontend.ps1"
   },
   "bundle": {

@@ -40,9 +40,10 @@ export const SEMANTIC_TOKEN_TYPES = [
     'css',                // 24: CSS code
     'svg',                // 25: SVG markup
 
-    // Special (26-27)
+    // Special (26-28)
     'input',              // 26: Input markers
     'format',             // 27: Format specifiers
+    'settingsJson',       // 28: #settings / #UI JSON payload
 ];
 
 /**
@@ -76,6 +77,7 @@ export const TOKEN_TYPE_MAP: Record<number, string> = {
     [CalcpadTokenType.Svg]: 'svg',
     [CalcpadTokenType.Input]: 'input',
     [CalcpadTokenType.Format]: 'format',
+    [CalcpadTokenType.SettingsJson]: 'settingsJson',
 };
 
 /**

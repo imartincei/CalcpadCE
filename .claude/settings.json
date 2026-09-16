@@ -12,5 +12,18 @@
       "Bash(export PATH=\"$HOME/.cargo/bin:$PATH\")",
       "Bash(cargo check *)"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR:-$PWD}/.claude/hooks/claude-md-reminder.sh\""
+          }
+        ]
+      }
+    ]
   }
 }

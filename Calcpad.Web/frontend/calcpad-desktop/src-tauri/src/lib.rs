@@ -1,4 +1,5 @@
 use std::backtrace::Backtrace;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -9,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use tauri::menu::{IsMenuItem, Menu, MenuBuilder, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Emitter, Manager, RunEvent, State};
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 use tauri_plugin_fs::FsExt;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
@@ -28,6 +30,8 @@ static API_TOKEN: OnceLock<String> = OnceLock::new();
 const SIDECAR_EXE_UNIX: &str = "Calcpad.Server";
 const SIDECAR_EXE_WINDOWS: &str = "Calcpad.Server.exe";
 const PORT_READY_TIMEOUT_MS: u64 = 30_000;
+const MAIN_WINDOW_LABEL: &str = "main";
+const CANCEL_LABEL: &str = "Cancel";
 
 /// Files handed to us by the OS at launch (double-click on .cpd or .cpdz via the
 /// installed file associations). Populated in setup() from argv; drained by
@@ -36,21 +40,26 @@ const PORT_READY_TIMEOUT_MS: u64 = 30_000;
 #[derive(Default)]
 struct PendingLaunchFiles(Mutex<Vec<String>>);
 
+/// Label of the window that most recently took focus, so a menu click can be delivered
+/// to it alone. Tracked here because `get_focused_window` needs tauri's `unstable` feature.
+struct FocusedWindow(Mutex<String>);
+
+impl Default for FocusedWindow {
+    fn default() -> Self {
+        Self(Mutex::new(MAIN_WINDOW_LABEL.to_string()))
+    }
+}
+
 /// What the menu shows that the frontend owns. A menu item carries no mutable
 /// state of its own, so every change rebuilds the whole menu — which means each
 /// setter has to be able to read back the parts it isn't changing.
+///
+/// The result-mode entries follow whichever document a window has open, so they are
+/// keyed by window label; the recent-file list is genuinely shared.
+#[derive(Default)]
 struct MenuState {
-    source_result_modes: Mutex<bool>,
+    source_result_modes: Mutex<HashMap<String, bool>>,
     recent_files: Mutex<Vec<String>>,
-}
-
-impl Default for MenuState {
-    fn default() -> Self {
-        Self {
-            source_result_modes: Mutex::new(true),
-            recent_files: Mutex::new(Vec::new()),
-        }
-    }
 }
 
 #[derive(Default)]
@@ -445,9 +454,21 @@ fn get_env(name: String) -> Option<String> {
     std::env::var(name).ok()
 }
 
-fn refresh_menu(app: &AppHandle) -> Result<(), String> {
-    let menu = build_menu(app).map_err(|e| e.to_string())?;
-    app.set_menu(menu).map_err(|e| e.to_string())?;
+/// Rebuilds one window's menu. Per-window rather than `app.set_menu`, which pushes the
+/// same menu to every window and so leaked one window's View state into the others.
+fn refresh_menu(app: &AppHandle, label: &str) -> Result<(), String> {
+    let Some(window) = app.get_webview_window(label) else {
+        return Ok(());
+    };
+    let menu = build_menu(app, label).map_err(|e| e.to_string())?;
+    window.set_menu(menu).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+fn refresh_all_menus(app: &AppHandle) -> Result<(), String> {
+    for label in app.webview_windows().into_keys() {
+        refresh_menu(app, &label)?;
+    }
     Ok(())
 }
 
@@ -455,12 +476,17 @@ fn refresh_menu(app: &AppHandle) -> Result<(), String> {
 /// dropped while a compiled worksheet is open, since the results toolbar drops their
 /// buttons too.
 #[tauri::command]
-fn set_source_result_modes_visible(app: AppHandle, visible: bool) -> Result<(), String> {
-    *app.state::<MenuState>()
+fn set_source_result_modes_visible(
+    app: AppHandle,
+    window: tauri::WebviewWindow,
+    visible: bool,
+) -> Result<(), String> {
+    app.state::<MenuState>()
         .source_result_modes
         .lock()
-        .expect("menu state mutex poisoned") = visible;
-    refresh_menu(&app)
+        .expect("menu state mutex poisoned")
+        .insert(window.label().to_string(), visible);
+    refresh_menu(&app, window.label())
 }
 
 /// Replaces the File → Open Recent entries, most recent first. The list itself is
@@ -471,7 +497,82 @@ fn set_recent_files(app: AppHandle, paths: Vec<String>) -> Result<(), String> {
         .recent_files
         .lock()
         .expect("menu state mutex poisoned") = paths;
-    refresh_menu(&app)
+    refresh_all_menus(&app)
+}
+
+/// Labels of every open window. The frontend needs the count to tell whether it is the
+/// last window (and so owes the full exit), and the list to ask the others to close.
+#[tauri::command]
+fn window_labels(app: AppHandle) -> Vec<String> {
+    app.webview_windows().into_keys().collect()
+}
+
+/// Opens another window in this process — one sidecar, one store, one drafts dir. Cloning
+/// the configured window carries its CSP, min sizes and browser args over. Async because
+/// building a webview from a sync command deadlocks on Windows.
+#[tauri::command]
+async fn new_window(app: AppHandle) -> Result<String, String> {
+    let mut config = app
+        .config()
+        .app
+        .windows
+        .first()
+        .ok_or("no window configured")?
+        .clone();
+
+    let label = (2..)
+        .map(|n| format!("{MAIN_WINDOW_LABEL}-{n}"))
+        .find(|l| app.get_webview_window(l).is_none())
+        .expect("an unused window label exists");
+    config.label = label.clone();
+
+    let menu = build_menu(&app, &label).map_err(|e| e.to_string())?;
+    tauri::WebviewWindowBuilder::from_config(&app, &config)
+        .map_err(|e| e.to_string())?
+        .menu(menu)
+        .build()
+        .map_err(|e| e.to_string())?;
+    Ok(label)
+}
+
+/// Native Save / Don't Save / Cancel prompt. The dialog plugin's JS API tops out at two
+/// buttons, so the three-way unsaved-changes question has to be asked from Rust.
+#[tauri::command]
+async fn confirm_three_way(
+    app: AppHandle,
+    window: tauri::Window,
+    title: String,
+    message: String,
+    yes_label: String,
+    no_label: String,
+) -> Result<String, String> {
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    let (yes, no) = (yes_label.clone(), no_label.clone());
+    app.dialog()
+        .message(message)
+        .title(title)
+        .kind(MessageDialogKind::Warning)
+        .parent(&window)
+        .buttons(MessageDialogButtons::YesNoCancelCustom(
+            yes_label,
+            no_label,
+            CANCEL_LABEL.to_string(),
+        ))
+        .show_with_result(move |res| {
+            let _ = tx.send(res);
+        });
+
+    let result = rx.await.map_err(|e| e.to_string())?;
+    // Linux reports the pressed button as Custom(label); dismissing via the window
+    // manager lands on Cancel.
+    Ok(match result {
+        tauri_plugin_dialog::MessageDialogResult::Yes
+        | tauri_plugin_dialog::MessageDialogResult::Ok => "yes".to_string(),
+        tauri_plugin_dialog::MessageDialogResult::No => "no".to_string(),
+        tauri_plugin_dialog::MessageDialogResult::Custom(s) if s == yes => "yes".to_string(),
+        tauri_plugin_dialog::MessageDialogResult::Custom(s) if s == no => "no".to_string(),
+        _ => "cancel".to_string(),
+    })
 }
 
 // Inside a linuxdeploy-generated AppImage, AppRun exports LD_LIBRARY_PATH so the bundled
@@ -1025,14 +1126,17 @@ fn recent_label(app: &AppHandle, path: &str) -> String {
     }
 }
 
-/// Builds the app menu from `MenuState`: the recent-file list, and whether to keep
-/// the View entries that only make sense for a document with readable source.
-fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
+/// Builds a window's menu from `MenuState`: the shared recent-file list, and whether
+/// that window keeps the View entries that need a document with readable source.
+fn build_menu(app: &AppHandle, window_label: &str) -> tauri::Result<Menu<tauri::Wry>> {
     let state = app.state::<MenuState>();
-    let source_result_modes = *state
+    let source_result_modes = state
         .source_result_modes
         .lock()
-        .expect("menu state mutex poisoned");
+        .expect("menu state mutex poisoned")
+        .get(window_label)
+        .copied()
+        .unwrap_or(true);
     let recent = state
         .recent_files
         .lock()
@@ -1135,6 +1239,15 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         true,
         &[
             &MenuItem::with_id(app, "new", "New Tab", true, Some("CmdOrCtrl+N"))?,
+            // Ctrl+Shift+N and Ctrl+Q are the editor's Numbered List and Toggle Comment,
+            // and a menu accelerator beats Monaco — so neither is bound here.
+            &MenuItem::with_id(
+                app,
+                "new-window",
+                "New Window",
+                true,
+                Some("CmdOrCtrl+Alt+W"),
+            )?,
             &MenuItem::with_id(app, "open", "Open...", true, Some("CmdOrCtrl+O"))?,
             &open_recent,
             &sep()?,
@@ -1168,7 +1281,7 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
             &sep()?,
             &export,
             &sep()?,
-            &MenuItem::with_id(app, "quit", "Quit", true, Some("CmdOrCtrl+Q"))?,
+            &MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?,
         ],
     )?;
 
@@ -1317,7 +1430,7 @@ pub fn run() {
     install_panic_hook();
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
-            if let Some(w) = app.get_webview_window("main") {
+            if let Some(w) = app.get_webview_window(MAIN_WINDOW_LABEL) {
                 let _ = w.show();
                 let _ = w.set_focus();
                 let _ = w.unminimize();
@@ -1325,7 +1438,11 @@ pub fn run() {
             for path in extract_launch_files(argv) {
                 // The OS handing us this path is the user's consent; no dialog ran.
                 allow_file_and_parent(app, &path);
-                let _ = app.emit("open-file-request", path.to_string_lossy().to_string());
+                let _ = app.emit_to(
+                    MAIN_WINDOW_LABEL,
+                    "open-file-request",
+                    path.to_string_lossy().to_string(),
+                );
             }
         }))
         .plugin(tauri_plugin_fs::init())
@@ -1341,8 +1458,22 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_log::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
+        // Applies the saved geometry after the window is created, so it wins over the
+        // config's `center: true`. StateFlags is spelled out rather than defaulted to
+        // all(): VISIBLE makes the plugin hide-then-show the window on restore, which is
+        // what the GNOME note in setup() below forbids and leaves the webview blank.
+        .plugin(
+            tauri_plugin_window_state::Builder::default()
+                .with_state_flags(
+                    tauri_plugin_window_state::StateFlags::SIZE
+                        | tauri_plugin_window_state::StateFlags::POSITION
+                        | tauri_plugin_window_state::StateFlags::MAXIMIZED,
+                )
+                .build(),
+        )
         .manage(ServerState::default())
         .manage(PendingLaunchFiles::default())
+        .manage(FocusedWindow::default())
         .manage(MenuState::default())
         .invoke_handler(tauri::generate_handler![
             server_url,
@@ -1361,7 +1492,30 @@ pub fn run() {
             allow_document_dir,
             set_source_result_modes_visible,
             set_recent_files,
+            confirm_three_way,
+            window_labels,
+            new_window,
         ])
+        .on_window_event(|window, event| match event {
+            tauri::WindowEvent::Focused(true) => {
+                *window
+                    .state::<FocusedWindow>()
+                    .0
+                    .lock()
+                    .expect("focused window mutex poisoned") = window.label().to_string();
+            }
+            // `new_window` reuses the lowest free `main-N`, so a stale entry would
+            // otherwise seed the next window with the old one's View state.
+            tauri::WindowEvent::Destroyed => {
+                window
+                    .state::<MenuState>()
+                    .source_result_modes
+                    .lock()
+                    .expect("menu state mutex poisoned")
+                    .remove(window.label());
+            }
+            _ => {}
+        })
         .setup(|app| {
             // Pin the on-disk locations the panic hook + draft commands need.
             // app_data_dir is per-user and writable on all supported platforms.
@@ -1377,11 +1531,20 @@ pub fn run() {
                 let _ = DRAFTS_DIR.set(drafts);
             }
 
-            let menu = build_menu(app.handle())?;
+            let menu = build_menu(app.handle(), MAIN_WINDOW_LABEL)?;
             app.set_menu(menu)?;
             let handle_for_menu = app.handle().clone();
+            // Addressed to the focused window: this handler fires for every window's menu,
+            // so a broadcast would run each click and accelerator in all of them at once.
             app.on_menu_event(move |_app, event| {
-                let _ = handle_for_menu.emit(
+                let target = handle_for_menu
+                    .state::<FocusedWindow>()
+                    .0
+                    .lock()
+                    .expect("focused window mutex poisoned")
+                    .clone();
+                let _ = handle_for_menu.emit_to(
+                    target,
                     "menu-click",
                     MenuClickPayload {
                         id: event.id().0.clone(),
@@ -1416,7 +1579,8 @@ pub fn run() {
                 tokio::time::sleep(Duration::from_millis(50)).await;
                 if let Ok(drafts) = draft_list() {
                     if !drafts.is_empty() {
-                        let _ = handle_for_drafts.emit("drafts-recovered", drafts);
+                        let _ =
+                            handle_for_drafts.emit_to(MAIN_WINDOW_LABEL, "drafts-recovered", drafts);
                     }
                 }
             });

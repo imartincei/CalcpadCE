@@ -25,6 +25,7 @@ namespace Calcpad.Server.Services
                 ["DejaVuSerifCondensed-Italic.woff2"] = [new("DejaVu Serif Condensed", "normal", "italic")],
                 ["DejaVuSerifCondensed-Bold.woff2"] = [new("DejaVu Serif Condensed", "bold", "normal")],
                 ["DejaVuSerifCondensed-BoldItalic.woff2"] = [new("DejaVu Serif Condensed", "bold", "italic")],
+                ["CalcpadCEVector.woff2"] = [new("CalcpadCE Vector", "normal", "normal")],
             };
 
         private static IReadOnlyDictionary<string, string>? _cachedDataUrls;
