@@ -1606,6 +1606,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="datagrid: an editable grid">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#units-in-a-grid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Units in a grid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sizing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sizing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -3351,6 +3379,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="datagrid: an editable grid">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#units-in-a-grid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Units in a grid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sizing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sizing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -3596,7 +3652,7 @@ Without it, the input properties are derived from the right-hand side.</p>
 <td><code>#UI Z = vector(5)</code>, <code>#UI G = matrix(r; c)</code></td>
 </tr>
 <tr>
-<td>An expression</td>
+<td>An expression (unless allowExpression is true)</td>
 <td>✘</td>
 <td><code>#UI k = 2*E</code>, <code>#UI k = max(v)</code>, <code>#UI v = [1; sqrt(4)]</code></td>
 </tr>
@@ -3655,6 +3711,18 @@ They share the line's JSON properties but are saved and overridden separately.</
 <td>CSS class applied to the line in the report</td>
 </tr>
 <tr>
+<td><code>forceUnits</code></td>
+<td>bool</td>
+<td>entry, datagrid</td>
+<td>Default <code>true</code>: the unit stays in the document and only the number is editable. <code>false</code> puts the unit in the control</td>
+</tr>
+<tr>
+<td><code>allowExpression</code></td>
+<td>bool</td>
+<td>entry, datagrid</td>
+<td>Default <code>false</code>. <code>true</code> accepts any expression, written to the document as typed. Implies <code>forceUnits: false</code></td>
+</tr>
+<tr>
 <td><code>rows</code></td>
 <td>number</td>
 <td>datagrid</td>
@@ -3679,6 +3747,24 @@ They share the line's JSON properties but are saved and overridden separately.</
 <td>Column header labels</td>
 </tr>
 <tr>
+<td><code>width</code></td>
+<td>number or percentage</td>
+<td>datagrid</td>
+<td>Total grid width in pixels, or a percentage of the line such as <code>"75%"</code>. Natural width when omitted</td>
+</tr>
+<tr>
+<td><code>rowHeaderWidth</code></td>
+<td>number</td>
+<td>datagrid</td>
+<td>Width of the row header column, in pixels. Default 50</td>
+</tr>
+<tr>
+<td><code>columnWidths</code></td>
+<td>array</td>
+<td>datagrid</td>
+<td>Column widths in pixels. May be shorter than the column count; the rest take the default 80</td>
+</tr>
+<tr>
 <td><code>keys</code></td>
 <td>array</td>
 <td>dropdown, radio</td>
@@ -3693,7 +3779,8 @@ They share the line's JSON properties but are saved and overridden separately.</
 </tbody>
 </table>
 <p><code>keys</code> and <code>values</code> are both required for a drop-down or radio group, and must be the same length.
-Header arrays must not be longer than the grid dimension they label.</p>
+The datagrid properties throw an error on any other control.
+<code>forceUnits</code> and <code>allowExpression</code> will error on a drop-down, radio group or checkbox, which always substitute the whole value from their own <code>values</code> anyway.</p>
 <p>You don't have to write JSON by hand — the <a href="new-calcpad-panel.html#properties">Properties tab</a> has a form for it that fills in the fields that apply to the control type it detects.</p>
 <h2 id="the-control-types">The control types<a class="headerlink" href="#the-control-types" title="Permanent link">&para;</a></h2>
 <h3 id="entry-an-input-box"><code>entry</code>: an input box<a class="headerlink" href="#entry-an-input-box" title="Permanent link">&para;</a></h3>
@@ -3701,6 +3788,16 @@ Header arrays must not be longer than the grid dimension they label.</p>
 The unit stays in the document beside the box, so only the number is editable; the box accepts digits, a decimal point and a sign, and rejects anything else as you type.</p>
 <div class="language-text highlight"><pre><span></span><code>#UI L = 10m
 #UI {"type": "entry"} W = 5m
+</code></pre></div>
+<p>Two properties loosen that, at the cost of the simple, unit-safe input.</p>
+<p><code>forceUnits: false</code> moves the unit into the box, so the whole value is editable and the entered one replaces the right-hand side outright — which is what lets an input change its unit as well as its magnitude.</p>
+<div class="language-text highlight"><pre><span></span><code>#UI {"forceUnits": false} q = 3kN/m
+</code></pre></div>
+<p><code>allowExpression: true</code> goes further and accepts anything, writing it into the document as typed.
+The box shows the expression as written rather than the number it came to, so a formula stays a formula across edits.
+Nothing is validated as you type: an entry the parser cannot read leaves the control in place and reports the error on the line below it, the same as any other line.
+It implies <code>forceUnits: false</code> — a formula cannot carry an appended unit.</p>
+<div class="language-text highlight"><pre><span></span><code>#UI {"allowExpression": true} A = b*h
 </code></pre></div>
 <h3 id="dropdown-a-list"><code>dropdown</code>: a list<a class="headerlink" href="#dropdown-a-list" title="Permanent link">&para;</a></h3>
 <p><code>keys</code> are shown, <code>values</code> are substituted.
@@ -3723,11 +3820,35 @@ A value may carry its own unit, so a drop-down can switch units as well as magni
 #UI G = matrix(3; 4)
 </code></pre></div>
 <p>Sizes computed from a variable or expression work too — <code>matrix(r; c)</code>, <code>matrix(len(x); len(y))</code> — the grid is sized from the value the line produced.</p>
+<p>A grid can use default values from any expression. 
+Whatever the line evaluates to fills the cells:</p>
+<div class="language-text highlight"><pre><span></span><code>#UI G = matrix(3; 3) + 5
+#UI H = vec2row(x)
+</code></pre></div>
 <p>Declaring <code>rows</code> and <code>columns</code> explicitly fits the literal to that shape: missing cells become <code>0</code>, extra ones are dropped.</p>
 <div class="language-text highlight"><pre><span></span><code>#UI {"type": "datagrid", "rows": 2, "columns": 3, "columnHeaders": ["a", "b", "c"], "rowHeaders": ["r1", "r2"]} T = [0; 0; 0 | 0; 0; 0]
 </code></pre></div>
-<p>The grid's size comes from the directive, so rows and columns cannot be inserted or deleted in the form.
-Every cell becomes an element of a matrix literal, so a cell holding text — typed or pasted in — is put back to <code>0</code>.</p>
+<p>The grid's size comes from the directive or default size, so rows and columns cannot be inserted or deleted in the form.</p>
+<h4 id="units-in-a-grid">Units in a grid<a class="headerlink" href="#units-in-a-grid" title="Permanent link">&para;</a></h4>
+<p>By default the cells hold plain numbers and a cell holding anything else is put back to <code>0</code>.
+When a default value carries a unit, the unit is kept aside rather than shown.
+The cells stay numeric, hovering the cell shows the unit that will be applied in the report.
+So <code>U = matrix(2; 2)*5m</code> fills the grid with <code>5</code> and writes <code>[5m; 5m | 5m; 5m]</code>, and a literal default such as <code>M = [1m; 2m]</code> behaves the same way.</p>
+<p>It is also recommended to put units in column or row headers.</p>
+<p><code>forceUnits: false</code> puts the units in the cells instead, so <code>5m</code> can be typed into one, and <code>allowExpression: true</code> accepts any expression in the cell.
+Note that this is still subject to the limitations of the calculation engine, putting a vector or matrix into a cell will throw an error.</p>
+<h4 id="sizing">Sizing<a class="headerlink" href="#sizing" title="Permanent link">&para;</a></h4>
+<p>By default each column is sized to the longest single word it has to show, its header included, with a minimum of 80 pixels.
+<code>width</code> overrides that total using a number of pixels or a percentage of the line such as <code>"75%"</code> (<code>"100%"</code> and <code>"full"</code> both fill the entire line).
+<code>rowHeaderWidth</code> and <code>columnWidths</code> set each row/column in the order they are declared.
+When <code>width</code> is set and the parts add up to more than it, they are all scaled down together, keeping their relative sizes.
+This means <code>columnWidths</code> can be written as plain ratios.
+No column is scaled below its own longest word, so a <code>width</code> too small for the content is overrun and the grid scrolls rather than clipping every column.</p>
+<div class="language-text highlight"><pre><span></span><code>#UI {"type": "datagrid", "width": "100%", "rowHeaderWidth": 140, "columnWidths": [2, 1, 1]} M = matrix(2; 3)
+</code></pre></div>
+<p>Text wraps at spaces only, and the rows grow to fit.
+A word too long for its column is cut off at the cell border.
+Click into the cell or hover over a header to read it in full.</p>
 <blockquote>
 <p>Note:
 Setting a datagrid with a row length of 1 will output a vector instead of matrix due to limitations in how vectors/matricies are input. This is planned to be fixed in a future version. As this is mostly an issue when dynamically defining row lengths from a variable, you can check if the row length is one and convert it to a matrix using vec2row() where this is an issue.</p>
@@ -3804,9 +3925,8 @@ A <code>reportStyle</code> class lands on the line's element, which is a paragra
 <p><code>depth</code> is highlighted in the form and unremarkable in the report; <code>P</code> is boxed in the report and an ordinary text box in the form; <code>q</code> gets both.</p>
 <p>Also, several classes can be listed at once — <code>"style": "highlight wide"</code> </p>
 <h3 id="inside-a-datagrid">Inside a datagrid<a class="headerlink" href="#inside-a-datagrid" title="Permanent link">&para;</a></h3>
-<p>A grid is a third-party widget, so a <code>style</code> class reaches its outer container but not the cells, headers or context menu inside it.
-Those are styled by a stylesheet that ships with the application, not from the document — see <em>Customizing the <code>#UI</code> Datagrid</em> from <code>DEVELOPER.md</code> in the Github repository files.
-Column widths and the grid's overall size are set by the preview script and are not adjustable from CSS at all.</p>
+<p>A grid is a third-party widget, so a <code>style</code> class reaches its outer container but not the cells, headers or context menu inside it.</p>
+<p>There is limited customization available using the datagrid properties, and more customization is planned.</p>
 <h2 id="saving-what-was-entered">Saving what was entered<a class="headerlink" href="#saving-what-was-entered" title="Permanent link">&para;</a></h2>
 <p>Saving input values writes them into a metadata comment at the top of the document, which is what restores them the next time you open it:</p>
 <div class="language-text highlight"><pre><span></span><code>'&lt;!--{"uiOverrides":{"L:1":"8","q:1":"30"}}--&gt;
@@ -3894,8 +4014,8 @@ Beam$(6m)
 <td>The line assigns nothing</td>
 </tr>
 <tr>
-<td><code>#UI</code> directives do not support expressions.</td>
-<td>The right-hand side is computed, not a value</td>
+<td><code>#UI</code> does not support expressions unless <code>'allowExpression'</code> is true.</td>
+<td>The right-hand side is computed, not a value, and <code>allowExpression</code> is off</td>
 </tr>
 <tr>
 <td>String mode is not supported by the <code>#UI</code> keyword.</td>
