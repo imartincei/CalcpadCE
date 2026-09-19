@@ -9,45 +9,6 @@ those components require. CalcpadCE's own licence is in [LICENSE](LICENSE).
 
 ---
 
-## Written offer for source code (LGPL-2.1 and GPL components)
-
-The Linux AppImage bundles WebKitGTK, the GTK stack and supporting system
-libraries. Some are licensed under the GNU Lesser General Public License,
-version 2.1.
-
-> For any component of this product licensed under the GNU Lesser General
-> Public License (LGPL) or the GNU General Public License (GPL), CalcpadCE will
-> provide the complete corresponding machine-readable source code, for a period
-> of three years from the date you obtained this product, on written request to
-> the address below, for no more than the cost of performing the distribution.
->
-> These components are unmodified copies of the versions published by the
-> upstream distribution; the source is also available directly from that
-> distribution's archive.
->
-> Requests: <TODO: contact address>
-
-This offer applies to the **AppImage only**. The `.deb`, `.rpm` and Arch
-packages declare these libraries as system dependencies and bundle none of
-them.
-
-### Bundled system libraries
-
-Regenerate when the bundled set changes:
-
-```bash
-tools/license-scan/collect-bundled-sources.sh <AppImage> bundled-sources
-# paste the copyleft rows of bundled-sources/manifest.csv here
-```
-
-Confirmed present as of 8.0.0-beta1 (x86_64 AppImage, 211 bundled objects):
-WebKitGTK (`libwebkit2gtk-4.1.so.0`, `libjavascriptcoregtk-4.1.so.0`, and the
-`WebKitWebProcess` / `WebKitNetworkProcess` helpers), GDK-PixBuf, GLib, GTK 3,
-Pango, librsvg, keyutils and liblzma. Versions come from the Ubuntu 22.04
-archive as built by CI.
-
----
-
 ## Mozilla Public License 2.0
 
 The following Rust crates are licensed under MPL-2.0 and are linked into the
@@ -64,9 +25,10 @@ source for each is available at the URL given, at the exact version shipped.
 
 A copy of the Mozilla Public License 2.0 is at <https://mozilla.org/MPL/2.0/>.
 
-**TODO**: DOMPurify is vendored inside `monaco-editor` and compiled into the
-shipped `editor.main.js`. It is dual Apache-2.0 OR MPL-2.0. Elect one
-deliberately and record the election here.
+DOMPurify, vendored inside `monaco-editor` and compiled into the shipped
+`editor.main.js`, is dual-licensed Apache-2.0 OR MPL-2.0. **CalcpadCE elects
+Apache-2.0**, so it carries no MPL obligation. Licence text:
+<https://www.apache.org/licenses/LICENSE-2.0>.
 
 ---
 

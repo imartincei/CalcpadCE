@@ -9,45 +9,6 @@ those components require. CalcpadCE's own licence is in [LICENSE](LICENSE).
 
 ---
 
-## Written offer for source code (LGPL-2.1 and GPL components)
-
-The Linux AppImage bundles WebKitGTK, the GTK stack and supporting system
-libraries. Some are licensed under the GNU Lesser General Public License,
-version 2.1.
-
-> For any component of this product licensed under the GNU Lesser General
-> Public License (LGPL) or the GNU General Public License (GPL), CalcpadCE will
-> provide the complete corresponding machine-readable source code, for a period
-> of three years from the date you obtained this product, on written request to
-> the address below, for no more than the cost of performing the distribution.
->
-> These components are unmodified copies of the versions published by the
-> upstream distribution; the source is also available directly from that
-> distribution's archive.
->
-> Requests: <TODO: contact address>
-
-This offer applies to the **AppImage only**. The `.deb`, `.rpm` and Arch
-packages declare these libraries as system dependencies and bundle none of
-them.
-
-### Bundled system libraries
-
-Regenerate when the bundled set changes:
-
-```bash
-tools/license-scan/collect-bundled-sources.sh <AppImage> bundled-sources
-# paste the copyleft rows of bundled-sources/manifest.csv here
-```
-
-Confirmed present as of 8.0.0-beta1 (x86_64 AppImage, 211 bundled objects):
-WebKitGTK (`libwebkit2gtk-4.1.so.0`, `libjavascriptcoregtk-4.1.so.0`, and the
-`WebKitWebProcess` / `WebKitNetworkProcess` helpers), GDK-PixBuf, GLib, GTK 3,
-Pango, librsvg, keyutils and liblzma. Versions come from the Ubuntu 22.04
-archive as built by CI.
-
----
-
 ## Mozilla Public License 2.0
 
 The following Rust crates are licensed under MPL-2.0 and are linked into the
@@ -64,9 +25,10 @@ source for each is available at the URL given, at the exact version shipped.
 
 A copy of the Mozilla Public License 2.0 is at <https://mozilla.org/MPL/2.0/>.
 
-**TODO**: DOMPurify is vendored inside `monaco-editor` and compiled into the
-shipped `editor.main.js`. It is dual Apache-2.0 OR MPL-2.0. Elect one
-deliberately and record the election here.
+DOMPurify, vendored inside `monaco-editor` and compiled into the shipped
+`editor.main.js`, is dual-licensed Apache-2.0 OR MPL-2.0. **CalcpadCE elects
+Apache-2.0**, so it carries no MPL obligation. Licence text:
+<https://www.apache.org/licenses/LICENSE-2.0>.
 
 ---
 
@@ -826,51 +788,14 @@ licence file beside them are covered under Fonts above; those marked
 
 ---
 
-## Held back pending verification
-
-Resolved into the dependency tree but not confirmed as shipped, so not
-listed above. Confirm whether each is distributed, then list or drop it.
-
-| Component | Version | Ecosystem | Reason |
-|---|---|---|---|
-| autocfg | 1.5.1 | cargo | build-dependency only; confirm it is not linked in before listing |
-| cargo_toml | 0.22.3 | cargo | build-dependency only; confirm it is not linked in before listing |
-| cc | 1.2.66 | cargo | build-dependency only; confirm it is not linked in before listing |
-| cfg-expr | 0.15.8 | cargo | build-dependency only; confirm it is not linked in before listing; aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu only |
-| cfg_aliases | 0.2.1 | cargo | build-dependency only; confirm it is not linked in before listing |
-| embed-resource | 3.0.11 | cargo | build-dependency only; confirm it is not linked in before listing |
-| find-msvc-tools | 0.1.9 | cargo | build-dependency only; confirm it is not linked in before listing |
-| phf_codegen | 0.13.1 | cargo | build-dependency only; confirm it is not linked in before listing |
-| pkg-config | 0.3.33 | cargo | build-dependency only; confirm it is not linked in before listing; aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu only |
-| rustc_version | 0.4.1 | cargo | build-dependency only; confirm it is not linked in before listing |
-| shlex | 2.0.1 | cargo | build-dependency only; confirm it is not linked in before listing |
-| string_cache_codegen | 0.6.1 | cargo | build-dependency only; confirm it is not linked in before listing |
-| system-deps | 6.2.2 | cargo | build-dependency only; confirm it is not linked in before listing; aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu only |
-| target-lexicon | 0.12.16 | cargo | build-dependency only; confirm it is not linked in before listing; aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu only |
-| tauri-build | 2.6.3 | cargo | build-dependency only; confirm it is not linked in before listing |
-| tauri-plugin | 2.6.3 | cargo | build-dependency only; confirm it is not linked in before listing |
-| tauri-winres | 0.3.6 | cargo | build-dependency only; confirm it is not linked in before listing |
-| toml | 0.8.2 | cargo | build-dependency only; confirm it is not linked in before listing; aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu only |
-| toml | 0.9.12+spec-1.1.0 | cargo | build-dependency only; confirm it is not linked in before listing |
-| toml_datetime | 0.7.5+spec-1.1.0 | cargo | build-dependency only; confirm it is not linked in before listing |
-| typescript | 5.9.3 | npm | installed as optional peer; verify it is bundled before listing |
-| typescript | 5.9.2 | npm | installed as optional peer; verify it is bundled before listing |
-| version-compare | 0.2.1 | cargo | build-dependency only; confirm it is not linked in before listing; aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu only |
-| version_check | 0.9.5 | cargo | build-dependency only; confirm it is not linked in before listing |
-| vswhom | 0.1.0 | cargo | build-dependency only; confirm it is not linked in before listing; x86_64-pc-windows-msvc only |
-| vswhom-sys | 0.1.3 | cargo | build-dependency only; confirm it is not linked in before listing; x86_64-pc-windows-msvc only |
-| winnow | 0.7.15 | cargo | build-dependency only; confirm it is not linked in before listing |
-| winreg | 0.55.0 | cargo | build-dependency only; confirm it is not linked in before listing; x86_64-pc-windows-msvc only |
-
----
-
 ## Licence texts
 
-71 distinct licence texts, covering 458 components. Each body
+76 distinct licence texts, covering 502 components. Each body
 appears once; the copyright notices from every component sharing it are listed
-above it. Texts are reproduced verbatim from the packages as shipped.
+above it. Texts are reproduced verbatim from the packages as shipped, or for
+packages that ship none, from the project's own repository as recorded below.
 
-### Licence text 1 — 164 components
+### Licence text 1 — 170 components
 
 <details><summary>Components using this text</summary>
 
@@ -986,6 +911,7 @@ above it. Texts are reproduced verbatim from the packages as shipped.
 - rustc-hash 2.1.3
 - rustix 1.1.4
 - scopeguard 1.2.0
+- seahash 4.1.0
 - semver 1.0.28
 - serde 1.0.228
 - serde-untagged 0.1.9
@@ -1017,6 +943,11 @@ above it. Texts are reproduced verbatim from the packages as shipped.
 - tracing-attributes 0.1.31
 - tracing-core 0.1.36
 - typeid 1.0.3
+- unic-char-property 0.9.0
+- unic-char-range 0.9.0
+- unic-common 0.9.0
+- unic-ucd-ident 0.9.0
+- unic-ucd-version 0.9.0
 - unicode-ident 1.0.24
 - unicode-segmentation 1.13.3
 - url 2.5.8
@@ -1129,7 +1060,7 @@ IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 ```
 
-### Licence text 2 — 155 components
+### Licence text 2 — 161 components
 
 <details><summary>Components using this text</summary>
 
@@ -1201,6 +1132,7 @@ DEALINGS IN THE SOFTWARE.
 - jsonptr 0.6.3
 - keyboard-types 0.7.0
 - libappindicator 0.9.0
+- libappindicator-sys 0.9.0
 - linux-raw-sys 0.12.1
 - lock_api 0.4.14
 - log 0.4.33
@@ -1252,6 +1184,11 @@ DEALINGS IN THE SOFTWARE.
 - toml_datetime 1.1.1+spec-1.1.0
 - tray-icon 0.24.1
 - typenum 1.20.1
+- unic-char-property 0.9.0
+- unic-char-range 0.9.0
+- unic-common 0.9.0
+- unic-ucd-ident 0.9.0
+- unic-ucd-version 0.9.0
 - unicode-segmentation 1.13.3
 - url 2.5.8
 - utf8_iter 1.0.4
@@ -1530,7 +1467,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-### Licence text 3 — 71 components
+### Licence text 3 — 79 components
 
 <details><summary>Components using this text</summary>
 
@@ -1545,6 +1482,8 @@ limitations under the License.
 - darling 0.23.0
 - darling_core 0.23.0
 - darling_macro 0.23.0
+- dlopen2 0.8.2
+- dlopen2_derive 0.4.3
 - field-offset 0.3.6
 - funty 2.0.0
 - half 2.7.1
@@ -1556,11 +1495,13 @@ limitations under the License.
 - json-patch 3.0.1
 - jsonptr 0.6.3
 - libappindicator 0.9.0
+- libappindicator-sys 0.9.0
 - miniz_oxide 0.8.9
 - muda 0.19.3
 - precomputed-hash 0.1.1
 - proc-macro-error 1.0.4
 - proc-macro-error-attr 1.0.4
+- PuppeteerSharp 21.1.1
 - radium 0.7.0
 - raw-window-handle 0.6.2
 - rfd 0.16.0
@@ -1600,6 +1541,10 @@ limitations under the License.
 - urlpattern 0.3.0
 - utf8-width 0.1.9
 - value-bag 1.12.0
+- WebDriverBiDi 0.0.43
+- webview2-com 0.38.2
+- webview2-com-macros 0.8.1
+- webview2-com-sys 0.38.2
 - window-vibrancy 0.6.0
 - wry 0.55.1
 - wyz 0.5.1
@@ -1619,11 +1564,13 @@ Copyright (c) 2016-2021 Diggory Blake, and other contributors.
 Copyright (c) 2017 - Present Tauri Apps Contributors
 Copyright (c) 2017 - Present The Tauri Programme in the Commons Conservancy
 Copyright (c) 2017 Aaron Hancock
+Copyright (c) 2017 Darío Kondratiuk
 Copyright (c) 2017 Elliot Linder <darfink@gmail.com>
 Copyright (c) 2017 Emilio Cobos Álvarez
 Copyright (c) 2017 Frommi
 Copyright (c) 2017 Ivan Dubrov
 Copyright (c) 2017 Matthew D. Steele
+Copyright (c) 2017 Szymon Wieloch
 Copyright (c) 2017 Ted Driggs
 Copyright (c) 2017-2021 qDot
 Copyright (c) 2017-2024 oyvindln
@@ -1631,6 +1578,7 @@ Copyright (c) 2018 Matthew D. Steele
 Copyright (c) 2018 myrrlyn (Alexander Payne)
 Copyright (c) 2018 PistonDevelopers
 Copyright (c) 2018 Sam Rijs, Alex Crichton and contributors
+Copyright (C) 2019 Ahmed Masud <ahmed.masud@saf.ai>
 Copyright (c) 2019 Bojan
 Copyright (c) 2019 Graham Esau
 Copyright (c) 2019 kneecaw (Nika Layzell)
@@ -1644,13 +1592,16 @@ Copyright (c) 2020 sval-rs
 Copyright (c) 2020-2022 Tauri Programme within The Commons Conservancy
 Copyright (c) 2020-2023 Ngo Iok Ui & Tauri Programme within The Commons Conservancy
 Copyright (c) 2021 1Password
+Copyright (c) 2021 Bill Avery
 Copyright (c) 2021 Chip Reed
 Copyright (c) 2021 Tauri Apps Contributors
 Copyright (c) 2021 the Deno authors
 Copyright (c) 2022 Bartłomiej Maryńczak
 Copyright (c) 2022 Chance Dinkins
+Copyright (C) 2022 OpenByte <development.openbyte@gmail.com>
 Copyright (c) 2022 The Arboard contributors
 Copyright (c) 2022-2022 Tauri Programme within The Commons Conservancy
+Copyright (c) 2022-2025 WebDriverBidi.NET Committers
 Copyright (c) 2023 magiclen.org (Ron Li)
 Copyright (c) 2023 Sean Larkin
 Copyright (c) [2021] [Marvin Countryman]
@@ -1944,7 +1895,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 END OF TERMS AND CONDITIONS
 ```
 
-### Licence text 5 — 45 components
+### Licence text 5 — 47 components
 
 <details><summary>Components using this text</summary>
 
@@ -1993,6 +1944,8 @@ END OF TERMS AND CONDITIONS
 - toml_edit 0.19.15
 - toml_edit 0.20.2
 - toml_edit 0.25.12+spec-1.1.0
+- toml_parser 1.1.2+spec-1.1.0
+- toml_writer 1.1.1+spec-1.1.0
 
 </details>
 
@@ -2111,30 +2064,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ```
 
-### Licence text 7 — 20 components
+### Licence text 7 — 22 components
 
 <details><summary>Components using this text</summary>
 
-- windows 0.61.3
-- windows-collections 0.2.0
-- windows-core 0.61.2
-- windows-future 0.2.1
-- windows-implement 0.60.2
-- windows-interface 0.59.3
-- windows-link 0.1.3
-- windows-link 0.2.1
-- windows-numerics 0.2.0
-- windows-result 0.3.4
-- windows-strings 0.4.2
-- windows-sys 0.59.0
-- windows-sys 0.60.2
-- windows-sys 0.61.2
-- windows-targets 0.52.6
-- windows-targets 0.53.5
-- windows-threading 0.1.0
-- windows-version 0.1.7
-- windows_x86_64_msvc 0.52.6
-- windows_x86_64_msvc 0.53.1
+- async-broadcast 0.7.2
+- bincode 1.3.3
+- derive_more 2.1.1
+- derive_more-impl 2.1.1
+- generic-array 0.14.7
+- HtmlAgilityPack 1.12.4
+- javascriptcore-rs 1.1.2
+- javascriptcore-rs-sys 1.1.1
+- monaco-editor 0.52.2
+- os_info 3.15.0
+- Packaging.Targets 0.1.220
+- soup3 0.5.0
+- soup3-sys 0.5.0
+- source-map-support 0.5.21
+- strsim 0.11.1
+- Swashbuckle.AspNetCore 10.0.1
+- Swashbuckle.AspNetCore.Swagger 10.0.1
+- Swashbuckle.AspNetCore.SwaggerGen 10.0.1
+- Swashbuckle.AspNetCore.SwaggerUI 10.0.1
+- tracing-core 0.1.36
+- typenum 1.20.1
+- weezl 0.1.12
 
 </details>
 
@@ -2142,34 +2097,51 @@ Copyright notices:
 
 ```
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-Copyright (c) Microsoft Corporation.
+Copyright (c) 2013-2017, The Gtk-rs Project Developers.
+Copyright (c) 2013-2021, The Gtk-rs Project Developers.
+Copyright (c) 2014 Evan Wallace
+Copyright (c) 2014 Mathijs van de Nes
+Copyright (c) 2014 Paho Lurie-Gregg
+Copyright (c) 2014 Ty Overby
+Copyright (c) 2015 Bartłomiej Kamiński
+Copyright (c) 2015 Danny Guo
+Copyright (c) 2016 - present Microsoft Corporation
+Copyright (c) 2016 Jelte Fennema
+Copyright (c) 2016 Richard Morris
+Copyright (c) 2016 Titus Wormer <tituswormer@gmail.com>
+Copyright (c) 2017 Stanislav Tkach
+Copyright (c) 2018 Akash Kurdekar
+Copyright (c) 2020 Yoshua Wuyts
+Copyright (c) 2021, Tauri Programme within The Commons Conservancy.
+Copyright (c) Frederik Carlier and Contributors
+Copyright (c) HeroicKatora 2020
 ```
 
 ```
-    MIT License
+The MIT License (MIT)
 
-    Copyright (c) Microsoft Corporation.
+Copyright (c) 2020 Yoshua Wuyts
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
 
-### Licence text 8 — 19 components
+### Licence text 8 — 21 components
 
 <details><summary>Components using this text</summary>
 
@@ -2192,6 +2164,8 @@ Copyright (c) Microsoft Corporation.
 - toml_edit 0.19.15
 - toml_edit 0.20.2
 - toml_edit 0.25.12+spec-1.1.0
+- toml_parser 1.1.2+spec-1.1.0
+- toml_writer 1.1.1+spec-1.1.0
 
 </details>
 
@@ -2418,7 +2392,65 @@ You may add Your own copyright statement to Your modifications and
    limitations under the License.
 ```
 
-### Licence text 9 — 18 components
+### Licence text 9 — 20 components
+
+<details><summary>Components using this text</summary>
+
+- windows 0.61.3
+- windows-collections 0.2.0
+- windows-core 0.61.2
+- windows-future 0.2.1
+- windows-implement 0.60.2
+- windows-interface 0.59.3
+- windows-link 0.1.3
+- windows-link 0.2.1
+- windows-numerics 0.2.0
+- windows-result 0.3.4
+- windows-strings 0.4.2
+- windows-sys 0.59.0
+- windows-sys 0.60.2
+- windows-sys 0.61.2
+- windows-targets 0.52.6
+- windows-targets 0.53.5
+- windows-threading 0.1.0
+- windows-version 0.1.7
+- windows_x86_64_msvc 0.52.6
+- windows_x86_64_msvc 0.53.1
+
+</details>
+
+Copyright notices:
+
+```
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+Copyright (c) Microsoft Corporation.
+```
+
+```
+    MIT License
+
+    Copyright (c) Microsoft Corporation.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+```
+
+### Licence text 10 — 18 components
 
 <details><summary>Components using this text</summary>
 
@@ -2472,7 +2504,7 @@ PackageDownloadLocation: git+ssh://github.com/tauri-apps/tauri.git
 Creator: Person: Daniel Thompson-Yvetot
 ```
 
-### Licence text 10 — 18 components
+### Licence text 11 — 18 components
 
 <details><summary>Components using this text</summary>
 
@@ -2558,7 +2590,7 @@ Portions of ICU4X may have been adapted from ICU4C and/or ICU4J.
 ICU 1.8.1 to ICU 57.1 © 1995-2016 International Business Machines Corporation and others.
 ```
 
-### Licence text 11 — 17 components
+### Licence text 12 — 17 components
 
 <details><summary>Components using this text</summary>
 
@@ -2618,7 +2650,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ```
 
-### Licence text 12 — 17 components
+### Licence text 13 — 17 components
 
 <details><summary>Components using this text</summary>
 
@@ -2663,26 +2695,21 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### Licence text 13 — 16 components
+### Licence text 14 — 11 components
 
 <details><summary>Components using this text</summary>
 
-- async-broadcast 0.7.2
-- bincode 1.3.3
-- derive_more 2.1.1
-- derive_more-impl 2.1.1
-- generic-array 0.14.7
-- javascriptcore-rs 1.1.2
-- javascriptcore-rs-sys 1.1.1
-- monaco-editor 0.52.2
-- os_info 3.15.0
-- soup3 0.5.0
-- soup3-sys 0.5.0
-- source-map-support 0.5.21
-- strsim 0.11.1
-- tracing-core 0.1.36
-- typenum 1.20.1
-- weezl 0.1.12
+- Microsoft.AspNetCore.OpenApi 10.0.0
+- Microsoft.Extensions.ApiDescription.Server 10.0.0
+- Microsoft.Extensions.DependencyInjection 10.0.0
+- Microsoft.Extensions.DependencyInjection.Abstractions 10.0.0
+- Microsoft.Extensions.Logging 10.0.0
+- Microsoft.Extensions.Logging.Abstractions 10.0.0
+- Microsoft.Extensions.Options 10.0.0
+- Microsoft.Extensions.Primitives 10.0.0
+- System.IO.Packaging 10.0.0
+- System.IO.Packaging 8.0.1
+- System.Security.Cryptography.Pkcs 8.0.1
 
 </details>
 
@@ -2690,28 +2717,15 @@ Copyright notices:
 
 ```
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-Copyright (c) 2013-2017, The Gtk-rs Project Developers.
-Copyright (c) 2013-2021, The Gtk-rs Project Developers.
-Copyright (c) 2014 Evan Wallace
-Copyright (c) 2014 Mathijs van de Nes
-Copyright (c) 2014 Paho Lurie-Gregg
-Copyright (c) 2014 Ty Overby
-Copyright (c) 2015 Bartłomiej Kamiński
-Copyright (c) 2015 Danny Guo
-Copyright (c) 2016 - present Microsoft Corporation
-Copyright (c) 2016 Jelte Fennema
-Copyright (c) 2016 Titus Wormer <tituswormer@gmail.com>
-Copyright (c) 2017 Stanislav Tkach
-Copyright (c) 2018 Akash Kurdekar
-Copyright (c) 2020 Yoshua Wuyts
-Copyright (c) 2021, Tauri Programme within The Commons Conservancy.
-Copyright (c) HeroicKatora 2020
+Copyright (c) .NET Foundation and Contributors
 ```
 
 ```
 The MIT License (MIT)
 
-Copyright (c) 2020 Yoshua Wuyts
+Copyright (c) .NET Foundation and Contributors
+
+All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -2732,7 +2746,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### Licence text 14 — 7 components
+### Licence text 15 — 7 components
 
 <details><summary>Components using this text</summary>
 
@@ -2781,7 +2795,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org/>
 ```
 
-### Licence text 15 — 6 components
+### Licence text 16 — 6 components
 
 <details><summary>Components using this text</summary>
 
@@ -2826,7 +2840,54 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### Licence text 16 — 6 components
+### Licence text 17 — 6 components
+
+<details><summary>Components using this text</summary>
+
+- SkiaSharp 3.119.1
+- SkiaSharp.NativeAssets.Linux 3.119.1
+- SkiaSharp.NativeAssets.macOS 3.119.1
+- SkiaSharp.NativeAssets.Win32 3.119.1
+- webkit2gtk 2.0.2
+- webkit2gtk-sys 2.0.2
+
+</details>
+
+Copyright notices:
+
+```
+Copyright (c) 2015-2016 Xamarin, Inc.
+Copyright (c) 2016 Boucher, Antoni <bouanto@zoho.com>
+Copyright (c) 2017-2018 Microsoft Corporation.
+Copyright (c) 2017-2021, The Gtk-rs Project Developers.
+Copyright (c) 2021, Tauri Programme within The Commons Conservancy
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+```
+
+```
+Copyright (c) 2016 Boucher, Antoni <bouanto@zoho.com>
+Copyright (c) 2017-2021, The Gtk-rs Project Developers.
+Copyright (c) 2021, Tauri Programme within The Commons Conservancy
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
+
+### Licence text 18 — 6 components
 
 <details><summary>Components using this text</summary>
 
@@ -2845,7 +2906,7 @@ This project is dual-licensed under the Unlicense and MIT licenses.
 You may use this code under the terms of either license.
 ```
 
-### Licence text 17 — 6 components
+### Licence text 19 — 6 components
 
 <details><summary>Components using this text</summary>
 
@@ -2884,7 +2945,7 @@ Permission is granted to anyone to use this software for any purpose, including 
 3. This notice may not be removed or altered from any source distribution.
 ```
 
-### Licence text 18 — 6 components
+### Licence text 20 — 6 components
 
 <details><summary>Components using this text</summary>
 
@@ -2929,7 +2990,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### Licence text 19 — 5 components
+### Licence text 21 — 5 components
 
 <details><summary>Components using this text</summary>
 
@@ -3162,7 +3223,40 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-### Licence text 20 — 4 components
+### Licence text 22 — 4 components
+
+<details><summary>Components using this text</summary>
+
+- alloc-no-stdlib 2.0.4
+- alloc-stdlib 0.2.4
+- brotli 8.0.4
+- brotli-decompressor 5.0.3
+
+</details>
+
+Copyright notices:
+
+```
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+Copyright (c) 2016 Dropbox, Inc.
+```
+
+```
+Copyright (c) 2016 Dropbox, Inc.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+
+### Licence text 23 — 4 components
 
 <details><summary>Components using this text</summary>
 
@@ -3394,39 +3488,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-### Licence text 21 — 3 components
-
-<details><summary>Components using this text</summary>
-
-- alloc-no-stdlib 2.0.4
-- brotli 8.0.4
-- brotli-decompressor 5.0.3
-
-</details>
-
-Copyright notices:
-
-```
-3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-Copyright (c) 2016 Dropbox, Inc.
-```
-
-```
-Copyright (c) 2016 Dropbox, Inc.
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-```
-
-### Licence text 22 — 3 components
+### Licence text 24 — 3 components
 
 <details><summary>Components using this text</summary>
 
@@ -3820,7 +3882,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 ```
 
-### Licence text 23 — 3 components
+### Licence text 25 — 3 components
 
 <details><summary>Components using this text</summary>
 
@@ -3860,7 +3922,49 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### Licence text 24 — 2 components
+### Licence text 26 — 2 components
+
+<details><summary>Components using this text</summary>
+
+- DocumentFormat.OpenXml 3.3.0
+- DocumentFormat.OpenXml.Framework 3.3.0
+
+</details>
+
+Copyright notices:
+
+```
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+Copyright (c) .NET Foundation and Contributors
+```
+
+```
+﻿The MIT License (MIT)
+
+Copyright (c) .NET Foundation and Contributors
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### Licence text 27 — 2 components
 
 <details><summary>Components using this text</summary>
 
@@ -3925,7 +4029,49 @@ IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 ```
 
-### Licence text 25 — 2 components
+### Licence text 28 — 2 components
+
+<details><summary>Components using this text</summary>
+
+- clipboard-win 5.4.1
+- error-code 3.3.2
+
+</details>
+
+Copyright notices:
+
+```
+SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
+The copyright notices in the Software and this entire statement, including
+```
+
+```
+Boost Software License - Version 1.0 - August 17th, 2003
+
+Permission is hereby granted, free of charge, to any person or organization
+obtaining a copy of the software and accompanying documentation covered by
+this license (the "Software") to use, reproduce, display, distribute,
+execute, and transmit the Software, and to prepare derivative works of the
+Software, and to permit third-parties to whom the Software is furnished to
+do so, all subject to the following:
+
+The copyright notices in the Software and this entire statement, including
+the above license grant, this restriction and the following disclaimer,
+must be included in all copies of the Software, in whole or in part, and
+all derivative works of the Software, unless such copies or derivative
+works are solely in the form of machine-executable object code generated by
+a source language processor.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT
+SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
+FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+```
+
+### Licence text 29 — 2 components
 
 <details><summary>Components using this text</summary>
 
@@ -3971,7 +4117,7 @@ IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 ```
 
-### Licence text 26 — 2 components
+### Licence text 30 — 2 components
 
 <details><summary>Components using this text</summary>
 
@@ -4172,7 +4318,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
    of your accepting any such warranty or additional liability.
 ```
 
-### Licence text 27 — 2 components
+### Licence text 31 — 2 components
 
 <details><summary>Components using this text</summary>
 
@@ -4201,7 +4347,7 @@ THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRE
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
-### Licence text 28 — 2 components
+### Licence text 32 — 2 components
 
 <details><summary>Components using this text</summary>
 
@@ -4289,7 +4435,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-### Licence text 29 — 2 components
+### Licence text 33 — 2 components
 
 <details><summary>Components using this text</summary>
 
@@ -4332,7 +4478,7 @@ IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 ```
 
-### Licence text 30 — 2 components
+### Licence text 34 — 2 components
 
 <details><summary>Components using this text</summary>
 
@@ -4580,7 +4726,7 @@ the License, but only in their entirety and only with respect to the Combined
 Software.
 ```
 
-### Licence text 31 — 2 components
+### Licence text 35 — 2 components
 
 <details><summary>Components using this text</summary>
 
@@ -4627,7 +4773,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
-### Licence text 32 — 2 components
+### Licence text 36 — 2 components
 
 <details><summary>Components using this text</summary>
 
@@ -4675,48 +4821,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
-### Licence text 33 — 2 components
-
-<details><summary>Components using this text</summary>
-
-- webkit2gtk 2.0.2
-- webkit2gtk-sys 2.0.2
-
-</details>
-
-Copyright notices:
-
-```
-Copyright (c) 2016 Boucher, Antoni <bouanto@zoho.com>
-Copyright (c) 2017-2021, The Gtk-rs Project Developers.
-Copyright (c) 2021, Tauri Programme within The Commons Conservancy
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-```
-
-```
-Copyright (c) 2016 Boucher, Antoni <bouanto@zoho.com>
-Copyright (c) 2017-2021, The Gtk-rs Project Developers.
-Copyright (c) 2021, Tauri Programme within The Commons Conservancy
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-```
-
-### Licence text 34 — 2 components
+### Licence text 37 — 2 components
 
 <details><summary>Components using this text</summary>
 
@@ -4761,7 +4866,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
-### Licence text 35 — 2 components
+### Licence text 38 — 2 components
 
 <details><summary>Components using this text</summary>
 
@@ -4792,7 +4897,129 @@ freely, subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 ```
 
-### Licence text 36 — 1 component
+### Licence text 39 — 1 component
+
+<details><summary>Components using this text</summary>
+
+- Markdig.Signed 0.43.0
+
+</details>
+
+Copyright notices:
+
+```
+Copyright (c) 2018-2019, Alexandre Mutel
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+```
+
+```
+Copyright (c) 2018-2019, Alexandre Mutel
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification
+, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this 
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, 
+   this list of conditions and the following disclaimer in the documentation 
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+
+### Licence text 40 — 1 component
+
+<details><summary>Components using this text</summary>
+
+- Microsoft.OpenApi 2.9.0
+
+</details>
+
+Copyright notices:
+
+```
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+Copyright (c) Microsoft Corporation. All rights reserved.
+```
+
+```
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### Licence text 41 — 1 component
+
+<details><summary>Components using this text</summary>
+
+- PDFsharp 6.2.0
+
+</details>
+
+Copyright notices:
+
+```
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+﻿Copyright (c) 2001-2025 empira Software GmbH, Troisdorf (Cologne Area), Germany
+```
+
+```
+﻿Copyright (c) 2001-2025 empira Software GmbH, Troisdorf (Cologne Area), Germany
+
+http://docs.pdfsharp.net
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+DEALINGS IN THE SOFTWARE.
+```
+
+### Licence text 42 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -4831,7 +5058,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ```
 
-### Licence text 37 — 1 component
+### Licence text 43 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -4860,7 +5087,7 @@ AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
 OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
 
-### Licence text 38 — 1 component
+### Licence text 44 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -5077,7 +5304,7 @@ You may add Your own copyright statement to Your modifications and
    limitations under the License.
 ```
 
-### Licence text 39 — 1 component
+### Licence text 45 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -5156,7 +5383,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-### Licence text 40 — 1 component
+### Licence text 46 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -5182,7 +5409,7 @@ The above copyright notice and this permission notice (including the next paragr
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### Licence text 41 — 1 component
+### Licence text 47 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -5452,7 +5679,7 @@ limitations under the License.
 ~~~~
 ```
 
-### Licence text 42 — 1 component
+### Licence text 48 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -5492,7 +5719,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### Licence text 43 — 1 component
+### Licence text 49 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -6131,7 +6358,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-### Licence text 44 — 1 component
+### Licence text 50 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -6176,7 +6403,7 @@ derived from the "nipper" project (https://github.com/importcjj/nipper),
 developed by Chen Jiaju, licensed under the MIT License and the Apache License 2.0 (dual licensed).
 ```
 
-### Licence text 45 — 1 component
+### Licence text 51 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -6254,7 +6481,7 @@ have been licensed under extremely permissive terms.
 ------------------------------------------------------------------------------
 ```
 
-### Licence text 46 — 1 component
+### Licence text 52 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -6401,48 +6628,7 @@ express Statement of Purpose.
     this CC0 or use of the Work.
 ```
 
-### Licence text 47 — 1 component
-
-<details><summary>Components using this text</summary>
-
-- error-code 3.3.2
-
-</details>
-
-Copyright notices:
-
-```
-SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
-The copyright notices in the Software and this entire statement, including
-```
-
-```
-Boost Software License - Version 1.0 - August 17th, 2003
-
-Permission is hereby granted, free of charge, to any person or organization
-obtaining a copy of the software and accompanying documentation covered by
-this license (the "Software") to use, reproduce, display, distribute,
-execute, and transmit the Software, and to prepare derivative works of the
-Software, and to permit third-parties to whom the Software is furnished to
-do so, all subject to the following:
-
-The copyright notices in the Software and this entire statement, including
-the above license grant, this restriction and the following disclaimer,
-must be included in all copies of the Software, in whole or in part, and
-all derivative works of the Software, unless such copies or derivative
-works are solely in the form of machine-executable object code generated by
-a source language processor.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT
-SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
-FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
-ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS IN THE SOFTWARE.
-```
-
-### Licence text 48 — 1 component
+### Licence text 53 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -6466,7 +6652,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### Licence text 49 — 1 component
+### Licence text 54 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -7067,7 +7253,7 @@ library.  If this is what you want to do, use the GNU Library General
 Public License instead of this License.
 ```
 
-### Licence text 50 — 1 component
+### Licence text 55 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -7107,7 +7293,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
-### Licence text 51 — 1 component
+### Licence text 56 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -7136,7 +7322,7 @@ NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE US
 THIS SOFTWARE.
 ```
 
-### Licence text 52 — 1 component
+### Licence text 57 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -7172,7 +7358,7 @@ PackageDownloadLocation: git+ssh://github.com/tauri-apps/muda.git
 Creator: Person: Daniel Thompson-Yvetot
 ```
 
-### Licence text 53 — 1 component
+### Licence text 58 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -7215,7 +7401,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### Licence text 54 — 1 component
+### Licence text 59 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -7607,7 +7793,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 ```
 
-### Licence text 55 — 1 component
+### Licence text 60 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -7633,7 +7819,7 @@ option. All files in the project carrying such notice may not be
 copied, modified, or distributed except according to those terms.
 ```
 
-### Licence text 56 — 1 component
+### Licence text 61 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -7651,7 +7837,7 @@ You should have received a copy of the license along with this
 work.  If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
 ```
 
-### Licence text 57 — 1 component
+### Licence text 62 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -7684,7 +7870,7 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
 
-### Licence text 58 — 1 component
+### Licence text 63 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -7886,7 +8072,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 END OF TERMS AND CONDITIONS
 ```
 
-### Licence text 59 — 1 component
+### Licence text 64 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8100,7 +8286,7 @@ APPENDIX: How to apply the Apache License to your work.
    identification within third-party archives.
 ```
 
-### Licence text 60 — 1 component
+### Licence text 65 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8181,7 +8367,7 @@ use or other dealings in these Data Files or Software without prior
 written authorization of the copyright holder.
 ```
 
-### Licence text 61 — 1 component
+### Licence text 66 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8206,7 +8392,7 @@ http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
 option.
 ```
 
-### Licence text 62 — 1 component
+### Licence text 67 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8243,7 +8429,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### Licence text 63 — 1 component
+### Licence text 68 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8278,7 +8464,7 @@ PackageDownloadLocation: git+ssh://github.com/tauri-apps/tao.git
 Creator: Person: Daniel Thompson-Yvetot
 ```
 
-### Licence text 64 — 1 component
+### Licence text 69 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8325,7 +8511,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 ```
 
-### Licence text 65 — 1 component
+### Licence text 70 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8355,7 +8541,7 @@ freely, subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 ```
 
-### Licence text 66 — 1 component
+### Licence text 71 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8391,7 +8577,7 @@ PackageDownloadLocation: git+ssh://github.com/tauri-apps/tray-icon.git
 Creator: Person: Daniel Thompson-Yvetot
 ```
 
-### Licence text 67 — 1 component
+### Licence text 72 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8403,7 +8589,7 @@ Creator: Person: Daniel Thompson-Yvetot
 MIT OR Apache-2.0
 ```
 
-### Licence text 68 — 1 component
+### Licence text 73 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8465,7 +8651,7 @@ dealings in these Data Files or Software without prior written
 authorization of the copyright holder.
 ```
 
-### Licence text 69 — 1 component
+### Licence text 74 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8523,7 +8709,7 @@ The above is the version of the MIT "Expat" License used by X.org:
     http://cgit.freedesktop.org/xorg/xserver/tree/COPYING
 ```
 
-### Licence text 70 — 1 component
+### Licence text 75 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8559,7 +8745,7 @@ PackageDownloadLocation: git+ssh://github.com/tauri-apps/window-vibrancy.git
 Creator: Person: Daniel Thompson-Yvetot
 ```
 
-### Licence text 71 — 1 component
+### Licence text 76 — 1 component
 
 <details><summary>Components using this text</summary>
 
@@ -8598,6 +8784,70 @@ Creator: Person: Daniel Thompson-Yvetot
 
 ---
 
+## Licence texts taken from the project repository
+
+These packages ship no licence file. Their manifest licenceUrl points at a
+generic SPDX template with a placeholder copyright line, so the text above
+was taken from the project's own repository instead, pinned to the commit
+or tag the package was built from where one is recorded.
+
+| Component | Version | Ecosystem | Ref | Source |
+|---|---|---|---|---|
+| alloc-stdlib | 0.2.4 | cargo | `0.2.4` | https://raw.githubusercontent.com/dropbox/rust-alloc-no-stdlib/0.2.4/LICENSE |
+| clipboard-win | 5.4.1 | cargo | `HEAD (untagged)` | https://raw.githubusercontent.com/DoumanAsh/clipboard-win/HEAD/LICENSE |
+| dlopen2 | 0.8.2 | cargo | `HEAD (untagged)` | https://raw.githubusercontent.com/OpenByteDev/dlopen2/HEAD/LICENSE |
+| dlopen2_derive | 0.4.3 | cargo | `HEAD (untagged)` | https://raw.githubusercontent.com/OpenByteDev/dlopen2/HEAD/LICENSE |
+| DocumentFormat.OpenXml | 3.3.0 | nuget | `fcdd9e4fa5a3c1136ed87196683c60f340ac5f62` | https://raw.githubusercontent.com/dotnet/Open-XML-SDK/fcdd9e4fa5a3c1136ed87196683c60f340ac5f62/LICENSE |
+| DocumentFormat.OpenXml.Framework | 3.3.0 | nuget | `fcdd9e4fa5a3c1136ed87196683c60f340ac5f62` | https://raw.githubusercontent.com/dotnet/Open-XML-SDK/fcdd9e4fa5a3c1136ed87196683c60f340ac5f62/LICENSE |
+| HtmlAgilityPack | 1.12.4 | nuget | `v1.12.4` | https://raw.githubusercontent.com/zzzprojects/html-agility-pack/v1.12.4/LICENSE |
+| libappindicator-sys | 0.9.0 | cargo | `libappindicator-sys-v0.9.0` | https://raw.githubusercontent.com/tauri-apps/libappindicator-rs/libappindicator-sys-v0.9.0/LICENSE-APACHE |
+| libappindicator-sys | 0.9.0 | cargo | `libappindicator-sys-v0.9.0` | https://raw.githubusercontent.com/tauri-apps/libappindicator-rs/libappindicator-sys-v0.9.0/LICENSE-MIT |
+| Markdig.Signed | 0.43.0 | nuget | `8c01cf054971a1ec4cd663edaca6e2d035236133` | https://raw.githubusercontent.com/xoofx/markdig/8c01cf054971a1ec4cd663edaca6e2d035236133/license.txt |
+| Microsoft.AspNetCore.OpenApi | 10.0.0 | nuget | `b0f34d51fccc69fd334253924abd8d6853fad7aa` | https://raw.githubusercontent.com/dotnet/dotnet/b0f34d51fccc69fd334253924abd8d6853fad7aa/LICENSE.TXT |
+| Microsoft.Extensions.ApiDescription.Server | 10.0.0 | nuget | `b0f34d51fccc69fd334253924abd8d6853fad7aa` | https://raw.githubusercontent.com/dotnet/dotnet/b0f34d51fccc69fd334253924abd8d6853fad7aa/LICENSE.TXT |
+| Microsoft.Extensions.DependencyInjection | 10.0.0 | nuget | `b0f34d51fccc69fd334253924abd8d6853fad7aa` | https://raw.githubusercontent.com/dotnet/dotnet/b0f34d51fccc69fd334253924abd8d6853fad7aa/LICENSE.TXT |
+| Microsoft.Extensions.DependencyInjection.Abstractions | 10.0.0 | nuget | `b0f34d51fccc69fd334253924abd8d6853fad7aa` | https://raw.githubusercontent.com/dotnet/dotnet/b0f34d51fccc69fd334253924abd8d6853fad7aa/LICENSE.TXT |
+| Microsoft.Extensions.Logging | 10.0.0 | nuget | `b0f34d51fccc69fd334253924abd8d6853fad7aa` | https://raw.githubusercontent.com/dotnet/dotnet/b0f34d51fccc69fd334253924abd8d6853fad7aa/LICENSE.TXT |
+| Microsoft.Extensions.Logging.Abstractions | 10.0.0 | nuget | `b0f34d51fccc69fd334253924abd8d6853fad7aa` | https://raw.githubusercontent.com/dotnet/dotnet/b0f34d51fccc69fd334253924abd8d6853fad7aa/LICENSE.TXT |
+| Microsoft.Extensions.Options | 10.0.0 | nuget | `b0f34d51fccc69fd334253924abd8d6853fad7aa` | https://raw.githubusercontent.com/dotnet/dotnet/b0f34d51fccc69fd334253924abd8d6853fad7aa/LICENSE.TXT |
+| Microsoft.Extensions.Primitives | 10.0.0 | nuget | `b0f34d51fccc69fd334253924abd8d6853fad7aa` | https://raw.githubusercontent.com/dotnet/dotnet/b0f34d51fccc69fd334253924abd8d6853fad7aa/LICENSE.TXT |
+| Microsoft.OpenApi | 2.9.0 | nuget | `787606a9ebbc749786a7596c4eca022866d43ad6` | https://raw.githubusercontent.com/Microsoft/OpenAPI.NET/787606a9ebbc749786a7596c4eca022866d43ad6/LICENSE |
+| Packaging.Targets | 0.1.220 | nuget | `3f7bd3c61a00ce2c51f4f53f34d149b0ce5f8fdd` | https://raw.githubusercontent.com/qmfrederik/dotnet-packaging/3f7bd3c61a00ce2c51f4f53f34d149b0ce5f8fdd/LICENSE |
+| PDFsharp | 6.2.0 | nuget | `v6.2.0` | https://raw.githubusercontent.com/empira/PDFsharp/v6.2.0/LICENSE |
+| PuppeteerSharp | 21.1.1 | nuget | `82386c6f24ef4d2c8ad1b46c4bf94ae477842675` | https://raw.githubusercontent.com/hardkoded/puppeteer-sharp/82386c6f24ef4d2c8ad1b46c4bf94ae477842675/LICENSE |
+| seahash | 4.1.0 | cargo | `HEAD (untagged)` | https://gitlab.redox-os.org/redox-os/seahash/-/raw/HEAD/LICENSE |
+| SkiaSharp | 3.119.1 | nuget | `cc78b5933d23e6383db5d246e70db915770d55d6` | https://raw.githubusercontent.com/mono/SkiaSharp/cc78b5933d23e6383db5d246e70db915770d55d6/LICENSE.txt |
+| SkiaSharp.NativeAssets.Linux | 3.119.1 | nuget | `cc78b5933d23e6383db5d246e70db915770d55d6` | https://raw.githubusercontent.com/mono/SkiaSharp/cc78b5933d23e6383db5d246e70db915770d55d6/LICENSE.txt |
+| SkiaSharp.NativeAssets.macOS | 3.119.1 | nuget | `cc78b5933d23e6383db5d246e70db915770d55d6` | https://raw.githubusercontent.com/mono/SkiaSharp/cc78b5933d23e6383db5d246e70db915770d55d6/LICENSE.txt |
+| SkiaSharp.NativeAssets.Win32 | 3.119.1 | nuget | `cc78b5933d23e6383db5d246e70db915770d55d6` | https://raw.githubusercontent.com/mono/SkiaSharp/cc78b5933d23e6383db5d246e70db915770d55d6/LICENSE.txt |
+| Swashbuckle.AspNetCore | 10.0.1 | nuget | `1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef` | https://raw.githubusercontent.com/domaindrivendev/Swashbuckle.AspNetCore/1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef/LICENSE |
+| Swashbuckle.AspNetCore.Swagger | 10.0.1 | nuget | `1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef` | https://raw.githubusercontent.com/domaindrivendev/Swashbuckle.AspNetCore/1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef/LICENSE |
+| Swashbuckle.AspNetCore.SwaggerGen | 10.0.1 | nuget | `1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef` | https://raw.githubusercontent.com/domaindrivendev/Swashbuckle.AspNetCore/1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef/LICENSE |
+| Swashbuckle.AspNetCore.SwaggerUI | 10.0.1 | nuget | `1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef` | https://raw.githubusercontent.com/domaindrivendev/Swashbuckle.AspNetCore/1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef/LICENSE |
+| System.IO.Packaging | 8.0.1 | nuget | `b0f34d51fccc69fd334253924abd8d6853fad7aa` | https://raw.githubusercontent.com/dotnet/dotnet/b0f34d51fccc69fd334253924abd8d6853fad7aa/LICENSE.TXT |
+| System.IO.Packaging | 10.0.0 | nuget | `b0f34d51fccc69fd334253924abd8d6853fad7aa` | https://raw.githubusercontent.com/dotnet/dotnet/b0f34d51fccc69fd334253924abd8d6853fad7aa/LICENSE.TXT |
+| System.Security.Cryptography.Pkcs | 8.0.1 | nuget | `81cabf2857a01351e5ab578947c7403a5b128ad1` | https://raw.githubusercontent.com/dotnet/runtime/81cabf2857a01351e5ab578947c7403a5b128ad1/LICENSE.TXT |
+| toml_parser | 1.1.2+spec-1.1.0 | cargo | `toml_parser-v1.1.2` | https://raw.githubusercontent.com/toml-rs/toml/toml_parser-v1.1.2/LICENSE-APACHE |
+| toml_parser | 1.1.2+spec-1.1.0 | cargo | `toml_parser-v1.1.2` | https://raw.githubusercontent.com/toml-rs/toml/toml_parser-v1.1.2/LICENSE-MIT |
+| toml_writer | 1.1.1+spec-1.1.0 | cargo | `toml_writer-v1.1.1` | https://raw.githubusercontent.com/toml-rs/toml/toml_writer-v1.1.1/LICENSE-APACHE |
+| toml_writer | 1.1.1+spec-1.1.0 | cargo | `toml_writer-v1.1.1` | https://raw.githubusercontent.com/toml-rs/toml/toml_writer-v1.1.1/LICENSE-MIT |
+| unic-char-property | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
+| unic-char-property | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
+| unic-char-range | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
+| unic-char-range | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
+| unic-common | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
+| unic-common | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
+| unic-ucd-ident | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
+| unic-ucd-ident | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
+| unic-ucd-version | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
+| unic-ucd-version | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
+| WebDriverBiDi | 0.0.43 | nuget | `a4d3a93333ca3d780dd3f0ce9869008073e8a043` | https://raw.githubusercontent.com/webdriverbidi-net/webdriverbidi-net/a4d3a93333ca3d780dd3f0ce9869008073e8a043/LICENSE |
+| webview2-com | 0.38.2 | cargo | `HEAD (untagged)` | https://raw.githubusercontent.com/wravery/webview2-rs/HEAD/LICENSE |
+| webview2-com-macros | 0.8.1 | cargo | `HEAD (untagged)` | https://raw.githubusercontent.com/wravery/webview2-rs/HEAD/LICENSE |
+| webview2-com-sys | 0.38.2 | cargo | `HEAD (untagged)` | https://raw.githubusercontent.com/wravery/webview2-rs/HEAD/LICENSE |
+
+---
+
 ## Components shipping no licence text
 
 These declare a licence in their manifest but ship no licence file, so there
@@ -8606,48 +8856,4 @@ they declare, with their source, which is the most that can be reproduced.
 
 | Component | Version | Ecosystem | Declared licence | Source |
 |---|---|---|---|---|
-| alloc-stdlib | 0.2.4 | cargo | BSD-3-Clause | https://github.com/dropbox/rust-alloc-no-stdlib |
-| clipboard-win | 5.4.1 | cargo | BSL-1.0 | https://github.com/DoumanAsh/clipboard-win |
-| dlopen2 | 0.8.2 | cargo | MIT | https://github.com/OpenByteDev/dlopen2 |
-| dlopen2_derive | 0.4.3 | cargo | MIT | https://github.com/OpenByteDev/dlopen2 |
-| DocumentFormat.OpenXml | 3.3.0 | nuget | MIT | https://github.com/dotnet/Open-XML-SDK |
-| DocumentFormat.OpenXml.Framework | 3.3.0 | nuget | MIT | https://github.com/dotnet/Open-XML-SDK |
-| HtmlAgilityPack | 1.12.4 | nuget | MIT | http://html-agility-pack.net/ |
-| libappindicator-sys | 0.9.0 | cargo | Apache-2.0 OR MIT | — |
-| Markdig.Signed | 0.43.0 | nuget | BSD-2-Clause | https://github.com/xoofx/markdig |
-| Microsoft.AspNetCore.OpenApi | 10.0.0 | nuget | MIT | https://asp.net/ |
-| Microsoft.Extensions.ApiDescription.Server | 10.0.0 | nuget | MIT | https://asp.net/ |
-| Microsoft.Extensions.DependencyInjection | 10.0.0 | nuget | MIT | https://dot.net/ |
-| Microsoft.Extensions.DependencyInjection.Abstractions | 10.0.0 | nuget | MIT | https://dot.net/ |
-| Microsoft.Extensions.Logging | 10.0.0 | nuget | MIT | https://dot.net/ |
-| Microsoft.Extensions.Logging.Abstractions | 10.0.0 | nuget | MIT | https://dot.net/ |
-| Microsoft.Extensions.Options | 10.0.0 | nuget | MIT | https://dot.net/ |
-| Microsoft.Extensions.Primitives | 10.0.0 | nuget | MIT | https://dot.net/ |
-| Microsoft.OpenApi | 2.9.0 | nuget | MIT | https://github.com/Microsoft/OpenAPI.NET |
-| Packaging.Targets | 0.1.220 | nuget | MIT | — |
-| PDFsharp | 6.2.0 | nuget | MIT | https://docs.pdfsharp.net/ |
-| PuppeteerSharp | 21.1.1 | nuget | MIT | https://github.com/hardkoded/puppeteer-sharp |
-| seahash | 4.1.0 | cargo | MIT | https://gitlab.redox-os.org/redox-os/seahash |
 | selectors | 0.36.1 | cargo | MPL-2.0 | https://github.com/servo/stylo |
-| SkiaSharp | 3.119.1 | nuget | MIT | https://go.microsoft.com/fwlink/?linkid=868515 |
-| SkiaSharp.NativeAssets.Linux | 3.119.1 | nuget | MIT | https://go.microsoft.com/fwlink/?linkid=868515 |
-| SkiaSharp.NativeAssets.macOS | 3.119.1 | nuget | MIT | https://go.microsoft.com/fwlink/?linkid=868515 |
-| SkiaSharp.NativeAssets.Win32 | 3.119.1 | nuget | MIT | https://go.microsoft.com/fwlink/?linkid=868515 |
-| Swashbuckle.AspNetCore | 10.0.1 | nuget | MIT | https://github.com/domaindrivendev/Swashbuckle.AspNetCore |
-| Swashbuckle.AspNetCore.Swagger | 10.0.1 | nuget | MIT | https://github.com/domaindrivendev/Swashbuckle.AspNetCore |
-| Swashbuckle.AspNetCore.SwaggerGen | 10.0.1 | nuget | MIT | https://github.com/domaindrivendev/Swashbuckle.AspNetCore |
-| Swashbuckle.AspNetCore.SwaggerUI | 10.0.1 | nuget | MIT | https://github.com/domaindrivendev/Swashbuckle.AspNetCore |
-| System.IO.Packaging | 10.0.0 | nuget | MIT | https://dot.net/ |
-| System.IO.Packaging | 8.0.1 | nuget | MIT | https://dot.net/ |
-| System.Security.Cryptography.Pkcs | 8.0.1 | nuget | MIT | https://dot.net/ |
-| toml_parser | 1.1.2+spec-1.1.0 | cargo | MIT OR Apache-2.0 | https://github.com/toml-rs/toml |
-| toml_writer | 1.1.1+spec-1.1.0 | cargo | MIT OR Apache-2.0 | https://github.com/toml-rs/toml |
-| unic-char-property | 0.9.0 | cargo | MIT/Apache-2.0 | https://github.com/open-i18n/rust-unic/ |
-| unic-char-range | 0.9.0 | cargo | MIT/Apache-2.0 | https://github.com/open-i18n/rust-unic/ |
-| unic-common | 0.9.0 | cargo | MIT/Apache-2.0 | https://github.com/open-i18n/rust-unic/ |
-| unic-ucd-ident | 0.9.0 | cargo | MIT/Apache-2.0 | https://github.com/open-i18n/rust-unic/ |
-| unic-ucd-version | 0.9.0 | cargo | MIT/Apache-2.0 | https://github.com/open-i18n/rust-unic/ |
-| WebDriverBiDi | 0.0.43 | nuget | MIT | — |
-| webview2-com | 0.38.2 | cargo | MIT | https://github.com/wravery/webview2-rs |
-| webview2-com-macros | 0.8.1 | cargo | MIT | https://github.com/wravery/webview2-rs |
-| webview2-com-sys | 0.38.2 | cargo | MIT | https://github.com/wravery/webview2-rs |

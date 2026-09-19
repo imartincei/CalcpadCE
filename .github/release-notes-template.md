@@ -16,8 +16,6 @@ Download the portable zip below, extract it anywhere, and run `CalcpadCE.exe`.
 | File | OS | Arch |
 | ---- | -- | ---- |
 | 🪟 **[CalcpadCE-portable-${VERSION}.zip](https://github.com/${REPO}/releases/download/v${VERSION}/CalcpadCE-portable-${VERSION}.zip)** | **Windows (portable)** | **x64** |
-| 🐧 [CalcpadCE-desktop-${VERSION}-x86_64.AppImage](https://github.com/${REPO}/releases/download/v${VERSION}/CalcpadCE-desktop-${VERSION}-x86_64.AppImage) | Linux (portable) | x86_64 |
-| 🐧 [CalcpadCE-desktop-${VERSION}-aarch64.AppImage](https://github.com/${REPO}/releases/download/v${VERSION}/CalcpadCE-desktop-${VERSION}-aarch64.AppImage) | Linux (portable) | ARM64 |
 | 🐧 [CalcpadCE-desktop-${VERSION}-x86_64.deb](https://github.com/${REPO}/releases/download/v${VERSION}/CalcpadCE-desktop-${VERSION}-x86_64.deb) | Debian / Ubuntu | x86_64 |
 | 🐧 [CalcpadCE-desktop-${VERSION}-aarch64.deb](https://github.com/${REPO}/releases/download/v${VERSION}/CalcpadCE-desktop-${VERSION}-aarch64.deb) | Debian / Ubuntu | ARM64 |
 | 🐧 [CalcpadCE-desktop-${VERSION}-x86_64.rpm](https://github.com/${REPO}/releases/download/v${VERSION}/CalcpadCE-desktop-${VERSION}-x86_64.rpm) | CentOS / Fedora | x86_64 |

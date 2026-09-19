@@ -79,6 +79,24 @@ def scan_corpus(corpus_dir):
     return texts
 
 
+def load_fetched(corpus_dir):
+    """package key -> [(text, url, ref)] fetched from upstream by fetch-licences.sh."""
+    out = collections.defaultdict(list)
+    man = os.path.join(corpus_dir, "licences-fetched", "manifest.csv")
+    if not os.path.exists(man):
+        return out
+    for row in csv.DictReader(open(man, encoding="utf8")):
+        path = os.path.join(corpus_dir, "licences-fetched", row["path"])
+        try:
+            text = open(path, encoding="utf8").read()
+        except OSError:
+            continue
+        if text.strip():
+            out[(row["ecosystem"], row["package"].lower())].append(
+                (text, row["url"], row["ref"]))
+    return out
+
+
 def _normalise(text):
     stripped = COPYRIGHT_LINE.sub("", text)
     return re.sub(r"\s+", " ", stripped).strip().lower()
@@ -94,6 +112,12 @@ def _copyrights(text):
     return out
 
 
+# Verified against a real build: not distributed, so no notice obligation.
+def _not_shipped(note):
+    return note.lower().startswith("not-shipped:")
+
+
+# Anything still unverified surfaces in its own section rather than shipping silently.
 def _deferred(note):
     return "confirm" in note.lower() or "verify" in note.lower()
 
@@ -113,7 +137,10 @@ def load_inventory(path):
         name = (row.get("package") or "").strip()
         if not name:
             continue
-        if _deferred((row.get("note") or "").strip()):
+        note = (row.get("note") or "").strip()
+        if _not_shipped(note):
+            continue
+        if _deferred(note):
             held.append(row)
             continue
         key = (row["ecosystem"], name, row["version"])
@@ -124,6 +151,7 @@ def load_inventory(path):
 def emit(inventory_path, corpus_dir, out=sys.stdout):
     packages, held = load_inventory(inventory_path)
     texts = scan_corpus(corpus_dir)
+    fetched = load_fetched(corpus_dir)
 
     by_license = collections.defaultdict(list)
     for (eco, name, version), row in packages.items():
@@ -161,24 +189,34 @@ def emit(inventory_path, corpus_dir, out=sys.stdout):
             seen.add(key)
             w(f"| {row['package']} | {row['version']} | {row['ecosystem']} | {row['note']} |\n")
 
-    _emit_texts(w, packages, texts)
+    _emit_texts(w, packages, texts, fetched)
 
 
-def _emit_texts(w, packages, texts):
+def _emit_texts(w, packages, texts, fetched=None):
     # normalised body -> {"text": verbatim, "packages": [...], "copyrights": set}
     groups = {}
     without = []
+    upstream = []
+    fetched = fetched or {}
 
     for (eco, name, version), row in sorted(packages.items()):
         # Vendored files have no manifest to declare anything; they are already
         # listed under Undeclared and handled in the preamble.
         if eco == "vendored":
             continue
-        shipped = texts.get((eco, name.lower()))
+        key = (eco, name.lower())
+        shipped = texts.get(key)
         if not shipped:
-            without.append((name, version, eco, _norm_license(row["declared_license"]),
-                            (row.get("project_url") or "").strip()))
-            continue
+            # No licence file in the package -- fall back to the project's own repo.
+            got = fetched.get(key)
+            if got:
+                shipped = [t for t, _, _ in got]
+                for _, url, ref in got:
+                    upstream.append((name, version, eco, ref, url))
+            else:
+                without.append((name, version, eco, _norm_license(row["declared_license"]),
+                                (row.get("project_url") or "").strip()))
+                continue
         for text in shipped:
             digest = hashlib.sha256(_normalise(text).encode()).hexdigest()
             group = groups.setdefault(digest, {"text": text, "packages": set(), "copyrights": set()})
@@ -191,7 +229,8 @@ def _emit_texts(w, packages, texts):
     w("\n---\n\n## Licence texts\n\n")
     w(f"{len(ordered)} distinct licence texts, covering {covered} components. Each body\n")
     w("appears once; the copyright notices from every component sharing it are listed\n")
-    w("above it. Texts are reproduced verbatim from the packages as shipped.\n")
+    w("above it. Texts are reproduced verbatim from the packages as shipped, or for\n")
+    w("packages that ship none, from the project's own repository as recorded below.\n")
 
     for i, group in enumerate(ordered, 1):
         names = sorted(group["packages"], key=str.lower)
@@ -210,6 +249,17 @@ def _emit_texts(w, packages, texts):
         w(group["text"].replace("\r\n", "\n").rstrip() + "\n")
         w("```\n")
 
+    if upstream:
+        w("\n---\n\n## Licence texts taken from the project repository\n\n")
+        w("These packages ship no licence file. Their manifest licenceUrl points at a\n")
+        w("generic SPDX template with a placeholder copyright line, so the text above\n")
+        w("was taken from the project's own repository instead, pinned to the commit\n")
+        w("or tag the package was built from where one is recorded.\n\n")
+        w("| Component | Version | Ecosystem | Ref | Source |\n|---|---|---|---|---|\n")
+        for name, version, eco, ref, url in sorted(set(upstream), key=lambda t: t[0].lower()):
+            pin = ref if ref != "HEAD" else "HEAD (untagged)"
+            w(f"| {name} | {version} | {eco} | `{pin}` | {url} |\n")
+
     if without:
         w("\n---\n\n## Components shipping no licence text\n\n")
         w("These declare a licence in their manifest but ship no licence file, so there\n")
@@ -220,6 +270,7 @@ def _emit_texts(w, packages, texts):
             w(f"| {name} | {version} | {eco} | {lic} | {url or '—'} |\n")
 
     print(f"  {len(ordered)} licence texts, {covered} components covered, "
+          f"{len({(u[0], u[1]) for u in upstream})} from upstream repos, "
           f"{len(without)} shipping no text", file=sys.stderr)
 
 

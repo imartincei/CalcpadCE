@@ -31,14 +31,16 @@ So the notices file is built in two halves:
 
 ```bash
 ./harvest.sh              # resolve dependencies -> corpus/inventory.csv
+./fetch-licences.sh       # licence texts for packages that ship none
 ./generate-notices.sh     # preamble + inventory -> THIRD-PARTY-NOTICES.md
 ```
 
 `generate-notices.sh` copies `notices-preamble.md` verbatim, then appends the
 component listing grouped by licence. Edit the preamble, never the generated
-half. Rows the harvesters could not confirm as shipped (npm optional peers,
-cargo build-dependencies) are held in a separate section rather than listed as
-distributed.
+half. Rows the harvesters classify as not distributed (npm optional peers,
+cargo build-dependencies) are dropped — see [Not distributed](#not-distributed).
+Anything still genuinely unverified lands in a "Held back pending verification"
+section instead of shipping silently; that section appearing means act on it.
 
 Re-run the FOSSology scan when dependencies change and diff the findings. A
 clean diff means nothing new needs a human.
@@ -52,6 +54,7 @@ harvest resolves each closure with the real package managers.
 cd tools/license-scan
 
 ./harvest.sh                  # resolve + download every dependency (~5 min)
+./fetch-licences.sh           # pull missing licence texts from upstream repos
 docker compose up -d          # start FOSSology (first boot ~2 min)
 docker compose restart scheduler   # see "First boot" below -- do not skip
 
@@ -123,10 +126,10 @@ Split the notices file in two:
   licence is right, and the text is reproduced.
 - **The exceptions** — the handful of places where declared metadata *lies*, or
   where an obligation exceeds attribution. Those are what FOSSology is for, and
-  on this repo it has already found them: DOMPurify's MPL inside `monaco-editor`,
-  SkiaSharp's vendored native stack, the stripped `jspreadsheet`/`jsuites`
-  banners, the MPL crates, the vendored-but-uncompiled libdbus C, and the
-  LGPL libraries bundled into the AppImage.
+  on this repo it has already found them: DOMPurify's dual licence inside
+  `monaco-editor`, SkiaSharp's vendored native stack, the stripped
+  `jspreadsheet`/`jsuites` banners, the MPL crates, and the
+  vendored-but-uncompiled libdbus C.
 
 That list is finite and now written down in [Findings](#findings). The expensive
 part of this exercise is done. Re-run the scan when dependencies change and diff
@@ -203,28 +206,6 @@ Note 10.0.12 — not the 10.0.11 ref pack nor a cached 10.0.9. Take framework
 notices from the version the artifact names, never from what the host happens to
 have.
 
-**The AppImage bundles an entire third-party stack this corpus does not model.**
-`CalcpadCE-desktop-8.0.0-beta1-x86_64.AppImage` holds 700 files and **211 shared
-objects**: 160 assorted system libraries, 33 GTK, 14 .NET runtime, 3 WebKitGTK,
-and `libSkiaSharp.so`. Attribution present: 17 Debian `copyright` files that
-`linuxdeploy` happened to copy, plus two font licences — roughly 8% coverage.
-`deb`/`rpm` declare these as system dependencies and bundle none of them, so this
-is an AppImage-only obligation.
-
-Two items from that stack need a decision:
-
-- **WebKitGTK is bundled.** WebKit is LGPL-2.1 (WebCore) plus BSD
-  (JavaScriptCore), so this is a relinking obligation on a confirmed-present
-  library — the same class as the SkiaSharp question, but no longer speculative.
-  **Escalate this one.**
-- **`libdbus-1.so.3` is bundled** (with its Debian `copyright` file). That makes
-  the AFL-2.1 / GPL-2.0-or-later dual licence live for the AppImage, and the
-  election has to be deliberate. Note this is the distro library, not the
-  vendored C in `libdbus-sys` — that one still never compiles.
-
-Also worth checking: only `DejaVuSerif-LICENSE` and `Jost-LICENSE` ship in the
-bundle. JuliaMono is absent, so the font list above may be stale for this target.
-
 **Vendored assets shipping without attribution:**
 
 - `jspreadsheet.min.js`, `jsuites.min.js`, `jspreadsheet.min.css` and
@@ -252,12 +233,12 @@ bundle. JuliaMono is absent, so the font list above may be stale for this target
 
 **Real, and missed entirely by declared metadata:**
 
-- **MPL-2.0 — DOMPurify vendored inside `monaco-editor`.** Lives at
+- **DOMPurify vendored inside `monaco-editor`.** Lives at
   `monaco-editor/esm/vs/base/browser/dompurify/dompurify.js` and is compiled
   into the shipped `editor.main.js`. `monaco-editor`'s `package.json` declares
-  MIT and nothing else. DOMPurify is dual Apache-2.0 OR MPL-2.0, so you can
-  elect Apache-2.0 — but that election has to be made deliberately and written
-  down. Left alone it is a file-level copyleft obligation on a file you ship.
+  MIT and nothing else. DOMPurify is dual Apache-2.0 OR MPL-2.0; **CalcpadCE
+  elects Apache-2.0**, recorded in `notices-preamble.md`, so it is attribution
+  only and not a file-level copyleft obligation.
 - **`monaco-editor` and `typescript` both carry their own third-party notice
   files** (CC-BY-4.0, Unicode, W3C-20150513). These are pass-through
   obligations: their notices must be reproduced in yours.
@@ -270,8 +251,8 @@ bundle. JuliaMono is absent, so the font list above may be stale for this target
 - `typescript` shows up in both npm production trees, but only because `vue`
   declares it as an **optional peer dependency** — `npm ci --omit=dev` installs
   those. It is a devDependency everywhere it is declared and never reaches a
-  bundle. `harvest.sh` now flags rows like this in the `note` column; do not
-  list them without confirming they actually ship.
+  bundle — confirmed against real build output, see
+  [Not distributed](#not-distributed).
 
 **GPL-2.0-or-later / AFL-2.1 in the Rust tree — present but not shipped:**
 
@@ -282,10 +263,9 @@ itself declares only `Apache-2.0/MIT` — another declared-vs-actual mismatch.
 It does not ship. `libdbus-sys` resolves with features `default, pkg-config` on
 both Linux targets, **not** `vendored`, so its build script links the system
 `libdbus-1` and never compiles the bundled C. Bulk-reject that subtree in the
-Browse UI rather than clearing it file by file. Two caveats: re-check the feature
-set after any dependency bump that could turn `vendored` on, and confirm the
-AppImage target is not bundling `libdbus-1.so` (deb/rpm declare it as a system
-dependency, so those are fine).
+Browse UI rather than clearing it file by file. One caveat: re-check the feature
+set after any dependency bump that could turn `vendored` on. The `deb`, `rpm` and
+Arch packages declare `libdbus-1` as a system dependency and bundle none of it.
 
 Crates are staged unpacked minus their root `tests/`, `benches/`, `examples/`,
 `fuzz/` and `ci/` directories — separate Cargo targets that are never linked into
@@ -313,6 +293,94 @@ for those.
 - Anything suffixed `-possibility` (`Microsoft-possibility`,
   `IJG-possibility`) — the suffix is FOSSology telling you it is a low
   confidence guess.
+
+### Packages that ship no licence file
+
+45 components declared a licence but shipped no licence file, leaving no
+copyright line to reproduce — and for MIT and BSD the copyright line is the
+part that actually has to travel with the copy.
+
+The manifest is a dead end here. Every NuGet package points `licenseUrl` at
+`https://licenses.nuget.org/<spdx>`, which serves the generic template reading
+`Copyright (c) <year> <copyright holders>` — a literal placeholder that adds
+nothing to the SPDX id already in the table.
+
+The `.nuspec` `<repository>` element is the good route, and it is better than a
+version tag: it names the real source repo *and* the exact commit the package
+was built from, so the text pins to that build.
+
+```xml
+<repository type="git" url="https://github.com/dotnet/dotnet"
+            commit="b0f34d51fccc69fd334253924abd8d6853fad7aa" />
+```
+
+`fetch-licences.sh` resolves each package that way, falling back to the
+project URL, and tries refs in order: build commit, `v<version>`, `<version>`,
+`<name>-v<version>`, then the default branch. It follows vanity redirects, so
+SkiaSharp's `go.microsoft.com/fwlink/?linkid=868515` resolves to
+`mono/SkiaSharp`. Results cache under `corpus/licences-fetched/` with a
+manifest of every URL used, keeping `generate-notices.sh` offline.
+
+That took the gap from 45 components to 1, and SkiaSharp now carries its real
+`Copyright (c) 2015-2016 Xamarin, Inc. / 2017-2018 Microsoft Corporation`
+rather than nothing. The one left is `selectors` 0.36.1 — `servo/stylo` carries
+no licence file at all and declares MPL-2.0 only in `Cargo.toml`. It is already
+covered in the preamble's MPL section.
+
+#### Hardcoded repository URLs — check these before a release
+
+Some packages name no repository anywhere: not in the manifest, not on the
+registry. For those the URL is **hardcoded** in `OVERRIDES` at the top of
+`fetch_licences.py`, which means nothing upstream will tell us when it goes
+stale. Re-check each one before cutting a release:
+
+| Package | Hardcoded URL | Why |
+|---|---|---|
+| `libappindicator-sys` | https://github.com/tauri-apps/libappindicator-rs | no `repository` in the crate manifest, and none on crates.io |
+
+A hardcoded URL fails in two directions and only one is loud. If the repo moves
+or the tag disappears the fetch reports `MISS` and the component drops back into
+"shipping no licence text", which is visible. But if upstream *starts* declaring
+its own repository, or the crate changes hands, the override silently keeps
+winning and we would go on reproducing a licence from the wrong project. Drop an
+entry as soon as the package declares its own.
+
+Re-run after any dependency bump: a new version means a new commit, and the
+copyright line can legitimately change between releases.
+
+### Not distributed
+
+28 rows resolve into the dependency tree but ship in nothing. Verified against
+the artifacts `build-desktop.sh` actually produces, not inferred from metadata,
+so `harvest.sh` marks them `not-shipped:` and the notices file omits them.
+
+**26 cargo build-dependencies.** Because `build-desktop.sh` passes `--target`,
+cargo splits host artifacts from target artifacts, and that split is the proof:
+
+```bash
+cd Calcpad.Web/frontend/calcpad-desktop/src-tauri
+# versioned crate sources compiled FOR THE TARGET (linked into the binary)
+cat target/<triple>/release/deps/*.d | tr ' ' '\n' \
+  | grep -oE 'registry/src/[^/]+/[^/]+/' | sed 's#.*/\([^/]*\)/$#\1#' | sort -u
+# the same under target/release/deps/ is host-only: build scripts, never linked
+```
+
+All 26 appear only in the host set. `cargo tree --edges normal` agrees on all
+three triples. Watch the three name collisions — `toml`, `toml_datetime` and
+`winnow` each have a *different* version that genuinely is linked and is
+listed; compare versions, not bare names.
+
+**2 npm `typescript` rows.** Neither bundle contains a TypeScript compiler:
+`grep -r createSourceFile\|createProgram\|'Debug Failure'` over
+`calcpad-web/dist/` and `vscode-calcpad/dist/extension.js` returns nothing, and
+no `ts.worker` chunk is emitted. The `typescript-*.js` and `tsMode-*.js` chunks
+in `dist/assets/` are monaco-editor 0.52.2's own language support (8K and 24K —
+the compiler is ~9MB), not the npm package. The extension is packaged
+`--no-dependencies` with `node_modules/**` in `.vscodeignore`, so the on-disk
+peer copy is not redistributed either.
+
+Re-run both checks after any dependency bump that could move a build-dependency
+into the normal graph.
 
 ## Components
 
@@ -346,9 +414,9 @@ any crate that only one platform reaches. That takes 553 lock entries down to
 and the four font trees. Nothing else in this tooling would find them, and they
 are all redistributed.
 
-The WPF desktop app is not listed: it is being removed from the product, so its
-dependencies are not shipped and do not belong in a notices file. Removing it
-also drops `Microsoft.Web.WebView2`, the one component under a proprietary
+The WPF desktop app is not listed: it was removed from the product, so its
+dependencies are not shipped and do not belong in a notices file. That removal
+also dropped `Microsoft.Web.WebView2`, the one component under a proprietary
 Microsoft EULA rather than an OSS license.
 
 `Calcpad.Tests` is deliberately excluded — xunit and coverlet are build-time

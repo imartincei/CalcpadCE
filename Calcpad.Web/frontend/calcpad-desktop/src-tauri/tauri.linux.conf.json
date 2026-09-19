@@ -7,7 +7,7 @@
     "beforeBuildCommand": "./build-frontend.sh"
   },
   "bundle": {
-    "targets": ["deb", "rpm", "appimage"],
+    "targets": ["deb", "rpm"],
     "resources": {
       "binaries/*.so": "./",
       "binaries/*.dll": "./",

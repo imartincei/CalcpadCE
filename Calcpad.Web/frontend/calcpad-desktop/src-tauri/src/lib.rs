@@ -575,56 +575,6 @@ async fn confirm_three_way(
     })
 }
 
-// Inside a linuxdeploy-generated AppImage, AppRun exports LD_LIBRARY_PATH so the bundled
-// binary can find its libs, and a spawned xdg-open would inherit it and crash any glib/dbus
-// tools it invokes. Strip those vars (plus the archived originals AppRun stashes).
-#[tauri::command]
-fn open_path_native(path: String) -> Result<(), String> {
-    #[cfg(target_os = "linux")]
-    {
-        // xdg-open has no `--` end-of-options marker — it is a shell script that would
-        // try to open a file literally named `--` — so a leading dash is rejected
-        // outright rather than escaped.
-        if path.starts_with('-') {
-            return Err(format!("refusing a path that reads as an option: {path}"));
-        }
-        let target = PathBuf::from(&path);
-        let mut cmd = std::process::Command::new("xdg-open");
-        cmd.arg(&target);
-        for key in [
-            "LD_LIBRARY_PATH",
-            "LD_PRELOAD",
-            "GTK_DATA_PREFIX",
-            "GTK_THEME",
-            "GTK_EXE_PREFIX",
-            "GTK_PATH",
-            "GTK_IM_MODULE_FILE",
-            "GDK_PIXBUF_MODULE_FILE",
-            "GIO_EXTRA_MODULES",
-            "GSETTINGS_SCHEMA_DIR",
-            "XDG_DATA_DIRS",
-            "PYTHONHOME",
-            "PYTHONPATH",
-            "PERLLIB",
-            "QT_PLUGIN_PATH",
-        ] {
-            let orig = format!("APPDIR_ORIG_{key}");
-            match std::env::var(&orig) {
-                Ok(v) if !v.is_empty() => { cmd.env(key, v); }
-                _ => { cmd.env_remove(key); }
-            }
-            cmd.env_remove(orig);
-        }
-        cmd.stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null());
-        cmd.spawn().map(|_| ()).map_err(|e| e.to_string())
-    }
-    #[cfg(not(target_os = "linux"))]
-    {
-        let _ = path;
-        Err("open_path_native is Linux-only".to_string())
-    }
-}
-
 #[tauri::command]
 fn server_dir(app: AppHandle) -> Result<String, String> {
     // Directory where the sidecar was extracted at install time. Calcpad.Server
@@ -636,8 +586,8 @@ fn server_dir(app: AppHandle) -> Result<String, String> {
         .map_err(|e| e.to_string())
 }
 
-// Writable log directory shared with the .NET sidecar. On an AppImage the resource dir is a
-// read-only FUSE mount, so both sides point at app_data_dir/logs instead.
+// Writable log directory shared with the .NET sidecar. The resource dir can be read-only,
+// so both sides point at app_data_dir/logs instead.
 fn resolve_log_dir(app: &AppHandle) -> Option<PathBuf> {
     let dir = app.path().app_data_dir().ok()?.join("logs");
     let _ = std::fs::create_dir_all(&dir);
@@ -748,8 +698,8 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     // never sees them. These vars must be set before the runtime boots, which is why they live
     // here rather than in Program.cs.
     //
-    // The dump goes to the writable logs/ dir because on an AppImage the resource dir beside
-    // the apphost is read-only. Fixed filename — each crash overwrites the last, matching the
+    // The dump goes to the writable logs/ dir because the resource dir beside the apphost can
+    // be read-only. Fixed filename — each crash overwrites the last, matching the
     // one-server-at-a-time model.
     let dump_dir = crash_dir()
         .map(|p| p.to_path_buf())
@@ -1486,7 +1436,6 @@ pub fn run() {
             draft_list,
             draft_read,
             draft_delete,
-            open_path_native,
             log_dir,
             take_pending_launch_files,
             allow_document_dir,

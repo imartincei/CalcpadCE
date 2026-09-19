@@ -162,7 +162,7 @@ def collect_cargo(dest: str, component: str, cargo_home: str, *metas: str) -> No
 
         notes = []
         if kinds == {"build"}:
-            notes.append("build-dependency only; confirm it is not linked in before listing")
+            notes.append("not-shipped: build-dependency, never linked into the binary")
         if triples != all_triples:
             notes.append(f"{', '.join(sorted(triples))} only")
 
@@ -246,7 +246,7 @@ def collect_npm(root: str, component: str) -> None:
 
         note = ""
         if reachable is not None and pkg["name"] not in reachable:
-            note = "installed as optional peer; verify it is bundled before listing"
+            note = "not-shipped: optional peer, never reaches a bundle"
 
         out.writerow([
             component, "npm", pkg["name"], pkg.get("version", ""), lic,

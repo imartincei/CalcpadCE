@@ -98,7 +98,6 @@ jobs:
           mkdir -p artifacts
           cp "$bundle"/deb/*.deb "artifacts/CalcpadCE-desktop-${{ inputs.version }}-${{ matrix.arch }}.deb"
           cp "$bundle"/rpm/*.rpm "artifacts/CalcpadCE-desktop-${{ inputs.version }}-${{ matrix.arch }}.rpm"
-          cp "$bundle"/appimage/*.AppImage "artifacts/CalcpadCE-desktop-${{ inputs.version }}-${{ matrix.arch }}.AppImage"
           if [ "${{ matrix.arch }}" = x86_64 ]; then
             cp Calcpad.Web/frontend/calcpad-desktop/packaging/arch/*.pkg.tar.zst \
               "artifacts/CalcpadCE-desktop-${{ inputs.version }}-x86_64.pkg.tar.zst"
@@ -114,12 +113,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           path: artifacts/CalcpadCE-desktop-${{ inputs.version }}-${{ matrix.arch }}.rpm
-          archive: false
-
-      - name: Upload AppImage
-        uses: actions/upload-artifact@v7
-        with:
-          path: artifacts/CalcpadCE-desktop-${{ inputs.version }}-${{ matrix.arch }}.AppImage
           archive: false
 
       - name: Upload Arch package
