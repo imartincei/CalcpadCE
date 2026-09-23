@@ -3294,10 +3294,6 @@ It uses native file dialogs and menu bar and has offline capabilities.</p>
 </tr>
 <tr>
 <td>Linux</td>
-<td>AppImage (run directly)</td>
-</tr>
-<tr>
-<td>Linux</td>
 <td>Debian <code>.deb</code></td>
 </tr>
 <tr>
@@ -3311,8 +3307,8 @@ It uses native file dialogs and menu bar and has offline capabilities.</p>
 </tbody>
 </table>
 <p>The calculation engine and its dependencies are bundled inside the app — you do <strong>not</strong> need .NET installed separately.
-The Linux <code>.AppImage</code> and Windows Portable builds include what they need to run.
-The other Linux options expect WebKitGTK to already be present on the system and may require installing a few other common dependencies.</p>
+The Windows Portable build includes what it needs to run.
+The Linux packages expect WebKitGTK to already be present on the system and may require installing a few other common dependencies.</p>
 <p>For PDF export you need a <strong>Chromium-based browser</strong> (Chrome, Edge, or Chromium) installed on the system.
 On Linux, the app will tell you which package to install if none is found — see <a href="new-exports.html#browser-requirement">Exports</a>.</p>
 <h2 id="your-first-document">Your first document<a class="headerlink" href="#your-first-document" title="Permanent link">&para;</a></h2>
@@ -3466,10 +3462,6 @@ It starts automatically when the app launches and shuts down when you close it �
 <tr>
 <td>Unsaved work after a crash</td>
 <td>The app writes backup copies of unsaved files; reopen them from the Files tab.</td>
-</tr>
-<tr>
-<td>AppImage will not start: <code>dlopen(): error loading libfuse.so.2</code></td>
-<td>An AppImage mounts itself at launch and needs FUSE 2, but many current distributions ship only FUSE 3. Either run <code>./CalcpadCE.AppImage --appimage-extract-and-run</code>, or install FUSE 2 — the package is <code>fuse2</code> on Arch, <code>libfuse2</code> on Debian and Ubuntu.</td>
 </tr>
 </tbody>
 </table>
