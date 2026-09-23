@@ -62,7 +62,6 @@ All endpoints are under `POST /api/calcpad/` unless noted.
 | `pdf/browser` | GET | Which browser PDF export would use |
 | `pdf/browser/install` | POST | Download the bundled headless Chromium |
 | `highlight` | POST | Get syntax highlighting tokens |
-| `highlight-line` | POST | Highlight a single line |
 | `lint` | POST | Lint code and return diagnostics |
 | `definitions` | POST | Extract variable/function/macro definitions |
 | `symbol-at-position` | POST | The symbol under a cursor and all its occurrences |

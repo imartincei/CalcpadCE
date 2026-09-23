@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Calcpad.Highlighter.Linter.Models;
 using Calcpad.Highlighter.Parsing;
+using Calcpad.Highlighter.Tokenizer;
 
 namespace Calcpad.Highlighter.ContentResolution
 {
@@ -23,6 +25,7 @@ namespace Calcpad.Highlighter.ContentResolution
             var lineContinuationMap = new Dictionary<int, List<int>>();
             var lineContinuationSegments = new Dictionary<int, List<LineContinuationSegment>>();
 
+            var parseModes = new ParseModeTracker();
             int i = 0;
             while (i < lines.Count)
             {
@@ -32,6 +35,13 @@ namespace Calcpad.Highlighter.ContentResolution
                 // Continue if: explicit continuation OR (implicit continuation AND unbalanced delimiters)
                 bool hasUnbalanced = parenDepth > 0 || bracketDepth > 0 || braceDepth > 0;
                 bool shouldContinue = explicitCont || (implicitCont && hasUnbalanced);
+
+                // HTML/markdown content never continues, e.g. CSS lines ending in ';'
+                var trimmed = line.AsSpan().Trim();
+                if (parseModes.Mode != ParseMode.Cpd && !ParseModeTracker.IsDirective(trimmed))
+                    shouldContinue = false;
+                else
+                    parseModes.Apply(trimmed);
 
                 if (shouldContinue && i < lines.Count - 1)
                 {

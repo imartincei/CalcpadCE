@@ -193,6 +193,14 @@ export interface DefinitionsResponse {
     projectPath: string | null;
     /** Resolved absolute `#LibraryPath`, or null when undeclared/unresolvable. */
     libraryPath: string | null;
+    /** Source lines in #html/#markdown mode after macro and #include expansion. Absent from older servers. */
+    parseModes?: ParseModeRange[];
+}
+
+export interface ParseModeRange {
+    startLine: number;  // Zero-based
+    endLine: number;    // Zero-based, inclusive
+    mode: 'html' | 'markdown';
 }
 
 export interface MacroDefinition {

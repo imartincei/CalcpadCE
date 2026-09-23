@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Calcpad.Highlighter.ContentResolution;
+using ParseMode = Calcpad.Highlighter.Linter.Models.ParseMode;
 
 namespace Calcpad.Highlighter.Tokenizer.Models
 {
@@ -25,6 +26,12 @@ namespace Calcpad.Highlighter.Tokenizer.Models
 
         /// <summary>All ← assignments - must target existing variables (name, line, column)</summary>
         public List<(string Name, int Line, int Column)> OuterScopeAssignments { get; } = new();
+
+        /// <summary>Parse mode of every line inside an #html or #markdown block. Absent lines are Calcpad.</summary>
+        public Dictionary<int, ParseMode> LineModes { get; } = new();
+
+        /// <summary>HTML/markdown content lines, which get no tokens apart from macro calls.</summary>
+        public HashSet<int> RawLines { get; } = new();
 
         // --- Lint mode only: rich definition metadata ---
 

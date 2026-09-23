@@ -1971,7 +1971,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
         // Initialize comment formatter
         outputChannel.appendLine('Initializing comment formatter...', 'verbose');
-        const commentFormatter = new CommentFormatter(outputChannel);
+        const commentFormatter = new CommentFormatter(outputChannel, definitionsService);
         const commentFormatterDisposables = commentFormatter.registerCommands();
 
         // Initialize insert manager (snippet service)

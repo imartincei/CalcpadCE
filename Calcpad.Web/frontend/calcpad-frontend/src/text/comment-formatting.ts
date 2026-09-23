@@ -1,5 +1,6 @@
 export type InlineFormat = 'bold' | 'italic' | 'underline' | 'subscript' | 'superscript';
 export type CommentFormat = 'html' | 'markdown';
+export type ParseMode = 'cpd' | CommentFormat;
 
 export const HTML_INLINE: Record<InlineFormat, [string, string]> = {
     bold: ['<strong>', '</strong>'],
@@ -89,9 +90,40 @@ export function getCommentPrefixInsertColumn(lineText: string, selectionColumn?:
     return indentLen + 1;
 }
 
+/**
+ * Parse mode in effect at the 0-based `line`, from the #html/#cpd/#markdown directives above it.
+ * Openers push and any #end form pops, as in ExpressionParser.
+ */
+export function getParseModeAt(getLine: (index: number) => string, line: number): ParseMode {
+    const stack: ParseMode[] = [];
+    let mode: ParseMode = 'cpd';
+    for (let i = 0; i < line; i++) {
+        const text = getLine(i).trim();
+        if (/^#end (html|cpd|markdown)(\s|$)/i.test(text)) {
+            mode = stack.pop() ?? 'cpd';
+            continue;
+        }
+        const opener = /^#(html|cpd|markdown)(\s|$)/i.exec(text);
+        if (opener) {
+            stack.push(mode);
+            mode = opener[1].toLowerCase() as ParseMode;
+        }
+    }
+    return mode;
+}
+
+/**
+ * Split a line into [indent, content, trailingQuote]. Raw lines, in #html/#markdown mode,
+ * have no comment quotes to strip.
+ */
+function splitContent(lineText: string, raw: boolean): [indent: string, content: string, trailingQuote: string] {
+    return raw ? [...splitIndent(lineText), ''] : stripCommentPrefix(lineText);
+}
+
 /** Build the replacement line text for a heading hotkey, preserving indentation. */
-export function buildHeadingLine(lineText: string, level: number, format: CommentFormat): string {
-    const [indent, rawContent, trailingQuote] = stripCommentPrefix(lineText);
+export function buildHeadingLine(lineText: string, level: number, format: CommentFormat, raw = false): string {
+    const [indent, rawContent, trailingQuote] = splitContent(lineText, raw);
+    const quote = raw ? '' : "'";
     let content = rawContent;
 
     const htmlMatch = content.match(/^<h[1-6]>(.*)<\/h[1-6]>$/);
@@ -100,15 +132,15 @@ export function buildHeadingLine(lineText: string, level: number, format: Commen
     if (mdMatch) content = mdMatch[2];
 
     if (format === 'html') {
-        return `${indent}'<h${level}>${content}</h${level}>${trailingQuote}`;
+        return `${indent}${quote}<h${level}>${content}</h${level}>${trailingQuote}`;
     }
-    return `${indent}'${'#'.repeat(level)} ${content}${trailingQuote}`;
+    return `${indent}${quote}${'#'.repeat(level)} ${content}${trailingQuote}`;
 }
 
 /** Build the replacement line text for the paragraph hotkey, preserving indentation. */
-export function buildParagraphLine(lineText: string): string {
-    const [indent, content, trailingQuote] = stripCommentPrefix(lineText);
-    return `${indent}'<p>${content}</p>${trailingQuote}`;
+export function buildParagraphLine(lineText: string, raw = false): string {
+    const [indent, content, trailingQuote] = splitContent(lineText, raw);
+    return `${indent}${raw ? '' : "'"}<p>${content}</p>${trailingQuote}`;
 }
 
 /**
@@ -116,31 +148,52 @@ export function buildParagraphLine(lineText: string): string {
  * wrapper tags (<ul>/<ol>) take the first selected line's indentation; each
  * item keeps its own line's indentation.
  */
-export function buildListLines(lineTexts: string[], format: CommentFormat, ordered: boolean): string[] {
+export function buildListLines(lineTexts: string[], format: CommentFormat, ordered: boolean, raw = false): string[] {
     if (lineTexts.length === 0) return [];
     const [wrapperIndent] = splitIndent(lineTexts[0]);
+    const q = raw ? '' : "'";
     const lines: string[] = [];
 
     if (format === 'html') {
-        lines.push(`${wrapperIndent}'<${ordered ? 'ol' : 'ul'}>`);
+        lines.push(`${wrapperIndent}${q}<${ordered ? 'ol' : 'ul'}>`);
         for (const lineText of lineTexts) {
-            const [indent, content, tq] = stripCommentPrefix(lineText);
-            lines.push(`${indent}'<li>${content}</li>${tq}`);
+            const [indent, content, tq] = splitContent(lineText, raw);
+            lines.push(`${indent}${q}<li>${content}</li>${tq}`);
         }
-        lines.push(`${wrapperIndent}'</${ordered ? 'ol' : 'ul'}>`);
+        lines.push(`${wrapperIndent}${q}</${ordered ? 'ol' : 'ul'}>`);
     } else if (ordered) {
         let num = 1;
         for (const lineText of lineTexts) {
-            const [indent, content, tq] = stripCommentPrefix(lineText);
-            lines.push(`${indent}'${num}. ${content}${tq}`);
+            const [indent, content, tq] = splitContent(lineText, raw);
+            lines.push(`${indent}${q}${num}. ${content}${tq}`);
             num++;
         }
     } else {
         for (const lineText of lineTexts) {
-            const [indent, content, tq] = stripCommentPrefix(lineText);
-            lines.push(`${indent}'- ${content}${tq}`);
+            const [indent, content, tq] = splitContent(lineText, raw);
+            lines.push(`${indent}${q}- ${content}${tq}`);
         }
     }
 
     return lines;
+}
+
+/** True if the line, after its indentation, is wrapped in an HTML comment. */
+export function isHtmlCommentLine(lineText: string): boolean {
+    const [, rest] = splitIndent(lineText);
+    return rest.startsWith('<!--') && rest.trimEnd().endsWith('-->');
+}
+
+/** Wrap a line in an HTML comment, the comment syntax for #html/#markdown content. */
+export function wrapHtmlComment(lineText: string): string {
+    const [indent, rest] = splitIndent(lineText);
+    return `${indent}<!-- ${rest} -->`;
+}
+
+/** Remove the HTML comment that {@link wrapHtmlComment} added, if any. */
+export function unwrapHtmlComment(lineText: string): string {
+    if (!isHtmlCommentLine(lineText)) return lineText;
+    const [indent, rest] = splitIndent(lineText);
+    const inner = rest.trimEnd().slice(4, -3);
+    return indent + inner.replace(/^ /, '').replace(/ $/, '');
 }

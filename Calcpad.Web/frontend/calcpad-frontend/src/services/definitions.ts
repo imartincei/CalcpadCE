@@ -2,6 +2,7 @@ import type { CalcpadApiClient } from '../api/client';
 import type { DefinitionsResponse } from '../types/api';
 import type { ILogger } from '../types/interfaces';
 import type { ResolvedPathRoots } from '../text/path-roots';
+import type { ParseMode } from '../text/comment-formatting';
 
 /**
  * Service for fetching and caching definitions from the Calcpad server.
@@ -35,6 +36,18 @@ export class CalcpadDefinitionsService {
     public getCachedPathRoots(documentKey: string): ResolvedPathRoots {
         const cached = this.cache.get(documentKey);
         return { project: cached?.projectPath ?? null, library: cached?.libraryPath ?? null };
+    }
+
+    /**
+     * The parse mode of a 0-based line, from the last cached `/definitions` response. The server
+     * reads it after expanding macros and includes, which a text scan cannot. `null` when there
+     * is no cache entry yet, so callers fall back to their own scan.
+     */
+    public getCachedParseMode(documentKey: string, line: number): ParseMode | null {
+        const ranges = this.cache.get(documentKey)?.parseModes;
+        if (!ranges) return null;
+        const range = ranges.find(r => line >= r.startLine && line <= r.endLine);
+        return range?.mode ?? 'cpd';
     }
 
     /**

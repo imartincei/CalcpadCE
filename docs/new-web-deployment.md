@@ -57,7 +57,6 @@ All paths are relative to `/api/calcpad`.
 | `/pdf/browser/install` | POST | Download the bundled headless Chromium |
 | `/sample` | GET | Fetch a sample document |
 | `/highlight` | POST | Tokenize a full document for syntax highlighting |
-| `/highlight-line` | POST | Tokenize a single line (incremental) |
 | `/lint` | POST | Run the linter and return diagnostics |
 | `/definitions` | POST | List macros, functions, variables, and units |
 | `/symbol-at-position` | POST | The symbol under a cursor position and all its occurrences |

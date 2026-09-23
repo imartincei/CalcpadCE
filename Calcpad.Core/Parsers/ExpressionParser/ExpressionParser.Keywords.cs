@@ -64,6 +64,12 @@ namespace Calcpad.Core
             Ui,
             ProjectPath,
             LibraryPath,
+            Html,
+            Cpd,
+            Markdown,
+            End_Html,
+            End_Cpd,
+            End_Markdown,
             SkipLine
         }
         private enum KeywordResult
@@ -105,7 +111,7 @@ namespace Calcpad.Core
                 return Keyword.None;
 
             var i = char.ToLowerInvariant(s[1]) - 'a';
-            if (i < 0 || i >= KeywordNames.Length)
+            if (i < 0 || i >= KeywordIndex.Length)
                 return Keyword.None;
 
             var ind = KeywordIndex[i];
@@ -136,11 +142,37 @@ namespace Calcpad.Core
             else if (s[0] == '#' && keyword == Keyword.None)
                 keyword = GetKeyword(s);
 
+            var isModeKeyword = keyword >= Keyword.Html && keyword <= Keyword.End_Markdown;
+            // Skipped lines must not cache their keyword, or a loop would replay it
+            if (_modeSuppressed && !isModeKeyword)
+            {
+                keyword = Keyword.None;
+                return KeywordResult.Continue;
+            }
+
             if (keyword == Keyword.None)
                 return KeywordResult.None;
 
+            if (IsNonCpdMode && !isModeKeyword)
+            {
+                if (_condition.IsSatisfied)
+                    AppendError(s.ToString(), Messages.Only_mode_directives_are_allowed_in_HTML_or_markdown_mode, _currentLine);
+
+                keyword = Keyword.None;
+                return KeywordResult.Continue;
+            }
+
             switch (keyword)
             {
+                case Keyword.Html: SetParseMode(s, keyword, ParseMode.Html); break;
+                case Keyword.Cpd: SetParseMode(s, keyword, ParseMode.Cpd); break;
+                case Keyword.Markdown: SetParseMode(s, keyword, ParseMode.Markdown); break;
+                case Keyword.End_Html:
+                case Keyword.End_Cpd:
+                case Keyword.End_Markdown:
+                    FlushMarkdown();
+                    (_parseMode, _modeSuppressed) = _parseModeStack.Count > 0 ? _parseModeStack.Pop() : (ParseMode.Cpd, false);
+                    break;
                 case Keyword.Hide: SetVisibility(s, keyword, Settings.Math.ShowHiddenOutput && _isVisible); break;
                 case Keyword.Show: SetVisibility(s, keyword, true); break;
                 case Keyword.Pre: SetVisibility(s, keyword, !ForPrint); break;
@@ -254,6 +286,18 @@ namespace Calcpad.Core
             _visibilityStack.Push(_isVisible);
             if (IsDirectiveConditionMet(s, keyword))
                 _isVisible = value;
+        }
+
+        private void SetParseMode(ReadOnlySpan<char> s, Keyword keyword, ParseMode mode)
+        {
+            FlushMarkdown();
+            _parseModeStack.Push((_parseMode, _modeSuppressed));
+            _parseMode = mode;
+            var kwdLength = KeywordLength(keyword);
+            var hasCondition = s.Length > kwdLength && !s[kwdLength..].IsWhiteSpace();
+            // Only the inline condition suppresses; an unsatisfied #if already disables the lines
+            if (hasCondition && _calculate && _condition.IsSatisfied && !IsDirectiveConditionMet(s, keyword))
+                _modeSuppressed = true;
         }
 
         private void SetOutputMode(ReadOnlySpan<char> s, Keyword keyword, int value)

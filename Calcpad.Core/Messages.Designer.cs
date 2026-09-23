@@ -1841,5 +1841,14 @@ namespace Calcpad.Core {
                 return ResourceManager.GetString("Path_root_folder_not_found_0_1", resourceCulture);
             }
         }
+
+        // / <summary>
+        // /   Looks up a localized string similar to Only #html, #cpd, #markdown and their #end forms are allowed in #HTML and #markdown mode..
+        // / </summary>
+        public static string Only_mode_directives_are_allowed_in_HTML_or_markdown_mode {
+            get {
+                return ResourceManager.GetString("Only_mode_directives_are_allowed_in_HTML_or_markdown_mode", resourceCulture);
+            }
+        }
     }
 }

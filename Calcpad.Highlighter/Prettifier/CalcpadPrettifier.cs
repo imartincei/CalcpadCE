@@ -1,6 +1,8 @@
 using System;
 using System.Text;
 using Calcpad.Highlighter.Linter.Constants;
+using Calcpad.Highlighter.Linter.Models;
+using Calcpad.Highlighter.Tokenizer;
 
 namespace Calcpad.Highlighter.Prettifier
 {
@@ -9,7 +11,7 @@ namespace Calcpad.Highlighter.Prettifier
     /// <c>#if</c>/<c>#else</c>/<c>#end if</c>, <c>#for</c>/<c>#while</c>/<c>#repeat</c>/<c>#loop</c>,
     /// and multiline <c>#def</c>/<c>#end def</c>, where inline <c>#def name = ...</c> does not open
     /// a block. Only leading whitespace is adjusted; line content, comments and the original
-    /// line-ending style are preserved.
+    /// line-ending style are preserved. #html/#markdown content lines are left untouched.
     /// </summary>
     public static class CalcpadPrettifier
     {
@@ -23,6 +25,7 @@ namespace Calcpad.Highlighter.Prettifier
             var sb = new StringBuilder(source.Length);
             var depth = 0;
             var pos = 0;
+            var parseModes = new ParseModeTracker();
 
             while (pos < source.Length)
             {
@@ -49,6 +52,14 @@ namespace Calcpad.Highlighter.Prettifier
 
                 var rawLine = source.Substring(lineStart, contentEnd - lineStart);
                 var trimmed = rawLine.Trim();
+
+                // Leading whitespace is significant in markdown, and HTML keeps the author's layout
+                if (parseModes.Mode != ParseMode.Cpd && !ParseModeTracker.IsDirective(trimmed))
+                {
+                    sb.Append(rawLine).Append(lineEnding);
+                    continue;
+                }
+                parseModes.Apply(trimmed);
 
                 if (options.TrimTrailingWhitespace)
                     trimmed = TrimTrailingWhitespace(trimmed);

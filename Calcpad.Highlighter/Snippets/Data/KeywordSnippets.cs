@@ -621,9 +621,51 @@ namespace Calcpad.Highlighter.Snippets.Data
                 Category = "Output Control",
                 KeywordType = "Keyword"
             },
-            // The parsing-mode switches #cpd, #html and #markdown are deliberately
-            // absent: Calcpad.Core has no Keyword entry for them, so they must lint
-            // as invalid keywords until Core implements them.
+            new SnippetItem
+            {
+                Insert = "#html",
+                Description = "Output the following lines as raw HTML. Only #cpd, #markdown and the #end forms are allowed inside; macros still expand. Optionally takes a condition, e.g. '#html x > 3', that skips the block when false. Applies up to a matching #end html, or until the next mode directive.",
+                Example = "x = 5\n#html x > 3\n<div class=\"note\">\n    <b>x</b> is large\n</div>\n#end html\n'Back to Calcpad",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#markdown",
+                Description = "Render the following lines as Markdown, including tables, lists and code blocks. Only #cpd, #html and the #end forms are allowed inside; macros still expand. Optionally takes a condition, e.g. '#markdown x > 3', that skips the block when false. Applies up to a matching #end markdown, or until the next mode directive.",
+                Example = "#markdown\n## Loads\n| Case | Load |\n|------|------|\n| Dead | 5 kN |\n#end markdown\n'Back to Calcpad",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#cpd",
+                Description = "Parse the following lines as Calcpad (the default mode), e.g. to calculate inside an #html block. Optionally takes a condition, e.g. '#cpd x > 3', that skips the block when false. Applies up to a matching #end cpd, or until the next mode directive.",
+                Example = "#html\n<div class=\"note\">\n#cpd\nA = 2*3\n#end cpd\n</div>\n#end html",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end html",
+                Description = "Restore the parse mode in effect before the matching #html",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end markdown",
+                Description = "Restore the parse mode in effect before the matching #markdown",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end cpd",
+                Description = "Restore the parse mode in effect before the matching #cpd",
+                Category = "Output Control",
+                KeywordType = "Keyword"
+            },
 
             // ============================================
             // BREAKPOINTS

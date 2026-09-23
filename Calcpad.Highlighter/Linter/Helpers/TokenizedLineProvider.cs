@@ -55,6 +55,9 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 }
                 lineTokens.Add(token);
             }
+
+            foreach (var (line, mode) in _fullResult.LineModes)
+                _lineModes[line] = mode;
         }
 
         /// <summary>
@@ -166,9 +169,7 @@ namespace Calcpad.Highlighter.Linter.Helpers
         }
 
         /// <summary>
-        /// Effective Calcpad parse mode for the given line, always Cpd for now: the mode-switching
-        /// directives (#cpd, #html, #markdown) are not implemented in Calcpad.Core, so nothing
-        /// populates <see cref="_lineModes"/>. Restore the map here when Core gains the keywords.
+        /// Parse mode in effect at the line. A mode directive's own line is in the enclosing mode.
         /// </summary>
         public ParseMode GetLineMode(int lineNumber) =>
             _lineModes.TryGetValue(lineNumber, out var m) ? m : ParseMode.Cpd;

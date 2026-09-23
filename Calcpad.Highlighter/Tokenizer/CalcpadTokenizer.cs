@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using Calcpad.Highlighter.Linter.Constants;
 using Calcpad.Highlighter.Linter.Helpers;
+using Calcpad.Highlighter.Linter.Models;
 using Calcpad.Highlighter.Parsing;
 using Calcpad.Highlighter.Tokenizer.Models;
 
@@ -121,14 +122,59 @@ namespace Calcpad.Highlighter.Tokenizer
                 InitMacroCollectionState();
 
             int lineNum = 0;
+            var parseModes = new ParseModeTracker();
             // ReadOnlyMemory<char> slices survive across nested helper calls — a ref-struct
             // ReadOnlySpan cannot, since TokenizerState stores Text as a field.
             foreach (var lineMemory in new LineMemoryEnumerator(source.AsMemory()))
             {
+                var trimmed = lineMemory.Span.Trim();
+                var inMacroBody = _inMacroDefinition;
+                if (parseModes.Mode != ParseMode.Cpd)
+                {
+                    _result.LineModes[lineNum] = parseModes.Mode;
+                    if (_mode != TokenizerMode.Macro && !inMacroBody && !ParseModeTracker.IsDirective(trimmed))
+                    {
+                        _result.RawLines.Add(lineNum);
+                        AddRawLineMacroTokens(lineMemory.Span, lineNum++);
+                        _continueLine = false;
+                        continue;
+                    }
+                }
                 TokenizeLineInternal(lineMemory, lineNum++);
+                if (!inMacroBody)
+                    parseModes.Apply(trimmed);
             }
 
             return _result;
+        }
+
+        /// <summary>HTML/markdown content lines only highlight the macro calls that expand inside them.</summary>
+        private void AddRawLineMacroTokens(ReadOnlySpan<char> text, int lineNumber)
+        {
+            if (_definedMacros.Count == 0)
+                return;
+
+            for (int end = text.IndexOf('$'); end >= 0;)
+            {
+                var start = end;
+                while (start > 0 && IsMacroIdentChar(text[start - 1], 1) && text[start - 1] != '$')
+                    --start;
+
+                while (start < end && !IsMacroIdentChar(text[start], 0))
+                    ++start;
+
+                for (int i = start; i < end; ++i)
+                {
+                    var candidate = text[i..(end + 1)].ToString();
+                    if (_definedMacros.Contains(candidate))
+                    {
+                        _result.AddToken(new Token(lineNumber, i, candidate.Length, TokenType.Macro, candidate));
+                        break;
+                    }
+                }
+                var next = text[(end + 1)..].IndexOf('$');
+                end = next < 0 ? -1 : end + 1 + next;
+            }
         }
 
         /// <summary>

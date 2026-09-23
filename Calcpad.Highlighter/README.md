@@ -83,7 +83,7 @@ Stage 3 line → Stage3.SourceMap → Stage 2 line → Stage2.SourceMap → Stag
 
 | Mode | Purpose | Used by |
 |------|---------|---------|
-| **Highlight** | Tokens for syntax coloring only | `/highlight`, `/highlight-line` |
+| **Highlight** | Tokens for syntax coloring only | `/highlight` |
 | **Macro** | Tokens + full macro definitions | Stage 2 |
 | **Lint** | Tokens + variables, functions, units, command blocks, loop and `#read` variables | Stage 3 |
 

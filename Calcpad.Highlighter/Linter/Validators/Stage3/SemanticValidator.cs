@@ -3,6 +3,7 @@ using System.Text.Json;
 using Calcpad.Highlighter.Linter.Constants;
 using Calcpad.Highlighter.Linter.Helpers;
 using Calcpad.Highlighter.Linter.Models;
+using Calcpad.Highlighter.Tokenizer;
 using Calcpad.Highlighter.Tokenizer.Models;
 
 namespace Calcpad.Highlighter.Linter.Validators.Stage3
@@ -97,7 +98,11 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         {
             for (int i = 0; i < stage3.Lines.Count; i++)
             {
-                if (!tokenProvider.IsCpdMode(i)) continue;
+                if (!tokenProvider.IsCpdMode(i))
+                {
+                    ValidateNonCpdDirective(i, stage3.Lines[i], result, tokenProvider);
+                    continue;
+                }
 
                 var line = stage3.Lines[i];
 
@@ -354,6 +359,30 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         /// <summary>
         /// Checks if a keyword is valid. Includes regular keywords, control block keywords, and end keywords.
         /// </summary>
+        /// <summary>Only the mode directives, plus the macro ones Core expands beforehand, are allowed in #html/#markdown.</summary>
+        private static void ValidateNonCpdDirective(int line, string text, LinterResult result, TokenizedLineProvider tokenProvider)
+        {
+            var trimmed = text.AsSpan().Trim();
+            if (!ParseModeTracker.IsDirective(trimmed) ||
+                ParseModeTracker.IsModeDirective(trimmed) ||
+                ParseModeTracker.IsMacroDirective(trimmed))
+                return;
+
+            var length = trimmed.IndexOfAny(' ', '\t');
+            if (length < 0)
+                length = trimmed.Length;
+            else if (CalcpadBuiltIns.MultiWordFirstWords.Contains(trimmed[1..length].ToString()))
+            {
+                var second = trimmed[length..].TrimStart();
+                var secondEnd = second.IndexOfAny(' ', '\t');
+                length = trimmed.Length - second.Length + (secondEnd < 0 ? second.Length : secondEnd);
+            }
+            var start = text.Length - text.TrimStart().Length;
+            var mode = tokenProvider.GetLineMode(line) == ParseMode.Html ? "html" : "markdown";
+            result.AddError(line, start, start + length, "CPD-3420",
+                $"'{trimmed[..length]}' is not allowed in #{mode} mode. Close the block with #end {mode} first.");
+        }
+
         private static bool IsValidKeyword(string keyword)
         {
             return CalcpadBuiltIns.Keywords.Contains(keyword) ||

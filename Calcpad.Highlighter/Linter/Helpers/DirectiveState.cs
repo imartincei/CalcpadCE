@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Calcpad.Highlighter.Linter.Models;
+using Calcpad.Highlighter.Tokenizer;
 
 namespace Calcpad.Highlighter.Linter.Helpers
 {
@@ -48,6 +50,7 @@ namespace Calcpad.Highlighter.Linter.Helpers
     ///   - line breaking:  #wrap / #split
     ///   - number type:    #complex / #phasor
     ///   - visibility:     #show / #hide / #pre / #post (and their #end forms)
+    ///   - parse mode:     #cpd / #html / #markdown (and their #end forms)
     /// Only the categories the tooling consumes are tracked, and an #end form pops back to the
     /// state in effect before its opener, mirroring ExpressionParser's own stacks.
     /// </summary>
@@ -55,11 +58,13 @@ namespace Calcpad.Highlighter.Linter.Helpers
     {
         private readonly Stack<OutputMode> _outputStack = new();
         private readonly Stack<VisibilityMode> _visibilityStack = new();
+        private readonly ParseModeTracker _parseModes = new();
 
         public OutputMode Output { get; private set; } = OutputMode.Equations;
         public VisibilityMode Visibility { get; private set; } = VisibilityMode.Shown;
         public ScopeMode Scope { get; private set; } = ScopeMode.Global;
         public bool IsMarkdownOn { get; private set; }
+        public ParseMode ParseMode => _parseModes.Mode;
 
         /// <summary>
         /// Updates the tracked state from a trimmed directive line, ignoring non-tracked
@@ -67,6 +72,9 @@ namespace Calcpad.Highlighter.Linter.Helpers
         /// </summary>
         public void Apply(ReadOnlySpan<char> trimmedLine)
         {
+            if (_parseModes.Apply(trimmedLine))
+                return;
+
             if (Matches(trimmedLine, "#end val") || Matches(trimmedLine, "#end equ") || Matches(trimmedLine, "#end noc"))
                 Output = _outputStack.Count > 0 ? _outputStack.Pop() : OutputMode.Equations;
             else if (Matches(trimmedLine, "#equ"))

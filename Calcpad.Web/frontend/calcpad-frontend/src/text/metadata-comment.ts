@@ -219,6 +219,7 @@ export const LINT_CODES: LintCode[] = [
     { code: 'CPD-3417', description: "Duplicate 'uiOverrides' metadata comment" },
     { code: 'CPD-3418', description: "'uiOverrides' sharing a comment with another key" },
     { code: 'CPD-3419', description: 'Deprecated stored input value' },
+    { code: 'CPD-3420', description: 'Directive not allowed in #html/#markdown mode' },
     { code: 'CPD-3601', description: 'Invalid format specifier' },
 ];
 

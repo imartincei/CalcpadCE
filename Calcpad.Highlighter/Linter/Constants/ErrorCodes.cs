@@ -77,6 +77,7 @@ namespace Calcpad.Highlighter.Linter.Constants
             ["CPD-3417"] = "Duplicate 'uiOverrides' metadata comment",
             ["CPD-3418"] = "'uiOverrides' sharing a comment with another key",
             ["CPD-3419"] = "Deprecated stored input value",
+            ["CPD-3420"] = "Directive not allowed in #html/#markdown mode",
 
             // Stage 3: Format (CPD-36xx)
             ["CPD-3601"] = "Invalid format specifier"

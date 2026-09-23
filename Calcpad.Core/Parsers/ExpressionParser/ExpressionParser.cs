@@ -67,15 +67,14 @@ namespace Calcpad.Core
         public void Cancel() => _parser?.Cancel();
         public void Pause() => _isPausedByUser = true;
 
-        private string HtmlId
+        private string HtmlId => LineAttributes(_currentLine, _parser.Line);
+
+        private string LineAttributes(int currentLine, int sourceLine)
         {
-            get
-            {
-                if (!Debug) return string.Empty;
-                var isFirstPass = _loops.Count == 0 || _loops.Peek().IsFirstPass;
-                var idAttribute = isFirstPass ? $" id=\"line-{_currentLine + 1}\"" : string.Empty;
-                return $"{idAttribute} data-source-line=\"{_parser.Line}\" class=\"line\"";
-            }
+            if (!Debug) return string.Empty;
+            var isFirstPass = _loops.Count == 0 || _loops.Peek().IsFirstPass;
+            var idAttribute = isFirstPass ? $" id=\"line-{currentLine + 1}\"" : string.Empty;
+            return $"{idAttribute} data-source-line=\"{sourceLine}\" class=\"line\"";
         }
 
         public void Parse(string sourceCode, bool calculate = true, bool getXml = true) =>
@@ -107,12 +106,12 @@ namespace Calcpad.Core
                     var keyword = currentLineCache.Keyword;
                     if (keyword == Keyword.SkipLine)
                         continue;
-                    if (keyword == Keyword.Continue)
+                    if (keyword == Keyword.Continue && !_modeSuppressed)
                     {
                         ParseKeywordContinue();
                         continue;
                     }
-                    if (currentLineCache.IsCached && keyword == Keyword.None)
+                    if (!_modeSuppressed && currentLineCache.IsCached && keyword == Keyword.None)
                     {
                         if (IsEnabled())
                         {
@@ -137,8 +136,9 @@ namespace Calcpad.Core
                     else
                         _parser.Line = _currentLine + 1;
 
+                    var rawLine = lineSpan.TrimEnd();
                     lineSpan = lineSpan.Trim();
-                    if (HasLineExtension(textSpan.TrimEnd()))
+                    if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
                     {
                         var c = textSpan[^1];
                         if (c == '_')
@@ -151,7 +151,7 @@ namespace Calcpad.Core
                     else
                         textSpan = lineSpan;
 
-                    if (HasLineExtension(textSpan.TrimEnd()))
+                    if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
                     {
                         _lineCache[_currentLine] = new(null, Keyword.SkipLine);
                         continue;
@@ -162,6 +162,16 @@ namespace Calcpad.Core
 
                     if (textSpan.IsEmpty)
                     {
+                        if (_modeSuppressed)
+                            continue;
+
+                        if (IsNonCpdMode)
+                        {
+                            if (IsEnabled())
+                                ParseNonCpdModeLine(ReadOnlySpan<char>.Empty);
+
+                            continue;
+                        }
                         if (_isVisible && _isVal != 1 && _htmlLines < MaxHtmlLines && IsEnabled())
                             _sb.AppendLine($"<p{HtmlId}>&nbsp;</p>");
 
@@ -178,6 +188,13 @@ namespace Calcpad.Core
                     else if (result == KeywordResult.Break)
                         break;
 
+                    if (IsNonCpdMode)
+                    {
+                        if (IsEnabled())
+                            ParseNonCpdModeLine(rawLine);
+
+                        continue;
+                    }
                     _parser.IsCalculation = _isVal != -1;
                     if ((textSpan[0] != '$' || !ParsePlot(textSpan)) &&
                         ParseCondition(textSpan, keyword))
@@ -203,6 +220,7 @@ namespace Calcpad.Core
                             _lineCache[_currentLine] = new(null, keyword);
                     }
                 }
+                FlushMarkdown();
                 if (_currentLine == lineCount && (_calculate || !IsPaused))
                 {
                     var ifNotClosed = _condition.Id > 0 && !_condition.IsLoop;
@@ -228,6 +246,7 @@ namespace Calcpad.Core
             }
             finally
             {
+                FlushMarkdown();
                 Finalize(lineCount);
             }
 
@@ -518,6 +537,9 @@ namespace Calcpad.Core
                 _substitutionStack.Clear();
                 _previousKeyword = Keyword.None;
                 _isMarkdownOn = false;
+                _parseMode = ParseMode.Cpd;
+                _modeSuppressed = false;
+                _parseModeStack.Clear();
                 _uiVarCounts.Clear();
                 _uiDeclarationIndex.Clear();
                 OpenXmlExpressions.Clear();
@@ -538,6 +560,8 @@ namespace Calcpad.Core
             _currentLine = _startLine - 1;
             _isVisible = true;
             _visibilityStack.Clear();
+            _mdBuffer.Clear();
+            _mdLines.Clear();
             ResetUiState();
         }
 

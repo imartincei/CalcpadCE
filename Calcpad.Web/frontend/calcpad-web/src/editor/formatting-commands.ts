@@ -1,5 +1,5 @@
 import * as monaco from 'monaco-editor';
-import type { EditorBridge } from './bridge';
+import { getActiveDocumentKey, type EditorBridge } from './bridge';
 import {
     HTML_INLINE,
     MARKDOWN_INLINE,
@@ -7,8 +7,13 @@ import {
     buildHeadingLine,
     buildParagraphLine,
     buildListLines,
+    getParseModeAt,
+    isHtmlCommentLine,
+    wrapHtmlComment,
+    unwrapHtmlComment,
     type InlineFormat,
     type CommentFormat,
+    type ParseMode,
 } from 'calcpad-frontend';
 
 /**
@@ -55,17 +60,35 @@ export function registerFormattingCommands(
     }
 
     // Block elements
-    add('calcpad.formatParagraph',    'CalcpadCE: Paragraph',     [KM.CtrlCmd | KC.KeyL], () => insertParagraph(editor));
-    add('calcpad.formatLineBreak',    'CalcpadCE: Line Break',    [KM.CtrlCmd | KC.KeyR], () => insertLineBreak(editor));
+    add('calcpad.formatParagraph',    'CalcpadCE: Paragraph',     [KM.CtrlCmd | KC.KeyL], () => insertParagraph(editor, bridge));
+    add('calcpad.formatLineBreak',    'CalcpadCE: Line Break',    [KM.CtrlCmd | KC.KeyR], () => insertLineBreak(editor, bridge));
     add('calcpad.formatBulletedList', 'CalcpadCE: Bulleted List', [KM.CtrlCmd | KM.Shift | KC.KeyL], () => insertBulletedList(editor, bridge));
     add('calcpad.formatNumberedList', 'CalcpadCE: Numbered List', [KM.CtrlCmd | KM.Shift | KC.KeyN], () => insertNumberedList(editor, bridge));
 
     // Comments
-    add('calcpad.toggleComment',  'CalcpadCE: Toggle Comment',   [KM.CtrlCmd | KC.KeyQ], () => toggleComment(editor));
-    add('calcpad.uncomment',      'CalcpadCE: Uncomment',        [KM.CtrlCmd | KM.Shift | KC.KeyQ], () => uncomment(editor));
+    add('calcpad.toggleComment',  'CalcpadCE: Toggle Comment',   [KM.CtrlCmd | KC.KeyQ], () => toggleComment(editor, bridge));
+    add('calcpad.uncomment',      'CalcpadCE: Uncomment',        [KM.CtrlCmd | KM.Shift | KC.KeyQ], () => uncomment(editor, bridge));
     add('calcpad.pasteAsComment', 'CalcpadCE: Paste as Comment', [KM.CtrlCmd | KM.Shift | KC.KeyV], () => pasteAsComment(editor, bridge));
 
     return { dispose() { for (const d of disposables) d.dispose(); } };
+}
+
+/**
+ * The server's mode accounts for macros that switch mode; the text scan covers a cold cache.
+ */
+function getParseMode(editor: monaco.editor.IStandaloneCodeEditor, bridge: EditorBridge): ParseMode {
+    const model = editor.getModel();
+    const pos = editor.getPosition();
+    if (!model || !pos) return 'cpd';
+    const line = pos.lineNumber - 1;
+    return bridge.definitions.getCachedParseMode(getActiveDocumentKey(), line)
+        ?? getParseModeAt(i => model.getLineContent(i + 1), line);
+}
+
+/** Raw lines sit in an #html/#markdown block, where content needs no comment quotes. */
+function getContext(editor: monaco.editor.IStandaloneCodeEditor, bridge: EditorBridge): { format: CommentFormat; raw: boolean } {
+    const mode = getParseMode(editor, bridge);
+    return mode === 'cpd' ? { format: getFormat(editor, bridge), raw: false } : { format: mode, raw: true };
 }
 
 function getFormat(editor: monaco.editor.IStandaloneCodeEditor, bridge: EditorBridge): CommentFormat {
@@ -126,7 +149,7 @@ function wrapInline(
 ): void {
     const model = editor.getModel();
     if (!model) return;
-    const format = getFormat(editor, bridge);
+    const { format, raw } = getContext(editor, bridge);
     const [prefix, suffix] = format === 'html' ? HTML_INLINE[type] : MARKDOWN_INLINE[type];
     const selections = editor.getSelections() ?? [];
     if (selections.length === 0) return;
@@ -134,7 +157,7 @@ function wrapInline(
     const edits: monaco.editor.IIdentifiedSingleEditOperation[] = [];
     // Bold/italic/etc. need the line wrapped in a comment for the HTML tags
     // to render, same as headings — add one if missing.
-    const insertedAt = ensureCommentPrefixes(model, selections, edits);
+    const insertedAt = raw ? new Map<number, number>() : ensureCommentPrefixes(model, selections, edits);
 
     const newSelections: monaco.Selection[] = [];
 
@@ -169,7 +192,7 @@ function insertHeading(
 ): void {
     const model = editor.getModel();
     if (!model) return;
-    const format = getFormat(editor, bridge);
+    const { format, raw } = getContext(editor, bridge);
     const selections = editor.getSelections() ?? [];
 
     const edits: monaco.editor.IIdentifiedSingleEditOperation[] = [];
@@ -183,7 +206,7 @@ function insertHeading(
         contentWasEmpty.push(strippedContent.trim().length === 0);
         edits.push({
             range: new monaco.Range(lineNumber, 1, lineNumber, lineText.length + 1),
-            text: buildHeadingLine(lineText, level, format),
+            text: buildHeadingLine(lineText, level, format, raw),
             forceMoveMarkers: true,
         });
     }
@@ -207,10 +230,11 @@ function insertHeading(
     }
 }
 
-function insertParagraph(editor: monaco.editor.IStandaloneCodeEditor): void {
+function insertParagraph(editor: monaco.editor.IStandaloneCodeEditor, bridge: EditorBridge): void {
     const model = editor.getModel();
     if (!model) return;
     const selections = editor.getSelections() ?? [];
+    const raw = getParseMode(editor, bridge) !== 'cpd';
 
     const edits: monaco.editor.IIdentifiedSingleEditOperation[] = [];
     for (const sel of selections) {
@@ -218,18 +242,19 @@ function insertParagraph(editor: monaco.editor.IStandaloneCodeEditor): void {
         const lineText = model.getLineContent(lineNumber);
         edits.push({
             range: new monaco.Range(lineNumber, 1, lineNumber, lineText.length + 1),
-            text: buildParagraphLine(lineText),
+            text: buildParagraphLine(lineText, raw),
             forceMoveMarkers: true,
         });
     }
     editor.executeEdits('calcpad-format-paragraph', edits);
 }
 
-function insertLineBreak(editor: monaco.editor.IStandaloneCodeEditor): void {
+function insertLineBreak(editor: monaco.editor.IStandaloneCodeEditor, bridge: EditorBridge): void {
     const selections = editor.getSelections() ?? [];
+    const text = getParseMode(editor, bridge) !== 'cpd' ? '<br/>' : "'<br/>\n";
     const edits: monaco.editor.IIdentifiedSingleEditOperation[] = selections.map(sel => ({
         range: sel,
-        text: "'<br/>\n",
+        text,
         forceMoveMarkers: true,
     }));
     editor.executeEdits('calcpad-format-linebreak', edits);
@@ -243,13 +268,13 @@ function insertBulletedList(
     if (!model) return;
     const sel = editor.getSelection();
     if (!sel) return;
-    const format = getFormat(editor, bridge);
+    const { format, raw } = getContext(editor, bridge);
     const startLine = sel.startLineNumber;
     const endLine = sel.endLineNumber;
 
     const lineTexts: string[] = [];
     for (let i = startLine; i <= endLine; i++) lineTexts.push(model.getLineContent(i));
-    const lines = buildListLines(lineTexts, format, false);
+    const lines = buildListLines(lineTexts, format, false, raw);
 
     editor.executeEdits('calcpad-format-ul', [{
         range: new monaco.Range(startLine, 1, endLine, model.getLineLength(endLine) + 1),
@@ -266,13 +291,13 @@ function insertNumberedList(
     if (!model) return;
     const sel = editor.getSelection();
     if (!sel) return;
-    const format = getFormat(editor, bridge);
+    const { format, raw } = getContext(editor, bridge);
     const startLine = sel.startLineNumber;
     const endLine = sel.endLineNumber;
 
     const lineTexts: string[] = [];
     for (let i = startLine; i <= endLine; i++) lineTexts.push(model.getLineContent(i));
-    const lines = buildListLines(lineTexts, format, true);
+    const lines = buildListLines(lineTexts, format, true, raw);
 
     editor.executeEdits('calcpad-format-ol', [{
         range: new monaco.Range(startLine, 1, endLine, model.getLineLength(endLine) + 1),
@@ -281,13 +306,20 @@ function insertNumberedList(
     }]);
 }
 
-function toggleComment(editor: monaco.editor.IStandaloneCodeEditor): void {
+function toggleComment(editor: monaco.editor.IStandaloneCodeEditor, bridge: EditorBridge): void {
     const model = editor.getModel();
     if (!model) return;
     const sel = editor.getSelection();
     if (!sel) return;
     const startLine = sel.startLineNumber;
     const endLine = sel.endLineNumber;
+
+    if (getParseMode(editor, bridge) !== 'cpd') {
+        const lineNumbers = Array.from({ length: endLine - startLine + 1 }, (_, i) => startLine + i);
+        const unwrap = lineNumbers.every(i => isHtmlCommentLine(model.getLineContent(i)));
+        replaceLines(editor, 'calcpad-toggle-comment', lineNumbers, unwrap ? unwrapHtmlComment : wrapHtmlComment);
+        return;
+    }
 
     let allCommented = true;
     for (let i = startLine; i <= endLine; i++) {
@@ -308,11 +340,17 @@ function toggleComment(editor: monaco.editor.IStandaloneCodeEditor): void {
     editor.executeEdits('calcpad-toggle-comment', edits);
 }
 
-function uncomment(editor: monaco.editor.IStandaloneCodeEditor): void {
+function uncomment(editor: monaco.editor.IStandaloneCodeEditor, bridge: EditorBridge): void {
     const model = editor.getModel();
     if (!model) return;
     const sel = editor.getSelection();
     if (!sel) return;
+
+    if (getParseMode(editor, bridge) !== 'cpd') {
+        const lineNumbers = Array.from({ length: sel.endLineNumber - sel.startLineNumber + 1 }, (_, i) => sel.startLineNumber + i);
+        replaceLines(editor, 'calcpad-uncomment', lineNumbers, unwrapHtmlComment);
+        return;
+    }
 
     const edits: monaco.editor.IIdentifiedSingleEditOperation[] = [];
     for (let i = sel.startLineNumber; i <= sel.endLineNumber; i++) {
@@ -321,6 +359,21 @@ function uncomment(editor: monaco.editor.IStandaloneCodeEditor): void {
         }
     }
     editor.executeEdits('calcpad-uncomment', edits);
+}
+
+function replaceLines(
+    editor: monaco.editor.IStandaloneCodeEditor,
+    source: string,
+    lineNumbers: number[],
+    transform: (lineText: string) => string,
+): void {
+    const model = editor.getModel();
+    if (!model) return;
+    editor.executeEdits(source, lineNumbers.map(i => ({
+        range: new monaco.Range(i, 1, i, model.getLineLength(i) + 1),
+        text: transform(model.getLineContent(i)),
+        forceMoveMarkers: true,
+    })));
 }
 
 async function pasteAsComment(editor: monaco.editor.IStandaloneCodeEditor, bridge: EditorBridge): Promise<void> {
@@ -332,7 +385,9 @@ async function pasteAsComment(editor: monaco.editor.IStandaloneCodeEditor, bridg
     }
     if (!clipboardText) return;
 
-    const commented = clipboardText.split('\n').map(l => "'" + l).join('\n');
+    const commented = getParseMode(editor, bridge) !== 'cpd'
+        ? `<!--\n${clipboardText}\n-->`
+        : clipboardText.split('\n').map(l => "'" + l).join('\n');
     const sel = editor.getSelection();
     if (!sel) return;
 

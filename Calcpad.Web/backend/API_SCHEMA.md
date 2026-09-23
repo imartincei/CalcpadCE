@@ -41,7 +41,6 @@ Launches that do not set the variable (a `dotnet run` during development, the sa
 - [POST /pdf/browser/install](#post-pdfbrowserinstall)
 - [POST /docx](#post-docx)
 - [POST /highlight](#post-highlight)
-- [POST /highlight-line](#post-highlight-line)
 - [POST /lint](#post-lint)
 - [POST /definitions](#post-definitions)
 - [POST /symbol-at-position](#post-symbol-at-position)
@@ -431,23 +430,6 @@ interface HighlightToken {
 
 ---
 
-## POST /highlight-line
-
-Tokenize a single line of Calcpad source code (for incremental updates).
-
-**Request:**
-```typescript
-interface HighlightLineRequest {
-  line: string;          // The line content to tokenize
-  lineNumber?: number;   // Zero-based line number (default: 0)
-  includeText?: boolean; // Whether to include token text (default: false)
-}
-```
-
-**Response:** Same as `/highlight`
-
----
-
 ## POST /lint
 
 Lint Calcpad source code and return diagnostics (errors, warnings, and informational messages). Supports lint-ignore regions via comments.
@@ -549,6 +531,7 @@ interface LintDiagnostic {
 | CPD-3417 | Semantic | Duplicate 'uiOverrides' metadata comment |
 | CPD-3418 | Semantic | 'uiOverrides' sharing a comment with another key |
 | CPD-3419 | Semantic | Deprecated stored input value |
+| CPD-3420 | Semantic | Directive not allowed in #html/#markdown mode |
 | **Stage 3: Format (CPD-36xx)** |||
 | CPD-3601 | Format | Invalid format specifier |
 
@@ -612,6 +595,13 @@ interface DefinitionsResponse {
   customUnits: CustomUnitDefinitionDto[];
   projectPath: string | null;  // Resolved absolute #ProjectPath, or null when undeclared/unresolvable
   libraryPath: string | null;  // Resolved absolute #LibraryPath, or null when undeclared/unresolvable
+  parseModes: ParseModeRangeDto[];  // Source lines in #html/#markdown mode, after macro and #include expansion
+}
+
+interface ParseModeRangeDto {
+  startLine: number;           // Zero-based first line
+  endLine: number;             // Zero-based last line, inclusive
+  mode: 'html' | 'markdown';   // Lines not covered by a range are Calcpad
 }
 
 interface MacroDefinitionDto {
@@ -1061,7 +1051,7 @@ GET /api/calcpad/snippets?category=Functions/Trigonometric
 
 4. **Error ranges** — For the linter, use `column` and `endColumn` to underline or highlight the problematic code region.
 
-5. **Incremental updates** — Use `/highlight-line` for real-time syntax highlighting as the user types, then periodically call `/lint` for full validation.
+5. **Incremental updates** — Re-send the whole document to `/highlight` as the user types, since tokens depend on state from earlier lines (macros, line continuations, `#html`/`#markdown` blocks), then periodically call `/lint` for full validation.
 
 6. **PDF / DOCX generation** — Call `/convert` to obtain HTML and pass it to `/pdf`, or call `/docx` directly with Calcpad source. Check `/pdf/health` to verify the PDF service is available.
 

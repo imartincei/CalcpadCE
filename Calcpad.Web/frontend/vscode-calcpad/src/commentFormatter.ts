@@ -1,14 +1,20 @@
 import * as vscode from 'vscode';
 import type { ILogger } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
+import type { CalcpadDefinitionsService } from './calcpadDefinitionsService';
 import {
     HTML_INLINE,
     MARKDOWN_INLINE,
     stripCommentPrefix,
+    splitIndent,
     getCommentPrefixInsertColumn,
     buildHeadingLine,
     buildParagraphLine,
     buildListLines,
+    getParseModeAt,
+    isHtmlCommentLine,
+    wrapHtmlComment,
+    unwrapHtmlComment,
     type InlineFormat,
     type CommentFormat,
 } from 'calcpad-frontend';
@@ -18,12 +24,15 @@ type CommentFormatSetting = 'html' | 'markdown' | 'auto';
 /**
  * Handles text formatting hotkeys for Calcpad comment lines.
  * Supports HTML and Markdown modes via the calcpad.commentFormat setting.
+ * Inside #html/#markdown blocks the hotkeys write raw content in that block's format.
  */
 export class CommentFormatter {
     private outputChannel: ILogger;
+    private definitionsService: CalcpadDefinitionsService;
 
-    constructor(outputChannel: ILogger) {
+    constructor(outputChannel: ILogger, definitionsService: CalcpadDefinitionsService) {
         this.outputChannel = outputChannel;
+        this.definitionsService = definitionsService;
     }
 
     public registerCommands(): vscode.Disposable[] {
@@ -54,6 +63,17 @@ export class CommentFormatter {
             vscode.commands.registerTextEditorCommand('vscode-calcpad.uncomment', (e) => this.uncomment(e)),
             vscode.commands.registerTextEditorCommand('vscode-calcpad.pasteAsComment', (e) => this.pasteAsComment(e))
         ];
+    }
+
+    /**
+     * Raw lines sit in an #html/#markdown block, where content needs no comment quotes. The
+     * server's mode accounts for macros that switch mode; the text scan covers a cold cache.
+     */
+    private getContext(editor: vscode.TextEditor): { format: CommentFormat; raw: boolean } {
+        const line = editor.selection.active.line;
+        const mode = this.definitionsService.getCachedParseMode(editor.document.uri.toString(), line)
+            ?? getParseModeAt(i => editor.document.lineAt(i).text, line);
+        return mode === 'cpd' ? { format: this.getFormat(), raw: false } : { format: mode, raw: true };
     }
 
     private getFormat(): CommentFormat {
@@ -101,11 +121,11 @@ export class CommentFormatter {
      * wrap edit reads them.
      */
     private async wrapInline(editor: vscode.TextEditor, type: InlineFormat): Promise<void> {
-        const format = this.getFormat();
+        const { format, raw } = this.getContext(editor);
         const [prefix, suffix] = format === 'html' ? HTML_INLINE[type] : MARKDOWN_INLINE[type];
 
         const startCharByLine = new Map<number, number>();
-        for (const sel of editor.selections) {
+        for (const sel of raw ? [] : editor.selections) {
             const prev = startCharByLine.get(sel.start.line);
             if (prev === undefined || sel.start.character < prev) startCharByLine.set(sel.start.line, sel.start.character);
         }
@@ -154,19 +174,19 @@ export class CommentFormatter {
      * Strips any existing heading tags/markdown headings first.
      */
     private async insertHeading(editor: vscode.TextEditor, level: number): Promise<void> {
-        const format = this.getFormat();
+        const { format, raw } = this.getContext(editor);
         const contentWasEmpty: boolean[] = [];
 
         await editor.edit(editBuilder => {
             for (const selection of editor.selections) {
                 const line = editor.document.lineAt(selection.active.line);
-                const [, content] = stripCommentPrefix(line.text);
+                const [, content] = raw ? splitIndent(line.text) : stripCommentPrefix(line.text);
                 const strippedContent = content
                     .replace(/^<h[1-6]>(.*)<\/h[1-6]>$/, '$1')
                     .replace(/^#{1,6}\s+(.*)$/, '$1');
                 contentWasEmpty.push(strippedContent.trim().length === 0);
 
-                editBuilder.replace(line.range, buildHeadingLine(line.text, level, format));
+                editBuilder.replace(line.range, buildHeadingLine(line.text, level, format, raw));
             }
         });
 
@@ -192,10 +212,11 @@ export class CommentFormatter {
      * Wrap selected lines in <p>...</p> tags.
      */
     private async insertParagraph(editor: vscode.TextEditor): Promise<void> {
+        const { raw } = this.getContext(editor);
         await editor.edit(editBuilder => {
             for (const selection of editor.selections) {
                 const line = editor.document.lineAt(selection.active.line);
-                editBuilder.replace(line.range, buildParagraphLine(line.text));
+                editBuilder.replace(line.range, buildParagraphLine(line.text, raw));
             }
         });
     }
@@ -204,9 +225,10 @@ export class CommentFormatter {
      * Insert a <br/> line break at the cursor position.
      */
     private async insertLineBreak(editor: vscode.TextEditor): Promise<void> {
+        const text = this.getContext(editor).raw ? '<br/>' : "'<br/>\n";
         await editor.edit(editBuilder => {
             for (const selection of editor.selections) {
-                editBuilder.insert(selection.active, "'<br/>\n");
+                editBuilder.insert(selection.active, text);
             }
         });
     }
@@ -215,7 +237,7 @@ export class CommentFormatter {
      * Wrap selected lines as a bulleted list.
      */
     private async insertBulletedList(editor: vscode.TextEditor): Promise<void> {
-        const format = this.getFormat();
+        const { format, raw } = this.getContext(editor);
 
         await editor.edit(editBuilder => {
             const startLine = editor.selection.start.line;
@@ -227,7 +249,7 @@ export class CommentFormatter {
                 editor.document.lineAt(startLine).range.start,
                 editor.document.lineAt(endLine).range.end
             );
-            editBuilder.replace(fullRange, buildListLines(lineTexts, format, false).join('\n'));
+            editBuilder.replace(fullRange, buildListLines(lineTexts, format, false, raw).join('\n'));
         });
     }
 
@@ -235,7 +257,7 @@ export class CommentFormatter {
      * Wrap selected lines as a numbered list.
      */
     private async insertNumberedList(editor: vscode.TextEditor): Promise<void> {
-        const format = this.getFormat();
+        const { format, raw } = this.getContext(editor);
 
         await editor.edit(editBuilder => {
             const startLine = editor.selection.start.line;
@@ -247,14 +269,18 @@ export class CommentFormatter {
                 editor.document.lineAt(startLine).range.start,
                 editor.document.lineAt(endLine).range.end
             );
-            editBuilder.replace(fullRange, buildListLines(lineTexts, format, true).join('\n'));
+            editBuilder.replace(fullRange, buildListLines(lineTexts, format, true, raw).join('\n'));
         });
     }
 
     /**
-     * Toggle comment prefix (') on selected lines.
+     * Toggle comment prefix (') on selected lines, or an HTML comment in #html/#markdown blocks.
      */
     private async toggleComment(editor: vscode.TextEditor): Promise<void> {
+        if (this.getContext(editor).raw) {
+            await this.toggleHtmlComment(editor);
+            return;
+        }
         await editor.edit(editBuilder => {
             const startLine = editor.selection.start.line;
             const endLine = editor.selection.end.line;
@@ -286,10 +312,30 @@ export class CommentFormatter {
         });
     }
 
+    private async toggleHtmlComment(editor: vscode.TextEditor): Promise<void> {
+        const { start, end } = editor.selection;
+        const lines = Array.from({ length: end.line - start.line + 1 }, (_, i) => editor.document.lineAt(start.line + i));
+        const allCommented = lines.every(line => isHtmlCommentLine(line.text));
+        await editor.edit(editBuilder => {
+            for (const line of lines) {
+                editBuilder.replace(line.range, allCommented ? unwrapHtmlComment(line.text) : wrapHtmlComment(line.text));
+            }
+        });
+    }
+
     /**
-     * Remove comment prefix (') from selected lines.
+     * Remove comment prefix (') from selected lines, or the HTML comment in #html/#markdown blocks.
      */
     private async uncomment(editor: vscode.TextEditor): Promise<void> {
+        if (this.getContext(editor).raw) {
+            await editor.edit(editBuilder => {
+                for (let i = editor.selection.start.line; i <= editor.selection.end.line; i++) {
+                    const line = editor.document.lineAt(i);
+                    editBuilder.replace(line.range, unwrapHtmlComment(line.text));
+                }
+            });
+            return;
+        }
         await editor.edit(editBuilder => {
             const startLine = editor.selection.start.line;
             const endLine = editor.selection.end.line;
@@ -315,10 +361,12 @@ export class CommentFormatter {
             return;
         }
 
-        const commentedLines = clipboardText
-            .split('\n')
-            .map(line => "'" + line)
-            .join('\n');
+        const commentedLines = this.getContext(editor).raw
+            ? `<!--\n${clipboardText}\n-->`
+            : clipboardText
+                .split('\n')
+                .map(line => "'" + line)
+                .join('\n');
 
         await editor.edit(editBuilder => {
             if (editor.selection.isEmpty) {

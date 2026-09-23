@@ -69,6 +69,7 @@ nav:
     - Linter and Diagnostics: new-linter.md
     - UI Mode: new-ui-mode.md
     - Visibility Directives: new-visibility-directives.md
+    - Parsing Modes: new-parsing-modes.md
     - Metadata Comments: new-metadata-comments.md
     - Running the Server: new-web-deployment.md
     - Migration Guide: migration-guide.md

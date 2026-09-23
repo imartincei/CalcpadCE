@@ -41,7 +41,7 @@ Documented in [API_SCHEMA.md](API_SCHEMA.md). Summary:
 - `POST /api/calcpad/convert` — Calcpad source to HTML (`?unwrap=true` for the expanded source)
 - `POST /api/calcpad/docx`, `/pdf` — document export (`/pdf/health` for readiness, `/pdf/browser` and `/pdf/browser/install` for the Chromium dependency)
 - `GET  /api/calcpad/sample` — sample document
-- `POST /api/calcpad/highlight`, `/highlight-line` — tokenization
+- `POST /api/calcpad/highlight` — tokenization
 - `POST /api/calcpad/lint` — diagnostics with CPD codes
 - `POST /api/calcpad/definitions` — symbol index
 - `POST /api/calcpad/symbol-at-position` — the symbol under a cursor and all its occurrences

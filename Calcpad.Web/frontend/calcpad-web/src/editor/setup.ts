@@ -1,15 +1,16 @@
 import * as monaco from 'monaco-editor';
-import { calcpadLanguageConfiguration } from './language';
+import { calcpadLanguageConfiguration, calcpadMonarchLanguage } from './language';
 import { calcpadDarkTheme, calcpadLightTheme } from './theme';
 
 /**
  * Register the CalcPad language and theme with Monaco.
- * Call this once before creating any editors. No token provider is registered —
- * highlighting comes solely from the server's semantic tokens.
+ * Call this once before creating any editors. Calcpad highlighting comes from the server's
+ * semantic tokens; the Monarch tokenizer only colors #html/#markdown content.
  */
 export function registerCalcpadLanguage(): void {
     monaco.languages.register({ id: 'calcpad', extensions: ['.cpd', '.cpdz'] });
     monaco.languages.setLanguageConfiguration('calcpad', calcpadLanguageConfiguration);
+    monaco.languages.setMonarchTokensProvider('calcpad', calcpadMonarchLanguage);
 }
 
 export function registerCalcpadTheme(): void {

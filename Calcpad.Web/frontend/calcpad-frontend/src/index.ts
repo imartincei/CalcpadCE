@@ -12,6 +12,7 @@ export type {
     HighlightToken,
     DefinitionsRequest,
     DefinitionsResponse,
+    ParseModeRange,
     MacroDefinition,
     FunctionDefinition,
     VariableDefinition,
@@ -231,7 +232,7 @@ export {
     couldCompleteDedentKeyword,
     calculateExpectedIndent,
 } from './text/auto-indent';
-export type { InlineFormat, CommentFormat } from './text/comment-formatting';
+export type { InlineFormat, CommentFormat, ParseMode } from './text/comment-formatting';
 export {
     HTML_INLINE,
     MARKDOWN_INLINE,
@@ -244,6 +245,10 @@ export {
     buildHeadingLine,
     buildParagraphLine,
     buildListLines,
+    getParseModeAt,
+    isHtmlCommentLine,
+    wrapHtmlComment,
+    unwrapHtmlComment,
 } from './text/comment-formatting';
 export type {
     MetadataCommentData,

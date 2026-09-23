@@ -6,6 +6,7 @@ import {
     CalcpadApiClient,
     DefinitionsResponse,
     ResolvedPathRoots,
+    type ParseMode,
 } from 'calcpad-frontend';
 import { VSCodeFileSystem } from './adapters';
 
@@ -31,6 +32,10 @@ export class CalcpadDefinitionsService {
 
     public getCachedPathRoots(documentUri: string): ResolvedPathRoots {
         return this.definitionsService.getCachedPathRoots(documentUri);
+    }
+
+    public getCachedParseMode(documentUri: string, line: number): ParseMode | null {
+        return this.definitionsService.getCachedParseMode(documentUri, line);
     }
 
     public async refreshDefinitions(document: vscode.TextDocument): Promise<DefinitionsResponse | null> {

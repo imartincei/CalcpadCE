@@ -652,4 +652,7 @@
   <data name="Path_root_folder_not_found_0_1" xml:space="preserve">
     <value>{0} folder not found: {1}.</value>
   </data>
+  <data name="Only_mode_directives_are_allowed_in_HTML_or_markdown_mode" xml:space="preserve">
+    <value>Only #html, #cpd, #markdown and their #end forms are allowed in #HTML and #markdown mode.</value>
+  </data>
 </root>

@@ -4,30 +4,58 @@
   "scopeName": "source.calcpad",
   "fileTypes": ["cpd", "cpdz"],
   "patterns": [
-    { "include": "#html-mode" },
-    { "include": "#markdown-mode" }
+    { "include": "#html-block" },
+    { "include": "#markdown-block" },
+    { "include": "#cpd-block" }
   ],
   "repository": {
-    "html-mode": {
+    "html-block": {
       "begin": "(?i)^\\s*(#html)\\b.*$",
-      "while": "(?i)^(?!\\s*(#cpd|#md|#markdown)\\b)",
+      "end": "(?i)^\\s*(#end\\s+(?:html|cpd|markdown))\\b.*$",
       "beginCaptures": {
+        "1": { "name": "keyword.control.block.calcpad" }
+      },
+      "endCaptures": {
         "1": { "name": "keyword.control.block.calcpad" }
       },
       "contentName": "meta.embedded.block.html",
       "patterns": [
+        { "include": "#html-block" },
+        { "include": "#markdown-block" },
+        { "include": "#cpd-block" },
         { "include": "text.html.basic" }
       ]
     },
-    "markdown-mode": {
-      "begin": "(?i)^\\s*(#md|#markdown)\\b.*$",
-      "while": "(?i)^(?!\\s*(#cpd|#html)\\b)",
+    "markdown-block": {
+      "begin": "(?i)^\\s*(#markdown)\\b.*$",
+      "end": "(?i)^\\s*(#end\\s+(?:html|cpd|markdown))\\b.*$",
       "beginCaptures": {
+        "1": { "name": "keyword.control.block.calcpad" }
+      },
+      "endCaptures": {
         "1": { "name": "keyword.control.block.calcpad" }
       },
       "contentName": "meta.embedded.block.markdown",
       "patterns": [
+        { "include": "#html-block" },
+        { "include": "#markdown-block" },
+        { "include": "#cpd-block" },
         { "include": "text.html.markdown" }
+      ]
+    },
+    "cpd-block": {
+      "begin": "(?i)^\\s*(#cpd)\\b.*$",
+      "end": "(?i)^\\s*(#end\\s+(?:html|cpd|markdown))\\b.*$",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.block.calcpad" }
+      },
+      "endCaptures": {
+        "1": { "name": "keyword.control.block.calcpad" }
+      },
+      "patterns": [
+        { "include": "#html-block" },
+        { "include": "#markdown-block" },
+        { "include": "#cpd-block" }
       ]
     }
   }
