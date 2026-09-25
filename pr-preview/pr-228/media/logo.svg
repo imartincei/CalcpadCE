@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="256" height="256">
+  <defs>
+    <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#23A9F2" />
+      <stop offset="100%" stop-color="#006DB0" />
+    </linearGradient>
+
+    <mask id="center-hole">
+      <rect width="100" height="100" fill="white" />
+      <circle cx="50" cy="50" r="9" fill="black" />
+    </mask>
+  </defs>
+
+  <path d="M 50 20
+           L 80 50"
+    stroke="#FFC107"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round" />
+
+  <path d="M 17 17
+           Q 50 42 83 17
+           Q 58 50 83 83
+           Q 50 58 17 83
+           Q 42 50 17 17 Z"
+    mask="url(#center-hole)"
+    fill="url(#logo-gradient)"
+    stroke="url(#logo-gradient)"
+    stroke-width="3"
+    stroke-linejoin="round" />
+
+    <path d="M 80 50
+           L 50 80"
+    stroke="#FFC107"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round" />
+</svg>
