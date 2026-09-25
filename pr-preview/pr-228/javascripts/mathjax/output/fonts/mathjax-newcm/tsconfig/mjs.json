@@ -1,9 +1,0 @@
-{
-  "extends": "./common.json",
-  "compilerOptions": {
-    "target": "ES6",
-    "outDir": "../mjs",
-    "module": "ES6",
-    "moduleResolution": "node"
-  }
-}
