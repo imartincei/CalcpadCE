@@ -505,7 +505,7 @@ tan_angle = tan(angle°)";
 
             var isLocal = false;
             var isUiOverridesComment = false;
-            var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.None);
+            var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
             var outputLines = new List<string>();
 
             foreach (var line in lines)

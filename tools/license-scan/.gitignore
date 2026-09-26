@@ -1,0 +1,12 @@
+# Harvested third-party payloads and scratch state -- regenerate with ./harvest.sh
+corpus/
+.cargo-home
+.nuget-packages/
+.work/
+
+# FOSSology API token cache and generated reports
+.token
+reports/
+
+# Database/repository snapshots from backup.sh
+backups/

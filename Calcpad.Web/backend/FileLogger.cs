@@ -82,8 +82,8 @@ namespace Calcpad.Server
         {
             try
             {
-                // Hosts set CALCPAD_LOG_DIR when the executable dir is read-only (AppImage FUSE
-                // mount, Program Files). Executable-adjacent logs/ otherwise.
+                // Hosts set CALCPAD_LOG_DIR when the executable dir is read-only (e.g.
+                // Program Files). Executable-adjacent logs/ otherwise.
                 var overrideDir = Environment.GetEnvironmentVariable("CALCPAD_LOG_DIR");
                 string logsDir;
                 if (!string.IsNullOrEmpty(overrideDir))

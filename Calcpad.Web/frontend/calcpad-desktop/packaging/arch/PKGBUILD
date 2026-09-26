@@ -55,7 +55,8 @@ package() {
     local libdir="$pkgdir/usr/lib/CalcpadCE"
     install -Dm755 -t "$libdir" "$bindir"/*.so
     install -Dm755 -t "$libdir" "$bindir/Calcpad.Server" "$bindir/createdump"
-    install -Dm644 -t "$libdir" "$bindir"/*.dll "$bindir"/*.json "$bindir/template.html"
+    install -Dm644 -t "$libdir" "$bindir"/*.dll "$bindir"/*.json "$bindir/template.html" \
+        "$bindir/THIRD-PARTY-NOTICES.txt" "$bindir/LICENSE.txt"
     install -Dm644 -t "$libdir/Fonts" "$bindir"/Fonts/*
     install -Dm644 -t "$libdir/bg" "$bindir"/bg/*
     install -Dm644 -t "$libdir/zh" "$bindir"/zh/*
@@ -72,4 +73,6 @@ package() {
 
     install -Dm644 "$_srcroot/../../../LICENSE" \
         "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -Dm644 "$_srcroot/../../../THIRD-PARTY-NOTICES.txt" \
+        "$pkgdir/usr/share/licenses/$pkgname/THIRD-PARTY-NOTICES.txt"
 }

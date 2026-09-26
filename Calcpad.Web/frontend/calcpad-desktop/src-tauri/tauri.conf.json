@@ -35,6 +35,8 @@
       "binaries/Calcpad.Server.runtimeconfig.json": "./",
       "binaries/Calcpad.Server.staticwebassets.endpoints.json": "./",
       "binaries/appsettings.json": "./",
+      "binaries/THIRD-PARTY-NOTICES.txt": "./",
+      "binaries/LICENSE.txt": "./",
       "binaries/*.html": "./",
       "binaries/Fonts/**/*": "./Fonts/",
       "binaries/bg/**/*": "./bg/",

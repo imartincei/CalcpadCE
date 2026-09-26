@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-    <script src="https://calcpad.local/jquery-3.6.3.min.js"></script>
     <style>
         body {
             background-color: white;
@@ -743,190 +742,18 @@
                 color: #09e;
             }
     </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".dvcs:has(.block) > :first-child").forEach(function (el) {
+                el.innerHTML = "&hairsp;";
+            });
+            document.querySelectorAll(".roundBox").forEach(function (box) {
+                box.addEventListener("click", function () {
+                    var line = document.getElementById("line-" + box.dataset.line);
+                    if (line) window.scrollTo(0, line.offsetTop - box.offsetHeight - 20);
+                });
+            });
+        });
+    </script>
 </head>
 <body>
-    <script>
-        var contextMenu = false;
-        function getVerticalPosition(line) { return document.querySelector("[data-text='" + line + "']").getBoundingClientRect().top; }
-        function isNumeric(s) { return s.match(/^-?\d+(?:\.\d+)?$/); }
-        if (window.jQuery) {
-            function getHtmlWithInput() {
-                $("input[type=text]").each(function () {
-                    $(this).attr("value", $(this).val());
-                });
-                $("input[type=hidden]").each(function () {
-                    $(this).attr("value", $(this).val());
-                });
-                $("textarea").each(function () {
-                    $(this).html($(this).val());
-                });
-                $("input[type=radio]").each(function () {
-                    if (this.checked)
-                        $(this).attr("checked", "checked");
-                    else
-                        $(this).removeAttr("checked");
-                });
-                $("input[type=checkbox]").each(function () {
-                    if (this.checked)
-                        $(this).attr("checked", "checked");
-                    else
-                        $(this).removeAttr("checked");
-                });
-                $("select option").each(function () {
-                    if (this.selected) {
-                        $(this).attr("selected", "true");
-                    }
-                    else
-                        $(this).removeAttr("selected");
-                });
-                return document.body.outerHTML;
-            }
-
-            function getTargetId(element) {
-                var id = $(element).attr("name");
-                if (id != null && id.length > 0)
-                    return id;
-
-                return $(element).data("target");
-            }
-
-            function getValue(id, source) {
-                var value = "";
-                var target = $("#" + id + " input");
-                var domObj = target.get(0);
-                if (domObj == null || domObj.Length == 0) {
-                    target = $("#" + id + " .eq u");
-                    target.each(function () {
-                        value += $(this).text() + ";";
-                    });
-                    $(source).prop('disabled', true);
-                }
-                else {
-                    target.each(function () {
-                        value += $(this).val() + ";";
-                    });
-                }
-                if (value.length > 1) {
-                    value = value.slice(0, -1);
-                }
-                return value;
-            }
-
-            $(document).ready(function () {
-
-                $(".dvcs:has(.block) > :first-child").html("&hairsp;");
-
-                $("#Units").change(function () { $(".Units").text($(this).val()); });
-
-                $(".fold > :first-child").click(function () {
-                    if ($(this).parent().hasClass("fold")) {
-                        $(this).parent().removeClass("fold").addClass("unfold");
-                    }
-                    else {
-                        $(this).parent().removeClass("unfold").addClass("fold");
-                    }
-                });
-
-                $("select").each(function (index) {
-                    if ($(this).prop("id") != "Units") {
-                        var id = getTargetId(this);
-                        if (id != null && id.length > 0) {
-                            var value = getValue(id, this);
-                            $(this).val(value);
-                        }
-                    }
-
-                });
-
-                $("select").change(function () {
-                    var id = getTargetId(this);
-                    if (id != null && id.length > 0) {
-                        var target = $("#" + id + " input");
-                        if (target != null) {
-                            var values = $(this).val().split(";");
-                            target.each(function (index) {
-                                $(this).val(values[index]);
-                            });
-                        }
-                    }
-                });
-
-                $("input:radio, input:checkbox").each(function (index) {
-                    var id = getTargetId(this);
-                    if (id != null && id.length > 0) {
-                        var value = getValue(id, this);
-                        $(this).prop("checked", $(this).val() == value);
-                    }
-                });
-
-                $("input:radio, input:checkbox").change(function () {
-                    var id = getTargetId(this);
-                    if (id != null && id.length > 0) {
-                        var target = $("#" + id + " input");
-                        if (target != null) {
-                            if ($(this).prop("checked")) {
-                                var values = $(this).val().split(";");
-                                target.each(function (index) {
-                                    $(this).val(values[index]);
-                                });
-                            }
-                            else if ($(this).prop("type") == "checkbox") {
-                                target.each(function () {
-                                    $(this).val("0");
-                                });
-                            }
-                        }
-                    }
-                });
-
-                $(".line:not(style, script)").each(function () {
-                    var line = $(this).prop("id").split("-")[1];
-                    var $lineLink = $('<a class="lineLink" href="#0" data-text="' + line + '" title="Code line ' + line + '">&larr;</a>');
-                    $(this).append($lineLink);
-                    $lineLink.hide();
-                    $(this).hover(function () {
-                        $(".lineLink").hide();
-                        $lineLink.show();
-                    });
-                    $(window).scroll(function () {
-                        $lineLink.hide();
-                    });
-                });
-
-                $("body").mouseleave(function () {
-                    $(".lineLink").hide();
-                });
-
-                $(".roundBox").click(function () {
-                    var line = $(this).data("line");
-                    var e = document.getElementById("line-" + line);
-                    if (e) {
-                        window.scrollTo(0, e.offsetTop - $(this).outerHeight() - 20);
-                    }
-                });
-                $(".money").each(function () { $(this).text(Number(($(this).text())).toFixed(2)); });
-
-                $("input").change(function() {
-                    var e = $(this);
-                    var s = e.val();
-                    if (isNumeric(s)) {
-                        e.css("color", "black");
-                        e.removeAttr("title");
-                    } else {
-                        e.css("color", "red");
-                        e.attr("title", "无效号码");
-					}
-                });
-
-                $("a").click(function () {
-                    chrome.webview.postMessage('clicked');
-                });
-
-				window.addEventListener('click', () => {
-					chrome.webview.postMessage('focused');
-				});
-            });
-        }
-        document.oncontextmenu = function () { contextMenu = true; };
-        document.onmousedown = function () { contextMenu = false; };
-    </script>

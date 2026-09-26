@@ -17,7 +17,7 @@ jobs:
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.x'
+          global-json-file: global.json
 
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -60,6 +60,10 @@ jobs:
           New-Item -ItemType Directory -Path artifacts -Force | Out-Null
           Copy-Item Calcpad.Web/frontend/calcpad-desktop/src-tauri/target/portable/CalcpadCE-portable-win64.zip `
             -Destination "artifacts/CalcpadCE-portable-${{ inputs.version }}.zip"
+
+      - name: Verify third-party notices
+        shell: bash
+        run: ./tools/license-scan/verify-notices.sh "artifacts/CalcpadCE-portable-${{ inputs.version }}.zip"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7

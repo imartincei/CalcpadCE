@@ -7,7 +7,7 @@
     "beforeBuildCommand": "./build-frontend.sh"
   },
   "bundle": {
-    "targets": ["deb", "rpm", "appimage"],
+    "targets": ["deb", "rpm"],
     "resources": {
       "binaries/*.so": "./",
       "binaries/*.dll": "./",
@@ -15,6 +15,8 @@
       "binaries/Calcpad.Server.runtimeconfig.json": "./",
       "binaries/Calcpad.Server.staticwebassets.endpoints.json": "./",
       "binaries/appsettings.json": "./",
+      "binaries/THIRD-PARTY-NOTICES.txt": "./",
+      "binaries/LICENSE.txt": "./",
       "binaries/Calcpad.Server": "./",
       "binaries/createdump": "./",
       "binaries/template.html": "./",
@@ -24,10 +26,18 @@
     },
     "linux": {
       "deb": {
-        "depends": []
+        "depends": [],
+        "files": {
+          "/usr/share/doc/CalcpadCE/copyright": "../../../../LICENSE",
+          "/usr/share/doc/CalcpadCE/THIRD-PARTY-NOTICES.txt": "../../../../THIRD-PARTY-NOTICES.txt"
+        }
       },
       "rpm": {
-        "depends": []
+        "depends": [],
+        "files": {
+          "/usr/share/licenses/CalcpadCE/LICENSE": "../../../../LICENSE",
+          "/usr/share/licenses/CalcpadCE/THIRD-PARTY-NOTICES.txt": "../../../../THIRD-PARTY-NOTICES.txt"
+        }
       }
     }
   }

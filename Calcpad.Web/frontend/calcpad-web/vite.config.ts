@@ -19,6 +19,13 @@ export default defineConfig(() => ({
     build: {
         outDir: 'dist',
         emptyOutDir: true,
+        // rolldown drops /*! @license */ banners by default. DOMPurify's is the
+        // only attribution monaco ships for it, so losing it breaches Apache-2.0.
+        rolldownOptions: {
+            output: {
+                comments: { legal: true },
+            },
+        },
     },
     // Monaco pulls in ~100 language files, and without pre-bundling vite's dep-optimizer runs
     // esbuild in parallel with browser transform requests, where esbuild 0.21.5's worker races

@@ -17,7 +17,7 @@ jobs:
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.x'
+          global-json-file: global.json
 
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -37,6 +37,9 @@ jobs:
 
       - name: Package extension
         run: npm run package:vsix --prefix Calcpad.Web/frontend/vscode-calcpad
+
+      - name: Verify third-party notices
+        run: ./tools/license-scan/verify-notices.sh Calcpad.Web/frontend/vscode-calcpad/*.vsix
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7

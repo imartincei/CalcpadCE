@@ -42,6 +42,10 @@ node "$SYNC_SCRIPT" \
     --configuration=Release \
     --keep-skia-natives
 
+# After the sync: it prunes anything it does not recognise from the target.
+cp "$REPO_ROOT/THIRD-PARTY-NOTICES.txt" "$BINARIES_DIR/"
+cp "$REPO_ROOT/LICENSE" "$BINARIES_DIR/LICENSE.txt"
+
 if [[ "$TRIPLE" == *windows* ]]; then
     APPHOST="$BINARIES_DIR/Calcpad.Server.exe"
 else

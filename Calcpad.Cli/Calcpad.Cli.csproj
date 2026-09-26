@@ -28,6 +28,10 @@
       <LinuxPath>/usr/bin/calcpad</LinuxPath>
     </Content>
     <Content Include="doc/**/*" CopyToPublishDirectory="PreserveNewest" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="$(MSBuildThisFileDirectory)..\THIRD-PARTY-NOTICES.txt"
+      CopyToPublishDirectory="PreserveNewest"
+      CopyToOutputDirectory="PreserveNewest"
+      TargetPath="doc/THIRD-PARTY-NOTICES.txt" />
     <Content Include="$(ExamplesContentDir)\**\*"
       CopyToPublishDirectory="PreserveNewest"
       CopyToOutputDirectory="PreserveNewest"
@@ -75,9 +79,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="doc\HELP.zh.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="doc\jquery-3.6.3.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="doc\LICENSE.bg.TXT">

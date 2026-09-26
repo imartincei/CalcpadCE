@@ -297,24 +297,6 @@
             "problemMatcher": []
         },
         {
-            "label": "Desktop: Bundle AppImage (Linux)",
-            "type": "shell",
-            "group": "build",
-            "linux": {
-                "command": "bash",
-                "args": [
-                    "${workspaceFolder}/Calcpad.Web/frontend/calcpad-desktop/build-desktop.sh",
-                    "--bundles=appimage"
-                ]
-            },
-            "windows": { "command": "echo", "args": ["AppImage can only be built on Linux"] },
-            "presentation": {
-                "reveal": "always",
-                "panel": "dedicated"
-            },
-            "problemMatcher": []
-        },
-        {
             "label": "Desktop: Bundle .deb (Linux)",
             "type": "shell",
             "group": "build",

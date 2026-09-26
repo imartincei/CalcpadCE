@@ -87,9 +87,18 @@ A local webserver will spawn to serve the rendered documentation:
 ## Creating a Release
 
 Releasing is automated via GitHub Actions.
-The workflow is as follows:
+The tag you push decides which workflow runs:
+
+| Tag | Workflow | Result |
+| --- | --- | --- |
+| `vX.Y.Z` | `stable-release-build.yml` | Stable release, marked "Latest" |
+| `vX.Y.Z-<suffix>`, e.g. `v8.0.0-beta.1` or `v8.0.0-rc.2` | `pre-release-build.yml` | Pre-release, **not** marked "Latest" |
+
+Both build the same artifacts via `build-all.yml`: the Windows portable zip, the Linux desktop packages (`.deb`, `.rpm`, `.pkg.tar.zst`), and the VS Code extension.
 
 Items marked with 🫵, require an action by you.
+
+### Stable Release
 
 - 🫵 Push a tag in the format `vX.Y.Z`.
 - The artifacts for all platforms are built.
@@ -100,5 +109,27 @@ Items marked with 🫵, require an action by you.
   - refactorings, which are not relevant from the user's perspective
   - fixes which addressed only unreleased code
 - 🫵 Click on "Publish Release".
-- A workflow is triggered to create a PR in the winget repo updating the version.
+- 🫵 Run the `Publish to WinGet` workflow manually, passing the release tag.
+  It is manual until a Windows installer ships: see `winget-publish.yml`.
 - 🫵 Write an announcement on GitHub Discussions.
+
+### Pre-Release
+
+Same build, but three deliberate differences from the stable flow:
+
+- **Marked as a pre-release, and not marked "Latest".**
+  The Releases page keeps pointing normal users at the newest stable version.
+- **No generated release notes.**
+  The commit-derived list is noise in the body of a test build, so the release text is only the download table from `.github/pre-release-notes-template.md`.
+  Add comments to draft manually as needed.
+- **No website bump and no WinGet submission.**
+
+The steps:
+- 🫵 Push a tag in the format `vX.Y.Z-<suffix>`, for example `v8.0.0-beta.1`.
+- The artifacts for all platforms are built.
+- A pre-release draft is created on the repo's Releases page.
+- 🫵 Edit the draft to say what is being tested and what feedback you want.
+- 🫵 Click on "Publish Release".
+
+In most cases, there is no announcement step on Github: a pre-release is published for testers and is not broadcast.
+Pre-releases should be posted on Discord, and major pre-releases can also be posted in a Github Discussion.

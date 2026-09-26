@@ -28,6 +28,10 @@ Write-Host ">> .NET RID:     $Rid"
 New-Item -ItemType Directory -Force -Path $BinariesDir | Out-Null
 node $SyncScript "--target=$BinariesDir" "--rid=$Rid" '--configuration=Release' '--keep-skia-natives'
 
+# After the sync: it prunes anything it does not recognise from the target.
+Copy-Item (Join-Path $RepoRoot 'THIRD-PARTY-NOTICES.txt') -Destination $BinariesDir -Force
+Copy-Item (Join-Path $RepoRoot 'LICENSE') -Destination (Join-Path $BinariesDir 'LICENSE.txt') -Force
+
 Push-Location $ScriptDir
 try {
     npx tauri build --config src-tauri/tauri.windows.conf.json --target $Target --no-bundle
@@ -62,6 +66,10 @@ foreach ($sub in 'bg', 'zh', 'Fonts') {
         Copy-Item -Recurse -Path $srcSub -Destination (Join-Path $StageDir $sub)
     }
 }
+
+# Staged explicitly rather than relying on Tauri's resource copy under --no-bundle.
+Copy-Item (Join-Path $RepoRoot 'THIRD-PARTY-NOTICES.txt') -Destination $StageDir -Force
+Copy-Item (Join-Path $RepoRoot 'LICENSE') -Destination (Join-Path $StageDir 'LICENSE.txt') -Force
 
 $exeSrc = Join-Path $StageDir 'calcpad-desktop.exe'
 $exeDst = Join-Path $StageDir 'CalcpadCE.exe'

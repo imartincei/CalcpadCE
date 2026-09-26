@@ -23,6 +23,10 @@ Write-Host ">> .NET RID:     $Rid"
 New-Item -ItemType Directory -Force -Path $BinariesDir | Out-Null
 node $SyncScript "--target=$BinariesDir" "--rid=$Rid" '--configuration=Release' '--keep-skia-natives'
 
+# After the sync: it prunes anything it does not recognise from the target.
+Copy-Item (Join-Path $RepoRoot 'THIRD-PARTY-NOTICES.txt') -Destination $BinariesDir -Force
+Copy-Item (Join-Path $RepoRoot 'LICENSE') -Destination (Join-Path $BinariesDir 'LICENSE.txt') -Force
+
 $srcExe  = Join-Path $BinariesDir 'Calcpad.Server.exe'
 $destExe = Join-Path $BinariesDir "calcpad-server-$Target.exe"
 if (-not (Test-Path $srcExe)) {

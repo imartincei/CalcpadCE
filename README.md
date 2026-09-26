@@ -123,6 +123,7 @@ On Windows use `.\stage-sidecar.ps1` instead.
 To produce installers for your platform, run `./build-desktop.sh` (or `.\build-desktop.ps1`) from the same directory.
 
 The command line interpreter builds on its own with `dotnet build Calcpad.Cli` from the repository root.
+It is a development tool used to render the documentation's examples and is not part of a release.
 
 ### VS Code Tasks
 

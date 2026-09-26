@@ -1,0 +1,61 @@
+name: Pre-Release
+
+# Suffixed tags only: i.e. v8.0.0-beta.1, v8.2.0-alpha.2, etc.
+# Plain vX.Y.Z goes to stable-release-build.yml.
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+-*']
+
+jobs:
+  determine-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Determine version
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+  build-all:
+    needs: determine-version
+    uses: ./.github/workflows/build-all.yml
+    with:
+      version: ${{ needs.determine-version.outputs.version }}
+
+  release:
+    needs: [build-all, determine-version]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/pre-release-notes-template.md
+          sparse-checkout-cone-mode: false
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts/
+          merge-multiple: true
+          # Artifacts are uploaded raw; the portable build is itself a zip.
+          skip-decompress: true
+
+      - name: Generate release notes
+        env:
+          VERSION: ${{ needs.determine-version.outputs.version }}
+          REPO: ${{ github.repository }}
+        run: envsubst < .github/pre-release-notes-template.md > release-notes.md
+
+      # generate_release_notes is off:
+      # make_latest keeps stable as the default download.
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: artifacts/*
+          body_path: release-notes.md
+          generate_release_notes: false
+          make_latest: false
+          prerelease: true
+          draft: true

@@ -761,15 +761,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
         }
     }
 
-    // On Linux, prefer a native command that spawns xdg-open with the
-    // AppImage's LD_LIBRARY_PATH / GTK_* env stripped. plugin-opener inherits
-    // the parent's env, and inside an AppImage that env poisons every glib
-    // tool xdg-open forwards to (gio open, dbus-send, kfmclient...).
     private async openPathSafe(target: string): Promise<void> {
-        if (this._platform === 'linux') {
-            await invoke('open_path_native', { path: target });
-            return;
-        }
         await openPath(target);
     }
 
@@ -921,8 +913,8 @@ export class TauriMessageBridge extends BaseMessageBridge {
         }
     }
 
-    // No fall back to the resource dir: it sits outside the opener scope (and is
-    // read-only inside an AppImage anyway), so an open there would only fail.
+    // No fall back to the resource dir: it sits outside the opener scope (and can be
+    // read-only), so an open there would only fail.
     private getServerLogDir(): string | null {
         return this._serverLogDir || null;
     }

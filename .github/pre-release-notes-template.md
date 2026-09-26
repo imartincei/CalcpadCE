@@ -1,3 +1,8 @@
+## 🧪 Pre-Release
+
+CalcpadCE ${VERSION} is a pre-release, published for testing.
+It is not marked as the latest release — for everyday use, download the newest stable version instead.
+
 ## 🛡️ Windows SmartScreen Note
 
 Because CalcpadCE is a new, community-driven project, Windows SmartScreen flags `CalcpadCE.exe` as an unrecognized app.

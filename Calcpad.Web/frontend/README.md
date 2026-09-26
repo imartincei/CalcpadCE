@@ -70,7 +70,7 @@ calcpad-desktop/           Tauri desktop wrapper
     ├── src-tauri/         Rust shell (window, menu, sidecar spawn) + tauri.conf.json
     ├── stage-sidecar.sh   Publishes Calcpad.Server for the host RID and stages the
     │   stage-sidecar.ps1  apphost as src-tauri/binaries/calcpad-server-<triple>[.exe]
-    ├── build-desktop.sh   Full bundle: sidecar → `tauri build` → msi/nsis/deb/rpm/appimage/dmg
+    ├── build-desktop.sh   Full bundle: sidecar → `tauri build` → msi/nsis/deb/rpm/dmg
     │   build-desktop.ps1
     ├── build-portable.ps1 Windows portable: `tauri build --no-bundle` → flat folder → zip
     └── packaging/arch/    PKGBUILD that packages the build-desktop.sh output for pacman
@@ -104,14 +104,14 @@ cd calcpad-web && npm install && npm run build
 cd calcpad-desktop && npm install && bash build-desktop.sh
 
 # One Linux format at a time
-bash build-desktop.sh --bundles=deb        # or rpm, appimage
+bash build-desktop.sh --bundles=deb        # or rpm
 ```
 
 ### Linux packaging
 
-`build-desktop.sh` with no `--bundles` produces `deb`, `rpm`, and `appimage`. The Arch
+`build-desktop.sh` with no `--bundles` produces `deb` and `rpm`. The Arch
 package is a separate step because `makepkg` is not a `tauri build` target — it wraps
-the tree that `build-desktop.sh` already produced, so all four come from one build:
+the tree that `build-desktop.sh` already produced, so all three come from one build:
 
 ```bash
 cd calcpad-desktop

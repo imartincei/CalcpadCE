@@ -868,7 +868,7 @@
     "package": "npm run sync-server:slim && npm run build:vue && rollup -c --sourcemap",
     "package:full": "npm run sync-server && npm run build:vue && rollup -c --sourcemap",
     "package:lite": "npm run sync-server:slim && npm run build:vue && rollup -c --sourcemap",
-    "package:vsix": "npm run package && vsce package --no-dependencies",
+    "package:vsix": "npm run package && node scripts/stage-notices.mjs && vsce package --no-dependencies",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "build:vue": "vite build",
