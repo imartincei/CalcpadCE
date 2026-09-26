@@ -3307,27 +3307,6 @@ You can use the following switches for that purpose:</p>
 <li><code>#split</code> the equation is split after the "=" symbol</li>
 <li><code>#wrap</code> the equation is wrapped at the end of the line (default)</li>
 </ul>
-<p>Matrices and vectors are rendered either as a structured grid of aligned cells enclosed in brackets that stretch to the full height of the content, or on a single line.
-Choose the way they look in the output with the <code>inlineMatrices</code> setting:</p>
-<ul>
-<li><code>#settings {"inlineMatrices": false}</code> matrices and vectors are rendered as a structured grid (default)</li>
-<li><code>#settings {"inlineMatrices": true}</code> matrices and vectors are rendered on a single line</li>
-</ul>
-<p>The setting applies from the point it appears to the rest of the document and has no <code>#end</code> form.
-You can change it back and forth as many times as you like; the last one in the document wins.
-Write each directive on a line of its own - only the first directive on a line is read.</p>
-<p>For example:</p>
-<div class="language-text highlight"><pre><span></span><code>#settings {"inlineMatrices": false}
-A = [1; 2|3; 4]
-
-#settings {"inlineMatrices": true}
-B = [1; 2|3; 4]
-
-#settings {"inlineMatrices": false}
-C = [1; 2|3; 4]
-</code></pre></div>
-<p>Here <em>A</em> and <em>C</em> are printed as a grid of cells inside full-height brackets, while <em>B</em> is printed as a single line.
-The same switch is available globally, as "Inline Matrices" in the settings panel.</p>
 <h2 id="rounding">Rounding<a class="headerlink" href="#rounding" title="Permanent link">&para;</a></h2>
 <p>Rounding is specified by the number of digits <em>n</em> after the decimal point.
 It is entered into the "<strong>Rounding</strong>" input box at the bottom of the program window.
