@@ -100,3 +100,10 @@ deepNest = sqr(abs(sin(45) + cos(45)))
 redef(a) = a + 1
 redef(a; b) = a + b
 redefUse = redef(2; 3)
+
+' Optional parameters with defaults and keyword argument calls
+kwFunc(x; y = 2; z = 3kg) = x*y + z
+kwAllDefaults = kwFunc(1)
+kwPositional = kwFunc(1; 5; 2kg)
+kwMixed = kwFunc(1; z = 4kg)
+kwNamed = kwFunc(z = 4kg; x = 1; y = 5)

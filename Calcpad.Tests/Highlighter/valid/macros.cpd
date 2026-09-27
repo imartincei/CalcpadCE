@@ -47,3 +47,9 @@ cmt$('hidden comment')
 ' Macro in expression context
 a = 5
 b = double$(a)
+' Macro optional parameters and keyword arguments
+#def kwMacro$(a$; b$ = 10; c$ = 5) = a$ + b$ + c$
+kwAllDefaults = kwMacro$(1)
+kwPositional = kwMacro$(1; 2; 3)
+kwMixed = kwMacro$(1; c$ = 7)
+kwNamed = kwMacro$(a$ = 1; c$ = 7; b$ = 2)

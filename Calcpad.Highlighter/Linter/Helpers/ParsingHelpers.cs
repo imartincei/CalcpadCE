@@ -44,6 +44,31 @@ namespace Calcpad.Highlighter.Linter.Helpers
         /// Extracts function parameter names from a function definition line.
         /// For example: "square(x) = x^2" returns {"x"}
         /// </summary>
+        /// <summary>
+        /// Splits "name = default" on the first '=' outside brackets. Returns false when the
+        /// parameter has no default, in which case <paramref name="defaultValue"/> is empty.
+        /// </summary>
+        public static bool SplitParameterDefault(ReadOnlySpan<char> parameter,
+            out ReadOnlySpan<char> name, out ReadOnlySpan<char> defaultValue)
+        {
+            var depth = 0;
+            for (var i = 0; i < parameter.Length; i++)
+            {
+                var c = parameter[i];
+                if (c == '(' || c == '[' || c == '{') depth++;
+                else if (c == ')' || c == ']' || c == '}') depth--;
+                else if (c == '=' && depth == 0)
+                {
+                    name = parameter[..i].Trim();
+                    defaultValue = parameter[(i + 1)..].Trim();
+                    return true;
+                }
+            }
+            name = parameter.Trim();
+            defaultValue = default;
+            return false;
+        }
+
         public static HashSet<string> GetFunctionParamsFromLine(string line)
         {
             var result = new HashSet<string>(StringComparer.Ordinal);
@@ -51,14 +76,15 @@ namespace Calcpad.Highlighter.Linter.Helpers
 
             // Look for function definition pattern: name(params) = ...
             var parenOpen = line.IndexOf('(');
-            var parenClose = line.IndexOf(')');
-            var equalsSign = line.IndexOf('=');
-
-            // Must have pattern: name(params) = (paren before equals, close paren before equals)
-            if (parenOpen < 0 || parenClose < 0 || equalsSign < 0)
+            if (parenOpen < 0)
                 return result;
 
-            if (parenOpen >= parenClose || parenClose >= equalsSign)
+            var parenClose = FindMatchingClose(lineSpan, parenOpen, '(', ')');
+            if (parenClose < 0)
+                return result;
+
+            var equalsSign = line.IndexOf('=', parenClose);
+            if (equalsSign < 0)
                 return result;
 
             // Check that something comes before the paren (function name)
@@ -73,7 +99,9 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 var trimmed = paramSpan.Trim();
                 if (trimmed.Length > 0)
                 {
-                    result.Add(trimmed.ToString());
+                    SplitParameterDefault(trimmed, out var name, out _);
+                    if (!name.IsEmpty)
+                        result.Add(name.ToString());
                 }
             }
 

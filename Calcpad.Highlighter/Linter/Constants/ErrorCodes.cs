@@ -25,6 +25,7 @@ namespace Calcpad.Highlighter.Linter.Constants
             ["CPD-2210"] = "Invalid character in macro name",
             ["CPD-2211"] = "Invalid character in macro parameter",
             ["CPD-2212"] = "Duplicate macro parameter",
+            ["CPD-2213"] = "Required parameter after optional parameter",
 
             // Stage 3: Balance (CPD-31xx)
             ["CPD-3101"] = "Unmatched opening parenthesis",
@@ -41,6 +42,7 @@ namespace Calcpad.Highlighter.Linter.Constants
             ["CPD-3204"] = "Variable name conflicts with a keyword",
             ["CPD-3205"] = "Variable name conflicts with a built-in constant",
             ["CPD-3206"] = "Function must have at least one parameter",
+            ["CPD-3215"] = "Required parameter after optional parameter in function definition",
 
             // Stage 3: Usage (CPD-33xx)
             ["CPD-3301"] = "Undefined variable",
@@ -56,6 +58,8 @@ namespace Calcpad.Highlighter.Linter.Constants
             ["CPD-3311"] = "Empty parameter in a function call",
             ["CPD-3312"] = "Unused variable",
             ["CPD-3313"] = "Redefinition of existing function",
+            ["CPD-3314"] = "Unknown keyword argument",
+            ["CPD-3315"] = "Unknown keyword argument in function call",
 
             // Stage 3: Semantic (CPD-34xx)
             ["CPD-3401"] = "Invalid operator usage",

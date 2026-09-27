@@ -1,0 +1,91 @@
+'<!-- Exercises optional parameters with default values and keyword-argument calls, for both custom functions and macros. -->
+'<h1>Keyword Arguments and Optional Parameters</h1>
+'<p>A function or macro parameter can carry a default value, written with <b>=</b> in the
+'parameter list. A call can then omit that argument, or name it explicitly as
+'<b>name = value</b>. Required parameters come before optional ones in a definition, and
+'positional arguments come before keyword arguments in a call.</p>
+'
+'<h2>1. Functions</h2>
+'<h3>1.1 Optional parameters</h3>
+f(x; y = 2; z = 3) = x + y + z
+'Only the required argument, so y and z take their defaults
+r_1 = f(1)
+'Every argument positional
+r_2 = f(1; 10; 100)
+'Positional first, then one keyword argument
+r_3 = f(1; z = 100)
+'All keyword, in any order
+r_4 = f(z = 100; x = 1; y = 10)
+'
+'<h3>1.2 Defaults carrying units</h3>
+w(L; q = 5kN/m) = q*L^2/8
+L_s = 6m
+'Default load
+M_1 = w(L_s)|kN*m
+'Load supplied by name
+M_2 = w(L_s; q = 12kN/m)|kN*m
+'
+'<h3>1.3 Defaults are resolved at call time</h3>
+'<p>A default is stored as source text and evaluated in the global scope on every call,
+'so it follows the current value of whatever it references.</p>
+k = 5
+g(x; m = k) = x*m
+'k is 5 here
+g_1 = g(2)
+k = 50
+'the same call, with k now 50
+g_2 = g(2)
+'
+'<h3>1.4 A default may be an expression or a vector</h3>
+h(x; y = sqr(16)) = x + y
+h_1 = h(1)
+h_2 = h(1; y = 100)
+p(x; v = [2; 4; 6]) = x*sum(v)
+p_1 = p(2)
+p_2 = p(2; v = [1; 1])
+'
+'<h3>1.5 Nested calls</h3>
+n_1 = f(f(1); 4)
+n_2 = f(x = f(1; z = 0); y = 0)
+'
+'<h2>2. Macros</h2>
+'<h3>2.1 Inline macro with defaults</h3>
+#def calc$(a$; b$ = 10; c$ = 5) = a$ + b$ + c$
+'Only the required argument
+m_1 = calc$(1)
+'All positional
+m_2 = calc$(1; 2; 3)
+'Positional then keyword
+m_3 = calc$(1; c$ = 7)
+'All keyword, in any order
+m_4 = calc$(a$ = 1; c$ = 7; b$ = 2)
+'
+'<h3>2.2 Multiline macro with a default</h3>
+#def convert$(v$; u$ = mm)
+	'<p>Converted to the requested unit:</p>
+	v$|u$
+#end def
+d = 2.5m
+'Default unit
+convert$(d)
+'Unit supplied by name
+convert$(d; u$ = cm)
+'
+'<h3>2.3 An empty argument list takes every default</h3>
+#def stamp$(a$ = 1; b$ = 2) = a$ + b$
+s_1 = stamp$()
+s_2 = stamp$(b$ = 20)
+'
+'<h3>2.4 A default may contain brackets</h3>
+#def total$(v$ = [1; 2; 3]) = sum(v$)
+#def totalM$(m$ = [1; 2; 3|4; 5; 6]) = sum(m$)
+t_1 = total$()
+v_x = [10; 20]
+t_2 = total$(v_x)
+t_3 = totalM$()
+t_4 = totalM$(m$ = mfill(matrix(4; 5); 4))
+'
+'<h3>2.5 A macro default feeding a function default</h3>
+#def apply$(v$; fac$ = 3) = w(v$; q = fac$*1kN/m)
+A_1 = apply$(L_s)|kN*m
+A_2 = apply$(L_s; fac$ = 8)|kN*m

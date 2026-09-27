@@ -15,6 +15,8 @@ namespace Calcpad.Highlighter.Tokenizer
         private readonly HashSet<string> _definedMacros = new(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _definedUnits = new(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _localVariables = new(StringComparer.Ordinal);
+        // Functions with optional parameters - the only ones whose calls accept keyword arguments.
+        private readonly HashSet<string> _functionsWithDefaults = new(StringComparer.Ordinal);
 
         // Tracks #read keyword in all modes (not just Lint) so the next variable can be
         // recorded as a definition.
@@ -42,6 +44,7 @@ namespace Calcpad.Highlighter.Tokenizer
             _definedFunctions.Clear();
             _definedMacros.Clear();
             _definedUnits.Clear();
+            _functionsWithDefaults.Clear();
             _expectingReadVariable = false;
         }
 
@@ -89,6 +92,9 @@ namespace Calcpad.Highlighter.Tokenizer
                     {
                         return TokenType.MacroParameter;
                     }
+                    // A keyword argument names a parameter of the called function.
+                    if (IsKeywordArgumentName(text))
+                        return TokenType.LocalVariable;
                     // Check if this is a local variable (function param, command scope var, etc.)
                     if (_state.IsInFunctionParams || _state.IsAfterAtOrAmp)
                     {
@@ -287,8 +293,10 @@ namespace Calcpad.Highlighter.Tokenizer
                     }
                     else
                     {
-                        // Other brackets clear pending state
-                        ClearPendingDefinitions();
+                        // Square brackets and braces inside a definition's parameter list belong
+                        // to a default value, so they must not cancel the pending definition.
+                        if (_pendingFunctionName == null || _pendingFunctionParenDepth == 0)
+                            ClearPendingDefinitions();
                     }
                     break;
 
@@ -305,7 +313,12 @@ namespace Calcpad.Highlighter.Tokenizer
                     {
                         // Inside function definition parens, = is a default value separator, not assignment
                         if (_pendingFunctionName != null && _pendingFunctionParenDepth > 0)
+                        {
+                            if (_state.IsFunctionDefinition)
+                                _functionsWithDefaults.Add(_pendingFunctionName);
+
                             break;
+                        }
 
                         // Assignment operator - confirm definition or track reassignment
                         bool isFirstDef = false;
@@ -409,6 +422,23 @@ namespace Calcpad.Highlighter.Tokenizer
             _pendingFunctionName = null;
             _pendingFunctionLine = -1;
             _pendingFunctionParenDepth = 0;
+        }
+
+        /// <summary>
+        /// True for an identifier followed by '=' inside a call that takes keyword arguments.
+        /// </summary>
+        private bool IsKeywordArgumentName(string text)
+        {
+            if ((_state.FunctionCallMask >> _state.BracketCount & 1) == 0)
+                return false;
+
+            var span = _state.Text.Span;
+            var i = _state.TokenStartColumn + text.Length;
+            while (i < span.Length && char.IsWhiteSpace(span[i]))
+                ++i;
+
+            return i < span.Length && span[i] == '=' &&
+                   (i + 1 >= span.Length || span[i + 1] != '=');
         }
 
         private bool IsKnownFunction(string name)

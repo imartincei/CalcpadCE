@@ -277,11 +277,20 @@
   <data name="Condition_result_is_invalid_0" xml:space="preserve">
         <value>Невалиден резултат от проверка на условие: {0}.</value>
     </data>
+  <data name="Duplicate_argument_0" xml:space="preserve">
+        <value>Duplicate argument for parameter "{0}".</value>
+    </data>
   <data name="Duplicate_macro_parameter_names_0_and_1" xml:space="preserve">
         <value>Дублиране на имената на параметрите на макрос: {0} и {1}.</value>
     </data>
   <data name="Macro_not_defined_0" xml:space="preserve">
         <value>Недефиниран макрос: {0}.</value>
+    </data>
+  <data name="Required_parameter_after_optional_0" xml:space="preserve">
+        <value>Required parameter "{0}" cannot follow an optional parameter.</value>
+    </data>
+  <data name="Unknown_keyword_argument_0" xml:space="preserve">
+        <value>Unknown keyword argument: "{0}".</value>
     </data>
   <data name="Missing_0_in_surface_map_command" xml:space="preserve">
         <value>Липсва {0} в команда за 2D графика.</value>

@@ -54,6 +54,7 @@ namespace Calcpad.Highlighter.Tokenizer
             public int MacroArgs;
             public int CommandCount;
             public int BracketCount;
+            public uint FunctionCallMask;           // Bit per bracket depth: call to a function with optional params
             public int MatrixCount;
             public TokenType CurrentType;
             public TokenType PreviousType;
@@ -520,6 +521,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 _state.IsPlot |= previous.IsPlot;
                 _state.IsUnits = previous.IsUnits;
                 _state.BracketCount = previous.BracketCount;
+                _state.FunctionCallMask = previous.FunctionCallMask;
                 _state.MatrixCount = previous.MatrixCount;
                 _state.CommandCount = previous.CommandCount;
                 _state.IsInCommandBlock = previous.IsInCommandBlock;

@@ -115,6 +115,8 @@ namespace Calcpad.Highlighter.Tokenizer
             if (c == '(')
             {
                 _state.BracketCount++;
+                var callBit = 1u << _state.BracketCount;
+                _state.FunctionCallMask &= ~callBit;
                 if (t == TokenType.Variable)
                 {
                     _state.CurrentType = TokenType.Function;
@@ -160,6 +162,14 @@ namespace Calcpad.Highlighter.Tokenizer
                         }
                     }
                 }
+
+                // Only functions with optional parameters take keyword arguments - anywhere
+                // else '=' inside call parentheses is a comparison.
+                if (!_state.IsFunctionDefinition &&
+                    (t == TokenType.Variable || t == TokenType.Function) &&
+                    _builder.Length > 0 &&
+                    _functionsWithDefaults.Contains(_builder.ToString()))
+                    _state.FunctionCallMask |= callBit;
             }
             else if (c == ')')
             {
@@ -264,13 +274,13 @@ namespace Calcpad.Highlighter.Tokenizer
 
             if (c == '=')
             {
-                _state.IsFunction = true;
                 // Inside parens (BracketCount > 0), = is a default value separator: f(x = 5) = x^2
                 // Stop marking tokens as params (so default expr tokens aren't params),
                 // but keep IsFunctionDefinition true so the definition is recognized.
                 // IsInFunctionParams is restored on ';' for the next parameter.
                 if (_state.BracketCount == 0)
                 {
+                    _state.IsFunction = true;
                     _state.IsFunctionDefinition = false;
                 }
                 _state.IsInFunctionParams = false;
@@ -301,9 +311,10 @@ namespace Calcpad.Highlighter.Tokenizer
             if (_state.CommandCount > 0 || c == ';')
             {
                 Append(TokenType.Operator);
-                // Restore IsInFunctionParams after ';' inside function definition parens
-                // so the next parameter name is correctly typed as LocalVariable
-                if (c == ';' && _state.IsFunctionDefinition && _state.BracketCount > 0)
+                // Restore IsInFunctionParams after ';' inside definition parens so the next
+                // parameter name is still typed as a parameter after a default value.
+                if (c == ';' && _state.BracketCount > 0 &&
+                    (_state.IsFunctionDefinition || (_state.HasMacro && !_inMacroDefinition)))
                     _state.IsInFunctionParams = true;
             }
             else if (c == '|' && (_state.IsUnits || _state.MatrixCount > 0))

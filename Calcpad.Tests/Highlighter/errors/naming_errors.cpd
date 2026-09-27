@@ -13,3 +13,6 @@ e = 2.71
 
 ' CPD-3208: Function with no params
 calc() = 43
+
+' CPD-3215: Required parameter after optional parameter
+reqAfterOpt(x = 1; y) = x + y

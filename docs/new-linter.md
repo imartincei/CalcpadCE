@@ -34,6 +34,7 @@ The tables below group them by the kind of problem.
 | CPD-2210 | Error | Invalid character in macro name |
 | CPD-2211 | Error | Invalid character in macro parameter |
 | CPD-2212 | Error | Duplicate macro parameter |
+| CPD-2213 | Error | Required parameter after optional parameter |
 
 ### Brackets and blocks
 
@@ -56,6 +57,7 @@ The tables below group them by the kind of problem.
 | CPD-3204 | Error | Variable name conflicts with a keyword |
 | CPD-3205 | Error | Variable name conflicts with a built-in constant |
 | CPD-3206 | Error | Function must have at least one parameter |
+| CPD-3215 | Error | Required parameter after optional parameter in function definition |
 
 ### Usage
 
@@ -74,6 +76,8 @@ The tables below group them by the kind of problem.
 | CPD-3311 | Error | Empty parameter in a function call |
 | CPD-3312 | Information | Unused variable |
 | CPD-3313 | Error | Redefinition of existing function |
+| CPD-3314 | Error | Unknown keyword argument in a macro call |
+| CPD-3315 | Error | Unknown keyword argument in a function call |
 
 ### Semantics
 

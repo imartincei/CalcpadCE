@@ -1,0 +1,548 @@
+<div class="calcpad-output">
+ <!-- Exercises optional parameters with default values and keyword-argument calls, for both custom functions and macros. -->
+ <h1>Keyword Arguments and Optional Parameters</h1>
+ <p>
+  A function or macro parameter can carry a default value, written with
+  <b>=</b>
+  in the
+  <p>parameter list. A call can then omit that argument, or name it explicitly as</p>
+  <b>name = value</b>
+  . Required parameters come before optional ones in a definition, and
+  <p>positional arguments come before keyword arguments in a call.</p>
+ </p>
+ <p>
+ </p>
+ <h2>1. Functions</h2>
+ <h3>1.1 Optional parameters</h3>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   ;
+   <var>z</var>
+   )  =
+   <var>x</var>
+   +
+   <var>y</var>
+   +
+   <var>z</var>
+  </span>
+ </p>
+ <p>Only the required argument, so y and z take their defaults</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>1</sub>
+   =
+   <var>f</var>
+   ( 1; 2; 3 )  = 6
+  </span>
+ </p>
+ <p>Every argument positional</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>2</sub>
+   =
+   <var>f</var>
+   ( 1; 10; 100 )  = 111
+  </span>
+ </p>
+ <p>Positional first, then one keyword argument</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>3</sub>
+   =
+   <var>f</var>
+   ( 1; 2; 100 )  = 103
+  </span>
+ </p>
+ <p>All keyword, in any order</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>4</sub>
+   =
+   <var>f</var>
+   ( 1; 10; 100 )  = 111
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>1.2 Defaults carrying units</h3>
+ <p>
+  <span class="eq">
+   <var>w</var>
+   (
+   <var>L</var>
+   ;
+   <var>q</var>
+   )  =
+   <span class="dvc">
+    <var>q</var>
+    ·
+    <var>L</var>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    8
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>L</var>
+   <sub>s</sub>
+   = 6
+   <i>m</i>
+  </span>
+ </p>
+ <p>Default load</p>
+ <p>
+  <span class="eq">
+   <var>M</var>
+   <sub>1</sub>
+   =
+   <var>w</var>
+   <span class="b1">(</span>
+   <var>L</var>
+   <sub>s</sub>
+   ; 5
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+   <span class="b1">)</span>
+   =
+   <var>w</var>
+   <span class="b1">(</span>
+   6
+   <i>m</i>
+   ; 5
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+   <span class="b1">)</span>
+   = 22.5
+   <i>kN</i>
+   <i>·</i>
+   <i>m</i>
+  </span>
+ </p>
+ <p>Load supplied by name</p>
+ <p>
+  <span class="eq">
+   <var>M</var>
+   <sub>2</sub>
+   =
+   <var>w</var>
+   <span class="b1">(</span>
+   <var>L</var>
+   <sub>s</sub>
+   ; 12
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+   <span class="b1">)</span>
+   =
+   <var>w</var>
+   <span class="b1">(</span>
+   6
+   <i>m</i>
+   ; 12
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+   <span class="b1">)</span>
+   = 54
+   <i>kN</i>
+   <i>·</i>
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>1.3 Defaults are resolved at call time</h3>
+ <p>
+  A default is stored as source text and evaluated in the global scope on every call,
+  <p>so it follows the current value of whatever it references.</p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   = 5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>g</var>
+   (
+   <var>x</var>
+   ;
+   <var>m</var>
+   )  =
+   <var>x</var>
+   ·
+   <var>m</var>
+  </span>
+ </p>
+ <p>k is 5 here</p>
+ <p>
+  <span class="eq">
+   <var>g</var>
+   <sub>1</sub>
+   =
+   <var>g</var>
+   ( 2;
+   <var>k</var>
+   )  =
+   <var>g</var>
+   ( 2; 5 )  = 10
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   = 50
+  </span>
+ </p>
+ <p>the same call, with k now 50</p>
+ <p>
+  <span class="eq">
+   <var>g</var>
+   <sub>2</sub>
+   =
+   <var>g</var>
+   ( 2;
+   <var>k</var>
+   )  =
+   <var>g</var>
+   ( 2; 50 )  = 100
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>1.4 A default may be an expression or a vector</h3>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )  =
+   <var>x</var>
+   +
+   <var>y</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   <sub>1</sub>
+   =
+   <var>h</var>
+   ( 1;
+   <span class="o0">
+    <span class="r">√</span>
+    16
+   </span>
+   )  = 5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   <sub>2</sub>
+   =
+   <var>h</var>
+   ( 1; 100 )  = 101
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   (
+   <var>x</var>
+   ;
+   <var>v</var>
+   )  =
+   <var>x</var>
+   ·
+   <b>sum</b>
+   (
+   <var>v</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>1</sub>
+   =
+   <var>p</var>
+   ( 2;
+   <span class="b0">[</span>
+   2; 4; 6
+   <span class="b0">]</span>
+   )  = 24
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>2</sub>
+   =
+   <var>p</var>
+   ( 2;
+   <span class="b0">[</span>
+   1; 1
+   <span class="b0">]</span>
+   )  = 4
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>1.5 Nested calls</h3>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>1</sub>
+   =
+   <var>f</var>
+   (
+   <var>f</var>
+   ( 1; 2; 3 ) ; 4; 3 )  = 13
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>2</sub>
+   =
+   <var>f</var>
+   (
+   <var>f</var>
+   ( 1; 2; 0 ) ; 0; 3 )  = 6
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>2. Macros</h2>
+ <h3>2.1 Inline macro with defaults</h3>
+ <p>Only the required argument</p>
+ <p>
+  <span class="eq">
+   <var>m</var>
+   <sub>1</sub>
+   = 1 + 10 + 5 = 16
+  </span>
+ </p>
+ <p>All positional</p>
+ <p>
+  <span class="eq">
+   <var>m</var>
+   <sub>2</sub>
+   = 1 + 2 + 3 = 6
+  </span>
+ </p>
+ <p>Positional then keyword</p>
+ <p>
+  <span class="eq">
+   <var>m</var>
+   <sub>3</sub>
+   = 1 + 10 + 7 = 18
+  </span>
+ </p>
+ <p>All keyword, in any order</p>
+ <p>
+  <span class="eq">
+   <var>m</var>
+   <sub>4</sub>
+   = 1 + 2 + 7 = 10
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>2.2 Multiline macro with a default</h3>
+ <p>
+  <span class="eq">
+   <var>d</var>
+   = 2.5
+   <i>m</i>
+  </span>
+ </p>
+ <p>Default unit</p>
+ <p>Converted to the requested unit:</p>
+ <p>
+  <span class="eq">
+   <var>d</var>
+   = 2500
+   <i>mm</i>
+  </span>
+ </p>
+ <p>Unit supplied by name</p>
+ <p>Converted to the requested unit:</p>
+ <p>
+  <span class="eq">
+   <var>d</var>
+   = 250
+   <i>cm</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>2.3 An empty argument list takes every default</h3>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   <sub>1</sub>
+   = 1 + 2 = 3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   <sub>2</sub>
+   = 1 + 20 = 21
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>2.4 A default may contain brackets</h3>
+ <p>
+  <span class="eq">
+   <var>t</var>
+   <sub>1</sub>
+   =
+   <b>sum</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">]</span>
+   )  = 6
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   <sub>x</sub>
+   =
+   <span class="b0">[</span>
+   10; 20
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   10 20
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>t</var>
+   <sub>2</sub>
+   =
+   <b>sum</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   <sub>x</sub>
+   )  = 30
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>2.5 A macro default feeding a function default</h3>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>1</sub>
+   =
+   <var>w</var>
+   <span class="b1">(</span>
+   <var>L</var>
+   <sub>s</sub>
+   ; 3 · 1
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+   <span class="b1">)</span>
+   =
+   <var>w</var>
+   <span class="b1">(</span>
+   6
+   <i>m</i>
+   ; 3 · 1
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+   <span class="b1">)</span>
+   = 13.5
+   <i>kN</i>
+   <i>·</i>
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>2</sub>
+   =
+   <var>w</var>
+   <span class="b1">(</span>
+   <var>L</var>
+   <sub>s</sub>
+   ; 8 · 1
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+   <span class="b1">)</span>
+   =
+   <var>w</var>
+   <span class="b1">(</span>
+   6
+   <i>m</i>
+   ; 8 · 1
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+   <span class="b1">)</span>
+   = 36
+   <i>kN</i>
+   <i>·</i>
+   <i>m</i>
+  </span>
+ </p>
+</div>

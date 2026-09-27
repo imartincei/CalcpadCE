@@ -19,8 +19,15 @@
 	#def badPlace$ = 1
 #end if
 
+' CPD-3314: Unknown keyword argument in a macro call
+#def kwMacro$(a$; b$ = 1) = a$ + b$
+badKeyword = kwMacro$(1; z$ = 2)
+
 ' CPD-2206: Unmatched #end def
 #def unmatched$
 
 ' CPD-2212: Duplicate macro parameter
 #def dupParam$(x$; x$) = x$
+
+' CPD-2213: Required parameter after optional parameter
+#def reqAfterOpt$(a$ = 1; b$) = a$ + b$

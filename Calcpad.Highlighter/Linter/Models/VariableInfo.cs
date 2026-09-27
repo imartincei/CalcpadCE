@@ -33,9 +33,34 @@ namespace Calcpad.Highlighter.Linter.Models
         public List<string> Parameters { get; set; } = new();
 
         /// <summary>
+        /// For functions/macros: default value expressions parallel to <see cref="Parameters"/>.
+        /// A null entry marks a required parameter; a null list means all are required.
+        /// </summary>
+        public List<string> ParameterDefaults { get; set; }
+
+        /// <summary>
         /// For functions/macros: parameter count
         /// </summary>
         public int ParameterCount => Parameters.Count;
+
+        /// <summary>
+        /// For functions/macros: number of parameters without a default value.
+        /// </summary>
+        public int RequiredParameterCount
+        {
+            get
+            {
+                if (ParameterDefaults is null)
+                    return Parameters.Count;
+
+                var count = 0;
+                for (var i = 0; i < Parameters.Count; i++)
+                    if (i >= ParameterDefaults.Count || ParameterDefaults[i] is null)
+                        count++;
+
+                return count;
+            }
+        }
 
         /// <summary>
         /// The raw expression on the right side of the assignment

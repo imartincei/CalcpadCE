@@ -720,6 +720,14 @@ namespace Calcpad.Highlighter.Tokenizer
                         argTokens.Add(new Token(_state.Line, originalCol, clipLen, token.Type, clipText));
                     }
 
+                    // A keyword argument names a parameter of the called macro.
+                    if (argTokens.Count > 1 && argTokens[1].Text == "=" &&
+                        paramOrder.Contains(argTokens[0].Text))
+                    {
+                        var kw = argTokens[0];
+                        argTokens[0] = new Token(kw.Line, kw.Column, kw.Length, TokenType.MacroParameter, kw.Text);
+                    }
+
                     // Fix up tokens: if inside a macro definition, reclassify any tokens
                     // matching outer macro parameters from Macro to MacroParameter
                     if (_inMacroDefinition && _macroParameters.Count > 0)
@@ -816,7 +824,8 @@ namespace Calcpad.Highlighter.Tokenizer
 
         private bool ParseMacroContent(char c, int i, int len)
         {
-            if (c == '=' && _state.HasMacro && !_state.IsInFunctionParams)
+            // Inside the parameter list '=' introduces a default, not the macro body.
+            if (c == '=' && _state.HasMacro && !_state.IsInFunctionParams && _state.BracketCount == 0)
             {
                 var afterEquals = i + 1 < len ? _state.Text.Span[(i + 1)..].TrimStart().ToString() : string.Empty;
 
@@ -826,7 +835,8 @@ namespace Calcpad.Highlighter.Tokenizer
                     _macroBodies[_pendingMacroDefName] = afterEquals;
                     if (!_macroParameterOrder.ContainsKey(_pendingMacroDefName))
                     {
-                        _macroParameterOrder[_pendingMacroDefName] = new List<string>(_macroParameters);
+                        // Read from the line so the order is the declared one.
+                        _macroParameterOrder[_pendingMacroDefName] = ExtractMacroParams(_state.Text.Span);
                     }
                     _pendingMacroDefName = null;
                 }
@@ -836,8 +846,9 @@ namespace Calcpad.Highlighter.Tokenizer
                 {
                     _macroCurrInlineContent = afterEquals;
                     _macroCurrIsInline = true;
-                    var paramNames = ExtractMacroParams(_state.Text.Span);
+                    var (paramNames, paramDefaults) = ExtractMacroParamsWithDefaults(_state.Text.Span);
                     _macroCurrParams = paramNames;
+                    _macroCurrDefaults = paramDefaults;
                     // Ensure _macroParameterOrder reflects the ordered param names
                     if (!_macroParameterOrder.ContainsKey(_macroCurrName))
                         _macroParameterOrder[_macroCurrName] = paramNames;
@@ -850,27 +861,32 @@ namespace Calcpad.Highlighter.Tokenizer
             return false;
         }
 
+        private static List<string> ExtractMacroParams(ReadOnlySpan<char> lineSpan) =>
+            ExtractMacroParamsWithDefaults(lineSpan).Names;
+
         /// <summary>
-        /// Extracts macro parameter names from a #def line.
-        /// Handles both inline (#def macro$(x$; y$) = ...) and multiline forms.
+        /// Extracts macro parameter names and default values from a #def line.
+        /// Defaults[i] is null for a required parameter.
+        /// Handles both inline (#def macro$(x$; y$ = 1) = ...) and multiline forms.
         /// </summary>
-        private static List<string> ExtractMacroParams(ReadOnlySpan<char> lineSpan)
+        private static (List<string> Names, List<string> Defaults) ExtractMacroParamsWithDefaults(ReadOnlySpan<char> lineSpan)
         {
             var names = new List<string>();
+            var defaults = new List<string>();
 
             var dollarIndex = lineSpan.IndexOf('$');
-            if (dollarIndex < 0) return names;
+            if (dollarIndex < 0) return (names, defaults);
 
             // Check that '(' immediately follows '$' (with optional whitespace).
             // If '=' appears before '(', the '(' is part of the body, not params.
             // e.g., #def emptyV$ = find(vector(1); 1; 1) — no params
             var afterDollar = lineSpan[(dollarIndex + 1)..].TrimStart();
             if (afterDollar.IsEmpty || afterDollar[0] != '(')
-                return names;
+                return (names, defaults);
 
             var openParen = lineSpan.Length - afterDollar.Length;  // absolute index of '('
             var closeParen = ParsingHelpers.FindMatchingClose(lineSpan, openParen, '(', ')');
-            if (closeParen < 0) return names;
+            if (closeParen < 0) return (names, defaults);
 
             var paramsSpan = lineSpan.Slice(openParen + 1, closeParen - openParen - 1);
 
@@ -882,14 +898,16 @@ namespace Calcpad.Highlighter.Tokenizer
             {
                 seg = seg.Trim();
                 if (seg.IsEmpty) return;
-                names.Add(seg.ToString());
+                var hasDefault = ParsingHelpers.SplitParameterDefault(seg, out var name, out var defaultValue);
+                names.Add(name.ToString());
+                defaults.Add(hasDefault ? defaultValue.ToString() : null);
             }
 
             for (int i = 0; i < paramsSpan.Length; i++)
             {
                 var c = paramsSpan[i];
-                if (c == '(') parenDepth++;
-                else if (c == ')') parenDepth--;
+                if (c == '(' || c == '[' || c == '{') parenDepth++;
+                else if (c == ')' || c == ']' || c == '}') parenDepth--;
                 else if (c == ';' && parenDepth == 0)
                 {
                     ProcessSegment(paramsSpan[segStart..i]);
@@ -898,7 +916,7 @@ namespace Calcpad.Highlighter.Tokenizer
             }
             ProcessSegment(paramsSpan[segStart..]);
 
-            return names;
+            return (names, defaults);
         }
 
         /// <summary>

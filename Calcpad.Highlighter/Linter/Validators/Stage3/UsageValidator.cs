@@ -534,15 +534,27 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                             if (argList.Count == 1 && argList[0].Length == 0)
                                 argList.Clear();
 
-                            var expected = lastDefParamCount.TryGetValue(funcName, out var pc)
-                                ? pc : funcInfo.ParamCount;
+                            var hasLastDef = lastDefParamCount.TryGetValue(funcName, out var lastDef);
+                            var expected = hasLastDef ? lastDef.Count : funcInfo.ParamCount;
+                            var required = hasLastDef ? lastDef.Required : funcInfo.RequiredParamCount;
+                            var paramNames = hasLastDef ? lastDef.Names : funcInfo.ParamNames;
+                            var endCol = ParsingHelpers.FindClosingParen(line, token.Column + token.Length);
+                            if (endCol <= token.Column + token.Length) endCol = token.Column + token.Length;
+
                             int totalActual = argList.Count;
-                            if (totalActual != expected)
+                            foreach (var arg in argList)
                             {
-                                var endCol = ParsingHelpers.FindClosingParen(line, token.Column + token.Length);
-                                if (endCol <= token.Column + token.Length) endCol = token.Column + token.Length;
+                                if (!TryGetKeywordArgName(arg, paramNames, out var kwName, out var isUnknown) && isUnknown)
+                                    result.AddError(i, token.Column, endCol, "CPD-3315",
+                                        "'" + kwName + "' is not a parameter of '" + funcName + "'");
+                            }
+                            if (totalActual < required || totalActual > expected)
+                            {
+                                var expectedText = required == expected
+                                    ? expected.ToString()
+                                    : required + "-" + expected;
                                 result.AddError(i, token.Column, endCol, "CPD-3302",
-                                    "'" + funcName + "' expects " + expected + " parameter(s) but got " + totalActual);
+                                    "'" + funcName + "' expects " + expectedText + " parameter(s) but got " + totalActual);
                             }
                         }
                     }
@@ -561,9 +573,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         /// definition. The tokenizer only registers the first definition's arity, but Calcpad
         /// resolves redefinitions to the latest one, so call checks must use the last count.
         /// </summary>
-        private static Dictionary<string, int> BuildLastDefinitionParamCounts(Stage3Context stage3, TokenizedLineProvider tokenProvider)
+        private static Dictionary<string, (int Count, int Required, List<string> Names)> BuildLastDefinitionParamCounts(Stage3Context stage3, TokenizedLineProvider tokenProvider)
         {
-            var counts = new Dictionary<string, int>(StringComparer.Ordinal);
+            var counts = new Dictionary<string, (int Count, int Required, List<string> Names)>(StringComparer.Ordinal);
             for (int i = 0; i < stage3.Lines.Count; i++)
             {
                 if (!tokenProvider.IsCpdMode(i)) continue;
@@ -580,7 +592,16 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 if (paramList.Count == 1 && paramList[0].Trim().Length == 0)
                     paramList.Clear();
 
-                counts[defMatch.Groups[1].Value] = paramList.Count;
+                var names = new List<string>(paramList.Count);
+                var required = 0;
+                foreach (var param in paramList)
+                {
+                    var hasDefault = ParsingHelpers.SplitParameterDefault(param.AsSpan().Trim(), out var nameSpan, out _);
+                    names.Add(nameSpan.ToString());
+                    if (!hasDefault)
+                        required++;
+                }
+                counts[defMatch.Groups[1].Value] = (paramList.Count, required, names);
             }
             return counts;
         }
@@ -603,6 +624,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     continue;
 
                 var tokens = tokenProvider.GetTokensForLine(i);
+                var keywordArgNames = new HashSet<string>(StringComparer.Ordinal);
 
                 foreach (var token in tokens)
                 {
@@ -615,6 +637,10 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     // Check if macro is defined
                     if (!stage3.DefinedMacros.ContainsKey(macroName))
                     {
+                        // Already reported as an unknown keyword argument of an enclosing call
+                        if (keywordArgNames.Contains(macroName))
+                            continue;
+
                         // Pass Stage3 line index - diagnostic extensions handle mapping
                         result.AddError(i, token.Column, token.Column + token.Length, "CPD-3303",
                             "'" + macroName + "'");
@@ -627,18 +653,68 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                         var rawArgs = ParseMacroCallArgStrings(line, token.Column + token.Length);
                         if (rawArgs == null) rawArgs = new List<string>();
 
+                        var endCol = ParsingHelpers.FindClosingParen(line, token.Column + token.Length);
+                        if (endCol <= token.Column + token.Length)
+                            endCol = token.Column + token.Length;
+
                         int totalActual = rawArgs.Count;
-                        if (totalActual != macroInfo.ParamCount)
+                        foreach (var arg in rawArgs)
                         {
-                            var endCol = ParsingHelpers.FindClosingParen(line, token.Column + token.Length);
-                            if (endCol <= token.Column + token.Length)
-                                endCol = token.Column + token.Length;
+                            if (!TryGetKeywordArgName(arg, macroInfo.ParamNames, out var kwName, out var isUnknown) &&
+                                isUnknown && !stage3.DefinedMacros.ContainsKey(kwName))
+                            {
+                                keywordArgNames.Add(kwName);
+                                result.AddError(i, token.Column, endCol, "CPD-3314",
+                                    "'" + kwName + "' is not a parameter of '" + macroName + "'");
+                            }
+                        }
+                        if (totalActual < macroInfo.RequiredParamCount || totalActual > macroInfo.ParamCount)
+                        {
+                            var expectedText = macroInfo.RequiredParamCount == macroInfo.ParamCount
+                                ? macroInfo.ParamCount.ToString()
+                                : macroInfo.RequiredParamCount + "-" + macroInfo.ParamCount;
                             result.AddError(i, token.Column, endCol, "CPD-3304",
-                                "'" + macroName + "' expects " + macroInfo.ParamCount + " parameter(s) but got " + totalActual);
+                                "'" + macroName + "' expects " + expectedText + " parameter(s) but got " + totalActual);
                         }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Recognises an "name = value" call argument. Returns true when name is one of
+        /// <paramref name="paramNames"/>; sets <paramref name="isUnknown"/> when it looks like a
+        /// keyword argument but names no parameter.
+        /// </summary>
+        private static bool TryGetKeywordArgName(string arg, List<string> paramNames, out string name, out bool isUnknown)
+        {
+            name = null;
+            isUnknown = false;
+            if (string.IsNullOrWhiteSpace(arg) ||
+                !ParsingHelpers.SplitParameterDefault(arg.AsSpan().Trim(), out var nameSpan, out _) ||
+                !IsIdentifier(nameSpan))
+                return false;
+
+            name = nameSpan.ToString();
+            if (paramNames != null)
+                foreach (var p in paramNames)
+                    if (name == p)
+                        return true;
+
+            isUnknown = true;
+            return false;
+        }
+
+        private static bool IsIdentifier(ReadOnlySpan<char> s)
+        {
+            if (s.IsEmpty || !(char.IsLetter(s[0]) || s[0] == '_'))
+                return false;
+
+            for (var i = 1; i < s.Length; i++)
+                if (!(char.IsLetterOrDigit(s[i]) || s[i] == '_' || (s[i] == '$' && i == s.Length - 1)))
+                    return false;
+
+            return true;
         }
 
         private static bool IsBeingDefined(string line, int identifierStart, string identifier)

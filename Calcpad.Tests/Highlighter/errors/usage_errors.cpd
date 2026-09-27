@@ -27,3 +27,7 @@ badUnit = 5badunit
 
 ' CPD-3311: Empty parameter
 emptyParam = max(1; ; 3)
+
+' CPD-3315: Unknown keyword argument in a function call
+kwFunc(x; y = 2) = x + y
+badKeyword = kwFunc(1; q = 3)

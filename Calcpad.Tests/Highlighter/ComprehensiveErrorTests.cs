@@ -60,11 +60,14 @@ namespace Calcpad.Tests.Highlighter
                 { "macro_errors.cpd", "CPD-2209" },
                 { "macro_errors.cpd", "CPD-2210" },
                 { "macro_errors.cpd", "CPD-2212" },
+                { "macro_errors.cpd", "CPD-2213" },
+                { "macro_errors.cpd", "CPD-3314" },
 
                 // Naming errors (CPD-32xx)
                 { "naming_errors.cpd", "CPD-3204" },
                 { "naming_errors.cpd", "CPD-3205" }, // Warning: conflict with built-in constant is allowed
                 { "naming_errors.cpd", "CPD-3206" },
+                { "naming_errors.cpd", "CPD-3215" },
 
                 // Usage errors (CPD-33xx)
                 { "usage_errors.cpd", "CPD-3301" },
@@ -74,6 +77,7 @@ namespace Calcpad.Tests.Highlighter
                 { "usage_errors.cpd", "CPD-3308" },
                 { "usage_errors.cpd", "CPD-3310" },
                 { "usage_errors.cpd", "CPD-3311" },
+                { "usage_errors.cpd", "CPD-3315" },
 
                 // Semantic errors (CPD-34xx)
                 { "semantic_errors.cpd", "CPD-3401" },

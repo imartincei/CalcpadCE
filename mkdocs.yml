@@ -70,6 +70,7 @@ nav:
     - UI Mode: new-ui-mode.md
     - Visibility Directives: new-visibility-directives.md
     - Metadata Comments: new-metadata-comments.md
+    - Keyword Arguments: new-keyword-arguments.md
     - Running the Server: new-web-deployment.md
     - Migration Guide: migration-guide.md
   - Quick Reference:

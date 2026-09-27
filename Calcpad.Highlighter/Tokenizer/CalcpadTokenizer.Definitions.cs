@@ -266,6 +266,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 {
                     Name = _lintDefName,
                     Params = funcParams,
+                    Defaults = ExtractFunctionParamDefaults(_lintDefLineText.Span, funcParams),
                     LineNumber = _lintDefNameLine,
                     Source = sourceInfo.Source,
                     SourceFile = sourceInfo.SourceFile,
@@ -338,6 +339,47 @@ namespace Calcpad.Highlighter.Tokenizer
         /// Detects if an expression is a command block ($Inline{...}, $Block{...}, $While{...})
         /// and extracts its statements.
         /// </summary>
+        /// <summary>
+        /// Reads default value expressions for a function's parameters from its definition line.
+        /// Returns null when no parameter has a default.
+        /// </summary>
+        private static List<string> ExtractFunctionParamDefaults(ReadOnlySpan<char> line, List<string> parameters)
+        {
+            if (parameters.Count == 0)
+                return null;
+
+            var open = line.IndexOf('(');
+            if (open < 0)
+                return null;
+
+            var close = ParsingHelpers.FindMatchingClose(line, open, '(', ')');
+            if (close < 0)
+                return null;
+
+            var defaults = new List<string>(parameters.Count);
+            var hasDefault = false;
+            var index = 0;
+            foreach (var segment in ParameterParser.SplitByDelimiter(line[(open + 1)..close].ToString(), ';'))
+            {
+                if (index >= parameters.Count)
+                    break;
+
+                if (ParsingHelpers.SplitParameterDefault(segment.AsSpan().Trim(), out _, out var value))
+                {
+                    defaults.Add(value.ToString());
+                    hasDefault = true;
+                }
+                else
+                    defaults.Add(null);
+
+                index++;
+            }
+            while (defaults.Count < parameters.Count)
+                defaults.Add(null);
+
+            return hasDefault ? defaults : null;
+        }
+
         private static CommandBlockInfo DetectCommandBlock(string expression, FunctionDefinition funcDef)
         {
             var exprSpan = expression.AsSpan();

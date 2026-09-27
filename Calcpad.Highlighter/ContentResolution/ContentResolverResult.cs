@@ -9,6 +9,9 @@ namespace Calcpad.Highlighter.ContentResolution
     {
         public string Name { get; set; }
         public List<string> Params { get; set; }
+
+        /// <summary>Default values parallel to Params. A null entry marks a required parameter.</summary>
+        public List<string> Defaults { get; set; }
         public List<string> Content { get; set; }
         public int LineNumber { get; set; }
         public string Source { get; set; } // "local" | "include"
@@ -34,6 +37,9 @@ namespace Calcpad.Highlighter.ContentResolution
     {
         public string Name { get; set; }
         public List<string> Params { get; set; }
+
+        /// <summary>Default values parallel to Params. A null entry marks a required parameter.</summary>
+        public List<string> Defaults { get; set; }
         public int LineNumber { get; set; }
         public string Source { get; set; }
         public string SourceFile { get; set; }
@@ -136,6 +142,9 @@ namespace Calcpad.Highlighter.ContentResolution
     {
         public int LineNumber { get; set; }
         public int ParamCount { get; set; }
+
+        /// <summary>Number of parameters without a default value.</summary>
+        public int RequiredParamCount { get; set; }
         public List<string> ParamNames { get; set; } = new();
     }
 
@@ -143,6 +152,9 @@ namespace Calcpad.Highlighter.ContentResolution
     {
         public int LineNumber { get; set; }
         public int ParamCount { get; set; }
+
+        /// <summary>Number of parameters without a default value.</summary>
+        public int RequiredParamCount { get; set; }
         public List<string> ParamNames { get; set; } = new();
     }
 

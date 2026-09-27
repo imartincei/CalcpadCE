@@ -160,6 +160,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage2
             {
                 var parameters = ParameterParser.ParseParameters(paramsStr); // splits by ';'
                 var seenParams = new HashSet<string>(StringComparer.Ordinal); // params are case sensitive
+                var seenOptional = false;
 
                 foreach (var param in parameters)
                 {
@@ -167,7 +168,15 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage2
                     if (string.IsNullOrWhiteSpace(param))
                         continue;
 
-                    var paramName = param;
+                    var hasDefault = ParsingHelpers.SplitParameterDefault(param.AsSpan().Trim(), out var nameSpan, out _);
+                    var paramName = nameSpan.ToString();
+                    if (hasDefault)
+                        seenOptional = true;
+                    else if (seenOptional)
+                    {
+                        result.AddError(stage2Line, 0, line.Length, "CPD-2213",
+                            "'" + paramName + "'", LineStage.Stage2);
+                    }
 
                     // Check for duplicate parameter names
                     if (!seenParams.Add(paramName))
