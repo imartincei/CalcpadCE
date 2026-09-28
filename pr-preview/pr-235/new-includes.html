@@ -3083,7 +3083,7 @@
 <table>
 <thead>
 <tr>
-<th></th>
+<th>Aspect</th>
 <th><code>#include</code></th>
 <th><code>#read</code></th>
 </tr>
@@ -3138,7 +3138,7 @@
 </ul>
 <p>This is deliberate behavior, as resolving an included module's own saved values automatically would prevent overriding it in the main calculation file.</p>
 <p><strong>To share entered values across several files, write them out as data instead of relying on <code>#include</code>:</strong></p>
-<p><strong>module.cpd:</strong>
+<p><strong>module.cpd:</strong></p>
 <div class="language-text highlight"><pre><span></span><code>#local
 #ProjectPath C:/path-to-my-project
 #UI sharedData = [1; 2|3; 4]
@@ -3146,7 +3146,7 @@
 #global
 'To read it automatically from the file calling the module:'
 #read M from {project}/shared-inputs.csv
-</code></pre></div></p>
+</code></pre></div>
 <p>As <code>#write</code> sits inside <code>#local</code>, it only runs when <code>shared/inputs.cpd</code> is opened by itself, so including this file elsewhere never re-triggers the write or input form.</p>
 <p><strong>calculation.cpd:</strong></p>
 <div class="language-text highlight"><pre><span></span><code>'This reads shared data that in input from a module without triggering the datagrid UI.

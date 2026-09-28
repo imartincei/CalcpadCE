@@ -1463,8 +1463,41 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#export-portable-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Export Portable Package
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
   
 </li>
       
@@ -3137,8 +3170,41 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#export-portable-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Export Portable Package
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
   
 </li>
       
@@ -3321,11 +3387,11 @@ y = x + 1
 <h3 id="save-as-compiled-worksheet">Save As Compiled Worksheet<a class="headerlink" href="#save-as-compiled-worksheet" title="Permanent link">&para;</a></h3>
 <p>Compiling produces a <code>.cpdz</code> from the document you are working on.
 It is a separate output rather than a rename: the file you have open keeps its own name and stays editable, so you can keep working on the <code>.cpd</code> and re-compile whenever you need a new copy to hand out.</p>
-<p>A compiled worksheet is fully portable: everything the document  depends on (#include, #read, and images) is written into it, so it runs with nothing beside it.</p>
-<h1 id="read-data-and-images-are-capped-at-20-mb-in-total-10-mb-each-since-it-is-all-bundled-in-the-cpdz-which-takes-more-system-resources-than-reading-from-a-file">read data and images are capped at 20 MB in total (10 MB each), since it is all bundled in the .cpdz (which takes more system resources than reading from a file).<a class="headerlink" href="#read-data-and-images-are-capped-at-20-mb-in-total-10-mb-each-since-it-is-all-bundled-in-the-cpdz-which-takes-more-system-resources-than-reading-from-a-file" title="Permanent link">&para;</a></h1>
-<p>The export will fail with a warning if this limit is exceeded.</p>
+<p>A compiled worksheet is fully portable: everything the document depends on (#include, #read, and images) is written into it, so it runs with nothing beside it.</p>
+<p><code>#read</code> data and images are capped at 20 MB in total (10 MB each), since it is all bundled in the .cpdz (which takes more system resources than reading from a file).
+The export will fail with a warning if this limit is exceeded.</p>
 <p>If a referenced file cannot be read, i.e. from a missing <code>.csv</code> or <code>#include</code>, the export is stopped and an error is given.</p>
-<p><code>#write</code> and <code>#append</code> will write next to the compiled file when it runs instead of the original write path. 
+<p><code>#write</code> and <code>#append</code> will write next to the compiled file when it runs instead of the original write path.
 Duplicate filenames get -1, -2 appended to the filename to keep them separate.</p>
 <p>Opening a compiled worksheet gives you the input form with the CalcpadCE file locked.
 Values you enter can still be saved back into it: in the desktop app it saves like any other file, and in VS Code a compiled worksheet opens in its own editor where <strong>Save</strong> writes the entered values back.</p>
@@ -3340,12 +3406,14 @@ It is a <code>.zip</code> holding the document as text beside a folder of everyt
         library.cpd
         loads.csv
 </code></pre></div>
-<p>Unzip it anywhere and open the <code>.cpd</code>, and it renders as it did in its original environment. This is very useful for archiving or backing up calculations that depend on library files that may change in the future.
-- An <code>#include</code>d file is packed with its own references, which are rewritten as well.
-- Images given as a web address or as inline data are left alone: they already resolve anywhere.
-- <code>#write</code> and <code>#append</code> will write next to the <code>.cpd</code> file when it runs instead of the original write path.
-- Duplicate filenames get -1, -2 appended to the filename to keep them separate.
-- A <code>{project}</code>, <code>{library}</code> or <code>{user}</code> reference (see <a href="new-includes.html#path-root-tokens-project-and-library">Path root tokens</a>) is resolved against your own declared roots and packed like any other reference.</p>
+<p>Unzip it anywhere and open the <code>.cpd</code>, and it renders as it did in its original environment. This is very useful for archiving or backing up calculations that depend on library files that may change in the future.</p>
+<ul>
+<li>An <code>#include</code>d file is packed with its own references, which are rewritten as well.</li>
+<li>Images given as a web address or as inline data are left alone: they already resolve anywhere.</li>
+<li><code>#write</code> and <code>#append</code> will write next to the <code>.cpd</code> file when it runs instead of the original write path.</li>
+<li>Duplicate filenames get -1, -2 appended to the filename to keep them separate.</li>
+<li>A <code>{project}</code>, <code>{library}</code> or <code>{user}</code> reference (see <a href="new-includes.html#path-root-tokens-project-and-library">Path root tokens</a>) is resolved against your own declared roots and packed like any other reference.</li>
+</ul>
 <p>If a referenced file cannot be read, i.e. from a missing <code>.csv</code> or <code>#include</code>, the export is stopped and an error is given.</p>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <table>
