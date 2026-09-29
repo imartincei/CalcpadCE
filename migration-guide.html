@@ -1438,6 +1438,34 @@
   
   
     <li class="md-nav__item">
+      <a href="new-parsing-modes.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parsing Modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="new-metadata-comments.html" class="md-nav__link">
         
   
@@ -3257,7 +3285,7 @@
 
 <h1 id="migration-guide">Migration Guide<a class="headerlink" href="#migration-guide" title="Permanent link">&para;</a></h1>
 <p>Most changes to CalcpadCE are additive, and documents written for an earlier version keep calculating unchanged.
-Changes that alter how existing code is interpreted are listed here. 
+Changes that alter how existing code is interpreted are listed here.
 These sections also note how to migrate to supported syntax.</p>
 <h2 id="migrate-from-7xx">Migrate from 7.x.x<a class="headerlink" href="#migrate-from-7xx" title="Permanent link">&para;</a></h2>
 <h3 id="input-syntax-is-deprecated"><code>?{}</code> Input syntax is deprecated<a class="headerlink" href="#input-syntax-is-deprecated" title="Permanent link">&para;</a></h3>
@@ -3284,7 +3312,7 @@ The <strong>Default Input Length Unit</strong> setting that drove it, and the <c
 <h4 id="how-to-update_1">How to update<a class="headerlink" href="#how-to-update_1" title="Permanent link">&para;</a></h4>
 <p>Replace each <code>%u</code> with the unit the document actually uses.</p>
 <p>Where an equation used <code>Units</code> as a conversion factor, write the factor itself instead based on what <code>%u</code> was replaced with.</p>
-<p>This is a temporary loss of functionality. 
+<p>This is a temporary loss of functionality.
 Dynamic input units are coming in a future version via string variables, where the unit can be picked from a dropdown and assigned to a string variable you can reference anywhere else in the document.
 There is also an option to input units with the number by setting "forceUnits:false" or "allowExpression:true", see <a href="new-ui-mode.html">UI mode</a></p>
 <h3 id="the-report-font-changed-from-georgia-pro-to-dejavu-serif-condensed">The report font changed from Georgia Pro to DejaVu Serif Condensed<a class="headerlink" href="#the-report-font-changed-from-georgia-pro-to-dejavu-serif-condensed" title="Permanent link">&para;</a></h3>
@@ -3309,7 +3337,7 @@ DejaVu Serif also has no Light or SemiBold, so bold text and <code>∑</code>, <
 </code></pre></div>
 <h3 id="dots-are-no-longer-allowed-as-part-of-a-variable-name">Dots are no longer allowed as part of a variable name<a class="headerlink" href="#dots-are-no-longer-allowed-as-part-of-a-variable-name" title="Permanent link">&para;</a></h3>
 <p>A dot after an identifier is now always element access. Names can no longer contain a dot.</p>
-<p>Previously the meaning of the dot depended on what happened to be in scope. 
+<p>Previously the meaning of the dot depended on what happened to be in scope.
 If the name to the left of it already held a vector or a matrix, the dot was element access; in every other case it was absorbed into the name.
 This produced unpredictable behavior in certain cases, which is why this change was made.</p>
 <h4 id="what-breaks_3">What breaks<a class="headerlink" href="#what-breaks_3" title="Permanent link">&para;</a></h4>

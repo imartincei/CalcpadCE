@@ -1807,6 +1807,34 @@
   
   
     <li class="md-nav__item">
+      <a href="new-parsing-modes.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parsing Modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="new-metadata-comments.html" class="md-nav__link">
         
   
@@ -3583,7 +3611,7 @@ In <strong>Input</strong> and <strong>Report</strong>, a <strong>Print PDF</stro
 <table>
 <thead>
 <tr>
-<th></th>
+<th>Mode</th>
 <th><code>#pre</code> shown</th>
 <th><code>#post</code> shown</th>
 <th>Entered <code>#UI</code> values applied</th>
@@ -3663,9 +3691,11 @@ Without it, the input properties are derived from the right-hand side.</p>
 </tr>
 </tbody>
 </table>
-<p>Some considerations:
-- Exponent notation is not valid: write the full number instead.
-- Saved values are matched to controls by variable name, so be careful when renaming variables — see <a href="#editing-a-document-that-has-saved-values">Editing a document that has saved values</a>.</p>
+<p>Some considerations:</p>
+<ul>
+<li>Exponent notation is not valid: write the full number instead.</li>
+<li>Saved values are matched to controls by variable name, so be careful when renaming variables — see <a href="#editing-a-document-that-has-saved-values">Editing a document that has saved values</a>.</li>
+</ul>
 <h3 id="labels">Labels<a class="headerlink" href="#labels" title="Permanent link">&para;</a></h3>
 <p>An inline comment on the line can label the control:</p>
 <div class="language-text highlight"><pre><span></span><code>#UI 'Span, 'L = 6m
@@ -3820,7 +3850,7 @@ A value may carry its own unit, so a drop-down can switch units as well as magni
 #UI G = matrix(3; 4)
 </code></pre></div>
 <p>Sizes computed from a variable or expression work too — <code>matrix(r; c)</code>, <code>matrix(len(x); len(y))</code> — the grid is sized from the value the line produced.</p>
-<p>A grid can use default values from any expression. 
+<p>A grid can use default values from any expression.
 Whatever the line evaluates to fills the cells:</p>
 <div class="language-text highlight"><pre><span></span><code>#UI G = matrix(3; 3) + 5
 #UI H = vec2row(x)
@@ -3923,7 +3953,7 @@ A <code>reportStyle</code> class lands on the line's element, which is a paragra
 #UI {"type": "datagrid", "style": "bordered"} T = [1; 2 | 3; 4]
 </code></pre></div>
 <p><code>depth</code> is highlighted in the form and unremarkable in the report; <code>P</code> is boxed in the report and an ordinary text box in the form; <code>q</code> gets both.</p>
-<p>Also, several classes can be listed at once — <code>"style": "highlight wide"</code> </p>
+<p>Also, several classes can be listed at once — <code>"style": "highlight wide"</code></p>
 <h3 id="inside-a-datagrid">Inside a datagrid<a class="headerlink" href="#inside-a-datagrid" title="Permanent link">&para;</a></h3>
 <p>A grid is a third-party widget, so a <code>style</code> class reaches its outer container but not the cells, headers or context menu inside it.</p>
 <p>There is limited customization available using the datagrid properties, and more customization is planned.</p>
