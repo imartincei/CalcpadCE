@@ -44,6 +44,7 @@ import {
     fetchPdfBrowserStatus,
     installPdfBrowser,
     isBrowserNotFound,
+    isBrowserLaunchFailed,
     pdfResponseError,
     type PickedImage,
     type InlineImageBudget,
@@ -394,6 +395,19 @@ export class TauriMessageBridge extends BaseMessageBridge {
         // starts from a state where a browser actually exists.
         if (isBrowserNotFound(err))
             return await this.offerBrowserDownload(err.downloadSizeMb);
+
+        if (isBrowserLaunchFailed(err)) {
+            try {
+                return await dialogAsk(msg, {
+                    title: 'Browser failed to start',
+                    kind: 'warning',
+                    okLabel: 'Retry',
+                    cancelLabel: 'Close',
+                });
+            } catch {
+                return false;
+            }
+        }
 
         try {
             await dialogMessage(msg, { title: 'Failed to generate PDF', kind: 'error', okLabel: 'OK' });
@@ -994,8 +1008,9 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     private async browserInstallAdvice(): Promise<string> {
         if (this._platform === 'windows') {
-            return 'Install Microsoft Edge (preinstalled on recent Windows) or Google Chrome,\n'
-                + 'then set BROWSER_PATH in extensions/server/appsettings.json if it is not on PATH.';
+            return 'Install Microsoft Edge (preinstalled on recent Windows) or Google Chrome.\n'
+                + 'If it is installed somewhere unusual, set "BrowserPath" in the appsettings.json\n'
+                + 'next to Calcpad.Server.exe, using forward slashes (C:/...).';
         }
         if (this._platform === 'macos') {
             return 'Install Google Chrome from https://www.google.com/chrome/\n'

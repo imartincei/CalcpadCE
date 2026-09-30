@@ -2,7 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { join } from '@tauri-apps/api/path';
 import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
-import { buildCrashRecord, type ILogger, type CalcpadLogLevel, type ServerLifecycleState } from 'calcpad-frontend';
+import { buildCrashRecord, extractConfigError, SERVER_CONFIG_ERROR_EXIT_CODE, type ILogger, type CalcpadLogLevel, type ServerLifecycleState } from 'calcpad-frontend';
 
 /**
  * Manages the client-side view of the Calcpad.Server lifecycle. The actual
@@ -41,6 +41,7 @@ export class TauriServerManager {
     private token: string | null = null;
     private _isRunning = false;
     private _crashCount = 0;
+    private _configInvalid = false;
     private _stableTimer: ReturnType<typeof setTimeout> | null = null;
     private unlistenUrl: UnlistenFn | null = null;
     private unlistenCrash: UnlistenFn | null = null;
@@ -53,6 +54,8 @@ export class TauriServerManager {
     /** Always raised after onUrlChanged, so a listener may assume the new URL is already applied. */
     public onStatusChanged?: (state: ServerLifecycleState, detail?: string) => void;
     public onStartupBlocked?: (details: string) => void;
+    /** The server refused to start because an appsettings file is malformed. */
+    public onConfigInvalid?: (details: string) => void;
     public onServerLog?: (line: string, stream: 'stdout' | 'stderr') => void;
 
     /** `autoRestartEnabled` is off in secondary windows: `server-crashed` is broadcast, so
@@ -118,6 +121,16 @@ export class TauriServerManager {
         this.unlistenCrash = await listen<ServerCrashPayload>('server-crashed', (evt) => {
             this._isRunning = false;
             this.url = '';
+            // Restarting can't fix a malformed appsettings.json, so report it once and stop.
+            if (evt.payload.code === SERVER_CONFIG_ERROR_EXIT_CODE) {
+                const detail = extractConfigError(evt.payload.tail || '') ?? 'appsettings.json is not valid JSON.';
+                this._configInvalid = true;
+                this.clearStabilityReset();
+                this.log(`Server settings are invalid: ${detail}`, 'error');
+                this.onStatusChanged?.('stopped', 'invalid appsettings.json');
+                this.onConfigInvalid?.(detail);
+                return;
+            }
             // Crash before the stability window elapsed — the streak stands.
             this.clearStabilityReset();
             this._crashCount++;
@@ -140,8 +153,9 @@ export class TauriServerManager {
 
         this.unlistenStartupError = await listen<string>('server-startup-error', (evt) => {
             this.log(`Server failed to start: ${evt.payload}`, 'error');
-            this.onStatusChanged?.('stopped', evt.payload);
-            this.onStartupBlocked?.(evt.payload);
+            this.onStatusChanged?.('stopped', this._configInvalid ? 'invalid appsettings.json' : evt.payload);
+            // server-crashed arrives first and already reported the config error.
+            if (!this._configInvalid) this.onStartupBlocked?.(evt.payload);
             rejectReady?.(new Error(evt.payload));
             rejectReady = null;
             resolveReady = null;
@@ -196,6 +210,7 @@ export class TauriServerManager {
     async restart(): Promise<void> {
         this.clearStabilityReset();
         this._crashCount = 0;
+        this._configInvalid = false;
         this.onStatusChanged?.('starting', 'restart');
         try {
             const newUrl = await invoke<string>('restart_server');

@@ -18,6 +18,17 @@ export interface CrashRecordInput {
     reportJson?: string | null;
 }
 
+/** Calcpad.Server exits with this when an appsettings file is malformed; restarting won't help. */
+export const SERVER_CONFIG_ERROR_EXIT_CODE = 78;
+const CONFIG_ERROR_PREFIX = 'CONFIG ERROR: ';
+
+/** The server's one-line config error from its stderr output, or null if there is none. */
+export function extractConfigError(output: string): string | null {
+    const line = output.split(/\r?\n/).find(l => l.includes(CONFIG_ERROR_PREFIX));
+    if (!line) return null;
+    return line.slice(line.indexOf(CONFIG_ERROR_PREFIX) + CONFIG_ERROR_PREFIX.length).trim();
+}
+
 /**
  * Map a .NET runtime exit code to a human-readable label. Codes come back as
  * signed 32-bit ints, so mask to unsigned before comparing.
@@ -27,6 +38,7 @@ export function decodeExitCode(code: number | null): string {
     const u = code >>> 0;
     switch (u) {
         case 0x00000000: return '(success)';
+        case SERVER_CONFIG_ERROR_EXIT_CODE: return '(invalid appsettings.json)';
         case 0xC0000005: return '(STATUS_ACCESS_VIOLATION)';
         case 0xC00000FD: return '(STATUS_STACK_OVERFLOW)';
         case 0xC000013A: return '(STATUS_CONTROL_C_EXIT — Ctrl+C)';

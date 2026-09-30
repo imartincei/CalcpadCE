@@ -4,10 +4,13 @@
  * The server no longer downloads a headless Chromium behind the user's back: when
  * it finds no Chromium-family browser it answers `/api/calcpad/pdf` with 503 and
  * `code: "BROWSER_NOT_FOUND"`. Hosts turn that into a prompt and, if the user
- * accepts, call `installPdfBrowser` before retrying the export.
+ * accepts, call `installPdfBrowser` before retrying the export. A browser that was
+ * found but would not start answers `code: "BROWSER_LAUNCH_FAILED"` instead, which
+ * hosts turn into a retry prompt.
  */
 
 export const BROWSER_NOT_FOUND = 'BROWSER_NOT_FOUND';
+export const BROWSER_LAUNCH_FAILED = 'BROWSER_LAUNCH_FAILED';
 
 export interface PdfBrowserStatus {
     available: boolean;
@@ -34,12 +37,29 @@ export function isBrowserNotFound(err: unknown): err is BrowserNotFoundError {
         || (typeof err === 'object' && err !== null && (err as { code?: string }).code === BROWSER_NOT_FOUND);
 }
 
+/** Thrown when a browser was found but failed to start, even after the server's own retry. */
+export class BrowserLaunchFailedError extends Error {
+    public readonly code = BROWSER_LAUNCH_FAILED;
+    public readonly browserPath: string | null;
+
+    constructor(message: string, browserPath: string | null = null) {
+        super(message);
+        this.name = 'BrowserLaunchFailedError';
+        this.browserPath = browserPath;
+    }
+}
+
+export function isBrowserLaunchFailed(err: unknown): err is BrowserLaunchFailedError {
+    return err instanceof BrowserLaunchFailedError
+        || (typeof err === 'object' && err !== null && (err as { code?: string }).code === BROWSER_LAUNCH_FAILED);
+}
+
 /**
  * Converts a non-OK `/api/calcpad/pdf` response into the error to throw, so every
  * host recognizes the missing-browser case the same way.
  */
 export async function pdfResponseError(response: Response): Promise<Error> {
-    let body: { code?: string; message?: string; error?: string; downloadSizeMb?: number } | null = null;
+    let body: { code?: string; message?: string; error?: string; downloadSizeMb?: number; path?: string } | null = null;
     try {
         body = await response.json();
     } catch {
@@ -50,6 +70,12 @@ export async function pdfResponseError(response: Response): Promise<Error> {
         return new BrowserNotFoundError(
             body.message || 'No Chromium-family browser is available for PDF export.',
             body.downloadSizeMb ?? 0,
+        );
+    }
+    if (body?.code === BROWSER_LAUNCH_FAILED) {
+        return new BrowserLaunchFailedError(
+            body.message || 'The browser used for PDF export failed to start.',
+            body.path ?? null,
         );
     }
 

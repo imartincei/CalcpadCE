@@ -91,6 +91,9 @@ export {
     BROWSER_NOT_FOUND,
     BrowserNotFoundError,
     isBrowserNotFound,
+    BROWSER_LAUNCH_FAILED,
+    BrowserLaunchFailedError,
+    isBrowserLaunchFailed,
     pdfResponseError,
     fetchPdfBrowserStatus,
     installPdfBrowser,
@@ -192,6 +195,8 @@ export { parseHeadings } from './services/headings';
 
 export {
     decodeExitCode,
+    SERVER_CONFIG_ERROR_EXIT_CODE,
+    extractConfigError,
     formatCrashReportPayload,
     buildCrashRecord,
 } from './services/crash-report';

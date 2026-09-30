@@ -156,6 +156,15 @@ try
         Environment.SetEnvironmentVariable("CALCPAD_PORT", Environment.GetEnvironmentVariable("CALCPAD_PORT") ?? "9420");
     }
 
+    // A malformed appsettings.json would otherwise surface as an opaque host-builder crash.
+    if (Program.FindInvalidSettingsFile() is string settingsError)
+    {
+        FileLogger.LogError("Invalid configuration file", new InvalidDataException(settingsError));
+        Console.Error.WriteLine($"{Program.ConfigErrorPrefix}{settingsError}");
+        FileLogger.Flush();
+        Environment.Exit(Program.ConfigErrorExitCode);
+    }
+
     // Create and configure web application using shared service
     var (app, serverUrl) = CalcpadApiService.CreateConfiguredApp(forwardedArgs);
 
@@ -297,6 +306,53 @@ catch (Exception ex)
 
 internal static partial class Program
 {
+    /// <summary>EX_CONFIG from sysexits.h. Hosts match on it to skip auto-restart.</summary>
+    internal const int ConfigErrorExitCode = 78;
+    internal const string ConfigErrorPrefix = "CONFIG ERROR: ";
+
+    /// <summary>
+    /// Parses the appsettings files the host builder will load, with the same leniency
+    /// (comments, trailing commas). Returns a user-facing message for the first bad one.
+    /// </summary>
+    internal static string? FindInvalidSettingsFile()
+    {
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+            ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+            ?? "Production";
+        var options = new System.Text.Json.JsonDocumentOptions
+        {
+            CommentHandling = System.Text.Json.JsonCommentHandling.Skip,
+            AllowTrailingCommas = true,
+        };
+
+        foreach (var name in new[] { "appsettings.json", $"appsettings.{environment}.json" })
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, name);
+            if (!File.Exists(path)) continue;
+            try
+            {
+                using var _ = System.Text.Json.JsonDocument.Parse(File.ReadAllText(path), options);
+            }
+            catch (System.Text.Json.JsonException ex)
+            {
+                // The reader's message ends with a 0-based "LineNumber: n | BytePositionInLine: n."
+                var reason = ex.Message.Split(" LineNumber:")[0].Trim();
+                var where = ex.LineNumber is long line
+                    ? $" (line {line + 1}, column {(ex.BytePositionInLine ?? 0) + 1})"
+                    : "";
+                var hint = reason.Contains("escapable character")
+                    ? " In Windows paths use forward slashes (C:/Program Files/...) or doubled backslashes."
+                    : "";
+                return $"{path} is not valid JSON{where}: {reason}{hint} Fix or delete the file, then restart.";
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                return $"{path} could not be read: {ex.Message}";
+            }
+        }
+        return null;
+    }
+
     /// <summary>
     /// True if the URL's host is loopback. Gates server-mode bindings for now.
     /// </summary>

@@ -175,6 +175,24 @@ async function showServerBlockedDialog(details: string): Promise<void> {
     }
 }
 
+async function showConfigInvalidDialog(details: string): Promise<void> {
+    const { message: dialogMessage } = await import('@tauri-apps/plugin-dialog');
+    const body =
+        "CalcpadCE's calculation server could not read its settings file.\n\n"
+        + `${details}\n\n`
+        + 'The editor still works, but preview, linting, and PDF/Word export '
+        + 'need the server. After fixing the file, choose Server → Restart Server.';
+    try {
+        await dialogMessage(body, {
+            title: 'Invalid appsettings.json',
+            kind: 'error',
+            okLabel: 'OK',
+        });
+    } catch {
+        // The Output panel carries the same message.
+    }
+}
+
 async function bootstrap(): Promise<void> {
     let serverUrl: string;
     // Secondary windows (File > New Window) share this process, the sidecar and the
@@ -215,6 +233,10 @@ async function bootstrap(): Promise<void> {
             pendingServerLogs.push({ msg: `Server did not start — ${details}`, level: 'error' });
             void showServerBlockedDialog(details);
         };
+        // server-crashed is broadcast; one dialog is enough.
+        if (isPrimaryWindow) {
+            serverManager.onConfigInvalid = (details: string) => { void showConfigInvalidDialog(details); };
+        }
 
         try {
             await serverManager.start();

@@ -278,6 +278,19 @@ expected to ask the user and then call `POST /pdf/browser/install`.
 }
 ```
 
+**503 — browser failed to start:** a browser was found but would not launch, even after the
+server retried once. Usually transient (for example, the browser is mid-update), so clients
+offer a retry rather than a download.
+
+```json
+{
+  "error": "Browser failed to start",
+  "code": "BROWSER_LAUNCH_FAILED",
+  "message": "The browser at '…' was found but failed to start (…). …",
+  "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+}
+```
+
 ---
 
 ## GET /pdf/health
