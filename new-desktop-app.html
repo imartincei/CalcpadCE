@@ -3318,7 +3318,11 @@ It uses native file dialogs and menu bar and has offline capabilities.</p>
 <tbody>
 <tr>
 <td>Windows</td>
-<td>Portable <code>.zip</code> build (no install for beta)</td>
+<td>Setup <code>.exe</code> or <code>.msi</code> installer</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>Portable <code>.zip</code> build</td>
 </tr>
 <tr>
 <td>Linux</td>
@@ -3334,7 +3338,12 @@ It uses native file dialogs and menu bar and has offline capabilities.</p>
 </tr>
 </tbody>
 </table>
-<p>The calculation engine and its dependencies are bundled inside the app — you do <strong>not</strong> need .NET installed separately.
+<p>The Windows setup installer downloads and installs the required .NET runtimes if they are missing, so installation may require an internet connection.
+You can install for the current user or for everyone on the computer.
+The default is to install only for the current user.
+Administrator approval is requested only for a systemwide installation.
+Missing runtimes follow the selected installation scope.
+The MSI installer requires the .NET and ASP.NET Core runtimes to be installed separately.
 The Windows Portable build includes what it needs to run.
 The Linux packages expect WebKitGTK to already be present on the system and may require installing a few other common dependencies.</p>
 <p>For PDF export you need a <strong>Chromium-based browser</strong> (Chrome, Edge, or Chromium) installed on the system.
