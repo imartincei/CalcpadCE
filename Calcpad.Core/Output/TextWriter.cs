@@ -194,6 +194,30 @@ namespace Calcpad.Core
             }
         }
 
+        protected override string WrapMatrix(string[][] rows, int columns)
+        {
+            var widths = new int[columns];
+            foreach (var cells in rows)
+                for (var j = 0; j < cells.Length; ++j)
+                    widths[j] = Math.Max(widths[j], cells[j].Length);
+
+            var sb = new StringBuilder("[");
+            for (var i = 0; i < rows.Length; ++i)
+            {
+                if (i > 0)
+                    sb.Append(" |");
+
+                for (var j = 0; j < columns; ++j)
+                {
+                    if (j > 0)
+                        sb.Append("  ");
+
+                    sb.Append(string.Format($"{{0,{widths[j]}}}", rows[i][j]));
+                }
+            }
+            return sb.Append(']').ToString();
+        }
+
         internal override string FormatMatrixValue(RealValue value, double zeroThreshold)
         {
             var d = value.D;
