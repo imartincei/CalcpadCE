@@ -27,22 +27,18 @@
                 "--extensionDevelopmentPath=${workspaceFolder}/Calcpad.Web/frontend/vscode-calcpad"
             ],
             "outFiles": [
-                "${workspaceFolder}/Calcpad.Web/frontend/vscode-calcpad/out/**/*.js"
+                "${workspaceFolder}/Calcpad.Web/frontend/vscode-calcpad/dist/**/*.js"
             ],
             "preLaunchTask": "Extension: Compile & Sync Server"
         },
         {
-            // `tauri dev` hot-reloads the Vue frontend and rebuilds the Rust
-            // shell on change. Sidecar staging runs via preLaunchTask so the
-            // ShellExt lookup in lib.rs resolves.
             "name": "Desktop: Dev (Tauri)",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "npx",
-            "runtimeArgs": ["tauri", "dev"],
+            "runtimeExecutable": "node",
+            "runtimeArgs": ["desktop.mjs", "dev"],
             "cwd": "${workspaceFolder}/Calcpad.Web/frontend/calcpad-desktop",
-            "console": "integratedTerminal",
-            "preLaunchTask": "Desktop: Stage Sidecar"
+            "console": "integratedTerminal"
         }
     ]
 }

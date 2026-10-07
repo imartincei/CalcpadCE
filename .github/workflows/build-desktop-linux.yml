@@ -20,6 +20,8 @@ jobs:
             triple: aarch64-unknown-linux-gnu
             arch: aarch64
     runs-on: ${{ matrix.runner }}
+    env:
+      CALCPAD_VERSION: ${{ inputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -58,9 +60,6 @@ jobs:
             xdg-utils \
             file \
             wget
-
-      - name: Set version
-        run: node Calcpad.Web/frontend/scripts/bump-versions.mjs set ${{ inputs.version }}
 
       - name: Install frontend dependencies
         run: |

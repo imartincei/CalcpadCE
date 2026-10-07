@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
-    <Version>8.0.0-beta1</Version>
+    <Version>8.0.0-beta2-preview</Version>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <FontsDir>$(MSBuildThisFileDirectory)Resources\Fonts\</FontsDir>
   </PropertyGroup>
 </Project>

@@ -29,7 +29,16 @@ function Stop-Watchers {
             $_.CommandLine -match 'calcpad-(web|frontend)' -and
             $_.CommandLine -match 'build:watch|tsc.*--watch|run\s+watch'
         } |
-        ForEach-Object { & taskkill.exe /PID $_.ProcessId /T /F 2>$null | Out-Null }
+        ForEach-Object {
+            & {
+                # A previous tree kill may already have removed this process.
+                $ErrorActionPreference = 'Continue'
+                & taskkill.exe /PID $_.ProcessId /T /F 2>$null | Out-Null
+                if ($LASTEXITCODE -notin 0, 128) {
+                    throw "Watcher cleanup failed for process $($_.ProcessId) ($LASTEXITCODE)"
+                }
+            }
+        }
 }
 
 function Start-Watcher([string]$Prefix, [string]$Script, [string]$Log) {
@@ -37,7 +46,7 @@ function Start-Watcher([string]$Prefix, [string]$Script, [string]$Log) {
     Start-Process -PassThru -WindowStyle Hidden -FilePath 'powershell' `
         -WorkingDirectory $ScriptDir `
         -RedirectStandardOutput $Log -RedirectStandardError "$Log.err" `
-        -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $LocalNpm,
+        -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$LocalNpm`"",
                       '--prefix', $Prefix, 'run', $Script
 }
 
@@ -61,6 +70,7 @@ function Wait-ForBuild($Proc, [string]$Log, [string]$Label) {
 Push-Location $ScriptDir
 try {
     Stop-Watchers
+    if ($Stop) { return }
 
     # calcpad-web compiles against calcpad-frontend's emitted output, so that lands
     # first - and `run build` also runs the postbuild codegen `tsc --watch` never does.

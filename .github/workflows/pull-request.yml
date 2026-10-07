@@ -17,13 +17,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
       - name: Determine version
         id: version
-        shell: bash
-        run: |
-          BASE_VERSION=$(sed -n 's/.*<Version>\(.*\)<\/Version>.*/\1/p' Directory.Build.props)
-          SHORT_SHA=$(git rev-parse --short HEAD)
-          echo "version=${BASE_VERSION}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+        run: node tools/version.mjs snapshot
 
   build-desktop-windows:
     needs: determine-version
@@ -32,4 +33,7 @@ jobs:
       version: ${{ needs.determine-version.outputs.version }}
 
   test:
+    needs: determine-version
     uses: ./.github/workflows/run-tests.yml
+    with:
+      version: ${{ needs.determine-version.outputs.version }}

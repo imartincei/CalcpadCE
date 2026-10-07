@@ -12,12 +12,18 @@ The app ships as a per-platform download:
 
 | Platform | Format |
 | -------- | ------ |
-| Windows | Portable `.zip` build (no install for beta) |
+| Windows | Setup `.exe` or `.msi` installer |
+| Windows | Portable `.zip` build |
 | Linux | Debian `.deb` |
 | Linux | Fedora `.rpm` |
 | Linux | Arch (compressed package with PKGBUILD) |
 
-The calculation engine and its dependencies are bundled inside the app — you do **not** need .NET installed separately.
+The Windows setup installer downloads and installs the required .NET runtimes if they are missing, so installation may require an internet connection.
+You can install for the current user or for everyone on the computer.
+The default is to install only for the current user.
+Administrator approval is requested only for a systemwide installation.
+Missing runtimes follow the selected installation scope.
+The MSI installer requires the .NET and ASP.NET Core runtimes to be installed separately.
 The Windows Portable build includes what it needs to run.
 The Linux packages expect WebKitGTK to already be present on the system and may require installing a few other common dependencies.
 

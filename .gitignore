@@ -397,3 +397,5 @@ package-lock.json
 # Notices staged into the extension root at package time (source of truth is
 # the repo-root THIRD-PARTY-NOTICES.txt).
 Calcpad.Web/frontend/vscode-calcpad/THIRD-PARTY-NOTICES.txt
+
+Calcpad.Web/frontend/vscode-calcpad/.package/

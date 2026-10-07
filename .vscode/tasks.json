@@ -220,11 +220,6 @@
         },
 
         // ── Desktop (Tauri) ─────────────────────────────────────────────
-        // Publishes Calcpad.Server for the host RID and stages the apphost as
-        // src-tauri/binaries/calcpad-server-<target-triple>[.exe] so that
-        // tauri.conf.json's `bundle.externalBin` sidecar lookup resolves. Run
-        // before `tauri dev` — tauri build handles staging on its own via
-        // build-desktop.sh.
         {
             "label": "Desktop: Stage Sidecar",
             "type": "shell",
@@ -249,14 +244,13 @@
         {
             "label": "Desktop: Dev",
             "type": "shell",
-            "command": "npx",
-            "args": ["tauri", "dev"],
+            "command": "node",
+            "args": ["desktop.mjs", "dev"],
             "options": {
                 "cwd": "${workspaceFolder}/Calcpad.Web/frontend/calcpad-desktop"
             },
             "group": "build",
             "isBackground": true,
-            "dependsOn": "Desktop: Stage Sidecar",
             "problemMatcher": {
                 "pattern": { "regexp": "^$" },
                 "background": {
@@ -584,65 +578,6 @@
             "problemMatcher": []
         },
 
-        // ── Version Bump (frontend packages + Directory.Build.props kept in sync) ──
-        {
-            "label": "Version: Bump Patch",
-            "type": "process",
-            "command": "node",
-            "args": [
-                "${workspaceFolder}/Calcpad.Web/frontend/scripts/bump-versions.mjs",
-                "patch"
-            ],
-            "presentation": {
-                "reveal": "always",
-                "panel": "dedicated"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Version: Bump Minor",
-            "type": "process",
-            "command": "node",
-            "args": [
-                "${workspaceFolder}/Calcpad.Web/frontend/scripts/bump-versions.mjs",
-                "minor"
-            ],
-            "presentation": {
-                "reveal": "always",
-                "panel": "dedicated"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Version: Bump Major",
-            "type": "process",
-            "command": "node",
-            "args": [
-                "${workspaceFolder}/Calcpad.Web/frontend/scripts/bump-versions.mjs",
-                "major"
-            ],
-            "presentation": {
-                "reveal": "always",
-                "panel": "dedicated"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Version: Set Exact",
-            "type": "process",
-            "command": "node",
-            "args": [
-                "${workspaceFolder}/Calcpad.Web/frontend/scripts/bump-versions.mjs",
-                "patch",
-                "${input:exactVersion}"
-            ],
-            "presentation": {
-                "reveal": "always",
-                "panel": "dedicated"
-            },
-            "problemMatcher": []
-        },
-
         // ── Scripts (Python) ────────────────────────────────────────────
         {
             "label": "Scripts: Compare Renderings",
@@ -686,13 +621,6 @@
                 "panel": "dedicated"
             },
             "problemMatcher": []
-        }
-    ],
-    "inputs": [
-        {
-            "id": "exactVersion",
-            "type": "promptString",
-            "description": "Exact version to set (e.g. 2.1.4 or 2.1.4-beta.3)"
         }
     ]
 }

@@ -10,6 +10,8 @@ on:
 jobs:
   build-desktop-windows:
     runs-on: windows-latest
+    env:
+      CALCPAD_VERSION: ${{ inputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -34,20 +36,21 @@ jobs:
         with:
           workspaces: Calcpad.Web/frontend/calcpad-desktop/src-tauri
 
-      - name: Set version
-        run: node Calcpad.Web/frontend/scripts/bump-versions.mjs set ${{ inputs.version }}
-
       - name: Install frontend dependencies
         run: |
           npm ci --prefix Calcpad.Web/frontend/calcpad-frontend
           npm ci --prefix Calcpad.Web/frontend/calcpad-web
           npm ci --prefix Calcpad.Web/frontend/calcpad-desktop
 
-      # Installers (msi/nsis) ship once the release is out of beta.
-      # - name: Build desktop installers (Tauri)
-      #   working-directory: Calcpad.Web/frontend/calcpad-desktop
-      #   shell: pwsh
-      #   run: ./build-desktop.ps1
+      - name: Build desktop installers (Tauri)
+        working-directory: Calcpad.Web/frontend/calcpad-desktop
+        shell: pwsh
+        run: ./build-desktop.ps1
+
+      - name: Test runtime prerequisites
+        working-directory: Calcpad.Web/frontend/calcpad-desktop
+        shell: powershell
+        run: ./packaging/windows/install-dotnet.test.ps1
 
       - name: Build portable
         working-directory: Calcpad.Web/frontend/calcpad-desktop
@@ -58,15 +61,33 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Path artifacts -Force | Out-Null
-          Copy-Item Calcpad.Web/frontend/calcpad-desktop/src-tauri/target/portable/CalcpadCE-portable-win64.zip `
+          $bundle = 'Calcpad.Web/frontend/calcpad-desktop/src-tauri/target/x86_64-pc-windows-msvc/release/bundle'
+          Copy-Item "$bundle/msi/CalcpadCE_${env:CALCPAD_VERSION}_x64_en-US.msi" -Destination "artifacts/CalcpadCE-desktop-$env:CALCPAD_VERSION-x64.msi"
+          Copy-Item "$bundle/nsis/CalcpadCE_${env:CALCPAD_VERSION}_x64-setup.exe" -Destination "artifacts/CalcpadCE-desktop-$env:CALCPAD_VERSION-x64-setup.exe"
+          Copy-Item "Calcpad.Web/frontend/calcpad-desktop/src-tauri/target/portable/CalcpadCE-portable-${{ inputs.version }}.zip" `
             -Destination "artifacts/CalcpadCE-portable-${{ inputs.version }}.zip"
 
       - name: Verify third-party notices
         shell: bash
         run: ./tools/license-scan/verify-notices.sh "artifacts/CalcpadCE-portable-${{ inputs.version }}.zip"
 
-      - name: Upload artifacts
+      - name: Upload MSI installer
         uses: actions/upload-artifact@v7
         with:
-          path: artifacts/*
+          path: artifacts/CalcpadCE-desktop-${{ inputs.version }}-x64.msi
           archive: false
+          if-no-files-found: error
+
+      - name: Upload EXE installer
+        uses: actions/upload-artifact@v7
+        with:
+          path: artifacts/CalcpadCE-desktop-${{ inputs.version }}-x64-setup.exe
+          archive: false
+          if-no-files-found: error
+
+      - name: Upload portable ZIP
+        uses: actions/upload-artifact@v7
+        with:
+          path: artifacts/CalcpadCE-portable-${{ inputs.version }}.zip
+          archive: false
+          if-no-files-found: error

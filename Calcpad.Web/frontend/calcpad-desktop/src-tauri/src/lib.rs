@@ -685,6 +685,18 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     eprintln!("[sidecar-timing] spawning {:?}", exe_path);
     let log_dir = resolve_log_dir(app);
     let mut command = tokio::process::Command::new(&exe_path);
+    #[cfg(windows)]
+    {
+        let runtime_root = exe_dir.join(".dotnet");
+        if runtime_root.join("dotnet.exe").is_file() {
+            let architecture = if cfg!(target_arch = "aarch64") {
+                "ARM64"
+            } else {
+                "X64"
+            };
+            command.env(format!("DOTNET_ROOT_{architecture}"), &runtime_root);
+        }
+    }
     command
         .args([
             "--no-exit-on-stdin-close",

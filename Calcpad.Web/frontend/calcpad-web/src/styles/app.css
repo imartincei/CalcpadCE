@@ -21,6 +21,10 @@ html[data-theme="light"] {
     color-scheme: light;
 }
 
+body {
+    font-family: var(--vscode-font-family);
+}
+
 /* Style every <select> consistently, not just the output channel one.
  * `option` styling is honored by Chromium/WebKit on Linux when color-scheme
  * is set above. */
@@ -41,12 +45,18 @@ select option {
     color: var(--vscode-dropdown-foreground, #cccccc);
 }
 
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
 .app-layout {
     display: flex;
-    height: 100vh;
+    flex: 1;
+    min-height: 0;
     background: var(--vscode-editor-background);
     color: var(--vscode-foreground);
-    font-family: var(--vscode-font-family);
 }
 
 /* While any divider is being dragged, iframes must not swallow the drag's mousemove/

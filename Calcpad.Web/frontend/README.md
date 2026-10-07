@@ -32,7 +32,12 @@ cd calcpad-frontend && npm install && npm run build
 cd vscode-calcpad && npm install && npm run package
 ```
 
+Use the **Extension: Run** launch configuration in VS Code to debug the extension.
+
 **Web Editor:**
+
+Set `VITE_SERVER_URL` to the standalone server's URL before starting the web editor.
+
 ```bash
 cd calcpad-web && npm install && npm run dev
 ```
@@ -44,7 +49,7 @@ The editor takes its server URL from a `?server=` query parameter, else `VITE_SE
 cd calcpad-desktop && npm install && npm run dev
 ```
 
-> **Note:** `tauri dev` requires the Calcpad.Server sidecar staged into `src-tauri/binaries/`. Use the `Desktop: Stage Sidecar` VS Code task, or run `stage-sidecar.sh` / `stage-sidecar.ps1` before the first dev launch.
+`npm run dev` stages the server and starts Tauri on the current platform.
 
 ---
 
@@ -76,7 +81,7 @@ calcpad-desktop/           Tauri desktop wrapper
     └── packaging/arch/    PKGBUILD that packages the build-desktop.sh output for pacman
 ```
 
-`tauri.conf.json`'s `bundle.externalBin` picks the staged sidecar up and includes it in the packaged installer.
+The desktop app includes the bundled calculation server.
 
 ---
 
@@ -107,6 +112,9 @@ cd calcpad-desktop && npm install && bash build-desktop.sh
 bash build-desktop.sh --bundles=deb        # or rpm
 ```
 
+To compile the extension for development, run `npm run compile` in `vscode-calcpad`.
+Rebuild its bundled server with `npm run sync-server` in the same directory.
+
 ### Linux packaging
 
 `build-desktop.sh` with no `--bundles` produces `deb` and `rpm`. The Arch
@@ -119,7 +127,7 @@ bash build-desktop.sh --bundles=deb        # any target; supplies the binary + s
 cd packaging/arch && makepkg -f            # → calcpad-ce-<ver>-x86_64.pkg.tar.zst
 ```
 
-`pkgver` is kept in sync by [`scripts/bump-versions.mjs`](scripts/bump-versions.mjs).
+Arch packaging uses the version recorded by the desktop build.
 
 ### Watching for Changes
 
@@ -133,6 +141,8 @@ cd vscode-calcpad && npm run watch
 # Web editor (dev server with HMR)
 cd calcpad-web && npm run dev
 ```
+
+For continuous web builds, run `npm run build:watch` in `calcpad-web`.
 
 ### Code Signing (Windows)
 

@@ -8,6 +8,7 @@
   },
   "bundle": {
     "targets": ["msi", "nsis"],
+    "licenseFile": "../../../../LICENSE",
     "resources": {
       "binaries/*.dll": "./",
       "binaries/Calcpad.Server.deps.json": "./",
@@ -24,19 +25,17 @@
     },
     "windows": {
       "wix": {
-        "language": "en-US"
+        "language": "en-US",
+        "fragmentPaths": ["../packaging/windows/dotnet.wxs"],
+        "featureRefs": ["DotNetPrerequisites"]
       },
       "nsis": {
-        "installMode": "perMachine"
+        "installMode": "both",
+        "installerHooks": "../packaging/windows/dotnet.nsh"
       },
-      "signCommand": {
-        "cmd": "powershell",
-        "args": [
-          "-NoProfile",
-          "-Command",
-          "if ($env:CALCPAD_SIGN_THUMBPRINT) { signtool sign /sha1 $env:CALCPAD_SIGN_THUMBPRINT /fd sha256 /tr http://timestamp.digicert.com /td sha256 '{{ %1 }}' }"
-        ]
-      }
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com",
+      "tsp": true
     }
   }
 }

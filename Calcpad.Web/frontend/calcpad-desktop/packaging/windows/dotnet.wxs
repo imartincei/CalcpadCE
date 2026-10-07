@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <Feature Id="DotNetPrerequisites" Title=".NET prerequisites" Display="hidden" Level="1" />
+    <Property Id="CALCPAD_NETCORE">
+      <RegistrySearch Id="NetCoreInstallLocation" Root="HKLM"
+                      Key="SOFTWARE\dotnet\Setup\InstalledVersions\$(sys.BUILDARCH)"
+                      Name="InstallLocation" Type="directory" Win64="no">
+        <DirectorySearch Id="NetCoreDirectory" Path="shared\Microsoft.NETCore.App" Depth="1">
+          <FileSearch Name="System.Private.CoreLib.dll"
+                      MinVersion="10.0.0.0" MaxVersion="10.65535.65535.65535" />
+        </DirectorySearch>
+      </RegistrySearch>
+    </Property>
+    <Property Id="CALCPAD_ASPNETCORE">
+      <RegistrySearch Id="AspNetCoreInstallLocation" Root="HKLM"
+                      Key="SOFTWARE\dotnet\Setup\InstalledVersions\$(sys.BUILDARCH)"
+                      Name="InstallLocation" Type="directory" Win64="no">
+        <DirectorySearch Id="AspNetCoreDirectory" Path="shared\Microsoft.AspNetCore.App" Depth="1">
+          <FileSearch Name="Microsoft.AspNetCore.dll"
+                      MinVersion="10.0.0.0" MaxVersion="10.65535.65535.65535" />
+        </DirectorySearch>
+      </RegistrySearch>
+    </Property>
+    <Condition Message="Install the $(sys.BUILDARCH) .NET and ASP.NET Core runtimes from https://dotnet.microsoft.com/download/dotnet/10.0 before running this MSI, or use the CalcpadCE setup EXE to install them automatically.">
+      Installed OR (CALCPAD_NETCORE AND CALCPAD_ASPNETCORE)
+    </Condition>
+  </Fragment>
+</Wix>

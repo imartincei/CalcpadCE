@@ -17,16 +17,19 @@ $ScriptDir   = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot    = Resolve-Path (Join-Path $ScriptDir '..\..\..')
 $SyncScript  = Join-Path $RepoRoot 'Calcpad.Web\frontend\vscode-calcpad\scripts\sync-bundled-server.mjs'
 $BinariesDir = Join-Path $ScriptDir 'src-tauri\binaries'
+$BuildVersion = node (Join-Path $ScriptDir '../../../tools/version.mjs')
+if ($LASTEXITCODE -ne 0) { throw 'Version resolution failed' }
 $ReleaseDir  = Join-Path $ScriptDir "src-tauri\target\$Target\release"
 $OutputDir   = Join-Path $ScriptDir 'src-tauri\target\portable'
 $StageDir    = Join-Path $OutputDir 'CalcpadCE-portable-win64'
-$ZipPath     = Join-Path $OutputDir 'CalcpadCE-portable-win64.zip'
+$ZipPath     = Join-Path $OutputDir "CalcpadCE-portable-$BuildVersion.zip"
 
 Write-Host ">> Cargo target: $Target"
 Write-Host ">> .NET RID:     $Rid"
 
 New-Item -ItemType Directory -Force -Path $BinariesDir | Out-Null
 node $SyncScript "--target=$BinariesDir" "--rid=$Rid" '--configuration=Release' '--keep-skia-natives'
+if ($LASTEXITCODE -ne 0) { throw 'Sidecar publishing failed' }
 
 # After the sync: it prunes anything it does not recognise from the target.
 Copy-Item (Join-Path $RepoRoot 'THIRD-PARTY-NOTICES.txt') -Destination $BinariesDir -Force
@@ -34,7 +37,8 @@ Copy-Item (Join-Path $RepoRoot 'LICENSE') -Destination (Join-Path $BinariesDir '
 
 Push-Location $ScriptDir
 try {
-    npx tauri build --config src-tauri/tauri.windows.conf.json --target $Target --no-bundle
+    node desktop.mjs build --sidecar-staged --target $Target --no-bundle
+    if ($LASTEXITCODE -ne 0) { throw 'Desktop build failed' }
 }
 finally {
     Pop-Location

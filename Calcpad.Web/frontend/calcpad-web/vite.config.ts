@@ -1,3 +1,4 @@
+import { resolveVersion } from '../../../tools/version.mjs';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
@@ -9,6 +10,7 @@ import path from 'path';
 export default defineConfig(() => ({
     plugins: [vue()],
     define: {
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(resolveVersion()),
         'import.meta.env.VITE_PLATFORM': JSON.stringify('web'),
     },
     resolve: {

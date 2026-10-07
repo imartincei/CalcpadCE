@@ -1,6 +1,5 @@
 [package]
 name = "calcpad-desktop"
-version = "8.0.0-beta1"
 description = "CalcpadCE desktop shell"
 authors = ["CalcpadCE Contributors"]
 license = "MIT"

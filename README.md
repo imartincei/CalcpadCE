@@ -107,19 +107,19 @@ If you are planning a major feature, we recommend opening a Discussion first to 
 Download and install the [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0), [Node.js](https://nodejs.org/) 22+ and [Rust](https://rustup.rs/).
 
 The desktop app is a [Tauri](https://tauri.app/) shell around the CalcpadCE web frontend, with the calculation server bundled as a sidecar.
-Install the frontend dependencies, stage the sidecar, then start it:
+Install dependencies in all three frontend projects shown below, then start the desktop app:
 
 ```shell
 git clone https://github.com/imartincei/CalcpadCE.git
 cd CalcpadCE/Calcpad.Web/frontend/calcpad-frontend
 npm install
+cd ../calcpad-web
+npm install
 cd ../calcpad-desktop
 npm install
-./stage-sidecar.sh
-npx tauri dev
+npm run dev
 ```
 
-On Windows use `.\stage-sidecar.ps1` instead.
 To produce installers for your platform, run `./build-desktop.sh` (or `.\build-desktop.ps1`) from the same directory.
 
 The command line interpreter builds on its own with `dotnet build Calcpad.Cli` from the repository root.
@@ -133,7 +133,7 @@ They pick the right script for your platform automatically.
 | Task | What it does |
 | ---- | ------------ |
 | `Frontend: Install All Dependencies` | `npm install` across the frontend library, web editor, extension and desktop app |
-| `Desktop: Stage Sidecar` | Publishes `Calcpad.Server` and stages it as the Tauri sidecar (run before `tauri dev`) |
+| `Desktop: Stage Sidecar` | Publishes `Calcpad.Server` and stages it as the Tauri sidecar |
 | `Desktop: Dev` | Starts `tauri dev` with hot reload, staging the sidecar first |
 | `Desktop: Bundle All` | Builds every installer format configured for your platform |
 | `Desktop: Build Portable (Windows)` | Builds the Windows portable bundle |

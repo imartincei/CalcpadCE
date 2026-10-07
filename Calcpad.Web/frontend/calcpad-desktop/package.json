@@ -1,16 +1,13 @@
 {
   "name": "calcpad-desktop",
-  "version": "8.0.0-beta1",
   "private": true,
   "description": "CalcpadCE Desktop — Tauri shell with an embedded ASP.NET Core server",
   "author": "CalcpadCE Contributors",
   "license": "MIT",
   "scripts": {
-    "tauri": "tauri",
-    "dev": "tauri dev --config src-tauri/tauri.linux.conf.json",
-    "dev:windows": "tauri dev --config src-tauri/tauri.windows.conf.json",
-    "build": "tauri build --config src-tauri/tauri.linux.conf.json",
-    "build:windows": "tauri build --config src-tauri/tauri.windows.conf.json"
+    "dev": "node desktop.mjs dev",
+    "build": "node desktop.mjs build",
+    "build:windows": "node desktop.mjs build"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2"

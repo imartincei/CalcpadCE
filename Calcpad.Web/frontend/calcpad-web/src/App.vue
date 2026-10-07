@@ -283,25 +283,7 @@
           <div v-if="filteredOutputLines.length === 0" class="problems-empty">No output on this channel yet.</div>
         </div>
       </div>
-      <!-- Status bar -->
-      <div v-show="!uiModeFullscreen" class="status-bar" @contextmenu.prevent>
-        <span class="status-problems" @click="openBottomTab('problems')">
-          <svg class="status-icon lintError" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
-          </svg> {{ errorCount }}
-          <svg class="status-icon warning" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.964 0L.165 13.233c-.457.778.091 1.767.982 1.767h13.706c.891 0 1.44-.99.982-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-          </svg> {{ warningCount }}
-          <svg class="status-icon info" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
-          </svg> {{ infoCount }}
-        </span>
-        <span class="status-output" @click="openBottomTab('output')">Output</span>
-        <span class="spacer"></span>
-        <span v-if="serverStatus !== 'connected'" class="status-server" :class="serverStatus" :title="serverStatusTitle">
-          ● {{ serverStatusLabel }}
-        </span>
-      </div>
+
     </div>
 
     <!-- Editor ↔ results divider. Nothing to resize in UI mode. -->
@@ -558,6 +540,25 @@
         </div>
       </div>
     </div>
+  </div>
+  <!-- Status bar -->
+  <div v-show="!uiModeFullscreen" class="status-bar" @contextmenu.prevent>
+    <span class="status-problems" @click="openBottomTab('problems')">
+      <svg class="status-icon lintError" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
+      </svg> {{ errorCount }}
+      <svg class="status-icon warning" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.964 0L.165 13.233c-.457.778.091 1.767.982 1.767h13.706c.891 0 1.44-.99.982-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+      </svg> {{ warningCount }}
+      <svg class="status-icon info" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+      </svg> {{ infoCount }}
+    </span>
+    <span class="status-output" @click="openBottomTab('output')">Output</span>
+    <span class="spacer"></span>
+    <span v-if="serverStatus !== 'connected'" class="status-server" :class="serverStatus" :title="serverStatusTitle">
+      ● {{ serverStatusLabel }}
+    </span>
   </div>
 </template>
 

@@ -28,7 +28,8 @@ Write-Host ">> Cargo target: $Triple"
 Write-Host ">> .NET RID:     $Rid"
 
 New-Item -ItemType Directory -Force -Path $BinariesDir | Out-Null
-node $SyncScript "--target=$BinariesDir" "--rid=$Rid" '--configuration=Release' '--keep-skia-natives'
+node $SyncScript "--target=$BinariesDir" "--rid=$Rid" '--configuration=Release' '--keep-skia-natives' '--framework-dependent'
+if ($LASTEXITCODE -ne 0) { throw 'Sidecar publishing failed' }
 
 # After the sync: it prunes anything it does not recognise from the target.
 Copy-Item (Join-Path $RepoRoot 'THIRD-PARTY-NOTICES.txt') -Destination $BinariesDir -Force

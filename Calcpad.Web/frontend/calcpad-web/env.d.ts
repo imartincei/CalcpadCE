@@ -7,6 +7,7 @@ declare module '*.vue' {
 }
 
 interface ImportMetaEnv {
+    readonly VITE_APP_VERSION: string;
     readonly VITE_PLATFORM: 'web';
     readonly VITE_SERVER_URL?: string;
 }

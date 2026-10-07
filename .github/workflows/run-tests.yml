@@ -2,6 +2,10 @@ name: Run Tests
 
 on:
   workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
 
 jobs:
   test:
@@ -15,9 +19,18 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Test version resolution
+        run: node --test tools/version.test.mjs
+
       - name: Run tests
         run: >
           dotnet test Calcpad.Tests
+          -p:Version=${{ inputs.version }}
           --logger "console;verbosity=detailed"
           --logger "trx;LogFileName=test-results.trx"
           --results-directory ./test-results

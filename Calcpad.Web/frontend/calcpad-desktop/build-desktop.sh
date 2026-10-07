@@ -23,6 +23,7 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/../../.." && pwd)
 SYNC_SCRIPT="$REPO_ROOT/Calcpad.Web/frontend/vscode-calcpad/scripts/sync-bundled-server.mjs"
 BINARIES_DIR="$SCRIPT_DIR/src-tauri/binaries"
+export CALCPAD_VERSION=$(node "$SCRIPT_DIR/../../../tools/version.mjs")
 
 DOTNET_RID=""
 CARGO_TARGET=""
@@ -109,7 +110,7 @@ cd "$SCRIPT_DIR"
 
 if [[ -n "$BUNDLES" ]]; then
     IFS=',' read -ra BUNDLE_LIST <<< "$BUNDLES"
-    npx tauri build --config src-tauri/tauri.linux.conf.json --target "$CARGO_TARGET" --bundles "${BUNDLE_LIST[@]}"
+    node desktop.mjs build --sidecar-staged --target "$CARGO_TARGET" --bundles "${BUNDLE_LIST[@]}"
 else
-    npx tauri build --config src-tauri/tauri.linux.conf.json --target "$CARGO_TARGET"
+    node desktop.mjs build --sidecar-staged --target "$CARGO_TARGET"
 fi

@@ -1,3 +1,4 @@
+import { resolveVersion } from '../../../tools/version.mjs';
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'node:path'
@@ -40,6 +41,7 @@ export default defineConfig({
     }
   },
   define: {
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(resolveVersion()),
     // Vue.js production optimizations
     __VUE_PROD_DEVTOOLS__: false,
     __VUE_OPTIONS_API__: true,

@@ -11,7 +11,13 @@
 #   cd packaging/arch && makepkg -f
 
 pkgname=calcpad-ce
-pkgver=8.0.0.beta1
+_srcroot="$startdir/../.."
+case "$CARCH" in
+    x86_64)  _triple='x86_64-unknown-linux-gnu' ;;
+    aarch64) _triple='aarch64-unknown-linux-gnu' ;;
+esac
+pkgver=$(cat "$_srcroot/src-tauri/target/$_triple/release/version.txt")
+pkgver=${pkgver//[-+]/.}
 pkgrel=1
 pkgdesc='CalcpadCE desktop editor — Vue frontend with an embedded ASP.NET Core server'
 arch=('x86_64' 'aarch64')
@@ -26,13 +32,6 @@ sha256sums=('SKIP')
 # libSkiaSharp.so actually grows. !debug avoids a debug package with no symbols
 # to put in it.
 options=('!strip' '!debug')
-
-_srcroot="$startdir/../.."
-
-case "$CARCH" in
-    x86_64)  _triple='x86_64-unknown-linux-gnu' ;;
-    aarch64) _triple='aarch64-unknown-linux-gnu' ;;
-esac
 
 package() {
     local reldir="$_srcroot/src-tauri/target/$_triple/release"
