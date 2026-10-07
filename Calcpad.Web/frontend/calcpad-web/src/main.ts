@@ -241,8 +241,10 @@ async function bootstrap(): Promise<void> {
         try {
             await serverManager.start();
         } catch (err) {
-            const msg = err instanceof Error ? (err.stack ?? err.message) : String(err);
-            pendingServerLogs.push({ msg: `[bootstrap] Server failed to start: ${msg}`, level: 'error' });
+            if (!serverManager.isConfigInvalid) {
+                const msg = err instanceof Error ? (err.stack ?? err.message) : String(err);
+                pendingServerLogs.push({ msg: `[bootstrap] Server failed to start: ${msg}`, level: 'error' });
+            }
             console.error('[bootstrap] Server failed to start:', err);
         }
         serverUrl = serverManager.getBaseUrl() || '';
@@ -1520,7 +1522,7 @@ async function bootstrap(): Promise<void> {
     // serverManager.start() ran before the callbacks above existed, so seed from what it knows.
     // markStopped leaves polling suspended, which is right: only a user restart can help.
     if (serverManager && !serverManager.isRunning) {
-        connectionMonitor.markStopped('server did not start');
+        connectionMonitor.markStopped(serverManager.isConfigInvalid ? 'invalid appsettings.json' : 'server did not start');
     } else {
         connectionMonitor.start();
     }

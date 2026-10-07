@@ -311,19 +311,14 @@ internal static partial class Program
     internal const string ConfigErrorPrefix = "CONFIG ERROR: ";
 
     /// <summary>
-    /// Parses the appsettings files the host builder will load, with the same leniency
-    /// (comments, trailing commas). Returns a user-facing message for the first bad one.
+    /// Loads the appsettings files the host builder will load, through the same JSON
+    /// configuration provider. Returns a user-facing message for the first bad one.
     /// </summary>
     internal static string? FindInvalidSettingsFile()
     {
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
             ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
             ?? "Production";
-        var options = new System.Text.Json.JsonDocumentOptions
-        {
-            CommentHandling = System.Text.Json.JsonCommentHandling.Skip,
-            AllowTrailingCommas = true,
-        };
 
         foreach (var name in new[] { "appsettings.json", $"appsettings.{environment}.json" })
         {
@@ -331,14 +326,24 @@ internal static partial class Program
             if (!File.Exists(path)) continue;
             try
             {
-                using var _ = System.Text.Json.JsonDocument.Parse(File.ReadAllText(path), options);
+                new Microsoft.Extensions.Configuration.ConfigurationBuilder()
+                    .AddJsonFile(path, optional: false, reloadOnChange: false)
+                    .Build();
             }
-            catch (System.Text.Json.JsonException ex)
+            catch (InvalidDataException ex)
             {
-                // The reader's message ends with a 0-based "LineNumber: n | BytePositionInLine: n."
-                var reason = ex.Message.Split(" LineNumber:")[0].Trim();
-                var where = ex.LineNumber is long line
-                    ? $" (line {line + 1}, column {(ex.BytePositionInLine ?? 0) + 1})"
+                Exception cause = ex;
+                while (cause.InnerException != null && cause is not System.Text.Json.JsonException)
+                    cause = cause.InnerException;
+
+                // Reader messages end with a 0-based "LineNumber: n | BytePositionInLine: n."
+                var reason = System.Text.RegularExpressions.Regex
+                    .Replace(cause.Message.Split(" LineNumber:")[0], @"\s+", " ").Trim();
+                if (cause is not System.Text.Json.JsonException json)
+                    return $"{path} is not a valid settings file: {reason} Fix or delete the file, then restart.";
+
+                var where = json.LineNumber is long line
+                    ? $" (line {line + 1}, column {(json.BytePositionInLine ?? 0) + 1})"
                     : "";
                 var hint = reason.Contains("escapable character")
                     ? " In Windows paths use forward slashes (C:/Program Files/...) or doubled backslashes."

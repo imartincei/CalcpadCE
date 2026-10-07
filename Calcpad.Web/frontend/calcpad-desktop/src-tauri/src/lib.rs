@@ -75,12 +75,21 @@ struct ServerState {
     // dying old sidecar (e.g. during restart) would clobber the freshly spawned
     // one's url/kill_tx.
     generation: AtomicU64,
+    // Boot spawn failures happen before the webview listens, so keep them for `server_startup_failure`.
+    startup_failure: Mutex<Option<StartupFailure>>,
+    last_crash: Mutex<Option<ServerCrashPayload>>,
 }
 
 #[derive(Clone, Serialize)]
 struct ServerCrashPayload {
     code: Option<i32>,
     tail: String,
+}
+
+#[derive(Clone, Serialize)]
+struct StartupFailure {
+    error: String,
+    crash: Option<ServerCrashPayload>,
 }
 
 #[derive(Clone, Serialize)]
@@ -375,6 +384,11 @@ fn server_url(state: State<'_, ServerState>) -> Option<String> {
     state.url.lock().ok().and_then(|g| g.clone())
 }
 
+#[tauri::command]
+fn server_startup_failure(state: State<'_, ServerState>) -> Option<StartupFailure> {
+    state.startup_failure.lock().ok().and_then(|g| g.clone())
+}
+
 /// Hands the webview the token it must send as `X-Calcpad-Token` on every API call. Safe to
 /// expose: the webview is the app's own frontend served from `tauri://`, while worksheet
 /// content renders inside a sandboxed opaque-origin frame with no IPC access.
@@ -634,6 +648,12 @@ fn log_dir(app: AppHandle) -> Result<String, String> {
 async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     let state: State<'_, ServerState> = app.state();
     let my_gen = state.generation.fetch_add(1, Ordering::SeqCst) + 1;
+    if let Ok(mut g) = state.startup_failure.lock() {
+        *g = None;
+    }
+    if let Ok(mut g) = state.last_crash.lock() {
+        *g = None;
+    }
 
     let parent_pid = std::process::id().to_string();
     // Explicit port-file path in temp so we don't depend on the child's CWD.
@@ -838,7 +858,7 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
         tail: Arc<Mutex<String>>,
         saw_first: Arc<std::sync::atomic::AtomicBool>,
         log_tx: mpsc::Sender<ServerLogLine>,
-    ) {
+    ) -> tauri::async_runtime::JoinHandle<()> {
         tauri::async_runtime::spawn(async move {
             let mut lines = BufReader::new(stream).lines();
             loop {
@@ -874,10 +894,11 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
                     Ok(None) | Err(_) => break,
                 }
             }
-        });
+        })
     }
+    let mut readers = Vec::new();
     if let Some(s) = stdout {
-        spawn_stream_reader(
+        readers.push(spawn_stream_reader(
             Box::new(s),
             "stdout",
             spawn_started,
@@ -886,10 +907,10 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
             tail.clone(),
             saw_first_output.clone(),
             log_tx.clone(),
-        );
+        ));
     }
     if let Some(s) = stderr {
-        spawn_stream_reader(
+        readers.push(spawn_stream_reader(
             Box::new(s),
             "stderr",
             spawn_started,
@@ -898,7 +919,7 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
             tail.clone(),
             saw_first_output.clone(),
             log_tx.clone(),
-        );
+        ));
     }
 
     // Wait task — owns the Child, races natural exit against the kill signal,
@@ -935,6 +956,13 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
                 }
             }
             if !killed {
+                // Exit can beat the readers to the last lines (e.g. the server's CONFIG ERROR).
+                let _ = tokio::time::timeout(Duration::from_millis(500), async {
+                    for r in readers {
+                        let _ = r.await;
+                    }
+                })
+                .await;
                 let tail_snapshot = tail
                     .lock()
                     .ok()
@@ -961,13 +989,16 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
                     tail = tail_snapshot,
                 );
                 write_crash_report("sidecar", &body);
-                let _ = app_for_wait.emit(
-                    "server-crashed",
-                    ServerCrashPayload {
-                        code: exit_code,
-                        tail: tail_snapshot,
-                    },
-                );
+                let payload = ServerCrashPayload {
+                    code: exit_code,
+                    tail: tail_snapshot,
+                };
+                if is_current {
+                    if let Ok(mut g) = state.last_crash.lock() {
+                        *g = Some(payload.clone());
+                    }
+                }
+                let _ = app_for_wait.emit("server-crashed", payload);
                 if let Some(tx) = tx_url.lock().ok().and_then(|mut g| g.take()) {
                     let _ = tx.send(Err(format!(
                         "sidecar exited before port ready (code {:?})",
@@ -1427,6 +1458,7 @@ pub fn run() {
         .manage(MenuState::default())
         .invoke_handler(tauri::generate_handler![
             server_url,
+            server_startup_failure,
             server_token,
             restart_server,
             stop_server,
@@ -1515,6 +1547,14 @@ pub fn run() {
                             ms = unix_millis(),
                         );
                         write_crash_report("startup", &body);
+                        let state: State<'_, ServerState> = handle_for_spawn.state();
+                        let crash = state.last_crash.lock().ok().and_then(|g| g.clone());
+                        if let Ok(mut g) = state.startup_failure.lock() {
+                            *g = Some(StartupFailure {
+                                error: err.clone(),
+                                crash,
+                            });
+                        }
                         let _ = handle_for_spawn.emit("server-startup-error", err);
                     }
                 }

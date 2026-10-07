@@ -87,4 +87,4 @@ For Monaco editor features and VS Code commands, see the recipes in `reference/w
 4. **Follow existing patterns** - Match code style and architecture
 5. **Implement** - Start with types, then service/client, then UI
 6. **Build shared lib first** - If you changed calcpad-frontend, rebuild it before testing consumers
-7. **Test** - Run `npm run dev` for the web editor, or launch the VS Code extension
+7. **Test** - Run `npm run dev` for the web editor, or launch the VS Code extension. To drive the desktop app (native dialogs, menus, server failures) without taking over the user's screen, use `tools/desktop-test/` (Windows; see its README)

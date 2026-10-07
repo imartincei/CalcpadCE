@@ -31,6 +31,12 @@ interface ServerCrashPayload {
     tail: string;
 }
 
+/** Rust's record of a failed boot spawn, for windows that started listening too late. */
+interface StartupFailure {
+    error: string;
+    crash: ServerCrashPayload | null;
+}
+
 interface ServerLogPayload {
     stream: 'stdout' | 'stderr';
     line: string;
@@ -69,6 +75,8 @@ export class TauriServerManager {
     }
 
     get isRunning(): boolean { return this._isRunning; }
+    /** The last start failed on a malformed appsettings file, already reported via onConfigInvalid. */
+    get isConfigInvalid(): boolean { return this._configInvalid; }
     getBaseUrl(): string { return this.url; }
 
     /**
@@ -93,6 +101,34 @@ export class TauriServerManager {
             resolveReady = resolve;
             rejectReady = reject;
         });
+        // A failure can reject this before the race below awaits it.
+        ready.catch(() => { /* observed by the race */ });
+
+        let sawCrash = false;
+        let failureReported = false;
+        const reportStartupFailure = async (eventError?: string): Promise<void> => {
+            let failure: StartupFailure | null = null;
+            try {
+                failure = await invoke<StartupFailure | null>('server_startup_failure');
+            } catch {
+                // Fall back to the event payload.
+            }
+            const error = failure?.error ?? eventError;
+            if (!error || failureReported) return;
+            failureReported = true;
+            // `server-crashed` fired before this window was listening.
+            if (failure?.crash && !sawCrash) this.handleCrash(failure.crash);
+            if (this._configInvalid) {
+                this.onStatusChanged?.('stopped', 'invalid appsettings.json');
+            } else {
+                this.log(`Server failed to start: ${error}`, 'error');
+                this.onStatusChanged?.('stopped', error);
+                this.onStartupBlocked?.(error);
+            }
+            rejectReady?.(new Error(error));
+            rejectReady = null;
+            resolveReady = null;
+        };
 
         try {
             this.token = await invoke<string>('server_token');
@@ -104,6 +140,7 @@ export class TauriServerManager {
             this.unlistenUrl = await listen<string>('server-url', (evt) => {
                 this.url = evt.payload;
                 this._isRunning = true;
+                this._configInvalid = false;
                 this.scheduleStabilityReset();
                 this.log(`[timing] server-url event received ${t()}ms after start()`, 'verbose');
                 this.log(`Server ready at ${this.url}`);
@@ -119,32 +156,8 @@ export class TauriServerManager {
         }
 
         this.unlistenCrash = await listen<ServerCrashPayload>('server-crashed', (evt) => {
-            this._isRunning = false;
-            this.url = '';
-            // Restarting can't fix a malformed appsettings.json, so report it once and stop.
-            if (evt.payload.code === SERVER_CONFIG_ERROR_EXIT_CODE) {
-                const detail = extractConfigError(evt.payload.tail || '') ?? 'appsettings.json is not valid JSON.';
-                this._configInvalid = true;
-                this.clearStabilityReset();
-                this.log(`Server settings are invalid: ${detail}`, 'error');
-                this.onStatusChanged?.('stopped', 'invalid appsettings.json');
-                this.onConfigInvalid?.(detail);
-                return;
-            }
-            // Crash before the stability window elapsed — the streak stands.
-            this.clearStabilityReset();
-            this._crashCount++;
-            this.log(`Server crashed (code=${evt.payload.code ?? 'unknown'}) — attempt ${this._crashCount}/${MAX_AUTO_RESTARTS}`, 'error');
-            void this.writeCrashRecord(evt.payload);
-            if (!this.autoRestartEnabled) {
-                this.onStatusChanged?.('stopped', 'crashed');
-            } else if (this._crashCount < MAX_AUTO_RESTARTS) {
-                this.onStatusChanged?.('starting', `crashed, retry ${this._crashCount}/${MAX_AUTO_RESTARTS}`);
-                setTimeout(() => { void this.autoRestart(); }, AUTO_RESTART_DELAY_MS);
-            } else {
-                this.onStatusChanged?.('stopped', 'auto-restart exhausted');
-                this.onCrashExhausted?.(evt.payload.tail || '');
-            }
+            sawCrash = true;
+            this.handleCrash(evt.payload);
         });
 
         this.unlistenLog = await listen<ServerLogPayload>('server-log', (evt) => {
@@ -152,13 +165,7 @@ export class TauriServerManager {
         });
 
         this.unlistenStartupError = await listen<string>('server-startup-error', (evt) => {
-            this.log(`Server failed to start: ${evt.payload}`, 'error');
-            this.onStatusChanged?.('stopped', this._configInvalid ? 'invalid appsettings.json' : evt.payload);
-            // server-crashed arrives first and already reported the config error.
-            if (!this._configInvalid) this.onStartupBlocked?.(evt.payload);
-            rejectReady?.(new Error(evt.payload));
-            rejectReady = null;
-            resolveReady = null;
+            void reportStartupFailure(evt.payload);
         });
 
         this.log(`[timing] all listeners ready at ${t()}ms`, 'verbose');
@@ -180,6 +187,9 @@ export class TauriServerManager {
         } catch (err) {
             this.log(`[timing] server_url invoke failed at ${t()}ms: ${err instanceof Error ? err.message : String(err)}`, 'verbose');
         }
+
+        // Likewise, a boot that already failed emitted its events before we listened.
+        await reportStartupFailure();
 
         this.log(`[timing] awaiting server-url event race at ${t()}ms`, 'verbose');
         const timeout = new Promise<never>((_, reject) =>
@@ -206,6 +216,35 @@ export class TauriServerManager {
         this.onStatusChanged?.('stopped', 'stopped by user');
     }
 
+    private handleCrash(payload: ServerCrashPayload): void {
+        this._isRunning = false;
+        this.url = '';
+        // Restarting can't fix a malformed appsettings.json, so report it once and stop.
+        if (payload.code === SERVER_CONFIG_ERROR_EXIT_CODE) {
+            const detail = extractConfigError(payload.tail || '') ?? 'appsettings.json is not valid JSON.';
+            this._configInvalid = true;
+            this.clearStabilityReset();
+            this.log(`Server settings are invalid: ${detail}`, 'error');
+            this.onStatusChanged?.('stopped', 'invalid appsettings.json');
+            this.onConfigInvalid?.(detail);
+            return;
+        }
+        // Crash before the stability window elapsed — the streak stands.
+        this.clearStabilityReset();
+        this._crashCount++;
+        this.log(`Server crashed (code=${payload.code ?? 'unknown'}) — attempt ${this._crashCount}/${MAX_AUTO_RESTARTS}`, 'error');
+        void this.writeCrashRecord(payload);
+        if (!this.autoRestartEnabled) {
+            this.onStatusChanged?.('stopped', 'crashed');
+        } else if (this._crashCount < MAX_AUTO_RESTARTS) {
+            this.onStatusChanged?.('starting', `crashed, retry ${this._crashCount}/${MAX_AUTO_RESTARTS}`);
+            setTimeout(() => { void this.autoRestart(); }, AUTO_RESTART_DELAY_MS);
+        } else {
+            this.onStatusChanged?.('stopped', 'auto-restart exhausted');
+            this.onCrashExhausted?.(payload.tail || '');
+        }
+    }
+
     /** Manual force-stop then respawn via Rust (menu / refresh). Resets the crash streak. */
     async restart(): Promise<void> {
         this.clearStabilityReset();
@@ -221,10 +260,15 @@ export class TauriServerManager {
             this.onStatusChanged?.('running', this.url);
             this.log(`Server restarted at ${newUrl}`);
         } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            this.log(`restart_server invoke failed: ${msg}`, 'error');
             this._isRunning = false;
             this.url = '';
+            // server-crashed already logged the config error and showed the dialog.
+            if (this._configInvalid) {
+                this.onStatusChanged?.('stopped', 'invalid appsettings.json');
+                throw new Error('invalid appsettings.json');
+            }
+            const msg = err instanceof Error ? err.message : String(err);
+            this.log(`restart_server invoke failed: ${msg}`, 'error');
             this.onStatusChanged?.('stopped', msg);
             throw err;
         }
@@ -236,6 +280,7 @@ export class TauriServerManager {
      * mean Rust never re-emits `server-crashed`.
      */
     private async autoRestart(): Promise<void> {
+        this._configInvalid = false;
         try {
             const newUrl = await invoke<string>('restart_server');
             this.url = newUrl;
@@ -247,6 +292,10 @@ export class TauriServerManager {
             const msg = err instanceof Error ? err.message : String(err);
             this._isRunning = false;
             this.url = '';
+            if (this._configInvalid) {
+                this.onStatusChanged?.('stopped', 'invalid appsettings.json');
+                return;
+            }
             this._crashCount++;
             this.log(`Auto-restart failed: ${msg} — attempt ${this._crashCount}/${MAX_AUTO_RESTARTS}`, 'error');
             if (this._crashCount < MAX_AUTO_RESTARTS) {

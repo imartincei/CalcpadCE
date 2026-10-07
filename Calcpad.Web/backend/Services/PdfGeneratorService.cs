@@ -319,7 +319,7 @@ namespace Calcpad.Server.Services
                     try
                     {
                         _browser = await LaunchBrowserAsync(executablePath).ConfigureAwait(false);
-                        FileLogger.LogInfo("Browser launch succeeded on retry", executablePath);
+                        FileLogger.LogWarning("Browser launch succeeded on retry", executablePath);
                     }
                     catch (Exception ex)
                     {
@@ -335,7 +335,7 @@ namespace Calcpad.Server.Services
                         if (fallbackPath == null || string.Equals(fallbackPath, executablePath, StringComparison.OrdinalIgnoreCase))
                             throw new BrowserLaunchFailedException(executablePath, LaunchFailedMessage(executablePath, ex), ex);
 
-                        FileLogger.LogInfo("Falling back to downloaded ChromeHeadlessShell", fallbackPath);
+                        FileLogger.LogWarning("Falling back to downloaded ChromeHeadlessShell", fallbackPath);
                         _browser = await LaunchBrowserAsync(fallbackPath).ConfigureAwait(false);
                     }
                 }
@@ -348,11 +348,15 @@ namespace Calcpad.Server.Services
             }
         }
 
+        // Two attempts plus the retry delay must finish inside the clients' 60 s PDF fetch timeout.
+        private const int BrowserLaunchTimeoutMs = 20_000;
+
         private static Task<IBrowser> LaunchBrowserAsync(string executablePath) =>
             Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
                 ExecutablePath = executablePath,
+                Timeout = BrowserLaunchTimeoutMs,
                 Args = ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu", "--disable-dev-shm-usage"]
             });
 
