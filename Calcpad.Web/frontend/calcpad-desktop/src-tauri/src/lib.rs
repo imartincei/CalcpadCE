@@ -75,8 +75,9 @@ struct ServerState {
     // dying old sidecar (e.g. during restart) would clobber the freshly spawned
     // one's url/kill_tx.
     generation: AtomicU64,
-    // Boot spawn failures happen before the webview listens, so keep them for `server_startup_failure`.
-    startup_failure: Mutex<Option<StartupFailure>>,
+    // Why the server is down, for webviews that were not listening when it failed (boot, or a
+    // window opened later). Cleared on every spawn.
+    failure: Mutex<Option<ServerFailure>>,
     last_crash: Mutex<Option<ServerCrashPayload>>,
 }
 
@@ -87,7 +88,7 @@ struct ServerCrashPayload {
 }
 
 #[derive(Clone, Serialize)]
-struct StartupFailure {
+struct ServerFailure {
     error: String,
     crash: Option<ServerCrashPayload>,
 }
@@ -385,8 +386,17 @@ fn server_url(state: State<'_, ServerState>) -> Option<String> {
 }
 
 #[tauri::command]
-fn server_startup_failure(state: State<'_, ServerState>) -> Option<StartupFailure> {
-    state.startup_failure.lock().ok().and_then(|g| g.clone())
+fn server_failure(state: State<'_, ServerState>) -> Option<ServerFailure> {
+    state.failure.lock().ok().and_then(|g| g.clone())
+}
+
+/// Records why the server is down, with the current generation's crash if there was one.
+fn record_failure(app: &AppHandle, error: String) {
+    let state: State<'_, ServerState> = app.state();
+    let crash = state.last_crash.lock().ok().and_then(|g| g.clone());
+    if let Ok(mut g) = state.failure.lock() {
+        *g = Some(ServerFailure { error, crash });
+    };
 }
 
 /// Hands the webview the token it must send as `X-Calcpad-Token` on every API call. Safe to
@@ -435,7 +445,11 @@ fn allow_document_dir(app: AppHandle, path: String) -> Result<(), String> {
 #[tauri::command]
 async fn restart_server(app: AppHandle) -> Result<String, String> {
     stop_sidecar(&app);
-    spawn_sidecar(&app).await.map_err(|e| e.to_string())
+    let result = spawn_sidecar(&app).await;
+    if let Err(err) = &result {
+        record_failure(&app, err.clone());
+    }
+    result
 }
 
 #[tauri::command]
@@ -648,7 +662,7 @@ fn log_dir(app: AppHandle) -> Result<String, String> {
 async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     let state: State<'_, ServerState> = app.state();
     let my_gen = state.generation.fetch_add(1, Ordering::SeqCst) + 1;
-    if let Ok(mut g) = state.startup_failure.lock() {
+    if let Ok(mut g) = state.failure.lock() {
         *g = None;
     }
     if let Ok(mut g) = state.last_crash.lock() {
@@ -1016,6 +1030,13 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
                         "sidecar exited before port ready (code {:?})",
                         exit_code
                     )));
+                } else if is_current {
+                    // Ran, then died: no spawn caller is left to record it.
+                    let reason = match exit_code {
+                        Some(code) => format!("server exited unexpectedly (exit code {code})"),
+                        None => "server exited unexpectedly".to_string(),
+                    };
+                    record_failure(&app_for_wait, reason);
                 }
             }
         });
@@ -1470,7 +1491,7 @@ pub fn run() {
         .manage(MenuState::default())
         .invoke_handler(tauri::generate_handler![
             server_url,
-            server_startup_failure,
+            server_failure,
             server_token,
             restart_server,
             stop_server,
@@ -1559,14 +1580,7 @@ pub fn run() {
                             ms = unix_millis(),
                         );
                         write_crash_report("startup", &body);
-                        let state: State<'_, ServerState> = handle_for_spawn.state();
-                        let crash = state.last_crash.lock().ok().and_then(|g| g.clone());
-                        if let Ok(mut g) = state.startup_failure.lock() {
-                            *g = Some(StartupFailure {
-                                error: err.clone(),
-                                crash,
-                            });
-                        }
+                        record_failure(&handle_for_spawn, err.clone());
                         let _ = handle_for_spawn.emit("server-startup-error", err);
                     }
                 }

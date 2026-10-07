@@ -31,8 +31,8 @@ interface ServerCrashPayload {
     tail: string;
 }
 
-/** Rust's record of a failed boot spawn, for windows that started listening too late. */
-interface StartupFailure {
+/** Rust's record of why the server is down, for windows that started listening too late. */
+interface ServerFailure {
     error: string;
     crash: ServerCrashPayload | null;
 }
@@ -48,6 +48,12 @@ export class TauriServerManager {
     private _isRunning = false;
     private _crashCount = 0;
     private _configInvalid = false;
+    private _startFailureReported = false;
+    // While a respawn is under way its own crash event is reported by the respawn's caller;
+    // handling it again started a second auto-restart chain.
+    private _autoRestartPending = false;
+    private _manualRestartInFlight = false;
+    private _lastCrashTail = '';
     private _stableTimer: ReturnType<typeof setTimeout> | null = null;
     private unlistenUrl: UnlistenFn | null = null;
     private unlistenCrash: UnlistenFn | null = null;
@@ -77,6 +83,8 @@ export class TauriServerManager {
     get isRunning(): boolean { return this._isRunning; }
     /** The last start failed on a malformed appsettings file, already reported via onConfigInvalid. */
     get isConfigInvalid(): boolean { return this._configInvalid; }
+    /** start() already logged why the server is unavailable. */
+    get startFailureReported(): boolean { return this._startFailureReported; }
     getBaseUrl(): string { return this.url; }
 
     /**
@@ -105,23 +113,26 @@ export class TauriServerManager {
         ready.catch(() => { /* observed by the race */ });
 
         let sawCrash = false;
-        let failureReported = false;
         const reportStartupFailure = async (eventError?: string): Promise<void> => {
-            let failure: StartupFailure | null = null;
+            let failure: ServerFailure | null = null;
             try {
-                failure = await invoke<StartupFailure | null>('server_startup_failure');
+                failure = await invoke<ServerFailure | null>('server_failure');
             } catch {
                 // Fall back to the event payload.
             }
             const error = failure?.error ?? eventError;
-            if (!error || failureReported) return;
-            failureReported = true;
-            // `server-crashed` fired before this window was listening.
-            if (failure?.crash && !sawCrash) this.handleCrash(failure.crash);
+            if (!error || this._startFailureReported) return;
+            this._startFailureReported = true;
+            // `server-crashed` fired before this window was listening. Only the window that owns
+            // auto-restart replays a real crash; others just need to spot a config error.
+            const crash = failure?.crash;
+            if (crash && !sawCrash && (this.autoRestartEnabled || crash.code === SERVER_CONFIG_ERROR_EXIT_CODE)) {
+                this.handleCrash(crash);
+            }
             if (this._configInvalid) {
                 this.onStatusChanged?.('stopped', 'invalid appsettings.json');
             } else {
-                this.log(`Server failed to start: ${error}`, 'error');
+                this.log(`Server unavailable: ${error}`, 'error');
                 this.onStatusChanged?.('stopped', error);
                 this.onStartupBlocked?.(error);
             }
@@ -231,6 +242,8 @@ export class TauriServerManager {
         }
         // Crash before the stability window elapsed — the streak stands.
         this.clearStabilityReset();
+        this._lastCrashTail = payload.tail || '';
+        if (this._autoRestartPending || this._manualRestartInFlight) return;
         this._crashCount++;
         this.log(`Server crashed (code=${payload.code ?? 'unknown'}) — attempt ${this._crashCount}/${MAX_AUTO_RESTARTS}`, 'error');
         void this.writeCrashRecord(payload);
@@ -238,6 +251,7 @@ export class TauriServerManager {
             this.onStatusChanged?.('stopped', 'crashed');
         } else if (this._crashCount < MAX_AUTO_RESTARTS) {
             this.onStatusChanged?.('starting', `crashed, retry ${this._crashCount}/${MAX_AUTO_RESTARTS}`);
+            this._autoRestartPending = true;
             setTimeout(() => { void this.autoRestart(); }, AUTO_RESTART_DELAY_MS);
         } else {
             this.onStatusChanged?.('stopped', 'auto-restart exhausted');
@@ -251,6 +265,7 @@ export class TauriServerManager {
         this._crashCount = 0;
         this._configInvalid = false;
         this.onStatusChanged?.('starting', 'restart');
+        this._manualRestartInFlight = true;
         try {
             const newUrl = await invoke<string>('restart_server');
             this.url = newUrl;
@@ -271,6 +286,8 @@ export class TauriServerManager {
             this.log(`restart_server invoke failed: ${msg}`, 'error');
             this.onStatusChanged?.('stopped', msg);
             throw err;
+        } finally {
+            this._manualRestartInFlight = false;
         }
     }
 
@@ -288,11 +305,13 @@ export class TauriServerManager {
             this.onUrlChanged?.(this.url);
             this.onStatusChanged?.('running', this.url);
             this.log(`Server auto-restarted at ${newUrl} (attempt ${this._crashCount}/${MAX_AUTO_RESTARTS})`);
+            this._autoRestartPending = false;
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
             this._isRunning = false;
             this.url = '';
             if (this._configInvalid) {
+                this._autoRestartPending = false;
                 this.onStatusChanged?.('stopped', 'invalid appsettings.json');
                 return;
             }
@@ -302,8 +321,10 @@ export class TauriServerManager {
                 this.onStatusChanged?.('starting', `retry ${this._crashCount}/${MAX_AUTO_RESTARTS}`);
                 setTimeout(() => { void this.autoRestart(); }, AUTO_RESTART_DELAY_MS);
             } else {
+                this._autoRestartPending = false;
                 this.onStatusChanged?.('stopped', 'auto-restart exhausted');
-                this.onCrashExhausted?.(msg);
+                // The crashed server's own output says more than the respawn error logged above.
+                this.onCrashExhausted?.(this._lastCrashTail);
             }
         }
     }

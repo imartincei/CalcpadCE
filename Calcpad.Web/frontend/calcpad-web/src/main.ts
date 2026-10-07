@@ -151,14 +151,14 @@ async function rgbaToPng(rgba: Uint8Array, width: number, height: number): Promi
 }
 
 /**
- * Native message box shown when the calculation server never becomes ready.
+ * Native message box shown when the calculation server could not start.
  * The editor itself keeps working; only server-backed features (preview,
  * linting, export) need it.
  */
 async function showServerBlockedDialog(details: string): Promise<void> {
     const { message: dialogMessage } = await import('@tauri-apps/plugin-dialog');
     const body =
-        "CalcpadCE's calculation server started but never became ready.\n\n"
+        "CalcpadCE's calculation server could not start.\n\n"
         + 'The editor still works, but preview, linting, and PDF/Word export '
         + 'need the server. Choose Server → Restart Server to try again.\n\n'
         + `Details: ${details}`;
@@ -225,19 +225,16 @@ async function bootstrap(): Promise<void> {
             pendingServerRawLogs.push({ line, stream });
         };
 
-        serverManager.onStartupBlocked = (details: string) => {
-            pendingServerLogs.push({ msg: `Server did not start — ${details}`, level: 'error' });
-            void showServerBlockedDialog(details);
-        };
-        // server-crashed is broadcast; one dialog is enough.
+        // The server is shared, so one dialog is enough; the manager already logged the reason.
         if (isPrimaryWindow) {
+            serverManager.onStartupBlocked = (details: string) => { void showServerBlockedDialog(details); };
             serverManager.onConfigInvalid = (details: string) => { void showConfigInvalidDialog(details); };
         }
 
         try {
             await serverManager.start();
         } catch (err) {
-            if (!serverManager.isConfigInvalid) {
+            if (!serverManager.startFailureReported) {
                 const msg = err instanceof Error ? (err.stack ?? err.message) : String(err);
                 pendingServerLogs.push({ msg: `[bootstrap] Server failed to start: ${msg}`, level: 'error' });
             }

@@ -30,9 +30,15 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'cargo build failed' }
 } finally { Pop-Location }
 
-# Resource dir == exe dir for a debug build, so the server publish tree sits next to the exe.
+# Resource dir == exe dir for a debug build, so the server publish tree sits next to the exe. It is
+# assembled fresh in .work\app so files from an older publish can't skew a test.
 $Binaries = Join-Path $Desktop 'src-tauri\binaries'
 if (-not (Test-Path (Join-Path $Binaries 'Calcpad.Server.exe'))) { throw "No server in $Binaries; rerun with -Stage" }
-Copy-Item -Recurse -Force -Path (Join-Path $Binaries '*') -Destination (Join-Path $Work 'tauri-target\debug')
-Copy-Item -Force (Join-Path $Work 'tauri-target\debug\appsettings.json') (Join-Path $Work 'appsettings.default.json')
-"Built $Work\tauri-target\debug\calcpad-desktop.exe"
+& (Join-Path $Here 'launch.ps1') -Stop | Out-Null
+$App = Join-Path $Work 'app'
+if (Test-Path $App) { Remove-Item -Recurse -Force $App }
+New-Item -ItemType Directory -Path $App | Out-Null
+Copy-Item -Recurse -Path (Join-Path $Binaries '*') -Destination $App
+Copy-Item (Join-Path $Work 'tauri-target\debug\calcpad-desktop.exe'), (Join-Path $Work 'tauri-target\debug\calcpad_desktop.pdb') $App
+Copy-Item -Force (Join-Path $App 'appsettings.json') (Join-Path $Work 'appsettings.default.json')
+"Built $App\calcpad-desktop.exe"

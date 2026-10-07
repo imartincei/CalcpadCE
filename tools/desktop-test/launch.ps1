@@ -7,7 +7,7 @@ param([string]$Settings, [hashtable]$Env = @{}, [int]$CdpPort = 9223, [switch]$S
 $ErrorActionPreference = 'Stop'
 $Here = $PSScriptRoot
 $Work = Join-Path $Here '.work'
-$Dbg = Join-Path $Work 'tauri-target\debug'
+$Dbg = Join-Path $Work 'app'
 $Exe = Join-Path $Dbg 'calcpad-desktop.exe'
 
 function Stop-TestApp {

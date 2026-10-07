@@ -21,6 +21,12 @@
     <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
 
+  <!-- Framework-dependent apphosts skip their own folder when looking for the runtime, so a
+       hostfxr left over from a self-contained install can't make them run as self-contained. -->
+  <PropertyGroup Condition="'$(SelfContained)' != 'true'">
+    <AppHostDotNetSearch>EnvironmentVariable;Global</AppHostDotNetSearch>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
