@@ -11,6 +11,10 @@ namespace Calcpad.Server.Services
     {
         private static readonly HttpClient _healthCheckClient = new();
 
+        /// <summary>Set to <c>1</c> by a host to run with built-in defaults instead of a broken appsettings.json.</summary>
+        internal const string IgnoreSettingsEnvVar = "CALCPAD_IGNORE_APPSETTINGS";
+        internal static bool IgnoreSettingsFiles => Environment.GetEnvironmentVariable(IgnoreSettingsEnvVar) == "1";
+
         /// <summary>
         /// Configure the web application builder with all necessary services
         /// </summary>
@@ -19,7 +23,7 @@ namespace Calcpad.Server.Services
             var builder = WebApplication.CreateBuilder(new WebApplicationOptions
             {
                 Args = args,
-                ContentRootPath = AppContext.BaseDirectory
+                ContentRootPath = ResolveContentRoot()
             });
 
             // One sink for framework and our own entries alike, so both obey MinLevel and both
@@ -249,6 +253,16 @@ namespace Calcpad.Server.Services
             {
                 return false;
             }
+        }
+
+        // appsettings*.json load from the content root, eagerly inside CreateBuilder, so
+        // pointing it at an empty directory is the only way to skip them.
+        private static string ResolveContentRoot()
+        {
+            if (!IgnoreSettingsFiles) return AppContext.BaseDirectory;
+            var empty = Path.Combine(Path.GetTempPath(), "calcpad-server-no-settings");
+            Directory.CreateDirectory(empty);
+            return empty;
         }
 
         /// <summary>

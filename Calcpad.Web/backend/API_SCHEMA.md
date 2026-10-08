@@ -1079,6 +1079,7 @@ GET /api/calcpad/snippets?category=Functions/Trigonometric
 | `CALCPAD_ENABLE_HTTPS` | `false` | Serves `https` instead of `http`. Only applies on the `CALCPAD_PORT` path |
 | `CALCPAD_API_TOKEN` | *(unset — unauthenticated)* | Per-launch token required in `X-Calcpad-Token` |
 | `CALCPAD_DETACHED` | *(unset)* | `1` disables the stdin-EOF watchdog and the default port file, so the server outlives its parent |
+| `CALCPAD_IGNORE_APPSETTINGS` | *(unset)* | `1` skips `appsettings*.json` and runs with built-in defaults. The desktop app sets this when the user ignores a malformed settings file |
 | `CALCPAD_LOG_LEVEL` | `warning` | Startup verbosity: `error`, `warning`, `information` or `verbose`. Covers ASP.NET's own logs too. Change it at runtime via [POST /log-level](#get-log-level-post-log-level); both hosts pass the user's setting here so startup entries honour it as well |
 | `CALCPAD_LOG_DIR` | *(executable-adjacent `logs/`)* | Where `CalcpadServer-{date}.log` is written. Hosts set this when the install directory is read-only |
 | `CALCPAD_HANG_THRESHOLD_SECONDS` | `60` | Seconds without a completed request before the hang watchdog writes a report |

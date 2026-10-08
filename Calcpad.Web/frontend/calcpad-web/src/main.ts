@@ -5,6 +5,7 @@ import CalcpadAppVue from 'calcpad-frontend/vue/components/CalcpadApp.vue';
 import { initMessaging } from 'calcpad-frontend/vue/services/messaging';
 import { discardMetadataDraft } from 'calcpad-frontend/vue/metadata-drafts';
 import { MessageBridge } from './services/message-bridge';
+import type { TauriServerManager } from './services/server-manager';
 import { WorkspaceStateStore, isResultMode, type ResultMode, type WorkspaceLayout } from './services/workspace-state';
 import { buildApiSettings } from 'calcpad-frontend/types/settings';
 import { ConnectionMonitor, setLogLevel, coerceLogLevel, stripCpdSnippetWrapper } from 'calcpad-frontend';
@@ -174,21 +175,35 @@ async function showServerBlockedDialog(details: string): Promise<void> {
     }
 }
 
-async function showConfigInvalidDialog(details: string): Promise<void> {
+async function showConfigInvalidDialog(details: string): Promise<'retry' | 'ignore' | null> {
     const { message: dialogMessage } = await import('@tauri-apps/plugin-dialog');
     const body =
         "CalcpadCE's calculation server could not read its settings file.\n\n"
         + `${details}\n\n`
-        + 'The editor still works, but preview, linting, and PDF/Word export '
-        + 'need the server. After fixing the file, choose Server → Restart Server.';
+        + 'Fix the file, then choose Retry to load it again. Choose Ignore to start '
+        + 'the server with default settings.';
     try {
-        await dialogMessage(body, {
+        const choice = await dialogMessage(body, {
             title: 'Invalid appsettings.json',
             kind: 'error',
-            okLabel: 'OK',
+            buttons: { ok: 'Retry', cancel: 'Ignore' },
         });
+        // Some platforms report the custom label, others the default button name.
+        return choice === 'Retry' || choice === 'Ok' ? 'retry' : 'ignore';
     } catch {
         // The Output panel carries the same message.
+        return null;
+    }
+}
+
+/** A Retry that fails the same way raises onConfigInvalid again, so this loops until resolved. */
+async function resolveConfigInvalid(manager: TauriServerManager, details: string): Promise<void> {
+    const choice = await showConfigInvalidDialog(details);
+    if (!choice) return;
+    try {
+        await manager.restart({ ignoreSettings: choice === 'ignore' });
+    } catch {
+        // restart() already logged it.
     }
 }
 
@@ -228,7 +243,8 @@ async function bootstrap(): Promise<void> {
         // The server is shared, so one dialog is enough; the manager already logged the reason.
         if (isPrimaryWindow) {
             serverManager.onStartupBlocked = (details: string) => { void showServerBlockedDialog(details); };
-            serverManager.onConfigInvalid = (details: string) => { void showConfigInvalidDialog(details); };
+            const manager = serverManager;
+            serverManager.onConfigInvalid = (details: string) => { void resolveConfigInvalid(manager, details); };
         }
 
         try {
@@ -1517,6 +1533,8 @@ async function bootstrap(): Promise<void> {
     if (serverManager && !serverManager.isRunning) {
         connectionMonitor.markStopped(serverManager.isConfigInvalid ? 'invalid appsettings.json' : 'server did not start');
     } else {
+        // A Retry/Ignore answered during boot can restart it before onUrlChanged was wired.
+        if (serverManager) activeBridge.api.setBaseUrl(serverManager.getBaseUrl());
         connectionMonitor.start();
     }
 

@@ -157,7 +157,11 @@ try
     }
 
     // A malformed appsettings.json would otherwise surface as an opaque host-builder crash.
-    if (Program.FindInvalidSettingsFile() is string settingsError)
+    if (CalcpadApiService.IgnoreSettingsFiles)
+    {
+        FileLogger.LogWarning("Ignoring appsettings files", $"{CalcpadApiService.IgnoreSettingsEnvVar}=1; using built-in defaults");
+    }
+    else if (Program.FindInvalidSettingsFile() is string settingsError)
     {
         FileLogger.LogError("Invalid configuration file", new InvalidDataException(settingsError));
         Console.Error.WriteLine($"{Program.ConfigErrorPrefix}{settingsError}");
@@ -340,7 +344,7 @@ internal static partial class Program
                 var reason = System.Text.RegularExpressions.Regex
                     .Replace(cause.Message.Split(" LineNumber:")[0], @"\s+", " ").Trim();
                 if (cause is not System.Text.Json.JsonException json)
-                    return $"{path} is not a valid settings file: {reason} Fix or delete the file, then restart.";
+                    return $"{path} is not a valid settings file: {reason}";
 
                 var where = json.LineNumber is long line
                     ? $" (line {line + 1}, column {(json.BytePositionInLine ?? 0) + 1})"
@@ -348,7 +352,7 @@ internal static partial class Program
                 var hint = reason.Contains("escapable character")
                     ? " In Windows paths use forward slashes (C:/Program Files/...) or doubled backslashes."
                     : "";
-                return $"{path} is not valid JSON{where}: {reason}{hint} Fix or delete the file, then restart.";
+                return $"{path} is not valid JSON{where}: {reason}{hint}";
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {

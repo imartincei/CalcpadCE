@@ -2,7 +2,7 @@ use std::backtrace::Backtrace;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
@@ -79,6 +79,8 @@ struct ServerState {
     // window opened later). Cleared on every spawn.
     failure: Mutex<Option<ServerFailure>>,
     last_crash: Mutex<Option<ServerCrashPayload>>,
+    // The user chose Ignore on a malformed appsettings.json; kept across auto-restarts.
+    ignore_settings: AtomicBool,
 }
 
 #[derive(Clone, Serialize)]
@@ -442,8 +444,14 @@ fn allow_document_dir(app: AppHandle, path: String) -> Result<(), String> {
         .map_err(|e| e.to_string())
 }
 
+/// `ignore_settings` left out keeps the current mode, which is what auto-restart wants.
 #[tauri::command]
-async fn restart_server(app: AppHandle) -> Result<String, String> {
+async fn restart_server(app: AppHandle, ignore_settings: Option<bool>) -> Result<String, String> {
+    if let Some(ignore) = ignore_settings {
+        app.state::<ServerState>()
+            .ignore_settings
+            .store(ignore, Ordering::SeqCst);
+    }
     stop_sidecar(&app);
     let result = spawn_sidecar(&app).await;
     if let Err(err) = &result {
@@ -730,6 +738,9 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     }
     if let Some(level) = stored_log_level(app) {
         command.env("CALCPAD_LOG_LEVEL", level);
+    }
+    if state.ignore_settings.load(Ordering::SeqCst) {
+        command.env("CALCPAD_IGNORE_APPSETTINGS", "1");
     }
     // Every /api route on the child requires this header value, passed via env rather than argv
     // (see api_token()). ASPNETCORE_ENVIRONMENT is pinned because the child inherits our whole

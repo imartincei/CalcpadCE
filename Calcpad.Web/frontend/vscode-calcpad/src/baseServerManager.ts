@@ -747,7 +747,7 @@ export class BaseServerManager {
                 const stderr = this._lastCrashOutput.join('\n');
                 if (this._lastExitCode === SERVER_CONFIG_ERROR_EXIT_CODE) {
                     const detail = extractConfigError(stderr) ?? 'appsettings.json is not valid JSON.';
-                    throw new Error(`Invalid server settings: ${detail}`);
+                    throw new Error(`Invalid server settings: ${detail} Fix the file, then click the CalcpadCE refresh button.`);
                 }
                 const logFile = this.readServerLogFile();
                 const parts: string[] = [];

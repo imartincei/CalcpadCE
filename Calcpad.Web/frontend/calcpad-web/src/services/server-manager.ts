@@ -259,21 +259,29 @@ export class TauriServerManager {
         }
     }
 
-    /** Manual force-stop then respawn via Rust (menu / refresh). Resets the crash streak. */
-    async restart(): Promise<void> {
+    /**
+     * Manual force-stop then respawn via Rust (menu / refresh). Resets the crash streak.
+     * `ignoreSettings` runs on built-in defaults instead of appsettings.json; a plain restart
+     * reads the file again.
+     */
+    async restart(options: { ignoreSettings?: boolean } = {}): Promise<void> {
+        const ignoreSettings = options.ignoreSettings ?? false;
         this.clearStabilityReset();
         this._crashCount = 0;
         this._configInvalid = false;
         this.onStatusChanged?.('starting', 'restart');
         this._manualRestartInFlight = true;
         try {
-            const newUrl = await invoke<string>('restart_server');
+            const newUrl = await invoke<string>('restart_server', { ignoreSettings });
             this.url = newUrl;
             this._isRunning = true;
             this.onUrlChanged?.(this.url);
             // The `server-url` event may not have reached JS yet, and a duplicate is a no-op.
             this.onStatusChanged?.('running', this.url);
             this.log(`Server restarted at ${newUrl}`);
+            if (ignoreSettings) {
+                this.log('appsettings.json was ignored. The server is using default settings.', 'warning');
+            }
         } catch (err) {
             this._isRunning = false;
             this.url = '';
