@@ -26,6 +26,8 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>Error code clients match on to offer the bundled-Chromium download.</summary>
         private const string BrowserNotFoundCode = "BROWSER_NOT_FOUND";
+        /// <summary>A browser exists but would not start; clients offer a retry.</summary>
+        private const string BrowserLaunchFailedCode = "BROWSER_LAUNCH_FAILED";
 
         public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService, ContentResolutionCache contentResolutionCache, IWebHostEnvironment environment)
         {
@@ -336,6 +338,17 @@ namespace Calcpad.Server.Controllers
                 FileLogger.LogVerbose("PDF generated successfully", $"Size: {pdfBytes.Length} bytes");
 
                 return File(pdfBytes, "application/pdf", "document.pdf");
+            }
+            catch (BrowserLaunchFailedException ex)
+            {
+                FileLogger.LogWarning("PDF generation blocked: browser failed to start", ex.Message);
+                return StatusCode(503, new
+                {
+                    error = "Browser failed to start",
+                    code = BrowserLaunchFailedCode,
+                    message = ex.Message,
+                    path = ex.BrowserPath
+                });
             }
             catch (BrowserUnavailableException ex)
             {

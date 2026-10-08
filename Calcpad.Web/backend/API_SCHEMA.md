@@ -278,6 +278,19 @@ expected to ask the user and then call `POST /pdf/browser/install`.
 }
 ```
 
+**503 — browser failed to start:** a browser was found but would not launch, even after the
+server retried once. Usually transient (for example, the browser is mid-update), so clients
+offer a retry rather than a download.
+
+```json
+{
+  "error": "Browser failed to start",
+  "code": "BROWSER_LAUNCH_FAILED",
+  "message": "The browser at '…' was found but failed to start (…). …",
+  "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+}
+```
+
 ---
 
 ## GET /pdf/health
@@ -1066,6 +1079,7 @@ GET /api/calcpad/snippets?category=Functions/Trigonometric
 | `CALCPAD_ENABLE_HTTPS` | `false` | Serves `https` instead of `http`. Only applies on the `CALCPAD_PORT` path |
 | `CALCPAD_API_TOKEN` | *(unset — unauthenticated)* | Per-launch token required in `X-Calcpad-Token` |
 | `CALCPAD_DETACHED` | *(unset)* | `1` disables the stdin-EOF watchdog and the default port file, so the server outlives its parent |
+| `CALCPAD_IGNORE_APPSETTINGS` | *(unset)* | `1` skips `appsettings*.json` and runs with built-in defaults. The desktop app sets this when the user ignores a malformed settings file |
 | `CALCPAD_LOG_LEVEL` | `warning` | Startup verbosity: `error`, `warning`, `information` or `verbose`. Covers ASP.NET's own logs too. Change it at runtime via [POST /log-level](#get-log-level-post-log-level); both hosts pass the user's setting here so startup entries honour it as well |
 | `CALCPAD_LOG_DIR` | *(executable-adjacent `logs/`)* | Where `CalcpadServer-{date}.log` is written. Hosts set this when the install directory is read-only |
 | `CALCPAD_HANG_THRESHOLD_SECONDS` | `60` | Seconds without a completed request before the hang watchdog writes a report |

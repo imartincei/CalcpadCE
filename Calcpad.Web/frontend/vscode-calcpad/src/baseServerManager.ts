@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as crypto from 'crypto';
 import { spawn, execSync, ChildProcess } from 'child_process';
 import type { ILogger, ServerLifecycleState, CalcpadLogLevel } from 'calcpad-frontend';
-import { decodeExitCode, buildCrashRecord, API_TOKEN_HEADER, getLogLevel } from 'calcpad-frontend';
+import { decodeExitCode, buildCrashRecord, extractConfigError, SERVER_CONFIG_ERROR_EXIT_CODE, API_TOKEN_HEADER, getLogLevel } from 'calcpad-frontend';
 
 interface LockFileContents {
     pid: number;
@@ -53,6 +53,7 @@ export class BaseServerManager {
     private _restartCount: number = 0;
     private _lastCrashOutput: string[] = [];
     private _processClosed: boolean = false;
+    private _lastExitCode: number | null = null;
     /** Set when the spawn itself failed (EACCES, EPERM, ENOENT etc.). Distinguishes
      *  "Windows blocked the exe" from "process started but crashed". */
     private _spawnFailed: boolean = false;
@@ -349,6 +350,7 @@ export class BaseServerManager {
         this._spawnFailed = false;
         this._spawnFailedCode = null;
         this._processClosed = false;
+        this._lastExitCode = null;
         this.log(`Spawned via ${useAppHost ? 'apphost' : 'dotnet'} (PID ${this.serverProcess.pid}, detached)`, 'verbose');
 
         // Rewrite the lock with the actual child PID (replacing our host-PID placeholder).
@@ -409,6 +411,7 @@ export class BaseServerManager {
         });
 
         this.serverProcess.on('exit', (code, signal) => {
+            this._lastExitCode = code;
             const decoded = decodeExitCode(code);
             this.log(`[exit] Server process exited (code=${code}${decoded ? ` ${decoded}` : ''}, signal=${signal})`);
             if (code !== null && code !== 0) {
@@ -429,7 +432,8 @@ export class BaseServerManager {
 
             // Auto-restart if not intentionally disposed and not in initial startup
             // (during startup, waitForReady will detect the exit and report the error)
-            if (!this._disposed && !this._startingUp && code !== 0) {
+            // A malformed appsettings.json fails every restart the same way.
+            if (!this._disposed && !this._startingUp && code !== 0 && code !== SERVER_CONFIG_ERROR_EXIT_CODE) {
                 this._restartCount++;
                 if (this._restartCount < BaseServerManager.MAX_RESTARTS) {
                     this.log(`Unexpected exit — attempting restart ${this._restartCount}/${BaseServerManager.MAX_RESTARTS} in 2 seconds...`);
@@ -741,6 +745,10 @@ export class BaseServerManager {
                 // server log file as fallback. stdout is intentionally excluded —
                 // it's informational and goes only to the server debug channel.
                 const stderr = this._lastCrashOutput.join('\n');
+                if (this._lastExitCode === SERVER_CONFIG_ERROR_EXIT_CODE) {
+                    const detail = extractConfigError(stderr) ?? 'appsettings.json is not valid JSON.';
+                    throw new Error(`Invalid server settings: ${detail} Fix the file, then click the CalcpadCE refresh button.`);
+                }
                 const logFile = this.readServerLogFile();
                 const parts: string[] = [];
                 if (stderr) { parts.push(`[stderr]\n${stderr}`); }

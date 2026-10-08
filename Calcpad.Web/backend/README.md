@@ -62,6 +62,7 @@ Documented in [API_SCHEMA.md](API_SCHEMA.md). Summary:
 | `CALCPAD_HOST` | `127.0.0.1` | Host part of the bind URL |
 | `CALCPAD_API_TOKEN` | *(unset — unauthenticated)* | Required in `X-Calcpad-Token` on every `/api` request when set |
 | `CALCPAD_DETACHED` | *(unset)* | `1` disables the stdin-EOF watchdog and the default port file |
+| `CALCPAD_IGNORE_APPSETTINGS` | *(unset)* | `1` skips `appsettings*.json` and runs with built-in defaults. The desktop app sets this when the user ignores a malformed settings file |
 | `CALCPAD_LOG_LEVEL` | `warning` | Startup verbosity: `error`, `warning`, `information` or `verbose`. Covers ASP.NET's own logs too. Change it at runtime via `POST /api/calcpad/log-level` |
 | `CALCPAD_LOG_DIR` | *(executable-adjacent `logs/`)* | Where `CalcpadServer-{date}.log` is written. Hosts set this when the install dir is read-only |
 | `CALCPAD_HANG_THRESHOLD_SECONDS` | `60` | How long without a completed request before the hang watchdog reports |
