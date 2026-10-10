@@ -16,6 +16,7 @@ export type {
     MacroDefinition,
     FunctionDefinition,
     VariableDefinition,
+    VariableTypeChange,
     CustomUnitDefinition,
     SymbolLocation,
     SymbolKind,
@@ -86,7 +87,7 @@ export type {
 } from './types/snippets';
 
 // --- API Client --------------------------------------------------------------
-export { CalcpadApiClient, API_TOKEN_HEADER, parseConvertErrorHeader, combineSignals } from './api/client';
+export { CalcpadApiClient, API_TOKEN_HEADER, parseConvertErrorHeader, hasConvertTrace, combineSignals } from './api/client';
 export {
     BROWSER_NOT_FOUND,
     BrowserNotFoundError,
@@ -220,6 +221,7 @@ export {
     formatMacroCompletion,
     formatFunctionCompletion,
     formatVariableCompletion,
+    getVariableTypeAt,
     formatCustomUnitCompletion,
     formatBuiltinSnippetCompletion,
 } from './text/completion-format';

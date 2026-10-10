@@ -270,30 +270,30 @@ namespace Calcpad.Highlighter.ContentResolution
         public PathRoots PathRoots { get; set; }
 
         /// <summary>
-        /// Maps macro name (case-insensitive) to its comment parameters — those used in comments,
+        /// Maps macro name to its comment parameters — those used in comments,
         /// directly or transitively. Computed after all macros are collected, with transitive
         /// closure for nested macro calls.
         /// </summary>
-        public Dictionary<string, HashSet<string>> MacroCommentParameters { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, HashSet<string>> MacroCommentParameters { get; set; } = new(System.StringComparer.Ordinal);
 
         /// <summary>
         /// Maps macro name to ordered list of parameter names.
         /// Used for matching call-site argument positions to parameter names.
         /// </summary>
-        public Dictionary<string, List<string>> MacroParameterOrder { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, List<string>> MacroParameterOrder { get; set; } = new(System.StringComparer.Ordinal);
 
         /// <summary>
         /// Maps macro name to inline body text (everything after = in #def for inline macros,
         /// or joined content lines for multiline macros).
         /// Used for argument type resolution via substitution + tokenization.
         /// </summary>
-        public Dictionary<string, string> MacroBodies { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, string> MacroBodies { get; set; } = new(System.StringComparer.Ordinal);
 
         /// <summary>
-        /// User-defined macro info for linting, built by the tokenizer during Macro mode.
-        /// Key: macro name (case-insensitive), Value: MacroInfo with param counts.
+        /// User-defined macro info for linting, from the first definition of each macro.
+        /// Key: macro name, Value: MacroInfo with param counts.
         /// </summary>
-        public Dictionary<string, MacroInfo> UserDefinedMacros { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, MacroInfo> UserDefinedMacros { get; set; } = new(System.StringComparer.Ordinal);
 
         /// <summary>
         /// SHA256 hex digest of each `#include`d file's content, keyed by its resolved absolute
@@ -370,19 +370,21 @@ namespace Calcpad.Highlighter.ContentResolution
         /// call sites from expansion tracking — mapped to original source lines with include file
         /// info. Used for go-to-definition and find-all-occurrences.
         /// </summary>
-        public Dictionary<string, List<SymbolLocation>> MacroIndex { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, List<SymbolLocation>> MacroIndex { get; set; } = new(System.StringComparer.Ordinal);
 
         /// <summary>
         /// Maps macro name to its comment parameters (parameters used in comments, directly or transitively).
-        /// Key: macro name (case-insensitive), Value: set of parameter names that are comment parameters.
+        /// Key: macro name, Value: set of parameter names that are comment parameters.
         /// </summary>
-        public Dictionary<string, HashSet<string>> MacroCommentParameters { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, HashSet<string>> MacroCommentParameters { get; set; } = new(System.StringComparer.Ordinal);
 
         /// <summary>
         /// Maps macro name to ordered list of parameter names.
         /// Used for matching call-site argument positions to parameter names.
         /// </summary>
-        public Dictionary<string, List<string>> MacroParameterOrder { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, List<string>> MacroParameterOrder { get; set; } = new(System.StringComparer.Ordinal);
+
+        internal Stage3Result ShallowCopy() => (Stage3Result)MemberwiseClone();
     }
 
     public class StagedResolvedContent
@@ -390,5 +392,8 @@ namespace Calcpad.Highlighter.ContentResolution
         public Stage1Result Stage1 { get; set; }
         public Stage2Result Stage2 { get; set; }
         public Stage3Result Stage3 { get; set; }
+
+        /// <summary>What Core executed for this content; null when no trace matched.</summary>
+        public RuntimeOverlay Runtime { get; set; }
     }
 }

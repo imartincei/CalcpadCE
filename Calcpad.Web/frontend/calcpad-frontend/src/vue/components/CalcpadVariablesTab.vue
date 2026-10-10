@@ -351,7 +351,7 @@ const getMacroTooltip = (macro: VariableItem): string => {
     lines.push(macro.description)
   }
 
-  if (macro.params && (macro.paramTypes?.length || macro.paramDescriptions?.length || macro.defaults?.length)) {
+  if (macro.params && (macro.paramTypes?.length || macro.paramDescriptions?.length)) {
     lines.push('')
     lines.push('Parameters:')
     const paramNames = macro.params.split('; ')
@@ -359,15 +359,9 @@ const getMacroTooltip = (macro: VariableItem): string => {
       const name = paramNames[i]
       const type = macro.paramTypes && i < macro.paramTypes.length ? macro.paramTypes[i] : undefined
       const desc = macro.paramDescriptions && i < macro.paramDescriptions.length ? macro.paramDescriptions[i] : undefined
-      const def = macro.defaults && i < macro.defaults.length ? macro.defaults[i] : undefined
       let paramLine = `  ${name}`
       if (type) paramLine += ` (${type})`
       if (desc) paramLine += ` - ${desc}`
-      if (def !== undefined && def !== null) {
-        paramLine += ` [default: ${def}]`
-      } else if (macro.defaults?.length) {
-        paramLine += ` [required]`
-      }
       lines.push(paramLine)
     }
   }
@@ -399,7 +393,7 @@ const getFunctionTooltip = (func: VariableItem): string => {
     lines.push(`Returns: ${func.returnType}`)
   }
 
-  if (func.params && (func.paramTypes?.length || func.paramDescriptions?.length || func.defaults?.length)) {
+  if (func.params && (func.paramTypes?.length || func.paramDescriptions?.length)) {
     lines.push('')
     lines.push('Parameters:')
     const paramNames = func.params.split('; ')
@@ -407,15 +401,9 @@ const getFunctionTooltip = (func: VariableItem): string => {
       const name = paramNames[i]
       const type = func.paramTypes && i < func.paramTypes.length ? func.paramTypes[i] : undefined
       const desc = func.paramDescriptions && i < func.paramDescriptions.length ? func.paramDescriptions[i] : undefined
-      const def = func.defaults && i < func.defaults.length ? func.defaults[i] : undefined
       let paramLine = `  ${name}`
       if (type) paramLine += ` (${type})`
       if (desc) paramLine += ` - ${desc}`
-      if (def !== undefined && def !== null) {
-        paramLine += ` [default: ${def}]`
-      } else if (func.defaults?.length) {
-        paramLine += ` [required]`
-      }
       lines.push(paramLine)
     }
   }

@@ -15,14 +15,14 @@ namespace Calcpad.Highlighter.Tokenizer
 
         // Tracks which parameters for each macro are "comment parameters" (used in comment text)
         // Key: macro name (case-insensitive), Value: set of parameter names that appear in comments
-        private readonly Dictionary<string, HashSet<string>> _macroCommentParameters = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, HashSet<string>> _macroCommentParameters = new(StringComparer.Ordinal);
 
         // Tracks ordered parameter lists per macro (for call-site argument matching)
-        private readonly Dictionary<string, List<string>> _macroParameterOrder = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, List<string>> _macroParameterOrder = new(StringComparer.Ordinal);
 
         // Stores inline macro bodies for argument type resolution via substitution + tokenization
         // Key: macro name (case-insensitive), Value: body text (everything after = in #def)
-        private readonly Dictionary<string, string> _macroBodies = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string> _macroBodies = new(StringComparer.Ordinal);
 
         // Pre-tokenized argument tokens for the current macro call (populated by look-ahead)
         // Each entry is a list of tokens for one argument, with call-site-adjusted columns
@@ -264,7 +264,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 // Use <= to include full matches (e.g., "unhide$" matches "unhide$" exactly)
                 // This ensures the longest defined macro wins over shorter suffixes
                 // (e.g., "unhide$" is preferred over "hide$" when both are defined)
-                if (macro.Length <= text.Length && text.EndsWith(macro, StringComparison.OrdinalIgnoreCase))
+                if (macro.Length <= text.Length && text.EndsWith(macro, StringComparison.Ordinal))
                 {
                     if (bestMatch == null || macro.Length > bestMatch.Length)
                         bestMatch = macro;
@@ -623,7 +623,7 @@ namespace Calcpad.Highlighter.Tokenizer
             if (args.Count == 0)
                 return;
 
-            _resolvingMacros ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            _resolvingMacros ??= new HashSet<string>(StringComparer.Ordinal);
             _resolvingMacros.Add(macroName);
             try
             {
@@ -829,18 +829,6 @@ namespace Calcpad.Highlighter.Tokenizer
                         _macroParameterOrder[_pendingMacroDefName] = new List<string>(_macroParameters);
                     }
                     _pendingMacroDefName = null;
-                }
-
-                // In Macro mode, capture the inline content before tokenizing the rest
-                if (_mode == TokenizerMode.Macro && _macroCurrName != null)
-                {
-                    _macroCurrInlineContent = afterEquals;
-                    _macroCurrIsInline = true;
-                    var paramNames = ExtractMacroParams(_state.Text.Span);
-                    _macroCurrParams = paramNames;
-                    // Ensure _macroParameterOrder reflects the ordered param names
-                    if (!_macroParameterOrder.ContainsKey(_macroCurrName))
-                        _macroParameterOrder[_macroCurrName] = paramNames;
                 }
 
                 // Return false to let the main loop tokenize the body normally,

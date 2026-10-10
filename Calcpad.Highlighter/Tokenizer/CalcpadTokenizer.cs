@@ -118,8 +118,6 @@ namespace Calcpad.Highlighter.Tokenizer
 
             if (_mode == TokenizerMode.Lint)
                 InitLintState();
-            if (_mode == TokenizerMode.Macro)
-                InitMacroCollectionState();
 
             int lineNum = 0;
             var parseModes = new ParseModeTracker();
@@ -132,7 +130,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 if (parseModes.Mode != ParseMode.Cpd)
                 {
                     _result.LineModes[lineNum] = parseModes.Mode;
-                    if (_mode != TokenizerMode.Macro && !inMacroBody && !ParseModeTracker.IsDirective(trimmed, parseModes.Mode))
+                    if (!inMacroBody && !ParseModeTracker.IsDirective(trimmed, parseModes.Mode))
                     {
                         _result.RawLines.Add(lineNum);
                         AddRawLineMacroTokens(lineMemory.Span, lineNum++);
@@ -485,10 +483,6 @@ namespace Calcpad.Highlighter.Tokenizer
             // In Lint mode, finalize any pending definition at end of line
             if (_mode == TokenizerMode.Lint)
                 FinalizeLineLint();
-
-            // In Macro mode, finalize any pending macro definition at end of line
-            if (_mode == TokenizerMode.Macro)
-                FinalizeLineMacroCollection();
 
             // For multiline macro definitions: if we saw #def macro$(...) but no = on this line,
             // enter macro definition mode for subsequent lines

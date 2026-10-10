@@ -21,17 +21,19 @@ namespace Calcpad.Server.Controllers
         private readonly CalcpadService _calcpadService;
         private readonly PdfGeneratorService _pdfService;
         private readonly ContentResolutionCache _contentResolutionCache;
+        private readonly RuntimeTraceCache _runtimeTraceCache;
         private readonly IWebHostEnvironment _environment;
         private static readonly LintIgnoreRegionParser _lintIgnoreRegionParser = new();
 
         /// <summary>Error code clients match on to offer the bundled-Chromium download.</summary>
         private const string BrowserNotFoundCode = "BROWSER_NOT_FOUND";
 
-        public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService, ContentResolutionCache contentResolutionCache, IWebHostEnvironment environment)
+        public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService, ContentResolutionCache contentResolutionCache, RuntimeTraceCache runtimeTraceCache, IWebHostEnvironment environment)
         {
             _calcpadService = calcpadService;
             _pdfService = pdfService;
             _contentResolutionCache = contentResolutionCache;
+            _runtimeTraceCache = runtimeTraceCache;
             _environment = environment;
         }
 
@@ -53,7 +55,7 @@ namespace Calcpad.Server.Controllers
                 }
 
                 var forceUnwrapped = unwrap || request.ForceUnwrappedCode;
-                var (htmlResult, _, errors) = _calcpadService.Convert(
+                var (htmlResult, _, errors, trace) = _calcpadService.Convert(
                     request.Content, request.Settings, forceUnwrapped, request.Theme, request.SourceFilePath,
                     request.ForPrint, captureOpenXml: false, request.EnableUi, request.UiOverrides,
                     debug: request.IncludeLineAnchors, hideErrorLines: request.HideErrorLines,
@@ -69,6 +71,12 @@ namespace Calcpad.Server.Controllers
                     Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
                 });
                 Response.Headers["X-Calcpad-Errors"] = Uri.EscapeDataString(errorsJson);
+                // Tells the client lint and definitions can now use what this run executed.
+                if (trace != null)
+                {
+                    _runtimeTraceCache.Store(request.SourceFilePath, request.Content, trace);
+                    Response.Headers["X-Calcpad-Trace"] = "1";
+                }
                 return Content(htmlResult, "text/html");
             }
             catch (OperationCanceledException)
@@ -418,7 +426,7 @@ namespace Calcpad.Server.Controllers
                 // never a navigable preview, so line anchors are always off - but ForPrint
                 // and UiOverrides come from the request, so the caller chooses between a
                 // report (#pre hidden, entered #UI values applied) and the preview layout.
-                var (html, openXmlExpressions, _) = _calcpadService.Convert(
+                var (html, openXmlExpressions, _, _) = _calcpadService.Convert(
                     request.Content, request.Settings, request.ForceUnwrappedCode, request.Theme, request.SourceFilePath,
                     forPrint: request.ForPrint, captureOpenXml: true, enableUi: false, uiOverrides: request.UiOverrides,
                     debug: false, write: request.Write, cancellationToken: cancellationToken);
@@ -604,13 +612,19 @@ namespace Calcpad.Server.Controllers
                     Variables = staged.Stage3.VariablesWithDefinitions.Select(v =>
                     {
                         var varInfo = typeTracker.Variables.GetValueOrDefault(v.Name);
+                        // The first definition Core executed, which may not be the first written.
+                        var executed = staged.Runtime?.GetFirstDefinition(v.Name);
+                        var isLocal = (v.Source ?? "local") == "local";
                         return new VariableDefinitionDto
                         {
                             Name = v.Name,
-                            Expression = v.Definition,
+                            Expression = executed?.FirstExpression ?? v.Definition,
                             Type = varInfo?.Type.ToString() ?? "Unknown",
                             TypeId = (int)(varInfo?.Type ?? CalcpadType.Unknown),
-                            LineNumber = v.LineNumber,
+                            TypeChanges = staged.Runtime?.GetTypeChanges(v.Name)?
+                                .Select(c => new VariableTypeChangeDto { Line = c.Line, Type = c.Type.ToString() })
+                                .ToList(),
+                            LineNumber = executed != null && isLocal ? executed.FirstLine - 1 : v.LineNumber,
                             Source = v.Source ?? "local",
                             SourceFile = v.SourceFile,
                             Description = v.Description
@@ -1267,6 +1281,12 @@ namespace Calcpad.Server.Controllers
         /// </summary>
         public int TypeId { get; set; }
 
+        /// <summary>
+        /// Where each new type starts, when a run changed the variable's type (Type is then Various).
+        /// Null otherwise.
+        /// </summary>
+        public List<VariableTypeChangeDto>? TypeChanges { get; set; }
+
         /// <summary>Zero-based line number where the variable is first defined</summary>
         public int LineNumber { get; set; }
 
@@ -1278,6 +1298,15 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>User-provided description from a metadata comment</summary>
         public string? Description { get; set; }
+    }
+
+    public class VariableTypeChangeDto
+    {
+        /// <summary>Zero-based line of the assignment that gave the variable this type</summary>
+        public int Line { get; set; }
+
+        /// <summary>Value, Vector or Matrix</summary>
+        public string Type { get; set; } = "Unknown";
     }
 
     public class CustomUnitDefinitionDto

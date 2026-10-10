@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Calcpad.Core;
 using Calcpad.Highlighter.ContentResolution;
 using Calcpad.Highlighter.Linter.Constants;
 using Calcpad.Highlighter.Linter.Helpers;
@@ -215,9 +216,14 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 // the check runs from the expression onwards. Captured before Apply so the
                 // condition of '#noc x ≡ 5' is still checked, since the parser evaluates it even
                 // though the block it opens is not.
-                var wasNoCalculation = directives.Output == OutputMode.NoCalculation;
+                var isDirective = LineParser.IsDirectiveLine(trimmed);
+                // A directive line keeps the static state, so its own condition is still checked.
+                var traced = isDirective ? null : stage3.Runtime?.GetOutputMode(i);
+                var wasNoCalculation = traced is { } mode
+                    ? mode == TraceOutputMode.NoCalculation
+                    : directives.Output == OutputMode.NoCalculation;
                 var expressionStart = 0;
-                if (LineParser.IsDirectiveLine(trimmed))
+                if (isDirective)
                 {
                     directives.Apply(trimmed);
                     expressionStart = LineParser.GetDirectiveExpressionStart(line);
@@ -311,7 +317,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                             // tokenization, but element access is still plausible.
                             if (stage3.DefinedVariables.Contains(beforeDot) && stage3.TypeTracker != null)
                             {
-                                var varInfo = stage3.TypeTracker.GetVariableInfo(beforeDot);
+                                var varInfo = stage3.TypeTracker.GetVariableInfoAt(beforeDot, i);
                                 if (varInfo == null || varInfo.SupportsElementAccess)
                                     continue;
                             }
@@ -323,9 +329,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     }
 
                     // If using element access, validate that the variable supports it
-                    if (isElementAccess && stage3.TypeTracker != null)
+                    if (isElementAccess && stage3.TypeTracker != null && !stage3.IsNotExecuted(i))
                     {
-                        var varInfo = stage3.TypeTracker.GetVariableInfo(baseName);
+                        var varInfo = stage3.TypeTracker.GetVariableInfoAt(baseName, i);
                         if (varInfo != null && !varInfo.SupportsElementAccess)
                         {
                             result.AddWarning(i, token.Column, token.Column + token.Length, "CPD-3306",

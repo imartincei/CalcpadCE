@@ -18,16 +18,6 @@ namespace Calcpad.Highlighter.Linter.Helpers
     }
 
     /// <summary>
-    /// Scope mode set by the #local / #global directives. A #local section is excluded when the
-    /// file is pulled in through #include (mirrors Core's CalcpadReader.Include filtering).
-    /// </summary>
-    public enum ScopeMode
-    {
-        Global,
-        Local
-    }
-
-    /// <summary>
     /// Visibility mode set by the #show / #hide / #pre / #post directives (mirrors
     /// ExpressionParser's _isVisible, driven by ForPrint for #pre/#post).
     /// </summary>
@@ -43,7 +33,6 @@ namespace Calcpad.Highlighter.Linter.Helpers
     /// Tracks the running state of Calcpad's mode directives as lines are visited in order, where
     /// within each category the most recent directive wins (see ExpressionParser.ParseKeyword):
     ///   - output value:  #equ / #val / #noc (and #end equ / #end val / #end noc)
-    ///   - scope:          #global / #local
     ///   - markdown:       #md [on] / #md off
     ///   - substitution:   #varsub / #nosub / #novar (and #end varsub / #end nosub / #end novar)
     ///   - angle:          #rad / #deg / #gra
@@ -62,7 +51,6 @@ namespace Calcpad.Highlighter.Linter.Helpers
 
         public OutputMode Output { get; private set; } = OutputMode.Equations;
         public VisibilityMode Visibility { get; private set; } = VisibilityMode.Shown;
-        public ScopeMode Scope { get; private set; } = ScopeMode.Global;
         public bool IsMarkdownOn { get; private set; }
         public ParseMode ParseMode => _parseModes.Mode;
 
@@ -115,10 +103,6 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 _visibilityStack.Push(Visibility);
                 Visibility = VisibilityMode.PrintOnly;
             }
-            else if (Matches(trimmedLine, "#global"))
-                Scope = ScopeMode.Global;
-            else if (Matches(trimmedLine, "#local"))
-                Scope = ScopeMode.Local;
             else if (Matches(trimmedLine, "#md"))
                 ApplyMarkdown(trimmedLine);
         }

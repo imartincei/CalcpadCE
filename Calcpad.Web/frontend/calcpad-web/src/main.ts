@@ -689,6 +689,10 @@ async function bootstrap(): Promise<void> {
         pendingPreviewScrollLine.delete(group.id);
 
         if (result && !(result instanceof ArrayBuffer)) {
+            if (result.traceUpdated) {
+                void refreshDefinitionsFor(group);
+                void group.diagnostics?.refresh();
+            }
             // Before the image inlining and the injection passes each copy it. Showing a
             // render costs several times its own size, so the check that can hold the line
             // is the one in front of all of them.

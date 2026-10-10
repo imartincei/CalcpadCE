@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Calcpad.Highlighter.Linter.Helpers;
 using Calcpad.Highlighter.Linter.Models;
 using Calcpad.Highlighter.Parsing;
@@ -16,98 +14,37 @@ namespace Calcpad.Highlighter.ContentResolution
     public partial class ContentResolver
     {
         /// <summary>
-        /// STAGE 3: Expand macros, collect all definitions
-        /// Removes macro definitions and substitutes macro calls with their expanded content
+        /// STAGE 3: Lines as MacroParser emitted them (definitions removed, macros expanded),
+        /// then definition collection.
         /// </summary>
-        private Stage3Result ProcessStage3(Stage2Result stage2, Stage1Result stage1)
+        private Stage3Result ProcessStage3(Stage2Result stage2, Stage1Result stage1, List<OutputLine> outputs)
         {
-            var lines = new List<string>();
-            var sourceMap = new Dictionary<int, int>();
+            var lines = new List<string>(outputs.Count);
+            var sourceMap = new Dictionary<int, int>(outputs.Count);
             var macroExpansions = new Dictionary<int, MacroExpansionInfo>();
-
-            // Build macro map from stage2 definitions (skip duplicates, use first definition)
-            var macros = new Dictionary<string, (List<string> Params, List<string> Content)>(StringComparer.OrdinalIgnoreCase);
-            foreach (var macroDef in stage2.MacroDefinitions)
+            List<string> expandedNames = null;
+            IReadOnlyList<string> expandedFrom = null;
+            foreach (var output in outputs)
             {
-                if (!macros.ContainsKey(macroDef.Name))
-                {
-                    macros[macroDef.Name] = (macroDef.Params, macroDef.Content);
-                }
-            }
-
-            // Pre-sort macros by name length descending so longer names match first
-            // (e.g. "string$" before "ng$" in "gstring$"). Done once here instead of
-            // per ExpandMacros call.
-            var sortedMacros = macros
-                .OrderByDescending(m => m.Key.Length)
-                .Select(m => (Name: m.Key, m.Value.Params, m.Value.Content))
-                .ToList();
-
-            // Process lines: skip macro definitions, expand macro calls
-            bool inMultilineMacro = false;
-
-            for (int i = 0; i < stage2.Lines.Count; i++)
-            {
-                var line = stage2.Lines[i];
-                var trimmedSpan = line.AsSpan().Trim();
-
-                // Check for multiline macro end
-                if (inMultilineMacro)
-                {
-                    if (trimmedSpan.Equals("#end def", StringComparison.OrdinalIgnoreCase))
-                    {
-                        inMultilineMacro = false;
-                    }
-                    // Skip all lines inside macro definition
+                var i = lines.Count;
+                lines.Add(output.Text);
+                sourceMap[i] = output.Stage2Line;
+                if (output.ExpandedMacros is null)
                     continue;
-                }
 
-                // Check for macro definition start (char-based, no regex)
-                if (trimmedSpan.StartsWith("#def ", StringComparison.OrdinalIgnoreCase))
+                if (!ReferenceEquals(output.ExpandedMacros, expandedFrom))
                 {
-                    if (HasEqualsOutsideParens(trimmedSpan, 5))
-                    {
-                        // Inline macro (#def name$(params) = content) - skip this single line
-                        continue;
-                    }
-
-                    // Multiline macro start (#def name$(params)) - skip until #end def
-                    inMultilineMacro = true;
-                    continue;
+                    expandedFrom = output.ExpandedMacros;
+                    expandedNames = [.. expandedFrom];
                 }
-
-                // Regular line - expand macro calls, tracking which macros were expanded
-                var originalLine = line;
-                var expandedMacroNames = new List<string>();
-                var expandedLine = ExpandMacros(line, sortedMacros, expandedMacroNames);
-                var isFromMacroExpansion = expandedLine != originalLine;
-
-                // Handle multiline expansions (macro content can have multiple lines).
-                // Macro content is built by JoinLines with '\n' only and macro body lines
-                // never carry '\r' (the tokenizer's per-line slicing strips line endings),
-                // so LineEnumerator's full \r\n/\r/\n handling yields identical segments
-                // to Split('\n') here — without the string[] allocation.
-                var expandedSpan = expandedLine.AsSpan();
-                int totalContentLines = expandedSpan.Count('\n') + 1;
-
-                int subIdx = 0;
-                foreach (var lineSpan in new LineEnumerator(expandedSpan))
+                macroExpansions[i] = new MacroExpansionInfo
                 {
-                    lines.Add(lineSpan.ToString());
-                    sourceMap[lines.Count - 1] = i;
-                    if (isFromMacroExpansion)
-                    {
-                        macroExpansions[lines.Count - 1] = new MacroExpansionInfo
-                        {
-                            MacroNames = expandedMacroNames,
-                            CallSiteLine = originalLine,
-                            CallSiteStage2Line = i,
-                            ContentLineIndex = subIdx,
-                            TotalContentLines = totalContentLines
-                        };
-                    }
-                    subIdx++;
-                }
+                    MacroNames = expandedNames,
+                    CallSiteLine = stage2.Lines[output.Stage2Line],
+                    CallSiteStage2Line = output.Stage2Line,
+                    ContentLineIndex = output.ContentIndex,
+                    TotalContentLines = output.ContentCount
+                };
             }
 
             // Build new includeMap for the filtered lines
@@ -152,7 +89,7 @@ namespace Calcpad.Highlighter.ContentResolution
             }
 
             var userDefinedMacros = stage2.UserDefinedMacros
-                ?? new Dictionary<string, MacroInfo>(StringComparer.OrdinalIgnoreCase);
+                ?? new Dictionary<string, MacroInfo>(StringComparer.Ordinal);
             var customUnits = tokenizerResult.CustomUnitDefinitions;
             var commandBlockFunctions = tokenizerResult.CommandBlockFunctions;
 
@@ -696,7 +633,7 @@ namespace Calcpad.Highlighter.ContentResolution
             Dictionary<int, SourceInfo> stage2IncludeMap,
             Dictionary<int, List<LineContinuationSegment>> lineContinuationSegments)
         {
-            var index = new Dictionary<string, List<SymbolLocation>>(StringComparer.OrdinalIgnoreCase);
+            var index = new Dictionary<string, List<SymbolLocation>>(StringComparer.Ordinal);
 
             if (macroDefinitions.Count == 0)
                 return index;
@@ -758,8 +695,7 @@ namespace Calcpad.Highlighter.ContentResolution
 
             // Add call sites from macro expansion tracking
             // Each unique (macroName, callSiteStage2Line) pair represents one call site
-            var seenCallSites = new HashSet<(string Name, int Stage2Line)>(
-                new CallSiteComparer());
+            var seenCallSites = new HashSet<(string Name, int Stage2Line)>();
 
             foreach (var kvp in macroExpansions)
             {
@@ -816,7 +752,7 @@ namespace Calcpad.Highlighter.ContentResolution
             // Add macro calls found inside macro definition bodies: multiline bodies (between
             // #def and #end def) are skipped in Stage 3, so the expansion-based tracking above
             // never sees their references. Inline macro content (after '=') is also scanned.
-            var allMacroNameSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var allMacroNameSet = new HashSet<string>(StringComparer.Ordinal);
             foreach (var md in macroDefinitions)
                 allMacroNameSet.Add(md.Name);
 
@@ -944,7 +880,7 @@ namespace Calcpad.Highlighter.ContentResolution
             int from = 0;
             while (from <= line.Length - macroName.Length)
             {
-                int idx = line.IndexOf(macroName, from, StringComparison.OrdinalIgnoreCase);
+                int idx = line.IndexOf(macroName, from, StringComparison.Ordinal);
                 if (idx < 0) return -1;
                 if (idx == 0 || !CalcpadCharacterHelpers.IsMacroLetter(line[idx - 1], 1))
                     return idx;
@@ -984,218 +920,6 @@ namespace Calcpad.Highlighter.ContentResolution
             return (originalLine, column);
         }
 
-        /// <summary>Comparer for deduplicating macro call sites by name and stage2 line.</summary>
-        private class CallSiteComparer : IEqualityComparer<(string Name, int Stage2Line)>
-        {
-            public bool Equals((string Name, int Stage2Line) x, (string Name, int Stage2Line) y)
-                => string.Equals(x.Name, y.Name, StringComparison.OrdinalIgnoreCase) && x.Stage2Line == y.Stage2Line;
-
-            public int GetHashCode((string Name, int Stage2Line) obj)
-                => StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Name) ^ obj.Stage2Line.GetHashCode();
-        }
-
-        /// <summary>
-        /// Expands macros in a line, matching the longest name first as Calcpad.Core's MacroParser
-        /// does — with macros "string$" and "ng$", "gstring$" expands "string$". Optionally tracks
-        /// which macros were expanded for source mapping.
-        /// </summary>
-        private string ExpandMacros(string line, List<(string Name, List<string> Params, List<string> Content)> sortedMacros, List<string> expandedMacroNames = null, HashSet<string> currentlyExpanding = null)
-        {
-            if (sortedMacros.Count == 0 || !line.AsSpan().Contains('$'))
-                return line;
-
-            var result = new System.Text.StringBuilder(line.Length * 2);
-            var textBuffer = new System.Text.StringBuilder();
-            int i = 0;
-
-            while (i < line.Length)
-            {
-                var c = line[i];
-
-                // When we hit a $, check if the accumulated text ends with a macro name
-                if (c == '$')
-                {
-                    textBuffer.Append(c);
-
-                    // Try to find the longest matching macro name that ends at this position
-                    // Compare StringBuilder chars directly to avoid textBuffer.ToString() allocation
-                    (string Name, List<string> Params, List<string> Content)? matchedMacro = null;
-                    int macroStartInBuffer = -1;
-
-                    foreach (var entry in sortedMacros)
-                    {
-                        var name = entry.Name;
-                        // Skip macros currently being expanded on the call stack to break
-                        // self-referential (#def a$ = a$) and mutual (a$↔b$) cycles.
-                        if (currentlyExpanding != null && currentlyExpanding.Contains(name))
-                            continue;
-                        if (textBuffer.Length >= name.Length &&
-                            StringBuilderEndsWith(textBuffer, name))
-                        {
-                            matchedMacro = entry;
-                            macroStartInBuffer = textBuffer.Length - name.Length;
-                            break; // First match is the longest due to sorted order
-                        }
-                    }
-
-                    if (matchedMacro.HasValue)
-                    {
-                        var macro = matchedMacro.Value;
-                        var macroName = macro.Name;
-
-                        // Output text before the macro name
-                        if (macroStartInBuffer > 0)
-                        {
-                            result.Append(textBuffer.ToString(0, macroStartInBuffer));
-                        }
-                        textBuffer.Clear();
-
-                        // Check for arguments after the macro name
-                        int pos = i + 1;
-
-                        // Skip whitespace
-                        ParsingHelpers.SkipWhitespace(line, ref pos);
-
-                        List<string> argList;
-                        int replacementEnd;
-
-                        // Check for opening parenthesis (macro with arguments)
-                        if (pos < line.Length && line[pos] == '(')
-                        {
-                            var argsStart = pos + 1;
-                            var closePos = ParsingHelpers.FindMatchingClose(line, pos, '(', ')');
-
-                            if (closePos >= 0)
-                            {
-                                var argsStr = line.Substring(argsStart, closePos - argsStart);
-                                // Use ParseMacroParameters for macro calls - only parentheses count for nesting
-                                argList = ParameterParser.ParseMacroParameters(argsStr);
-                                replacementEnd = closePos + 1;
-                            }
-                            else
-                            {
-                                // Unbalanced parens - output as-is and continue
-                                result.Append(macroName);
-                                i++;
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            // No parenthesis - macro with no arguments
-                            argList = new List<string>();
-                            replacementEnd = i + 1;
-                        }
-
-                        // Resolve positional arguments against macro params
-                        var resolvedArgs = ResolveMacroArgs(macro.Params, argList);
-                        if (resolvedArgs != null)
-                        {
-                            expandedMacroNames?.Add(macroName);
-                            string macroContent;
-
-                            // Substitute parameters - sort by length descending to handle nested
-                            // param names (e.g. "ab" before "a"). Use a single StringBuilder so
-                            // chained Replace calls don't allocate a new string per parameter.
-                            if (macro.Params.Count > 0)
-                            {
-                                var sortedParams = macro.Params
-                                    .Select((p, idx) => (Param: p, Arg: resolvedArgs[idx]))
-                                    .OrderByDescending(x => x.Param.Length)
-                                    .ToList();
-
-                                var contentBuilder = new System.Text.StringBuilder();
-                                AppendJoinedLines(contentBuilder, macro.Content);
-                                foreach (var (param, arg) in sortedParams)
-                                {
-                                    contentBuilder.Replace(param, arg);
-                                }
-                                macroContent = contentBuilder.ToString();
-                            }
-                            else
-                            {
-                                macroContent = JoinLines(macro.Content);
-                            }
-
-                            // Recursively expand any macros in the result (nested expansions also tracked).
-                            // Track this macro in the cycle set so any recursive reference to itself
-                            // (direct or transitive) is matched against the guard above.
-                            currentlyExpanding ??= new HashSet<string>(StringComparer.Ordinal);
-                            currentlyExpanding.Add(macroName);
-                            try
-                            {
-                                macroContent = ExpandMacros(macroContent, sortedMacros, expandedMacroNames, currentlyExpanding);
-                            }
-                            finally
-                            {
-                                currentlyExpanding.Remove(macroName);
-                            }
-
-                            result.Append(macroContent);
-                            i = replacementEnd;
-                        }
-                        else
-                        {
-                            // Parameter count mismatch - preserve full call text so linter can report accurate diagnostics
-                            result.Append(macroName);
-                            result.Append(line, i + 1, replacementEnd - (i + 1));
-                            i = replacementEnd;
-                        }
-                    }
-                    else
-                    {
-                        // No macro matched, continue accumulating
-                        i++;
-                    }
-                }
-                else if (CalcpadCharacterHelpers.IsMacroLetter(c, textBuffer.Length))
-                {
-                    // Accumulate potential macro name characters
-                    textBuffer.Append(c);
-                    i++;
-                }
-                else
-                {
-                    // Non-macro character - flush buffer and output character
-                    if (textBuffer.Length > 0)
-                    {
-                        result.Append(textBuffer);
-                        textBuffer.Clear();
-                    }
-                    result.Append(c);
-                    i++;
-                }
-            }
-
-            // Flush any remaining buffer
-            if (textBuffer.Length > 0)
-            {
-                result.Append(textBuffer);
-            }
-
-            return result.ToString();
-        }
-
-        /// <summary>
-        /// Resolves positional arguments against macro parameters.
-        /// Returns a resolved argument array parallel to params, or null if the call is invalid.
-        /// </summary>
-        private static List<string> ResolveMacroArgs(List<string> paramNames, List<string> argList)
-        {
-            if (paramNames == null || paramNames.Count == 0)
-                return argList.Count == 0 ? new List<string>() : null;
-
-            // Treat a single empty-string arg as "no args" — corresponds to macro$()
-            var effectiveArgs = (argList.Count == 1 && argList[0].Trim().Length == 0)
-                ? new List<string>()
-                : argList;
-
-            if (effectiveArgs.Count != paramNames.Count)
-                return null;
-
-            return new List<string>(effectiveArgs);
-        }
-
         /// <summary>
         /// Checks if a #def line has an '=' at parenthesis depth 0, indicating an inline macro definition.
         /// Scans from startPos (after "#def ") to avoid false positives from '=' inside parentheses.
@@ -1211,23 +935,6 @@ namespace Calcpad.Highlighter.ContentResolution
                 else if (c == '=' && depth == 0) return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Checks if a StringBuilder ends with the given string (case-insensitive).
-        /// Avoids textBuffer.ToString() allocation in the ExpandMacros hot loop.
-        /// </summary>
-        private static bool StringBuilderEndsWith(StringBuilder sb, string value)
-        {
-            var len = value.Length;
-            if (sb.Length < len) return false;
-            var offset = sb.Length - len;
-            for (int i = 0; i < len; i++)
-            {
-                if (char.ToUpperInvariant(sb[offset + i]) != char.ToUpperInvariant(value[i]))
-                    return false;
-            }
-            return true;
         }
     }
 }

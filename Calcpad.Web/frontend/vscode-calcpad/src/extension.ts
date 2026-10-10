@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { pdfResponseError, isBrowserNotFound, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt} from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, hasConvertTrace, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt} from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -235,6 +235,8 @@ let extensionContext: vscode.ExtensionContext;
 let vueUiProvider: CalcpadVueUIProvider | undefined;
 // Set in activate(); the module-level export commands need it outside that scope.
 let sharedApiClient: CalcpadApiClient | undefined;
+// Set in activate(); reruns lint and definitions once a preview has recorded a runtime trace.
+let refreshDocumentAnalysis: ((document: vscode.TextDocument) => void) | undefined;
 
 const NO_SERVER_MESSAGE = 'No CalcpadCE server available — the bundled server did not start '
     + 'and no remote server URL is configured.';
@@ -942,6 +944,10 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         outputChannel.appendLine('API call successful', 'verbose');
 
         vueUiProvider?.updateConvertErrors(parseConvertErrorHeader(response));
+        if (hasConvertTrace(response)) {
+            const document = vscode.workspace.textDocuments.find(d => d.uri.toString() === sourceFileUri.toString());
+            if (document) refreshDocumentAnalysis?.(document);
+        }
 
         // Use the entire API response as the webview HTML
         const apiResponse = await response.text();
@@ -2028,11 +2034,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // Unified document processing function
     let isProcessingDocument = false;
+    // A request made mid-run is replayed after it rather than dropped.
+    let pendingDocument: vscode.TextDocument | undefined;
     async function processDocument(document: vscode.TextDocument) {
         if (document.languageId !== 'calcpad' && document.languageId !== 'plaintext') {
             return;
         }
-        if (isProcessingDocument) return;
+        if (isProcessingDocument) {
+            pendingDocument = document;
+            return;
+        }
 
         isProcessingDocument = true;
         try {
@@ -2040,7 +2051,11 @@ export async function activate(context: vscode.ExtensionContext) {
         } finally {
             isProcessingDocument = false;
         }
+        const next = pendingDocument;
+        pendingDocument = undefined;
+        if (next) await processDocument(next);
     }
+    refreshDocumentAnalysis = document => void processDocument(document);
 
     async function _doProcessDocument(document: vscode.TextDocument) {
         outputChannel.appendLine('[processDocument] Processing document: ' + document.uri.fsPath, 'verbose');
@@ -2066,8 +2081,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     sourceFile: m.sourceFile,
                     description: m.description,
                     paramTypes: m.paramTypes,
-                    paramDescriptions: m.paramDescriptions,
-                    defaults: m.defaults
+                    paramDescriptions: m.paramDescriptions
                 })),
                 variables: definitions.variables.map(v => ({
                     name: v.name,
@@ -2088,8 +2102,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     sourceFile: f.sourceFile,
                     description: f.description,
                     paramTypes: f.paramTypes,
-                    paramDescriptions: f.paramDescriptions,
-                    defaults: f.defaults
+                    paramDescriptions: f.paramDescriptions
                 })),
                 customUnits: definitions.customUnits.map(u => ({
                     name: u.name,

@@ -366,7 +366,7 @@ export class CalcpadApiClient {
                     return response.arrayBuffer();
                 }
                 const html = await response.text();
-                return { html, errors: parseConvertErrorHeader(response) };
+                return { html, errors: parseConvertErrorHeader(response), traceUpdated: hasConvertTrace(response) };
             } catch (error) {
                 this.logError('Convert', error);
                 return null;
@@ -436,7 +436,7 @@ export class CalcpadApiClient {
                 });
                 if (!response.ok) return null;
                 const html = await response.text();
-                return { html, errors: parseConvertErrorHeader(response) };
+                return { html, errors: parseConvertErrorHeader(response), traceUpdated: hasConvertTrace(response) };
             } catch (error) {
                 this.logError('ConvertUnwrapped', error);
                 return null;
@@ -534,6 +534,10 @@ export class CalcpadApiClient {
             this.logger.appendLine(`[${tag}] Error: ${error instanceof Error ? error.message : String(error)}`, 'warning');
         }
     }
+}
+
+export function hasConvertTrace(response: Response): boolean {
+    return response.headers.get('X-Calcpad-Trace') === '1';
 }
 
 export function parseConvertErrorHeader(response: Response): CalcpadError[] {

@@ -60,7 +60,6 @@ export function buildParameterizedDoc(
     paramTypes: string[] | undefined,
     paramDescriptions: string[] | undefined,
     sourceFile: string | undefined,
-    defaults: (string | null)[] | undefined,
 ): string {
     let doc = `**${heading}**`;
     if (sourceFile) doc += `\n\nSource: \`${sourceFile}\``;
@@ -69,23 +68,16 @@ export function buildParameterizedDoc(
     if (params && params.length > 0) {
         const hasTypes = !!paramTypes && paramTypes.length > 0;
         const hasDescs = !!paramDescriptions && paramDescriptions.length > 0;
-        const hasDefaults = !!defaults && defaults.length > 0;
 
-        if (hasTypes || hasDescs || hasDefaults) {
+        if (hasTypes || hasDescs) {
             doc += '\n\n**Parameters:**';
             for (let i = 0; i < params.length; i++) {
                 const name = params[i];
                 const type = hasTypes && i < paramTypes!.length ? paramTypes![i] : undefined;
                 const desc = hasDescs && i < paramDescriptions!.length ? paramDescriptions![i] : undefined;
-                const def = hasDefaults && i < defaults!.length ? defaults![i] : undefined;
                 let line = `\n- \`${name}\``;
                 if (type) line += ` *(${type})*`;
                 if (desc) line += ` — ${desc}`;
-                if (def !== undefined && def !== null) {
-                    line += ` *(default: ${def})*`;
-                } else if (hasDefaults) {
-                    line += ` *(required)*`;
-                }
                 doc += line;
             }
         } else {
@@ -115,7 +107,7 @@ export function formatMacroCompletion(macro: MacroDefinition): CompletionData {
         documentation: buildParameterizedDoc(
             'User-defined macro', macro.description,
             macro.parameters, macro.paramTypes, macro.paramDescriptions,
-            source, macro.defaults,
+            source,
         ),
         sortText: SORT_USER + macro.name,
     };
@@ -132,7 +124,7 @@ export function formatFunctionCompletion(func: FunctionDefinition): CompletionDa
         documentation: buildParameterizedDoc(
             'User-defined function', func.description,
             func.parameters, func.paramTypes, func.paramDescriptions,
-            source, func.defaults,
+            source,
         ),
         sortText: SORT_USER + func.name,
     };
@@ -153,6 +145,18 @@ export function formatVariableCompletion(variable: VariableDefinition): Completi
         documentation: doc,
         sortText: SORT_USER + variable.name,
     };
+}
+
+/** The variable's type on a 0-based line: the last change at or before it, else the first. */
+export function getVariableTypeAt(variable: VariableDefinition, line: number): string {
+    const changes = variable.typeChanges;
+    if (!changes) return variable.type;
+    let type = changes[0].type;
+    for (const change of changes) {
+        if (change.line > line) break;
+        type = change.type;
+    }
+    return type;
 }
 
 export function formatCustomUnitCompletion(unit: CustomUnitDefinition): CompletionData {

@@ -137,6 +137,8 @@ Array<{
 
 The header is listed in the CORS policy's exposed headers, so a browser client can read it.
 
+A render with line anchors (`includeLineAnchors`, on by default for anything but print) also records what the calculation executed and sets `X-Calcpad-Trace: 1`. `/lint`, `/definitions`, `/highlight` and `/symbol-at-position` requests for the same `content` and `sourceFilePath` then use it: variable types come from the run, and lines the run never reached (an untaken `#if` branch) skip type checks. A client should refetch lint and definitions when it sees the header. Until then, or for any other content, those endpoints use static inference.
+
 Every local `<img src>` comes back with its `{project}`/`{library}`/`{user}` token and any environment variable already expanded to an absolute forward-slash path, resolved against the roots declared anywhere in the `#include` chain. A source with no token is returned as authored, so a relative one still needs joining against `sourceFilePath`'s folder — the only path work left to a client that has to read the file off disk (to base64-inline it for a sandboxed preview, say). An undeclared root is reported as a normal render error and the source is left as written.
 
 ---
@@ -636,13 +638,19 @@ interface FunctionDefinitionDto {
 
 interface VariableDefinitionDto {
   name: string;
-  expression?: string;
-  type: string;
+  expression?: string;           // Right-hand side of the first definition; the first executed one when a trace matches
+  type: string;                  // "Various" when a matching trace saw the type change
   typeId: number;
-  lineNumber: number;
+  typeChanges: VariableTypeChangeDto[] | null;  // Set only alongside "Various": where each new type starts
+  lineNumber: number;            // Zero-based; the first executed definition when a trace matches
   source: string;
   sourceFile?: string;
   description?: string;
+}
+
+interface VariableTypeChangeDto {
+  line: number;                  // Zero-based line of the assignment
+  type: string;                  // Value, Vector or Matrix
 }
 
 interface CustomUnitDefinitionDto {

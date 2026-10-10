@@ -214,7 +214,6 @@ export interface MacroDefinition {
     description?: string;
     paramTypes?: string[];
     paramDescriptions?: string[];
-    defaults?: (string | null)[];
 }
 
 export interface FunctionDefinition {
@@ -232,7 +231,6 @@ export interface FunctionDefinition {
     description?: string;
     paramTypes?: string[];
     paramDescriptions?: string[];
-    defaults?: (string | null)[];
 }
 
 export interface VariableDefinition {
@@ -240,10 +238,17 @@ export interface VariableDefinition {
     expression?: string;
     type: string;
     typeId: number;
+    /** Where each new type starts, when a run changed the type. */
+    typeChanges?: VariableTypeChange[] | null;
     lineNumber: number;  // Zero-based line number
     source: string;
     sourceFile?: string;
     description?: string;
+}
+
+export interface VariableTypeChange {
+    line: number;  // Zero-based line number
+    type: string;
 }
 
 export interface CustomUnitDefinition {
@@ -312,6 +317,8 @@ export interface CalcpadError {
 export interface ConvertResult {
     html: string;
     errors: CalcpadError[];
+    /** The server recorded what this run executed, so lint and definitions are worth refetching. */
+    traceUpdated: boolean;
 }
 
 export interface CpdzDecodeResponse {

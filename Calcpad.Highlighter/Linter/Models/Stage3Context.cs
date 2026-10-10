@@ -14,7 +14,7 @@ namespace Calcpad.Highlighter.Linter.Models
         public Dictionary<int, SourceInfo> IncludeMap { get; set; } = new();
         public HashSet<string> DefinedVariables { get; set; } = new();
         public Dictionary<string, FunctionInfo> DefinedFunctions { get; set; } = new(StringComparer.Ordinal);
-        public Dictionary<string, MacroInfo> DefinedMacros { get; set; } = new(StringComparer.OrdinalIgnoreCase); // name -> macro info
+        public Dictionary<string, MacroInfo> DefinedMacros { get; set; } = new(StringComparer.Ordinal); // name -> macro info
         public HashSet<string> CustomUnits { get; set; } = new();
 
         /// <summary>
@@ -28,6 +28,13 @@ namespace Calcpad.Highlighter.Linter.Models
         /// Type tracker with full type information for all definitions
         /// </summary>
         public TypeTracker TypeTracker { get; set; } = new();
+
+        /// <summary>Runtime facts from Core; null when no trace matched the content.</summary>
+        public RuntimeOverlay Runtime { get; set; }
+
+        /// <summary>True when a matching Core run never reached the line, e.g. an untaken #if branch.</summary>
+        public bool IsNotExecuted(int stage3Line) =>
+            Runtime?.GetExecution(stage3Line) == LineExecution.NotExecuted;
 
         /// <summary>
         /// Functions that use command blocks ($Inline, $Block, $While).

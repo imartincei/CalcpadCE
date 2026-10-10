@@ -12,7 +12,7 @@ namespace Calcpad.Highlighter.Tokenizer
 
         private readonly HashSet<string> _definedVariables = new(StringComparer.Ordinal);
         private readonly HashSet<string> _definedFunctions = new(StringComparer.Ordinal);
-        private readonly HashSet<string> _definedMacros = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _definedMacros = new(StringComparer.Ordinal);
         private readonly HashSet<string> _definedUnits = new(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _localVariables = new(StringComparer.Ordinal);
 
@@ -212,10 +212,6 @@ namespace Calcpad.Highlighter.Tokenizer
             // Lint mode: pre-process all tokens except "=" (which needs isFirstDef info)
             if (_mode == TokenizerMode.Lint && !(type == TokenType.Operator && text == "="))
                 TrackDefinitionsLint(type, text);
-
-            // Macro mode: capture macro name and metadata
-            if (_mode == TokenizerMode.Macro)
-                TrackDefinitionsMacro(type, text);
 
             switch (type)
             {

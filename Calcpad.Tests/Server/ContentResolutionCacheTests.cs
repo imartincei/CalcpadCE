@@ -16,7 +16,7 @@ public class ContentResolutionCacheTests
     public void GetOrResolve_ReturnsTheSameCachedInstanceForUnchangedContent()
     {
         using var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        var cache = new ContentResolutionCache(memoryCache);
+        var cache = new ContentResolutionCache(memoryCache, new RuntimeTraceCache(memoryCache));
 
         var first = cache.GetOrResolve("a = 1\n", null);
         var second = cache.GetOrResolve("a = 1\n", null);
@@ -30,7 +30,7 @@ public class ContentResolutionCacheTests
         using var temp = new TempDir();
         var mainPath = temp.At("main.cpd");
         using var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        var cache = new ContentResolutionCache(memoryCache);
+        var cache = new ContentResolutionCache(memoryCache, new RuntimeTraceCache(memoryCache));
 
         var original = cache.GetOrResolve("a = 1\n", mainPath);
         cache.GetOrResolve("a = 2\n", mainPath); // new content for the same file
@@ -51,7 +51,7 @@ public class ContentResolutionCacheTests
         var mainContent = "#include inc.cpd\na = b + 1\n";
 
         using var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        var cache = new ContentResolutionCache(memoryCache);
+        var cache = new ContentResolutionCache(memoryCache, new RuntimeTraceCache(memoryCache));
 
         var first = cache.GetOrResolve(mainContent, mainPath);
         var cachedAgain = cache.GetOrResolve(mainContent, mainPath);

@@ -6,4 +6,4 @@
 #include
 
 ' CPD-1103: Deprecated #include input values
-#include import.cpd #{2; 3}
+#include ../valid/import.cpd #{2; 3}

@@ -395,7 +395,7 @@ public class PathRootsTests
         using var temp = new TempDir();
         temp.Write("sub/mod.cpd", $"#ProjectPath .\n{Img("{project}/logo.png")}\n");
 
-        var (html, _, errors) = new CalcpadService().Convert(
+        var (html, _, errors, _) = new CalcpadService().Convert(
             "#include sub/mod.cpd\n", sourceFilePath: temp.At("main.cpd"));
 
         Assert.Empty(errors);

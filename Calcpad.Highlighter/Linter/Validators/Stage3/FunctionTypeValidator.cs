@@ -108,8 +108,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                         continue;
                     }
 
-                    // Validate parameter types if we have a TypeTracker
-                    if (stage3.TypeTracker != null)
+                    // Types are unknowable on lines a matching run never reached
+                    if (stage3.TypeTracker != null && !stage3.IsNotExecuted(stage3Line))
                     {
                         ValidateParameterTypesAgainstOverloads(parameters, paramTokenGroups, matchingOverloads, funcName, token, stage3Line, line, stage3, functionParams, result);
                     }
@@ -170,11 +170,11 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 }
                 else if (i < paramTokenGroups.Count && paramTokenGroups[i].Count > 0)
                 {
-                    actualTypes[i] = InferTypeFromTokens(paramTokenGroups[i], stage3, functionParams);
+                    actualTypes[i] = InferTypeFromTokens(paramTokenGroups[i], stage3, functionParams, stage3Line);
                 }
                 else
                 {
-                    actualTypes[i] = InferParameterType(param, stage3, functionParams);
+                    actualTypes[i] = InferParameterType(param, stage3, functionParams, stage3Line);
                 }
             }
 
@@ -248,7 +248,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         /// <summary>
         /// Infers the CalcpadType of a parameter expression.
         /// </summary>
-        private CalcpadType InferParameterType(string expression, Stage3Context stage3, HashSet<string> functionParams)
+        private CalcpadType InferParameterType(string expression, Stage3Context stage3, HashSet<string> functionParams, int stage3Line)
         {
             var trimmed = expression.Trim();
 
@@ -259,7 +259,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             // Check if it's a known variable
             if (stage3.TypeTracker != null)
             {
-                var varInfo = stage3.TypeTracker.GetVariableInfo(trimmed);
+                var varInfo = stage3.TypeTracker.GetVariableInfoAt(trimmed, stage3Line);
                 if (varInfo != null)
                 {
                     // For functions, return the return type, not the type (which is Function)
@@ -296,7 +296,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         private static CalcpadType InferTypeFromTokens(
             List<Token> paramTokens,
             Stage3Context stage3,
-            HashSet<string> functionParams)
+            HashSet<string> functionParams,
+            int stage3Line)
         {
             // Single token: direct lookup
             if (paramTokens.Count == 1)
@@ -308,7 +309,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                         return CalcpadType.Various;
                     if (stage3.TypeTracker != null)
                     {
-                        var info = stage3.TypeTracker.GetVariableInfo(t.Text);
+                        var info = stage3.TypeTracker.GetVariableInfoAt(t.Text, stage3Line);
                         if (info != null)
                             return info.Type == CalcpadType.Function ? info.ReturnType : info.Type;
                     }
@@ -394,7 +395,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     }
                     if (stage3.TypeTracker != null)
                     {
-                        var info = stage3.TypeTracker.GetVariableInfo(t.Text);
+                        var info = stage3.TypeTracker.GetVariableInfoAt(t.Text, stage3Line);
                         if (info != null)
                         {
                             var vt = info.Type == CalcpadType.Function ? info.ReturnType : info.Type;

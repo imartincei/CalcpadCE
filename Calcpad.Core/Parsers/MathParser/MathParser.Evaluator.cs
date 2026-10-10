@@ -309,6 +309,9 @@ namespace Calcpad.Core
                     else if (t0.Type == TokenTypes.Variable)
                     {
                         _parser._backupVariable = new(ta.Content, ta.Variable.Value);
+                        if (_parser._trace is not null)
+                            _parser._trace.PendingTarget = ta.Content;
+
                         ta.Variable.Assign(b);
                     }
                 }

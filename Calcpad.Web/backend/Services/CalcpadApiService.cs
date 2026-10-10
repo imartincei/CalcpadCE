@@ -48,6 +48,7 @@ namespace Calcpad.Server.Services
             {
                 options.SizeLimit = ContentResolutionCache.ResolveSizeLimit();
             });
+            builder.Services.AddSingleton<RuntimeTraceCache>();
             builder.Services.AddSingleton<ContentResolutionCache>();
 
             builder.Services.AddCors(options =>
@@ -57,7 +58,7 @@ namespace Calcpad.Server.Services
                     policy.SetIsOriginAllowed(IsAllowedOrigin)
                           .AllowAnyMethod()
                           .AllowAnyHeader()
-                          .WithExposedHeaders("X-Calcpad-Errors");
+                          .WithExposedHeaders("X-Calcpad-Errors", "X-Calcpad-Trace");
                 });
             });
 

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Calcpad.Highlighter.ContentResolution;
 using Calcpad.Highlighter.Tokenizer;
@@ -41,14 +40,10 @@ namespace Calcpad.Tests.Highlighter
             try
             {
                 var libDir = System.IO.Directory.CreateDirectory(System.IO.Path.Combine(temp.FullName, "lib"));
-                var resolvedLibraryFile = System.IO.Path.GetFullPath("lib/steel.cpd", temp.FullName);
+                System.IO.File.WriteAllText(System.IO.Path.Combine(libDir.FullName, "steel.cpd"), "y = 2");
                 var content = $"#LibraryPath {libDir.FullName}\n#include {{library}}/steel.cpd\nx = 1";
-                var includeFiles = new Dictionary<string, string>
-                {
-                    [resolvedLibraryFile] = "y = 2"
-                };
 
-                var staged = new ContentResolver().GetStagedContent(content, includeFiles,
+                var staged = new ContentResolver().GetStagedContent(content,
                     sourceFilePath: System.IO.Path.Combine(temp.FullName, "main.cpd"));
                 var joined = string.Join('\n', staged.Stage2.Lines);
 
@@ -80,16 +75,11 @@ namespace Calcpad.Tests.Highlighter
             try
             {
                 var libDir = System.IO.Directory.CreateDirectory(System.IO.Path.Combine(temp.FullName, "lib"));
-                var resolvedDeclFile = System.IO.Path.GetFullPath("decl.cpd", temp.FullName);
-                var resolvedSteelFile = System.IO.Path.GetFullPath("steel.cpd", libDir.FullName);
+                System.IO.File.WriteAllText(System.IO.Path.Combine(temp.FullName, "decl.cpd"), $"#LibraryPath {libDir.FullName}");
+                System.IO.File.WriteAllText(System.IO.Path.Combine(libDir.FullName, "steel.cpd"), "y = 2");
                 var content = "#include decl.cpd\n#include {library}/steel.cpd\nx = 1";
-                var includeFiles = new Dictionary<string, string>
-                {
-                    [resolvedDeclFile] = $"#LibraryPath {libDir.FullName}",
-                    [resolvedSteelFile] = "y = 2"
-                };
 
-                var staged = new ContentResolver().GetStagedContent(content, includeFiles,
+                var staged = new ContentResolver().GetStagedContent(content,
                     sourceFilePath: System.IO.Path.Combine(temp.FullName, "main.cpd"));
                 var joined = string.Join('\n', staged.Stage2.Lines);
 
@@ -103,22 +93,19 @@ namespace Calcpad.Tests.Highlighter
             }
         }
 
+        // Asserts the {user} expansion without writing into the real profile folder.
         [Fact]
-        public void Include_WithUserToken_ResolvesWithNoDeclaration()
+        public void Include_WithUserToken_ExpandsWithNoDeclaration()
         {
             var home = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
-            var resolvedFile = System.IO.Path.GetFullPath("lib/steel.cpd", home);
-            var content = "#include {user}/lib/steel.cpd\nx = 1";
-            var includeFiles = new Dictionary<string, string>
-            {
-                [resolvedFile] = "y = 2"
-            };
+            var content = "#include {user}/calcpad-test-missing/steel.cpd\nx = 1";
 
-            var staged = new ContentResolver().GetStagedContent(content, includeFiles, sourceFilePath: SourceFilePath);
-            var joined = string.Join('\n', staged.Stage2.Lines);
+            var staged = new ContentResolver().GetStagedContent(content, sourceFilePath: SourceFilePath);
+            var placeholder = staged.Stage2.Lines[0];
 
-            Assert.DoesNotContain("Error: Include file not provided", joined);
-            Assert.Contains("y = 2", joined);
+            Assert.Contains("Error: Include file not provided", placeholder);
+            Assert.Contains(home, placeholder);
+            Assert.DoesNotContain("{user}", placeholder);
         }
     }
 }

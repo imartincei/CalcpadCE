@@ -1,7 +1,5 @@
 using System.Collections.Concurrent;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using Calcpad.Highlighter.ContentResolution;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -23,6 +21,7 @@ namespace Calcpad.Server.Services
         private const int RevalidateIntervalMs = 500;
 
         private readonly IMemoryCache _cache;
+        private readonly RuntimeTraceCache _traces;
         private readonly ConcurrentDictionary<string, string> _activeKeyBySourceFile = new();
 
         /// <summary>
@@ -46,13 +45,19 @@ namespace Calcpad.Server.Services
             public required StagedResolvedContent Staged { get; init; }
             public required ConcurrentDictionary<string, DateTime> IncludeWriteTimes { get; init; }
             public long LastValidatedTicks;
+
+            /// <summary><see cref="Staged"/> with the runtime trace applied.</summary>
+            public TracedContent? WithTrace;
         }
+
+        private sealed record TracedContent(long Version, StagedResolvedContent Staged);
 
         private readonly MemoryCacheEntryOptions _baseOptions;
 
-        public ContentResolutionCache(IMemoryCache cache)
+        public ContentResolutionCache(IMemoryCache cache, RuntimeTraceCache traces)
         {
             _cache = cache;
+            _traces = traces;
             _sizeLimit = ResolveSizeLimit();
             var expirationSeconds = int.TryParse(
                 Environment.GetEnvironmentVariable("CALCPAD_CONTENT_CACHE_EXPIRATION_SECONDS"), out var seconds)
@@ -66,10 +71,10 @@ namespace Calcpad.Server.Services
         public StagedResolvedContent GetOrResolve(string content, string? sourceFilePath)
         {
             var fileKey = sourceFilePath ?? string.Empty;
-            var key = $"{fileKey}|{Sha256Hex(content)}";
+            var key = ContentKey.For(sourceFilePath, content);
 
             if (_cache.TryGetValue(key, out CacheEntry? cached) && cached != null && IsIncludesFresh(cached))
-                return cached.Staged;
+                return ApplyTrace(cached, sourceFilePath, key);
 
             // Concurrent callers for the same key share one resolution instead of racing.
             var lazy = _inFlight.GetOrAdd(key, _ => new Lazy<CacheEntry>(
@@ -77,12 +82,30 @@ namespace Calcpad.Server.Services
                 LazyThreadSafetyMode.ExecutionAndPublication));
             try
             {
-                return lazy.Value.Staged;
+                return ApplyTrace(lazy.Value, sourceFilePath, key);
             }
             finally
             {
                 _inFlight.TryRemove(new KeyValuePair<string, Lazy<CacheEntry>>(key, lazy));
             }
+        }
+
+        /// <summary>
+        /// Overlays the latest /convert trace for this exact content. A trace recorded before an
+        /// include last changed describes stale include content, so it is ignored.
+        /// </summary>
+        private StagedResolvedContent ApplyTrace(CacheEntry entry, string? sourceFilePath, string key)
+        {
+            var trace = _traces.Get(sourceFilePath, key);
+            if (trace is null || entry.IncludeWriteTimes.Values.Any(t => t > trace.StoredUtc))
+                return entry.Staged;
+
+            if (entry.WithTrace is { } applied && applied.Version == trace.Version)
+                return applied.Staged;
+
+            var staged = ContentResolver.ApplyRuntimeTrace(entry.Staged, trace.Trace);
+            entry.WithTrace = new(trace.Version, staged);
+            return staged;
         }
 
         private CacheEntry Resolve(string content, string? sourceFilePath, string fileKey, string key)
@@ -142,7 +165,7 @@ namespace Calcpad.Server.Services
                     if (entry.IncludeWriteTimes.TryGetValue(path, out var known) && known == writeTime)
                         continue;
 
-                    if (Sha256Hex(File.ReadAllText(path)) != expectedHash) return false;
+                    if (ContentKey.Sha256Hex(File.ReadAllText(path)) != expectedHash) return false;
                     entry.IncludeWriteTimes[path] = writeTime;
                 }
                 catch
@@ -167,8 +190,5 @@ namespace Calcpad.Server.Services
                 return default;
             }
         }
-
-        private static string Sha256Hex(string text) =>
-            Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(text)));
     }
 }

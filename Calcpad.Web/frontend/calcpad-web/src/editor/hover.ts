@@ -5,6 +5,7 @@ import type {
     VariableDefinition,
     CustomUnitDefinition,
 } from 'calcpad-frontend/types/api';
+import { getVariableTypeAt } from 'calcpad-frontend/text/completion-format';
 import { buildBuiltinDocMarkdown, extractFunctionName } from './builtin-docs';
 import { getActiveDocumentKey, type EditorBridge } from './bridge';
 
@@ -32,11 +33,13 @@ export function registerHoverProvider(bridge: EditorBridge): monaco.IDisposable 
                 const macro = definitions.macros.find(m => m.name === word);
                 if (macro) return { contents: [{ value: buildMacroMarkdown(macro), isTrusted: true }], range };
 
+                // As in Core, a name is a function only when "(" directly follows it.
                 const func = definitions.functions.find(f => f.name === word);
-                if (func) return { contents: [{ value: buildFunctionMarkdown(func), isTrusted: true }], range };
-
                 const variable = definitions.variables.find(v => v.name === word);
-                if (variable) return { contents: [{ value: buildVariableMarkdown(variable), isTrusted: true }], range };
+                if (func && (!variable || lineText[match.end] === '(')) {
+                    return { contents: [{ value: buildFunctionMarkdown(func), isTrusted: true }], range };
+                }
+                if (variable) return { contents: [{ value: buildVariableMarkdown(variable, position.lineNumber - 1), isTrusted: true }], range };
 
                 const unit = definitions.customUnits.find(u => u.name === word);
                 if (unit) return { contents: [{ value: buildCustomUnitMarkdown(unit), isTrusted: true }], range };
@@ -81,7 +84,7 @@ function buildMacroMarkdown(macro: MacroDefinition): string {
         out.push('Source: `' + macro.sourceFile + '`');
     }
     if (macro.description) out.push(macro.description);
-    appendParameterDocs(out, macro.parameters, macro.paramTypes, macro.paramDescriptions, macro.defaults);
+    appendParameterDocs(out, macro.parameters, macro.paramTypes, macro.paramDescriptions);
     return out.join('\n\n');
 }
 
@@ -95,20 +98,21 @@ function buildFunctionMarkdown(func: FunctionDefinition): string {
     }
     if (func.description) out.push(func.description);
     if (func.returnType) out.push('Returns: *' + func.returnType + '*');
-    appendParameterDocs(out, func.parameters, func.paramTypes, func.paramDescriptions, func.defaults);
+    appendParameterDocs(out, func.parameters, func.paramTypes, func.paramDescriptions);
     if (func.expression) {
         out.push('**Expression:**\n```calcpad\n' + func.expression + '\n```');
     }
     return out.join('\n\n');
 }
 
-function buildVariableMarkdown(variable: VariableDefinition): string {
+function buildVariableMarkdown(variable: VariableDefinition, line: number): string {
     const out: string[] = [];
     out.push('```calcpad\n' + variable.name + ' = ' + (variable.expression ?? '') + '\n```');
     if (variable.source !== 'local' && variable.sourceFile) {
         out.push('Source: `' + variable.sourceFile + '`');
     }
-    if (variable.type) out.push('Type: *' + variable.type + '*');
+    const type = getVariableTypeAt(variable, line);
+    if (type) out.push('Type: *' + type + '*');
     if (variable.description) out.push(variable.description);
     return out.join('\n\n');
 }
@@ -128,29 +132,21 @@ function appendParameterDocs(
     params?: string[],
     paramTypes?: string[],
     paramDescriptions?: string[],
-    defaults?: (string | null)[],
 ): void {
     if (!params || params.length === 0) return;
 
     const hasTypes = !!paramTypes && paramTypes.length > 0;
     const hasDescs = !!paramDescriptions && paramDescriptions.length > 0;
-    const hasDefaults = !!defaults && defaults.length > 0;
 
-    if (hasTypes || hasDescs || hasDefaults) {
+    if (hasTypes || hasDescs) {
         const lines: string[] = ['**Parameters:**'];
         for (let i = 0; i < params.length; i++) {
             const name = params[i];
             const type = hasTypes && i < paramTypes!.length ? paramTypes![i] : undefined;
             const desc = hasDescs && i < paramDescriptions!.length ? paramDescriptions![i] : undefined;
-            const def = hasDefaults && i < defaults!.length ? defaults![i] : undefined;
             let line = '- `' + name + '`';
             if (type) line += ` *(${type})*`;
             if (desc) line += ' — ' + desc;
-            if (def !== undefined && def !== null) {
-                line += ` *(default: ${def})*`;
-            } else if (hasDefaults) {
-                line += ' *(required)*';
-            }
             lines.push(line);
         }
         out.push(lines.join('\n'));

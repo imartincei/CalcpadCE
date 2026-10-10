@@ -25,16 +25,10 @@ Tests live in [../Calcpad.Tests/Highlighter/](../Calcpad.Tests/Highlighter/).
 
 ## Content Resolution Pipeline
 
-`ContentResolver` processes raw source through three stages, each building on the previous, and every stage keeps a source map so errors trace back to the original lines.
+`ContentResolver` processes raw source through three stages, each building on the previous, and every stage keeps a source map so errors trace back to the original lines. Includes and macros are resolved by Calcpad.Core's own `MacroParser`, so the editor sees exactly what a calculation would.
 
 ```csharp
-var resolver = new ContentResolver();
-var staged = resolver.GetStagedContent(
-    content: sourceCode,
-    includeFiles: includeDict,         // filename -> content (plain text)
-    clientFileCache: cacheDict,        // filename -> raw bytes (base64-decoded)
-    sourceFilePath: "/path/to/file.cpd"
-);
+var staged = new ContentResolver().GetStagedContent(sourceCode, sourceFilePath: "/path/to/file.cpd");
 ```
 
 ### Stage 1 — Line continuations
@@ -45,27 +39,31 @@ Merges multi-line expressions into single lines. Explicit continuation is a trai
 
 ### Stage 2 — Include resolution and macro collection
 
-**Pass 1** replaces `#include` lines with the referenced file's content (recursive, 20 levels deep, circular includes detected), resolves `#ProjectPath`/`#LibraryPath` roots and environment variables, and tracks source origin (`local` vs `include`) plus original file line numbers per line. A file that can't be found becomes an error comment and processing continues.
+The Stage 1 lines run through `MacroParser` with a `MacroTrace` attached. The trace records every line read (includes inlined, with their file and line), every line emitted, and every `#def`. Stage 2 is built from what was read, Stage 3 from what was emitted.
 
-**Pass 2** tokenizes in **Macro** mode to collect every `#def`: name, parameters, defaults, content, description, and source location. It also computes *comment parameters* — parameters used inside comments, with transitive closure through nested macro calls — so the tokenizer highlights the matching call-site arguments as comments rather than expressions.
+Included files are read from disk, filtered with `MacroParser.FilterIncludedContent` (the same `#local`/`#global` rule the server's include delegate uses, but blanking lines so include line numbers stay exact), and put through Stage 1. A file that can't be found becomes an error comment and processing continues.
+
+Macro metadata comments and *comment parameters* are computed here. Comment parameters are parameters used inside comments, with transitive closure through nested macro calls, so the tokenizer highlights the matching call-site arguments as comments rather than expressions.
 
 `Stage2Result` carries `Lines`, `SourceMap`, `IncludeMap`, `PathRoots`, `MacroDefinitions`, `MacroCommentParameters`, `MacroParameterOrder`, `MacroBodies`, `UserDefinedMacros`, and `DuplicateMacros`.
 
 ### Stage 3 — Macro expansion and definition collection
 
-**Phase 1** expands macro calls by substituting arguments into macro bodies (skipping the already-collected `#def` blocks), recording expansion metadata so errors inside expanded content map back to the call site.
+**Phase 1** takes the lines `MacroParser` emitted, with `#def` blocks removed and macros expanded. Expansion metadata maps errors inside expanded content back to the call site. A line whose expansion failed is kept as written.
 
 **Phase 2** tokenizes the expanded content in **Lint** mode to extract variables, functions, custom units (`.unitName`), and command-block functions (`$Inline{}`, `$Block{}`, `$While{}`); builds the `TypeTracker`; and builds symbol indices mapping every name to all its occurrences with source-file info.
 
 `Stage3Result` carries the fully expanded `Lines` plus `MacroExpansions`, `UserDefinedFunctions`/`FunctionsWithParams`, `VariablesWithDefinitions`, `CustomUnits`, `CommandBlockFunctions`, `TypeTracker`, `VariableAssignments`/`VariableUsages`/`VariableReassignments`, and `VariableIndex`/`FunctionIndex`/`MacroIndex`.
 
-### How content is fetched
+### Runtime overlay
 
-`ContentResolver` performs no I/O of its own beyond the filesystem probe below; the caller pre-fetches everything and passes it in. `ResolveFileContent` tries, in order:
+When Calcpad.Core runs a document in `Debug` mode, `ExpressionParser.Trace` records each executed line's directive state and the kind (scalar, vector, matrix) of every global assignment per line. `ContentResolver.ApplyRuntimeTrace` turns a trace for the same content into a `RuntimeOverlay` on a copy of the staged content:
 
-1. **Filesystem** — `Path.GetFullPath` after environment-variable expansion, relative to the source file's directory.
-2. **`includeFiles`** — `Dictionary<string, string>` of plain-text content, resolved path first, then raw filename.
-3. **`clientFileCache`** — `Dictionary<string, byte[]>` decoded as UTF-8, for files a client (e.g. the VS Code extension) holds in memory that the server can't read.
+- `TypeTracker` takes variable types from the run, and `GetVariableInfoAt` gives the type just before a given line.
+- Lines the run never reached (an untaken `#if` branch) skip type checks.
+- The output mode (`#noc`) of each line comes from the run rather than `DirectiveState`.
+
+Without a matching trace, everything falls back to static inference.
 
 ### Source mapping
 
@@ -79,12 +77,11 @@ Stage 3 line → Stage3.SourceMap → Stage 2 line → Stage2.SourceMap → Stag
 
 ## Tokenizer
 
-`CalcpadTokenizer` turns source into typed tokens. It is split across 8 partial class files (core, comments, macros, parsing, type resolution, helpers, definitions, macro collection) and runs in three modes:
+`CalcpadTokenizer` turns source into typed tokens. It is split across 7 partial class files (core, comments, macros, parsing, type resolution, helpers, definitions) and runs in two modes:
 
 | Mode | Purpose | Used by |
 |------|---------|---------|
 | **Highlight** | Tokens for syntax coloring only | `/highlight` |
-| **Macro** | Tokens + full macro definitions | Stage 2 |
 | **Lint** | Tokens + variables, functions, units, command blocks, loop and `#read` variables | Stage 3 |
 
 `TokenType` ordinals are part of the wire format and are tabled in [API_SCHEMA.md](../Calcpad.Web/backend/API_SCHEMA.md) under `POST /highlight`; ordinals 29–30 are reserved so serialized values never renumber.

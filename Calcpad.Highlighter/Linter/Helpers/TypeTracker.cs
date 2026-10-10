@@ -3,6 +3,7 @@ using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Calcpad.Highlighter.ContentResolution;
 using Calcpad.Highlighter.Linter.Constants;
 using Calcpad.Highlighter.Linter.Models;
 using Calcpad.Highlighter.Snippets;
@@ -17,9 +18,34 @@ namespace Calcpad.Highlighter.Linter.Helpers
     {
         private readonly Dictionary<string, VariableInfo> _variables = new(StringComparer.Ordinal);
         private readonly Dictionary<string, VariableInfo> _functions = new(StringComparer.Ordinal);
-        private readonly Dictionary<string, VariableInfo> _macros = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, VariableInfo> _macros = new(StringComparer.Ordinal);
         private readonly Dictionary<string, VariableInfo> _customUnits = new(StringComparer.OrdinalIgnoreCase);
         private Dictionary<int, List<Token>> _tokensByLine;
+
+        /// <summary>Runtime facts from Core, when a trace matched the content.</summary>
+        public RuntimeOverlay Runtime { get; private set; }
+
+        /// <summary>A copy whose variable types come from <paramref name="runtime"/> where it knows them.</summary>
+        public TypeTracker WithRuntime(RuntimeOverlay runtime)
+        {
+            var tracker = new TypeTracker { Runtime = runtime, _tokensByLine = _tokensByLine };
+            foreach (var (name, info) in _variables)
+            {
+                var copy = info.Clone();
+                if (runtime.GetVariableType(name) is { } type)
+                    copy.Type = type;
+
+                tracker._variables[name] = copy;
+            }
+            foreach (var (name, info) in _functions)
+                tracker._functions[name] = info;
+            foreach (var (name, info) in _macros)
+                tracker._macros[name] = info;
+            foreach (var (name, info) in _customUnits)
+                tracker._customUnits[name] = info;
+
+            return tracker;
+        }
 
         /// <summary>
         /// Provides per-line tokens from the tokenizer so that type inference can use
@@ -76,7 +102,8 @@ namespace Calcpad.Highlighter.Linter.Helpers
             // Check if variable already exists with a different type
             if (_variables.TryGetValue(name, out var existing))
             {
-                if (existing.Type != newType && existing.Type != CalcpadType.Various)
+                // An expression that can't be inferred says nothing about a type change.
+                if (newType != CalcpadType.Unknown && existing.Type != newType && existing.Type != CalcpadType.Various)
                 {
                     // Type changed - mark as Various
                     existing.Type = CalcpadType.Various;
@@ -326,6 +353,27 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 return unitInfo;
 
             return null;
+        }
+
+        /// <summary>
+        /// Like <see cref="GetVariableInfo(string)"/>, with the variable's type as it was just
+        /// before the given Stage 3 line when a runtime trace knows it.
+        /// </summary>
+        public VariableInfo GetVariableInfoAt(string name, int stage3Line)
+        {
+            var info = GetVariableInfo(name);
+            if (Runtime is null || info is null)
+                return info;
+
+            var lookupName = name.EndsWith('.') ? name[..^1] : name;
+            if (!_variables.ContainsKey(lookupName) ||
+                Runtime.GetVariableType(lookupName, stage3Line) is not { } type ||
+                type == info.Type)
+                return info;
+
+            var copy = info.Clone();
+            copy.Type = type;
+            return copy;
         }
 
         /// <summary>

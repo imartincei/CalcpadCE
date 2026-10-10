@@ -49,6 +49,7 @@ namespace Calcpad.Highlighter.Linter
             var stage1Context = ConvertToStage1Context(staged.Stage1);
             var stage2Context = ConvertToStage2Context(staged.Stage2, staged.Stage1);
             var stage3Context = ConvertToStage3Context(staged.Stage3, staged.Stage2);
+            stage3Context.Runtime = staged.Runtime;
 
             // Set stage contexts on result for automatic line continuation mapping
             result.SetStageContexts(stage1Context, stage2Context, stage3Context);

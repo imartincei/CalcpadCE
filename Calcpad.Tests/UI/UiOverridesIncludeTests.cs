@@ -18,7 +18,7 @@ public class UiOverridesIncludeTests
         using var temp = new TempDir();
         temp.Write("sub/mod.cpd", "'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI L = 4\n");
 
-        var (html, _, errors) = new CalcpadService().Convert(
+        var (html, _, errors, _) = new CalcpadService().Convert(
             "#include sub/mod.cpd\n", sourceFilePath: temp.At("main.cpd"), forceUnwrappedCode: true);
 
         Assert.Empty(errors);
@@ -33,7 +33,7 @@ public class UiOverridesIncludeTests
         using var temp = new TempDir();
         temp.Write("sub/mod.cpd", "#UI q = 1\n");
 
-        var (html, _, errors) = new CalcpadService().Convert(
+        var (html, _, errors, _) = new CalcpadService().Convert(
             "'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#include sub/mod.cpd\n",
             sourceFilePath: temp.At("main.cpd"), forceUnwrappedCode: true);
 
