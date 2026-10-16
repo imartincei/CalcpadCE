@@ -1,0 +1,77 @@
+#settings {"complex": true}
+' Output control: visibility, equation display, formatting, rounding
+a = 10
+b = 20
+c = a + b
+' Visibility control
+#hide
+hiddenVar = 999
+#end hide
+#show
+visibleVar = 42
+#pre
+preOnly = 1
+#end pre
+#post
+postOnly = 2
+#end post
+#hide a ≡ 10
+condHidden = 1
+#end hide
+#show
+' Equation display modes
+#val
+valOnly = a + b
+#equ
+equMode = a + b
+#noc
+nocMode = a + b
+#equ
+' Variable substitution
+#nosub
+nosubVar = a + b
+#end nosub
+#novar
+novarVar = a + b
+#end novar
+#varsub
+varsubVar = a + b
+#end varsub
+#nosub a ≡ 10
+condNosubVar = a + b
+#end nosub
+' Rounding
+#round 2
+rounded2 = 3.14159265
+#round 4
+rounded4 = 3.14159265
+#round default
+' Format control
+#format F2
+formatted = 123.456789
+#format default
+' Trig unit switches
+#deg
+degResult = sin(90)
+#rad
+radResult = sin(1.5708)
+#gra
+graResult = sin(100)
+#deg
+' Complex output modes
+z = 3 + 4i
+#phasor
+phasorZ = z
+#complex
+complexZ = z
+' Markdown in comments
+#md on
+"**Bold** and *italic*"
+#md off
+' Constant protection
+#const protected = 100
+' HTML output wrap/split
+#split
+a = 1*2*3*4*5*6*7*8*9*10*11*12*13*14*15*16*17*18*19*20*21*22*23*24*25
+#wrap
+b = 1*2*3*4*5*6*7*8*9*10*11*12*13*14*15*16*17*18*19*20*21*22*23*24*25

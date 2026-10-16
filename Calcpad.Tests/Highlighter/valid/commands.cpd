@@ -1,0 +1,66 @@
+' Commands: numerical methods, plotting, iterative, expression blocks
+f(x) = x^2 - 4
+g(x) = x^3 + 3*x + 3
+h(x; y) = x^2 + y^2
+x_param(t) = 2*t
+y_param(t) = 3*t
+a = 0
+b = 5
+' Root finding
+rootResult = $Root{f(x) @ x = a : b}
+rootConst = $Root{f(x) = 5 @ x = a : b}
+' Find (approximate root)
+findResult = $Find{f(x) @ x = a : b}
+' Extrema
+supResult = $Sup{f(x) @ x = a : b}
+infResult = $Inf{f(x) @ x = a : b}
+' Integration
+areaResult = $Area{x^2 @ x = 0 : 1}
+integralResult = $Integral{x^2 @ x = 0 : 1}
+' Differentiation
+slopeResult = $Slope{x^2 @ x = 2}
+' Iterative sum and product
+sumResult = $Sum{k^2 @ k = 1 : 5}
+prodResult = $Product{k @ k = 1 : 5}
+' Repeat with counter
+repeatResult = 0
+$Repeat{repeatResult = repeatResult + j @ j = 1 : 5}
+' Repeat whose body does not reference the counter (counter only sets iteration count)
+fib(n) = if(n ≡ 1; 1; $Block{a = 0; b = 1; $Repeat{c = a + b; a ← b; b ← c @ k = 1 : n - 1}})
+' Nested commands
+nestedCmd = $Sum{$Sum{i*j @ j = 1 : 3} @ i = 1 : 3}
+' $While block
+w(x) = $While{x < 5; x = x + 1}
+' $Block and $Inline
+blk(x) = $Block{y = x*5; x = x*y + 1}
+inl(x) = $Inline{y = x*5; x = x*y + 1}
+' $Inline with element access
+setVec(i; v; val) = $Inline{tmp = v; tmp.i = val; v = tmp}
+setMat(i; j; m; val) = $Inline{tmp = m; tmp.(i; j) = val; m = tmp}
+' $Inline with vector append
+appendV(v; val) = $Inline{n = len(v); v = resize(v; n + 1); v.(n + 1) = val; v}
+' $Repeat with conditional
+vec = [4; 3; 4; 1; 2; 2; 3]
+filtered = 0
+$Repeat{filtered = filtered + if(take(k; vec) > 2; 1; 0) @ k = 1 : len(vec)}
+' Nested $Repeat in $Inline
+M_test = [1; 2 | 3; 4]
+flatM(m) = $Inline{v = vector(n_rows(m)*n_cols(m)); $Repeat{$Repeat{v.((i - 1)*n_cols(m) + j) = m.(i; j) @ j = 1 : n_cols(m)} @ i = 1 : n_rows(m)}; v}
+flatResult = flatM(M_test)
+' $Inline with accumulation
+accumulate(n) = $Inline{s = 0; $Repeat{s = s + k @ k = 1 : n}; s}
+accResult = accumulate(5)
+' $While with convergence
+converge(x) = $While{x > 0.01; x = x/2}
+convResult = converge(10)
+' $Repeat with outer scope ← assignment
+outer = 0
+$Repeat{outer ← outer + k @ k = 1 : 3}
+' Plotting
+PlotHeight = 300
+PlotWidth = 400
+PlotSVG = 1
+$Plot{sin(x) @ x = 0 : 2*π}
+$Plot{sin(x) & cos(x) @ x = 0 : 2*π}
+$Plot{x_param(t)|y_param(t) @ t = 0 : 5}
+$Map{h(x; y) @ x = 0 : 5 & y = 0 : 5}

@@ -127,6 +127,9 @@ namespace Calcpad.Core
         internal static MathParserException InvalidFunction(string s) =>
             new(string.Format(Messages.Invalid_function_0, s));
 
+        internal static MathParserException InvalidVariableName(string s) =>
+            new(string.Format(Messages.Invalid_variable_name_0, s));
+
         internal static MathParserException CannotEvaluateAsType(string literal, string type) =>
             new(string.Format(Messages.Cannot_evaluate_0_as_1, literal, type));
 
@@ -232,6 +235,9 @@ namespace Calcpad.Core
         internal static MathParserException CircularReference(string name) =>
             new(string.Format(Messages.Circular_reference_detected_for_function_0, name));
 
+        internal static MathParserException CircularMacroReference(string name) =>
+            new(string.Format(Messages.Circular_reference_detected_for_macro_0, name));
+
         internal static MathParserException InvalidFunctionDefinition() =>
             new(Messages.Invalid_function_definition_exception);
 
@@ -261,6 +267,15 @@ namespace Calcpad.Core
 
         internal static MathParserException UndefinedMacro(string s) =>
             new(string.Format(Messages.Macro_not_defined_0, s));
+
+        internal static MathParserException RequiredParameterAfterOptional(string name) =>
+            new(string.Format(Messages.Required_parameter_after_optional_0, name));
+
+        internal static MathParserException UnknownKeywordArgument(string name) =>
+            new(string.Format(Messages.Unknown_keyword_argument_0, name));
+
+        internal static MathParserException DuplicateArgument(string name) =>
+            new(string.Format(Messages.Duplicate_argument_0, name));
 
         internal static MathParserException MissingMapItem(string s) =>
             new(string.Format(Messages.Missing_0_in_surface_map_command, s));
@@ -372,6 +387,12 @@ namespace Calcpad.Core
 
         internal static MathParserException MatirixSizeLimit() =>
             new(string.Format(Messages.Matrix_size_cannot_exceed_0, Matrix.MaxSize));
+
+        internal static MathParserException EmbeddedDataSizeLimit() =>
+            new(string.Format(Messages.Embedded_data_cannot_exceed_0_MB, ExpressionParser.MaxEmbeddedDataSize / (1024 * 1024)));
+
+        internal static MathParserException DatagridSizeLimit() =>
+            new(string.Format(Messages.Datagrid_size_cannot_exceed_0_cells, UiDto.MaxSize));
 
         internal static MathParserException MatrixNotHigh() =>
             new(Messages.The_number_of_matrix_rows_must_be_greater_than_or_equal_to_the_number_of_columns);

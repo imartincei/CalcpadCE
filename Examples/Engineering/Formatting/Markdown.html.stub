@@ -1,0 +1,65 @@
+<div class="calcpad-output">
+ <!-- Mixes Markdown headings, lists and tables with Calcpad math by toggling `#md on`, the building block for Markdown-driven reports. -->
+ <h3>Markdown in CalcpadCE</h3>
+ <p>
+  <hr/>
+ </p>
+ <h3>Heading 3</h3>
+ <h4>Heading 4</h4>
+ <h5>Heading 5</h5>
+ <h6>Heading 6</h6>
+ <p>A quote in comment can be escaped by entering 'another' one</p>
+ <p>
+  This text is
+  <strong>bold</strong>
+  , this is
+  <em>italic</em>
+  and this is
+  <em>
+   <strong>bold-italic</strong>
+  </em>
+  .
+ </p>
+ <p>
+  You can also have
+  <ins>underlined</ins>
+  ,
+  <del>deleted</del>
+  and
+  <mark>marked</mark>
+  text.
+ </p>
+ <p>
+  Adding
+  <sub>sub</sub>
+  script and
+  <sup>super</sup>
+  script is now easier than ever.
+ </p>
+ <p>Code:</p>
+ <p>
+  <code>c = a + b</code>
+ </p>
+ <p>Image:</p>
+ <p>
+  <img alt="CalcpadCE" src="https://raw.githubusercontent.com/imartincei/CalcpadCE/refs/heads/main/docs/media/logo.svg"/>
+ </p>
+ <p>
+  Links:
+  <a href="https://www.markdownguide.org">https://www.markdownguide.org</a>
+  ,
+  <a href="https://calcpad-ce.org">CalcpadCE website</a>
+ </p>
+ <p>
+  <blockquote>
+   <p>Blockquote</p>
+  </blockquote>
+ </p>
+ <p>
+  <blockquote>
+   <blockquote>
+    <p>Next level</p>
+   </blockquote>
+  </blockquote>
+ </p>
+</div>

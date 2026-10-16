@@ -1,0 +1,177 @@
+<div class="calcpad-output">
+ <!-- Volume and surface area of a spherical segment (the slab between two parallel planes cutting a sphere). -->
+ <div style="max-width:130mm">
+  <img alt="segment.png" class="side" src="Images/math/volume/segment.png" style="height:60pt;"/>
+ </div>
+ <p>Raduses of bases</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">3</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-4">2</u>
+  </span>
+ </p>
+ <p>Height</p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-6">1</u>
+  </span>
+ </p>
+ <p>Radius of sphere</p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   =
+   <span class="dvc">
+    <span class="o0">
+     <span class="r">√</span>
+     (  (
+     <var>a</var>
+     −
+     <var>b</var>
+     )
+     <sup>2</sup>
+     +
+     <var>h</var>
+     <sup>2</sup>
+     )  ·  (  (
+     <var>a</var>
+     +
+     <var>b</var>
+     )
+     <sup>2</sup>
+     +
+     <var>h</var>
+     <sup>2</sup>
+     )
+    </span>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>h</var>
+   </span>
+   =
+   <span class="dvc">
+    <span class="o0">
+     <span class="r">√</span>
+     (  ( 3 − 2 )
+     <sup>2</sup>
+     + 1
+     <sup>2</sup>
+     )  ·  (  ( 3 + 2 )
+     <sup>2</sup>
+     + 1
+     <sup>2</sup>
+     )
+    </span>
+    <span class="dvl">
+    </span>
+    2 · 1
+   </span>
+   = 3.61
+  </span>
+ </p>
+ <p>Volume</p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   ·  ( 3 ·
+   <var>a</var>
+   <sup>2</sup>
+   + 3 ·
+   <var>b</var>
+   <sup>2</sup>
+   +
+   <var>h</var>
+   <sup>2</sup>
+   )  =
+   <span class="dvc">
+    3.14 · 1
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   ·  ( 3 · 3
+   <sup>2</sup>
+   + 3 · 2
+   <sup>2</sup>
+   + 1
+   <sup>2</sup>
+   )  = 20.94
+  </span>
+ </p>
+ <p>Area of side surface</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   <sub>o</sub>
+   = 2 ·
+   <var>π</var>
+   ·
+   <var>R</var>
+   ·
+   <var>h</var>
+   = 2 · 3.14 · 3.61 · 1 = 22.65
+  </span>
+ </p>
+ <p>Base areas</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <var>π</var>
+   ·
+   <var>a</var>
+   <sup>2</sup>
+   = 3.14 · 3
+   <sup>2</sup>
+   = 28.27
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>B</var>
+   =
+   <var>π</var>
+   ·
+   <var>b</var>
+   <sup>2</sup>
+   = 3.14 · 2
+   <sup>2</sup>
+   = 12.57
+  </span>
+ </p>
+ <p>Total surface area</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   =
+   <var>S</var>
+   <sub>o</sub>
+   +
+   <var>A</var>
+   +
+   <var>B</var>
+   = 22.65 + 28.27 + 12.57 = 63.5
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

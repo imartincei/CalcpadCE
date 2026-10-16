@@ -1,0 +1,661 @@
+<div class="calcpad-output">
+ <h3>Floor Load Takedown</h3>
+ <p>
+  A worked takedown that exercises the parts of
+  <b>#UI</b>
+  built for input forms: grids seeded
+  <p>from an expression, units carried through a grid of plain numbers, the width properties, and the</p>
+  <p>two properties that trade the guard rails for flexibility. Switch to Input mode to fill it in.</p>
+ </p>
+ <p>
+ </p>
+ <h3>1. A grid seeded from an expression</h3>
+ <p>
+ </p>
+ <p>
+  A datagrid replaces its whole right hand side the moment it is edited, so it can be seeded
+  <p>with any expression at all - not only a literal. That is what lets a blank schedule start at</p>
+  <p>something more useful than zeros; every cell below starts at 5 kN/m².</p>
+ </p>
+ <p>
+ </p>
+ <p>
+  The cells hold plain numbers and the unit is kept aside - hover a cell to see it. It goes
+  <p>back on when the grid writes its literal, so nothing downstream has to guess. Where the unit</p>
+  <p>matters at a glance it belongs in the header, and a header may contain a comma.</p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>w</var>
+   </b>
+   =
+   <b>matrix</b>
+   ( 4; 2 )  + 5
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+    <sup class="unit">2</sup>
+   </span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      5
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      5
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      5
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      5
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      5
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      5
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      5
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      5
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>2. Sizing</h3>
+ <p>
+ </p>
+ <p>
+  A grid takes its natural width - the row header plus 80 px a column - unless
+  <b>width</b>
+  says otherwise. Above it is
+  <b>"100%"</b>
+  , with
+  <b>columnWidths</b>
+  read as ratios
+  <p>and scaled to fit. Here the same shape is left to size itself, then pinned to 420 px.</p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>w</var>
+   </b>
+   <sub>nat</sub>
+   =
+   <b>matrix</b>
+   ( 4; 2 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>w</var>
+   </b>
+   <sub>fix</sub>
+   =
+   <b>matrix</b>
+   ( 4; 2 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  A grid of a single column is sized from its header rather than stretched across the page,
+  <p>and a header that spills wraps instead of clipping.</p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>ψ</var>
+   </b>
+   =
+   <b>matrix</b>
+   ( 4; 1 )  + 1 =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h5>Long names that should wrap</h5>
+ <p>
+  <span class="eq">
+   <b>
+    <var>longNames</var>
+   </b>
+   =
+   <b>matrix</b>
+   ( 4; 1 )  + 1 =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>3. Units typed into the cells</h3>
+ <p>
+ </p>
+ <p>
+  With
+  <b>forceUnits</b>
+  off the units move into the cells, so each one carries its own -
+  <p>which is what a schedule needs when it mixes point loads with pressures. Type</p>
+  <b>2kN</b>
+  ,
+  <b>0.5MN</b>
+  , whatever suits the line.
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>P</var>
+   </b>
+   =
+   <b>matrix</b>
+   ( 3; 1 )  + 2
+   <i>kN</i>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      2
+      <i>kN</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      2
+      <i>kN</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      2
+      <i>kN</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>4. Expressions in the cells</h3>
+ <p>
+ </p>
+ <p>
+  With
+  <b>allowExpression</b>
+  a cell takes anything and it is written to the document as typed,
+  <p>
+   so a tributary width can be entered as
+   <b>6m/2</b>
+   and stay that way, rather than collapsing to
+  </p>
+  <p>a number the next reader has to reverse-engineer. Nothing is checked as you type: an entry the</p>
+  <p>parser cannot read leaves the control in place and reports the error on the line below it.</p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>b</var>
+   </b>
+   =
+   <b>matrix</b>
+   ( 4; 1 )  +
+   <span class="dvc">
+    6
+    <i>m</i>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      3
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      3
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      3
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      3
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>5. The same two properties on an entry</h3>
+ <p>
+ </p>
+ <p>By default an entry edits the number and the unit stays in the document beside the box.</p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>L</var>
+   = 6
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  With
+  <b>forceUnits</b>
+  off the unit moves into the box, so the input can change its unit as
+  <p>
+   well as its magnitude - enter
+   <b>250mm</b>
+   or
+   <b>0.25m</b>
+   , whichever reads better.
+  </p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>t</var>
+   = 200
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  With
+  <b>allowExpression</b>
+  the box shows the expression as written rather than the number it
+  <p>came to, so a factor built from its parts can be adjusted instead of flattened on first touch.</p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>γ</var>
+   <sub>G</sub>
+   = 1.25 + 0.1 = 1.35
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>6. The takedown</h3>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>g</var>
+   <sub>k</sub>
+   =
+   <b>sum</b>
+   (
+   <b>col</b>
+   (
+   <b>
+    <var>w</var>
+   </b>
+   ; 1 )  ·
+   <b>col</b>
+   (
+   <b>
+    <var>b</var>
+   </b>
+   ; 1 )  )  = 60
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>q</var>
+   <sub>k</sub>
+   =
+   <b>sum</b>
+   (
+   <b>col</b>
+   (
+   <b>
+    <var>w</var>
+   </b>
+   ; 2 )  ·
+   <b>col</b>
+   (
+   <b>
+    <var>b</var>
+   </b>
+   ; 1 )  ·
+   <b>col</b>
+   (
+   <b>
+    <var>ψ</var>
+   </b>
+   ; 1 )  )  = 60
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>G</var>
+   <sub>k</sub>
+   =
+   <var>g</var>
+   <sub>k</sub>
+   ·
+   <var>L</var>
+   +
+   <b>sum</b>
+   (
+   <b>
+    <var>P</var>
+   </b>
+   )  = 60
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   · 6
+   <i>m</i>
+   +
+   <b>sum</b>
+   (
+   <b>
+    <var>P</var>
+   </b>
+   )  = 366
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>Q</var>
+   <sub>k</sub>
+   =
+   <var>q</var>
+   <sub>k</sub>
+   ·
+   <var>L</var>
+   = 60
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   · 6
+   <i>m</i>
+   = 360
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   <sub>d</sub>
+   =
+   <var>γ</var>
+   <sub>G</sub>
+   ·
+   <var>G</var>
+   <sub>k</sub>
+   + 1.5 ·
+   <var>Q</var>
+   <sub>k</sub>
+   = 1.35 · 366
+   <i>kN</i>
+   + 1.5 · 360
+   <i>kN</i>
+   = 1034.1
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  Design load carried into the column below, over a floor plate
+  <b>L</b>
+  long with a
+  <b>t</b>
+  slab.
+ </p>
+</div>

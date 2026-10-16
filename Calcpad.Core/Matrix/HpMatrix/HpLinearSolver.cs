@@ -68,7 +68,7 @@ namespace Calcpad.Core
                 var Ap = pool.Rent(n);
                 try
                 {
-                    // Extract column from B  
+                    // Extract column from B
                     B[j].AsSpan().CopyTo(r);
                     // Solve with pre-computed diagonal
                     SolvePCGWithArrays(r, x, z, p, Ap, diag, tol);

@@ -1,0 +1,76 @@
+<div class="calcpad-output">
+ <!-- Volume $V = \pi r^2 h$ and surface area $S = 2\pi r (r + h)$ of a right circular cylinder. -->
+ <div style="max-width:100mm">
+  <img alt="cylinder.png" class="side" src="Images/math/volume/cylinder.png" style="height:55pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  Base radius -
+  <span class="eq">
+   <var>r</var>
+   =
+   <u class="input-4">1</u>
+  </span>
+ </p>
+ <p>
+  Height -
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-5">2</u>
+  </span>
+ </p>
+ <p>Area of base</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <var>π</var>
+   ·
+   <var>r</var>
+   <sup>2</sup>
+   = 3.14 · 1
+   <sup>2</sup>
+   = 3.14
+  </span>
+ </p>
+ <p>Volume</p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <var>A</var>
+   ·
+   <var>h</var>
+   = 3.14 · 2 = 6.28
+  </span>
+ </p>
+ <p>Area of side surface</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   <sub>o</sub>
+   = 2 ·
+   <var>π</var>
+   ·
+   <var>r</var>
+   ·
+   <var>h</var>
+   = 2 · 3.14 · 1 · 2 = 12.57
+  </span>
+ </p>
+ <p>Total surface area</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   =
+   <var>S</var>
+   <sub>o</sub>
+   + 2 ·
+   <var>A</var>
+   = 12.57 + 2 · 3.14 = 18.85
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

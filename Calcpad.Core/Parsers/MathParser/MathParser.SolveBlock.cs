@@ -141,7 +141,7 @@ namespace Calcpad.Core
                 const string delimiters = "@=:";
                 var items = new SolverItem[n + 1];
                 int current = 0, bracketCounter = 0, equalityIndex = -1;
-                var ts = new TextSpan(script);  
+                var ts = new TextSpan(script);
                 var len = script.Length;
                 for (int i = 0; i < len; ++i)
                 {
@@ -211,11 +211,6 @@ namespace Calcpad.Core
                     _parser.Parse(item.Input, (i == 0 || i > 3) && allowAssignment);
                     item.Rpn = _parser._rpn;
                 }
-                if (_type == SolverTypes.Inf || _type == SolverTypes.Sup)
-                {
-                    var s = items[1].Input + (_type == SolverTypes.Sup ? "_sup" : "_inf");
-                    _parser.SetVariable(s, RealValue.NaN);
-                }
                 var rpn = items[1].Rpn;
                 Parameter[] parameters;
                 if (rpn.Length == 1 && rpn[0] is VariableToken vt)
@@ -226,6 +221,12 @@ namespace Calcpad.Core
                 }
                 else
                     throw Exceptions.CounterMustBeASingleVariableName();
+
+                if (_type == SolverTypes.Inf || _type == SolverTypes.Sup)
+                {
+                    var s = items[1].Input + (_type == SolverTypes.Sup ? "_sup" : "_inf");
+                    _parser.SetVariable(s, RealValue.NaN);
+                }
 
                 if (_parser.IsEnabled)
                 {
@@ -286,9 +287,9 @@ namespace Calcpad.Core
                     else if (c == '}')
                         --curlyBracketCounter;
 
-                    if (bracketCounter == 0 && 
-                        squareBracketCounter == 0 && 
-                        curlyBracketCounter == 0 && 
+                    if (bracketCounter == 0 &&
+                        squareBracketCounter == 0 &&
+                        curlyBracketCounter == 0 &&
                         c == ';')
                     {
                         ts.ExpandTo(i);
@@ -343,7 +344,7 @@ namespace Calcpad.Core
                 }
             }
 
-            private void Compile() 
+            private void Compile()
             {
                 var allowAssignment =
                     _type == SolverTypes.Repeat || IsBlock;
@@ -386,7 +387,7 @@ namespace Calcpad.Core
                 else
                     _a = _parser.CompileRpn(rpn);
 
-                
+
                 if (len > 3)
                 {
                     rpn = _items[3].Rpn;

@@ -1,0 +1,12 @@
+'<!-- CalcpadCE handles unit conversion natively with SI and Imperial units. Units are checked for consistency to spot errors early. -->
+'Simple unit conversion:
+A = 0.5m^2
+A|cm^2
+A|ft^2
+
+'Using different units within the same equation:
+ρ = 3bar + 100psi
+ρ = 3bar + 100psi|psi
+
+'Unit validation:
+'x = 1 Nm + 1 m ← Rejected with: Inconsistent units: "Nm + m".

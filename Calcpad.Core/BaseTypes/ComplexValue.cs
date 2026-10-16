@@ -108,10 +108,10 @@ namespace Calcpad.Core
                 B.AlmostEquals(other.B * d);
         }
 
-        // For complex numbers the real parts are ordered first and 
-        // then the imaginary parts if real are euals (lexicographic ordering)   
-        // Although it is not strictly correct mathematically, 
-        // it is useful for practical sorting in many cases. 
+        // For complex numbers the real parts are ordered first and
+        // then the imaginary parts if real are euals (lexicographic ordering)
+        // Although it is not strictly correct mathematically,
+        // it is useful for practical sorting in many cases.
 
         public int CompareTo(ComplexValue other)
         {

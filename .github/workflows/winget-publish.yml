@@ -1,0 +1,21 @@
+name: Publish to WinGet
+
+# Manual-only while the release is in beta and no Windows installer is published;
+# the `release` trigger comes back once installers ship.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to submit (e.g. v7.6.4)'
+        required: true
+
+jobs:
+  winget-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: vedantmgoyal9/winget-releaser@main
+        with:
+          identifier: Imartincei.CalcpadCE
+          installers-regex: '\.exe$'
+          release-tag: ${{ inputs.tag || github.event.release.tag_name }}
+          token: ${{ secrets.WINGET_PKGS_TOKEN }}

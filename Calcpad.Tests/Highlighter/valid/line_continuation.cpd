@@ -1,0 +1,59 @@
+' Line continuation: explicit _ and implicit ;|&@:({[
+' Explicit _ continuation
+a = 1 + 2 + 3 _
+	+ 4 + 5
+b = 1 _
+	+ 2 _
+	+ 3 _
+	+ 4
+longFunc(x; y; z) = x^2 _
+	+ y^2 _
+	+ z^2
+c = 100 * _
+	2
+d = (1 + 2 _
+	+ 3) * (4 + 5)
+'Comment with underscore_ does not continue
+nextLine = 42
+x_1 = 10
+midUnderscore = 1 + x_1 + 2
+' Implicit [ continuation (unbalanced bracket)
+v = [1; 2;
+	3; 4; 5]
+w = [1; 2 |
+	3; 4]
+' Implicit ( continuation (unbalanced paren)
+q(x; y; z) = (
+	x + y + z)
+r = sin(
+	1.5)
+' Implicit { continuation (unbalanced brace in command)
+p(x) = x^2
+s = $Inline{
+	y = 5; y + 1}
+' Implicit ; continuation in command block
+t = $Inline{x = 1;
+	y = 2;
+	x + y}
+' Implicit @ continuation in command
+u = 0
+$Repeat{u ← u + k @
+	k = 1 : 3}
+' Implicit & continuation in plot
+f_plot(x) = sin(x)
+g_plot(x) = cos(x)
+$Plot{f_plot(x) &
+	g_plot(x) @ x = 0 : 6}
+' Implicit : continuation in command range
+sumV = $Sum{k @
+	k = 1 :
+	10}
+' Explicit _ inside command block
+flatM(m) = $Inline{ _
+v = vector(n_rows(m)*n_cols(m)); _
+$Repeat{$Repeat{v.((i - 1)*n_cols(m) + j) = m.(i; j) @ j = 1 : n_cols(m)} @ i = 1 : n_rows(m)}; _
+v}
+appendV(v; val) = $Inline{ _
+n = len(v); _
+v = resize(v; n + 1); _
+v.(n + 1) = val; v}

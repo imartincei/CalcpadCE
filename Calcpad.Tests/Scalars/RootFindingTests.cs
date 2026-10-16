@@ -42,7 +42,7 @@
             "f_31(x) = π - 1/x",
             "f_32(x) = 4 - tan(x)",
             // Steven A. Stage
-            // Comments on An Improvement to the Brent’s Method 
+            // Comments on An Improvement to the Brent’s Method
             "f_33(x) = cos(x) - x^3",
             "f_34(x) = cos(x) - x",
             "f_35(x) = sqr(abs(x - 2/3))*if(x ≤ 2/3; 1; -1) - 0.1",

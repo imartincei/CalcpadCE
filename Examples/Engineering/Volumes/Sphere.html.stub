@@ -1,0 +1,58 @@
+<div class="calcpad-output">
+ <!-- Volume $V = \tfrac{4}{3}\pi r^3$ and surface area $S = 4\pi r^2$ of a sphere from its radius. -->
+ <div style="max-width:100mm">
+  <img alt="sphere.png" class="side" src="Images/math/volume/sphere.png" style="height:60pt;"/>
+ </div>
+ <p>Radius</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   =
+   <u class="input-4">1</u>
+  </span>
+ </p>
+ <p>Volume</p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <span class="dvc">
+    4
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   ·
+   <var>π</var>
+   ·
+   <var>r</var>
+   <sup>3</sup>
+   =
+   <span class="dvc">
+    4
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   · 3.14 · 1
+   <sup>3</sup>
+   = 4.19
+  </span>
+ </p>
+ <p>Surface area</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   = 4 ·
+   <var>π</var>
+   ·
+   <var>r</var>
+   <sup>2</sup>
+   = 4 · 3.14 · 1
+   <sup>2</sup>
+   = 12.57
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

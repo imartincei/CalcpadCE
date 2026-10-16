@@ -188,7 +188,7 @@ namespace Calcpad.Core
                 if (_rowCount > ParallelThreshold)
                     Parallel.For(0, _rowCount, CopyRow1);
                 else
-                    for (int i = 0; i < _rowCount; ++i) 
+                    for (int i = 0; i < _rowCount; ++i)
                         CopyRow1(i);
             }
             else
@@ -196,7 +196,7 @@ namespace Calcpad.Core
                 if (_rowCount > ParallelThreshold)
                     Parallel.For(0, _rowCount, CopyRow2);
                 else
-                    for (int i = _rowCount - 1; i >= 0; --i) 
+                    for (int i = _rowCount - 1; i >= 0; --i)
                         CopyRow2(i);
             }
             return M;
@@ -2601,7 +2601,7 @@ namespace Calcpad.Core
 
         internal override RealValue Min()
         {
-            var len = _hpRows.Length;    
+            var len = _hpRows.Length;
             var min = _hpRows[0].Min().D;
             if (len > ParallelThreshold)
             {
@@ -2930,7 +2930,7 @@ namespace Calcpad.Core
             return new(trace, _units);
         }
 
-        // L1 norm   
+        // L1 norm
         internal override RealValue L1Norm()
         {
             var norm = Col(1).L1Norm().D;
@@ -2958,7 +2958,7 @@ namespace Calcpad.Core
             return sig.Max();
         }
 
-        // L∞ (Infinity) or Chebyshev norm     
+        // L∞ (Infinity) or Chebyshev norm
         internal override RealValue InfNorm()
         {
             var norm = _hpRows[0].L1Norm().D;
@@ -3239,7 +3239,7 @@ namespace Calcpad.Core
         {
             var m = LU._rowCount;
             var start = -1;
-            // Forward substitution. Solve Ly = v by storing y in x. 
+            // Forward substitution. Solve Ly = v by storing y in x.
             for (int i = 0; i < m; ++i)
             {
                 var index = indexes[i];

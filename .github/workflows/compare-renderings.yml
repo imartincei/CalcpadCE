@@ -1,0 +1,51 @@
+name: Compare renderings
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'mkdocs.yml'
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'mkdocs.yml'
+
+jobs:
+  compare-renderings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: python -m pip install -r .github/scripts/requirements.txt
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Publish Calcpad CLI
+        run: |
+          dotnet publish Calcpad.Cli/Calcpad.Cli.csproj \
+            -c Release -r linux-x64 --self-contained \
+            -o cli-build
+
+      - name: Prepare comparison CLI settings
+        run: |
+          mkdir -p "$HOME/Documents/.config/calcpad"
+          cp .github/scripts/CliSettingsComparison.xml "$HOME/Documents/.config/calcpad/Settings.xml"
+
+      - name: Compare renderings
+        run: python .github/scripts/compare_renderings.py

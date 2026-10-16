@@ -1,0 +1,151 @@
+<div class="calcpad-output">
+ <!-- Defines bit, byte and the [binary prefixes](https://en.wikipedia.org/wiki/Binary_prefix) (KiB, MiB, GiB, TiB) as custom units, ready for bandwidth and storage calculations. -->
+ <p>
+  <b>Definition</b>
+ </p>
+ <p>
+  <span class="eq">
+   <i>bit</i>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <i>byte</i>
+   = 8
+   <i>bit</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <i>KB</i>
+   = 1000
+   <i>byte</i>
+  </span>
+  ,
+  <span class="eq">
+   <i>KiB</i>
+   = 1024
+   <i>byte</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <i>MB</i>
+   = 1000
+   <i>KB</i>
+  </span>
+  ,
+  <span class="eq">
+   <i>MiB</i>
+   = 1024
+   <i>KiB</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <i>TB</i>
+   = 1000
+   <i>MB</i>
+  </span>
+  ,
+  <span class="eq">
+   <i>TiB</i>
+   = 1024
+   <i>MiB</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <i>PB</i>
+   = 1000
+   <i>TB</i>
+  </span>
+  ,
+  <span class="eq">
+   <i>PiB</i>
+   = 1024
+   <i>TiB</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <i>EB</i>
+   = 1000
+   <i>PB</i>
+  </span>
+  ,
+  <span class="eq">
+   <i>EiB</i>
+   = 1024
+   <i>PiB</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <i>ZB</i>
+   = 1000
+   <i>EB</i>
+  </span>
+  ,
+  <span class="eq">
+   <i>ZiB</i>
+   = 1024
+   <i>EiB</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <i>YB</i>
+   = 1000
+   <i>ZB</i>
+  </span>
+  ,
+  <span class="eq">
+   <i>YiB</i>
+   = 1024
+   <i>ZiB</i>
+  </span>
+ </p>
+ <p>
+  <b>Conversion</b>
+ </p>
+ <p>
+  <span class="eq">
+   <i>MiB</i>
+   = 1048576
+   <i>byte</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <i>TiB</i>
+   = 1073741824
+   <i>byte</i>
+  </span>
+ </p>
+ <p>
+  <b>Usage</b>
+ </p>
+ <p>
+  <span class="eq">
+   <var>v</var>
+   = 10000000
+   <span class="dvc">
+    <i>byte</i>
+    <span class="dvl">
+    </span>
+    <i>s</i>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>v</var>
+   = 33.53
+   <i>TiB</i>
+   <i class="unit">∕</i>
+   <i>h</i>
+  </span>
+ </p>
+</div>

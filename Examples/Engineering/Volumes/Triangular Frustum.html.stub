@@ -1,0 +1,228 @@
+<div class="calcpad-output">
+ <!-- Volume of a triangular frustum from the two parallel triangular faces and height. -->
+ <div style="max-width:120mm">
+  <img alt="triangular-frustum.png" class="side" src="Images/math/volume/triangular-frustum.png" style="height:60pt;"/>
+ </div>
+ <p>
+  <b>Dimensions:</b>
+ </p>
+ <p>Bottom base</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <u class="input-5">10</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>B</var>
+   =
+   <u class="input-5">8</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>C</var>
+   =
+   <u class="input-5">6</u>
+  </span>
+ </p>
+ <p>Top base</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-7">5</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   =
+   <span class="dvc">
+    <var>B</var>
+    ·
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    <var>A</var>
+   </span>
+   =
+   <span class="dvc">
+    8 · 5
+    <span class="dvl">
+    </span>
+    10
+   </span>
+   = 4
+  </span>
+  ,
+  <span class="eq">
+   <var>c</var>
+   =
+   <span class="dvc">
+    <var>C</var>
+    ·
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    <var>A</var>
+   </span>
+   =
+   <span class="dvc">
+    6 · 5
+    <span class="dvl">
+    </span>
+    10
+   </span>
+   = 3
+  </span>
+ </p>
+ <p>
+  Height -
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-8">2</u>
+  </span>
+ </p>
+ <!--
+<-->
+ <p>
+  <b>Bottom base</b>
+ </p>
+ <p>Semiperimeter</p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   = 0.5 ·  (
+   <var>A</var>
+   +
+   <var>B</var>
+   +
+   <var>C</var>
+   )  = 0.5 ·  ( 10 + 8 + 6 )  = 12
+  </span>
+ </p>
+ <p>Area (Heron equation)</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>1</sub>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>p</var>
+    ·  (
+    <var>p</var>
+    −
+    <var>A</var>
+    )  ·  (
+    <var>p</var>
+    −
+    <var>B</var>
+    )  ·  (
+    <var>p</var>
+    −
+    <var>C</var>
+    )
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    12 ·  ( 12 − 10 )  ·  ( 12 − 8 )  ·  ( 12 − 6 )
+   </span>
+   = 24
+  </span>
+ </p>
+ <p>
+  <b>Top base</b>
+ </p>
+ <p>Semiperimeter</p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   = 0.5 ·  (
+   <var>a</var>
+   +
+   <var>b</var>
+   +
+   <var>c</var>
+   )  = 0.5 ·  ( 5 + 4 + 3 )  = 6
+  </span>
+ </p>
+ <p>Area (Heron equation)</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>2</sub>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>p</var>
+    ·  (
+    <var>p</var>
+    −
+    <var>a</var>
+    )  ·  (
+    <var>p</var>
+    −
+    <var>b</var>
+    )  ·  (
+    <var>p</var>
+    −
+    <var>c</var>
+    )
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    6 ·  ( 6 − 5 )  ·  ( 6 − 4 )  ·  ( 6 − 3 )
+   </span>
+   = 6
+  </span>
+ </p>
+ <p>
+  <b>Volume</b>
+ </p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   ·  (
+   <var>A</var>
+   <sub>1</sub>
+   +
+   <span class="o0">
+    <span class="r">√</span>
+    <var>A</var>
+    <sub>1</sub>
+    ·
+    <var>A</var>
+    <sub>2</sub>
+   </span>
+   +
+   <var>A</var>
+   <sub>2</sub>
+   )  =
+   <span class="dvc">
+    2
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   ·  ( 24 +
+   <span class="o0">
+    <span class="r">√</span>
+    24 · 6
+   </span>
+   + 6 )  = 28
+  </span>
+ </p>
+ <!--
+<-->
+</div>

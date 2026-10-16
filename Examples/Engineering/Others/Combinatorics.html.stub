@@ -1,0 +1,261 @@
+<div class="calcpad-output">
+ <!-- Tabulates permutations and combinations with and without repetition using the built-in $perm$ and $comb$ helpers. -->
+ <h4>1. Permutations</h4>
+ (order of element matters)
+ <h5>1.1. Permutations without repetitions</h5>
+ <p>
+  Number of permutations of n elements -
+  <span class="eq">
+   <var>P</var>
+   (
+   <var>n</var>
+   )  =
+   <var>n</var>
+   !
+  </span>
+  (factorial function)
+ </p>
+ <p>
+  Example -
+  <span class="eq">
+   <var>P</var>
+   ( 5 )  = 120
+  </span>
+ </p>
+ <p>
+  Number of permutations of k elements from n possible -
+  <span class="eq">
+   <var>P</var>
+   (
+   <var>n</var>
+   ;
+   <var>k</var>
+   )  =
+   <span class="dvc">
+    <var>n</var>
+    !
+    <span class="dvl">
+    </span>
+    (
+    <var>n</var>
+    −
+    <var>k</var>
+    ) !
+   </span>
+  </span>
+ </p>
+ <p>
+  Example -
+  <span class="eq">
+   <var>P</var>
+   ( 5; 2 )  = 20
+  </span>
+ </p>
+ <p>
+  Efficient method for calculation -
+  <span class="eq">
+   <var>P</var>
+   (
+   <var>n</var>
+   ;
+   <var>k</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>k</var>
+     − 1
+    </small>
+    <span class="nary">∏</span>
+    <small>
+     <var>i</var>
+     = 0
+    </small>
+   </span>
+   <span class="b1">(</span>
+   <var>n</var>
+   −
+   <var>i</var>
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <p>
+  Example -
+  <span class="eq">
+   <var>P</var>
+   ( 5; 2 )  = 20
+  </span>
+ </p>
+ <h5>1.2. Permutations with repetitions</h5>
+ <p>
+  Number of permutations of k elements from n possible -
+  <span class="eq">
+   <var>P</var>
+   (
+   <var>n</var>
+   ;
+   <var>k</var>
+   )  =
+   <var>n</var>
+   <sup>
+    <var>k</var>
+   </sup>
+  </span>
+ </p>
+ <p>
+  Example -
+  <span class="eq">
+   <var>P</var>
+   ( 5; 2 )  = 25
+  </span>
+ </p>
+ <h4>2. Combinations</h4>
+ (order of element doesn′t matter)
+ <h5>2.1. Combinations without repetitions</h5>
+ <p>
+  Number of combinations of k elements from n possible -
+  <span class="eq">
+   <var>C</var>
+   (
+   <var>n</var>
+   ;
+   <var>k</var>
+   )  =
+   <span class="dvc">
+    <var>n</var>
+    !
+    <span class="dvl">
+    </span>
+    (
+    <var>n</var>
+    −
+    <var>k</var>
+    ) ! ·
+    <var>k</var>
+    !
+   </span>
+  </span>
+ </p>
+ <p>(a.k.a. binomial coefficients)</p>
+ <p>
+  Example -
+  <span class="eq">
+   <var>C</var>
+   ( 5; 2 )  = 10
+  </span>
+ </p>
+ <p>
+  Efficient method for calculation -
+  <span class="eq">
+   <var>C</var>
+   (
+   <var>n</var>
+   ;
+   <var>k</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>k</var>
+    </small>
+    <span class="nary">∏</span>
+    <small>
+     <var>i</var>
+     = 1
+    </small>
+   </span>
+   <span class="b1">(</span>
+   1 +
+   <span class="dvc">
+    <var>n</var>
+    −
+    <var>k</var>
+    <span class="dvl">
+    </span>
+    <var>i</var>
+   </span>
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <p>
+  Example -
+  <span class="eq">
+   <var>C</var>
+   ( 5; 2 )  = 10
+  </span>
+  =
+  <span class="eq">
+   <var>C</var>
+   ( 5; 5 − 2 )  = 10
+  </span>
+ </p>
+ <h5>2.1. Combinations with repetitions</h5>
+ <p>
+  Number of combinations of k elements from n possible -
+  <span class="eq">
+   <var>C</var>
+   (
+   <var>n</var>
+   ;
+   <var>k</var>
+   )  =
+   <span class="dvc">
+    (
+    <var>k</var>
+    +
+    <var>n</var>
+    − 1 ) !
+    <span class="dvl">
+    </span>
+    (
+    <var>n</var>
+    − 1 ) ! ·
+    <var>k</var>
+    !
+   </span>
+  </span>
+ </p>
+ <p>
+  Example -
+  <span class="eq">
+   <var>C</var>
+   ( 5; 2 )  = 15
+  </span>
+ </p>
+ <p>
+  Efficient method for calculation -
+  <span class="eq">
+   <var>C</var>
+   (
+   <var>n</var>
+   ;
+   <var>k</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>k</var>
+    </small>
+    <span class="nary">∏</span>
+    <small>
+     <var>i</var>
+     = 1
+    </small>
+   </span>
+   <span class="b1">(</span>
+   1 +
+   <span class="dvc">
+    <var>n</var>
+    − 1
+    <span class="dvl">
+    </span>
+    <var>i</var>
+   </span>
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <p>
+  Example -
+  <span class="eq">
+   <var>C</var>
+   ( 5; 2 )  = 15
+  </span>
+ </p>
+</div>

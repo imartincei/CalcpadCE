@@ -1,0 +1,80 @@
+{
+  "productName": "CalcpadCE",
+  "identifier": "org.calcpad-ce.desktop",
+  "build": {
+    "frontendDist": "../../calcpad-web/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "CalcpadCE",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 800,
+        "minHeight": 600,
+        "center": true,
+        "resizable": true,
+        "visible": true,
+        "additionalBrowserArgs": "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection,IsolateSandboxedIframes"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' https:; connect-src 'self' ipc: http://127.0.0.1:* http://localhost:* https: blob: data:; img-src 'self' data: blob: asset: http://asset.localhost http: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; font-src 'self' data: https:; worker-src 'self' blob: https:; frame-src data: blob: http: https:; media-src 'self' data: blob: https:; object-src 'none'; base-uri 'none'; form-action 'none'",
+      "dangerousDisableAssetCspModification": [
+        "script-src",
+        "style-src"
+      ]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "resources": {
+      "binaries/Calcpad.Server.deps.json": "./",
+      "binaries/Calcpad.Server.runtimeconfig.json": "./",
+      "binaries/Calcpad.Server.staticwebassets.endpoints.json": "./",
+      "binaries/appsettings.json": "./",
+      "binaries/THIRD-PARTY-NOTICES.txt": "./",
+      "binaries/LICENSE.txt": "./",
+      "binaries/*.html": "./",
+      "binaries/Fonts/**/*": "./Fonts/",
+      "binaries/bg/**/*": "./bg/",
+      "binaries/zh/**/*": "./zh/"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "fileAssociations": [
+      {
+        "ext": [
+          "cpd"
+        ],
+        "name": "CalcpadCE Document",
+        "description": "CalcpadCE calculation document",
+        "mimeType": "application/x-calcpadce",
+        "role": "Editor",
+        "rank": "Default"
+      },
+      {
+        "ext": [
+          "cpdz"
+        ],
+        "name": "CalcpadCE Compiled Worksheet",
+        "description": "CalcpadCE compiled worksheet, opened as an input form",
+        "mimeType": "application/x-calcpadce-compiled",
+        "role": "Editor",
+        "rank": "Default"
+      }
+    ],
+    "category": "DeveloperTool",
+    "shortDescription": "CalcpadCE desktop editor",
+    "longDescription": "CalcpadCE is a Vue-based editor for CalcpadCE calculation files, backed by an embedded ASP.NET Core server.",
+    "macOS": {
+      "minimumSystemVersion": "11.0"
+    }
+  }
+}

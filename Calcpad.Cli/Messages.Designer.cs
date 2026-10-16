@@ -10,8 +10,8 @@
 
 namespace Calcpad.Cli {
     using System;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,15 +23,15 @@ namespace Calcpad.Cli {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Messages {
-        
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Messages() {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -45,7 +45,7 @@ namespace Calcpad.Cli {
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -59,7 +59,7 @@ namespace Calcpad.Cli {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Commands.
         /// </summary>
@@ -68,16 +68,7 @@ namespace Calcpad.Cli {
                 return ResourceManager.GetString("Commands", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to  Copyright: © 2026 by Proektsoft EOOD..
-        /// </summary>
-        internal static string Copyright_2023_By_Proektsoft_EOOD {
-            get {
-                return ResourceManager.GetString("Copyright_2023_By_Proektsoft_EOOD", resourceCulture);
-            }
-        }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Enter math expressions or commands (or type HELP for further instructions).
         /// </summary>
@@ -86,7 +77,7 @@ namespace Calcpad.Cli {
                 return ResourceManager.GetString("Enter_Math_Expressions_Or_Commands_Or_Type_HELP_For_Further_Instructions", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
@@ -95,7 +86,7 @@ namespace Calcpad.Cli {
                 return ResourceManager.GetString("Error", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Input file does not exist..
         /// </summary>
@@ -104,7 +95,7 @@ namespace Calcpad.Cli {
                 return ResourceManager.GetString("InputFileDoesNotExist", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Invalid input file extension. Must be &apos;cpd&apos; or &apos;txt&apos;..
         /// </summary>
@@ -113,7 +104,7 @@ namespace Calcpad.Cli {
                 return ResourceManager.GetString("InvalidInputFileExtensionMustBeCpdOrTxt", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Invalid output extension.. Must be &apos;html&apos;, &apos;docx&apos; or &apos;pdf&apos;..
         /// </summary>
@@ -122,7 +113,7 @@ namespace Calcpad.Cli {
                 return ResourceManager.GetString("InvalidOutputExtensionMustBeHtmlDocxOrPdf", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Loading the settings file....
         /// </summary>
@@ -131,7 +122,16 @@ namespace Calcpad.Cli {
                 return ResourceManager.GetString("Loading_The_Settings_File", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to PDF export is not currently available in the CLI. It is planned for a future release. In the meantime, use the CalcpadCE desktop app to export PDF, or run the standalone CalcpadCE server if you need PDF export as a background task.
+        /// </summary>
+        internal static string PdfExportNotAvailable {
+            get {
+                return ResourceManager.GetString("PdfExportNotAvailable", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Press any key when ready..
         /// </summary>
@@ -140,7 +140,7 @@ namespace Calcpad.Cli {
                 return ResourceManager.GetString("Press_Any_Key_When_Ready", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Press any key to continue..
         /// </summary>
@@ -149,7 +149,7 @@ namespace Calcpad.Cli {
                 return ResourceManager.GetString("PressAnyKeyToContinue", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Problem \&quot;{0}\&quot; does not exist..
         /// </summary>
@@ -158,7 +158,7 @@ namespace Calcpad.Cli {
                 return ResourceManager.GetString("Problem_0_Does_Not_Exist", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Problem title:.
         /// </summary>
@@ -167,7 +167,7 @@ namespace Calcpad.Cli {
                 return ResourceManager.GetString("Problem_Title", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to There are no saved problems..
         /// </summary>
@@ -176,16 +176,16 @@ namespace Calcpad.Cli {
                 return ResourceManager.GetString("There_Are_No_Saved_Problems", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to  Welcome to Calcpad VM command line interpreter v.{0}.{1}.{2}!.
+        ///   Looks up a localized string similar to  Welcome to CalcpadCE command line interpreter v.{0}!.
         /// </summary>
         internal static string Welcome_To_Calcpad_Command_Line_Interpreter {
             get {
                 return ResourceManager.GetString("Welcome_To_Calcpad_Command_Line_Interpreter", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Would you like to restore the previous settings (y/n)?.
         /// </summary>

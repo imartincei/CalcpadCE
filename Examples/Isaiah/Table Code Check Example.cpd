@@ -1,0 +1,29 @@
+#include Helper.cpd
+#include TableGen.cpd
+hide$
+debug = 0
+unhide$
+genTableCSS$(#dfdfdf; #dfdfdf; #ffffff; #000000; 10)
+#def headers$ = ["North Wall", "South Wall", "East Wall"]
+
+'<h4>Using 0 for null values with $Repeat (or no null values)</h4>'
+M_u = [10;20;30|40;57;0/0|70;0/0;0/0]*kip*ft
+øM_n = [15;25;35|35;57;0/0|60;0/0;0/0]*kip*ft
+hideC$(debug≡0)
+momentChecks = matrix(n_rows(M_u); n_cols(M_u))
+$Repeat{$Repeat{momentChecks.(i;j) = if(clrUnits(M_u.(i;j))≡0/0;0;M_u.(i;j)/øM_n.(i;j)) @ i = 1 : n_rows(M_u)} @ j = 1 : n_cols(M_u)}
+unhideC$(debug≡0)
+genTableColor$(table1; momentChecks; headers$; "Lintel"; "≤"; 1; lime; pink; true)
+
+'<h4>Using undefined for null values with #for loop</h4>'
+M_u = [10;20;30|40;57;0/0|70;0/0;0/0]*kip*ft
+øM_n = [15;25;35|35;57;0/0|60;0/0;0/0]*kip*ft
+hideC$(debug≡0)
+momentChecks = matrix(n_rows(M_u); n_cols(M_u))
+#for i = 1:n_rows(momentChecks)
+    #for j = 1:n_cols(momentChecks)
+        momentChecks.(i;j) = if(clrUnits(M_u.(i;j))≡0/0;0/0;M_u.(i;j)/øM_n.(i;j))
+    #loop
+#loop
+unhideC$(debug≡0)
+genTableColor$(table2; momentChecks; headers$; "Lintel"; "≤"; 1; lime; pink; true)

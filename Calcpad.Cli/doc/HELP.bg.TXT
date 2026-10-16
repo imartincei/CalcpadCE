@@ -1,20 +1,20 @@
 ————————————————————————————————————————————————————————————————————————————————
  Команди:
 ————————————————————————————————————————————————————————————————————————————————
-	NEW     - изчиства текущата сесия и започва нова;
-	OPEN    - отваря задача, записана на диска;
-	SAVE    - записва текущата задача на диска;
-	LIST    - показва списък на записаните на диска задачи;
-	EXIT    - изход от програмата;
-	RESET   - изчиства резултатите и преизчислява всичко отначало;
-	CLS     - изчиства резултатите и продължава от последния ред;
-	DEL     - изтрива последния ред;
-	DEG     - задава единици за тригонометрични функции - градуси;
-	RAD     - задава единици за тригонометрични функции - радиани;
-	GRA     - задава единици за тригонометрични функции - гради;
-	SETTINGS/OPTIONS - отваря файла с настройки за редактиране; 
-	LICENSE - показва лицензния файл;
-	HELP    - показва текущия помощен файл.
+    NEW     - изчиства текущата сесия и започва нова;
+    OPEN    - отваря задача, записана на диска;
+    SAVE    - записва текущата задача на диска;
+    LIST    - показва списък на записаните на диска задачи;
+    EXIT    - изход от програмата;
+    RESET   - изчиства резултатите и преизчислява всичко отначало;
+    CLS     - изчиства резултатите и продължава от последния ред;
+    DEL     - изтрива последния ред;
+    DEG     - задава единици за тригонометрични функции - градуси;
+    RAD     - задава единици за тригонометрични функции - радиани;
+    GRA     - задава единици за тригонометрични функции - гради;
+    SETTINGS/OPTIONS - отваря файла с настройки за редактиране;
+    LICENSE - показва лицензния файл;
+    HELP    - показва текущия помощен файл.
 
 ————————————————————————————————————————————————————————————————————————————————
  Оператори: ! ^ / ÷ \ % * - + ≡ ≠ < > ≤ ≥ ∧ ∨ ⊕ = ← ? (поле за вход)
@@ -32,7 +32,7 @@
     round(x)   floor(x)   ceiling(x)  trunc(x)    hp(x)          settunits(x; u)
     sign(x)    mod(x; y)  gcd(x; y)   lcm(x; y)   ishp(x)        clrtunits(x)
     re(z)      im(z)      abs(z)      phase(z)    conj(z)        atan2(x; y)
-    and(x; y; z…)         or(x; y; z…)            xor(x; y; z…)  not(x)        
+    and(x; y; z…)         or(x; y; z…)            xor(x; y; z…)  not(x)
     min(x; y; z…)         max(x; y; z…)
     sum(x; y; z…)         average(x; y; z…)       sumsq(x; y; z…)
     product(x; y; z…)     mean(x; y; z…)          srss(x; y; z…)
@@ -49,59 +49,59 @@
     resize(v; n)          norm_2(v)       reverse(v)          count(v; x; i)
     fill(v; x)            norm_e(v)       find(v; x; i)       lookup(a; b; x)
     join(a; b; c…)        norm_p(v; p)    find_eq(v; x; i)    lookup_eq(a; b; x)
-    slice(v; i1; i2)      norm_i(v)       find_ne(v; x; i)    lookup_ne(a; b; x)                       
+    slice(v; i1; i2)      norm_i(v)       find_ne(v; x; i)    lookup_ne(a; b; x)
     first(v; n)           unit(v)         find_lt(v; x; i)    lookup_lt(a; b; x)
     last(v; n)            dot(a; b)       find_le(v; x; i)    lookup_le(a; b; x)
     extract(v; i)         cross(a; b)     find_gt(v; x; i)    lookup_gt(a; b; x)
-                                          find_ge(v; x; i)    lookup_ge(a; b; x)    
+                                          find_ge(v; x; i)    lookup_ge(a; b; x)
 ————————————————————————————————————————————————————————————————————————————————
  Матрични функции:
 ————————————————————————————————————————————————————————————————————————————————
-    Създаване:                   Създаване hp:         column_hp(m; c)  
-    matrix(m; n)                 matrix_hp(m; n)        utriang_hp(n)    
-    identity(n)                  identity_hp(n)         ltriang_hp(n)    
-    diagonal(n; d)               diagonal_hp(n; d)      symmetric_hp(n)  
-    column(m; c)                  
-    utriang(n)                   Математически:         Данни:                    
-    ltriang(n)                   hprod(A; B)            sort_cols(M; i)  
-    symmetric(n)                 fprod(A; B)            rsort_cols(M; i) 
-    vec2diag(v)                  kprod(A; B)            sort_rows(M; j) 
-    vec2row(v)                   mnorm(M)              	
-    vec2col(v)                   mnorm_e(M)             rsort_rows(M; j) 
-    join_cols(c1; c2; c3…)       mnorm_1(M)             order_cols(M; i) 
-    join_rows(r1; r2; r3…)       mnorm_2(M)             revorder_cols(M; i) 
-    augment(A; B; C…)            mnorm_i(M)             order_rows(M; j) 
-    stack(A; B; C…)              cond(M)                revorder_rows(M; j) 
-	                             cond_e(M)              mcount(M; x) 
-    Структурни:                  cond_1(M)              msearch(M; x; i; j) 
-    n_rows(M)                    cond_2(M)              mfind(M; x) 
-    n_cols(M)                    cond_i(M)              mfind_eq(M; x) 
-    resize(M; m; n)              det(M)                 mfind_ne(M; x) 
-    fill(M; x)                   rank(M)                mfind_lt(M; x) 
-    fill_row(M; i; x)            trace(M)               mfind_le(M; x) 
-    fill_col(M; j; x)            transp(M)              mfind_gt(M; x) 
-    copy(A; B; i; j)             adj(M)                 mfind_ge(M; x) 
-    add(A; B; i; j)              cofactor(M)            hlookup(M; x; i1; i2)    
-    row(M; i)                    eigenvals(M; ne)       hlookup_eq(M; x; i1; i2) 
-    col(M; j)                    eigenvecs(M; ne)       hlookup_ne(M; x; i1; i2) 
-    extract_rows(M; i)           cholesky(M; ne)        hlookup_lt(M; x; i1; i2) 
-    extract_cols(M; j)           lu(M)                  hlookup_le(M; x; i1; i2) 
-    diag2vec(v)                  qr(M)                  hlookup_gt(M; x; i1; i2) 
-    col(M; j)                    svd(M)                 hlookup_ge(M; x; i1; i2) 
-    extract_rows(M; i)           inverse(M)             vlookup(M; x; j1; j2)    
-    extract_cols(M; j)           lsolve(A; b)           vlookup_eq(M; x; j1; j2) 
-    diag2vec(v)                  clsolve(A; b)          vlookup_ne(M; x; j1; j2) 
-    submatrix(M; i1; i2; j1; j2) slolve(A; B)           vlookup_lt(M; x; j1; j2) 
-                                 csolve(A; B)           vlookup_le(M; x; j1; j2) 
-    Двойна интерполация:         cmsolve(A; B)          vlookup_gt(M; x; j1; j2) 
-    take(x; y; M)	             smsolve(A; B)          vlookup_ge(M; x; j1; j2) 
-    line(x; y; M)                matmul(A; B)           
-    spline(x; y; M)				 ift(M), fft(M)
+    Създаване:                   Създаване hp:         column_hp(m; c)
+    matrix(m; n)                 matrix_hp(m; n)        utriang_hp(n)
+    identity(n)                  identity_hp(n)         ltriang_hp(n)
+    diagonal(n; d)               diagonal_hp(n; d)      symmetric_hp(n)
+    column(m; c)
+    utriang(n)                   Математически:         Данни:
+    ltriang(n)                   hprod(A; B)            sort_cols(M; i)
+    symmetric(n)                 fprod(A; B)            rsort_cols(M; i)
+    vec2diag(v)                  kprod(A; B)            sort_rows(M; j)
+    vec2row(v)                   mnorm(M)
+    vec2col(v)                   mnorm_e(M)             rsort_rows(M; j)
+    join_cols(c1; c2; c3…)       mnorm_1(M)             order_cols(M; i)
+    join_rows(r1; r2; r3…)       mnorm_2(M)             revorder_cols(M; i)
+    augment(A; B; C…)            mnorm_i(M)             order_rows(M; j)
+    stack(A; B; C…)              cond(M)                revorder_rows(M; j)
+                                 cond_e(M)              mcount(M; x)
+    Структурни:                  cond_1(M)              msearch(M; x; i; j)
+    n_rows(M)                    cond_2(M)              mfind(M; x)
+    n_cols(M)                    cond_i(M)              mfind_eq(M; x)
+    resize(M; m; n)              det(M)                 mfind_ne(M; x)
+    fill(M; x)                   rank(M)                mfind_lt(M; x)
+    fill_row(M; i; x)            trace(M)               mfind_le(M; x)
+    fill_col(M; j; x)            transp(M)              mfind_gt(M; x)
+    copy(A; B; i; j)             adj(M)                 mfind_ge(M; x)
+    add(A; B; i; j)              cofactor(M)            hlookup(M; x; i1; i2)
+    row(M; i)                    eigenvals(M; ne)       hlookup_eq(M; x; i1; i2)
+    col(M; j)                    eigenvecs(M; ne)       hlookup_ne(M; x; i1; i2)
+    extract_rows(M; i)           cholesky(M; ne)        hlookup_lt(M; x; i1; i2)
+    extract_cols(M; j)           lu(M)                  hlookup_le(M; x; i1; i2)
+    diag2vec(v)                  qr(M)                  hlookup_gt(M; x; i1; i2)
+    col(M; j)                    svd(M)                 hlookup_ge(M; x; i1; i2)
+    extract_rows(M; i)           inverse(M)             vlookup(M; x; j1; j2)
+    extract_cols(M; j)           lsolve(A; b)           vlookup_eq(M; x; j1; j2)
+    diag2vec(v)                  clsolve(A; b)          vlookup_ne(M; x; j1; j2)
+    submatrix(M; i1; i2; j1; j2) slolve(A; B)           vlookup_lt(M; x; j1; j2)
+                                 csolve(A; B)           vlookup_le(M; x; j1; j2)
+    Двойна интерполация:         cmsolve(A; B)          vlookup_gt(M; x; j1; j2)
+    take(x; y; M)                smsolve(A; B)          vlookup_ge(M; x; j1; j2)
+    line(x; y; M)                matmul(A; B)
+    spline(x; y; M)              ift(M), fft(M)
 
 ————————————————————————————————————————————————————————————————————————————————
  Итерационни и числени методи:
 ————————————————————————————————————————————————————————————————————————————————
-    $Root{f(x) = const @ x = a : b}     $Derivative{f(x) @ x = a} 
+    $Root{f(x) = const @ x = a : b}     $Derivative{f(x) @ x = a}
     $Root{f(x) @ x = a : b}             $Sum{f(k) @ k = a : b}
     $Find{f(x) @ x = a : b}             $Product{f(k) @ k = a : b}
     $Sup{f(x) @ x = a : b}              $Repeat{f(k) @ k = a : b}
@@ -109,13 +109,13 @@
     $Area{f(x) @ x = a : b}             $Block{expressions}
     $Integral{f(x) @ x = a : b}         $Inline{expressions}
     $Slope{f(x) @ x = a}                Precision
-	
+
 ————————————————————————————————————————————————————————————————————————————————
  Мерни единици:
 ————————————————————————————————————————————————————————————————————————————————
     Бездименсионни:           % ‰ ‱ pcm ppm ppb ppt ppq
     Ъгли:                     ° ′ ″ deg rad grad rev
-	
+
     Метрични (SI и съвместими):
         Маса:                 g hg kg t kt Mt Gt dg cg mg μg Da u
         Дължина:              m km dm cm mm μm nm pm AU ly
@@ -134,7 +134,7 @@
                               bar mbar μbar atm at Torr mmHg
         Вискозитет:           P cP St cSt
         Енергия/работа:       J   kJ   MJ   GJ   TJ   mJ   μJ   nJ   pJ
-                              Wh  kWh  MWh  GWh  TWh  mWh  μWh  nWh  pWh    
+                              Wh  kWh  MWh  GWh  TWh  mWh  μWh  nWh  pWh
                               eV  keV  MeV  GeV  TeV  PeV  EeV  cal  kcal erg
         Мощност:              W   kW   MW   GW   TW   mW   μW   nW   pW   hpM  ks
                               VA  kVA  MVA  GVA  TVA  mVA  μVA  nVA  pVA
@@ -143,7 +143,7 @@
         Напрежение:           V   kV   MV   GV   TV   mV   μV   nV   pV
         Капацитет:            F   kF   MF   GF   TF   mF   μF   nF   pF
         Съпротивление:        Ω   kΩ   MΩ   GΩ   TΩ   mΩ   μΩ   nΩ   pΩ
-        Проводимост:          S   kS   MS   GS   TS   mS   μS   nS   pS 
+        Проводимост:          S   kS   MS   GS   TS   mS   μS   nS   pS
                               ℧   k℧   M℧   G℧   T℧   m℧   μ℧   n℧   p℧
         Магнитен поток:       Wb  kWb  MWb  GWb  TWb  mWb  μWb  nWb  pWb
         Плътност на потока:   T   kT   MT   GT   TT   mT   μT   nT   pT
@@ -154,16 +154,16 @@
         Погълната доза:       Gy  kGy  MGy  GGy  TGy  mGy  μGy  nGy  pGy
         Еквивалентна доза:    Sv  kSv  MSv  GSv  TSv  mSv  μSv  nSv  pSv
         Активност на катал-р: kat
-		
+
     Неметрични (Imperial/US):
-        Маса:            gr dr oz lb (lbm, lb_m) kipm (kip_m) st qr 
+        Маса:            gr dr oz lb (lbm, lb_m) kipm (kip_m) st qr
                          cwt (cwt_UK, cwt_US) ton (ton_UK, ton_US) slug
         Дължина:         th in ft yd ch fur mi ftm (ftm_UK, ftm_US)
                          cable (cable_UK, cable_US) nmi li rod pole perch lea
         Скорост:         mph knot
         Температура:     °F Δ°F °R
         Area:            rood ac
-        Обем, течност:   fl_oz     gi      pt     qt     gal     bbl   
+        Обем, течност:   fl_oz     gi      pt     qt     gal     bbl
                          fl_oz_UK  gi_UK   pt_UK  qt_UK  gal_UK  bbl_UK
                          fl_oz_US  gi_US   pt_US  qt_US  gal_US  bbl_US
         Обем, сух:       pt_dry    qt_dry  gal_dry bbl_dry
@@ -178,28 +178,31 @@
 ————————————————————————————————————————————————————————————————————————————————
 (добавете апостроф ` преди съответната буква на латиница)
 
-От: `a `b `c `d `e `f `g `h `i `j `k `l `m `n `o `p `q `r `s `t `u `v `w `x `y `z 
+От: `a `b `c `d `e `f `g `h `i `j `k `l `m `n `o `p `q `r `s `t `u `v `w `x `y `z
+    ~a ~b ~c ~d ~e ~f ~g ~h ~i ~j ~k ~l ~m ~n ~o ~p ~q ~r ~s ~t ~u ~v ~w ~x ~y ~z
 До:  α  β  χ  δ  ε  φ  γ  η  ι  ø  κ  λ  μ  ν  ο  π  θ  ρ  σ  τ  υ  ϑ  ω  ξ  ψ  ζ
 
-От: `A `B `C `D `E `F `G `H `I `J `K `L `M `N `O `P `Q `R `S `T `U `V `W `X `Y `Z 
+От: `A `B `C `D `E `F `G `H `I `J `K `L `M `N `O `P `Q `R `S `T `U `V `W `X `Y `Z
+    ~A ~B ~C ~D ~E ~F ~G ~H ~I ~J ~K ~L ~M ~N ~O ~P ~Q ~R ~S ~T ~U ~V ~W ~X ~Y ~Z
 До:  Α  Β  Χ  Δ  Ε  Φ  Γ  Η  Ι  Ø  Κ  Λ  Μ  Ν  Ο  Π  Θ  Ρ  Σ  Τ  Υ  ∡  Ω  Ξ  Ψ  Ζ
 
 От: `@ `' (единична кавичка) `" (двойна кавичка)
-До:  °  ′ (единичен прим)  ″ (двоен прим/секонд)
+    ~@ ~' (единична кавичка) ~" (двойна кавичка)
+До:  °  ′ (единичен прим)     ″ (двоен прим/секонд)
 
 ————————————————————————————————————————————————————————————————————————————————
-Опции на командния ред (поддържат същите възможности на езика като Calcpad.exe):
-———————————————————————————————————————————————————————————————————————————————— 
+Опции на командния ред (поддържат същите възможности на езика като CalcpadCE.exe):
+————————————————————————————————————————————————————————————————————————————————
     cli input.cpd output.html - изчислява input.cpd и записва резултатите
     cli input.cpd output.docx   в посочения изходен файл със съответния формат
     cli input.cpd output.pdf    (html, docx или pdf);
-		
+
     cli input.cpd html - изчислява input.cpd и записва резултатите в input.html;
-    cli input.cpd docx - изчислява input.cpd и записва резултатите в input.docx;	
+    cli input.cpd docx - изчислява input.cpd и записва резултатите в input.docx;
     cli input.cpd pdf  - изчислява input.cpd и записва резултатите в input.pdf;
-	
+
     cli input.cpd      - изчислява input.cpd и записва резултатите в input.html.
-	
-	Допълнителни аргументи:
-		-s   		   - "тих" режим (не отваря изходния файл), например:
-		cli input.cpd output.html -s
+
+    Допълнителни аргументи:
+        -s             - "тих" режим (не отваря изходния файл), например:
+        cli input.cpd output.html -s

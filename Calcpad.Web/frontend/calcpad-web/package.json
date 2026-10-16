@@ -1,0 +1,36 @@
+{
+  "name": "calcpad-web",
+  "private": true,
+  "description": "CalcpadCE web editor — Monaco + Vue sidebar powered by calcpad-frontend",
+  "author": "CalcpadCE Contributors",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:desktop": "vite build --mode desktop",
+    "build:watch": "vite build --watch",
+    "preview": "vite preview",
+    "check:contrast": "node ../scripts/check-contrast.mjs"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-clipboard-manager": "^2",
+    "@tauri-apps/plugin-dialog": "^2",
+    "@tauri-apps/plugin-fs": "^2",
+    "@tauri-apps/plugin-log": "^2",
+    "@tauri-apps/plugin-opener": "^2",
+    "@tauri-apps/plugin-os": "^2",
+    "@tauri-apps/plugin-process": "^2",
+    "@tauri-apps/plugin-store": "^2",
+    "calcpad-frontend": "file:../calcpad-frontend",
+    "monaco-editor": "^0.52.0",
+    "vue": "^3.5.39"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "@vitejs/plugin-vue": "^6.0.7",
+    "typescript": "^5.9.0",
+    "vite": "^8.1.3"
+  }
+}

@@ -1,0 +1,221 @@
+<div class="calcpad-output">
+ <!-- Solves $a x^2 + b x + c = 0$ with the built-in numerical root finder, returning both real or complex roots from the user-supplied coefficients. -->
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   )  =
+   <var>a</var>
+   ·
+   <var>x</var>
+   <sup>2</sup>
+   +
+   <var>b</var>
+   ·
+   <var>x</var>
+   +
+   <var>c</var>
+  </span>
+  = 0
+ </p>
+ <p>Coefficients:</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">2</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-4">3</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>c</var>
+   =
+   <u class="input-4">-5</u>
+  </span>
+ </p>
+ <p>Discriminant:</p>
+ <p>
+  <span class="eq">
+   <var>D</var>
+   =
+   <var>b</var>
+   <sup>2</sup>
+   − 4 ·
+   <var>a</var>
+   ·
+   <var>c</var>
+   = 3
+   <sup>2</sup>
+   − 4 · 2 ·  ( -5 )  = 49
+  </span>
+ </p>
+ <p>The discriminant is grater or equal to zero. Real roots exist.</p>
+ <p>
+  <span class="eq">
+   <var>q</var>
+   = -0.5 ·  (
+   <var>b</var>
+   +
+   <b>sign</b>
+   (
+   <var>b</var>
+   ≡ 0 +
+   <var>b</var>
+   )  ·
+   <span class="o0">
+    <span class="r">√</span>
+    <var>D</var>
+   </span>
+   )  = -0.5 ·  ( 3 +
+   <b>sign</b>
+   ( 3 ≡ 0 + 3 )  ·
+   <span class="o0">
+    <span class="r">√</span>
+    49
+   </span>
+   )  = -5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>x</var>
+   <sub>1</sub>
+   =
+   <span class="dvc">
+    <var>q</var>
+    <span class="dvl">
+    </span>
+    <var>a</var>
+   </span>
+   =
+   <span class="dvc">
+    -5
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = -2.5
+  </span>
+  ,
+  <span class="eq">
+   <var>x</var>
+   <sub>2</sub>
+   =
+   <span class="dvc">
+    <var>c</var>
+    <span class="dvl">
+    </span>
+    <var>q</var>
+   </span>
+   =
+   <span class="dvc">
+    -5
+    <span class="dvl">
+    </span>
+    -5
+   </span>
+   = 1
+  </span>
+ </p>
+ <svg class="plot" data-plot="svg" height="1040px" style="width:316.67pt; height:192.59pt;" version="1.1" viewbox=" 0 0 1710 1040" width="1710px" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+   .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+  </style>
+  <g class="plot">
+   <rect class="Frame" height="800" width="1440" x="180" y="120">
+   </rect>
+   <line class="Grid" x1="180" x2="1620" y1="913.3" y2="913.3">
+   </line>
+   <text class="sm end" x="161" y="931.3">-6</text>
+   <line class="Grid" x1="180" x2="1620" y1="797.2" y2="797.2">
+   </line>
+   <text class="sm end" x="161" y="815.2">-4</text>
+   <line class="Grid" x1="180" x2="1620" y1="681.1" y2="681.1">
+   </line>
+   <text class="sm end" x="161" y="699.1">-2</text>
+   <line class="Grid" x1="180" x2="1620" y1="565" y2="565">
+   </line>
+   <text class="sm end" x="161" y="583">0</text>
+   <line class="Grid" x1="180" x2="1620" y1="448.9" y2="448.9">
+   </line>
+   <text class="sm end" x="161" y="466.9">2</text>
+   <line class="Grid" x1="180" x2="1620" y1="332.8" y2="332.8">
+   </line>
+   <text class="sm end" x="161" y="350.8">4</text>
+   <line class="Grid" x1="180" x2="1620" y1="216.7" y2="216.7">
+   </line>
+   <text class="sm end" x="161" y="234.7">6</text>
+   <line class="Grid" x1="282.14" x2="282.14" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="282.14" y="972">-3</text>
+   <line class="Grid" x1="419.29" x2="419.29" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="419.29" y="972">-2.5</text>
+   <line class="Grid" x1="556.43" x2="556.43" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="556.43" y="972">-2</text>
+   <line class="Grid" x1="693.57" x2="693.57" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="693.57" y="972">-1.5</text>
+   <line class="Grid" x1="830.71" x2="830.71" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="830.71" y="972">-1</text>
+   <line class="Grid" x1="967.86" x2="967.86" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="967.86" y="972">-0.5</text>
+   <line class="Grid" x1="1105" x2="1105" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="1105" y="972">0</text>
+   <line class="Grid" x1="1242.14" x2="1242.14" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="1242.14" y="972">0.5</text>
+   <line class="Grid" x1="1379.29" x2="1379.29" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="1379.29" y="972">1</text>
+   <line class="Grid" x1="1516.43" x2="1516.43" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="1516.43" y="972">1.5</text>
+   <line class="Axis" x1="180" x2="1620" y1="565" y2="565">
+   </line>
+   <text x="1642" y="547">x</text>
+   <line class="Axis" x1="1105" x2="1105" y1="120" y2="920">
+   </line>
+   <text class="mid" x="1105" y="84">y</text>
+   <text x="8" y="1023">[-3.38; -6.12]</text>
+   <text class="end" x="1702" y="44">[1.88; 7.66]</text>
+   <polyline class="Series1" points="179.29,120.56 225.74,220.45 272.19,313.69 318.64,400.26 365.09,480.18 411.54,553.44 458,620.04 504.45,679.97 550.9,733.25 597.35,779.87 643.8,819.83 667.03,837.31 690.25,853.13 713.48,867.28 736.71,879.76 759.93,890.59 783.16,899.74 806.38,907.24 829.61,913.06 852.83,917.23 876.06,919.72 899.29,920.56 922.51,919.72 945.74,917.23 968.96,913.06 992.19,907.24 1015.41,899.74 1038.64,890.59 1061.87,879.76 1085.09,867.28 1108.32,853.13 1131.54,837.31 1154.77,819.83 1201.22,779.87 1247.67,733.25 1294.12,679.97 1340.58,620.04 1387.03,553.44 1433.48,480.18 1479.93,400.26 1526.38,313.69 1572.83,220.45 1619.29,120.56">
+   </polyline>
+   <polygon class="Fill1" points="179.29,565 179.29,120.56 225.74,220.45 272.19,313.69 318.64,400.26 365.09,480.18 411.54,553.44 458,620.04 504.45,679.97 550.9,733.25 597.35,779.87 643.8,819.83 667.03,837.31 690.25,853.13 713.48,867.28 736.71,879.76 759.93,890.59 783.16,899.74 806.38,907.24 829.61,913.06 852.83,917.23 876.06,919.72 899.29,920.56 922.51,919.72 945.74,917.23 968.96,913.06 992.19,907.24 1015.41,899.74 1038.64,890.59 1061.87,879.76 1085.09,867.28 1108.32,853.13 1131.54,837.31 1154.77,819.83 1201.22,779.87 1247.67,733.25 1294.12,679.97 1340.58,620.04 1387.03,553.44 1433.48,480.18 1479.93,400.26 1526.38,313.69 1572.83,220.45 1619.29,120.56 1619.29,565" stroke-width="0">
+   </polygon>
+   <circle class="Series2" cx="419.29" cy="565" r="10">
+   </circle>
+   <circle class="Series3" cx="1379.29" cy="565" r="10">
+   </circle>
+  </g>
+ </svg>
+</div>

@@ -1,0 +1,27 @@
+name: Build All
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-desktop-windows:
+    uses: ./.github/workflows/build-desktop-windows.yml
+    with:
+      version: ${{ inputs.version }}
+
+  build-desktop-linux:
+    uses: ./.github/workflows/build-desktop-linux.yml
+    with:
+      version: ${{ inputs.version }}
+
+  build-vscode-extension:
+    uses: ./.github/workflows/build-vscode-extension.yml
+    with:
+      version: ${{ inputs.version }}

@@ -1,0 +1,372 @@
+<div class="calcpad-output">
+ <!-- Compares the `$Slope` operator (Richardson extrapolation) against `$Derivative` (complex-step method) on $e^x$ and $\sin(x^2)$ at large arguments.
+<p>Exposes the round-off blow-up of finite differences and the machine-precision accuracy of the complex-step trick. -->
+ <p>
+  Function -
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   )  =
+   <var>e</var>
+   <sup>
+    <var>x</var>
+   </sup>
+  </span>
+  , Point -
+  <span class="eq">
+   <var>a</var>
+   = 100
+  </span>
+ </p>
+ <p>
+  Theoretical value -
+  <span class="eq">
+   <var>f′</var>
+   (
+   <var>x</var>
+   )  =
+   <var>e</var>
+   <sup>
+    <var>x</var>
+   </sup>
+  </span>
+  ,
+  <span class="eq">
+   <var>y′</var>
+   <sub>a</sub>
+   =
+   <var>f′</var>
+   (
+   <var>a</var>
+   )  =
+   <var>f′</var>
+   ( 100 )  = 2.69×10
+   <sup>43</sup>
+  </span>
+ </p>
+ <p>
+  <strong>$Slope</strong>
+  function (Richardson extrapolation) -
+  <span class="eq">
+   <var>y′</var>
+   <sub>aS</sub>
+   =
+   <span class="b1">
+   </span>
+   <span class="dvc">
+    <em>d</em>
+    <span class="dvl">
+    </span>
+    <em>d</em>
+    <var>x</var>
+   </span>
+   <var>f</var>
+   (
+   <var>x</var>
+   )
+   <span class="b1">|</span>
+   <span class="low">
+    <em>x</em>
+    =
+    <var>a</var>
+   </span>
+   = 2.69×10
+   <sup>43</sup>
+  </span>
+ </p>
+ <p>
+  <blockquote>
+   <p>
+    Error -
+    <span class="eq">
+     <var>δ</var>
+     =
+     <span class="dvc">
+      <b class="b0">|</b>
+      <var>y′</var>
+      <sub>a</sub>
+      −
+      <var>y′</var>
+      <sub>aS</sub>
+      <b class="b0">|</b>
+      <span class="dvl">
+      </span>
+      <var>y′</var>
+      <sub>a</sub>
+     </span>
+     =
+     <span class="dvc">
+      <b class="b0">|</b>
+      2.69×10
+      <sup>43</sup>
+      − 2.69×10
+      <sup>43</sup>
+      <b class="b0">|</b>
+      <span class="dvl">
+      </span>
+      2.69×10
+      <sup>43</sup>
+     </span>
+     = 5.92×10
+     <sup>-10</sup>
+     <i>%</i>
+    </span>
+    -
+    <span class="err">Approx.</span>
+   </p>
+  </blockquote>
+ </p>
+ <p>
+  <strong>$Derivative</strong>
+  function (Complex step method) -
+  <span class="eq">
+   <var>y′</var>
+   <sub>aD</sub>
+   =
+   <span class="b1">
+   </span>
+   <span class="dvc">
+    <em>d</em>
+    <span class="dvl">
+    </span>
+    <em>d</em>
+    <var>x</var>
+   </span>
+   <var>f</var>
+   (
+   <var>x</var>
+   )
+   <span class="b1">|</span>
+   <span class="low">
+    <em>x</em>
+    =
+    <var>a</var>
+   </span>
+   = 2.69×10
+   <sup>43</sup>
+  </span>
+ </p>
+ <p>
+  <blockquote>
+   <p>
+    Error -
+    <span class="eq">
+     <var>δ</var>
+     =
+     <span class="dvc">
+      <b class="b0">|</b>
+      <var>y′</var>
+      <sub>a</sub>
+      −
+      <var>y′</var>
+      <sub>aD</sub>
+      <b class="b0">|</b>
+      <span class="dvl">
+      </span>
+      <var>y′</var>
+      <sub>a</sub>
+     </span>
+     =
+     <span class="dvc">
+      <b class="b0">|</b>
+      2.69×10
+      <sup>43</sup>
+      − 2.69×10
+      <sup>43</sup>
+      <b class="b0">|</b>
+      <span class="dvl">
+      </span>
+      2.69×10
+      <sup>43</sup>
+     </span>
+     = 0
+     <i>%</i>
+    </span>
+    -
+    <span class="ok">Exact!!!</span>
+   </p>
+  </blockquote>
+ </p>
+ <p>
+  Function -
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   )  =
+   <b>sin</b>
+   (
+   <var>x</var>
+   <sup>2</sup>
+   )
+   <b class="err" title=" Warning! Function redefined.">!!!</b>
+  </span>
+  , Point -
+  <span class="eq">
+   <var>a</var>
+   = 1000
+  </span>
+ </p>
+ <p>
+  Theoretical value -
+  <span class="eq">
+   <var>f′</var>
+   (
+   <var>x</var>
+   )  = 2 ·
+   <var>x</var>
+   ·
+   <b>cos</b>
+   (
+   <var>x</var>
+   <sup>2</sup>
+   )
+  </span>
+  ,
+  <span class="eq">
+   <var>y′</var>
+   <sub>a</sub>
+   =
+   <var>f′</var>
+   (
+   <var>a</var>
+   )  =
+   <var>f′</var>
+   ( 1000 )  = 1873.5
+  </span>
+ </p>
+ <p>
+  <strong>$Slope</strong>
+  function (Richardson extrapolation) -
+  <span class="eq">
+   <var>y′</var>
+   <sub>aS</sub>
+   =
+   <span class="b1">
+   </span>
+   <span class="dvc">
+    <em>d</em>
+    <span class="dvl">
+    </span>
+    <em>d</em>
+    <var>x</var>
+   </span>
+   <var>f</var>
+   (
+   <var>x</var>
+   )
+   <span class="b1">|</span>
+   <span class="low">
+    <em>x</em>
+    =
+    <var>a</var>
+   </span>
+   = 1873.5
+  </span>
+ </p>
+ <p>
+  <blockquote>
+   <p>
+    Error -
+    <span class="eq">
+     <var>δ</var>
+     =
+     <span class="dvc">
+      <b class="b0">|</b>
+      <var>y′</var>
+      <sub>a</sub>
+      −
+      <var>y′</var>
+      <sub>aS</sub>
+      <b class="b0">|</b>
+      <span class="dvl">
+      </span>
+      <var>y′</var>
+      <sub>a</sub>
+     </span>
+     =
+     <span class="dvc">
+      <b class="b0">|</b>
+      1873.5 − 1873.5
+      <b class="b0">|</b>
+      <span class="dvl">
+      </span>
+      1873.5
+     </span>
+     = 1.15×10
+     <sup>-8</sup>
+     <i>%</i>
+    </span>
+    -
+    <span class="err">Approx.</span>
+   </p>
+  </blockquote>
+ </p>
+ <p>
+  <strong>$Derivative</strong>
+  function (Complex step method) -
+  <span class="eq">
+   <var>y′</var>
+   <sub>aD</sub>
+   =
+   <span class="b1">
+   </span>
+   <span class="dvc">
+    <em>d</em>
+    <span class="dvl">
+    </span>
+    <em>d</em>
+    <var>x</var>
+   </span>
+   <var>f</var>
+   (
+   <var>x</var>
+   )
+   <span class="b1">|</span>
+   <span class="low">
+    <em>x</em>
+    =
+    <var>a</var>
+   </span>
+   = 1873.5
+  </span>
+ </p>
+ <p>
+  <blockquote>
+   <p>
+    Error -
+    <span class="eq">
+     <var>δ</var>
+     =
+     <span class="dvc">
+      <b class="b0">|</b>
+      <var>y′</var>
+      <sub>a</sub>
+      −
+      <var>y′</var>
+      <sub>aD</sub>
+      <b class="b0">|</b>
+      <span class="dvl">
+      </span>
+      <var>y′</var>
+      <sub>a</sub>
+     </span>
+     =
+     <span class="dvc">
+      <b class="b0">|</b>
+      1873.5 − 1873.5
+      <b class="b0">|</b>
+      <span class="dvl">
+      </span>
+      1873.5
+     </span>
+     = 0
+     <i>%</i>
+    </span>
+    -
+    <span class="ok">Exact!!!</span>
+   </p>
+  </blockquote>
+ </p>
+</div>

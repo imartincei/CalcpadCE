@@ -1,0 +1,213 @@
+<div class="calcpad-output">
+ <script src="https://code.jquery.com/jquery-3.6.3.min.js">
+ </script>
+ <!-- Lookup table that returns the total reinforcement area $A_s$ for a chosen bar diameter and bar count, with the cells highlighting the picked combination on hover. -->
+ <style>td:hover {color:red;} table {cursor:default;}</style>
+ <p>
+  Required reinforcement area -
+  <span class="eq">
+   <var>A</var>
+   <sub>s,req</sub>
+   =
+   <u class="input-6">7</u>
+  </span>
+  cm²
+ </p>
+ <img alt="bars.png" src="Images/structures/rc/design/bars.png" style="height:104pt; width:122pt;"/>
+ <table class="bordered">
+  <tr>
+   <th>Count</th>
+   <!--00-->
+   <th id="c1">1</th>
+   <th id="c2">2</th>
+   <th id="c3">3</th>
+   <th id="c4">4</th>
+   <th id="c5">5</th>
+   <th id="c6">6</th>
+   <th id="c7">6.67</th>
+   <th id="c8">7</th>
+   <th id="c9">8</th>
+   <th id="c10">8.33</th>
+   <th id="c11">9</th>
+   <th id="c12">10</th>
+  </tr>
+  <!--60-->
+  <!--01-->
+  <tr>
+   <th id="r1">Ø8</th>
+   <td align="right">0.5</td>
+   <td align="right">1.01</td>
+   <td align="right">1.51</td>
+   <td align="right">2.01</td>
+   <td align="right">2.51</td>
+   <td align="right">3.02</td>
+   <td align="right">3.35</td>
+   <td align="right">3.52</td>
+   <td align="right">4.02</td>
+   <td align="right">4.19</td>
+   <td align="right">4.52</td>
+   <td align="right">5.03</td>
+   <!--02-->
+   <tr>
+    <th id="r2">Ø10</th>
+    <td align="right">0.79</td>
+    <td align="right">1.57</td>
+    <td align="right">2.36</td>
+    <td align="right">3.14</td>
+    <td align="right">3.93</td>
+    <td align="right">4.71</td>
+    <td align="right">5.24</td>
+    <td align="right">5.5</td>
+    <td align="right">6.28</td>
+    <td align="right">6.54</td>
+    <td align="right" style="background:#EAFFCA">7.07</td>
+    <td align="right" style="background:#EAFFCA">7.85</td>
+    <!--03-->
+    <tr>
+     <th id="r3">Ø12</th>
+     <td align="right">1.13</td>
+     <td align="right">2.26</td>
+     <td align="right">3.39</td>
+     <td align="right">4.52</td>
+     <td align="right">5.65</td>
+     <td align="right">6.79</td>
+     <td align="right" style="background:#EAFFCA">7.54</td>
+     <td align="right" style="background:#EAFFCA">7.92</td>
+     <td align="right" style="background:#EAFFCA">9.05</td>
+     <td align="right" style="background:#EAFFCA">9.42</td>
+     <td align="right" style="background:#EAFFCA">10.18</td>
+     <td align="right" style="background:#EAFFCA">11.31</td>
+     <!--04-->
+     <tr>
+      <th id="r4">Ø14</th>
+      <td align="right">1.54</td>
+      <td align="right">3.08</td>
+      <td align="right">4.62</td>
+      <td align="right">6.16</td>
+      <td align="right" style="background:#EAFFCA">7.7</td>
+      <td align="right" style="background:#EAFFCA">9.24</td>
+      <td align="right" style="background:#EAFFCA">10.26</td>
+      <td align="right" style="background:#EAFFCA">10.78</td>
+      <td align="right" style="background:#EAFFCA">12.32</td>
+      <td align="right" style="background:#EAFFCA">12.83</td>
+      <td align="right" style="background:#EAFFCA">13.85</td>
+      <td align="right" style="background:#EAFFCA">15.39</td>
+      <!--05-->
+      <tr>
+       <th id="r5">Ø16</th>
+       <td align="right">2.01</td>
+       <td align="right">4.02</td>
+       <td align="right">6.03</td>
+       <td align="right" style="background:#EAFFCA">8.04</td>
+       <td align="right" style="background:#EAFFCA">10.05</td>
+       <td align="right" style="background:#EAFFCA">12.06</td>
+       <td align="right" style="background:#EAFFCA">13.4</td>
+       <td align="right" style="background:#EAFFCA">14.07</td>
+       <td align="right" style="background:#EAFFCA">16.08</td>
+       <td align="right" style="background:#EAFFCA">16.76</td>
+       <td align="right" style="background:#EAFFCA">18.1</td>
+       <td align="right" style="background:#EAFFCA">20.11</td>
+       <!--06-->
+       <tr>
+        <th id="r6">Ø18</th>
+        <td align="right">2.54</td>
+        <td align="right">5.09</td>
+        <td align="right" style="background:#EAFFCA">7.63</td>
+        <td align="right" style="background:#EAFFCA">10.18</td>
+        <td align="right" style="background:#EAFFCA">12.72</td>
+        <td align="right" style="background:#EAFFCA">15.27</td>
+        <td align="right" style="background:#EAFFCA">16.96</td>
+        <td align="right" style="background:#EAFFCA">17.81</td>
+        <td align="right" style="background:#EAFFCA">20.36</td>
+        <td align="right" style="background:#EAFFCA">21.21</td>
+        <td align="right" style="background:#EAFFCA">22.9</td>
+        <td align="right" style="background:#EAFFCA">25.45</td>
+        <!--07-->
+        <tr>
+         <th id="r7">Ø20</th>
+         <td align="right">3.14</td>
+         <td align="right">6.28</td>
+         <td align="right" style="background:#EAFFCA">9.42</td>
+         <td align="right" style="background:#EAFFCA">12.57</td>
+         <td align="right" style="background:#EAFFCA">15.71</td>
+         <td align="right" style="background:#EAFFCA">18.85</td>
+         <td align="right" style="background:#EAFFCA">20.94</td>
+         <td align="right" style="background:#EAFFCA">21.99</td>
+         <td align="right" style="background:#EAFFCA">25.13</td>
+         <td align="right" style="background:#EAFFCA">26.18</td>
+         <td align="right" style="background:#EAFFCA">28.27</td>
+         <td align="right" style="background:#EAFFCA">31.42</td>
+         <!--08-->
+         <tr>
+          <th id="r8">Ø22</th>
+          <td align="right">3.8</td>
+          <td align="right" style="background:#EAFFCA">7.6</td>
+          <td align="right" style="background:#EAFFCA">11.4</td>
+          <td align="right" style="background:#EAFFCA">15.21</td>
+          <td align="right" style="background:#EAFFCA">19.01</td>
+          <td align="right" style="background:#EAFFCA">22.81</td>
+          <td align="right" style="background:#EAFFCA">25.34</td>
+          <td align="right" style="background:#EAFFCA">26.61</td>
+          <td align="right" style="background:#EAFFCA">30.41</td>
+          <td align="right" style="background:#EAFFCA">31.68</td>
+          <td align="right" style="background:#EAFFCA">34.21</td>
+          <td align="right" style="background:#EAFFCA">38.01</td>
+          <!--09-->
+          <tr>
+           <th id="r9">Ø25</th>
+           <td align="right">4.91</td>
+           <td align="right" style="background:#EAFFCA">9.82</td>
+           <td align="right" style="background:#EAFFCA">14.73</td>
+           <td align="right" style="background:#EAFFCA">19.63</td>
+           <td align="right" style="background:#EAFFCA">24.54</td>
+           <td align="right" style="background:#EAFFCA">29.45</td>
+           <td align="right" style="background:#EAFFCA">32.72</td>
+           <td align="right" style="background:#EAFFCA">34.36</td>
+           <td align="right" style="background:#EAFFCA">39.27</td>
+           <td align="right" style="background:#EAFFCA">40.91</td>
+           <td align="right" style="background:#EAFFCA">44.18</td>
+           <td align="right" style="background:#EAFFCA">49.09</td>
+           <!--010-->
+           <tr>
+            <th id="r10">Ø28</th>
+            <td align="right">6.16</td>
+            <td align="right" style="background:#EAFFCA">12.32</td>
+            <td align="right" style="background:#EAFFCA">18.47</td>
+            <td align="right" style="background:#EAFFCA">24.63</td>
+            <td align="right" style="background:#EAFFCA">30.79</td>
+            <td align="right" style="background:#EAFFCA">36.95</td>
+            <td align="right" style="background:#EAFFCA">41.05</td>
+            <td align="right" style="background:#EAFFCA">43.1</td>
+            <td align="right" style="background:#EAFFCA">49.26</td>
+            <td align="right" style="background:#EAFFCA">51.31</td>
+            <td align="right" style="background:#EAFFCA">55.42</td>
+            <td align="right" style="background:#EAFFCA">61.58</td>
+            <!--011-->
+            <tr>
+             <th id="r11">Ø32</th>
+             <td align="right" style="background:#EAFFCA">8.04</td>
+             <td align="right" style="background:#EAFFCA">16.08</td>
+             <td align="right" style="background:#EAFFCA">24.13</td>
+             <td align="right" style="background:#EAFFCA">32.17</td>
+             <td align="right" style="background:#EAFFCA">40.21</td>
+             <td align="right" style="background:#EAFFCA">48.25</td>
+             <td align="right" style="background:#EAFFCA">53.62</td>
+             <td align="right" style="background:#EAFFCA">56.3</td>
+             <td align="right" style="background:#EAFFCA">64.34</td>
+             <td align="right" style="background:#EAFFCA">67.02</td>
+             <td align="right" style="background:#EAFFCA">72.38</td>
+             <td align="right" style="background:#EAFFCA">80.42</td>
+            </tr>
+           </tr>
+          </tr>
+         </tr>
+        </tr>
+       </tr>
+      </tr>
+     </tr>
+    </tr>
+   </tr>
+  </tr>
+ </table>
+ <script>var col=0;var row=0;$("td").hover(function(){$("#r"+row+",#c"+col).css("color","black").css("background-color","#F0F0F0");col=$(this).parent().children().index($(this));row=$(this).parent().parent().children().index($(this).parent());$("#r"+row+",#c"+col).css("color","red").css("background-color","#FFF0A0");;});</script>
+</div>

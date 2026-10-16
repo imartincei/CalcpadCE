@@ -1,0 +1,1365 @@
+<div class="calcpad-output">
+ <!-- HP variant of the vector math toolkit: $L_p$ norms, dot and cross products, element-wise transcendentals and statistical primitives, evaluated on packed storage. -->
+ <style>em {font-family:"Times New Roman";}</style>
+ <p>
+  <b>Norm_p</b>
+  (
+  <em>vector</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <b>norm</b>
+   <sub>p</sub>
+   (
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">]</span>
+   ) ; 3 )  = 3.3
+  </span>
+  - the Lp norm of the vector for
+  <span class="eq">
+   <var>p</var>
+   = 3
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Norm_1</b>
+  (
+  <em>vector</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <b>norm</b>
+   <sub>1</sub>
+   (
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   -1; 2; 3
+   <span class="b0">]</span>
+   )  )  = 6
+  </span>
+  - the L1 (Manhattan or taxicab) norm of the vector
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Norm</b>
+  (
+  <em>vector</em>
+  ) or
+  <b>Norm_2</b>
+  (
+  <em>vector</em>
+  ) or
+  <b>Norm_e</b>
+  (
+  <em>vector</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   1 2 3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>norm</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   )  = 3.74
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>norm</b>
+   <sub>2</sub>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   )  = 3.74
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>norm</b>
+   <sub>e</sub>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   )  = 3.74
+  </span>
+  - the L2 (Euclidian) norm of vector
+  <em>a</em>
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Norm_i</b>
+  (
+  <em>vector</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <b>norm</b>
+   <sub>i</sub>
+   (
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">]</span>
+   )  )  = 3
+  </span>
+  - the L∞ (infinity) norm of the vector
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Unit</b>
+  (
+  <em>vector</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <b>unit</b>
+   (
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   -1; 2; 3
+   <span class="b0">]</span>
+   )  )  =
+   <b class="b0">[</b>
+   -0.267 0.535 0.802
+   <b class="b0">]</b>
+  </span>
+  - the normalized (unit) vector
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Dot</b>
+  (
+  <em>vector</em>
+  ;
+  <em>vector</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 4
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   1 2 4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   5; 3; 1
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   5 3 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>dot</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  = 15
+  </span>
+  - scalar (dot) product of vectors
+  <em>a</em>
+  and
+  <em>b</em>
+  ;
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Cross</b>
+  (
+  <em>vector</em>
+  ;
+  <em>vector</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 4
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   1 2 4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   5; 3; 1
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   5 3 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cross</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -10 19 -7
+   <b class="b0">]</b>
+  </span>
+  - cross product of vectors
+  <em>a</em>
+  and
+  <em>b</em>
+  ;
+ </p>
+ <p>
+ </p>
+ <p>
+  Trigonometric:
+  <hr/>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   0; 30; 45; 60; 90
+   <span class="b0">]</span>
+   )  ·
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   0; 30; 45; 60; 90
+   <span class="b0">]</span>
+   )  ·
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   =
+   <b class="b0">[</b>
+   0 0.524 0.785 1.05 1.57
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>sin</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 0.5 0.707 0.866 1
+   <b class="b0">]</b>
+  </span>
+  - sine
+ </p>
+ <p>
+  <span class="eq">
+   <b>cos</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 0.866 0.707 0.5 0
+   <b class="b0">]</b>
+  </span>
+  - cosine
+ </p>
+ <p>
+  <span class="eq">
+   <b>tan</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 0.577 1 1.73 1.63×10
+   <sup>16</sup>
+   <b class="b0">]</b>
+  </span>
+  - tangent
+ </p>
+ <p>
+  <span class="eq">
+   <b>csc</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">+∞</span>
+   2 1.41 1.15 1
+   <b class="b0">]</b>
+  </span>
+  - cosecant
+ </p>
+ <p>
+  <span class="eq">
+   <b>sec</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 1.15 1.41 2 1.63×10
+   <sup>16</sup>
+   <b class="b0">]</b>
+  </span>
+  - secant
+ </p>
+ <p>
+  <span class="eq">
+   <b>cot</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">+∞</span>
+   1.73 1 0.577 0
+   <b class="b0">]</b>
+  </span>
+  - cotangent
+ </p>
+ <p>
+ </p>
+ <p>
+  Hyperbolic:
+  <hr/>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   0; 0.5; 1
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   0 0.5 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>sinh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 0.521 1.18
+   <b class="b0">]</b>
+  </span>
+  - hyperbolic sine
+ </p>
+ <p>
+  <span class="eq">
+   <b>cosh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 1.13 1.54
+   <b class="b0">]</b>
+  </span>
+  - hyperbolic cosine
+ </p>
+ <p>
+  <span class="eq">
+   <b>tanh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 0.462 0.762
+   <b class="b0">]</b>
+  </span>
+  - hyperbolic tangent
+ </p>
+ <p>
+  <span class="eq">
+   <b>csch</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">+∞</span>
+   1.92 0.851
+   <b class="b0">]</b>
+  </span>
+  - hyperbolic cosecant
+ </p>
+ <p>
+  <span class="eq">
+   <b>sech</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 0.887 0.648
+   <b class="b0">]</b>
+  </span>
+  - hyperbolic secant
+ </p>
+ <p>
+  <span class="eq">
+   <b>coth</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">+∞</span>
+   2.16 1.31
+   <b class="b0">]</b>
+  </span>
+  - hyperbolic cotangent
+ </p>
+ <p>
+ </p>
+ <p>
+  Inverse trigonometric:
+  <hr/>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   0; 0.5;
+   <span class="dvc">
+    <span class="o0">
+     <span class="r">√</span>
+     2
+    </span>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ;
+   <span class="dvc">
+    <span class="o0">
+     <span class="r">√</span>
+     3
+    </span>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ; 1
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   0 0.5 0.707 0.866 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   =
+   <b>reverse</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 0.866 0.707 0.5 0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>asin</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 0.524 0.785 1.05 1.57
+   <b class="b0">]</b>
+  </span>
+  - inverse sine
+ </p>
+ <p>
+  <span class="eq">
+   <b>acos</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1.57 1.05 0.785 0.524 0
+   <b class="b0">]</b>
+  </span>
+  - inverse cosine
+ </p>
+ <p>
+  <span class="eq">
+   <b>atan</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 0.464 0.615 0.714 0.785
+   <b class="b0">]</b>
+  </span>
+  - inverse tangent
+ </p>
+ <p>
+  <span class="eq">
+   <b>atan2</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1.57 1.05 0.785 0.524 0
+   <b class="b0">]</b>
+  </span>
+  - the angle whose tangent is the quotient of y and x
+ </p>
+ <p>
+  <span class="eq">
+   <b>acsc</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>
+     <span class="vec">⃗</span>
+     x
+    </var>
+   </span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   0 0.524 0.785 1.05 1.57
+   <b class="b0">]</b>
+  </span>
+  - inverse cosecant
+ </p>
+ <p>
+  <span class="eq">
+   <b>asec</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>
+     <span class="vec">⃗</span>
+     x
+    </var>
+   </span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   1.57 1.05 0.785 0.524 0
+   <b class="b0">]</b>
+  </span>
+  - inverse secant
+ </p>
+ <p>
+  <span class="eq">
+   <b>acot</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1.57 1.11 0.955 0.857 0.785
+   <b class="b0">]</b>
+  </span>
+  - inverse cotangent
+ </p>
+ <p>
+ </p>
+ <p>
+  Inverse hyperbolic:
+  <hr/>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 4
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   1 2 4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>asinh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.881 1.44 2.09
+   <b class="b0">]</b>
+  </span>
+  - inverse hyperbolic sine
+ </p>
+ <p>
+  <span class="eq">
+   <b>acosh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 1.32 2.06
+   <b class="b0">]</b>
+  </span>
+  - inverse hyperbolic cosine
+ </p>
+ <p>
+  <span class="eq">
+   <b>atanh</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>
+     <span class="vec">⃗</span>
+     x
+    </var>
+    <span class="dvl">
+    </span>
+    5
+   </span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   0.203 0.424 1.1
+   <b class="b0">]</b>
+  </span>
+  - inverse hyperbolic tangent
+ </p>
+ <p>
+  <span class="eq">
+   <b>acsch</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>
+     <span class="vec">⃗</span>
+     x
+    </var>
+   </span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   0.881 1.44 2.09
+   <b class="b0">]</b>
+  </span>
+  - inverse hyperbolic cosecant
+ </p>
+ <p>
+  <span class="eq">
+   <b>asech</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>
+     <span class="vec">⃗</span>
+     x
+    </var>
+   </span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   0 1.32 2.06
+   <b class="b0">]</b>
+  </span>
+  - inverse hyperbolic secant
+ </p>
+ <p>
+  <span class="eq">
+   <b>acoth</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    5
+    <span class="dvl">
+    </span>
+    <var>
+     <span class="vec">⃗</span>
+     x
+    </var>
+   </span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   0.203 0.424 1.1
+   <b class="b0">]</b>
+  </span>
+  - inverse hyperbolic cotangent
+ </p>
+ <p>
+ </p>
+ <p>
+  Logarithmic, exponential and roots:
+  <hr/>
+ </p>
+ <p>
+  <span class="eq">
+   <b>log</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 0.301 0.602
+   <b class="b0">]</b>
+  </span>
+  - decimal logarithm
+ </p>
+ <p>
+  <span class="eq">
+   <b>ln</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 0.693 1.39
+   <b class="b0">]</b>
+  </span>
+  - natural logarithm
+ </p>
+ <p>
+  <span class="eq">
+   <b>log</b>
+   <sub>2</sub>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 1 2
+   <b class="b0">]</b>
+  </span>
+  - binary logarithm
+ </p>
+ <p>
+  <span class="eq">
+   <b>exp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   2.72 7.39 54.6
+   <b class="b0">]</b>
+  </span>
+  - natural exponent = eˣ
+ </p>
+ <p>
+  <span class="eq">
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     x
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   1 1.41 2
+   <b class="b0">]</b>
+  </span>
+  - square root
+ </p>
+ <p>
+  <span class="eq">
+   <sup class="nth">3</sup>
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     x
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   1 1.26 1.59
+   <b class="b0">]</b>
+  </span>
+  - cubic root
+ </p>
+ <p>
+  <span class="eq">
+   <sup class="nth">3</sup>
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     x
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   1 1.26 1.59
+   <b class="b0">]</b>
+  </span>
+  - n-th root
+ </p>
+ <p>
+ </p>
+ <p>
+  Rounding:
+  <hr/>
+ </p>
+ <p>
+  <span class="eq">
+   <b>round</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 2 4
+   <b class="b0">]</b>
+  </span>
+  - round to the nearest integer
+ </p>
+ <p>
+  <span class="eq">
+   <b>floor</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 2 4
+   <b class="b0">]</b>
+  </span>
+  - round to the smaller integer(towards - ∞)
+ </p>
+ <p>
+  <span class="eq">
+   <b>ceiling</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 2 4
+   <b class="b0">]</b>
+  </span>
+  - round to the greater integer(towards + ∞)
+ </p>
+ <p>
+  <span class="eq">
+   <b>trunc</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 2 4
+   <b class="b0">]</b>
+  </span>
+  - round to the smaller integer(towards zero)
+ </p>
+ <p>
+ </p>
+ <p>
+  Integer:
+  <hr/>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b class="b0">[</b>
+   1 2 4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   + 2 =
+   <b class="b0">[</b>
+   3 4 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mod</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 2 4
+   <b class="b0">]</b>
+  </span>
+  - the remainder of an integer division
+ </p>
+ <p>
+  <span class="eq">
+   <b>gcd</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   )  = 1
+  </span>
+  - the greatest common divisor of several integers
+ </p>
+ <p>
+  <span class="eq">
+   <b>lcm</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   )  = 12
+  </span>
+  - the least common multiple of several integers
+ </p>
+ <p>
+ </p>
+ <p>
+  Aggregate and interpolation:
+  <hr/>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   0; 2; 6
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   0 2 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   5; 3; 1
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   5 3 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>min</b>
+   ( 4;
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 7;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ; 10; 11 )  = 0
+  </span>
+  - minimum of multiple values
+ </p>
+ <p>
+  <span class="eq">
+   <b>max</b>
+   ( 4;
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 7;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ; 10; 11 )  = 11
+  </span>
+  - maximum of multiple values
+ </p>
+ <p>
+  <span class="eq">
+   <b>sum</b>
+   ( 4;
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 7;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ; 10; 11 )  = 49
+  </span>
+  - sum of multiple values
+ </p>
+ <p>
+  <span class="eq">
+   <b>sumsq</b>
+   ( 4;
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 7;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ; 10; 11 )  = 361
+  </span>
+  - sum of squares
+ </p>
+ <p>
+  <span class="eq">
+   <b>srss</b>
+   ( 4;
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 7;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ; 10; 11 )  = 19
+  </span>
+  - square root of sum of squares
+ </p>
+ <p>
+  <span class="eq">
+   <b>average</b>
+   ( 4;
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 7;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ; 10; 11 )  = 4.9
+  </span>
+  - average of multiple values
+ </p>
+ <p>
+  <span class="eq">
+   <b>product</b>
+   ( 4;
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 7;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ; 10; 11 )  = 0
+  </span>
+  - product of multiple values
+ </p>
+ <p>
+  <span class="eq">
+   <b>mean</b>
+   ( 4;
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 7;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ; 10; 11 )  = 0
+  </span>
+  - geometric mean
+ </p>
+ <p>
+  <span class="eq">
+   <b>take</b>
+   ( 3;
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   )  = 6
+  </span>
+  - the 3-rd element from the list
+ </p>
+ <p>
+  <span class="eq">
+   <b>line</b>
+   ( 1.5;
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   )  = 1
+  </span>
+  - linear interpolation
+ </p>
+ <p>
+  <span class="eq">
+   <b>spline</b>
+   ( 1.5;
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   )  = 0.812
+  </span>
+  - Hermite spline interpolation
+ </p>
+</div>

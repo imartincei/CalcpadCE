@@ -332,7 +332,10 @@ namespace Calcpad.Core
         protected string HtmlImg(string src)
         {
             double w = Math.Round(0.75 * Width / ScreenScaleFactor);
-            return $"<img class=\"plot\" src=\"{src}\" alt=\"Plot\" style=\"width:{w}pt;\">";
+            var dataAttr = src.StartsWith("data:image/png", StringComparison.Ordinal)
+                ? " data-plot=\"png\""
+                : string.Empty;
+            return $"<img class=\"plot\"{dataAttr} src=\"{src}\" alt=\"Plot\" style=\"width:{w}pt;\">";
         }
 
         protected static void PngToFile(SKBitmap bitmap, string imagePath, string imageFileName)
@@ -355,7 +358,7 @@ namespace Calcpad.Core
         }
 
         protected static void SvgToFile(SvgDrawing drawing, string imagePath, string imageFileName)
-        {            
+        {
             var fullPath = imagePath + imageFileName;
             try
             {

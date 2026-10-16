@@ -6,7 +6,7 @@
 
         private const string RandomMatrixA = "a = random(column(n; 1))";
         private const string RandomMatrixB = "b = random(column(n; 1))";
-        
+
 
         private static string[] OperatorTestHelper(char o, string tol = "0") => [
             "n = 500",
@@ -34,7 +34,7 @@
             RandomMatrixA,
             $"c = {func}(a)",
             $"c_hp = {func}(hp(a))",
-            "r = abs(c - c_hp) ≤ 10^-14*abs(c)"
+            TestCalc.CompareWithTolerance("c", "c_hp", "10^-14")
         ];
 
         private static string[] InterpolationTestHelper(string func) => [
@@ -43,7 +43,7 @@
             RandomMatrixA,
             $"c = {func}(i; 1; a)",
             $"c_hp = {func}(i; 1; hp(a))",
-            "r = abs(c - c_hp) ≤ 10^-14*abs(c)"
+            TestCalc.CompareWithTolerance("c", "c_hp", "10^-14")
 ];
 
         [Fact]
@@ -78,7 +78,7 @@
                 "a_hp = hp(a)",
                 "b_hp = hp(b)",
                 $"c_hp = a_hp * b_hp",
-                "r = abs(c - c_hp) ≤ 10^-14*abs(c)",
+                TestCalc.CompareWithTolerance("c", "c_hp", "10^-14"),
                 "mcount(r; 0)"
             ]);
             Assert.Equal(0, result);
@@ -881,7 +881,7 @@
                 RandomMatrixB,
                 "c = fprod(a; b)",
                 "c_hp = fprod(hp(a); hp(b))",
-                "abs(c - c_hp) ≤ 10^-12*abs(c)"
+                TestCalc.CompareWithToleranceDirect("c", "c_hp", "10^-12")
             ]);
             Assert.Equal(1, result);
         }
@@ -922,7 +922,7 @@
                 RandomMatrixA,
                 "c = mnorm_2(a)",
                 "c_hp = mnorm_2(hp(a))",
-                "abs(c - c_hp) ≤ 10^-12*abs(c)"
+                TestCalc.CompareWithToleranceDirect("c", "c_hp", "10^-12")
             ]);
             Assert.Equal(1, result);
         }
@@ -937,7 +937,7 @@
                 RandomMatrixA,
                 "c = mnorm_i(a)",
                 "c_hp = mnorm_i(hp(a))",
-                "r = abs(c - c_hp) ≤ 10^-12*abs(c)"
+                TestCalc.CompareWithTolerance("c", "c_hp", "10^-12")
             ]);
             Assert.Equal(1, result);
         }

@@ -237,7 +237,7 @@
         {
             string A = "[1; 3; 5|7; 2; 6|4; 8; 9]";
             string B = "[2; 4; 6|1; 3; 9|5; 7; 3]";
-            var calc = new TestCalc(new()); 
+            var calc = new TestCalc(new());
             calc.Run($"hprod({A}; {B})");
             Assert.Equal("[2 12 30|7 6 54|20 56 27]", calc.ToString());
         }

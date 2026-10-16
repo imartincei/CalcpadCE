@@ -1,0 +1,1232 @@
+<div class="calcpad-output">
+ <!-- Bending capacity $M_{Rd}$ of a T-cross-section with given reinforcement: rectangular stress block, neutral-axis depth from horizontal equilibrium and lever arm to the resultant of the compressed concrete. -->
+ <small>
+  According to
+  <strong>Eurocode</strong>
+  : EN 1992-1-1
+ </small>
+ <div style="max-width:180mm">
+  <img alt="tbeam-bending.png" src="Images/structures/rc/design/tbeam-bending.png" style="width:400pt;"/>
+  <p>
+   Design bending moment -
+   <span class="eq">
+    <var>M</var>
+    <sub>Ed</sub>
+    =
+    <u class="input-5">800</u>
+   </span>
+   kN·m
+  </p>
+  <h4>Cross section dimensions</h4>
+  <p>
+   Web -
+   <span class="eq">
+    <var>b</var>
+    <sub>w</sub>
+    =
+    <u class="input-7">300</u>
+   </span>
+   mm,
+   <span class="eq">
+    <var>h</var>
+    <sub>w</sub>
+    =
+    <u class="input-7">650</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Flange -
+   <span class="eq">
+    <var>b</var>
+    <sub>f</sub>
+    =
+    <u class="input-8">1200</u>
+   </span>
+   mm,
+   <span class="eq">
+    <var>h</var>
+    <sub>f</sub>
+    =
+    <u class="input-8">120</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Flange area -
+   <span class="eq">
+    <var>A</var>
+    <sub>f</sub>
+    =  (
+    <var>b</var>
+    <sub>f</sub>
+    −
+    <var>b</var>
+    <sub>w</sub>
+    )  ·
+    <var>h</var>
+    <sub>f</sub>
+    =  ( 1200 − 300 )  · 120 = 108000
+   </span>
+   mm²
+  </p>
+  <p>
+   Section area -
+   <span class="eq">
+    <var>A</var>
+    <sub>c</sub>
+    =
+    <var>b</var>
+    <sub>w</sub>
+    ·
+    <var>h</var>
+    <sub>w</sub>
+    +
+    <var>A</var>
+    <sub>f</sub>
+    = 300 · 650 + 108000 = 303000
+   </span>
+   mm²
+  </p>
+  <p>
+   <b>Concrete cover to the center of reinforcement</b>
+  </p>
+  <p>
+   Bottom -
+   <span class="eq">
+    <var>d</var>
+    <sub>1</sub>
+    =
+    <u class="input-14">50</u>
+   </span>
+   mm,    Top -
+   <span class="eq">
+    <var>d</var>
+    <sub>2</sub>
+    =
+    <u class="input-14">50</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Effective cross section depth -
+   <span class="eq">
+    <var>d</var>
+    =
+    <var>h</var>
+    <sub>w</sub>
+    −
+    <var>d</var>
+    <sub>1</sub>
+    = 650 − 50 = 600
+   </span>
+   mm
+  </p>
+  <p>
+   <b>Reinforcement</b>
+  </p>
+  <p>
+   Bottom -
+   <span class="eq">
+    <var>A</var>
+    <sub>s1</sub>
+    =
+    <u class="input-19">3700</u>
+   </span>
+   mm²,    Top -
+   <span class="eq">
+    <var>A</var>
+    <sub>s2</sub>
+    =
+    <u class="input-19">0</u>
+   </span>
+   mm²
+  </p>
+  <p>Reinforcement ratios</p>
+  <p>
+   - bottom reinforcement -
+   <span class="eq">
+    <var>ρ</var>
+    <sub>1</sub>
+    =
+    <span class="dvc">
+     <var>A</var>
+     <sub>s1</sub>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+     <sub>w</sub>
+     ·
+     <var>d</var>
+    </span>
+    =
+    <span class="dvc">
+     3700
+     <span class="dvl">
+     </span>
+     300 · 600
+    </span>
+    = 0.0206
+   </span>
+  </p>
+  <p>
+   - top reinforcement -
+   <span class="eq">
+    <var>ρ</var>
+    <sub>2</sub>
+    =
+    <span class="dvc">
+     <var>A</var>
+     <sub>s2</sub>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+     <sub>w</sub>
+     ·
+     <var>d</var>
+    </span>
+    =
+    <span class="dvc">
+     0
+     <span class="dvl">
+     </span>
+     300 · 600
+    </span>
+    = 0
+   </span>
+  </p>
+  <h4>Material properties</h4>
+  <p class="ref" style="float:right">[EN 1992-1-1, Table 3.1]</p>
+  <p>
+   <b>Concrete</b>
+  </p>
+  <p>
+   Characteristic compressive cylinder strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ck</sub>
+    =
+    <u class="input-28">20</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Partial safety factor for concrete -
+   <span class="eq">
+    <var>γ</var>
+    <sub>c</sub>
+    = 1.5
+   </span>
+   ,
+   <span class="eq">
+    <var>α</var>
+    <sub>cc</sub>
+    =
+    <u class="input-29">0.85</u>
+   </span>
+  </p>
+  <p>
+   Design compressive cylinder strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>cd</sub>
+    =
+    <span class="dvc">
+     <var>α</var>
+     <sub>cc</sub>
+     ·
+     <var>f</var>
+     <sub>ck</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>c</sub>
+    </span>
+    =
+    <span class="dvc">
+     0.85 · 20
+     <span class="dvl">
+     </span>
+     1.5
+    </span>
+    = 11.33
+   </span>
+   MPa
+  </p>
+  <p>
+   Ultimate compressive strain -
+   <span class="eq">
+    <var>ε</var>
+    <sub>cu2</sub>
+    = 0.0035
+   </span>
+  </p>
+  <p>
+   Strain at the end of the parabolic part of the diagram -
+   <span class="eq">
+    <var>ε</var>
+    <sub>c2</sub>
+    = 0.002
+   </span>
+  </p>
+  <p>
+   Mean value of axial tensile strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ctm</sub>
+    = 0.3 ·
+    <var>f</var>
+    <sub>ck</sub>
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+    = 0.3 · 20
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+    = 2.21
+   </span>
+   MPa
+  </p>
+  <p>
+   <b>Steel</b>
+  </p>
+  <p>
+   Characteristic yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>yk</sub>
+    =
+    <u class="input-37">500</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Partial safety factor for steel -
+   <span class="eq">
+    <var>γ</var>
+    <sub>s</sub>
+    = 1.15
+   </span>
+  </p>
+  <p>
+   Design yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>yd</sub>
+    =
+    <span class="dvc">
+     <var>f</var>
+     <sub>yk</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>s</sub>
+    </span>
+    =
+    <span class="dvc">
+     500
+     <span class="dvl">
+     </span>
+     1.15
+    </span>
+    = 434.78
+   </span>
+   MPa
+  </p>
+  <p>
+   Modulus of elasticity -
+   <span class="eq">
+    <var>E</var>
+    <sub>s</sub>
+    = 200
+   </span>
+   GPa
+  </p>
+  <p>
+   <b>Strain-stress diagrams</b>
+   , MPa:
+  </p>
+  <!-- <span class="eq"><var>PlotWidth</var> = 250</span> , <span class="eq"><var>PlotHeight</var> = 125</span> -->
+  <table>
+   <tr>
+    <td>
+     <svg class="plot" data-plot="svg" height="740px" style="width:235.19pt; height:137.04pt;" version="1.1" viewbox=" 0 0 1270 740" width="1270px" xmlns="http://www.w3.org/2000/svg">
+      <style type="text/css">
+       .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+      </style>
+      <g class="plot">
+       <rect class="Frame" height="500" width="1000" x="180" y="120">
+       </rect>
+       <line class="Grid" x1="180" x2="1180" y1="620" y2="620">
+       </line>
+       <text class="sm end" x="161" y="638">0</text>
+       <line class="Grid" x1="180" x2="1180" y1="531.76" y2="531.76">
+       </line>
+       <text class="sm end" x="161" y="549.76">2</text>
+       <line class="Grid" x1="180" x2="1180" y1="443.53" y2="443.53">
+       </line>
+       <text class="sm end" x="161" y="461.53">4</text>
+       <line class="Grid" x1="180" x2="1180" y1="355.29" y2="355.29">
+       </line>
+       <text class="sm end" x="161" y="373.29">6</text>
+       <line class="Grid" x1="180" x2="1180" y1="267.06" y2="267.06">
+       </line>
+       <text class="sm end" x="161" y="285.06">8</text>
+       <line class="Grid" x1="180" x2="1180" y1="178.82" y2="178.82">
+       </line>
+       <text class="sm end" x="161" y="196.82">10</text>
+       <line class="Grid" x1="180" x2="180" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="180" y="672">0</text>
+       <line class="Grid" x1="322.86" x2="322.86" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="322.86" y="672">0.5</text>
+       <line class="Grid" x1="465.71" x2="465.71" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="465.71" y="672">1</text>
+       <line class="Grid" x1="608.57" x2="608.57" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="608.57" y="672">1.5</text>
+       <line class="Grid" x1="751.43" x2="751.43" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="751.43" y="672">2</text>
+       <line class="Grid" x1="894.29" x2="894.29" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="894.29" y="672">2.5</text>
+       <line class="Grid" x1="1037.14" x2="1037.14" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="1037.14" y="672">3</text>
+       <text class="sm mid" x="1180" y="672">3.5</text>
+       <line class="Axis" x1="180" x2="1180" y1="620" y2="620">
+       </line>
+       <text x="1202" y="602">x</text>
+       <line class="Axis" x1="180" x2="180" y1="120" y2="620">
+       </line>
+       <text class="mid" x="180" y="84">y</text>
+       <text x="8" y="723">[0; 0]</text>
+       <text class="end" x="1262" y="44">[3.5; 11.33]</text>
+       <polyline class="Series1" points="180,620 212.26,565.14 244.52,513.47 276.77,464.99 309.03,419.69 341.29,377.58 373.55,338.65 405.81,302.91 438.06,270.36 470.32,241 502.58,214.82 534.84,191.83 567.1,172.03 599.35,155.41 631.61,141.98 647.74,136.46 663.87,131.74 680,127.81 696.13,124.68 712.26,122.35 728.39,120.81 744.52,120.07 760.65,120 792.9,120 825.16,120 857.42,120 889.68,120 921.94,120 954.19,120 986.45,120 1018.71,120 1050.97,120 1083.23,120 1115.48,120 1147.74,120 1180,120">
+       </polyline>
+       <polygon class="Fill1" points="180,620 180,620 212.26,565.14 244.52,513.47 276.77,464.99 309.03,419.69 341.29,377.58 373.55,338.65 405.81,302.91 438.06,270.36 470.32,241 502.58,214.82 534.84,191.83 567.1,172.03 599.35,155.41 631.61,141.98 647.74,136.46 663.87,131.74 680,127.81 696.13,124.68 712.26,122.35 728.39,120.81 744.52,120.07 760.65,120 792.9,120 825.16,120 857.42,120 889.68,120 921.94,120 954.19,120 986.45,120 1018.71,120 1050.97,120 1083.23,120 1115.48,120 1147.74,120 1180,120 1180,620" stroke-width="0">
+       </polygon>
+      </g>
+     </svg>
+    </td>
+    <td>
+     <svg class="plot" data-plot="svg" height="740px" style="width:235.19pt; height:137.04pt;" version="1.1" viewbox=" 0 0 1270 740" width="1270px" xmlns="http://www.w3.org/2000/svg">
+      <style type="text/css">
+       .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+      </style>
+      <g class="plot">
+       <rect class="Frame" height="500" width="1000" x="180" y="120">
+       </rect>
+       <line class="Grid" x1="180" x2="1180" y1="600" y2="600">
+       </line>
+       <text class="sm end" x="161" y="618">-400</text>
+       <line class="Grid" x1="180" x2="1180" y1="485" y2="485">
+       </line>
+       <text class="sm end" x="161" y="503">-200</text>
+       <line class="Grid" x1="180" x2="1180" y1="370" y2="370">
+       </line>
+       <text class="sm end" x="161" y="388">0</text>
+       <line class="Grid" x1="180" x2="1180" y1="255" y2="255">
+       </line>
+       <text class="sm end" x="161" y="273">200</text>
+       <line class="Grid" x1="180" x2="1180" y1="140" y2="140">
+       </line>
+       <text class="sm end" x="161" y="158">400</text>
+       <line class="Grid" x1="180" x2="180" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="180" y="672">-10</text>
+       <line class="Grid" x1="305" x2="305" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="305" y="672">-7.5</text>
+       <line class="Grid" x1="430" x2="430" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="430" y="672">-5</text>
+       <line class="Grid" x1="555" x2="555" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="555" y="672">-2.5</text>
+       <line class="Grid" x1="680" x2="680" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="680" y="672">0</text>
+       <line class="Grid" x1="805" x2="805" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="805" y="672">2.5</text>
+       <line class="Grid" x1="930" x2="930" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="930" y="672">5</text>
+       <line class="Grid" x1="1055" x2="1055" y1="120" y2="620">
+       </line>
+       <text class="sm mid" x="1055" y="672">7.5</text>
+       <text class="sm mid" x="1180" y="672">10</text>
+       <line class="Axis" x1="180" x2="1180" y1="370" y2="370">
+       </line>
+       <text x="1202" y="352">x</text>
+       <line class="Axis" x1="680" x2="680" y1="120" y2="620">
+       </line>
+       <text class="mid" x="680" y="84">y</text>
+       <text x="8" y="723">[-10; -434.78]</text>
+       <text class="end" x="1262" y="44">[10; 434.78]</text>
+       <polyline class="Series1" points="180,620 212.26,620 244.52,620 276.77,620 309.03,620 341.29,620 373.55,620 405.81,620 438.06,620 470.32,620 502.58,620 534.84,620 550.97,620 559.03,620 563.06,620 567.1,620 569.11,620 570.12,620 571.13,620 572.14,618.08 573.15,615.77 575.16,611.13 579.19,601.85 583.23,592.58 591.29,574.03 599.35,555.48 631.61,481.29 663.87,407.1 696.13,332.9 728.39,258.71 760.65,184.52 768.71,165.97 776.77,147.42 780.81,138.15 784.84,128.87 786.85,124.23 787.86,121.92 788.87,120 789.88,120 790.89,120 792.9,120 796.94,120 800.97,120 809.03,120 825.16,120 857.42,120 889.68,120 921.94,120 954.19,120 986.45,120 1018.71,120 1050.97,120 1083.23,120 1115.48,120 1147.74,120 1180,120">
+       </polyline>
+       <polygon class="Fill1" points="180,370 180,620 212.26,620 244.52,620 276.77,620 309.03,620 341.29,620 373.55,620 405.81,620 438.06,620 470.32,620 502.58,620 534.84,620 550.97,620 559.03,620 563.06,620 567.1,620 569.11,620 570.12,620 571.13,620 572.14,618.08 573.15,615.77 575.16,611.13 579.19,601.85 583.23,592.58 591.29,574.03 599.35,555.48 631.61,481.29 663.87,407.1 696.13,332.9 728.39,258.71 760.65,184.52 768.71,165.97 776.77,147.42 780.81,138.15 784.84,128.87 786.85,124.23 787.86,121.92 788.87,120 789.88,120 790.89,120 792.9,120 796.94,120 800.97,120 809.03,120 825.16,120 857.42,120 889.68,120 921.94,120 954.19,120 986.45,120 1018.71,120 1050.97,120 1083.23,120 1115.48,120 1147.74,120 1180,120 1180,370" stroke-width="0">
+       </polygon>
+      </g>
+     </svg>
+    </td>
+   </tr>
+  </table>
+  <h4>Design checks</h4>
+  <p class="ref">
+   [EN 1992-1-1, § 9.2.1.1]
+   <p>Minimum tensile reinforcement ratio</p>
+   <p>
+    <span class="eq">
+     <var>ρ</var>
+     <sub>min</sub>
+     =
+     <b>max</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      0.26 ·
+      <var>f</var>
+      <sub>ctm</sub>
+      <span class="dvl">
+      </span>
+      <var>f</var>
+      <sub>yk</sub>
+     </span>
+     ; 0.0013
+     <span class="b1">)</span>
+     =
+     <b>max</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      0.26 · 2.21
+      <span class="dvl">
+      </span>
+      500
+     </span>
+     ; 0.0013
+     <span class="b1">)</span>
+     = 0.0013
+    </span>
+   </p>
+   <p>
+    Maximum tensile reinforcement ratio -
+    <span class="eq">
+     <var>ρ</var>
+     <sub>max</sub>
+     = 0.04
+    </span>
+   </p>
+   <p>
+    Internal section forces as a function of the compressive zone depth
+    <i>x</i>
+    .
+   </p>
+   <p>Reinforcement strain:</p>
+   <p>
+    - in bottom reinforcement -
+    <span class="eq">
+     <var>ε</var>
+     <sub>s1</sub>
+     (
+     <var>x</var>
+     )  =
+     <span class="dvc">
+      <var>ε</var>
+      <sub>cu2</sub>
+      ·  (
+      <var>d</var>
+      −
+      <var>x</var>
+      )
+      <span class="dvl">
+      </span>
+      <var>x</var>
+     </span>
+    </span>
+   </p>
+   <p>
+    - in top reinforcement -
+    <span class="eq">
+     <var>ε</var>
+     <sub>s2</sub>
+     (
+     <var>x</var>
+     )  =
+     <span class="dvc">
+      <var>ε</var>
+      <sub>cu2</sub>
+      ·  (
+      <var>d</var>
+      <sub>2</sub>
+      −
+      <var>x</var>
+      )
+      <span class="dvl">
+      </span>
+      <var>x</var>
+     </span>
+    </span>
+   </p>
+   <p>
+    - at flange bottom edge -
+    <span class="eq">
+     <var>ε</var>
+     <sub>cf</sub>
+     (
+     <var>x</var>
+     )  =
+     <span class="dvc">
+      <var>ε</var>
+      <sub>cu2</sub>
+      ·  (
+      <var>x</var>
+      −
+      <var>h</var>
+      <sub>f</sub>
+      )
+      <span class="dvl">
+      </span>
+      <var>x</var>
+     </span>
+    </span>
+   </p>
+   <p>Factors for integration of concrete stress diagram</p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     =
+     <var>f</var>
+     <sub>cd</sub>
+     ·
+     <var>ε</var>
+     <sub>cu2</sub>
+     = 11.33 · 0.0035 = 0.0397
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     <sub>1</sub>
+     (
+     <var>ε</var>
+     <sub>cu</sub>
+     )  =
+     <span class="dvr">
+      <small>
+       <var>ε</var>
+       <sub>cu</sub>
+      </small>
+      <span class="nary">
+       <em>∫</em>
+      </span>
+      <small>0</small>
+     </span>
+     <span class="dvc">
+      <var>σ</var>
+      <sub>c</sub>
+      (
+      <var>ε</var>
+      )
+      <span class="dvl">
+      </span>
+      <var>k</var>
+     </span>
+     d
+     <var>ε</var>
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     <sub>2</sub>
+     (
+     <var>ε</var>
+     <sub>cu</sub>
+     )  =
+     <span class="dvr">
+      <small>
+       <var>ε</var>
+       <sub>cu</sub>
+      </small>
+      <span class="nary">
+       <em>∫</em>
+      </span>
+      <small>0</small>
+     </span>
+     <span class="dvc">
+      <var>σ</var>
+      <sub>c</sub>
+      (
+      <var>ε</var>
+      )  ·
+      <var>ε</var>
+      <span class="dvl">
+      </span>
+      <var>ε</var>
+      <sub>cu2</sub>
+      ·
+      <var>k</var>
+     </span>
+     d
+     <var>ε</var>
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     <sub>1</sub>
+     =
+     <var>k</var>
+     <sub>1</sub>
+     (
+     <var>ε</var>
+     <sub>cu2</sub>
+     )  =
+     <var>k</var>
+     <sub>1</sub>
+     ( 0.0035 )  = 0.81
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     <sub>2</sub>
+     =
+     <var>k</var>
+     <sub>2</sub>
+     (
+     <var>ε</var>
+     <sub>cu2</sub>
+     )  =
+     <var>k</var>
+     <sub>2</sub>
+     ( 0.0035 )  = 0.473
+    </span>
+   </p>
+   <p>Internal section forces:</p>
+   <p>
+    - in concrete -
+    <span class="eq">
+     <var>N</var>
+     <sub>c</sub>
+     (
+     <var>x</var>
+     )  = - (
+     <var>k</var>
+     <sub>1</sub>
+     ·
+     <var>x</var>
+     ·
+     <var>b</var>
+     <sub>f</sub>
+     ·  (
+     <var>x</var>
+     &lt;
+     <var>h</var>
+     <sub>f</sub>
+     )  +  (
+     <var>k</var>
+     <sub>1</sub>
+     ·
+     <var>x</var>
+     ·
+     <var>b</var>
+     <sub>f</sub>
+     −
+     <var>k</var>
+     <sub>1</sub>
+     (
+     <var>ε</var>
+     <sub>cf</sub>
+     (
+     <var>x</var>
+     )  )  ·  (
+     <var>x</var>
+     −
+     <var>h</var>
+     <sub>f</sub>
+     )  ·  (
+     <var>b</var>
+     <sub>f</sub>
+     −
+     <var>b</var>
+     <sub>w</sub>
+     )  )  ·  (
+     <var>x</var>
+     ≥
+     <var>h</var>
+     <sub>f</sub>
+     )  )  ·
+     <var>f</var>
+     <sub>cd</sub>
+     · 10
+     <sup>-3</sup>
+    </span>
+   </p>
+   <p>
+    - in  bottom reinforcement -
+    <span class="eq">
+     <var>N</var>
+     <sub>s1</sub>
+     (
+     <var>x</var>
+     )  =
+     <var>σ</var>
+     <sub>s</sub>
+     (
+     <var>ε</var>
+     <sub>s1</sub>
+     (
+     <var>x</var>
+     )  )  ·
+     <var>A</var>
+     <sub>s1</sub>
+     · 10
+     <sup>-3</sup>
+    </span>
+   </p>
+   <p>
+    - in  top reinforcement -
+    <span class="eq">
+     <var>N</var>
+     <sub>s2</sub>
+     (
+     <var>x</var>
+     )  =
+     <var>σ</var>
+     <sub>s</sub>
+     (
+     <var>ε</var>
+     <sub>s2</sub>
+     (
+     <var>x</var>
+     )  )  ·
+     <var>A</var>
+     <sub>s2</sub>
+     · 10
+     <sup>-3</sup>
+    </span>
+   </p>
+   <p>Section capacity for axial force</p>
+   <p>
+    <span class="eq">
+     <var>N</var>
+     <sub>Rd</sub>
+     (
+     <var>x</var>
+     )  =
+     <var>N</var>
+     <sub>c</sub>
+     (
+     <var>x</var>
+     )  +
+     <var>N</var>
+     <sub>s1</sub>
+     (
+     <var>x</var>
+     )  +
+     <var>N</var>
+     <sub>s2</sub>
+     (
+     <var>x</var>
+     )
+    </span>
+   </p>
+   <svg class="plot" data-plot="svg" height="740px" style="width:235.19pt; height:137.04pt;" version="1.1" viewbox=" 0 0 1270 740" width="1270px" xmlns="http://www.w3.org/2000/svg">
+    <style type="text/css">
+     .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+    </style>
+    <g class="plot">
+     <rect class="Frame" height="500" width="1000" x="180" y="120">
+     </rect>
+     <text class="sm end" x="161" y="640.12">-4000</text>
+     <line class="Grid" x1="180" x2="1180" y1="532.59" y2="532.59">
+     </line>
+     <text class="sm end" x="161" y="550.59">-3000</text>
+     <line class="Grid" x1="180" x2="1180" y1="443.06" y2="443.06">
+     </line>
+     <text class="sm end" x="161" y="461.06">-2000</text>
+     <line class="Grid" x1="180" x2="1180" y1="353.53" y2="353.53">
+     </line>
+     <text class="sm end" x="161" y="371.53">-1000</text>
+     <line class="Grid" x1="180" x2="1180" y1="264" y2="264">
+     </line>
+     <text class="sm end" x="161" y="282">0</text>
+     <line class="Grid" x1="180" x2="1180" y1="174.47" y2="174.47">
+     </line>
+     <text class="sm end" x="161" y="192.47">1000</text>
+     <text class="sm mid" x="180" y="672">0</text>
+     <line class="Grid" x1="256.93" x2="256.93" y1="120" y2="620">
+     </line>
+     <line class="Grid" x1="333.87" x2="333.87" y1="120" y2="620">
+     </line>
+     <text class="sm mid" x="333.87" y="672">100</text>
+     <line class="Grid" x1="410.8" x2="410.8" y1="120" y2="620">
+     </line>
+     <line class="Grid" x1="487.74" x2="487.74" y1="120" y2="620">
+     </line>
+     <text class="sm mid" x="487.74" y="672">200</text>
+     <line class="Grid" x1="564.67" x2="564.67" y1="120" y2="620">
+     </line>
+     <line class="Grid" x1="641.61" x2="641.61" y1="120" y2="620">
+     </line>
+     <text class="sm mid" x="641.61" y="672">300</text>
+     <line class="Grid" x1="718.54" x2="718.54" y1="120" y2="620">
+     </line>
+     <line class="Grid" x1="795.48" x2="795.48" y1="120" y2="620">
+     </line>
+     <text class="sm mid" x="795.48" y="672">400</text>
+     <line class="Grid" x1="872.41" x2="872.41" y1="120" y2="620">
+     </line>
+     <line class="Grid" x1="949.35" x2="949.35" y1="120" y2="620">
+     </line>
+     <text class="sm mid" x="949.35" y="672">500</text>
+     <line class="Grid" x1="1026.28" x2="1026.28" y1="120" y2="620">
+     </line>
+     <line class="Grid" x1="1103.22" x2="1103.22" y1="120" y2="620">
+     </line>
+     <text class="sm mid" x="1103.22" y="672">600</text>
+     <line class="Grid" x1="1180.15" x2="1180.15" y1="120" y2="620">
+     </line>
+     <line class="Axis" x1="180" x2="1180" y1="264" y2="264">
+     </line>
+     <text x="1202" y="246">x</text>
+     <line class="Axis" x1="180" x2="180" y1="120" y2="620">
+     </line>
+     <text class="mid" x="180" y="84">y</text>
+     <text x="8" y="723">[0.1; -3977.17]</text>
+     <text class="end" x="1262" y="44">[650; 1607.59]</text>
+     <polyline class="Series1" points="180.15,120.07 212.41,140.74 244.67,161.4 276.93,182.07 309.19,202.73 341.44,223.39 373.7,244.04 405.96,263.44 438.22,280.21 470.48,294.56 502.73,307.01 534.99,318.04 567.25,328.02 599.51,337.22 631.77,345.83 664.02,353.98 696.28,361.76 712.41,365.53 728.54,369.23 736.61,371.06 740.64,371.96 744.67,372.87 746.69,373.32 747.69,373.54 748.7,373.77 749.71,374.13 750.72,375.02 751.73,375.91 752.73,376.79 756.77,380.29 760.8,383.76 768.86,390.58 776.93,397.24 793.06,410.15 825.32,434.43 857.57,456.88 889.83,477.76 922.09,497.27 954.35,515.59 986.61,532.86 1018.86,549.2 1051.12,564.71 1083.38,579.48 1115.64,593.59 1147.9,607.1 1180.15,620.07">
+     </polyline>
+     <polygon class="Fill1" points="180.15,264 180.15,120.07 212.41,140.74 244.67,161.4 276.93,182.07 309.19,202.73 341.44,223.39 373.7,244.04 405.96,263.44 438.22,280.21 470.48,294.56 502.73,307.01 534.99,318.04 567.25,328.02 599.51,337.22 631.77,345.83 664.02,353.98 696.28,361.76 712.41,365.53 728.54,369.23 736.61,371.06 740.64,371.96 744.67,372.87 746.69,373.32 747.69,373.54 748.7,373.77 749.71,374.13 750.72,375.02 751.73,375.91 752.73,376.79 756.77,380.29 760.8,383.76 768.86,390.58 776.93,397.24 793.06,410.15 825.32,434.43 857.57,456.88 889.83,477.76 922.09,497.27 954.35,515.59 986.61,532.86 1018.86,549.2 1051.12,564.71 1083.38,579.48 1115.64,593.59 1147.9,607.1 1180.15,620.07 1180.15,264" stroke-width="0">
+     </polygon>
+    </g>
+   </svg>
+   <p>Compression zone depth is determined from the equilibrium of axial forces</p>
+   <p>
+    <span class="eq">
+     <var>x</var>
+     =
+     <span class="cond">$Root</span>
+     {
+     <var>N</var>
+     <sub>Rd</sub>
+     (
+     <var>x</var>
+     )  = 0;
+     <var>x</var>
+     ∈ [0.1;
+     <var>h</var>
+     <sub>w</sub>
+     ]} = 147.5
+    </span>
+    mm
+   </p>
+   <p>Compression zone depth at reinforcement yield point</p>
+   <p>
+    <span class="eq">
+     <var>x</var>
+     <sub>lim</sub>
+     =
+     <span class="dvc down">
+      <var>d</var>
+      ·
+      <var>ε</var>
+      <sub>cu2</sub>
+      <span class="dvl">
+      </span>
+      <var>ε</var>
+      <sub>cu2</sub>
+      +
+      <span class="dvc">
+       <var>f</var>
+       <sub>yd</sub>
+       <span class="dvl">
+       </span>
+       <var>E</var>
+       <sub>s</sub>
+      </span>
+      · 10
+      <sup>-3</sup>
+     </span>
+     =
+     <span class="dvc down">
+      600 · 0.0035
+      <span class="dvl">
+      </span>
+      0.0035 +
+      <span class="dvc">
+       434.78
+       <span class="dvl">
+       </span>
+       200
+      </span>
+      · 10
+      <sup>-3</sup>
+     </span>
+     = 370.11
+    </span>
+    cm
+   </p>
+   <p>
+    Check:
+    <span class="eq">
+     <var>x</var>
+     = 147.5
+    </span>
+    ≤
+    <span class="eq">
+     <var>x</var>
+     <sub>lim</sub>
+     = 370.11
+    </span>
+    - compressive reinforcement is not required.
+   </p>
+   <p>Distance to the equivalent concrete stress force</p>
+   <p>- from the neutral line</p>
+   <p>
+    <span class="eq">
+     <var>z</var>
+     <sub>0</sub>
+     =
+     <span class="dvc">
+      <var>k</var>
+      <sub>2</sub>
+      ·
+      <var>x</var>
+      <sup>2</sup>
+      ·
+      <var>b</var>
+      <sub>f</sub>
+      −
+      <var>k</var>
+      <sub>2</sub>
+      (
+      <var>ε</var>
+      <sub>cf</sub>
+      (
+      <var>x</var>
+      )  )  ·  (
+      <var>x</var>
+      −
+      <var>h</var>
+      <sub>f</sub>
+      )
+      <sup>2</sup>
+      ·  (
+      <var>b</var>
+      <sub>f</sub>
+      −
+      <var>b</var>
+      <sub>w</sub>
+      )
+      <span class="dvl">
+      </span>
+      <var>k</var>
+      <sub>1</sub>
+      ·
+      <var>x</var>
+      ·
+      <var>b</var>
+      <sub>f</sub>
+      −
+      <var>k</var>
+      <sub>1</sub>
+      (
+      <var>ε</var>
+      <sub>cf</sub>
+      (
+      <var>x</var>
+      )  )  ·  (
+      <var>x</var>
+      −
+      <var>h</var>
+      <sub>f</sub>
+      )  ·  (
+      <var>b</var>
+      <sub>f</sub>
+      −
+      <var>b</var>
+      <sub>w</sub>
+      )
+     </span>
+     =
+     <span class="dvc">
+      0.473 · 147.5
+      <sup>2</sup>
+      · 1200 −
+      <var>k</var>
+      <sub>2</sub>
+      (
+      <var>ε</var>
+      <sub>cf</sub>
+      ( 147.5 )  )  ·  ( 147.5 − 120 )
+      <sup>2</sup>
+      ·  ( 1200 − 300 )
+      <span class="dvl">
+      </span>
+      0.81 · 147.5 · 1200 −
+      <var>k</var>
+      <sub>1</sub>
+      (
+      <var>ε</var>
+      <sub>cf</sub>
+      ( 147.5 )  )  ·  ( 147.5 − 120 )  ·  ( 1200 − 300 )
+     </span>
+     = 86.93
+    </span>
+    cm
+   </p>
+   <p>- from the bottom edge of the section</p>
+   <p>
+    <span class="eq">
+     <var>z</var>
+     <sub>c</sub>
+     =
+     <var>h</var>
+     <sub>w</sub>
+     −
+     <var>x</var>
+     +
+     <var>z</var>
+     <sub>0</sub>
+     = 650 − 147.5 + 86.93 = 589.43
+    </span>
+    mm
+   </p>
+   <p>Bending moment capacity</p>
+   <p>
+    <span class="eq">
+     <var>M</var>
+     <sub>Rd</sub>
+     =  (
+     <var>A</var>
+     <sub>s1</sub>
+     ·
+     <var>σ</var>
+     <sub>s</sub>
+     (
+     <var>ε</var>
+     <sub>s1</sub>
+     (
+     <var>x</var>
+     )  )  ·  (
+     <var>z</var>
+     <sub>c</sub>
+     −
+     <var>d</var>
+     <sub>1</sub>
+     )  +
+     <var>A</var>
+     <sub>s2</sub>
+     ·
+     <var>σ</var>
+     <sub>s</sub>
+     (
+     <var>ε</var>
+     <sub>s2</sub>
+     (
+     <var>x</var>
+     )  )  ·  (
+     <var>z</var>
+     <sub>c</sub>
+     −
+     <var>h</var>
+     <sub>w</sub>
+     +
+     <var>d</var>
+     <sub>2</sub>
+     )  )  · 10
+     <sup>-6</sup>
+     =  ( 3700 ·
+     <var>σ</var>
+     <sub>s</sub>
+     (
+     <var>ε</var>
+     <sub>s1</sub>
+     ( 147.5 )  )  ·  ( 589.43 − 50 )  + 0 ·
+     <var>σ</var>
+     <sub>s</sub>
+     (
+     <var>ε</var>
+     <sub>s2</sub>
+     ( 147.5 )  )  ·  ( 589.43 − 650 + 50 )  )  · 10
+     <sup>-6</sup>
+     = 867.77
+    </span>
+    kN·m
+   </p>
+   <p>Design bending moment is lower than bending capacity:</p>
+   <p>
+    <span class="eq">
+     <var>M</var>
+     <sub>Ed</sub>
+     = 800
+    </span>
+    ≤
+    <span class="eq">
+     <var>M</var>
+     <sub>Rd</sub>
+     = 867.77
+    </span>
+    kN·m
+   </p>
+   <p>Design checks are satisfied.</p>
+  </p>
+ </div>
+</div>

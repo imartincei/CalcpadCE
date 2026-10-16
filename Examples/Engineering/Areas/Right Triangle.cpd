@@ -1,0 +1,10 @@
+'<!-- Area $A = \tfrac{1}{2} a\, b$ and perimeter of a right triangle from its two legs (hypotenuse via Pythagoras). -->
+'<div style="max-width:110mm;"><img style="height:60pt;" class="side" alt="right-triangle.png" src="../../Images/math/area/right-triangle.png"></div>
+'Dimensions
+a = ? {4}','b = ? {3}
+c = sqr(a^2 + b^2)
+'Area
+A = a*b/2
+'Perimeter
+P = a + b + c
+'

@@ -1,0 +1,23 @@
+'Simple calculation:
+1 + 1
+
+'Comparing two values:
+7 > 3
+7 < 3
+
+'Calculation with variables:
+a = 2
+b = 3
+a*b
+
+'Using built-in constants:
+r = 1.5
+A = π*r^2
+
+'Integration:
+$Integral{ln(x) @ x = 0 : 1}
+
+'Matrix multiplication:
+A = [1; 2; 3|4; 5; 6]
+B = [6; 5|4; 3|2; 1]
+A*B

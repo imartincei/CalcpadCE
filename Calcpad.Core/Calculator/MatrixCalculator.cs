@@ -25,7 +25,7 @@ namespace Calcpad.Core
         private static readonly Func<IValue[], Matrix>[] MatrixMultiFunctions;
         private static readonly Func<Matrix, RealValue>[] MultiFunctions;
         private static readonly Func<RealValue, RealValue, Matrix, RealValue>[] Interpolations;
-       
+
         internal static readonly FrozenDictionary<string, int> FunctionIndex =
         new Dictionary<string, int>()
         {
@@ -128,7 +128,7 @@ namespace Calcpad.Core
         private static readonly FrozenSet<int> FunctionsWithOptionalLastParameter =
             new HashSet<int>() { 2, 3, 4 }.ToFrozenSet();
 
-        internal static bool IsLastParameterOptional(int i) => 
+        internal static bool IsLastParameterOptional(int i) =>
             FunctionsWithOptionalLastParameter.Contains(i);
 
         internal static readonly FrozenDictionary<string, int> Function3Index =
@@ -261,7 +261,7 @@ namespace Calcpad.Core
                 Kronecker,              // 30
                 CreateHp,               // 31
                 DiagonalHp,             // 32
-                ColumnHp,               // 33      
+                ColumnHp,               // 33
                 SetUnits,               // 34
                 MatMul,                 // 35
             ];
@@ -486,7 +486,7 @@ namespace Calcpad.Core
                 LowerTriangularMatrix ltm => new HpLowerTriangularMatrix(ltm),
                 UpperTriangularMatrix utm => new HpUpperTriangularMatrix(utm),
                 SymmetricMatrix sm => new HpSymmetricMatrix(sm),
-                Matrix matrix => new HpMatrix(matrix), 
+                Matrix matrix => new HpMatrix(matrix),
                 _ => v
             };
 

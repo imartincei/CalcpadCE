@@ -1,0 +1,415 @@
+import { invoke } from '@tauri-apps/api/core';
+import { listen, type UnlistenFn } from '@tauri-apps/api/event';
+import { join } from '@tauri-apps/api/path';
+import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
+import { buildCrashRecord, extractConfigError, SERVER_CONFIG_ERROR_EXIT_CODE, type ILogger, type CalcpadLogLevel, type ServerLifecycleState } from 'calcpad-frontend';
+
+/**
+ * Manages the client-side view of the Calcpad.Server lifecycle. The actual
+ * process is spawned and killed by the Tauri Rust layer (see src-tauri/src/lib.rs):
+ *   - `spawn_sidecar` runs at app startup and emits `server-url` when Kestrel binds.
+ *   - `stop_server` / `restart_server` are exposed as invoke commands.
+ *   - The child is killed on window close and app exit — no TS shutdown work.
+ *
+ * This class keeps the crash counter and the "auto-restart exhausted" UI hook,
+ * which are the parts the frontend has to own. Everything else is delegated.
+ */
+
+const MAX_AUTO_RESTARTS = 3;
+const AUTO_RESTART_DELAY_MS = 2000;
+const START_TIMEOUT_MS = 30_000;
+// A server that stays up this long is treated as recovered, so the crash
+// streak resets. Resetting immediately on bind (crashes almost always happen
+// after a successful start) would let a crash-on-use loop restart forever and
+// never hit the give-up threshold.
+const STABLE_RESET_MS = 30_000;
+
+export type ServerManagerLogger = ILogger;
+
+interface ServerCrashPayload {
+    code: number | null;
+    tail: string;
+}
+
+/** Rust's record of why the server is down, for windows that started listening too late. */
+interface ServerFailure {
+    error: string;
+    crash: ServerCrashPayload | null;
+}
+
+interface ServerLogPayload {
+    stream: 'stdout' | 'stderr';
+    line: string;
+}
+
+export class TauriServerManager {
+    private url = '';
+    private token: string | null = null;
+    private _isRunning = false;
+    private _crashCount = 0;
+    private _configInvalid = false;
+    private _startFailureReported = false;
+    // While a respawn is under way its own crash event is reported by the respawn's caller;
+    // handling it again started a second auto-restart chain.
+    private _autoRestartPending = false;
+    private _manualRestartInFlight = false;
+    private _lastCrashTail = '';
+    private _stableTimer: ReturnType<typeof setTimeout> | null = null;
+    private unlistenUrl: UnlistenFn | null = null;
+    private unlistenCrash: UnlistenFn | null = null;
+    private unlistenStartupError: UnlistenFn | null = null;
+    private unlistenLog: UnlistenFn | null = null;
+    private logger: ServerManagerLogger;
+
+    public onCrashExhausted?: (crashOutput: string) => void;
+    public onUrlChanged?: (newUrl: string) => void;
+    /** Always raised after onUrlChanged, so a listener may assume the new URL is already applied. */
+    public onStatusChanged?: (state: ServerLifecycleState, detail?: string) => void;
+    public onStartupBlocked?: (details: string) => void;
+    /** The server refused to start because an appsettings file is malformed. */
+    public onConfigInvalid?: (details: string) => void;
+    public onServerLog?: (line: string, stream: 'stdout' | 'stderr') => void;
+
+    /** `autoRestartEnabled` is off in secondary windows: `server-crashed` is broadcast, so
+     *  every window would otherwise race to respawn the one sidecar. */
+    constructor(logger: ServerManagerLogger, private readonly autoRestartEnabled = true) {
+        this.logger = logger;
+    }
+
+    setLogger(logger: ServerManagerLogger): void {
+        this.logger = logger;
+    }
+
+    get isRunning(): boolean { return this._isRunning; }
+    /** The last start failed on a malformed appsettings file, already reported via onConfigInvalid. */
+    get isConfigInvalid(): boolean { return this._configInvalid; }
+    /** start() already logged why the server is unavailable. */
+    get startFailureReported(): boolean { return this._startFailureReported; }
+    getBaseUrl(): string { return this.url; }
+
+    /**
+     * Per-launch token the sidecar requires on every `/api` route. Rust owns it and keeps it
+     * across sidecar restarts, so this is fetched once and never refreshed; null only if the
+     * command is missing, in which case the request goes out unauthenticated and the server
+     * answers 401.
+     */
+    getAuthToken(): string | null { return this.token; }
+
+    async start(): Promise<void> {
+        // Callers block on start() so the API bridge sees a real URL from
+        // its first request. Resolve as soon as we learn the URL from either
+        // channel; time out after START_TIMEOUT_MS to avoid a wedged boot.
+        const startedAt = performance.now();
+        const t = () => Math.round(performance.now() - startedAt);
+        this.log(`[timing] start() called`, 'verbose');
+        this.onStatusChanged?.('starting', 'boot');
+        let resolveReady: ((url: string) => void) | null = null;
+        let rejectReady: ((err: Error) => void) | null = null;
+        const ready = new Promise<string>((resolve, reject) => {
+            resolveReady = resolve;
+            rejectReady = reject;
+        });
+        // A failure can reject this before the race below awaits it.
+        ready.catch(() => { /* observed by the race */ });
+
+        let sawCrash = false;
+        const reportStartupFailure = async (eventError?: string): Promise<void> => {
+            let failure: ServerFailure | null = null;
+            try {
+                failure = await invoke<ServerFailure | null>('server_failure');
+            } catch {
+                // Fall back to the event payload.
+            }
+            const error = failure?.error ?? eventError;
+            if (!error || this._startFailureReported) return;
+            this._startFailureReported = true;
+            // `server-crashed` fired before this window was listening. Only the window that owns
+            // auto-restart replays a real crash; others just need to spot a config error.
+            const crash = failure?.crash;
+            if (crash && !sawCrash && (this.autoRestartEnabled || crash.code === SERVER_CONFIG_ERROR_EXIT_CODE)) {
+                this.handleCrash(crash);
+            }
+            if (this._configInvalid) {
+                this.onStatusChanged?.('stopped', 'invalid appsettings.json');
+            } else {
+                this.log(`Server unavailable: ${error}`, 'error');
+                this.onStatusChanged?.('stopped', error);
+                this.onStartupBlocked?.(error);
+            }
+            rejectReady?.(new Error(error));
+            rejectReady = null;
+            resolveReady = null;
+        };
+
+        try {
+            this.token = await invoke<string>('server_token');
+        } catch (err) {
+            this.log(`server_token invoke failed — API calls will be rejected: ${err instanceof Error ? err.message : String(err)}`, 'error');
+        }
+
+        try {
+            this.unlistenUrl = await listen<string>('server-url', (evt) => {
+                this.url = evt.payload;
+                this._isRunning = true;
+                this._configInvalid = false;
+                this.scheduleStabilityReset();
+                this.log(`[timing] server-url event received ${t()}ms after start()`, 'verbose');
+                this.log(`Server ready at ${this.url}`);
+                this.onUrlChanged?.(this.url);
+                this.onStatusChanged?.('running', this.url);
+                resolveReady?.(this.url);
+                resolveReady = null;
+            });
+            this.log(`[timing] server-url listener ready at ${t()}ms`, 'verbose');
+        } catch (err) {
+            this.log(`[timing] server-url listener FAILED at ${t()}ms: ${err instanceof Error ? err.message : String(err)}`, 'verbose');
+            throw err;
+        }
+
+        this.unlistenCrash = await listen<ServerCrashPayload>('server-crashed', (evt) => {
+            sawCrash = true;
+            this.handleCrash(evt.payload);
+        });
+
+        this.unlistenLog = await listen<ServerLogPayload>('server-log', (evt) => {
+            this.onServerLog?.(evt.payload.line, evt.payload.stream);
+        });
+
+        this.unlistenStartupError = await listen<string>('server-startup-error', (evt) => {
+            void reportStartupFailure(evt.payload);
+        });
+
+        this.log(`[timing] all listeners ready at ${t()}ms`, 'verbose');
+
+        // Rust starts spawning the sidecar in setup() before our listeners
+        // registered, so first check if the URL is already known — otherwise
+        // wait for the server-url event to fire.
+        try {
+            const current = await invoke<string | null>('server_url');
+            this.log(`[timing] server_url invoke returned "${current ?? 'null'}" at ${t()}ms`, 'verbose');
+            if (current) {
+                this.url = current;
+                this._isRunning = true;
+                this.log(`Server already running at ${current}`);
+                this.onUrlChanged?.(this.url);
+                this.onStatusChanged?.('running', this.url);
+                return;
+            }
+        } catch (err) {
+            this.log(`[timing] server_url invoke failed at ${t()}ms: ${err instanceof Error ? err.message : String(err)}`, 'verbose');
+        }
+
+        // Likewise, a boot that already failed emitted its events before we listened.
+        await reportStartupFailure();
+
+        this.log(`[timing] awaiting server-url event race at ${t()}ms`, 'verbose');
+        const timeout = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`server did not report a URL within ${START_TIMEOUT_MS}ms`)), START_TIMEOUT_MS),
+        );
+        try {
+            await Promise.race([ready, timeout]);
+            this.log(`[timing] race resolved at ${t()}ms`, 'verbose');
+        } catch (err) {
+            this.log(`[timing] race REJECTED at ${t()}ms: ${err instanceof Error ? err.message : String(err)}`, 'verbose');
+            throw err;
+        }
+    }
+
+    /** Ask Rust to stop the sidecar. */
+    async stop(): Promise<void> {
+        try {
+            await invoke('stop_server');
+        } catch (err) {
+            this.log(`stop_server invoke failed: ${err instanceof Error ? err.message : String(err)}`, 'error');
+        }
+        this._isRunning = false;
+        this.url = '';
+        this.onStatusChanged?.('stopped', 'stopped by user');
+    }
+
+    private handleCrash(payload: ServerCrashPayload): void {
+        this._isRunning = false;
+        this.url = '';
+        // Restarting can't fix a malformed appsettings.json, so report it once and stop.
+        if (payload.code === SERVER_CONFIG_ERROR_EXIT_CODE) {
+            const detail = extractConfigError(payload.tail || '') ?? 'appsettings.json is not valid JSON.';
+            this._configInvalid = true;
+            this.clearStabilityReset();
+            this.log(`Server settings are invalid: ${detail}`, 'error');
+            this.onStatusChanged?.('stopped', 'invalid appsettings.json');
+            this.onConfigInvalid?.(detail);
+            return;
+        }
+        // Crash before the stability window elapsed — the streak stands.
+        this.clearStabilityReset();
+        this._lastCrashTail = payload.tail || '';
+        if (this._autoRestartPending || this._manualRestartInFlight) return;
+        this._crashCount++;
+        this.log(`Server crashed (code=${payload.code ?? 'unknown'}) — attempt ${this._crashCount}/${MAX_AUTO_RESTARTS}`, 'error');
+        void this.writeCrashRecord(payload);
+        if (!this.autoRestartEnabled) {
+            this.onStatusChanged?.('stopped', 'crashed');
+        } else if (this._crashCount < MAX_AUTO_RESTARTS) {
+            this.onStatusChanged?.('starting', `crashed, retry ${this._crashCount}/${MAX_AUTO_RESTARTS}`);
+            this._autoRestartPending = true;
+            setTimeout(() => { void this.autoRestart(); }, AUTO_RESTART_DELAY_MS);
+        } else {
+            this.onStatusChanged?.('stopped', 'auto-restart exhausted');
+            this.onCrashExhausted?.(payload.tail || '');
+        }
+    }
+
+    /**
+     * Manual force-stop then respawn via Rust (menu / refresh). Resets the crash streak.
+     * `ignoreSettings` runs on built-in defaults instead of appsettings.json; a plain restart
+     * reads the file again.
+     */
+    async restart(options: { ignoreSettings?: boolean } = {}): Promise<void> {
+        const ignoreSettings = options.ignoreSettings ?? false;
+        this.clearStabilityReset();
+        this._crashCount = 0;
+        this._configInvalid = false;
+        this.onStatusChanged?.('starting', 'restart');
+        this._manualRestartInFlight = true;
+        try {
+            const newUrl = await invoke<string>('restart_server', { ignoreSettings });
+            this.url = newUrl;
+            this._isRunning = true;
+            this.onUrlChanged?.(this.url);
+            // The `server-url` event may not have reached JS yet, and a duplicate is a no-op.
+            this.onStatusChanged?.('running', this.url);
+            this.log(`Server restarted at ${newUrl}`);
+            if (ignoreSettings) {
+                this.log('appsettings.json was ignored. The server is using default settings.', 'warning');
+            }
+        } catch (err) {
+            this._isRunning = false;
+            this.url = '';
+            // server-crashed already logged the config error and showed the dialog.
+            if (this._configInvalid) {
+                this.onStatusChanged?.('stopped', 'invalid appsettings.json');
+                throw new Error('invalid appsettings.json');
+            }
+            const msg = err instanceof Error ? err.message : String(err);
+            this.log(`restart_server invoke failed: ${msg}`, 'error');
+            this.onStatusChanged?.('stopped', msg);
+            throw err;
+        } finally {
+            this._manualRestartInFlight = false;
+        }
+    }
+
+    /**
+     * Auto-restart after a crash. Unlike the manual restart(), this preserves the crash streak
+     * so a crash-loop eventually gives up, and reschedules itself because a failed respawn may
+     * mean Rust never re-emits `server-crashed`.
+     */
+    private async autoRestart(): Promise<void> {
+        this._configInvalid = false;
+        try {
+            const newUrl = await invoke<string>('restart_server');
+            this.url = newUrl;
+            this._isRunning = true;
+            this.onUrlChanged?.(this.url);
+            this.onStatusChanged?.('running', this.url);
+            this.log(`Server auto-restarted at ${newUrl} (attempt ${this._crashCount}/${MAX_AUTO_RESTARTS})`);
+            this._autoRestartPending = false;
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            this._isRunning = false;
+            this.url = '';
+            if (this._configInvalid) {
+                this._autoRestartPending = false;
+                this.onStatusChanged?.('stopped', 'invalid appsettings.json');
+                return;
+            }
+            this._crashCount++;
+            this.log(`Auto-restart failed: ${msg} — attempt ${this._crashCount}/${MAX_AUTO_RESTARTS}`, 'error');
+            if (this._crashCount < MAX_AUTO_RESTARTS) {
+                this.onStatusChanged?.('starting', `retry ${this._crashCount}/${MAX_AUTO_RESTARTS}`);
+                setTimeout(() => { void this.autoRestart(); }, AUTO_RESTART_DELAY_MS);
+            } else {
+                this._autoRestartPending = false;
+                this.onStatusChanged?.('stopped', 'auto-restart exhausted');
+                // The crashed server's own output says more than the respawn error logged above.
+                this.onCrashExhausted?.(this._lastCrashTail);
+            }
+        }
+    }
+
+    /** Clear the crash streak once the server has stayed up past the stability window. */
+    private scheduleStabilityReset(): void {
+        this.clearStabilityReset();
+        this._stableTimer = setTimeout(() => {
+            this._stableTimer = null;
+            if (this._crashCount > 0) {
+                this.log(`Server stable for ${STABLE_RESET_MS / 1000}s — resetting crash streak`, 'verbose');
+                this._crashCount = 0;
+            }
+        }, STABLE_RESET_MS);
+    }
+
+    private clearStabilityReset(): void {
+        if (this._stableTimer) {
+            clearTimeout(this._stableTimer);
+            this._stableTimer = null;
+        }
+    }
+
+    /**
+     * Render a human-readable `last-crash.txt` beside the .NET minidump, matching the VS Code
+     * extension, since the dump's crashreport.json carries the managed traceback for faults the
+     * server's own FileLogger never sees. Formatting is shared via calcpad-frontend so both
+     * hosts emit an identical record.
+     */
+    private async writeCrashRecord(payload: ServerCrashPayload): Promise<void> {
+        try {
+            const dir = await invoke<string>('log_dir');
+            const reportPath = await join(dir, 'last-crash.dmp.crashreport.json');
+            // createdump writes the JSON as the runtime tears down; it's normally
+            // there by the time the process is reaped and this fires, but retry
+            // briefly to absorb filesystem-flush latency.
+            let reportJson: string | null = null;
+            for (let i = 0; i < 10; i++) {
+                if (await exists(reportPath)) {
+                    try { reportJson = await readTextFile(reportPath); } catch { /* unreadable */ }
+                    break;
+                }
+                await new Promise(r => setTimeout(r, 200));
+            }
+            const record = buildCrashRecord({
+                timestampIso: new Date().toISOString(),
+                code: payload.code,
+                signal: null,
+                stderrTail: payload.tail || '',
+                reportJson,
+            });
+            await writeTextFile(await join(dir, 'last-crash.txt'), record);
+            this.log(`Crash record written to ${dir}/last-crash.txt`, 'verbose');
+        } catch (err) {
+            this.log(`Could not write crash record: ${err instanceof Error ? err.message : String(err)}`, 'warning');
+        }
+    }
+
+    /** Alias — Rust owns kill-on-exit, but the menu action still exists. */
+    async forceStop(): Promise<void> {
+        return this.stop();
+    }
+
+    /** Detach event listeners. Rust reaps the sidecar on window close. */
+    async dispose(): Promise<void> {
+        this.clearStabilityReset();
+        try { this.unlistenUrl?.(); } catch { /* ignore */ }
+        try { this.unlistenCrash?.(); } catch { /* ignore */ }
+        try { this.unlistenStartupError?.(); } catch { /* ignore */ }
+        try { this.unlistenLog?.(); } catch { /* ignore */ }
+        this.unlistenUrl = null;
+        this.unlistenCrash = null;
+        this.unlistenStartupError = null;
+        this.unlistenLog = null;
+    }
+
+    private log(message: string, level: CalcpadLogLevel = 'information'): void {
+        this.logger.appendLine(`[ServerManager] ${message}`, level);
+    }
+}

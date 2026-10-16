@@ -1,8 +1,8 @@
-﻿# Theoretical background
+﻿# Theoretical Background
 
-*(you can skip this if you find it boring)*
+> (you can skip this if you find it boring)
 
-How does Calcpad actually work?
+How does CalcpadCE actually work?
 There is a sophisticated math parser inside, that does most of the job.
 First, the source code is scanned, and the sequence of bytes is converted into a list of tokens, using lexical analysis.
 Each token is represented by data and type (purpose, role).
@@ -20,7 +20,7 @@ For example, the above expression makes "17", while "5\*(3 + 2)" makes "25". Tha
 For example, the expression "5\*(3 + 2)" is written in RPN as "5 3 2 + \*". The main advantage is that the order of operations can be clearly specified without the need for brackets.
 
 There is a simple and powerful algorithm for evaluation of expressions written in reverse polish notation (RPN). It is used by almost all calculators.
-However, Calcpad includes additional functionality for processing parameters, functions, macros, conditional execution, loops, etc.
+However, CalcpadCE includes additional functionality for processing parameters, functions, macros, conditional execution, loops, etc.
 
 This was a brief and simple explanation.
 If you are more curious about these topics, you can find more information in specialized books, papers or websites.

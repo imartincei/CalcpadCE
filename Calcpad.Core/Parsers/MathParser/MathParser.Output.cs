@@ -45,6 +45,9 @@ namespace Calcpad.Core
                     for (int i = 0, count = cf.ParameterCount; i < count; ++i)
                     {
                         _stringBuilder.Append(writer.FormatVariable(cf.ParameterName(i), string.Empty, false));
+                        if (cf.Defaults?[i] is { } defaultRpn)
+                            _stringBuilder.Append(assignment).Append(RenderRpn(defaultRpn, false, writer, out _));
+
                         if (i < cf.ParameterCount - 1)
                             _stringBuilder.Append(delimiter);
                     }
@@ -89,8 +92,8 @@ namespace Calcpad.Core
                                     if (eqLen < 0)
                                         eqLen = equation.LastIndexOf(globalAssignment);
 
-                                    eqLen = equation.Length - eqLen - assignment.Length;
-                                    if (subst.Length != eqLen)
+                                    eqLen += assignment.Length;
+                                    if (!equation.AsSpan(eqLen).SequenceEqual(subst))
                                     {
                                         if (_parser.VariableSubstitution != VariableSubstitutionOptions.SubstitutionsOnly)
                                         {
@@ -369,8 +372,8 @@ namespace Calcpad.Core
                         var sa = a.Content;
                         if (a.Order > t.Order && !formatEquation)
                             sa = AddBrackets(sa, a.Level, a.MinOffset, a.MaxOffset, '(', ')');
-                        else if (a.Type == TokenTypes.MultiFunction && 
-                            a.Index == Calculator.SwitchIndex && 
+                        else if (a.Type == TokenTypes.MultiFunction &&
+                            a.Index == Calculator.SwitchIndex &&
                             a.ParameterCount > 2)
                             sa = writer.CloseCurlyBrackets(sa, a.Level);
 
@@ -502,7 +505,7 @@ namespace Calcpad.Core
                         ReadOnlySpan<char> span = s;
                         int i2 = span.IndexOf("</");
                         if (i2 > 0)
-                        { 
+                        {
                             ReadOnlySpan<char> startSpan = span[..i2];
                             int i1 = startSpan.LastIndexOf(">") + 1;
                             if (i1 > 0 && double.TryParse(startSpan[i1..], out var d))
@@ -670,6 +673,9 @@ namespace Calcpad.Core
                         var cf = _functions[t.Index];
                         cfParameterCount = cf.ParameterCount - 1;
                     }
+                    else if (t.ArgumentMap is { } map && t.PositionalCount < map.Length)
+                        RenderKeywordArguments(t, b, map);
+
                     var s = RenderParameters(t, b, cfParameterCount);
                     t.Content = string.Concat(
                         writer.FormatVariable(t.Content, string.Empty, false),
@@ -677,6 +683,22 @@ namespace Calcpad.Core
                         AddBrackets(s, t.Level, t.MinOffset, t.MaxOffset, '(', ')'));
                     t.MinOffset = 0;
                     t.MaxOffset = 0;
+                }
+
+                void RenderKeywordArguments(RenderToken t, RenderToken b, int[] map)
+                {
+                    var cf = _functions[t.Index];
+                    var args = new RenderToken[map.Length];
+                    args[^1] = b;
+                    for (var k = map.Length - 2; k >= 0; --k)
+                        args[k] = stackBuffer.Pop();
+
+                    for (var k = t.PositionalCount; k < map.Length; ++k)
+                        args[k].Content = writer.FormatVariable(cf.ParameterName(map[k]), string.Empty, false) +
+                            writer.FormatOperator('=') + args[k].Content;
+
+                    for (var k = 0; k < map.Length - 1; ++k)
+                        stackBuffer.Push(args[k]);
                 }
 
                 void RenderMatrixToken(RenderToken t, RenderToken b)

@@ -1,0 +1,555 @@
+<div class="calcpad-output">
+ <!-- Section properties of a Zed (Z) profile: area, centroid, $I_x$, $I_y$, principal axes and radii of gyration. -->
+ <h3>Geometrical Properties of Zed Section</h3>
+ <div style="max-width:120mm">
+  <img alt="zed.png" class="side" src="Images/mechanics/sections/zed.png" style="height:150pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-5">20</u>
+  </span>
+  m,
+  <span class="eq">
+   <var>t</var>
+   <sub>w</sub>
+   =
+   <u class="input-5">2</u>
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   <sub>f</sub>
+   =
+   <u class="input-6">10</u>
+  </span>
+  m,
+  <span class="eq">
+   <var>t</var>
+   <sub>f</sub>
+   =
+   <u class="input-6">5</u>
+  </span>
+  m
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>w</sub>
+   =
+   <var>h</var>
+   ·
+   <var>t</var>
+   <sub>w</sub>
+   = 20 · 2 = 40
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>f</sub>
+   =  (
+   <var>b</var>
+   <sub>f</sub>
+   −
+   <var>t</var>
+   <sub>w</sub>
+   )  ·
+   <var>t</var>
+   <sub>f</sub>
+   =  ( 10 − 2 )  · 5 = 40
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <var>A</var>
+   <sub>w</sub>
+   + 2 ·
+   <var>A</var>
+   <sub>f</sub>
+   = 40 + 2 · 40 = 120
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>Centroid</p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   <sub>c</sub>
+   =
+   <var>b</var>
+   <sub>f</sub>
+   −
+   <span class="dvc">
+    <var>t</var>
+    <sub>w</sub>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 10 −
+   <span class="dvc">
+    2
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 9
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    20
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 10
+  </span>
+  m
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   = 2 ·  (
+   <var>h</var>
+   + 2 ·
+   <var>b</var>
+   <sub>f</sub>
+   −
+   <var>t</var>
+   <sub>w</sub>
+   )  = 2 ·  ( 20 + 2 · 10 − 2 )  = 76
+  </span>
+  m
+ </p>
+ <p>Second moments of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>y</sub>
+   =
+   <span class="dvc">
+    <var>b</var>
+    <sub>f</sub>
+    ·
+    <var>h</var>
+    <sup>3</sup>
+    −  (
+    <var>b</var>
+    <sub>f</sub>
+    −
+    <var>t</var>
+    <sub>w</sub>
+    )  ·  (
+    <var>h</var>
+    − 2 ·
+    <var>t</var>
+    <sub>f</sub>
+    )
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   =
+   <span class="dvc">
+    10 · 20
+    <sup>3</sup>
+    −  ( 10 − 2 )  ·  ( 20 − 2 · 5 )
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   = 6000
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>z</sub>
+   =
+   <span class="dvc">
+    (
+    <var>h</var>
+    − 2 ·
+    <var>t</var>
+    <sub>f</sub>
+    )  ·
+    <var>t</var>
+    <sub>w</sub>
+    <sup>3</sup>
+    + 2 ·
+    <var>t</var>
+    <sub>f</sub>
+    ·
+    <var>b</var>
+    <sub>f</sub>
+    ·  (
+    <var>b</var>
+    <sub>f</sub>
+    <sup>2</sup>
+    + 3 ·  (
+    <var>b</var>
+    <sub>f</sub>
+    −
+    <var>t</var>
+    <sub>w</sub>
+    )
+    <sup>2</sup>
+    )
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   =
+   <span class="dvc">
+    ( 20 − 2 · 5 )  · 2
+    <sup>3</sup>
+    + 2 · 5 · 10 ·  ( 10
+    <sup>2</sup>
+    + 3 ·  ( 10 − 2 )
+    <sup>2</sup>
+    )
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   = 2440
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>yz</sub>
+   =
+   <span class="dvc">
+    -
+    <var>b</var>
+    <sub>f</sub>
+    ·  (
+    <var>h</var>
+    −
+    <var>t</var>
+    <sub>f</sub>
+    )  ·
+    <var>A</var>
+    <sub>f</sub>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    -10 ·  ( 20 − 5 )  · 40
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = -3000
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Principal moments of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>1</sub>
+   =
+   <span class="dvc">
+    <var>I</var>
+    <sub>y</sub>
+    +
+    <var>I</var>
+    <sub>z</sub>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   +
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     (
+     <var>I</var>
+     <sub>y</sub>
+     −
+     <var>I</var>
+     <sub>z</sub>
+     )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    +
+    <var>I</var>
+    <sub>yz</sub>
+    <sup>2</sup>
+   </span>
+   =
+   <span class="dvc">
+    6000 + 2440
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   +
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     ( 6000 − 2440 )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    +  ( -3000 )
+    <sup>2</sup>
+   </span>
+   = 7708.32
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>2</sub>
+   =
+   <span class="dvc">
+    <var>I</var>
+    <sub>y</sub>
+    +
+    <var>I</var>
+    <sub>z</sub>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   −
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     (
+     <var>I</var>
+     <sub>y</sub>
+     −
+     <var>I</var>
+     <sub>z</sub>
+     )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    +
+    <var>I</var>
+    <sub>yz</sub>
+    <sup>2</sup>
+   </span>
+   =
+   <span class="dvc">
+    6000 + 2440
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   −
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     ( 6000 − 2440 )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    +  ( -3000 )
+    <sup>2</sup>
+   </span>
+   = 731.68
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Angle of principal axis</p>
+ <p>
+  <span class="eq">
+   <var>α</var>
+   <sub>1</sub>
+   =
+   <b>atan</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>I</var>
+    <sub>y</sub>
+    −
+    <var>I</var>
+    <sub>1</sub>
+    <span class="dvl">
+    </span>
+    <var>I</var>
+    <sub>yz</sub>
+   </span>
+   <span class="b1">)</span>
+   =
+   <b>atan</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    6000 − 7708.32
+    <span class="dvl">
+    </span>
+    -3000
+   </span>
+   <span class="b1">)</span>
+   = 29.66
+  </span>
+  <sup>о</sup>
+ </p>
+ <p>Polar moment of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>x</sub>
+   =
+   <var>I</var>
+   <sub>1</sub>
+   +
+   <var>I</var>
+   <sub>2</sub>
+   = 7708.32 + 731.68 = 8440
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Radii of gyration</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>y</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     6000
+     <span class="dvl">
+     </span>
+     120
+    </span>
+   </span>
+   = 7.07
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>z</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>z</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     2440
+     <span class="dvl">
+     </span>
+     120
+    </span>
+   </span>
+   = 4.51
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>x</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>x</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     8440
+     <span class="dvl">
+     </span>
+     120
+    </span>
+   </span>
+   = 8.39
+  </span>
+  m
+ </p>
+</div>

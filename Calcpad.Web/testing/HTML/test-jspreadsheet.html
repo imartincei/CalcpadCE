@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Jspreadsheet CE v5 Test</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/jspreadsheet.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/index.min.js"></script>
+</head>
+<body>
+    <h3>Test 1: Basic (v5 worksheets API)</h3>
+    <div id="test1"></div>
+
+    <h3>Test 2: Matrix with data</h3>
+    <div id="test2"></div>
+
+    <h3>Test 3: Vector (1 column)</h3>
+    <div id="test3"></div>
+
+    <script>
+        console.log('jspreadsheet type:', typeof jspreadsheet);
+
+        // Test 1: v5 worksheets syntax
+        try {
+            var t1 = jspreadsheet(document.getElementById('test1'), {
+                worksheets: [{
+                    minDimensions: [3, 3]
+                }]
+            });
+            console.log('Test 1 OK, worksheets:', t1);
+        } catch(e) {
+            console.error('Test 1 FAILED:', e);
+        }
+
+        // Test 2: Matrix [1;2;3 | 4;5;6]
+        try {
+            var t2 = jspreadsheet(document.getElementById('test2'), {
+                worksheets: [{
+                    data: [['1','2','3'],['4','5','6']],
+                    columns: [{width:80},{width:80},{width:80}],
+                    tableOverflow: true,
+                    tableWidth: '305px',
+                    tableHeight: '86px'
+                }]
+            });
+            console.log('Test 2 OK:', t2);
+        } catch(e) {
+            console.error('Test 2 FAILED:', e);
+        }
+
+        // Test 3: Vector [10;20;30]
+        try {
+            var t3 = jspreadsheet(document.getElementById('test3'), {
+                worksheets: [{
+                    data: [['10'],['20'],['30']],
+                    columns: [{width:80}],
+                    minDimensions: [1, 3],
+                    tableOverflow: true,
+                    tableWidth: '135px',
+                    tableHeight: '114px'
+                }]
+            });
+            console.log('Test 3 OK:', t3);
+        } catch(e) {
+            console.error('Test 3 FAILED:', e);
+        }
+    </script>
+</body>
+</html>

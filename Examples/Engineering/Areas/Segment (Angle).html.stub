@@ -1,0 +1,93 @@
+<div class="calcpad-output">
+ <!-- Area and arc length of a circular segment from radius and central angle. -->
+ <h3>Area and Arch Length of Circular Segment</h3>
+ <div style="max-width:120mm;">
+  <img alt="segment-angle.png" class="side" src="Images/math/area/segment-angle.png" style="height:70pt;"/>
+ </div>
+ <p>
+  Radius -
+  <span class="eq">
+   <var>r</var>
+   =
+   <u class="input-4">1</u>
+  </span>
+ </p>
+ <p>
+  Angle -
+  <span class="eq">
+   <var>α</var>
+   =
+   <u class="input-5">60</u>
+  </span>
+  °
+ </p>
+ <!--
+<-->
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   = 0.5 ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>α</var>
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   −
+   <b>sin</b>
+   (
+   <var>α</var>
+   )
+   <span class="b1">)</span>
+   ·
+   <var>r</var>
+   <sup>2</sup>
+   = 0.5 ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    3.14 · 60
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   −
+   <b>sin</b>
+   ( 60 )
+   <span class="b1">)</span>
+   · 1
+   <sup>2</sup>
+   = 0.0906
+  </span>
+ </p>
+ <p>Arch length</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>r</var>
+    ·
+    <var>α</var>
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   =
+   <span class="dvc">
+    3.14 · 1 · 60
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   = 1.05
+  </span>
+ </p>
+ <!--
+<-->
+</div>

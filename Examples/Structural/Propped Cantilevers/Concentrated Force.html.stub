@@ -1,0 +1,489 @@
+<div class="calcpad-output">
+ <!-- Force-method solution for a propped cantilever carrying a point force $F$ at distance $a$ from the fixed support, with the in-span peak at the load position. -->
+ <div style="max-width:180mm;">
+  <img alt="propped-cantilever-beam-concentrated-force.png" class="side" src="Images/mechanics/beams/propped-cantilever-beam-concentrated-force.png" style="width:210pt;"/>
+  <p>
+   <b>Input data</b>
+  </p>
+  <p>
+   Beam Length -
+   <span class="eq">
+    <var>l</var>
+    =
+    <u class="input-5">10</u>
+   </span>
+   m
+  </p>
+  <p>
+   Load -
+   <span class="eq">
+    <var>F</var>
+    =
+    <u class="input-6">10</u>
+   </span>
+   kN
+  </p>
+  <p>
+   Distances -
+   <span class="eq">
+    <var>a</var>
+    =
+    <u class="input-7">4</u>
+   </span>
+   m,
+  </p>
+  <p>
+   <span class="eq">
+    <var>b</var>
+    =
+    <var>l</var>
+    −
+    <var>a</var>
+    = 10 − 4 = 6
+   </span>
+   m,
+   <span class="eq">
+    <var>k</var>
+    =
+    <span class="dvc">
+     <var>b</var>
+     <span class="dvl">
+     </span>
+     <var>l</var>
+    </span>
+    =
+    <span class="dvc">
+     6
+     <span class="dvl">
+     </span>
+     10
+    </span>
+    = 0.6
+   </span>
+  </p>
+  <p>
+   <b>Internal forces</b>
+  </p>
+  <p>Bending</p>
+  <p>
+   <span class="eq">
+    <var>M</var>
+    <sub>A</sub>
+    =
+    <span class="dvc">
+     <var>F</var>
+     ·
+     <var>a</var>
+     ·
+     <var>k</var>
+     ·  ( 1 +
+     <var>k</var>
+     )
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    =
+    <span class="dvc">
+     10 · 4 · 0.6 ·  ( 1 + 0.6 )
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    = 19.2
+   </span>
+   kN·m
+  </p>
+  <p>
+   <span class="eq">
+    <var>M</var>
+    <sub>max</sub>
+    =
+    <span class="dvc">
+     <var>F</var>
+     ·
+     <var>b</var>
+     ·  ( 2 − 3 ·
+     <var>k</var>
+     +
+     <var>k</var>
+     <sup>3</sup>
+     )
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    =
+    <span class="dvc">
+     10 · 6 ·  ( 2 − 3 · 0.6 + 0.6
+     <sup>3</sup>
+     )
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    = 12.48
+   </span>
+   kN·m
+  </p>
+  <p>Shear</p>
+  <p>
+   <span class="eq">
+    <var>V</var>
+    <sub>A</sub>
+    =
+    <span class="dvc">
+     <var>F</var>
+     ·
+     <var>k</var>
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    ·  ( 3 −
+    <var>k</var>
+    <sup>2</sup>
+    )  =
+    <span class="dvc">
+     10 · 0.6
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    ·  ( 3 − 0.6
+    <sup>2</sup>
+    )  = 7.92
+   </span>
+   kN
+  </p>
+  <p>
+   <span class="eq">
+    <var>V</var>
+    <sub>B</sub>
+    =
+    <var>F</var>
+    −
+    <var>V</var>
+    <sub>A</sub>
+    = 10 − 7.92 = 2.08
+   </span>
+   kN
+  </p>
+  <p>
+   <b>Diagrams</b>
+  </p>
+  <p>
+   Calculate internal forces at
+   <span class="eq">
+    <var>x</var>
+    <sub>1</sub>
+    =
+    <u class="input-22">1</u>
+   </span>
+   m
+  </p>
+  <p>
+  </p>
+  <p>Bending</p>
+  <p>
+   <span class="eq">
+    <var>M</var>
+    (
+    <var>x</var>
+    )  = -
+    <var>M</var>
+    <sub>A</sub>
+    +
+    <var>V</var>
+    <sub>A</sub>
+    ·
+    <var>x</var>
+    −
+    <var>F</var>
+    ·  (
+    <var>x</var>
+    −
+    <var>a</var>
+    )  ·  (
+    <var>x</var>
+    &gt;
+    <var>a</var>
+    )
+   </span>
+  </p>
+  <svg class="plot" data-plot="svg" height="840px" style="width:494.44pt; height:155.56pt;" version="1.1" viewbox=" 0 0 2670 840" width="2670px" xmlns="http://www.w3.org/2000/svg">
+   <style type="text/css">
+    .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+   </style>
+   <g class="plot">
+    <rect class="Frame" height="600" width="2400" x="180" y="120">
+    </rect>
+    <line class="Grid" x1="180" x2="2580" y1="673.42" y2="673.42">
+    </line>
+    <text class="sm end" x="161" y="691.42">-10</text>
+    <line class="Grid" x1="180" x2="2580" y1="578.71" y2="578.71">
+    </line>
+    <text class="sm end" x="161" y="596.71">-5</text>
+    <line class="Grid" x1="180" x2="2580" y1="484" y2="484">
+    </line>
+    <text class="sm end" x="161" y="502">0</text>
+    <line class="Grid" x1="180" x2="2580" y1="389.29" y2="389.29">
+    </line>
+    <text class="sm end" x="161" y="407.29">5</text>
+    <line class="Grid" x1="180" x2="2580" y1="294.58" y2="294.58">
+    </line>
+    <text class="sm end" x="161" y="312.58">10</text>
+    <line class="Grid" x1="180" x2="2580" y1="199.87" y2="199.87">
+    </line>
+    <text class="sm end" x="161" y="217.87">15</text>
+    <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="180" y="772">0</text>
+    <line class="Grid" x1="300" x2="300" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="300" y="772">0.5</text>
+    <line class="Grid" x1="420" x2="420" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="420" y="772">1</text>
+    <line class="Grid" x1="540" x2="540" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="540" y="772">1.5</text>
+    <line class="Grid" x1="660" x2="660" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="660" y="772">2</text>
+    <line class="Grid" x1="780" x2="780" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="780" y="772">2.5</text>
+    <line class="Grid" x1="900" x2="900" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="900" y="772">3</text>
+    <line class="Grid" x1="1020" x2="1020" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1020" y="772">3.5</text>
+    <line class="Grid" x1="1140" x2="1140" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1140" y="772">4</text>
+    <line class="Grid" x1="1260" x2="1260" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1260" y="772">4.5</text>
+    <line class="Grid" x1="1380" x2="1380" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1380" y="772">5</text>
+    <line class="Grid" x1="1500" x2="1500" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1500" y="772">5.5</text>
+    <line class="Grid" x1="1620" x2="1620" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1620" y="772">6</text>
+    <line class="Grid" x1="1740" x2="1740" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1740" y="772">6.5</text>
+    <line class="Grid" x1="1860" x2="1860" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1860" y="772">7</text>
+    <line class="Grid" x1="1980" x2="1980" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1980" y="772">7.5</text>
+    <line class="Grid" x1="2100" x2="2100" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2100" y="772">8</text>
+    <line class="Grid" x1="2220" x2="2220" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2220" y="772">8.5</text>
+    <line class="Grid" x1="2340" x2="2340" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2340" y="772">9</text>
+    <line class="Grid" x1="2460" x2="2460" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2460" y="772">9.5</text>
+    <text class="sm mid" x="2580" y="772">10</text>
+    <line class="Axis" x1="180" x2="2580" y1="484" y2="484">
+    </line>
+    <text x="2602" y="466">x</text>
+    <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+    </line>
+    <text class="mid" x="180" y="84">y</text>
+    <text x="8" y="823">[0; -12.48]</text>
+    <text class="end" x="2662" y="44">[10; 19.2]</text>
+    <polyline class="Series1" points="180,120.32 257.42,168.71 334.84,217.1 412.26,265.5 489.68,313.89 567.1,362.28 644.52,410.68 721.94,459.07 799.35,507.46 876.77,555.86 954.19,604.25 1031.61,652.64 1070.32,676.84 1089.68,688.94 1109.03,701.04 1118.71,707.09 1128.39,713.14 1133.23,716.16 1135.65,717.67 1138.06,719.19 1140.48,720.32 1142.9,719.92 1145.32,719.52 1147.74,719.12 1152.58,718.33 1157.42,717.54 1167.1,715.95 1186.45,712.77 1225.16,706.41 1263.87,700.06 1341.29,687.35 1418.71,674.64 1496.13,661.93 1573.55,649.22 1650.97,636.51 1728.39,623.8 1805.81,611.09 1883.23,598.38 1960.65,585.68 2038.06,572.97 2115.48,560.26 2192.9,547.55 2270.32,534.84 2347.74,522.13 2425.16,509.42 2502.58,496.71 2580,484">
+    </polyline>
+    <polygon class="Fill1" points="180,484 180,120.32 257.42,168.71 334.84,217.1 412.26,265.5 489.68,313.89 567.1,362.28 644.52,410.68 721.94,459.07 799.35,507.46 876.77,555.86 954.19,604.25 1031.61,652.64 1070.32,676.84 1089.68,688.94 1109.03,701.04 1118.71,707.09 1128.39,713.14 1133.23,716.16 1135.65,717.67 1138.06,719.19 1140.48,720.32 1142.9,719.92 1145.32,719.52 1147.74,719.12 1152.58,718.33 1157.42,717.54 1167.1,715.95 1186.45,712.77 1225.16,706.41 1263.87,700.06 1341.29,687.35 1418.71,674.64 1496.13,661.93 1573.55,649.22 1650.97,636.51 1728.39,623.8 1805.81,611.09 1883.23,598.38 1960.65,585.68 2038.06,572.97 2115.48,560.26 2192.9,547.55 2270.32,534.84 2347.74,522.13 2425.16,509.42 2502.58,496.71 2580,484 2580,484" stroke-width="0">
+    </polygon>
+   </g>
+  </svg>
+  <p>
+   <span class="eq">
+    <var>M</var>
+    (
+    <var>x</var>
+    <sub>1</sub>
+    )  =
+    <var>M</var>
+    ( 1 )  = -11.28
+   </span>
+   kN·m
+  </p>
+  <p>Shear</p>
+  <p>
+   <span class="eq">
+    <var>V</var>
+    (
+    <var>x</var>
+    )  =
+    <var>V</var>
+    <sub>A</sub>
+    −
+    <var>F</var>
+    ·  (
+    <var>x</var>
+    &gt;
+    <var>a</var>
+    )
+   </span>
+  </p>
+  <svg class="plot" data-plot="svg" height="840px" style="width:494.44pt; height:155.56pt;" version="1.1" viewbox=" 0 0 2670 840" width="2670px" xmlns="http://www.w3.org/2000/svg">
+   <style type="text/css">
+    .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+   </style>
+   <g class="plot">
+    <rect class="Frame" height="600" width="2400" x="180" y="120">
+    </rect>
+    <line class="Grid" x1="180" x2="2580" y1="671" y2="671">
+    </line>
+    <text class="sm end" x="161" y="689">-1.25</text>
+    <line class="Grid" x1="180" x2="2580" y1="596" y2="596">
+    </line>
+    <text class="sm end" x="161" y="614">0</text>
+    <line class="Grid" x1="180" x2="2580" y1="521" y2="521">
+    </line>
+    <text class="sm end" x="161" y="539">1.25</text>
+    <line class="Grid" x1="180" x2="2580" y1="446" y2="446">
+    </line>
+    <text class="sm end" x="161" y="464">2.5</text>
+    <line class="Grid" x1="180" x2="2580" y1="371" y2="371">
+    </line>
+    <text class="sm end" x="161" y="389">3.75</text>
+    <line class="Grid" x1="180" x2="2580" y1="296" y2="296">
+    </line>
+    <text class="sm end" x="161" y="314">5</text>
+    <line class="Grid" x1="180" x2="2580" y1="221" y2="221">
+    </line>
+    <text class="sm end" x="161" y="239">6.25</text>
+    <line class="Grid" x1="180" x2="2580" y1="146" y2="146">
+    </line>
+    <text class="sm end" x="161" y="164">7.5</text>
+    <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="180" y="772">0</text>
+    <line class="Grid" x1="300" x2="300" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="300" y="772">0.5</text>
+    <line class="Grid" x1="420" x2="420" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="420" y="772">1</text>
+    <line class="Grid" x1="540" x2="540" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="540" y="772">1.5</text>
+    <line class="Grid" x1="660" x2="660" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="660" y="772">2</text>
+    <line class="Grid" x1="780" x2="780" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="780" y="772">2.5</text>
+    <line class="Grid" x1="900" x2="900" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="900" y="772">3</text>
+    <line class="Grid" x1="1020" x2="1020" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1020" y="772">3.5</text>
+    <line class="Grid" x1="1140" x2="1140" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1140" y="772">4</text>
+    <line class="Grid" x1="1260" x2="1260" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1260" y="772">4.5</text>
+    <line class="Grid" x1="1380" x2="1380" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1380" y="772">5</text>
+    <line class="Grid" x1="1500" x2="1500" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1500" y="772">5.5</text>
+    <line class="Grid" x1="1620" x2="1620" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1620" y="772">6</text>
+    <line class="Grid" x1="1740" x2="1740" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1740" y="772">6.5</text>
+    <line class="Grid" x1="1860" x2="1860" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1860" y="772">7</text>
+    <line class="Grid" x1="1980" x2="1980" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1980" y="772">7.5</text>
+    <line class="Grid" x1="2100" x2="2100" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2100" y="772">8</text>
+    <line class="Grid" x1="2220" x2="2220" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2220" y="772">8.5</text>
+    <line class="Grid" x1="2340" x2="2340" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2340" y="772">9</text>
+    <line class="Grid" x1="2460" x2="2460" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2460" y="772">9.5</text>
+    <text class="sm mid" x="2580" y="772">10</text>
+    <line class="Axis" x1="180" x2="2580" y1="596" y2="596">
+    </line>
+    <text x="2602" y="578">x</text>
+    <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+    </line>
+    <text class="mid" x="180" y="84">y</text>
+    <text x="8" y="823">[0; -2.08]</text>
+    <text class="end" x="2662" y="44">[10; 7.92]</text>
+    <polyline class="Series1" points="180,120.8 257.42,120.8 334.84,120.8 412.26,120.8 489.68,120.8 567.1,120.8 644.52,120.8 721.94,120.8 799.35,120.8 876.77,120.8 954.19,120.8 1031.61,120.8 1070.32,120.8 1089.68,120.8 1109.03,120.8 1118.71,120.8 1128.39,120.8 1133.23,120.8 1135.65,120.8 1138.06,120.8 1140.48,720.8 1142.9,720.8 1145.32,720.8 1147.74,720.8 1152.58,720.8 1157.42,720.8 1167.1,720.8 1186.45,720.8 1225.16,720.8 1263.87,720.8 1341.29,720.8 1418.71,720.8 1496.13,720.8 1573.55,720.8 1650.97,720.8 1728.39,720.8 1805.81,720.8 1883.23,720.8 1960.65,720.8 2038.06,720.8 2115.48,720.8 2192.9,720.8 2270.32,720.8 2347.74,720.8 2425.16,720.8 2502.58,720.8 2580,720.8">
+    </polyline>
+    <polygon class="Fill1" points="180,596 180,120.8 257.42,120.8 334.84,120.8 412.26,120.8 489.68,120.8 567.1,120.8 644.52,120.8 721.94,120.8 799.35,120.8 876.77,120.8 954.19,120.8 1031.61,120.8 1070.32,120.8 1089.68,120.8 1109.03,120.8 1118.71,120.8 1128.39,120.8 1133.23,120.8 1135.65,120.8 1138.06,120.8 1140.48,720.8 1142.9,720.8 1145.32,720.8 1147.74,720.8 1152.58,720.8 1157.42,720.8 1167.1,720.8 1186.45,720.8 1225.16,720.8 1263.87,720.8 1341.29,720.8 1418.71,720.8 1496.13,720.8 1573.55,720.8 1650.97,720.8 1728.39,720.8 1805.81,720.8 1883.23,720.8 1960.65,720.8 2038.06,720.8 2115.48,720.8 2192.9,720.8 2270.32,720.8 2347.74,720.8 2425.16,720.8 2502.58,720.8 2580,720.8 2580,596" stroke-width="0">
+    </polygon>
+   </g>
+  </svg>
+  <p>
+   <span class="eq">
+    <var>V</var>
+    (
+    <var>x</var>
+    <sub>1</sub>
+    )  =
+    <var>V</var>
+    ( 1 )  = 7.92
+   </span>
+   kN
+  </p>
+ </div>
+</div>

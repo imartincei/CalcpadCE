@@ -1,0 +1,317 @@
+<div class="calcpad-output">
+ <!-- A reference for styling the native 2D plots in CalcpadCE: configure a chart title, axis labels, legend entries and series colours through the `PlotTitle`, `PlotLabelX`, `PlotLabelY` and per-series `Plot...` options.
+<p>Use this as the starting template for any publication-quality plot. -->
+ <p>Functions</p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   <sub>1</sub>
+   (
+   <var>x</var>
+   )  = 1
+  </span>
+  ;
+  <span class="eq">
+   <var>f</var>
+   <sub>2</sub>
+   (
+   <var>x</var>
+   )  = -1
+  </span>
+  ;
+  <span class="eq">
+   <var>f</var>
+   <sub>3</sub>
+   (
+   <var>x</var>
+   )  =
+   <var>x</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   <sub>4</sub>
+   (
+   <var>x</var>
+   )  = 2 − 2 ·
+   <var>x</var>
+  </span>
+  ;
+  <span class="eq">
+   <var>f</var>
+   <sub>5</sub>
+   (
+   <var>x</var>
+   )  = 2 −
+   <var>x</var>
+  </span>
+  ;
+  <span class="eq">
+   <var>f</var>
+   <sub>6</sub>
+   (
+   <var>x</var>
+   )  = 2 ·
+   <var>x</var>
+   − 2
+  </span>
+ </p>
+ <p>Points</p>
+ <p>
+  <span class="eq">
+   <var>x</var>
+   <sub>7</sub>
+   = 1
+  </span>
+  ,
+  <span class="eq">
+   <var>y</var>
+   <sub>7</sub>
+   = 0.5
+  </span>
+  ;
+  <span class="eq">
+   <var>x</var>
+   <sub>8</sub>
+   = 1
+  </span>
+  ,
+  <span class="eq">
+   <var>y</var>
+   <sub>8</sub>
+   = 1.5
+  </span>
+  ;
+ </p>
+ <p>
+  <span class="eq">
+   <var>x</var>
+   <sub>9</sub>
+   = 1
+  </span>
+  ,
+  <span class="eq">
+   <var>y</var>
+   <sub>9</sub>
+   = -0.5
+  </span>
+  ;
+  <span class="eq">
+   <var>x</var>
+   <sub>10</sub>
+   = 1
+  </span>
+  ,
+  <span class="eq">
+   <var>y</var>
+   <sub>10</sub>
+   = -1.5
+  </span>
+  ;
+ </p>
+ <p>
+  Interval:
+  <span class="eq">
+   <var>a</var>
+   = 0
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   = 2
+  </span>
+ </p>
+ <div style="width:360pt;">
+  <p>
+   <small style="float:left; position:relative; top:10pt;">Label Y</small>
+   <center>
+    <strong>Plot Title</strong>
+   </center>
+   <svg class="plot" data-plot="svg" height="1040px" style="width:346.3pt; height:192.59pt;" version="1.1" viewbox=" 0 0 1870 1040" width="1870px" xmlns="http://www.w3.org/2000/svg">
+    <style type="text/css">
+     .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+.Series4 {stroke:#f0d000;}
+circle.Series4 {fill:#f0d000;}
+.Fill4 {fill:#f0d000; fill-opacity:0.035;}
+.Series5 {stroke:MediumVioletRed;}
+circle.Series5 {fill:MediumVioletRed;}
+.Fill5 {fill:MediumVioletRed; fill-opacity:0.030;}
+.Series6 {stroke:MediumSpringGreen;}
+circle.Series6 {fill:MediumSpringGreen;}
+.Fill6 {fill:MediumSpringGreen; fill-opacity:0.025;}
+.Series7 {stroke:BlueViolet;}
+circle.Series7 {fill:BlueViolet;}
+.Fill7 {fill:BlueViolet; fill-opacity:0.020;}
+.Series8 {stroke:LightSalmon;}
+circle.Series8 {fill:LightSalmon;}
+.Fill8 {fill:LightSalmon; fill-opacity:0.020;}
+.Series9 {stroke:DeepPink;}
+circle.Series9 {fill:DeepPink;}
+.Fill9 {fill:DeepPink; fill-opacity:0.020;}
+.Series10 {stroke:DarkTurquoise;}
+circle.Series10 {fill:DarkTurquoise;}
+.Fill10 {fill:DarkTurquoise; fill-opacity:0.020;}
+    </style>
+    <g class="plot">
+     <rect class="Frame" height="800" width="1600" x="180" y="120">
+     </rect>
+     <line class="Grid" x1="180" x2="1780" y1="920" y2="920">
+     </line>
+     <text class="sm end" x="161" y="938">-2</text>
+     <line class="Grid" x1="180" x2="1780" y1="820" y2="820">
+     </line>
+     <text class="sm end" x="161" y="838">-1.5</text>
+     <line class="Grid" x1="180" x2="1780" y1="720" y2="720">
+     </line>
+     <text class="sm end" x="161" y="738">-1</text>
+     <line class="Grid" x1="180" x2="1780" y1="620" y2="620">
+     </line>
+     <text class="sm end" x="161" y="638">-0.5</text>
+     <line class="Grid" x1="180" x2="1780" y1="520" y2="520">
+     </line>
+     <text class="sm end" x="161" y="538">0</text>
+     <line class="Grid" x1="180" x2="1780" y1="420" y2="420">
+     </line>
+     <text class="sm end" x="161" y="438">0.5</text>
+     <line class="Grid" x1="180" x2="1780" y1="320" y2="320">
+     </line>
+     <text class="sm end" x="161" y="338">1</text>
+     <line class="Grid" x1="180" x2="1780" y1="220" y2="220">
+     </line>
+     <text class="sm end" x="161" y="238">1.5</text>
+     <line class="Grid" x1="180" x2="1780" y1="120" y2="120">
+     </line>
+     <text class="sm end" x="161" y="138">2</text>
+     <line class="Grid" x1="180" x2="180" y1="120" y2="920">
+     </line>
+     <text class="sm mid" x="180" y="972">0</text>
+     <line class="Grid" x1="260" x2="260" y1="120" y2="920">
+     </line>
+     <line class="Grid" x1="340" x2="340" y1="120" y2="920">
+     </line>
+     <text class="sm mid" x="340" y="972">0.2</text>
+     <line class="Grid" x1="420" x2="420" y1="120" y2="920">
+     </line>
+     <line class="Grid" x1="500" x2="500" y1="120" y2="920">
+     </line>
+     <text class="sm mid" x="500" y="972">0.4</text>
+     <line class="Grid" x1="580" x2="580" y1="120" y2="920">
+     </line>
+     <line class="Grid" x1="660" x2="660" y1="120" y2="920">
+     </line>
+     <text class="sm mid" x="660" y="972">0.6</text>
+     <line class="Grid" x1="740" x2="740" y1="120" y2="920">
+     </line>
+     <line class="Grid" x1="820" x2="820" y1="120" y2="920">
+     </line>
+     <text class="sm mid" x="820" y="972">0.8</text>
+     <line class="Grid" x1="900" x2="900" y1="120" y2="920">
+     </line>
+     <line class="Grid" x1="980" x2="980" y1="120" y2="920">
+     </line>
+     <text class="sm mid" x="980" y="972">1</text>
+     <line class="Grid" x1="1060" x2="1060" y1="120" y2="920">
+     </line>
+     <line class="Grid" x1="1140" x2="1140" y1="120" y2="920">
+     </line>
+     <text class="sm mid" x="1140" y="972">1.2</text>
+     <line class="Grid" x1="1220" x2="1220" y1="120" y2="920">
+     </line>
+     <line class="Grid" x1="1300" x2="1300" y1="120" y2="920">
+     </line>
+     <text class="sm mid" x="1300" y="972">1.4</text>
+     <line class="Grid" x1="1380" x2="1380" y1="120" y2="920">
+     </line>
+     <line class="Grid" x1="1460" x2="1460" y1="120" y2="920">
+     </line>
+     <text class="sm mid" x="1460" y="972">1.6</text>
+     <line class="Grid" x1="1540" x2="1540" y1="120" y2="920">
+     </line>
+     <line class="Grid" x1="1620" x2="1620" y1="120" y2="920">
+     </line>
+     <text class="sm mid" x="1620" y="972">1.8</text>
+     <line class="Grid" x1="1700" x2="1700" y1="120" y2="920">
+     </line>
+     <text class="sm mid" x="1780" y="972">2</text>
+     <line class="Axis" x1="180" x2="1780" y1="520" y2="520">
+     </line>
+     <text x="1802" y="502">x</text>
+     <line class="Axis" x1="180" x2="180" y1="120" y2="920">
+     </line>
+     <text class="mid" x="180" y="84">y</text>
+     <text x="8" y="1023">[0; -2]</text>
+     <text class="end" x="1862" y="44">[2; 2]</text>
+     <polyline class="Series1" points="180,320 231.61,320 283.23,320 334.84,320 386.45,320 438.06,320 489.68,320 541.29,320 592.9,320 644.52,320 696.13,320 747.74,320 799.35,320 850.97,320 902.58,320 954.19,320 1005.81,320 1057.42,320 1109.03,320 1160.65,320 1212.26,320 1263.87,320 1315.48,320 1367.1,320 1418.71,320 1470.32,320 1521.94,320 1573.55,320 1625.16,320 1676.77,320 1728.39,320 1780,320">
+     </polyline>
+     <polygon class="Fill1" points="180,520 180,320 231.61,320 283.23,320 334.84,320 386.45,320 438.06,320 489.68,320 541.29,320 592.9,320 644.52,320 696.13,320 747.74,320 799.35,320 850.97,320 902.58,320 954.19,320 1005.81,320 1057.42,320 1109.03,320 1160.65,320 1212.26,320 1263.87,320 1315.48,320 1367.1,320 1418.71,320 1470.32,320 1521.94,320 1573.55,320 1625.16,320 1676.77,320 1728.39,320 1780,320 1780,520" stroke-width="0">
+     </polygon>
+     <polyline class="Series2" points="180,720 231.61,720 283.23,720 334.84,720 386.45,720 438.06,720 489.68,720 541.29,720 592.9,720 644.52,720 696.13,720 747.74,720 799.35,720 850.97,720 902.58,720 954.19,720 1005.81,720 1057.42,720 1109.03,720 1160.65,720 1212.26,720 1263.87,720 1315.48,720 1367.1,720 1418.71,720 1470.32,720 1521.94,720 1573.55,720 1625.16,720 1676.77,720 1728.39,720 1780,720">
+     </polyline>
+     <polygon class="Fill2" points="180,520 180,720 231.61,720 283.23,720 334.84,720 386.45,720 438.06,720 489.68,720 541.29,720 592.9,720 644.52,720 696.13,720 747.74,720 799.35,720 850.97,720 902.58,720 954.19,720 1005.81,720 1057.42,720 1109.03,720 1160.65,720 1212.26,720 1263.87,720 1315.48,720 1367.1,720 1418.71,720 1470.32,720 1521.94,720 1573.55,720 1625.16,720 1676.77,720 1728.39,720 1780,720 1780,520" stroke-width="0">
+     </polygon>
+     <polyline class="Series3" points="180,520 231.61,507.1 283.23,494.19 334.84,481.29 386.45,468.39 438.06,455.48 489.68,442.58 541.29,429.68 592.9,416.77 644.52,403.87 696.13,390.97 747.74,378.06 799.35,365.16 850.97,352.26 902.58,339.35 954.19,326.45 1005.81,313.55 1057.42,300.65 1109.03,287.74 1160.65,274.84 1212.26,261.94 1263.87,249.03 1315.48,236.13 1367.1,223.23 1418.71,210.32 1470.32,197.42 1521.94,184.52 1573.55,171.61 1625.16,158.71 1676.77,145.81 1728.39,132.9 1780,120">
+     </polyline>
+     <polyline class="Series4" points="180,120 231.61,145.81 283.23,171.61 334.84,197.42 386.45,223.23 438.06,249.03 489.68,274.84 541.29,300.65 592.9,326.45 644.52,352.26 696.13,378.06 747.74,403.87 799.35,429.68 850.97,455.48 902.58,481.29 954.19,507.1 1005.81,532.9 1057.42,558.71 1109.03,584.52 1160.65,610.32 1212.26,636.13 1263.87,661.94 1315.48,687.74 1367.1,713.55 1418.71,739.35 1470.32,765.16 1521.94,790.97 1573.55,816.77 1625.16,842.58 1676.77,868.39 1728.39,894.19 1780,920">
+     </polyline>
+     <polyline class="Series5" points="180,120 231.61,132.9 283.23,145.81 334.84,158.71 386.45,171.61 438.06,184.52 489.68,197.42 541.29,210.32 592.9,223.23 644.52,236.13 696.13,249.03 747.74,261.94 799.35,274.84 850.97,287.74 902.58,300.65 954.19,313.55 1005.81,326.45 1057.42,339.35 1109.03,352.26 1160.65,365.16 1212.26,378.06 1263.87,390.97 1315.48,403.87 1367.1,416.77 1418.71,429.68 1470.32,442.58 1521.94,455.48 1573.55,468.39 1625.16,481.29 1676.77,494.19 1728.39,507.1 1780,520">
+     </polyline>
+     <polyline class="Series6" points="180,920 231.61,894.19 283.23,868.39 334.84,842.58 386.45,816.77 438.06,790.97 489.68,765.16 541.29,739.35 592.9,713.55 644.52,687.74 696.13,661.94 747.74,636.13 799.35,610.32 850.97,584.52 902.58,558.71 954.19,532.9 1005.81,507.1 1057.42,481.29 1109.03,455.48 1160.65,429.68 1212.26,403.87 1263.87,378.06 1315.48,352.26 1367.1,326.45 1418.71,300.65 1470.32,274.84 1521.94,249.03 1573.55,223.23 1625.16,197.42 1676.77,171.61 1728.39,145.81 1780,120">
+     </polyline>
+     <circle class="Series7" cx="980" cy="420" r="10">
+     </circle>
+     <circle class="Series8" cx="980" cy="220" r="10">
+     </circle>
+     <circle class="Series9" cx="980" cy="620" r="10">
+     </circle>
+     <circle class="Series10" cx="980" cy="820" r="10">
+     </circle>
+    </g>
+   </svg>
+   <small style="float:right;position:relative; top:-10pt;">Label X</small>
+   <b>Legend:</b>
+   <p>
+    <b style="color:Tomato">━━━</b>
+    Line 1
+    <b style="color:YellowGreen">━━━</b>
+    Line 2
+    <b style="color:CornflowerBlue">━━━</b>
+    Line 3
+    <b style="color:Gold">━━━</b>
+    Line 4
+    <b style="color:MediumVioletRed">━━━</b>
+    Line 5
+    <b style="color:MediumSpringGreen">━━━</b>
+    Line 6
+    <br/>
+    <b style="color:BlueViolet">●</b>
+    Point 7
+    <b style="color:LightSalmon">●</b>
+    Point 8
+    <b style="color:DeepPink">●</b>
+    Point 9
+    <b style="color:DarkTurquoise">●</b>
+    Point 10
+   </p>
+  </p>
+ </div>
+</div>

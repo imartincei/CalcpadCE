@@ -1,0 +1,5 @@
+<div class="calcpad-output">
+ <style>h3 {    color: red;  }  h1 {    margin-top: 0;    padding-top: 0;}</style>
+ <h1>No gap at top!</h1>
+ <h3>This is red!</h3>
+</div>

@@ -1,0 +1,29 @@
+M = [1; 2 | 3; 4]
+total_m = matrix(n_rows(M); n_cols(M)) + 1
+#for i = 1 : n_rows(M)
+    #for j = 1 : n_cols(M)
+        total_m.(i;j) = total_m.(i;j) + M.(i;j)
+    #loop
+#loop
+V = [1;2;3]
+V2 = V
+M2 = matrix(1;3)
+#for i = 1 : 5
+    #for j = 1 : 3
+        V2.j = j
+    #loop
+    M2 = stack(vec2row(V2); M2)
+#loop
+V2
+total_m
+vSum(v) = $Inline{x = vector(len(v));$Repeat{x.i = 2 @ i = 1 : len(v)}; x}
+'This returns 0, but it should return 3'
+itrSum(v) = $Inline{x = 1;$Repeat{x ← x + 1 @ i = 1 : len(v)};x}
+mTotal = vSum(V)
+itrSum(V)
+V = [1;2;3]
+var = 1
+$Repeat{var ← var + 1 @ i = 1 : len(V)}
+var
+
+'This all works, see if you can find what wasnt working and put it here'

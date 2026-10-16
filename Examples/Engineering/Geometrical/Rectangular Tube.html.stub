@@ -1,0 +1,343 @@
+<div class="calcpad-output">
+ <!-- Section properties of a rectangular hollow section (RHS): area, $I_x$, $I_y$, section moduli and radii of gyration from outer and inner dimensions. -->
+ <h3>Geometrical Properties of Rectangular Tube</h3>
+ <div style="max-width:150mm">
+  <img alt="rectangular-tube.png" class="side" src="Images/mechanics/sections/rectangular-tube.png" style="height:150pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-5">300</u>
+  </span>
+  m,
+  <span class="eq">
+   <var>t</var>
+   <sub>w</sub>
+   =
+   <u class="input-5">20</u>
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-6">200</u>
+  </span>
+  m,
+  <span class="eq">
+   <var>t</var>
+   <sub>f</sub>
+   =
+   <u class="input-6">30</u>
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   <sub>1</sub>
+   =
+   <var>b</var>
+   − 2 ·
+   <var>t</var>
+   <sub>w</sub>
+   = 200 − 2 · 20 = 160
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   <sub>1</sub>
+   =
+   <var>h</var>
+   − 2 ·
+   <var>t</var>
+   <sub>f</sub>
+   = 300 − 2 · 30 = 240
+  </span>
+  m
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   = 2 ·  (
+   <var>h</var>
+   ·
+   <var>t</var>
+   <sub>w</sub>
+   +
+   <var>b</var>
+   <sub>1</sub>
+   ·
+   <var>t</var>
+   <sub>f</sub>
+   )  = 2 ·  ( 300 · 20 + 160 · 30 )  = 21600
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <var>h</var>
+   ·
+   <var>b</var>
+   −
+   <var>h</var>
+   <sub>1</sub>
+   ·
+   <var>b</var>
+   <sub>1</sub>
+   = 300 · 200 − 240 · 160 = 21600
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>Centroid</p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    <var>b</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    200
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 100
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    300
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 150
+  </span>
+  m
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   = 2 ·  (
+   <var>h</var>
+   +
+   <var>b</var>
+   )  = 2 ·  ( 300 + 200 )  = 1000
+  </span>
+  m
+ </p>
+ <p>Second moments of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>y</sub>
+   =
+   <span class="dvc">
+    <var>b</var>
+    ·
+    <var>h</var>
+    <sup>3</sup>
+    −
+    <var>b</var>
+    <sub>1</sub>
+    ·
+    <var>h</var>
+    <sub>1</sub>
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   =
+   <span class="dvc">
+    200 · 300
+    <sup>3</sup>
+    − 160 · 240
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   = 265680000
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>z</sub>
+   =
+   <span class="dvc">
+    <var>b</var>
+    <sup>3</sup>
+    ·
+    <var>h</var>
+    −
+    <var>b</var>
+    <sub>1</sub>
+    <sup>3</sup>
+    ·
+    <var>h</var>
+    <sub>1</sub>
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   =
+   <span class="dvc">
+    200
+    <sup>3</sup>
+    · 300 − 160
+    <sup>3</sup>
+    · 240
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   = 118080000
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Polar moment of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>x</sub>
+   =
+   <var>I</var>
+   <sub>y</sub>
+   +
+   <var>I</var>
+   <sub>z</sub>
+   = 265680000 + 118080000 = 383760000
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Radii of gyration</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>y</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     265680000
+     <span class="dvl">
+     </span>
+     21600
+    </span>
+   </span>
+   = 110.91
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>z</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>z</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     118080000
+     <span class="dvl">
+     </span>
+     21600
+    </span>
+   </span>
+   = 73.94
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>x</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>x</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     383760000
+     <span class="dvl">
+     </span>
+     21600
+    </span>
+   </span>
+   = 133.29
+  </span>
+  m
+ </p>
+</div>

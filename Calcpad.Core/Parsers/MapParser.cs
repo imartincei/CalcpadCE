@@ -35,7 +35,7 @@ namespace Calcpad.Core
                         break;
                     del = delimiters[index];
                     ts.Reset(i + 1);
-                } 
+                }
                 else
                     ts.Expand();
 
@@ -44,7 +44,7 @@ namespace Calcpad.Core
             }
             if (index <= n)
                 return string.Format(Messages.Missing_delimiter_0_in_surface_map_command_1, delimiters[index].ToString(), script.ToString());
-            
+
             for (int i = 0; i < n; ++i)
             {
                 if (string.IsNullOrWhiteSpace(input[i]))

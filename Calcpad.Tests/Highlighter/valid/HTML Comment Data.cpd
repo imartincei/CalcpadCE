@@ -1,0 +1,10 @@
+#settings {"decimals": 4}
+'<!--{"desc": "description", "paramDesc": ["param1", "param2"], "paramTypes": ["value", "value"]}-->'
+#def macro$(param1$; param2$) = param1$ = param2$'test'
+macro$(param; 6.12345)
+'<!--{"LintIgnore": ["CPD-3407", "CPD-3312"]}-->
+x = = 2
+'<!--{"EndLintIgnore": ["CPD-3307"]}-->
+x = 3
+'<!--{"EndLintIgnore": ["CPD-3312"]}-->
+y = 3

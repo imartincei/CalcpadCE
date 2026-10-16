@@ -1,0 +1,8 @@
+[CalcpadCE](https://calcpad-ce.org) worksheets in this section determine the climatic and operational [actions on structures](https://en.wikipedia.org/wiki/Structural_load) that govern the design of buildings — wind pressure, snow accumulation and the contact stresses transferred to the ground.
+The calculations follow [Eurocode](https://en.wikipedia.org/wiki/Eurocode) parts 1991-1-3 and 1991-1-4 and translate the code provisions directly into branching logic over terrain category, roof pitch and reference area.
+
+The [snow load worksheet](#snow-load) returns $s = \mu_1 \cdot C_e \cdot C_t \cdot s_k$ for monopitch and duopitch roofs, with the shape coefficient $\mu_1$ chosen from the pitch angle.
+The [snow drift sheet](#snow-drift) covers the more demanding case of a roof abutting a taller construction, where the drift length $l_s$ and the additional shape coefficients $\mu_s$ and $\mu_w$ describe the wind-driven and sliding contributions.
+The [wind load sheet](#wind-load) builds the peak velocity pressure $q_p$ from the basic wind velocity, terrain roughness and turbulence, then resolves zone-by-zone external pressure coefficients on walls and roof slopes for the transverse and longitudinal directions, and reduces them to line loads on columns, beams and purlins.
+
+The [foundation pad optimisation](#optimization-of-foundation-pad-dimensions) closes the load-take-down chain by sizing the rectangular base for the resulting axial force and biaxial bending so that the maximum contact pressure stays below the permissible value, no uplift occurs and the base area is a minimum — the optimum is found numerically with `Inf` over the side-ratio $k = a/b$.

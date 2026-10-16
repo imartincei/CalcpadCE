@@ -1,8 +1,8 @@
-﻿# Vectors
+# Vectors
 
-## Internal implementation and types of vectors
+## Internal Implementation and Types of Vectors
 
-There are two types of vectors in Calcpad: regular (small) and large.
+There are two types of vectors in CalcpadCE: regular (small) and large.
 Vectors can contain only real numbers with units.
 Complex vectors are not supported in this version.
 A single vector can contain different types of units, even if not consistent.
@@ -18,19 +18,21 @@ A vector is defined with its full "mathematical" length, but no memory is initia
 This length can be obtained by the **len**($\vec{v}$) function.
 The greatest index of a non-zero element defines the internal size of a vector.
 It is returned by the **size**($\vec{v}$) function.
-The rest of the elements are known to be zero, so Calcpad does not need to store them in memory.
+The rest of the elements are known to be zero, so CalcpadCE does not need to store them in memory.
 Instead, it returns directly zero, if such an element is accessed.
 
 This allows the software to work efficiently with vectors that are not entirely filled.
 Such vectors are very common in engineering as is the load vector in finite element analyses.
-However, Calcpad reserves a little bit more memory above the size, that is called "capacity". This is because resizing a vector is computationally expensive.
+However, CalcpadCE reserves a little bit more memory above the size, that is called "capacity". This is because resizing a vector is computationally expensive.
 Since we normally assign elements in a loop, in this way we avoid resizing the vector on each iteration.
 
 ## Definition
 
 Vectors can be defined by using the following syntax:
 
-`a = [ a_1; a_2; a_3; ... ; a_i; ... ; a_n ]`
+```calcpad
+a = [ a_1; a_2; a_3; ... ; a_i; ... ; a_n ]
+```
 
 The values of the separate elements can be specified by expressions that include variables, operators, functions, etc.
 For example:
@@ -73,7 +75,7 @@ If an index value is less than 1 or greater than the vector length **len**($\vec
 You can use indexing to initialize vectors inside loops (block or inline). For that purpose, you must include the loop counter into the index.
 For example:
 
-```matlab
+```calcpad
 a = vector(6)','b = vector(6)
 'Block loop
 #for k = 1 : len(a)
@@ -88,11 +90,11 @@ The above code will produce the following two vectors:
 $a = [1\ 4\ 9\ 16\ 25\ 36]$ and  
 $b = [0\ 1\ 4\ 9\ 16\ 25]$
 
-## Structural functions
+## Structural Functions
 
 This includes all functions that read or modify the structure of the vector.
 It means that the result does not depend on the content, i.e. the values of elements.
-The following functions are available in Calcpad:
+The following functions are available in CalcpadCE:
 
 ### **len**($\vec{a}$)
 
@@ -250,7 +252,7 @@ $\vec{i}$
     `a = [0; 1; 2; 3; 4; 5; 6]`  
     `extract(a; [2; 4; 6])` $= [1\ 3\ 5]$
 
-## Data functions
+## Data Functions
 
 This kind of functions treat the vector contents as numerical data.
 They are related mainly to sorting, ordering, searching and counting.
@@ -439,9 +441,8 @@ Different suffixes refer to different comparison operators.
 They replace the equality in the original functions while the other behavior remains unchanged.
 The possible suffixes are given in the table below:
 
-|  |  |  |  |
-|----|----|----|----|
 | suffix | find | lookup | comparison operator |
+| ------ | ---- | ------ | ------------------- |
 | \_eq | **find_eq**($\vec{a}$; *x*; *i*) | **lookup_eq**($\vec{a}$; $\vec{b}$; *x*) | = - equal |
 | \_ne | **find_ne**($\vec{a}$; *x*; *i*) | **lookup_ne**($\vec{a}$; $\vec{b}$; *x*) | ≠ - not equal |
 | \_lt | **find_lt**($\vec{a}$; *x*; *i*) | **lookup_lt**($\vec{a}$; $\vec{b}$; *x*) | \< - less than |
@@ -449,7 +450,7 @@ The possible suffixes are given in the table below:
 | \_gt | **find_gt**($\vec{a}$; *x*; *i*) | **lookup_gt**($\vec{a}$; $\vec{b}$; *x*) | \> - greater than |
 | \_ge | **find_ge**($\vec{a}$; *x*; *i*) | **lookup_ge**($\vec{a}$; $\vec{b}$; *x*) | ≥ - greater than or equal |
 
-## Math functions
+## Math Functions
 
 All standard scalar math functions accept vector arguments as well.
 The function is applied separately to each of the elements in the input vector and the results are returned in a corresponding output vector.
@@ -457,7 +458,7 @@ For example:
 
 `sin([0; 30; 45; 90])` $= [0\ 0.5\ 0.707\ 1]$
 
-Calcpad also includes several math functions that are specific for vectors:
+CalcpadCE also includes several math functions that are specific for vectors:
 
 ### **norm_p**($\vec{a}$)
 
@@ -578,7 +579,7 @@ $\vec{a}$, $\vec{b}$
     `b = [5; 3; 1]`  
     `cross(a; b)` $= [-10\ 19\ -7]$
 
-## Aggregate and interpolation functions
+## Aggregate and Interpolation Functions
 
 All aggregate functions can work with vectors.
 Since they are multivariate, each of them can accept a single vector, but also a list of scalars, vectors and matrices, mixed in arbitrary order.
@@ -615,7 +616,7 @@ For example:
 `[2; 4; 5]*[2; 3; 4]` $= [4\ 12\ 20]$
 
 If the lengths of both vectors are different, the shorter vector is padded with zeros to the length of the longer one.
-Dot and cross products in Calcpad are implemented as functions (see above). All binary operators are supported for vector-scalar and scalar-vector operands in a similar way.
+Dot and cross products in CalcpadCE are implemented as functions (see above). All binary operators are supported for vector-scalar and scalar-vector operands in a similar way.
 For example:
 
 `[2; 4; 5]*2` $= [4\ 8\ 10]$

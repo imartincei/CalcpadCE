@@ -59,13 +59,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Welcome_To_Calcpad_Command_Line_Interpreter" xml:space="preserve">
-    <value> 欢迎使用Calcpad命令行解释器v.{0}.{1}.{2}!</value>
+    <value> 欢迎使用Calcpad命令行解释器v.{0}!</value>
   </data>
   <data name="Press_Any_Key_When_Ready" xml:space="preserve">
     <value>准备好后按任意键.</value>
-  </data>
-  <data name="Copyright_2023_By_Proektsoft_EOOD" xml:space="preserve">
-    <value>版权所有:Proektsoft EOOD © 2026.</value>
   </data>
   <data name="Commands" xml:space="preserve">
     <value>命令</value>
@@ -102,5 +99,8 @@
   </data>
   <data name="InvalidOutputExtensionMustBeHtmlDocxOrPdf" xml:space="preserve">
     <value>输出扩展名无效！必须是“html”、“docx”或“pdf”.</value>
+  </data>
+  <data name="PdfExportNotAvailable" xml:space="preserve">
+    <value>命令行目前不支持导出 PDF。该功能计划在未来版本中提供。在此之前，请使用 CalcpadCE 桌面应用导出 PDF；如果需要将导出作为后台任务运行，请使用独立的 CalcpadCE 服务器。</value>
   </data>
 </root>

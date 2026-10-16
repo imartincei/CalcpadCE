@@ -1,0 +1,60 @@
+#def caseType$(R_u$; maxArray$; minArray$; LC_text$; case$; env$; unit$)
+	#if case$ ≡ 1
+		#if env$ ≡ 1
+			R_u$ = max(maxArray$)
+			index = search(maxArray$; R_u$; 1)
+		#else
+			R_u$ = maxArray$
+		#end if
+	#end if
+	#if case$ ≡ 2
+		#if env$ ≡ 1
+			R_u$ = min(minArray$)
+			index = search(minArray$; R_u$; 1)
+		#else
+			R_u$ = minArray$
+		#end if
+	#end if
+	#if case$ ≡ 3
+		#if env$ ≡ 1
+			R_u,max = max(maxArray$)
+			R_u,min = min(minArray$)
+			#if abs(R_u,max) ≥ abs(R_u,min)
+				R_u$ = R_u,max
+				index = search(maxArray$; R_u,max; 1)
+			#else
+				R_u$ = R_u,min
+				index = search(minArray$; R_u,min; 1)
+			#end if
+		#else
+			absMaxArray = vector(len(maxArray$))
+			$Repeat{absMaxArray.k = if(abs(maxArray$.k) ≥ abs(minArray$.k); maxArray$.k; minArray$.k) @ k = 1 : len(maxArray$)}
+			R_u$ = absMaxArray
+		#end if
+	#end if
+	unhide$
+	R_u$|unit$
+	#if env$ ≡ 1
+		 '<!--getStringFromArray(LC_text; index; ""; " controls")--> 
+	#end if
+#end def
+'
+#def ASCE710ASD$(R_u$; D$; L$; L_r$; S$; R$; W$; E$; F$; H_a$; H_r$; case$; env$; unit$)
+	hide$
+	LC_1 = D$ + F$ + H_a$ + 0.6*H_r$
+	LC_2 = D$ + F$ + L$ + H_a$ + 0.6*H_r$
+	LC_3,max = D$ + F$ + max(L_r$; S$; R$) + H_a$ + 0.6*H_r$
+	LC_3,min = D$ + F$ + min(L_r$; S$; R$) + H_a$ + 0.6*H_r$
+	LC_4,max = D$ + F$ + 0.75*L$ + 0.75*max(L_r$; S$; R$) + H_a$ + 0.6*H_r$
+	LC_4,min = D$ + F$ + 0.75*L$ + 0.75*min(L_r$; S$; R$) + H_a$ + 0.6*H_r$
+	LC_5,max = D$ + F$ + max(0.6*W$ + 0.7*E$) + 1.6*H_a$ + 0.9*H_r$
+	LC_5,min = D$ + F$ + min(0.6*W$ + 0.7*E$) + 1.6*H_a$ + 0.9*H_r$
+	LC_6a,max = D$ + F$ + 0.75*L$ + 0.75*0.6*W$ + 0.75*max(L_r$; S$; R$) + 1.6*H_a$ + 0.9*H_r$
+	LC_6a,min = D$ + F$ + 0.75*L$ + 0.75*0.6*W$ + 0.75*min(L_r$; S$; R$) + 1.6*H_a$ + 0.9*H_r$
+	LC_6b = D$ + F$ + 0.75*L$ + 0.75*0.7*E$ + 0.75*S$ + 1.6*H_a$ + 0.9*H_r$
+	LC_7 = 0.6*D$ + 0.6*F$ + 0.6*W$ + 1.6*H_a$ + 0.9*H_r$
+	LC_8 = 0.6*D$ + 0.6*F$ + 0.7*E$ + 1.6*H_a$ + 0.9*H_r$
+	maxArray = [LC_1; LC_2; LC_3,max; LC_4,max; LC_5,max; LC_6a,max; LC_6b; LC_7; LC_8]
+	minArray = [LC_1; LC_2; LC_3,min; LC_4,min; LC_5,min; LC_6a,min; LC_6b; LC_7; LC_8]
+	caseType$(R_u$; maxArray; minArray; ["LC1", "LC2", "LC3", "LC4", "LC5", "LC6", "LC7"]; case$; env$; unit$)
+#end def

@@ -1,0 +1,233 @@
+'<!--DXF Drawing Module - Renders to static image via dxf-viewer-->'
+'<!-- Multi-diagram model: window.dxfDrawings is a dictionary keyed by diagram id; window.dxfCurrentDrawingId is the active id. initDXF creates a new entry and sets it active; addLayer/setLayer/draw* use the current id (so callers do not need to thread the id through every draw call). renderDXF captures its diagram synchronously and suffixes DOM ids with the id, so multiple diagrams can coexist on a page. -->
+#def initDXF$(unit$; id$)
+	#val
+	'<script type="module">
+	'import Drawing from "https://cdn.jsdelivr.net/npm/dxf-writer@1.18.4/+esm";
+	'window.dxfDrawings = window.dxfDrawings || {};
+	'window.dxfDrawings["id$"] = new Drawing();
+	'window.dxfDrawings["id$"].setUnits("unit$");
+	'window.dxfDrawings["id$"].addLineType("DASHED", "---- ", [0.5, -0.5]);
+	'window.dxfDrawings["id$"].addLineType("DOTTED", ". ", [0.1, -0.1]);
+	'window.dxfCurrentDrawingId = "id$";
+	'</script>
+#end def
+'
+#def addLayer$(name$; aciColor$; lineType$)
+	'<script type="module">
+	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.addLayer("name$", 'aciColor$', "lineType$"); } }
+	'</script>
+#end def
+'
+#def setLayer$(name$)
+	'<script type="module">
+	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.setActiveLayer("name$"); } }
+	'</script>
+#end def
+'
+#def drawLine$(x1$; y1$; x2$; y2$)
+	'<script type="module">
+	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine('x1$', 'y1$', 'x2$', 'y2$'); } }
+	'</script>
+#end def
+'
+#def drawLines$(lines$)
+	'<!--Rows: Lines, Columns: X1, Y1, X2, Y2-->'
+	'<script type="module">
+	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId];
+	#for iζ = 1 : n_rows(lines$)
+		'if (d) { d.drawLine('lines$.(iζ; 1)', 'lines$.(iζ; 2)', 'lines$.(iζ; 3)', 'lines$.(iζ; 4)'); }
+	#loop
+	'}
+	'</script>
+#end def
+'
+#def drawRect$(x$; y$; width$; height$)
+	'<script type="module">
+	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId];
+	'if (d) {
+	'  const x = 'x$', y = 'y$', w = 'width$', h = 'height$';
+	'  d.drawLine(x, y, x + w, y);
+	'  d.drawLine(x + w, y, x + w, y + h);
+	'  d.drawLine(x + w, y + h, x, y + h);
+	'  d.drawLine(x, y + h, x, y);
+	'} }
+	'</script>
+#end def
+'
+#def drawCircle$(cx$; cy$; radius$)
+	'<script type="module">
+	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawCircle('cx$', 'cy$', 'radius$'); } }
+	'</script>
+#end def
+'
+#def drawCircles$(circles$)
+	'<!--Rows: Circles, Columns: cx, cy, radius-->'
+	'<script type="module">
+	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId];
+	#for iζ = 1 : n_rows(circles$)
+		'if (d) { d.drawCircle('circles$.(iζ; 1)', 'circles$.(iζ; 2)', 'circles$.(iζ; 3)'); }
+	#loop
+	'}
+	'</script>
+#end def
+'
+#def drawArc$(cx$; cy$; radius$; startAngle$; endAngle$)
+	'<script type="module">
+	'{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawArc('cx$', 'cy$', 'radius$', 'startAngle$', 'endAngle$'); } }
+	'</script>
+#end def
+'
+#def renderDXF$(imgWidth$; id$)
+	'<div id="dxf-render-container-id$" style="position:fixed; left:-9999px; top:0; width:1px; height:1px; overflow:hidden;"></div>
+	'<!-- Hidden but still in flow, with the canvas square ratio, so the box is the right
+	'     size from first layout. display:none would take no space and everything below
+	'     would jump when the drawing arrives, seconds after load. -->
+	'<img id="dxf-output-img-id$" style="visibility:hidden; width:'imgWidth$'px; max-width:100%; margin-top:30px; border:2px solid #ddd; border-radius:8px; background:#fff;" />
+	'<div style="margin-top:20px; padding:15px; background:#f8d7da; border-radius:4px; color:#721c24; display:none;" id="dxf-error-message-id$">
+	'  <strong>Error:</strong> <span id="dxf-error-text-id$"></span>
+	'</div>
+	'<script>console.log("PLAIN SCRIPT TEST id$");</script>
+	'<script type="module">
+	'console.log("MODULE SCRIPT START id$");
+	'import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/+esm";
+	'import * as DxfViewerModule from "https://cdn.jsdelivr.net/npm/dxf-viewer@1.0.46/+esm";
+	'const DxfViewer = DxfViewerModule.default || DxfViewerModule.DxfViewer;
+	'console.log("DXF render script loaded id$, DxfViewer:", typeof DxfViewer);
+	'
+	'const dxfId = "id$";
+	'const drawing = window.dxfDrawings && window.dxfDrawings[dxfId];
+	'
+	'function showError(msg) {
+	'  document.getElementById("dxf-error-text-" + dxfId).textContent = msg;
+	'  document.getElementById("dxf-error-message-" + dxfId).style.display = "block";
+	'}
+	'
+	'async function renderToImage() {
+	'  if (!DxfViewer) { throw new Error("DxfViewer library not loaded"); }
+	'  if (!drawing) { throw new Error("DXF drawing '" + dxfId + "' not initialized. Call initDXF first"); }
+	'
+	'  const container = document.getElementById("dxf-render-container-" + dxfId);
+	'  if (!container) { throw new Error("Render container '" + dxfId + "' not found"); }
+	'
+	'  const iw = 'imgWidth$';
+	'  const cw = iw * 2;
+	'  const viewer = new DxfViewer(container, {
+	'    autoResize: false,
+	'    canvasWidth: cw,
+	'    canvasHeight: cw,
+	'    clearColor: new THREE.Color("#fff"),
+	'    colorCorrection: true,
+	'    preserveDrawingBuffer: true
+	'  });
+	'
+	'  const dxfString = drawing.toDxfString();
+	'  console.log(dxfString);
+	'  const blob = new Blob([dxfString], { type: "application/dxf" });
+	'  const url = URL.createObjectURL(blob);
+	'
+	'  console.log("Loading DXF " + dxfId + "...");
+	'  await viewer.Load({ url: url });
+	'  URL.revokeObjectURL(url);
+	'
+	'  const bounds = viewer.GetBounds();
+	'  const origin = viewer.GetOrigin();
+	'  if (bounds) {
+	'    const bw = bounds.maxX - bounds.minX;
+	'    const bh = bounds.maxY - bounds.minY;
+	'    const ch = Math.max(Math.round(cw * bh / Math.max(bw, 0.001)), 1);
+	'    viewer.SetSize(cw, ch);
+	'    viewer.FitView(
+	'      bounds.minX - origin.x, bounds.maxX - origin.x,
+	'      bounds.minY - origin.y, bounds.maxY - origin.y
+	'    );
+	'  }
+	'  viewer.Render();
+	'
+	'  const canvas = viewer.GetCanvas();
+	'  const dataUrl = canvas.toDataURL("image/png");
+	'  const img = document.getElementById("dxf-output-img-" + dxfId);
+	'  await new Promise(function(resolve) {
+	'    img.onload = resolve;
+	'    img.onerror = resolve;
+	'    img.src = dataUrl;
+	'  });
+	'  img.style.visibility = "visible";
+	'  img.dataset.dxfReady = "ok";
+	'
+	'  viewer.Destroy();
+	'  container.remove();
+	'  console.log("DXF " + dxfId + " rendered to image successfully");
+	'}
+	'
+	'setTimeout(async function() {
+	'  console.log("setTimeout fired for " + dxfId + ", drawing:", !!drawing);
+	'  try {
+	'    await renderToImage();
+	'  } catch(err) {
+	'    console.error("Failed to render DXF " + dxfId + ":", err);
+	'    showError(err.message);
+	'    const failedImg = document.getElementById("dxf-output-img-" + dxfId);
+	'    if (failedImg) {
+	'      failedImg.style.display = "none";
+	'      failedImg.dataset.dxfReady = "failed";
+	'    }
+	'  }
+	'}, 100);
+	'</script>
+	#equ
+#end def
+#local
+'Define drawing dimensions
+width = 10
+height = 8
+
+'Initialize DXF drawing with units
+initDXF$(Inches; sample)
+
+'Create a layer for border lines (ACI color 1 = Red)
+addLayer$(BORDER; 1; CONTINUOUS)
+setLayer$(BORDER)
+
+'Draw a border around the drawing
+drawLine$(0; 0; width; 0)
+drawLine$(width; 0; width; height)
+drawLine$(width; height; 0; height)
+drawLine$(0; height; 0; 0)
+
+'Create a layer for diagonal lines (ACI color 5 = Blue)
+addLayer$(DIAGONAL; 5; DASHED)
+setLayer$(DIAGONAL)
+
+'Draw diagonal lines
+drawLine$(0; 0; width; height)
+drawLine$(width; 0; 0; height)
+
+'Create a layer for custom geometry (ACI color 4 = Cyan)
+addLayer$(CUSTOM; 4; CONTINUOUS)
+setLayer$(CUSTOM)
+
+'Draw a rectangle in the middle
+x1 = 3
+y1 = 2
+x2 = 7
+y2 = 6
+
+drawRect$(x1; y1; x2 - x1; y2 - y1)
+
+'Draw an X inside the rectangle
+lines = [x1; y1; x2; y2|x2; y1; x1; y2]
+drawLines$(lines)
+
+'Create a layer for circles (ACI color 3 = Green)
+addLayer$(CIRCLES; 3; CONTINUOUS)
+setLayer$(CIRCLES)
+
+'Draw a circle in the center of the rectangle
+cx = (x1 + x2)/2
+cy = (y1 + y2)/2
+radius = 1
+drawCircle$(cx; cy; radius)
+
+'Render the DXF as image (width in pixels)
+renderDXF$(800; sample)

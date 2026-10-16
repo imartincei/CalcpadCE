@@ -43,7 +43,7 @@ namespace Calcpad.Core
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal override double GetValue(int row, int col) => row.Equals(col) ? _hpRows[0].GetValue(row) : 0d;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal override void SetValue(double value, int row, int col)
         {
@@ -262,7 +262,7 @@ namespace Calcpad.Core
         internal override RealValue L1Norm() => _hpRows[0].InfNorm();
 
 
-        // L∞ (Infinity) or Chebyshev norm     
+        // L∞ (Infinity) or Chebyshev norm
         internal override RealValue InfNorm() => _hpRows[0].InfNorm();
         internal HpVector EigenValues(int count)
         {
@@ -287,7 +287,7 @@ namespace Calcpad.Core
             Matrix M = new(count, _rowCount + 1);
             for (int i = 0; i < count; ++i)
             {
-                M[indexes[i], 0] = _hpRows[0][i]; 
+                M[indexes[i], 0] = _hpRows[0][i];
                 M[i, indexes[i] + 1] = RealValue.One;
             }
             return M;

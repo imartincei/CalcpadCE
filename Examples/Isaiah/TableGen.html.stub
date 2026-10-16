@@ -1,0 +1,399 @@
+<div class="calcpad-output">
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <span class="b1">[</span>
+   0; 2; 3
+   <span class="b0">|</span>
+   4; 5; 6
+   <span class="b0">|</span>
+   1; 4;
+   <span class="dvc">
+    0
+    <span class="dvl">
+    </span>
+    0
+   </span>
+   <span class="b1">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">4</span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>long</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">|</span>
+   1; 2; 3; 4
+   <span class="b0">|</span>
+   5; 6; 7; 8
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <style>.calcpad-table { border-collapse: collapse; width: 100%; margin: 20px 0; }.calcpad-table thead tr { background-color: #dfdfdf; }.calcpad-table th, .calcpad-table td { border: 1px solid #000000; padding: 10px; }.calcpad-table th { text-align: center; font-weight: bold; }.calcpad-table tbody td:first-child { font-weight: bold; background-color: #dfdfdf; }.calcpad-table.no-index tbody td:first-child { font-weight: normal; background-color: #ffffff; }.calcpad-table tbody td { text-align: center; background-color: #ffffff;}</style>
+ <p>Headers and indices accept arrays, e.g. ["Row 1", "Row 2"], comma-separated strings, e.g. "Row 1, Row 2", or "none"/empty to hide.</p>
+ <script>function d(v) { return v == null ? "none" : v; }function parseParam(v) {    if (v == null) return "none";    if (Array.isArray(v)) return v;    if (typeof v === "string") return v;    return "none";}window.tableData = {    matrix: [[0, 2, 3], [4, 5, 6], [1, 4, NaN]],    headers: parseParam(["Col 1", "Col 2", "Col 3"]),    indices: parseParam(["Row 1", "Row 2", "Row 3"])};</script>
+ <div id="table1">
+ </div>
+ <script>
+  function compareWithOperator(value, operatorSymbol, compareValue) {    switch (operatorSymbol) {        case "≡":            return value === compareValue;        case "≠":            return value !== compareValue;        case "≤":            return value <= compareValue;        case "≥":            return value >= compareValue;        default:    }}(function() {    const data = window.tableData;    const matrix = data.matrix;    let headers = data.headers;    let indices = data.indices;    const showHeaders = headers !== "none";    const showIndices = indices !== "none";    if (showHeaders && typeof headers === "string") {        headers = headers.split(",").map(function(s) { return s.trim(); });    }    if (showIndices && typeof indices === "string") {        var baseText = indices;        indices = [];        for (var i = 0; i < matrix.length; i++) {            indices.push(baseText + " " + (i + 1));        }    }    const rowCount = showIndices ? indices.length : matrix.length;    let html = showIndices ? "<table class=\"calcpad-table\">" : "<table class=\"calcpad-table no-index\">";    if (showHeaders) {        html += "<thead><tr>";        if (showIndices) { html += "<th></th>"; }        for (let col = 0; col < headers.length; col++) {            html += "<th>" + headers[col] + "</th>";        }        html += "</tr></thead>";    }    html += "<tbody>";    for (let row = 0; row < rowCount; row++) {        html += "<tr>";        if (showIndices) { html += "<td>" + indices[row] + "</td>"; }        for (let col = 0; col < matrix[row].length; col++) {            const value = matrix[row][col];            let bgColor;            if ((true && value === 0) || isNaN(value)) {                bgColor = "black";            }            html += "<td style=\"background-color: " + bgColor + ";\">" + value + "</td>";        }        html += "</tr>";    }    html += "</tbody></table>";    document.getElementById("table1").innerHTML = html;})();
+ </script>
+ <script>function d(v) { return v == null ? "none" : v; }function parseParam(v) {    if (v == null) return "none";    if (Array.isArray(v)) return v;    if (typeof v === "string") return v;    return "none";}window.tableData = {    matrix: [[0, 2, 3], [4, 5, 6], [1, 4, NaN]],    headers: parseParam(["Col 1", "Col 2", "Col 3"]),    indices: parseParam("Row")};</script>
+ <div id="table2">
+ </div>
+ <script>
+  function compareWithOperator(value, operatorSymbol, compareValue) {    switch (operatorSymbol) {        case "≡":            return value === compareValue;        case "≠":            return value !== compareValue;        case "≤":            return value <= compareValue;        case "≥":            return value >= compareValue;        default:    }}(function() {    const data = window.tableData;    const matrix = data.matrix;    let headers = data.headers;    let indices = data.indices;    const showHeaders = headers !== "none";    const showIndices = indices !== "none";    if (showHeaders && typeof headers === "string") {        headers = headers.split(",").map(function(s) { return s.trim(); });    }    if (showIndices && typeof indices === "string") {        var baseText = indices;        indices = [];        for (var i = 0; i < matrix.length; i++) {            indices.push(baseText + " " + (i + 1));        }    }    const rowCount = showIndices ? indices.length : matrix.length;    let html = showIndices ? "<table class=\"calcpad-table\">" : "<table class=\"calcpad-table no-index\">";    if (showHeaders) {        html += "<thead><tr>";        if (showIndices) { html += "<th></th>"; }        for (let col = 0; col < headers.length; col++) {            html += "<th>" + headers[col] + "</th>";        }        html += "</tr></thead>";    }    html += "<tbody>";    for (let row = 0; row < rowCount; row++) {        html += "<tr>";        if (showIndices) { html += "<td>" + indices[row] + "</td>"; }        for (let col = 0; col < matrix[row].length; col++) {            const value = matrix[row][col];            let bgColor;            if ((true && value === 0) || isNaN(value)) {                bgColor = "black";            } else {                bgColor = compareWithOperator(value, "≤", 1) ? "lime" : "pink";            }            html += "<td style=\"background-color: " + bgColor + ";\">" + value + "</td>";        }        html += "</tr>";    }    html += "</tbody></table>";    document.getElementById("table2").innerHTML = html;})();
+ </script>
+ <script>function d(v) { return v == null ? "none" : v; }function parseParam(v) {    if (v == null) return "none";    if (Array.isArray(v)) return v;    if (typeof v === "string") return v;    return "none";}window.tableData = {    matrix: [[0, 2, 3], [4, 5, 6], [1, 4, NaN]],    headers: parseParam("none"),    indices: parseParam("none")};</script>
+ <div id="table3">
+ </div>
+ <script>
+  function compareWithOperator(value, operatorSymbol, compareValue) {    switch (operatorSymbol) {        case "≡":            return value === compareValue;        case "≠":            return value !== compareValue;        case "≤":            return value <= compareValue;        case "≥":            return value >= compareValue;        default:    }}(function() {    const data = window.tableData;    const matrix = data.matrix;    let headers = data.headers;    let indices = data.indices;    const showHeaders = headers !== "none";    const showIndices = indices !== "none";    if (showHeaders && typeof headers === "string") {        headers = headers.split(",").map(function(s) { return s.trim(); });    }    if (showIndices && typeof indices === "string") {        var baseText = indices;        indices = [];        for (var i = 0; i < matrix.length; i++) {            indices.push(baseText + " " + (i + 1));        }    }    const rowCount = showIndices ? indices.length : matrix.length;    let html = showIndices ? "<table class=\"calcpad-table\">" : "<table class=\"calcpad-table no-index\">";    if (showHeaders) {        html += "<thead><tr>";        if (showIndices) { html += "<th></th>"; }        for (let col = 0; col < headers.length; col++) {            html += "<th>" + headers[col] + "</th>";        }        html += "</tr></thead>";    }    html += "<tbody>";    for (let row = 0; row < rowCount; row++) {        html += "<tr>";        if (showIndices) { html += "<td>" + indices[row] + "</td>"; }        for (let col = 0; col < matrix[row].length; col++) {            const value = matrix[row][col];            let bgColor;            if ((true && value === 0) || isNaN(value)) {                bgColor = "black";            }            html += "<td style=\"background-color: " + bgColor + ";\">" + value + "</td>";        }        html += "</tr>";    }    html += "</tbody></table>";    document.getElementById("table3").innerHTML = html;})();
+ </script>
+ <script>function d(v) { return v == null ? "none" : v; }function parseParam(v) {    if (v == null) return "none";    if (Array.isArray(v)) return v;    if (typeof v === "string") return v;    return "none";}window.tableData = {    matrix: [[0, 2, 3], [4, 5, 6], [1, 4, NaN]],    headers: parseParam(),    indices: parseParam()};</script>
+ <div id="table4">
+ </div>
+ <script>
+  function compareWithOperator(value, operatorSymbol, compareValue) {    switch (operatorSymbol) {        case "≡":            return value === compareValue;        case "≠":            return value !== compareValue;        case "≤":            return value <= compareValue;        case "≥":            return value >= compareValue;        default:    }}(function() {    const data = window.tableData;    const matrix = data.matrix;    let headers = data.headers;    let indices = data.indices;    const showHeaders = headers !== "none";    const showIndices = indices !== "none";    if (showHeaders && typeof headers === "string") {        headers = headers.split(",").map(function(s) { return s.trim(); });    }    if (showIndices && typeof indices === "string") {        var baseText = indices;        indices = [];        for (var i = 0; i < matrix.length; i++) {            indices.push(baseText + " " + (i + 1));        }    }    const rowCount = showIndices ? indices.length : matrix.length;    let html = showIndices ? "<table class=\"calcpad-table\">" : "<table class=\"calcpad-table no-index\">";    if (showHeaders) {        html += "<thead><tr>";        if (showIndices) { html += "<th></th>"; }        for (let col = 0; col < headers.length; col++) {            html += "<th>" + headers[col] + "</th>";        }        html += "</tr></thead>";    }    html += "<tbody>";    for (let row = 0; row < rowCount; row++) {        html += "<tr>";        if (showIndices) { html += "<td>" + indices[row] + "</td>"; }        for (let col = 0; col < matrix[row].length; col++) {            const value = matrix[row][col];            let bgColor;            if ((true && value === 0) || isNaN(value)) {                bgColor = "black";            } else {                bgColor = compareWithOperator(value, "≤", 1) ? "lime" : "pink";            }            html += "<td style=\"background-color: " + bgColor + ";\">" + value + "</td>";        }        html += "</tr>";    }    html += "</tbody></table>";    document.getElementById("table4").innerHTML = html;})();
+ </script>
+ <script>function d(v) { return v == null ? "none" : v; }function parseParam(v) {    if (v == null) return "none";    if (Array.isArray(v)) return v;    if (typeof v === "string") return v;    return "none";}window.tableData = {    matrix: [[1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 3, 4], [5, 6, 7, 8]],    headers: parseParam("none"),    indices: parseParam("Row")};</script>
+ <div id="table5">
+ </div>
+ <script>
+  function compareWithOperator(value, operatorSymbol, compareValue) {    switch (operatorSymbol) {        case "≡":            return value === compareValue;        case "≠":            return value !== compareValue;        case "≤":            return value <= compareValue;        case "≥":            return value >= compareValue;        default:    }}(function() {    const data = window.tableData;    const matrix = data.matrix;    let headers = data.headers;    let indices = data.indices;    const showHeaders = headers !== "none";    const showIndices = indices !== "none";    if (showHeaders && typeof headers === "string") {        headers = headers.split(",").map(function(s) { return s.trim(); });    }    if (showIndices && typeof indices === "string") {        var baseText = indices;        indices = [];        for (var i = 0; i < matrix.length; i++) {            indices.push(baseText + " " + (i + 1));        }    }    const rowCount = showIndices ? indices.length : matrix.length;    let html = showIndices ? "<table class=\"calcpad-table\">" : "<table class=\"calcpad-table no-index\">";    if (showHeaders) {        html += "<thead><tr>";        if (showIndices) { html += "<th></th>"; }        for (let col = 0; col < headers.length; col++) {            html += "<th>" + headers[col] + "</th>";        }        html += "</tr></thead>";    }    html += "<tbody>";    for (let row = 0; row < rowCount; row++) {        html += "<tr>";        if (showIndices) { html += "<td>" + indices[row] + "</td>"; }        for (let col = 0; col < matrix[row].length; col++) {            const value = matrix[row][col];            let bgColor;            if ((true && value === 0) || isNaN(value)) {                bgColor = "black";            }            html += "<td style=\"background-color: " + bgColor + ";\">" + value + "</td>";        }        html += "</tr>";    }    html += "</tbody></table>";    document.getElementById("table5").innerHTML = html;})();
+ </script>
+</div>

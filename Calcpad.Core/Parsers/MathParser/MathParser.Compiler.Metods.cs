@@ -94,6 +94,19 @@ namespace Calcpad.Core
                     null
                 );
 
+            private static readonly MethodInfo EvaluateCustomFunctionDefaultsMethod =
+                typeof(Evaluator).GetMethod(
+                    nameof(Evaluator.EvaluateFunction),
+                    BindingFlags.Instance | BindingFlags.NonPublic,
+                    Type.DefaultBinder,
+                    [
+                        typeof(CustomFunction),
+                        typeof(int[]),
+                        typeof(IValue[])
+                    ],
+                    null
+                );
+
             private static readonly MethodInfo EvaluateCustomFunctionNMethod =
                 typeof(Evaluator).GetMethod(
                     nameof(Evaluator.EvaluateFunction),

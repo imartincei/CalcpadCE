@@ -1,0 +1,81 @@
+<div class="calcpad-output">
+ <!-- Area and arc length of a circular sector from radius and central angle, valid for $\alpha \le 360°$. -->
+ <h3>Area and Arch Length of Circular Sector</h3>
+ <div style="max-width:110mm;">
+  <img alt="sector-angle.png" class="side" src="Images/math/area/sector-angle.png" style="height:60pt;"/>
+ </div>
+ <p>
+  Radius -
+  <span class="eq">
+   <var>r</var>
+   =
+   <u class="input-4">1</u>
+  </span>
+ </p>
+ <p>
+  Angle -
+  <span class="eq">
+   <var>α</var>
+   =
+   <u class="input-5">60</u>
+  </span>
+  °
+ </p>
+ <!--
+<-->
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>r</var>
+    <sup>2</sup>
+    ·
+    <var>α</var>
+    <span class="dvl">
+    </span>
+    360
+   </span>
+   =
+   <span class="dvc">
+    3.14 · 1
+    <sup>2</sup>
+    · 60
+    <span class="dvl">
+    </span>
+    360
+   </span>
+   = 0.524
+  </span>
+ </p>
+ <p>Arch length</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>r</var>
+    ·
+    <var>α</var>
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   =
+   <span class="dvc">
+    3.14 · 1 · 60
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   = 1.05
+  </span>
+ </p>
+ <!--
+<-->
+</div>

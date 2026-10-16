@@ -1,0 +1,95 @@
+<div class="calcpad-output">
+ <!-- Wires raw HTML $select$ and input controls into a worksheet to drive a parametric cross-section design, demonstrating Calcpad form-based UI.
+<p>Copy the code into the Desktop application to modify the input values. -->
+ <p>
+  Cross section:
+  <select name="section">
+  </select>
+ </p>
+ <option value="100;150">RHS 100x150</option>
+ <option value="150;200">RHS 150x200</option>
+ <option value="200;250">RHS 200x250</option>
+ <p id="section">
+  Dimensions:
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-8">100</u>
+   <i>mm</i>
+  </span>
+  ,
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-8">150</u>
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  Steel grade:
+  <input id="S235" name="steel" type="radio" value="235"/>
+  <label for="S235">S235</label>
+  <input id="S275" name="steel" type="radio" value="275"/>
+  <label for="S275">S275</label>
+  <input id="S355" name="steel" type="radio" value="355"/>
+  <label for="S355">S355</label>
+ </p>
+ <p id="steel" style="display:none;">
+  <span class="eq">
+   <var>f</var>
+   <sub>y</sub>
+   =
+   <u class="input-17">235</u>
+   <i>MPa</i>
+  </span>
+ </p>
+ <p>
+  Steel yield strength:
+  <span class="eq">
+   <var>f</var>
+   <sub>y</sub>
+   = 235
+   <i>MPa</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>Additional options:</p>
+ <p>
+  <input id="roll" name="Rolled" type="checkbox" value="1"/>
+  <label for="roll">Hot rolled</label>
+ </p>
+ <p id="Rolled" style="display:none;">
+  <span class="eq">
+   <var>Rolled</var>
+   =
+   <u class="input-23">1</u>
+  </span>
+ </p>
+ <p>
+  <input id="zink" name="Zn" type="checkbox" value="1"/>
+  <label for="Zn">Zink plated</label>
+ </p>
+ <p id="Zn" style="display:none;">
+  <span class="eq">
+   <var>Zinc</var>
+   =
+   <u class="input-26">1</u>
+  </span>
+ </p>
+ <p>Values:</p>
+ <p>
+  <span class="eq">
+   <var>Rolled</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>Zinc</var>
+   = 1
+  </span>
+ </p>
+</div>

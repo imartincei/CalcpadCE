@@ -217,7 +217,7 @@ namespace Calcpad.Core
             VectorMultiFunctions[index];
 
         internal Vector EvaluateOperator(long index, Vector a, in RealValue b) =>
-            a is HpVector hp_a ? 
+            a is HpVector hp_a ?
             HpVector.EvaluateOperator(_calc.GetOperator(index), hp_a, b, index) :
             Vector.EvaluateOperator(_calc.GetOperator(index), a, b, index);
 
@@ -227,7 +227,7 @@ namespace Calcpad.Core
             Vector.EvaluateOperator(_calc.GetOperator(index), a, b, index);
 
         internal Vector EvaluateOperator(long index, Vector a, Vector b) =>
-            a is HpVector hp_a && b is HpVector hp_b && 
+            a is HpVector hp_a && b is HpVector hp_b &&
             (index != Calculator.PowerOperatorIndex || hp_a.Units == null) ?
             HpVector.EvaluateOperator(_calc.GetOperator(index), hp_a, hp_b, index) :
             Vector.EvaluateOperator(_calc.GetOperator(index), a, b, index);
@@ -265,7 +265,7 @@ namespace Calcpad.Core
             return new(n);
         }
 
-        private static HpVector CreateHp(in IValue length) => 
+        private static HpVector CreateHp(in IValue length) =>
             new(IValue.AsInt(length), null);
 
         private static IValue Length(in IValue vector) =>

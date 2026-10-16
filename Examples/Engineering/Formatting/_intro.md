@@ -1,0 +1,6 @@
+[CalcpadCE](https://calcpad-ce.org) gives a worksheet two output channels: the formula trace and a layer of presentation directives — [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS), [Markdown](https://en.wikipedia.org/wiki/Markdown), inline HTML, page-break controls and number-formatting commands — so the same source produces both an editable calculation and a print-ready report.
+
+The six worksheets in this group cover the toolkit end to end.
+[CSS Classes](#css-classes) demonstrates the built-in classes (`ref`, `ok`, `err`, `warn`, `note`) and how to define your own; [Design Check](#design-check) wraps those classes in a reusable `check$(s; f)` function that flips between green and red based on a utilisation ratio; and [Page Header with Logo](#page-header-with-logo) builds a printable header from a logo SVG and a small HTML table.
+[Markdown](#markdown) toggles `#md on` to mix Markdown headings, lists and tables with CalcpadCE math, and [Beam Design with Markdown](#beam-design-with-markdown) applies that mode to a full Eurocode 2 RC beam check, complete with page breaks.
+[Rounding and Formatting](#rounding-and-formatting) closes the tour with the `#round`, `#format` and `#scale` directives for tuning numerical display.

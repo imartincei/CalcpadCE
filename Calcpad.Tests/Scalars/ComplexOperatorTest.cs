@@ -225,7 +225,7 @@
         }
         #endregion
 
-        #region AdditionAndSubtraction 
+        #region AdditionAndSubtraction
         [Fact]
         [Trait("Category", "Addition")]
         public void Add_3_Plus_4i__2_Minus_3i()

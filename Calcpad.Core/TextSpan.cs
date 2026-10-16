@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Buffers;
 
 namespace Calcpad.Core
 {
@@ -36,7 +36,7 @@ namespace Calcpad.Core
 
         public readonly bool StartsWith(char c) => _contents[_start] == c;
 
-        public readonly bool StartsWithAny(char[] chars) => chars.Contains(_contents[_start]);
+        public readonly bool StartsWithAny(SearchValues<char> chars) => chars.Contains(_contents[_start]);
 
         public readonly bool Equals(ReadOnlySpan<char> s) => _contents[_start.._end].SequenceEqual(s);
     }

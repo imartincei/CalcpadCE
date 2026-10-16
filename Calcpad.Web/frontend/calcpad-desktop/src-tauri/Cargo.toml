@@ -1,0 +1,44 @@
+[package]
+name = "calcpad-desktop"
+description = "CalcpadCE desktop shell"
+authors = ["CalcpadCE Contributors"]
+license = "MIT"
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "calcpad_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-fs = "2"
+tauri-plugin-persisted-scope = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-store = "2"
+tauri-plugin-process = "2"
+tauri-plugin-os = "2"
+tauri-plugin-log = "2"
+tauri-plugin-single-instance = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-window-state = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# Only for the per-launch API token — already in the tree transitively, so this
+# pins nothing new. Kept off `rand` deliberately: this needs OS entropy, not a PRNG.
+getrandom = "0.2"
+tokio = { version = "1", features = ["sync", "time", "process", "io-util", "rt", "macros"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_System_JobObjects", "Win32_System_Threading", "Win32_Foundation", "Win32_Security"] }
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

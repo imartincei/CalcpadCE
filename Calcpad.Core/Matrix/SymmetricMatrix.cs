@@ -60,7 +60,7 @@ namespace Calcpad.Core
 
         internal UpperTriangularMatrix CholeskyDecomposition()
         {
-            var U = GetCholesky() ?? 
+            var U = GetCholesky() ??
                 throw Exceptions.MatrixNotPositiveDefinite();
 
             return U;
@@ -109,7 +109,7 @@ namespace Calcpad.Core
         }
 
         // Get LDLT decomposition by storing LT in U
-        // and D in the main diagonal of U 
+        // and D in the main diagonal of U
         private UpperTriangularMatrix GetLDLT()
         {
             UpperTriangularMatrix U = new(_rowCount);
@@ -171,7 +171,7 @@ namespace Calcpad.Core
 
         internal override Vector LSolve(Vector v)
         {
-            var U = GetLDLT() ?? 
+            var U = GetLDLT() ??
                 throw Exceptions.MatrixSingular();
 
             var x = new RealValue[_rowCount];
@@ -191,7 +191,7 @@ namespace Calcpad.Core
 
         internal override Matrix MSolve(Matrix M)
         {
-            var U = GetLDLT() ?? 
+            var U = GetLDLT() ??
                 throw Exceptions.MatrixSingular();
 
             return MSolveForU(U, M);
@@ -199,7 +199,7 @@ namespace Calcpad.Core
 
         internal virtual Matrix CmSolve(Matrix M)
         {
-            var U = GetCholesky() ?? 
+            var U = GetCholesky() ??
                 throw Exceptions.MatrixNotPositiveDefinite();
 
             return MSolveForU(U, M, true);
@@ -251,7 +251,7 @@ namespace Calcpad.Core
 
         internal override Matrix Invert()
         {
-            var U = GetLDLT() ?? 
+            var U = GetLDLT() ??
                 throw Exceptions.MatrixSingular(); // Decompose the matrix by LDLT decomp.
 
             return GetInverse(U);
@@ -317,7 +317,7 @@ namespace Calcpad.Core
             var len = _rows.Length;
             if (len == 0)
                 return RealValue.Zero;
-            
+
             var count = 0d;
             for (int i = 0; i < len; ++i)
             {
@@ -416,7 +416,7 @@ namespace Calcpad.Core
 
         internal override Matrix Transpose() => RawCopy();
 
-        // L∞ (Infinity) or Chebyshev norm     
+        // L∞ (Infinity) or Chebyshev norm
         internal override RealValue InfNorm()
         {
             RealValue norm = RealValue.Zero;
@@ -458,17 +458,17 @@ namespace Calcpad.Core
 
         /*
         Householder reduction of a real, symmetric matrix. On output, the orthogonal matrix Q
-        is returned effecting the transformation. d returns the diagonal elements of the tridiagonal 
+        is returned effecting the transformation. d returns the diagonal elements of the tridiagonal
         matrix, and e[0..n] the off-diagonal elements, with e[0] = 0.
 
         The algorithm was adapted from:
         Numerical Recipes 3rd Edition: The Art of Scientific Computing (3rd. ed.).
-        William H. Press, Saul A. Teukolsky, William T. Vetterling, and Brian P. Flannery. 2007. 
+        William H. Press, Saul A. Teukolsky, William T. Vetterling, and Brian P. Flannery. 2007.
         Cambridge University Press, USA.
         */
 
         private RealValue[][] Tridiagonalize(out RealValue[] d, out RealValue[] e, bool eigenvecs)
-        {                       
+        {
             d = new RealValue[_rowCount];
             e = new RealValue[_rowCount];
             var Q = new RealValue[_rowCount][];
@@ -594,20 +594,20 @@ namespace Calcpad.Core
         }
 
         /*
-        QL algorithm with implicit shifts, to determine the eigenvalues and eigenvectors of a 
-        real, symmetric, tridiagonal matrix, or of a real, symmetric matrix previously reduced 
+        QL algorithm with implicit shifts, to determine the eigenvalues and eigenvectors of a
+        real, symmetric, tridiagonal matrix, or of a real, symmetric matrix previously reduced
         by Tridiagonalize. On input, d[0..n] contains the diagonal elements of the tridiagonal matrix.
-        On output, it returns the eigenvalues. The vector e[0..n] inputs the subdiagonal elements 
-        of the tridiagonal matrix, with e[0] arbitrary. On output e is destroyed. When finding only 
-        the eigenvalues, several lines may be omitted, as noted in the comments. 
-        If the eigenvectors of a tridiagonal matrix are desired, the matrix Q[0..n][0..n] is input 
-        as the identity matrix. If the eigenvectors of the matrix that has been reduced by Tridiagonalize 
-        are required, then Q is input as the matrix output by Tridiagonalize. In either case, the kth column 
+        On output, it returns the eigenvalues. The vector e[0..n] inputs the subdiagonal elements
+        of the tridiagonal matrix, with e[0] arbitrary. On output e is destroyed. When finding only
+        the eigenvalues, several lines may be omitted, as noted in the comments.
+        If the eigenvectors of a tridiagonal matrix are desired, the matrix Q[0..n][0..n] is input
+        as the identity matrix. If the eigenvectors of the matrix that has been reduced by Tridiagonalize
+        are required, then Q is input as the matrix output by Tridiagonalize. In either case, the kth column
         of Q returns the normalized eigenvector corresponding to d[k].
 
         The algorithm was adapted from:
         Numerical Recipes 3rd Edition: The Art of Scientific Computing (3rd. ed.).
-        William H. Press, Saul A. Teukolsky, William T. Vetterling, and Brian P. Flannery. 2007. 
+        William H. Press, Saul A. Teukolsky, William T. Vetterling, and Brian P. Flannery. 2007.
         Cambridge University Press, USA.
         */
         private static void ImplicitQL(RealValue[] d, RealValue[] e, RealValue[][] Q, bool eigenvecs)
@@ -645,7 +645,7 @@ namespace Calcpad.Core
                         var c = s;
                         var p = RealValue.Zero;
                         var i = m - 1;
-                        while (i >= l)     // A plane rotation as in the original QL, 
+                        while (i >= l)     // A plane rotation as in the original QL,
                         {                  // followed by Givens rotations to restore tridiagonal form
                             var i1 = i + 1;
                             var f = s * e[i];

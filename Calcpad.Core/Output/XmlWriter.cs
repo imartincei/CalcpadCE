@@ -5,7 +5,7 @@ namespace Calcpad.Core
 {
     internal class XmlWriter : OutputWriter
     {
-        internal XmlWriter(MathSettings settings, bool phasor) : base(settings, phasor) 
+        internal XmlWriter(MathSettings settings, bool phasor) : base(settings, phasor)
         {
             AngleUnits =
             [
@@ -16,7 +16,7 @@ namespace Calcpad.Core
         }
         protected override OutputFormat FormatType => OutputFormat.Xml;
         internal const string NormalText = "<m:rPr><m:nor/></m:rPr>";
-        internal static readonly string UnitDivision = Run("∕", 
+        internal static readonly string UnitDivision = Run("∕",
         @$"{NormalText}<w:rPr>
             <w:rFonts w:ascii=""Cambria Math"" w:hAnsi=""Cambria Math"" />
             <w:sz w:val=""20"" />
@@ -25,17 +25,17 @@ namespace Calcpad.Core
         internal override string UnitString(Unit units) => units.Xml;
         internal override string FormatInput(string s, Unit units, int line, bool isCalculated)
         {
-            const string format1 = 
+            const string format1 =
             @$"<w:rPr>
                 <w:color w:val=""FF0000"" />
                 <w:shd w:fill=""FFFCCC"" />
             </w:rPr>";
-            const string format2 = 
+            const string format2 =
             @$"<w:rPr>
                 <w:u />
                 <w:shd w:val=""clear"" w:color=""auto"" w:fill=""FFFCCC"" />
             </w:rPr>";
-            const string format3 = 
+            const string format3 =
             @$"<w:rPr>
                 <w:shd w:val=""clear"" w:color=""auto""  w:fill=""FFFCCC"" />
             </w:rPr>";
@@ -84,15 +84,15 @@ namespace Calcpad.Core
         {
             const char vecCHar = '\u20D7';
             var isVector = s[0] == vecCHar;
-            const string format = 
+            const string format =
             @$"<w:rPr>
                 <w:color w:val=""0066DD""/>
             </w:rPr>";
-            const string formatBold = 
+            const string formatBold =
             @$"<w:rPr>
                 <w:color w:val=""0044AA""/>
             </w:rPr>";
-            return isVector ? 
+            return isVector ?
                 @$"<m:acc>
                     <m:accPr>
                         <m:chr m:val=""{vecCHar}""/>
@@ -107,7 +107,7 @@ namespace Calcpad.Core
 
         private static string FormatUnitsStatic(string s)
         {
-            const string format = 
+            const string format =
             @$"{NormalText}<w:rPr>
                 <w:rFonts w:ascii=""Cambria Math"" w:hAnsi=""Cambria Math"" />
                 <w:sz w:val=""22"" />
@@ -306,7 +306,7 @@ namespace Calcpad.Core
                     RunMinusNormal + Run(s[1..]) :
                     Run(s);
         }
- 
+
         private static readonly string RunI = Run("i");
         private static readonly string RunPlus = Run("+");
         private static readonly string RunMinus = Run("-");
@@ -398,7 +398,7 @@ namespace Calcpad.Core
             return string.Concat(sa[..index], "<m:endChr m:val=\"}\"/>", sa[(index + rightBracketString.Length)..]);
         }
 
-        private const string mPr = 
+        private const string mPr =
         @"<m:mPr>
             <m:mcs>
                 <m:mc>

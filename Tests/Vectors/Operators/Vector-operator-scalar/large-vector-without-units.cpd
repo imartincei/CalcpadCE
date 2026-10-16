@@ -76,7 +76,7 @@ f(v) = v!','c = f(v)
 	x.i = ((i - 1)^2 - 10*cos(i) + 3*(-1)^(i - 1) - 5*sin(i))/4.0
 	#if x.i > 50
 		x.i = exp(0.1*i)
-		
+
 	#end if
 #loop
 #for i = 6 : 10
@@ -110,7 +110,7 @@ b = -3
 c = x > b
 f(x; b) = x > b','c = f(x; b)
 
-"Less than or equal 
+"Less than or equal
 x
 b = -7
 c = x ≤ b
@@ -123,7 +123,7 @@ c = y ≥ b
 f(y; b) = y ≥ b','c = f(y; b)
 
 '<h1>Logical operators</h1>
-"Logical AND 
+"Logical AND
 y
 b = 0
 c = y ∧ b

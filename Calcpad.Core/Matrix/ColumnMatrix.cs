@@ -82,7 +82,7 @@ namespace Calcpad.Core
             return c;
         }
 
-        // L∞ (Infinity) or Chebyshev norm     
+        // L∞ (Infinity) or Chebyshev norm
         internal override RealValue InfNorm() => _rows[0].InfNorm();
 
         internal Vector ColRef() => _rows[0];

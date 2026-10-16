@@ -53,7 +53,7 @@
         }
         #endregion
 
-        #region Slope  
+        #region Slope
         [Fact]
         [Trait("Category", "Slope")]
         public void Slope_Exp()

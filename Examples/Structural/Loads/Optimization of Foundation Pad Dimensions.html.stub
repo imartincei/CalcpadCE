@@ -1,0 +1,1316 @@
+<div class="calcpad-output">
+ <!-- Numerical sizing of a rectangular foundation pad under axial force and biaxial bending: the side-ratio $k = a / b$ that minimises the base area while keeping the maximum stress below the permissible value and avoiding uplift is found with the embedded `Inf` solver. -->
+ <h3>Single load case problem</h3>
+ <p>Loads:</p>
+ <p>
+  Compression -
+  <span class="eq">
+   <var>N</var>
+   = 1000
+  </span>
+  kN
+ </p>
+ <p>
+  Bending along x-axis -
+  <span class="eq">
+   <var>M</var>
+   <sub>x</sub>
+   = 200
+  </span>
+  kNm
+ </p>
+ <p>
+  Bending along y-axis -
+  <span class="eq">
+   <var>M</var>
+   <sub>y</sub>
+   = 400
+  </span>
+  kNm
+ </p>
+ <p>
+  Permissible base stress -
+  <span class="eq">
+   <var>R</var>
+   <sub>0</sub>
+   = 200
+  </span>
+  kPa
+ </p>
+ <p>The mean foundation size is determined, using the fixed point method:</p>
+ <p>
+  Number of iterations -
+  <span class="eq">
+   <var>n</var>
+   = 10
+  </span>
+ </p>
+ <p>
+  Initial value -
+  <span class="eq">
+   <var>a</var>
+   =
+   <span class="dvc">
+    <var>N</var>
+    <span class="dvl">
+    </span>
+    <var>R</var>
+    <sub>0</sub>
+   </span>
+   =
+   <span class="dvc">
+    1000
+    <span class="dvl">
+    </span>
+    200
+   </span>
+   = 5
+  </span>
+  m
+ </p>
+ <p>
+  Solution -
+  <span class="eq">
+   <var>a</var>
+   =
+   <span class="cond">$Repeat</span>
+   {
+   <var>a</var>
+   =
+   <small class="nth">3</small>
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>N</var>
+     ·
+     <var>a</var>
+     +
+     <b class="b0">|</b>
+     <var>M</var>
+     <sub>x</sub>
+     <b class="b0">|</b>
+     +
+     <b class="b0">|</b>
+     <var>M</var>
+     <sub>y</sub>
+     <b class="b0">|</b>
+     <span class="dvl">
+     </span>
+     <var>R</var>
+     <sub>0</sub>
+    </span>
+   </span>
+   <span class="cond">for</span>
+   <var>k</var>
+   = 1...
+   <var>n</var>
+   } = 2.49
+  </span>
+ </p>
+ <p>The target function (to be minimized) is the base area:</p>
+ <var>A</var>
+ =
+ <var>a</var>
+ ·
+ <var>b</var>
+ = min
+ <p>
+  The target parameter is the ratio of the dimensions -
+  <var>k</var>
+  =
+  <var>a</var>
+  /
+  <var>b</var>
+  , within the limits:
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>min</sub>
+   = 0.2
+  </span>
+  and
+  <span class="eq">
+   <var>k</var>
+   <sub>max</sub>
+   = 5
+  </span>
+ </p>
+ <p>Limits for dimensions:</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   <sub>min</sub>
+   =
+   <span class="dvc">
+    <var>k</var>
+    <sub>min</sub>
+    ·
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   =
+   <span class="dvc">
+    0.2 · 2.49
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   = 0.125
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   <sub>max</sub>
+   =
+   <var>k</var>
+   <sub>max</sub>
+   ·
+   <var>a</var>
+   · 4 = 5 · 2.49 · 4 = 49.82
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>min</sub>
+   = 1
+  </span>
+  - for |
+  <var>M</var>
+  <sub>x</sub>
+  | &lt; |
+  <var>M</var>
+  <sub>y</sub>
+  |
+ </p>
+ <p>Theoretical value of the target parameter:</p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   =
+   <b>max</b>
+   <span class="b1">(</span>
+   <var>k</var>
+   <sub>min</sub>
+   ;
+   <b>min</b>
+   <span class="b1">(</span>
+   <span class="b1">|</span>
+   <span class="dvc">
+    <var>M</var>
+    <sub>y</sub>
+    <span class="dvl">
+    </span>
+    <var>M</var>
+    <sub>x</sub>
+   </span>
+   <span class="b1">|</span>
+   ;
+   <var>k</var>
+   <sub>max</sub>
+   <span class="b1">)</span>
+   <span class="b1">)</span>
+   =
+   <b>max</b>
+   <span class="b1">(</span>
+   1;
+   <b>min</b>
+   <span class="b1">(</span>
+   <span class="b1">|</span>
+   <span class="dvc">
+    400
+    <span class="dvl">
+    </span>
+    200
+   </span>
+   <span class="b1">|</span>
+   ; 5
+   <span class="b1">)</span>
+   <span class="b1">)</span>
+   = 2
+  </span>
+ </p>
+ <p>Load eccentricities:</p>
+ <p>
+  <span class="eq">
+   <var>e</var>
+   <sub>x</sub>
+   =
+   <span class="dvc">
+    <var>M</var>
+    <sub>x</sub>
+    <span class="dvl">
+    </span>
+    <var>N</var>
+   </span>
+   =
+   <span class="dvc">
+    200
+    <span class="dvl">
+    </span>
+    1000
+   </span>
+   = 0.2
+  </span>
+  ,
+  <span class="eq">
+   <var>e</var>
+   <sub>y</sub>
+   =
+   <span class="dvc">
+    <var>M</var>
+    <sub>y</sub>
+    <span class="dvl">
+    </span>
+    <var>N</var>
+   </span>
+   =
+   <span class="dvc">
+    400
+    <span class="dvl">
+    </span>
+    1000
+   </span>
+   = 0.4
+  </span>
+ </p>
+ <p>The solution must satisfy the following constraints (resistance criteria):</p>
+ <p>1.The maximal stress must not exceed the permissible value:</p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>max</sub>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   )  =
+   <span class="dvc">
+    <var>N</var>
+    <span class="dvl">
+    </span>
+    <var>a</var>
+    ·
+    <var>b</var>
+   </span>
+   ·
+   <span class="b1">(</span>
+   1 + 6 ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    <b class="b0">|</b>
+    <var>e</var>
+    <sub>x</sub>
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <var>a</var>
+   </span>
+   +
+   <span class="dvc">
+    <b class="b0">|</b>
+    <var>e</var>
+    <sub>y</sub>
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <var>b</var>
+   </span>
+   <span class="b1">)</span>
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <p>2. The minimal stress must be not less than zero (no uplift):</p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>min</sub>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   )  =
+   <span class="dvc">
+    <var>N</var>
+    <span class="dvl">
+    </span>
+    <var>a</var>
+    ·
+    <var>b</var>
+   </span>
+   ·
+   <span class="b1">(</span>
+   1 − 6 ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    <b class="b0">|</b>
+    <var>e</var>
+    <sub>x</sub>
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <var>a</var>
+   </span>
+   +
+   <span class="dvc">
+    <b class="b0">|</b>
+    <var>e</var>
+    <sub>y</sub>
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <var>b</var>
+   </span>
+   <span class="b1">)</span>
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <p>
+  Dimension that satisfies the constraints as a function of the target parameter
+  <var>k</var>
+  :
+ </p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   <sub>p,max</sub>
+   (
+   <var>k</var>
+   )  =
+   <span class="cond">$Find</span>
+   {
+   <var>p</var>
+   <sub>max</sub>
+   (
+   <var>a</var>
+   ;
+   <var>a</var>
+   ·
+   <var>k</var>
+   )  −
+   <var>R</var>
+   <sub>0</sub>
+   ;
+   <var>a</var>
+   ∈ [
+   <var>a</var>
+   <sub>min</sub>
+   ;
+   <var>a</var>
+   <sub>max</sub>
+   ]}
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   <sub>p,min</sub>
+   (
+   <var>k</var>
+   )  =
+   <span class="cond">$Find</span>
+   {
+   <var>p</var>
+   <sub>min</sub>
+   (
+   <var>a</var>
+   ;
+   <var>a</var>
+   ·
+   <var>k</var>
+   ) ;
+   <var>a</var>
+   ∈ [
+   <var>a</var>
+   <sub>min</sub>
+   ;
+   <var>a</var>
+   <sub>max</sub>
+   ]}
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   (
+   <var>k</var>
+   )  =
+   <b>max</b>
+   (
+   <var>a</var>
+   <sub>p,min</sub>
+   (
+   <var>k</var>
+   ) ;
+   <var>a</var>
+   <sub>p,max</sub>
+   (
+   <var>k</var>
+   )  )
+  </span>
+ </p>
+ <p>
+  Foundation base area as a function of the target parameter
+  <var>k</var>
+  :
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   (
+   <var>k</var>
+   )  =
+   <var>a</var>
+   (
+   <var>k</var>
+   )
+   <sup>2</sup>
+   ·
+   <var>k</var>
+  </span>
+ </p>
+ <p>The minimum value of the area and the respective target parameter are calculated by the embedded $Inf function:</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>inf</sub>
+   =
+   <span class="cond">$inf</span>
+   {
+   <var>A</var>
+   (
+   <var>k</var>
+   ) ;
+   <var>k</var>
+   ∈ [
+   <var>k</var>
+   <sub>min</sub>
+   ;
+   <var>k</var>
+   <sub>max</sub>
+   ]} = 11.52
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   =
+   <var>k</var>
+   <sub>inf</sub>
+   = 2
+  </span>
+  - equal to the theoretical value
+ </p>
+ <p>The optimal dimensions of the foundation pad are:</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <var>a</var>
+   (
+   <var>k</var>
+   )  =
+   <var>a</var>
+   ( 2 )  = 2.4
+  </span>
+  m,
+  <span class="eq">
+   <var>b</var>
+   =
+   <var>a</var>
+   ·
+   <var>k</var>
+   = 2.4 · 2 = 4.8
+  </span>
+  m
+ </p>
+ <p>The calculated minimal and maximal base stresses are:</p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>min</sub>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>p</var>
+   <sub>min</sub>
+   ( 2.4; 4.8 )  = 0
+  </span>
+  kPa
+ </p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>max</sub>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>p</var>
+   <sub>max</sub>
+   ( 2.4; 4.8 )  = 173.61
+  </span>
+  kPa2
+ </p>
+ <p>Plot for target function and solution:</p>
+ <svg class="plot" data-plot="svg" height="840px" style="width:272.22pt; height:155.56pt;" version="1.1" viewbox=" 0 0 1470 840" width="1470px" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+   .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+  </style>
+  <g class="plot">
+   <rect class="Frame" height="600" width="1200" x="180" y="120">
+   </rect>
+   <line class="Grid" x1="180" x2="1380" y1="720" y2="720">
+   </line>
+   <text class="sm end" x="161" y="738">0</text>
+   <line class="Grid" x1="180" x2="1380" y1="634.97" y2="634.97">
+   </line>
+   <text class="sm end" x="161" y="652.97">2</text>
+   <line class="Grid" x1="180" x2="1380" y1="549.93" y2="549.93">
+   </line>
+   <text class="sm end" x="161" y="567.93">4</text>
+   <line class="Grid" x1="180" x2="1380" y1="464.9" y2="464.9">
+   </line>
+   <text class="sm end" x="161" y="482.9">6</text>
+   <line class="Grid" x1="180" x2="1380" y1="379.86" y2="379.86">
+   </line>
+   <text class="sm end" x="161" y="397.86">8</text>
+   <line class="Grid" x1="180" x2="1380" y1="294.83" y2="294.83">
+   </line>
+   <text class="sm end" x="161" y="312.83">10</text>
+   <line class="Grid" x1="180" x2="1380" y1="209.8" y2="209.8">
+   </line>
+   <text class="sm end" x="161" y="227.8">12</text>
+   <line class="Grid" x1="180" x2="1380" y1="124.76" y2="124.76">
+   </line>
+   <text class="sm end" x="161" y="142.76">14</text>
+   <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="180" y="772">1</text>
+   <line class="Grid" x1="330" x2="330" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="330" y="772">1.5</text>
+   <line class="Grid" x1="480" x2="480" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="480" y="772">2</text>
+   <line class="Grid" x1="630" x2="630" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="630" y="772">2.5</text>
+   <line class="Grid" x1="780" x2="780" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="780" y="772">3</text>
+   <line class="Grid" x1="930" x2="930" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="930" y="772">3.5</text>
+   <line class="Grid" x1="1080" x2="1080" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="1080" y="772">4</text>
+   <line class="Grid" x1="1230" x2="1230" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="1230" y="772">4.5</text>
+   <text class="sm mid" x="1380" y="772">5</text>
+   <line class="Axis" x1="180" x2="1380" y1="720" y2="720">
+   </line>
+   <text x="1402" y="702">x</text>
+   <text x="8" y="823">[1; 0]</text>
+   <text class="end" x="1462" y="44">[5; 14.11]</text>
+   <polyline class="Series1" points="180,168.98 199.35,179.87 218.71,189.07 238.06,196.84 257.42,203.42 276.77,208.96 296.13,213.62 334.84,220.75 373.55,225.52 412.26,228.44 450.97,229.9 489.68,230.17 528.39,229.47 567.1,227.95 605.81,225.75 644.52,222.98 683.23,219.71 721.94,216.02 760.65,211.95 799.35,207.56 838.06,202.89 876.77,197.97 915.48,192.83 954.19,187.48 992.9,181.96 1031.61,176.28 1070.32,170.46 1109.03,164.5 1147.74,158.43 1186.45,152.24 1225.16,145.96 1263.87,139.59 1302.58,133.13 1341.29,126.6 1380,120">
+   </polyline>
+   <polygon class="Fill1" points="180,720 180,168.98 199.35,179.87 218.71,189.07 238.06,196.84 257.42,203.42 276.77,208.96 296.13,213.62 334.84,220.75 373.55,225.52 412.26,228.44 450.97,229.9 489.68,230.17 528.39,229.47 567.1,227.95 605.81,225.75 644.52,222.98 683.23,219.71 721.94,216.02 760.65,211.95 799.35,207.56 838.06,202.89 876.77,197.97 915.48,192.83 954.19,187.48 992.9,181.96 1031.61,176.28 1070.32,170.46 1109.03,164.5 1147.74,158.43 1186.45,152.24 1225.16,145.96 1263.87,139.59 1302.58,133.13 1341.29,126.6 1380,120 1380,720" stroke-width="0">
+   </polygon>
+   <polyline class="Series2" points="480,720 480,704.2 480,688.4 480,672.6 480,656.8 480,641 480,625.2 480,609.4 480,593.6 480,577.8 480,562 480,546.2 480,530.4 480,514.6 480,498.8 480,483 480,467.2 480,451.4 480,435.6 480,419.8 480,404 480,388.2 480,372.4 480,356.6 480,340.8 480,325 480,309.2 480,293.4 480,277.6 480,261.8 480,246 480,230.2">
+   </polyline>
+   <circle class="Series3" cx="480" cy="230.2" r="10">
+   </circle>
+  </g>
+ </svg>
+ <h3>Multiple load cases problem</h3>
+ <p>Loads:</p>
+ <p>
+  Compression -
+  <span class="eq">
+   <var>N</var>
+   (
+   <var>i</var>
+   )  =
+   <b>take</b>
+   (
+   <var>i</var>
+   ; 500; 1200; 1500; 3000 )
+  </span>
+  kN
+ </p>
+ <p>
+  Bending along x-axis -
+  <span class="eq">
+   <var>M</var>
+   <sub>x</sub>
+   (
+   <var>i</var>
+   )  =
+   <b>take</b>
+   (
+   <var>i</var>
+   ; 100; -500; 200; 100 )
+  </span>
+  kNm
+ </p>
+ <p>
+  Bending along y-axis -
+  <span class="eq">
+   <var>M</var>
+   <sub>y</sub>
+   (
+   <var>i</var>
+   )  =
+   <b>take</b>
+   (
+   <var>i</var>
+   ; 200; -200; 800; 250 )
+  </span>
+  kNm
+ </p>
+ <p>
+  Permissible base stress -
+  <span class="eq">
+   <var>R</var>
+   <sub>0</sub>
+   = 200
+  </span>
+  kPa
+ </p>
+ <p>
+  Mean foundation size -
+  <span class="eq">
+   <var>a</var>
+   = 3.93
+  </span>
+  m (calculated as maximum from all load cases)
+ </p>
+ <p>Limits for the target parameter:</p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>min</sub>
+   = 0.2
+  </span>
+  ,
+  <span class="eq">
+   <var>k</var>
+   <sub>max</sub>
+   = 4
+  </span>
+ </p>
+ <p>Limits for dimensions:</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   <sub>min</sub>
+   =
+   <span class="dvc">
+    <var>k</var>
+    <sub>min</sub>
+    ·
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   =
+   <span class="dvc">
+    0.2 · 3.93
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   = 0.197
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   <sub>max</sub>
+   =
+   <var>k</var>
+   <sub>max</sub>
+   ·
+   <var>a</var>
+   · 4 = 4 · 3.93 · 4 = 62.88
+  </span>
+  m
+ </p>
+ <p>Load eccentricities:</p>
+ <p>
+  <span class="eq">
+   <var>e</var>
+   <sub>x</sub>
+   (
+   <var>i</var>
+   )  =
+   <span class="dvc">
+    <var>M</var>
+    <sub>x</sub>
+    (
+    <var>i</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>N</var>
+    (
+    <var>i</var>
+    )
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <var>e</var>
+   <sub>y</sub>
+   (
+   <var>i</var>
+   )  =
+   <span class="dvc">
+    <var>M</var>
+    <sub>y</sub>
+    (
+    <var>i</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>N</var>
+    (
+    <var>i</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>The solution must satisfy the following constraints (resistance criteria):</p>
+ <p>
+  1.The max stress must not exceed the permissible one for each load case
+  <var>i</var>
+  :
+ </p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>max,i</sub>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   ;
+   <var>i</var>
+   )  =
+   <span class="dvc">
+    <var>N</var>
+    (
+    <var>i</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>a</var>
+    ·
+    <var>b</var>
+   </span>
+   ·
+   <span class="b1">(</span>
+   1 + 6 ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    <b class="b0">|</b>
+    <var>e</var>
+    <sub>x</sub>
+    (
+    <var>i</var>
+    )
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <var>a</var>
+   </span>
+   +
+   <span class="dvc">
+    <b class="b0">|</b>
+    <var>e</var>
+    <sub>y</sub>
+    (
+    <var>i</var>
+    )
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <var>b</var>
+   </span>
+   <span class="b1">)</span>
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <p>
+  2.The min stress must be not less than zero (no uplift) for each load case
+  <var>i</var>
+  :
+ </p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   <sub>min,i</sub>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   ;
+   <var>i</var>
+   )  =
+   <span class="dvc">
+    <var>N</var>
+    (
+    <var>i</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>a</var>
+    ·
+    <var>b</var>
+   </span>
+   ·
+   <span class="b1">(</span>
+   1 − 6 ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    <b class="b0">|</b>
+    <var>e</var>
+    <sub>x</sub>
+    (
+    <var>i</var>
+    )
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <var>a</var>
+   </span>
+   +
+   <span class="dvc">
+    <b class="b0">|</b>
+    <var>e</var>
+    <sub>y</sub>
+    (
+    <var>i</var>
+    )
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <var>b</var>
+   </span>
+   <span class="b1">)</span>
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <p>
+  Dimension that satisfies the constraints as a function of the target parameter
+  <var>k</var>
+  and the load case
+  <var>i</var>
+  :
+ </p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   <sub>p,max,i</sub>
+   (
+   <var>k</var>
+   ;
+   <var>i</var>
+   )  =
+   <span class="cond">$Find</span>
+   {
+   <var>p</var>
+   <sub>max,i</sub>
+   (
+   <var>a</var>
+   ;
+   <var>a</var>
+   ·
+   <var>k</var>
+   ;
+   <var>i</var>
+   )  −
+   <var>R</var>
+   <sub>0</sub>
+   ;
+   <var>a</var>
+   ∈ [
+   <var>a</var>
+   <sub>min</sub>
+   ;
+   <var>a</var>
+   <sub>max</sub>
+   ]}
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   <sub>p,min,i</sub>
+   (
+   <var>k</var>
+   ;
+   <var>i</var>
+   )  =
+   <span class="cond">$Find</span>
+   {
+   <var>p</var>
+   <sub>min,i</sub>
+   (
+   <var>a</var>
+   ;
+   <var>a</var>
+   ·
+   <var>k</var>
+   ;
+   <var>i</var>
+   ) ;
+   <var>a</var>
+   ∈ [
+   <var>a</var>
+   <sub>min</sub>
+   ;
+   <var>a</var>
+   <sub>max</sub>
+   ]}
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   <sub>i</sub>
+   (
+   <var>k</var>
+   ;
+   <var>i</var>
+   )  =
+   <b>max</b>
+   (
+   <var>a</var>
+   <sub>p,min,i</sub>
+   (
+   <var>k</var>
+   ;
+   <var>i</var>
+   ) ;
+   <var>a</var>
+   <sub>p,max,i</sub>
+   (
+   <var>k</var>
+   ;
+   <var>i</var>
+   )  )
+  </span>
+ </p>
+ <p>
+  Foundation pad area as a function of the target parameter
+  <var>k</var>
+  :
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>i</sub>
+   (
+   <var>k</var>
+   ;
+   <var>i</var>
+   )  =
+   <var>a</var>
+   <sub>i</sub>
+   (
+   <var>k</var>
+   ;
+   <var>i</var>
+   )
+   <sup>2</sup>
+   ·
+   <var>k</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>max</sub>
+   (
+   <var>k</var>
+   )  =
+   <b>max</b>
+   (
+   <var>A</var>
+   <sub>i</sub>
+   (
+   <var>k</var>
+   ; 1 ) ;
+   <var>A</var>
+   <sub>i</sub>
+   (
+   <var>k</var>
+   ; 2 ) ;
+   <var>A</var>
+   <sub>i</sub>
+   (
+   <var>k</var>
+   ; 3 ) ;
+   <var>A</var>
+   <sub>i</sub>
+   (
+   <var>k</var>
+   ; 4 )  )
+  </span>
+ </p>
+ <p>The minimum value of the area and the respective target parameter are calculated by the embedded $Inf function:</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>inf</sub>
+   =
+   <span class="cond">$inf</span>
+   {
+   <var>A</var>
+   <sub>max</sub>
+   (
+   <var>k</var>
+   ) ;
+   <var>k</var>
+   ∈ [
+   <var>k</var>
+   <sub>min</sub>
+   ;
+   <var>k</var>
+   <sub>max</sub>
+   ]} = 17.3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   =
+   <var>k</var>
+   <sub>inf</sub>
+   = 1.88
+  </span>
+ </p>
+ <p>The optimal dimensions of the foundation pad are:</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>A</var>
+     <sub>inf</sub>
+     <span class="dvl">
+     </span>
+     <var>k</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     17.3
+     <span class="dvl">
+     </span>
+     1.88
+    </span>
+   </span>
+   = 3.03
+  </span>
+  m,
+  <span class="eq">
+   <var>b</var>
+   =
+   <var>a</var>
+   ·
+   <var>k</var>
+   = 3.03 · 1.88 = 5.71
+  </span>
+  m
+ </p>
+ <p>Calculated base stresses:</p>
+ <table class="bordered data">
+  <tr>
+   <th>i</th>
+   <th>
+    p
+    <sub>min</sub>
+   </th>
+   <th>
+    p
+    <sub>max</sub>
+   </th>
+  </tr>
+  <tr>
+   <td>1</td>
+   <td>5.31</td>
+   <td>52.48</td>
+  </tr>
+  <tr>
+   <td>2</td>
+   <td>0</td>
+   <td>138.7</td>
+  </tr>
+  <tr>
+   <td>3</td>
+   <td>15.22</td>
+   <td>158.16</td>
+  </tr>
+  <tr>
+   <td>4</td>
+   <td>146.75</td>
+   <td>200</td>
+  </tr>
+ </table>
+ <p>Plot for target functions and solution:</p>
+ <svg class="plot" data-plot="svg" height="1040px" style="width:346.3pt; height:192.59pt;" version="1.1" viewbox=" 0 0 1870 1040" width="1870px" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+   .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+.Series4 {stroke:#f0d000;}
+circle.Series4 {fill:#f0d000;}
+.Fill4 {fill:#f0d000; fill-opacity:0.035;}
+.Series5 {stroke:MediumVioletRed;}
+circle.Series5 {fill:MediumVioletRed;}
+.Fill5 {fill:MediumVioletRed; fill-opacity:0.030;}
+.Series6 {stroke:MediumSpringGreen;}
+circle.Series6 {fill:MediumSpringGreen;}
+.Fill6 {fill:MediumSpringGreen; fill-opacity:0.025;}
+.Series7 {stroke:BlueViolet;}
+circle.Series7 {fill:BlueViolet;}
+.Fill7 {fill:BlueViolet; fill-opacity:0.020;}
+  </style>
+  <g class="plot">
+   <rect class="Frame" height="800" width="1600" x="180" y="120">
+   </rect>
+   <line class="Grid" x1="180" x2="1780" y1="920" y2="920">
+   </line>
+   <text class="sm end" x="161" y="938">0</text>
+   <line class="Grid" x1="180" x2="1780" y1="778.28" y2="778.28">
+   </line>
+   <text class="sm end" x="161" y="796.28">10</text>
+   <line class="Grid" x1="180" x2="1780" y1="636.55" y2="636.55">
+   </line>
+   <text class="sm end" x="161" y="654.55">20</text>
+   <line class="Grid" x1="180" x2="1780" y1="494.83" y2="494.83">
+   </line>
+   <text class="sm end" x="161" y="512.83">30</text>
+   <line class="Grid" x1="180" x2="1780" y1="353.11" y2="353.11">
+   </line>
+   <text class="sm end" x="161" y="371.11">40</text>
+   <line class="Grid" x1="180" x2="1780" y1="211.38" y2="211.38">
+   </line>
+   <text class="sm end" x="161" y="229.38">50</text>
+   <line class="Grid" x1="306.53" x2="306.53" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="306.53" y="972">0.5</text>
+   <line class="Grid" x1="517.05" x2="517.05" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="517.05" y="972">1</text>
+   <line class="Grid" x1="727.58" x2="727.58" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="727.58" y="972">1.5</text>
+   <line class="Grid" x1="938.11" x2="938.11" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="938.11" y="972">2</text>
+   <line class="Grid" x1="1148.63" x2="1148.63" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="1148.63" y="972">2.5</text>
+   <line class="Grid" x1="1359.16" x2="1359.16" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="1359.16" y="972">3</text>
+   <line class="Grid" x1="1569.68" x2="1569.68" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="1569.68" y="972">3.5</text>
+   <text class="sm mid" x="1780.21" y="972">4</text>
+   <line class="Axis" x1="180" x2="1780" y1="920" y2="920">
+   </line>
+   <text x="1802" y="902">x</text>
+   <text x="8" y="1023">[0.2; 0]</text>
+   <text class="end" x="1862" y="44">[4; 56.45]</text>
+   <polyline class="Series1" points="180.21,426.12 193.11,479.73 206.02,520.61 218.92,552.78 231.82,578.72 244.73,600.05 257.63,617.88 270.53,632.97 283.44,645.9 296.34,657.09 309.24,666.85 322.15,675.42 335.05,683 347.95,689.73 360.86,695.75 386.66,706.03 412.47,714.42 438.28,721.36 489.89,732.01 541.5,739.62 593.11,745.13 644.73,749.13 696.34,752.02 747.95,754.05 799.57,755.41 851.18,756.25 902.79,756.66 954.4,756.72 1006.02,756.49 1057.63,756.01 1109.24,755.33 1160.86,754.48 1212.47,753.47 1264.08,752.33 1315.69,751.07 1367.31,749.71 1418.92,748.26 1470.53,746.74 1522.15,745.14 1573.76,743.48 1625.37,741.77 1676.98,740 1728.6,738.18 1780.21,736.33">
+   </polyline>
+   <polyline class="Series2" points="180.21,752.1 231.82,755.57 283.44,755.84 335.05,754.96 386.66,753.56 438.28,751.92 464.08,751.06 476.98,750.62 489.89,750.17 502.79,748.89 515.69,746.63 541.5,742.02 593.11,732.56 644.73,722.83 696.34,712.9 747.95,702.83 799.57,692.65 851.18,682.37 902.79,672.02 954.4,661.6 1006.02,651.14 1057.63,640.63 1109.24,630.09 1160.86,619.52 1212.47,608.92 1264.08,598.3 1315.69,587.66 1367.31,577 1418.92,566.32 1470.53,555.64 1522.15,544.93 1573.76,534.22 1625.37,523.5 1676.98,512.77 1728.6,502.03 1780.21,491.29">
+   </polyline>
+   <polyline class="Series3" points="180.21,120 193.11,216.13 206.02,289.65 218.92,347.68 231.82,394.63 244.73,433.38 257.63,465.9 270.53,493.57 283.44,517.4 296.34,538.11 309.24,556.29 322.15,572.36 335.05,586.67 347.95,599.48 360.86,611.02 373.76,621.46 386.66,630.95 412.47,647.54 438.28,661.54 464.08,673.5 489.89,683.82 515.69,692.8 541.5,700.68 554.4,704.26 560.86,705.97 564.08,706.81 565.69,707.22 567.31,707.46 568.92,707.54 570.53,707.62 573.76,707.78 580.21,708.1 593.11,708.71 618.92,709.84 644.73,710.87 696.34,712.68 747.95,714.21 799.57,715.5 851.18,716.6 902.79,717.55 954.4,718.36 1006.02,719.06 1057.63,719.66 1109.24,720.18 1160.86,720.63 1212.47,721.01 1264.08,721.34 1315.69,721.61 1367.31,721.84 1418.92,722.04 1470.53,722.19 1522.15,722.32 1573.76,722.42 1625.37,722.49 1676.98,722.54 1728.6,722.57 1780.21,722.58">
+   </polyline>
+   <polyline class="Series4" points="180.21,648.74 231.82,658.25 283.44,663.32 335.05,666.49 386.66,668.65 438.28,670.2 489.89,671.36 541.5,672.24 593.11,672.92 644.73,673.45 696.34,673.87 747.95,674.2 799.57,674.46 851.18,674.65 902.79,674.8 954.4,674.92 1006.02,674.99 1057.63,675.04 1109.24,675.07 1160.86,675.07 1212.47,675.06 1264.08,675.03 1315.69,674.99 1367.31,674.94 1418.92,674.87 1470.53,674.8 1522.15,674.72 1573.76,674.64 1625.37,674.54 1676.98,674.44 1728.6,674.34 1780.21,674.23">
+   </polyline>
+   <polyline class="Series5" points="180.21,120 193.11,216.13 206.02,289.65 218.92,347.68 231.82,394.63 244.73,433.38 257.63,465.9 270.53,493.57 283.44,517.4 296.34,538.11 309.24,556.29 322.15,572.36 335.05,586.67 347.95,599.48 360.86,611.02 373.76,621.46 386.66,630.95 412.47,647.54 425.37,654.82 438.28,661.54 444.73,664.7 451.18,667.75 454.4,669.22 456.02,669.95 457.63,670.68 459.24,670.71 460.86,670.75 464.08,670.82 470.53,670.96 476.98,671.1 489.89,671.36 515.69,671.83 541.5,672.24 593.11,672.92 644.73,673.45 696.34,673.87 747.95,674.2 799.57,674.46 851.18,674.65 864.08,674.7 876.98,674.73 883.44,674.75 886.66,674.76 888.28,674.77 889.89,674.61 891.5,674.29 893.11,673.96 896.34,673.31 902.79,672.02 915.69,669.42 928.6,666.82 954.4,661.6 1006.02,651.14 1057.63,640.63 1109.24,630.09 1160.86,619.52 1212.47,608.92 1264.08,598.3 1315.69,587.66 1367.31,577 1418.92,566.32 1470.53,555.64 1522.15,544.93 1573.76,534.22 1625.37,523.5 1676.98,512.77 1728.6,502.03 1780.21,491.29">
+   </polyline>
+   <polygon class="Fill5" points="180.21,920 180.21,120 193.11,216.13 206.02,289.65 218.92,347.68 231.82,394.63 244.73,433.38 257.63,465.9 270.53,493.57 283.44,517.4 296.34,538.11 309.24,556.29 322.15,572.36 335.05,586.67 347.95,599.48 360.86,611.02 373.76,621.46 386.66,630.95 412.47,647.54 425.37,654.82 438.28,661.54 444.73,664.7 451.18,667.75 454.4,669.22 456.02,669.95 457.63,670.68 459.24,670.71 460.86,670.75 464.08,670.82 470.53,670.96 476.98,671.1 489.89,671.36 515.69,671.83 541.5,672.24 593.11,672.92 644.73,673.45 696.34,673.87 747.95,674.2 799.57,674.46 851.18,674.65 864.08,674.7 876.98,674.73 883.44,674.75 886.66,674.76 888.28,674.77 889.89,674.61 891.5,674.29 893.11,673.96 896.34,673.31 902.79,672.02 915.69,669.42 928.6,666.82 954.4,661.6 1006.02,651.14 1057.63,640.63 1109.24,630.09 1160.86,619.52 1212.47,608.92 1264.08,598.3 1315.69,587.66 1367.31,577 1418.92,566.32 1470.53,555.64 1522.15,544.93 1573.76,534.22 1625.37,523.5 1676.98,512.77 1728.6,502.03 1780.21,491.29 1780.21,920" stroke-width="0">
+   </polygon>
+   <polyline class="Series6" points="889.1,920 889.1,912.09 889.1,904.18 889.1,896.27 889.1,888.36 889.1,880.45 889.1,872.54 889.1,864.63 889.1,856.71 889.1,848.8 889.1,840.89 889.1,832.98 889.1,825.07 889.1,817.16 889.1,809.25 889.1,801.34 889.1,793.43 889.1,785.52 889.1,777.61 889.1,769.7 889.1,761.79 889.1,753.88 889.1,745.96 889.1,738.05 889.1,730.14 889.1,722.23 889.1,714.32 889.1,706.41 889.1,698.5 889.1,690.59 889.1,682.68 889.1,674.77">
+   </polyline>
+   <circle class="Series7" cx="889.1" cy="674.77" r="10">
+   </circle>
+  </g>
+ </svg>
+ <p>
+  Legend:
+  <b style="color:Tomato">━━</b>
+  1
+  <b style="color:YellowGreen">━━</b>
+  2
+  <b style="color:DodgerBlue">━━</b>
+  3
+  <b style="color:Gold">━━</b>
+  4
+  <b style="color:MediumVioletRed">━━</b>
+  max
+ </p>
+</div>

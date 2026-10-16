@@ -1,0 +1,36 @@
+' Nested macro calls test
+' Inner macros
+#def getMn$(M_result$; A_s$; d$)
+	M_result$ = A_s$*d$
+#end def
+
+#def getVn$(V_result$; M_a$; V_a$; d$)
+	V_result$ = V_a$*d$ + M_a$
+#end def
+
+#def checkMatrix$(cap$; demand$; mat$; r$; c$)
+	mat$.(r$; c$) = demand$/cap$
+#end def
+
+' Outer macro that calls inner macros
+#def out_check$(M_a$; V_a$; A_s$; d$; ind1$)
+	'<strong>Allowable Moment</strong>
+	getMn$(M_n; A_s$; d$)
+	'<strong>Allowable Shear</strong>
+	getVn$(V_n; M_a$; V_a$; d$)
+	'<strong>Moment Check</strong>
+	checkMatrix$(M_n; M_a$; check_M; 1; ind1$)
+	'<strong>Shear Check</strong>
+	checkMatrix$(V_n; V_a$; check_V; 1; ind1$)
+#end def
+
+' Define test variables
+A_s = 0.31in^2
+d_eff = 5.8125in
+M_app = 12.5kip*ft
+V_app = 3.2kip
+check_M = matrix(2; 5)
+check_V = matrix(2; 5)
+
+' Call the outer macro
+out_check$(M_app; V_app; A_s; d_eff; 1)

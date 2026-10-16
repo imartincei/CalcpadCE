@@ -1,11 +1,11 @@
-﻿# Functions
+# Functions
 
-Calcpad includes a library with common math functions, ready to use.
+CalcpadCE includes a library with common math functions, ready to use.
 
 ## Trigonometric
 
 | Name | Description |
-| -------- | - |
+| ---- | ----------- |
 | `sin(x)` | sine |
 | `cos(x)` | cosine |
 | `tan(x)` | tangent = **sin**(*x*)/**cos**(*x*), for each *x* ≠ kπ, k=1, 2, 3… |
@@ -16,7 +16,7 @@ Calcpad includes a library with common math functions, ready to use.
 ## Hyperbolic
 
 | Name | Description |
-| -------- | - |
+| ---- | ----------- |
 | `sinh(x)` | hyperbolic sine = (e*x* - e-*x*)/2 |
 | `cosh(x)` | hyperbolic cosine = (e*x* + e-*x*)/2 |
 | `tanh(x)` | hyperbolic tangent = (e*x* - e-*x*)/(e*x* + e-*x*) |
@@ -24,10 +24,10 @@ Calcpad includes a library with common math functions, ready to use.
 | `sech(x)` | hyperbolic secant = 1/**cosh**(*x*) |
 | `coth(x)` | hyperbolic cotangent = (e*x* + e-*x*)/(e*x* - e-*x*), for *x* ≠ 0 |
 
-## Inverse trigonometric
+## Inverse Trigonometric
 
 | Name | Description |
-| -------- | - |
+| ---- | ----------- |
 | `asin(x)` | inverse sine, defined for -1 ≤ *x* ≤ 1 |
 | `acos(x)` | inverse cosine, defined for -1 ≤ *x* ≤ 1 |
 | `atan(x)` | inverse tangent |
@@ -36,21 +36,21 @@ Calcpad includes a library with common math functions, ready to use.
 | `asec(x)` | inverse secant = **acos**(1/*x*) |
 | `acot(x)` | inverse cotangent |
 
-## Inverse hyperbolic
+## Inverse Hyperbolic
 
 | Name | Description |
-| -------- | - |
+| ---- | ----------- |
 | `asinh(x)` | inverse hyperbolic sine = **ln**(*x* + √(*x*2 + 1)), defined for -∞ ≤ *x* ≤ +∞ |
 | `acosh(x)` | inverse hyperbolic cosine = **ln**(*x* + √(*x* + 1)·√(*x* – 1)), defined for *x* ≥ 1 |
-| `atanh(x)` | inverse hyperbolic tangent = 1/2·**ln**\[(1 + *x*)/(1 - *x*)\], for -1 \< *x* \< 1 |
+| `atanh(x)` | inverse hyperbolic tangent = 1/2·**ln**\[(1 + *x*)/(1 - *x*)\], for -1 < *x* < 1 |
 | `acsch(x)` | inverse hyperbolic cosecant = **atanh**(1/*x*) |
 | `asech(x)` | inverse hyperbolic secant = **acosh**(1/*x*) |
 | `acoth(x)` | inverse hyperbolic cotangent = 1/2·**ln**\[(*x* + 1)/(*x* - 1)\], for \|*x*\| \> 1 |
 
-## Log/Exponential and roots
+## Log/Exponential and Roots
 
 | Name | Description |
-| -------- | - |
+| ---- | ----------- |
 | `log(x)` | decimal logarithm (with base 10), for each *x* \> 0 |
 | `ln(x)` | natural logarithm (with base *e* ≈ 2.7183), for each *x* \> 0 |
 | `log_2(x)` | binary logarithm (with base 2), for each *x* \> 0 |
@@ -62,7 +62,7 @@ Calcpad includes a library with common math functions, ready to use.
 ## Rounding
 
 | Name | Description |
-| -------- | - |
+| ---- | ----------- |
 | `round(x)` | rounds to the nearest integer |
 | `floor(x)` | rounds to the smaller integer (towards -∞) |
 | `ceiling(x)` | rounds to the greater integer (towards +∞) |
@@ -71,25 +71,26 @@ Calcpad includes a library with common math functions, ready to use.
 ## Integer
 
 | Name | Description |
-| -------- | - |
+| ---- | ----------- |
 | `mod(x; y)` | the remainder of an integer division |
 | `gcd(x; y; z…)` | the greatest common divisor of several integers |
 | `lcm(x; y; z…)` | the least common multiple of several integers |
+| `fact(n)` | factorial: multiplies all whole numbers from 1 up to *n*, e.g. **fact**(5) = 120. Works for whole numbers 0 to 170. Same as writing *n*! |
 
 ## Complex
 
 | Name | Description |
-| -------- | - |
+| ---- | ----------- |
 | `re(a + bi)` | returns the real part only, **re**(a + b*i*) = a |
 | `im(a + bi)` | returns the imaginary part as a real number, **im**(a + b*i*) = b |
 | `abs(a + bi)` | complex modulus = **sqrt**(a2 + b2) |
 | `phase(a + bi)` | complex number phase (argument) = **atan2**(a; b) |
 | `conj(a + bi)` | complex number conjugate = a - bi. |
 
-## Aggregate and interpolation
+## Aggregate and Interpolation
 
 | Name | Description |
-| -------- | - |
+| ---- | ----------- |
 | $min(A; \vec{b}; c…)$ | the smallest of multiple values |
 | $max(A; \vec{b}; c…)$ | the greatest of multiple values |
 | $sum(A; \vec{b}; c…)$ | sum of multiple values |
@@ -102,10 +103,10 @@ Calcpad includes a library with common math functions, ready to use.
 | $line(x; A; \vec{b}; c…)$ | performs linear interpolation among the specified values for *x* |
 | $spline(x; A; \vec{b}; c…)$ | performs Hermite spline interpolation |
 
-## Conditional and logical
+## Conditional and Logical
 
 | Name | Description |
-| -------- | - |
+| ---- | ----------- |
 | **if**(<*cond*>; <*value-if-true*>; <*value-if-false*>) | if the condition *cond* is satisfied, the function returns the first value, otherwise it returns the second value. The condition is satisfied when it evaluates to any non-zero number |
 | **switch**(<*cond1*>; <*value1*>; <*cond2*>; <*value2*>;…; <*default-value*>) | returns the value for which the respective condition is satisfied. Conditions are checked from left to right. If none is satisfied, it returns the default value in the end. |
 | `not(x)` | logical "not" |
@@ -116,7 +117,7 @@ Calcpad includes a library with common math functions, ready to use.
 ## Other
 
 | Name | Description |
-| -------- | - |
+| ---- | ----------- |
 | `abs(x)` | absolute value (modulus) of a real number \| *x* \| |
 | `sign(x)` | sign of a number = -1 if *x* \< 0; 1 if *x* \> 0; 0 if *x* = 0 |
 | `random(x)` | a random number between 0 and *x* |
@@ -125,6 +126,8 @@ Calcpad includes a library with common math functions, ready to use.
 | `clrunits(x)` | clears the units from a scalar, vector or matrix *x* |
 | `hp(x)` | converts x to its high-performance (hp) equivalent type |
 | `ishp(x)` | checks if the type of x is a high-performance (hp) vector or matrix |
+| `timer(x)` | how many seconds the calculation has taken so far, measured up to the point where *x* is worked out. Useful for timing long calculations |
+| `mandelbrot(x; y)` | tells you whether the point (*x*; *y*) belongs to the Mandelbrot set, mainly for plotting it. Returns "Undefined" for points inside the set, and a larger value the further outside a point lies |
 
 Vector and Matrix functions are described in their sections.
 
@@ -136,7 +139,7 @@ Arguments of trigonometric functions can be in **degrees**, **radians** or **gra
 
 1. By the radio buttons above the output window (🔘**D**, 🔘**R**, 🔘**G**).
 2. By compiler switches inside the code.
-  You have to insert a separate line containing: #deg for degrees, #rad for radians or #gra for grades.
+  You have to insert a separate line containing: `#deg` for degrees, `#rad` for radians or `#gra` for grades.
   This will affect all expressions after the current line to the end or until an alternative directive is found.
 3. By attaching native units to the value itself: *deg*, *°*, ′, ″, *rad*, *grad*, *rev* (see the “Units” section, further in this manual).
 
@@ -155,19 +158,19 @@ Rounding of midpoint values with **round**() evaluates to the nearest integer aw
 The **floor**() function rounds to the smaller value (towards -∞). The **ceiling**() function rounds in the opposite direction to the larger value (towards +∞). Unlike **floor**(), **trunc**() rounds towards zero, which is equivalent to simply truncating the fractional part.
 Some examples for rounding of negative and positive numbers are provided in the tables below:
 
-**Positive**
+### Positive
 
 | Function | x | Result |
-| --- | --- | --- |
+| -------- | - | ------ |
 | round(x) | 4.5 | 5 |
 | floor(x) | 4.8 | 4 |
 | ceiling(x) | 4.2 | 5 |
 | trunc(x) | 4.8 | 4 |
 
-**Negative**
+### Negative
 
 | Function | x | Result |
-| --- | --- | --- |
+| -------- | - | ------ |
 | round(x) | -4.5 | -5 |
 | floor(x) | -4.8 | -5 |
 | ceiling(x) | -4.2 | -4 |
@@ -175,14 +178,14 @@ Some examples for rounding of negative and positive numbers are provided in the 
 
 Rounding of complex numbers affects both real and imaginary parts.
 
-## Custom (user defined) functions
+## Custom (User Defined) Functions
 
 You can define your own functions and use them further in the calculations.
 Custom functions can have unlimited number of parameters.
 They are specified after the function name, enclosed in brackets "(" … ")" and separated by semicolons ";". Each function is defined, using the following format: "**f** ( *x*; *y*; *z*; … ) = **expression**", where "**f**" is the function name and "**x**", "**y**" and "**z**" are function parameters.
 On the right side you can have any valid expression including constants, operators, variables and even other functions, e.g.:
 
-```matlab
+```calcpad
 f(x) = x^2 + 2*x*sin(x)  
 g(x; y) = f(x)/(y - 4)
 ```

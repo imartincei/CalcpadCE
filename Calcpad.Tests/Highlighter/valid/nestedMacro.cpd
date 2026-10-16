@@ -1,0 +1,74 @@
+#include nestedMacroInclude.cpd
+#include nestedMacroInclude2.cpd
+#def note$(text$) = "text"
+#def hide$ = ''
+#def unhide$ = ''
+debug = 0
+#def out_check$(M_a$; V_a$; P_a$; M_aLC$; P_aLC$; A_s$; d$; A_n$; y_g$; r_g$; I_N$; ind1$; ind2$)
+    '<strong>Allowable Moment</strong>
+	getMn$(M_n; A_s$; d$)
+	'<strong>Allowable Shear</strong>
+	getVn$(V_n; M_a$; V_a$; P_a$; d$; A_n$; y_g$)
+	'<strong>Allowable Compression</strong>
+	getCom$(f_ab; M_aLC$; P_aLC$; A_s$; A_n$; d$; I_N$)
+#end def
+'
+#def getOutLoads$(M_a$; V_a$; P_a$; M_aLC$; P_aLC$; r_l$; WT_cmu$; ind1$; ind2$)
+    h_w,s = h_ws,s.ind1$note$('Span height of wall')
+	h_w,sw = h_ws,sw.ind1$note$('Height of wall for self-weight')
+	M_u = p_W,CC*h_w,s^2/8*r_l$*1ftnote$('Per-foot basis')
+	V_u = p_W,CC*h_w,s/2*r_l$*1ftnote$('Per-foot basis with loads scaled using a ratio at jambs')
+	M_a$ = 0.6*M_u
+	V_a$ = 0.6*V_u
+	#if find_eq(RB_walls; ind1$; 1)
+		#if find_eq(NS_walls; ind1$; 1)
+			b_t,R,P = l/2note$('Trib width of roof for axial loading')
+			F_L = F_L,R/b_L,R*1ft
+		#else
+			b_t,R,P = b/2note$('Trib width of roof for axial loading')
+			F_L = 0lbf
+		#end if
+		'Roof bears on this wall'
+		F_D = h_w,sw*WT_cmu$*r_l$ + WT_roof*b_t,R,P*1ft*r_l$
+		F_Lr = R_LL*b_t,R,P*r_l$*1ft
+		F_S = p_s*b_t,R,P*r_l$*1ft
+		ASCE710ASD$(P_a$; F_D; F_L; F_Lr; F_S; 0lbf; 0lbf; 0lbf; 0lbf; 0lbf; 0lbf; 3; 1; kip)
+		'Assume wind on roof/vertical seismic will not control axial load combos'
+		ASCE710ASD$(P_aLC$; F_D; F_L; F_Lr; F_S; 0lbf; 0lbf; 0lbf; 0lbf; 0lbf; 0lbf; 3; 2; kip)
+	#else
+		'Roof does not bear on this wall - only self-weight is used for axial loading'
+		F_D = h_w,sw*WT_cmu$*r_l$
+		P_a$ = F_D
+		ASCE710ASD$(P_aLC$; F_D; 0lbf; 0lbf; 0lbf; 0lbf; 0lbf; 0lbf; 0lbf; 0lbf; 0lbf; 3; 2; kip)
+	#end if
+	'Assume wind controls out of plane moment'
+	ASCE710ASD$(M_aLC$; 0kip*ft; 0kip*ft; 0kip*ft; 0kip*ft; 0kip*ft; M_u; 0kip*ft; 0kip*ft; 0kip*ft; 0kip*ft; 3; 2; kip*ft)
+#end def
+
+A_s,out = [1;2;3]*in^2
+d_out = [4;5;6]*in
+A_n,typ = [7;8;9]*in^2
+γ_g = [0.9; 0.95; 0.99]
+r,typ = [10; 11; 12]*in
+I_N,typ = [13; 14; 15]*in^4
+i = 1
+n = 123
+F_b = 32000psi
+F_s = 40000psi
+h_ws,s = [4;5;6]*ft
+h_ws,sw = [4;5;6]*ft
+p_W,CC = 30psf
+RB_walls = [1;1;2]
+NS_walls = [1;2;2]
+WT_cmu = [10;20;30]*lbf/ft
+WT_cmu,typ = [10;20;30]*lbf/ft
+WT_roof = 10psf
+l = 40ft
+b = 20ft
+F_L,R = 50lbf
+b_L,R = 5ft
+R_LL = 25psf
+p_s = 20psf
+f′_m = 1500psi
+getOutLoads$(M_a,out; V_a,out; P_a,out; M_a,LC; P_a,LC; 1; WT_cmu,typ.i; i; 0)
+out_check$(M_a,out; V_a,out; P_a,out; M_a,LC; P_a,LC; A_s,out.i; d_out.i; A_n,typ.i; γ_g.i; r,typ.i; I_N,typ.i; i; 0)

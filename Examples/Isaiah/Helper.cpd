@@ -1,0 +1,362 @@
+#hide  
+'<!--------------------------HTML FORMATTING----------------------------->'
+'Line break in printed PDF'
+#def break$ = '<p style="page-break-before: always;">' '</p>
+#def tab$ = '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'
+'Code Reference'
+#def ref$(text$) = '<span class="ref" style="color: blue; background: #EFEFFF; font-size: 12pt; font-style: italic">[' text$ ']</span>'
+'Code Comment'
+#def cmt$(c$) = '<!--' c$ '-->'
+cmt$('Code Comment Blocks')
+#def cmtStart$ = '<!--
+#def cmtEnd$ = '-->
+'Manual Hiding that does not override #show/#hide
+#def hide$ = '<div style=display:none>'
+#def unhide$ = '</div>'
+'Conditional Hiding
+#def hideC$(cond$)
+	#if cond$
+		'<div style=display:none>'
+	#end if
+#end def
+#def unhideC$(cond$)
+	#if cond$
+		'</div>'
+	#end if
+#end def
+'Note'
+#def note$(text$) = '<em>&ensp;' text$ '</em>'
+#def header$(text$) = '<h4 style="text-align: center;">text$</h4>'
+#def error$(message$) = '<span class="err">ERROR: ' message$ '</span>
+#def markup$(text$) = '<span style="color: red; font-style: italic;">text$</span>'
+#def important$(text$) = '<span style="color: red; font-weight: bold;">text$</span>'
+#def aside$(x$; y$; lpad$; rpad$)
+	'<p style="width:lpad$; float:left">'x$'</p>
+	'<aside style="width:rpad$; padding-left:2%; border-radius:8px;margin-left:0%; float:right ;font-style:italic; background:lightblue;">
+	'<p>'y$'</p> 
+	'</aside>
+#end def
+#def variable$(value$; unit$; desc$; reference$) = value$unit$note$(desc$)ref$(reference$)
+'<!--------------------------MATH FUNCTIONS----------------------------->'
+'Simple linear interpolation, outputs y
+#def interpolate$(x$; x_0$; x_1$; y_0$; y_1$) = 'use interpolate(x; x_0; y_0; x_1; y_1)'
+interpolate(x; x_0; y_0; x_1; y_1) = (y_0*(x_1 - x) + y_1*(x - x_0))/(x_1 - x_0)
+'
+'Equality check with tolerance, 1 = true, 0 = false
+#def eq_tolerance$(val1$; val2$; tol$) = 'use eq_tolerance(val1; val2; tol)'
+eq_tolerance(val1; val2; tol) = if(and(val1 - tol ≤ val2; val1 + tol ≥ val2); 1; 0)
+'
+'This is preferred to clrUnits() because it makes a copy rather than overriding the original variable'
+removeUnits(x) = x/getUnits(x)
+'<!--------------------------GEOMETRIC FUNCTIONS----------------------------->'
+cmt$('Use %userprofile%\cei-engineering.com\Engineering Tools - Documents\CalcPad\Modules\DXF\geometryFunctions.cpd')
+'<!--------------------------VECTOR FUNCTIONS----------------------------->'
+cmt$('Returns an empty vector')
+#def emptyV$ = find(vector(1); 1; 1)
+'
+cmt$('Adds a value to the end of a vector')
+#def appendV$(v$; val$)
+	'use appendV(v; val)'
+#end def
+appendV(v; val) = $Inline{ _
+len = len(v); 
+v = resize(v; len + 1); 
+v.(len + 1) = val; v}
+'
+cmt$('Sets the value of a vector as a function')
+set(i; v; val) = $Inline{helperV = v; helperV.i = val; v = helperV}
+'
+cmt$('Tests if value is in vector, 1-> In vector, 0-> not in vector')
+#def inV$(v$; val$) = len(find_eq(v$; val$; 1)) ≠ 0
+'
+cmt$('Removes duplicates from vectors')
+#def uniqueV$(result$; v$)
+	'uniqueV(v)'
+#end def
+uniqueV(v) = $Inline{ _
+unique = emptyV$; 
+$Repeat{if(inV$(unique; take(i; v)); 0; appendV(unique; take(i; v))) @ i = 1 : len(v)}; 
+unique}
+'
+cmt$('Removes all values = val from a vector')
+#def removeV$(result$; v$; val$)
+	'removeV(v; val)'
+#end def
+removeV(v; val) = $Inline{ _
+result = emptyV$; 
+$Repeat{if(take(i; v) ≠ val; appendV(result; take(i; v)); 0) @ i = 1 : len(v)}; 
+result}
+cmt$('Makes an independent copy of a vector. This is needed because clrUnits does NOT make a copy but operates on the original variable.')
+copyV(v) = join(v)
+'
+cmt$('Removes all values = val from a vector while ignoring units')
+#def removeVNoUnit$(result$; v$; val$)
+	'removeVIgnoreUnits(v; val)'
+#end def
+removeVIgnoreUnits(v; val) = $Inline{ _
+result = emptyV$; 
+$Repeat{if(clrUnits(take(i; v)) ≠ clrUnits(val); appendV(result; take(i; v)); 0) @ i = 1 : len(v)}; 
+result}
+'
+cmt$('Removes null values')
+removeNulls(vector) = $Inline{ _
+helperV = copyV(vector);
+extract(vector; find_ne(clrUnits(helperV); 0/0; 1))}
+'
+cmt$('Counts non-null elements in a vector or matrix row. Works with 0/0 values.')
+countNonNull(v) = $Inline{ _
+helperV = copyV(v);
+len(find_ne(clrUnits(helperV); 0/0; 1))}
+'
+cmt$('Double VLOOKUP where result is matching indecies in vf, where v1 is lookup column 1, v2 is lookup column 2, and v1_val/v2_val are the search values in the columns.')
+#def filterVecAnd$(result$; vf$; v1$; v2$; v1_val$; v2_val$)
+	'use result = filterVecAnd(vf; v1; v2; v1_val; v2_val)'
+#end def
+filterVecAnd(vf; v1; v2; v1_val; v2_val) = $Inline{ _
+v1_ind = find(v1; v1_val; 1); v2_ind = find(v2; v2_val; 1); 
+result = emptyV$; 
+$Repeat{if(len(find(v2_ind; v1_ind.i; 1)) ≡ 0; 0; appendV(result; take(v1_ind.i; vf))) @ i = 1 : len(v1_ind)}; 
+result}
+'<!--------------------------MATRIX FUNCTIONS----------------------------->'
+cmt$('Converts a matrix into a vector by flattening it')
+#def flatM$(result$; m$)
+	'flatM(m)'
+#end def
+flatM(m) = $Inline{ _
+v = vector(n_rows(m)*n_cols(m)); 
+$Repeat{$Repeat{v.((i - 1)*n_cols(m) + j) = m.(i; j) @ j = 1 : n_cols(m)} @ i = 1 : n_rows(m)}; 
+v}
+cmt$('Sets the value of a vector as a function')
+mset(i; j; m; val) = $Inline{helperM = m; helperM.(i; j) = val; m = helperM}
+'<!--{"desc": "Set a matrix row with values from a vector"}-->'
+msetRow(i; m; v) = $Inline{$Repeat{mset(i; j; m; v.(j)) @ j = 1 : n_cols(m)}}
+'<!--{"desc": "Set N elements of a matrix row with values from a vector"}-->'
+msetRowN(i; n; m; v) = $Inline{$Repeat{mset(i; j; m; v.(j)) @ j = 1 : n}}
+'<!--{"desc": "Set a matrix column with values from a vector"}-->'
+msetCol(i; m; v) = $Inline{$Repeat{mset(j; i; m; v.(j)) @ j = 1 : n_rows(m)}}
+'<!--{"desc": "Set N elements of a matrix column with values from a vector"}-->'
+msetColN(i; n; m; v) = $Inline{$Repeat{mset(j; i; m; v.(j)) @ j = 1 : n}}
+'
+cmt$('Append a vector to the end of a matrix. First append case to empty must be caught separately by setting the matrix equal to the first row.')
+appendM(M; v) = stack(M; vec2row(v))
+'
+cmt$('Returns a vector containing unique values in the matrix.')
+#def uniqueM$(result$; m$)
+	'uniqueM(m)'
+#end def
+uniqueM(m) = $Inline{ _
+v = flatM(m); 
+unique = uniqueV(v); 
+unique}
+'
+cmt$('Note: take can be used with 2 or 3 variables to get a value from a vector or matrix')
+cmt$('Copies first l_v.(i) cols per row from m into a null-filled matrix of the same size.')
+fillUndefM(m; l_v) = $Inline{ _
+result = mfill(matrix(n_rows(m); n_cols(m)); 0/0); _
+$Repeat{$Repeat{mset(i; j; result; if(j ≤ take(i; l_v); take(i; j; m); 0/0)) @ j = 1 : n_cols(m)} @ i = 1 : n_rows(m)}; _
+result}
+'
+cmt$('Finds and Replaces values in a matrix')
+FindReplaceM(m; F; R) = $Inline{ _
+result = matrix(n_rows(m); n_cols(m));
+$Repeat{$Repeat{mset(i; j; result; if(m.(i;j) ≡ F; R; take(i; j; m))) @ j = 1 : n_cols(m)} @ i = 1 : n_rows(m)}; _
+result}
+'
+cmt$('Gets a mapping of non-null row lengths from a jagged array')
+getNullMap(m) = $Inline{ _
+helperV = vector(n_rows(m)); 
+$Repeat{helperV.i = countNonNull(row(m; i)) @ i = 1 : n_rows(m)};
+helperV}
+
+ '<!--------------------------DESIGN FUNCTIONS----------------------------->'
+global_check = 1
+'Nominal Capacity; Required Capacity'
+#def check$(Rn$; Ru$)
+	#if Rn$ ≥ Ru$
+		'<p class = "ok" style="opacity: 0.7;" > 'Rn$'≥'Ru$'OKAY </p>'
+		#Val
+		round(Ru$*100/Rn$)'% Capacity'
+		'<br>'
+	#else
+		#Equ
+		'<p class = "err" style="opacity: 0.7"> 'Rn$'<'Ru$'N.G</p> '
+		hideC$(debug≡0)
+		global_check = 0
+		unhideC$(debug≡0)
+		#Val
+		round(Ru$*100/Rn$)'% Capacity
+		'<br>'
+	#end if
+	#equ
+#end def
+#def check_nocap$(Rn$; Ru$)
+	#if Rn$ ≥ Ru$
+		'<p class = "ok" style="opacity: 0.7" > 'Rn$'≥'Ru$'OKAY </p> '
+	#else
+		'<p class = "err" style="opacity: 0.7"> 'Rn$'<'Ru$'N.G</p> '
+	#end if
+#end def
+'
+#def checkVector$(Rn$; Ru$; vec$; ind$)
+	hideC$(debug≡0)
+	set(ind$; vec$; Ru$/Rn$)
+	unhideC$(debug≡0)
+	check$(Rn$; Ru$)
+#end def
+'
+#def checkMatrix$(Rn$; Ru$; mat$; row_i$; col_i$)
+	hideC$(debug≡0)
+	mset(row_i$; col_i$; mat$; Ru$/Rn$)
+	unhideC$(debug≡0)
+	check$(Rn$; Ru$)
+#end def
+'
+#def globalCheck$
+	#if global_check ≡ 1
+		'<p class = "ok" style="opacity: 0.7" >Design is okay</p>'
+	#else
+		'<p class = "err" style="opacity: 0.7">Design is not good</p>'
+	#end if
+#end def
+#def if$(cond$; true$; false$)
+	#if cond$
+		'<p class="ok" style="opacity: 0.8;">'true$'</p>
+	#else
+		'<p class="err" style="opacity: 0.8;">'false$'</p>
+	#end if
+#end def
+'
+#def GetShearModulus$(suffix$; poisson$; E$)
+	Gsuffix$ = E$/(2*(1 + poisson$))
+#end def
+'
+'<!--------------------------MATHJAX FORMAT----------------------------->'
+#def MathJax$(eqn$)
+	#val
+	'<!--TeX-AMS_HTML for Latex format-->'
+	'<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
+	'
+	'<script type="text/x-mathjax-config">
+	'MathJax.Hub.Config({
+	'  tex2jax: {inlineMath: [["$","$"], ["\\(","\\)"]]},
+	'  TeX: { equationNumbers: { autoNumber: "AMS" } }
+	'});
+	'</script>
+	'<style>.MathJax_Display { text-align: left !important;}</style>
+	'$$'eqn$'$$
+	#equ
+#end def
+'<!--------------------------Javascript----------------------------->'
+#def removeDisplayNone$
+	#val
+	'<script>
+	'document.addEventListener("DOMContentLoaded", function() {
+	'    const divs = document.querySelectorAll("div");
+	'    divs.forEach(div => {
+	'        if (div.style.display === "none") {
+	'            div.style.removeProperty("display");
+	'        }
+	'    });
+	'});
+	'</script>
+	#equ
+#end def
+'<!--------------------------Custom Units----------------------------->'
+.pci = lbf/in^3
+.pcf = lbf/ft^3
+.kcf = kip/ft^3
+.kci = kip/in^3
+.plf = lbf/ft
+.klf = kip/ft
+.k = kip
+'<!--------------------------UI Components----------------------------->'
+#def checkbox$(bool$; label$; id$)
+	#val
+	'<script>
+	'  var labelText = label$;
+	'  const baseId = "checkbox-" + window.checkbox_counter;
+	'  checkbox_counter++;
+	'
+	'  const p1 = document.createElement("p");
+	'  p1.id = baseId;
+	'
+	'  const checkbox = document.createElement("input");
+	'  checkbox.type = "checkbox";
+	'  checkbox.name = "id$";
+	'  checkbox.id = baseId;
+	'  checkbox.value = "1";
+	'  checkbox.style.color = "black";
+	'  checkbox.checked = true;
+	'
+	'  var label = document.createElement("label");
+	'  label.htmlFor = baseId;
+	'  label.textContent = labelText;
+	'
+	'  p1.appendChild(checkbox);
+	'  p1.appendChild(label);
+	'
+	'  document.body.appendChild(p1);
+	'</script>
+	#equ
+	'<p id="id$" style="display:none">'bool$ = ? {0}'</p>
+	hide$bool$unhide$
+#end def
+#show
+#local
+'<h3>Examples</h3>
+debug = 1
+'text
+break$
+tab$' text
+'calc'ref$("REFERENCE")
+cmt$('will not print')
+cmtStart$
+'Multiline comment
+cmtEnd$
+hide$'this will not print'unhide$
+hide$
+'this will not print'
+unhide$
+value = 1
+hideC$(value≡1)
+'this is only hidden when value ≡ 1'
+unhideC$(value≡1)
+hideC$(value≡2)
+'this shows when value ≡ 1'
+unhideC$(value≡2)
+hi = 1innote$('this is a note')
+error$('Something went wrong')
+'<br>'
+important$(Pay attention to this)
+'<br>'
+cmt$('aside seems broken')
+aside$(1; 1; 10; 10)
+eq_tolerance(9; 10; 2)
+eq_tolerance(10; 7; 2)
+v = [4; 3; 4; 1; 2; 2; 3; 4; 5; 5; 6]
+vf = [1; 2; 3; 4; 5; 6]
+v1 = [1; 1; 1; 2; 2; 2]
+v2 = [3; 4; 3; 4; 3; 4]
+filteredV = filterVecAnd(vf; v1; v2; 1; 3)
+uniqueV = uniqueV(v)
+M = [1; 3; 2|5; 4; 2|3; 5; 6]
+msetRow(2; M; [7; 8; 9])
+msetCol(2; M; [7; 8; 9])
+v_flat = flatM(M)
+uniqueM = uniqueM(M)
+removedV = removeV(v_flat; 4)
+vUnits = [1in; 4in; 6lbf; 6ft^2; 0/0]
+vUnits = removeVIgnoreUnits(vUnits; 0/0)
+vUnits = removeVIgnoreUnits(vUnits; 6)
+vector = emptyV$
+appendV(vector; 4)
+l_jagged = [1; 2; 0; 4]
+jaggedM = [1|2; 3|0|4; 7; 8; 9]
+jaggedM = fillUndefM(jaggedM; l_jagged)
+getNullMap(jaggedM)
+jaggedM
+vector = [1; 2; 3]
+set(2; vector; 5)
+matrix = [1; 2|3; 4]
+mset(2; 1; matrix; 6)
+header$(TEST HEADER)

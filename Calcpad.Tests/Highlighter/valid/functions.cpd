@@ -1,0 +1,116 @@
+#settings {"complex": true}
+' Functions: custom definitions, built-in calls, signatures, local params
+square(x) = x^2
+cube(x) = x^3
+addTwo(x; y) = x + y
+multiply(p; q; r) = p*q*r
+hypotenuse(a; b) = sqr(a^2 + b^2)
+sq = square(5)
+cb = cube(3)
+sum2 = addTwo(10; 20)
+prod3 = multiply(2; 3; 4)
+hyp = hypotenuse(3; 4)
+chainedFunc(val) = square(val) + cube(val)
+chainedResult = chainedFunc(2)
+complexParams(base; exp_v; mult) = (base^exp_v)*mult + sin(base)
+complexResult = complexParams(2; 3; 4)
+globalX = 100
+shadowTest(globalX) = globalX^2
+shadowResult = shadowTest(5)
+funcA(n) = n^2
+funcB(n) = n^3
+multiResult = funcA(2) + funcB(2)
+#deg
+sinVal = sin(45)
+cosVal = cos(60)
+tanVal = tan(30)
+cscVal = csc(30)
+secVal = sec(60)
+cotVal = cot(45)
+asinVal = asin(0.5)
+acosVal = acos(0.5)
+atanVal = atan(1)
+atan2Val = atan2(1; 1)
+acscVal = acsc(2)
+asecVal = asec(2)
+acotVal = acot(1)
+sinhVal = sinh(1)
+coshVal = cosh(1)
+tanhVal = tanh(1)
+cschVal = csch(1)
+sechVal = sech(1)
+cothVal = coth(1)
+asinhVal = asinh(1)
+acoshVal = acosh(2)
+atanhVal = atanh(0.5)
+acschVal = acsch(1)
+asechVal = asech(0.5)
+acothVal = acoth(2)
+logVal = log(100)
+lnVal = ln(e)
+log2Val = log_2(8)
+expVal = exp(1)
+sqrVal = sqr(16)
+sqrtVal = sqrt(25)
+cbrtVal = cbrt(27)
+rootVal = root(16; 4)
+roundVal = round(3.7)
+floorVal = floor(3.7)
+ceilVal = ceiling(3.7)
+truncVal = trunc(-3.7)
+modVal = mod(17; 5)
+gcdVal = gcd(12; 18)
+lcmVal = lcm(4; 6)
+gcdMulti = gcd(12; 18; 24)
+lcmMulti = lcm(4; 6; 8)
+z = 3 + 4i
+zAbs = abs(z)
+zRe = re(z)
+zIm = im(z)
+zPh = phase(z)
+zConj = conj(z)
+minVal = min(1; 5; 3)
+maxVal = max(1; 5; 3)
+sumVal = sum(1; 2; 3; 4; 5)
+sumsqVal = sumsq(1; 2; 3)
+srssVal = srss(3; 4)
+avgVal = average(1; 2; 3)
+prodVal = product(1; 2; 3)
+meanVal = mean(2; 8)
+takeVal = take(2; 10; 20; 30)
+lineVal = line(1.5; 0; 10; 20; 30)
+splineVal = spline(1.5; 0; 10; 20; 30)
+ifResult = if(5 > 3; 100; 0)
+switchResult = switch(1 < 0; 10; 1 > 0; 20; 99)
+notResult = not(0)
+andResult = and(1; 1; 1)
+orResult = or(0; 0; 1)
+xorResult = xor(1; 0)
+signVal = sign(-5)
+randVal = random(100)
+length = 5m
+unitsOf = getunits(length)
+withUnits = setunits(5; m)
+noUnits = clrunits(length)
+hpConv = hp([1; 2; 3])
+isHpRes = ishp(hpConv)
+deepNest = sqr(abs(sin(45) + cos(45)))
+
+' Function redefinition is allowed (reports CPD-3314 Information, not an error)
+redef(a) = a + 1
+redef(a; b) = a + b
+redefUse = redef(2; 3)
+
+' Optional parameters with defaults and keyword argument calls
+kwFunc(x; y = 2; z = 3kg) = x*y + z
+kwAllDefaults = kwFunc(1)
+kwPositional = kwFunc(1; 5; 2kg)
+kwMixed = kwFunc(1; z = 4kg)
+kwNamed = kwFunc(z = 4kg; x = 1; y = 5)
+kwArea(b; h = b) = b*h
+kwSquare = kwArea(3)
+kwLater(x; y = kwB) = x + y
+kwB = 7
+kwLaterUse = kwLater(1)
+kwNoDefaults(x; y) = x - y
+kwNoDefaultsUse = kwNoDefaults(y = 1; x = 5)

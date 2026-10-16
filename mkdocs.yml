@@ -3,6 +3,9 @@ use_directory_urls: false
 
 theme:
   name: material
+  custom_dir: docs/overrides
+  font: false
+  logo: media/logo.svg
   palette:
     - scheme: default
       primary: indigo
@@ -24,10 +27,12 @@ theme:
     - content.code.copy
 
 hooks:
-  - hooks/math_fix.py
+  - docs/hooks/copy_fonts.py
+  - docs/hooks/math_fix.py
+  - docs/hooks/render_examples.py
 
 nav:
-  - Home:
+  - Documentation:
     - index.md
     - Fields of Application: fields-of-application.md
     - Installation: installation.md
@@ -51,15 +56,41 @@ nav:
     - Units: units.md
     - Vectors: vectors.md
     - Matrices: matrices.md
-    - High Performance Vectors and Matrices: high-performance-vectors-and-matrices.md
+    - High Performance Functions: high-performance-vectors-and-matrices.md
+  - New Apps and Features (beta):
+    - Selecting a CalcpadCE Deployment: new-selecting-calcpadce-deployment.md
+    - VS Code Extension: new-vscode-extension.md
+    - Desktop App: new-desktop-app.md
+    - The CalcpadCE Editor: new-calcpadce-editor.md
+    - The CalcpadCE Panel: new-calcpad-panel.md
+    - Settings: new-settings.md
+    - Exports: new-exports.md
+    - Includes and File Reads: new-includes.md
+    - Linter and Diagnostics: new-linter.md
+    - UI Mode: new-ui-mode.md
+    - Visibility Directives: new-visibility-directives.md
+    - Parsing Modes: new-parsing-modes.md
+    - Metadata Comments: new-metadata-comments.md
+    - Keyword Arguments: new-keyword-arguments.md
+    - Running the Server: new-web-deployment.md
+    - Migration Guide: migration-guide.md
+  - Quick Reference:
+    - quick-reference.md
 
 markdown_extensions:
+  - toc:
+      permalink: true
   - tables
   - attr_list
+  - mdx_truly_sane_lists:
+      nested_indent: 2
   - md_in_html
   - def_list
   - admonition
   - pymdownx.details
+  - pymdownx.highlight:
+      use_pygments: true
+      pygments_lang_class: true
   - pymdownx.superfences
   - pymdownx.arithmatex:
       generic: true
@@ -73,7 +104,8 @@ markdown_extensions:
 
 extra_javascript:
   - javascripts/mathjax.js
-  - javascripts/mathjax/tex-mml-chtml.js
+  - javascripts/mathjax/tex-chtml.js
 
 extra_css:
   - stylesheets/extra.css
+  - stylesheets/calcpad-output.css

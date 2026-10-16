@@ -1,0 +1,6 @@
+[CalcpadCE](https://calcpad-ce.org) worksheet in this section computes [stresses and settlements](https://en.wikipedia.org/wiki/Soil_mechanics) in an elastic half-space under an arbitrary surface pressure by integration of the [Boussinesq](https://en.wikipedia.org/wiki/Joseph_Valentin_Boussinesq) point-load solution.
+
+The [soil stress and deformations sheet](#soil-stress-and-deformations) integrates the Boussinesq vertical-stress kernel $3 z^3 / (2 \pi R^5)$ and the two shear-stress kernels over a rectangular footprint with a user-defined pressure distribution $p(x, y)$.
+A trapezoidal pressure $p(x, y) = 100 \text{ kPa} \cdot (1 + x / a)$ on a $2 \text{ m} \times 3 \text{ m}$ area is taken as the example, and the vertical stress $\sigma_z$ and shear stresses $\tau_{xz}$, $\tau_{yz}$ are mapped on a vertical section through the loaded area.
+The vertical settlement at the surface follows from $d(x, y) = (1 - \nu^2) / E_0 \cdot \int \sigma_z \mathrm d z$ over the active depth, so the elastic modulus $E_0$ and the Poisson ratio $\nu$ are the only soil parameters required.
+Both single-variable and double-variable plots (`$Plot`, `$Map`) visualise the stress field and the settlement trough in a single document.

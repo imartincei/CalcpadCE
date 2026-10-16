@@ -1,0 +1,559 @@
+using Calcpad.Core;
+using Calcpad.Highlighter.Tokenizer;
+using Calcpad.Highlighter.Tokenizer.Models;
+using Calcpad.Server.Controllers;
+
+namespace Calcpad.Server.Services
+{
+    public class CalcpadService
+    {
+        private readonly string _tempDirectory;
+
+        // Scoped service, so this would otherwise re-read the ~200KB template on every request.
+        private static readonly string _htmlTemplate = LoadHtmlTemplate();
+
+        public CalcpadService()
+        {
+            _tempDirectory = Path.GetTempPath();
+        }
+
+        /// <summary>
+        /// Creates the Include delegate for MacroParser. Core only invokes this when the
+        /// resolved path exists on disk, so a bare File.ReadAllText is sufficient and any I/O
+        /// failure surfaces through the catch as a Calcpad error comment (URL-hosted includes
+        /// are not currently supported).
+        /// </summary>
+        internal static Func<string, Queue<string>, string> CreateIncludeDelegate()
+        {
+            return (fileName, fields) =>
+            {
+                try
+                {
+                    return ProcessIncludedContent(File.ReadAllText(fileName));
+                }
+                catch (Exception ex)
+                {
+                    FileLogger.LogError($"Error reading include file: {fileName}", ex);
+                    return $"' Error reading file: {fileName} - {ex.Message}";
+                }
+            };
+        }
+
+        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors) Convert(
+            string calcpadContent,
+            Settings? settings = null,
+            bool forceUnwrappedCode = false,
+            string theme = "light",
+            string? sourceFilePath = null,
+            bool forPrint = false,
+            bool captureOpenXml = false,
+            bool enableUi = false,
+            Dictionary<string, string>? uiOverrides = null,
+            bool? debug = null,
+            bool? hideErrorLines = null,
+            bool write = false,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(calcpadContent))
+            {
+                FileLogger.LogVerbose("Convert called with empty content");
+                throw new ArgumentException("Content cannot be null or empty", nameof(calcpadContent));
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                FileLogger.LogVerbose("Starting conversion", $"Content length: {calcpadContent.Length}, Has settings: {settings != null}, Force unwrapped: {forceUnwrappedCode}, For print: {forPrint}");
+
+                // 1. Use Calcpad.Core settings directly (defaults are set in constructors).
+                //    Per-file overrides now come from the #settings directive, handled in Core.
+                Settings coreSettings = settings ?? new Settings();
+
+                // Printed output is a report by definition, so it never carries controls.
+                // Overrides still apply - the report shows the values that were entered.
+                enableUi &= !forPrint;
+
+                // Input mode hides the source editor, so its "on line [N]" links point at
+                // nothing reachable. Defaults to following enableUi; the report pane beside
+                // the form passes its own override since it isn't gated on enableUi.
+                var showErrorLines = !(hideErrorLines ?? enableUi);
+
+                // 2. Parse macros and includes (server reads referenced files from disk).
+                var macroParser = new MacroParser
+                {
+                    Include = CreateIncludeDelegate(),
+                    SourceFilePath = sourceFilePath
+                };
+
+                string outputText;
+                var hasMacroErrors = macroParser.Parse(calcpadContent, out outputText, null, 0, true);
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                string htmlResult;
+                IReadOnlyList<string> openXmlExpressions = Array.Empty<string>();
+                var errors = new List<CalcpadError>(macroParser.Errors);
+
+                if (hasMacroErrors || forceUnwrappedCode)
+                {
+                    // Forced-unwrapped with no macro errors: silently run
+                    // ExpressionParser so the code view can highlight lines that
+                    // would error in the wrapped preview. Skip when macro errors
+                    // already exist since the expression pass would just fail.
+                    if (forceUnwrappedCode && !hasMacroErrors)
+                    {
+                        try
+                        {
+                            // Hard-coded rather than threaded from `write`: this pass exists only to
+                            // collect error lines, so it must never repeat the document's writes.
+                            var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, PathRoots = macroParser.PathRoots, Debug = true, AllowDataWrite = false };
+                            silent.Parse(outputText, true, false);
+                            errors.AddRange(silent.Errors);
+                        }
+                        catch (Exception silentEx)
+                        {
+                            FileLogger.LogWarning("Silent expression parse for error collection failed", silentEx.Message);
+                        }
+                    }
+                    htmlResult = ConvertCodeToHtml(outputText, errors);
+                }
+                else
+                {
+                    try
+                    {
+                        // Debug mode makes Calcpad.Core emit per-line anchors (id="line-N"
+                        // class="line") and the error-summary boxes the interactive preview
+                        // uses for line links. It defaults to the opposite of forPrint but is
+                        // independently settable: the on-screen report is a print layout that
+                        // still wants line links.
+                        var parser = new ExpressionParser
+                        {
+                            Settings = coreSettings,
+                            SourceFilePath = sourceFilePath,
+                            PathRoots = macroParser.PathRoots,
+                            Debug = debug ?? !forPrint,
+                            ForPrint = forPrint,
+                            EnableUi = enableUi,
+                            UiOverrides = uiOverrides,
+                            ShowErrorLines = showErrorLines,
+                            AllowDataWrite = write
+                        };
+                        parser.Parse(outputText, true, captureOpenXml);
+                        htmlResult = parser.HtmlResult;
+                        errors.AddRange(parser.Errors);
+                        if (captureOpenXml)
+                            openXmlExpressions = parser.OpenXmlExpressions.ToList();
+                    }
+                    catch (Exception parseEx)
+                    {
+                        FileLogger.LogWarning("Expression parsing failed, falling back to unwrapped code", parseEx.Message);
+                        htmlResult = ConvertCodeToHtml(outputText, errors);
+                    }
+                }
+
+                // 6. Apply HTML wrapper with theme support
+                var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);
+                FileLogger.LogVerbose("Conversion completed successfully", $"Output length: {finalHtml.Length}");
+
+                return (finalHtml, openXmlExpressions, errors);
+            }
+            catch (OperationCanceledException)
+            {
+                // Let this propagate as-is rather than the wrapped InvalidOperationException
+                // below — it's an expected supersede/abort, not a conversion failure.
+                throw;
+            }
+            catch (MathParserException ex)
+            {
+                FileLogger.LogError("Math parsing error during conversion", ex);
+                throw new InvalidOperationException($"Math parsing error: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("Calcpad conversion failed", ex);
+                throw new InvalidOperationException($"Calcpad conversion failed: {ex.Message}", ex);
+            }
+        }
+
+        public string GetSampleContent()
+        {
+            return @"""Sample Mathematical Calculations
+'<hr/>
+'Basic arithmetic operations:
+a = 10
+b = 5
+'Addition:
+sum = a + b
+'Subtraction:  
+diff = a - b
+'Multiplication:
+prod = a * b
+'Division:
+ratio = a / b
+'Power:
+power = a^2
+'Square root:
+sqrt_a = sqr(a)
+'Trigonometric functions (angle in degrees):
+angle = 45
+sin_angle = sin(angle°)
+cos_angle = cos(angle°)
+tan_angle = tan(angle°)";
+        }
+
+
+        private string ConvertCodeToHtml(string code, IReadOnlyList<CalcpadError>? errorList = null)
+        {
+            // Convert code to HTML with line numbers and syntax highlighting (following WPF pattern)
+            const string ErrorString = "#Error";
+
+            // Key by OutputLine so macro-expanded loops only highlight the exact
+            // erroring row, not every iteration that came from the same source
+            // line. Fall back to SourceLine when OutputLine isn't known (0).
+            var errorsByOutputLine = new Dictionary<int, string>();
+            var errorsBySourceLine = new Dictionary<int, string>();
+            if (errorList != null)
+            {
+                foreach (var err in errorList)
+                {
+                    if (err.OutputLine > 0)
+                    {
+                        errorsByOutputLine[err.OutputLine] = errorsByOutputLine.TryGetValue(err.OutputLine, out var prevO)
+                            ? prevO + "\n" + err.Message
+                            : err.Message;
+                    }
+                    else
+                    {
+                        errorsBySourceLine[err.SourceLine] = errorsBySourceLine.TryGetValue(err.SourceLine, out var prevS)
+                            ? prevS + "\n" + err.Message
+                            : err.Message;
+                    }
+                }
+            }
+
+            var errors = new Queue<int>();
+            var stringBuilder = new System.Text.StringBuilder();
+            var lines = code.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            // One tokenizer pass over the whole listing: multi-line constructs need the state.
+            var lineTexts = new string[lines.Length];
+            var sourceLines = new string[lines.Length];
+            for (var l = 0; l < lines.Length; l++)
+            {
+                var v = lines[l].IndexOf('\v');
+                lineTexts[l] = v < 0 ? lines[l] : lines[l].Substring(0, v);
+                sourceLines[l] = v < 0 ? (l + 1).ToString() : lines[l].Substring(v + 1);
+            }
+            var tokensByLine = TokenizeListing(lineTexts);
+
+            stringBuilder.AppendLine("<div class=\"code\">");
+            var lineNumber = 0;
+
+            for (var l = 0; l < lineTexts.Length; l++)
+            {
+                ++lineNumber;
+                var lineText = lineTexts[l];
+                var sourceLine = sourceLines[l];
+
+                // Format line number with proper padding
+                var lineNumText = lineNumber.ToString();
+                var n = lineNumText.Length;
+                var spaceCount = Math.Max(0, 6 - n);
+                var paddedSpaces = new string(' ', spaceCount).Replace(" ", "&nbsp;");
+
+                errorsByOutputLine.TryGetValue(lineNumber, out var errMsg);
+                if (errMsg == null && int.TryParse(sourceLine, out var srcLineNum))
+                    errorsBySourceLine.TryGetValue(srcLineNum, out errMsg);
+                var errClass = errMsg != null ? " err-line" : "";
+                var errTitle = errMsg != null ? $" title=\"{System.Web.HttpUtility.HtmlAttributeEncode(errMsg)}\"" : "";
+                if (errMsg != null) errors.Enqueue(lineNumber);
+
+                // The paragraph id is the (output) line number for in-preview scrolling; the line-num
+                // anchor carries data-text=sourceLine so clicking it navigates the editor to the
+                // original source line (mirrors WPF's CodeToHtml).
+                stringBuilder.Append($"<p class=\"line-text{errClass}\" id=\"line-{lineNumber}\"{errTitle}><a class=\"line-num\" href=\"#0\" data-text=\"{sourceLine}\" title=\"Source line {sourceLine}\">{paddedSpaces}{lineNumber}</a>&emsp;│&emsp;");
+
+                if (lineText.StartsWith(ErrorString))
+                {
+                    var errorText = lineText.Length > ErrorString.Length ? lineText.Substring(ErrorString.Length) : "";
+                    // MacroParser already HTML encoded the error text, but we need to preserve HTML links
+                    // So we decode it first, then re-encode only the parts that aren't HTML links
+                    var decodedError = System.Web.HttpUtility.HtmlDecode(errorText);
+                    stringBuilder.Append($"<span class=\"err\">{decodedError}</span>");
+                }
+                else if (lineText.Contains("<a href=\"#0\" data-text=\"") || lineText.StartsWith("Error in"))
+                {
+                    // Line contains error HTML with data-text links - don't apply syntax highlighting
+                    // The HTML tags are NOT encoded in the raw text from MacroParser
+                    stringBuilder.Append($"<span class=\"err\">{lineText}</span>");
+                }
+                else
+                {
+                    stringBuilder.Append(HighlightLine(lineText, tokensByLine, l));
+                }
+                stringBuilder.AppendLine("</p>");
+            }
+            
+            stringBuilder.AppendLine("</div>");
+            
+            // Add error summary
+            if (errors.Count != 0)
+            {
+                stringBuilder.AppendLine($"<div class=\"errorHeader\">Found <b>{errors.Count}</b> errors in modules and macros:");
+                var count = 0;
+                while (errors.Count != 0 && ++count < 20)
+                {
+                    var errorLine = errors.Dequeue();
+                    stringBuilder.Append($" <span class=\"roundBox\" data-line=\"{errorLine}\">{errorLine}</span>");
+                }
+                if (errors.Count > 0)
+                    stringBuilder.Append(" ...");
+                
+                stringBuilder.AppendLine("</div>");
+                stringBuilder.AppendLine("<style>body {padding-top:1.1em;} .code p {margin:0; line-height:1.55em;}</style>");
+            }
+            else
+            {
+                stringBuilder.AppendLine("<style>.code p {margin:0; line-height:1.55em;}</style>");
+            }
+            
+            return stringBuilder.ToString();
+        }
+
+        // Names match the frontend's SEMANTIC_TOKEN_TYPES, so all three views share one palette.
+        private static readonly string[] TokenClasses = BuildTokenClasses();
+
+        private static string[] BuildTokenClasses()
+        {
+            var types = Enum.GetValues<TokenType>();
+            var classes = new string[types.Max(t => (int)t) + 1];
+            foreach (var t in types)
+            {
+                var name = t.ToString();
+                classes[(int)t] = char.ToLowerInvariant(name[0]) + name[1..];
+            }
+            classes[(int)TokenType.JavaScript] = "javascript";
+            return classes;
+        }
+
+        /// <summary>Falls back to no highlighting rather than failing an already-failing parse.</summary>
+        private static Dictionary<int, List<Token>> TokenizeListing(string[] lineTexts)
+        {
+            try
+            {
+                return new CalcpadTokenizer().Tokenize(string.Join('\n', lineTexts)).TokensByLine;
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogWarning("Tokenizing the unwrapped listing failed", ex.Message);
+                return [];
+            }
+        }
+
+        /// <summary>Slices the source line, not token.Text, so normalized glyphs list as written.</summary>
+        private static string HighlightLine(string line, Dictionary<int, List<Token>> tokensByLine, int lineIndex)
+        {
+            if (string.IsNullOrEmpty(line) || !tokensByLine.TryGetValue(lineIndex, out var tokens))
+                return System.Web.HttpUtility.HtmlEncode(line);
+
+            var result = new System.Text.StringBuilder(line.Length * 2);
+            var pos = 0;
+            foreach (var token in tokens)
+            {
+                var end = Math.Min(token.Column + token.Length, line.Length);
+                if (token.Type == TokenType.None || token.Column < pos || end <= token.Column)
+                    continue;
+
+                if (token.Column > pos)
+                    result.Append(System.Web.HttpUtility.HtmlEncode(line[pos..token.Column]));
+
+                result.Append("<span class=\"")
+                    .Append(TokenClasses[(int)token.Type])
+                    .Append("\">")
+                    .Append(System.Web.HttpUtility.HtmlEncode(line[token.Column..end]))
+                    .Append("</span>");
+                pos = end;
+            }
+            if (pos < line.Length)
+                result.Append(System.Web.HttpUtility.HtmlEncode(line[pos..]));
+
+            return result.ToString();
+        }
+
+        private static string LoadHtmlTemplate()
+        {
+            try
+            {
+                // First try to read from embedded resource (for single-file deployments)
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var resourceName = "Calcpad.Server.template.html";
+                
+                using var stream = assembly.GetManifestResourceStream(resourceName);
+                if (stream != null)
+                {
+                    using var reader = new StreamReader(stream);
+                    var template = reader.ReadToEnd();
+                    FileLogger.LogVerbose("Loaded HTML template from embedded resource");
+                    return template;
+                }
+                
+                // Fallback to file system (for development and non-single-file deployments)
+                var templatePath = Path.Combine(AppContext.BaseDirectory, "template.html");
+                if (File.Exists(templatePath))
+                {
+                    var template = File.ReadAllText(templatePath);
+                    FileLogger.LogVerbose("Loaded HTML template from file system", templatePath);
+                    return template;
+                }
+                
+                throw new FileNotFoundException($"Template file not found at {templatePath}");
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("Failed to load HTML template, using fallback", ex);
+                return GetFallbackTemplate();
+            }
+        }
+
+        private static string GetFallbackTemplate()
+        {
+            return @"<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Calcpad Calculation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        .math { font-family: 'Times New Roman', serif; }
+        .error { color: red; }
+        table { border-collapse: collapse; margin: 10px 0; }
+        td, th { padding: 5px 10px; border: 1px solid #ccc; }
+        .center { text-align: center; }
+    </style>
+</head>
+<body>
+    {{CONTENT}}
+</body>
+</html>";
+        }
+
+        private string WrapHtmlResult(string htmlContent, string theme = "light", bool enableUi = false)
+        {
+            // Use the comprehensive HTML template with theme support
+            var themeClass = theme.ToLower() == "dark" ? " class=\"dark-theme\"" : "";
+            var templateWithTheme = _htmlTemplate.Replace("<body>", $"<body{themeClass}>");
+
+            // Register @font-face rules for fonts referenced by name in the
+            // template CSS (e.g. Jost*), so they don't depend on OS installation,
+            // and expose window.__calcpadFonts for any other client-side use.
+            // Injected before </head> so it runs before any module scripts in body.
+            var headMarkup = BundledFonts.GetFontFaceStyleTag() + BundledFonts.GetInjectionScript();
+
+            // The datagrid libraries are large, so they only go in when a grid is
+            // actually present. jspreadsheet has to be defined before the event
+            // script runs, hence <head> rather than alongside it.
+            if (enableUi && htmlContent.Contains("calcpad-ui-datagrid", StringComparison.Ordinal))
+                headMarkup += BundledUiAssets.GetHeadMarkup();
+
+            if (!string.IsNullOrEmpty(headMarkup))
+            {
+                var headCloseIdx = templateWithTheme.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);
+                if (headCloseIdx >= 0)
+                    templateWithTheme = templateWithTheme.Insert(headCloseIdx, headMarkup);
+            }
+
+            // Report and print output carry no controls, so they get no event script.
+            if (enableUi)
+            {
+                var bodyCloseIdx = templateWithTheme.LastIndexOf("</body>", StringComparison.OrdinalIgnoreCase);
+                if (bodyCloseIdx >= 0)
+                    templateWithTheme = templateWithTheme.Insert(bodyCloseIdx, UiPreviewScript.GetScriptTag());
+            }
+
+            return templateWithTheme.Replace("{{CONTENT}}", htmlContent);
+        }
+
+        private static void TryDeleteFile(string filePath)
+        {
+            try
+            {
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+            }
+            catch
+            {
+                // Ignore cleanup errors
+            }
+        }
+
+        /// <summary>
+        /// Processes included file content to respect #local and #global directives.
+        /// Following the pattern from Calcpad.Cli.CalcpadReader.Include
+        /// <para>
+        /// A saved 'uiOverrides' comment only has any effect on the file that carries it -
+        /// the host restores it by scanning the document you have open, before #include is
+        /// expanded, so one coming from an included file would otherwise sit inert in the
+        /// flattened text. Stripped the same way #local content is, whether or not the
+        /// including file wrapped it in #local/#global itself.
+        /// </para>
+        /// </summary>
+        private static string ProcessIncludedContent(string content)
+        {
+            if (string.IsNullOrEmpty(content))
+                return content;
+
+            var isLocal = false;
+            var isUiOverridesComment = false;
+            var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            var outputLines = new List<string>();
+
+            foreach (var line in lines)
+            {
+                if (isUiOverridesComment)
+                {
+                    if (line.Contains("-->", StringComparison.Ordinal))
+                        isUiOverridesComment = false;
+
+                    continue;
+                }
+                if (Validator.IsKeyword(line, "#local"))
+                {
+                    isLocal = true;
+                }
+                else if (Validator.IsKeyword(line, "#global"))
+                {
+                    isLocal = false;
+                }
+                else if (IsUiOverridesCommentStart(line))
+                {
+                    isUiOverridesComment = !line.Contains("-->", StringComparison.Ordinal);
+                }
+                else
+                {
+                    // Only include lines that are not marked as local
+                    if (!isLocal)
+                    {
+                        outputLines.Add(line);
+                    }
+                }
+            }
+
+            return string.Join(Environment.NewLine, outputLines);
+        }
+
+        /// <summary>
+        /// True for the first line of a metadata comment ('<!--{...}-->) whose JSON carries
+        /// a 'uiOverrides' key. A cheap substring check rather than a JSON parse, matching
+        /// the rest of this method's line-based approach - good enough since the host always
+        /// writes the key verbatim.
+        /// </summary>
+        private static bool IsUiOverridesCommentStart(string line)
+        {
+            var trimmed = line.TrimStart();
+            return (trimmed.StartsWith('\'') || trimmed.StartsWith('"'))
+                && trimmed.Contains("<!--", StringComparison.Ordinal)
+                && trimmed.Contains("uiOverrides", StringComparison.Ordinal);
+        }
+    }
+}

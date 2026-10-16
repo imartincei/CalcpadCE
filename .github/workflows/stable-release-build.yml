@@ -1,0 +1,78 @@
+name: Stable Release
+
+# vX.Y.Z only. Tags with a suffix (i.e. v8.0.0-beta.1) go to pre-release-build.yml.
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+jobs:
+  determine-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Determine version
+        id: version
+        run: node tools/version.mjs release
+
+  build-all:
+    needs: determine-version
+    uses: ./.github/workflows/build-all.yml
+    with:
+      version: ${{ needs.determine-version.outputs.version }}
+
+  release:
+    needs: [build-all, determine-version]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/release-notes-template.md
+          sparse-checkout-cone-mode: false
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts/
+          merge-multiple: true
+          # Artifacts are uploaded raw; the portable build is itself a zip.
+          skip-decompress: true
+
+      - name: Generate release notes
+        env:
+          VERSION: ${{ needs.determine-version.outputs.version }}
+          REPO: ${{ github.repository }}
+        run: envsubst < .github/release-notes-template.md > release-notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: artifacts/*
+          body_path: release-notes.md
+          generate_release_notes: true
+          make_latest: true
+          prerelease: false
+          draft: true
+
+  bump-website-version:
+    needs: [build-all, determine-version]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger version bump in CalcpadCE-Website
+        run: |
+          gh workflow run bump-website-version.yml \
+            --repo fwolter/CalcpadCE-Website \
+            --field version=${{ needs.determine-version.outputs.version }}
+        env:
+          GH_TOKEN: ${{ secrets.WEBSITE_ACTIONS_TOKEN }}

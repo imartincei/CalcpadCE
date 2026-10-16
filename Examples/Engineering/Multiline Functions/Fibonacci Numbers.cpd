@@ -1,0 +1,17 @@
+'<!-- Recursive multiline definition of the [Fibonacci](https://en.wikipedia.org/wiki/Fibonacci_number) function $fib(n)$, illustrating self-referential calls and conditional base cases. -->
+'Function:
+fib(n) = if(n ≡ 1; 1;
+  $block{
+    a = 0;
+    b = 1;
+    $repeat{
+       c = a + b;
+       a ← b;
+       b ← c;
+     @ k = 1 : n - 1} _
+  } _
+)
+'Results:
+#for i = 1 : 9
+	fib(i)
+#loop

@@ -1,0 +1,17 @@
+#include Helper.cpd
+hide$debug=0unhide$
+'<strong>If clrUnits is okay to show in output</strong>
+t = 5ft
+j = 6in
+hideC$(debug≡0)
+t = t|in','j = j|ft
+unhideC$(debug≡0)
+clrUnits(t)*clrUnits(j)
+'<br>'
+'<strong>If clrUnits is not okay to show in output</strong>
+t = 5ft
+j = 6in
+hideC$(debug≡0)
+t = t/in','j = j/ft
+unhideC$(debug≡0)
+t*j

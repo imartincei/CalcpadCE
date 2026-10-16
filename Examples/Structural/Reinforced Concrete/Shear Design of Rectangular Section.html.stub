@@ -1,0 +1,1023 @@
+<div class="calcpad-output">
+ <!-- Shear design of a rectangular section under EN 1992-1-1: shear strength without links $V_{Rd,c}$, required link area for a strut angle $\theta$ and check of the maximum strut compression. -->
+ <small>
+  According to
+  <strong>Eurocode</strong>
+  : EN 1992-1-1
+ </small>
+ <div style="max-width:180mm;">
+  <img alt="beam-shear.png" class="side" src="Images/structures/rc/design/beam-shear.png" style="width:270pt;"/>
+  <h4>Cross section dimensions</h4>
+  <p>
+   Width -
+   <span class="eq">
+    <var>b</var>
+    =
+    <u class="input-6">300</u>
+   </span>
+   mm, Height
+   <span class="eq">
+    <var>h</var>
+    =
+    <u class="input-6">800</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Cross section area -
+   <span class="eq">
+    <var>A</var>
+    <sub>c</sub>
+    =
+    <var>b</var>
+    ·
+    <var>h</var>
+    = 300 · 800 = 240000
+   </span>
+   mm²
+  </p>
+  <p>
+   Tensile reinforcement area -
+   <span class="eq">
+    <var>A</var>
+    <sub>sl</sub>
+    =
+    <u class="input-10">1200</u>
+   </span>
+   mm²
+  </p>
+  <p>
+   Effective depth -
+   <span class="eq">
+    <var>d</var>
+    =
+    <var>h</var>
+    −
+    <u class="input-11">50</u>
+    = 800 −
+    <u class="input-11">50</u>
+    = 750
+   </span>
+   mm
+  </p>
+  <p>
+   Reinforcement ratio -
+   <span class="eq">
+    <var>ρ</var>
+    <sub>l</sub>
+    =
+    <b>min</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>A</var>
+     <sub>sl</sub>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+     ·
+     <var>d</var>
+    </span>
+    ; 0.02
+    <span class="b1">)</span>
+    =
+    <b>min</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     1200
+     <span class="dvl">
+     </span>
+     300 · 750
+    </span>
+    ; 0.02
+    <span class="b1">)</span>
+    = 0.00533
+   </span>
+  </p>
+  <p>
+   Shear links diameter -
+   <span class="eq">
+    <var>d</var>
+    <sub>w</sub>
+    =
+    <u class="input-15">8</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Number of legs for one link -
+   <span class="eq">
+    <var>n</var>
+    <sub>w</sub>
+    =
+    <u class="input-16">2</u>
+   </span>
+  </p>
+  <p>
+   <b>Section design loads</b>
+  </p>
+  <p>
+   Shear force -
+   <span class="eq">
+    <var>V</var>
+    <sub>Ed</sub>
+    =
+    <u class="input-18">600</u>
+   </span>
+   kN  Axial force -
+   <span class="eq">
+    <var>N</var>
+    <sub>Ed</sub>
+    =
+    <u class="input-18">0</u>
+   </span>
+   kN
+  </p>
+  <h4>Material properties</h4>
+  <p class="ref">[EN 1992-1-1, Table 3.1]</p>
+  <p>
+   <b>Concrete</b>
+  </p>
+  <p>
+   Characteristic compressive cylinder strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ck</sub>
+    =
+    <u class="input-22">20</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Partial safety factor for concrete -
+   <span class="eq">
+    <var>γ</var>
+    <sub>c</sub>
+    = 1.5
+   </span>
+   ,
+   <span class="eq">
+    <var>α</var>
+    <sub>cc</sub>
+    =
+    <u class="input-23">1</u>
+   </span>
+  </p>
+  <p>
+   Design compressive cylinder strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>cd</sub>
+    =
+    <span class="dvc">
+     <var>α</var>
+     <sub>cc</sub>
+     ·
+     <var>f</var>
+     <sub>ck</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>c</sub>
+    </span>
+    =
+    <span class="dvc">
+     1 · 20
+     <span class="dvl">
+     </span>
+     1.5
+    </span>
+    = 13.33
+   </span>
+   MPa
+  </p>
+  <p>
+   <b>Steel for shear reinforcement</b>
+  </p>
+  <p>
+   Characteristic yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>yk</sub>
+    =
+    <u class="input-28">500</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Partial safety factor for steel -
+   <span class="eq">
+    <var>γ</var>
+    <sub>s</sub>
+    = 1.15
+   </span>
+  </p>
+  <p>
+   Design yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ywd</sub>
+    =
+    <span class="dvc">
+     <var>f</var>
+     <sub>yk</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>s</sub>
+    </span>
+    =
+    <span class="dvc">
+     500
+     <span class="dvl">
+     </span>
+     1.15
+    </span>
+    = 434.78
+   </span>
+   MPa
+  </p>
+  <p>
+  </p>
+  <div class="fold">
+   <h4>
+    Shear capacity without reinforcement
+    <small class="ref">[EN 1992-1-1, § 6.2.2]</small>
+   </h4>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     =
+     <b>min</b>
+     <span class="b1">(</span>
+     1 +
+     <span class="o1">
+      <span class="r1">
+      </span>
+      <span class="dvc">
+       200
+       <span class="dvl">
+       </span>
+       <var>d</var>
+      </span>
+     </span>
+     ; 2
+     <span class="b1">)</span>
+     =
+     <b>min</b>
+     <span class="b1">(</span>
+     1 +
+     <span class="o1">
+      <span class="r1">
+      </span>
+      <span class="dvc">
+       200
+       <span class="dvl">
+       </span>
+       750
+      </span>
+     </span>
+     ; 2
+     <span class="b1">)</span>
+     = 1.52
+    </span>
+   </p>
+   <p>
+    Stress due to axial force (N
+    <sub>Ed</sub>
+    &gt; 0 for compression)
+   </p>
+   <p>
+    <span class="eq">
+     <var>σ</var>
+     <sub>cp_</sub>
+     =
+     <span class="dvc">
+      <var>N</var>
+      <sub>Ed</sub>
+      · 10
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      <var>A</var>
+      <sub>c</sub>
+     </span>
+     =
+     <span class="dvc">
+      0 · 10
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      240000
+     </span>
+     = 0
+    </span>
+    MPa
+   </p>
+   <p>
+    Maximum stress value:
+    <span class="eq">
+     0.2 ·
+     <var>f</var>
+     <sub>cd</sub>
+     = 0.2 · 13.33 = 2.67
+    </span>
+    MPa
+   </p>
+   <p>
+    <span class="eq">
+     <var>σ</var>
+     <sub>cp</sub>
+     =
+     <b>min</b>
+     (
+     <var>σ</var>
+     <sub>cp_</sub>
+     ; 0.2 ·
+     <var>f</var>
+     <sub>cd</sub>
+     )  =
+     <b>min</b>
+     ( 0; 0.2 · 13.33 )  = 0
+    </span>
+    MPa
+   </p>
+   <p>
+    <span class="eq">
+     <var>C</var>
+     <sub>Rd_c</sub>
+     =
+     <span class="dvc">
+      0.18
+      <span class="dvl">
+      </span>
+      <var>γ</var>
+      <sub>c</sub>
+     </span>
+     =
+     <span class="dvc">
+      0.18
+      <span class="dvl">
+      </span>
+      1.5
+     </span>
+     = 0.12
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>v</var>
+     <sub>min</sub>
+     = 0.035 ·
+     <var>k</var>
+     <sup>
+      <span class="dvc">
+       3
+       <span class="dvl">
+       </span>
+       2
+      </span>
+     </sup>
+     ·
+     <span class="o0">
+      <span class="r">√</span>
+      <var>f</var>
+      <sub>ck</sub>
+     </span>
+     = 0.035 · 1.52
+     <sup>
+      <span class="dvc">
+       3
+       <span class="dvl">
+       </span>
+       2
+      </span>
+     </sup>
+     ·
+     <span class="o0">
+      <span class="r">√</span>
+      20
+     </span>
+     = 0.292
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     <sub>1</sub>
+     = 0.15
+    </span>
+   </p>
+   <p class="ref">(6.2a)</p>
+   <p>Shear resistance</p>
+   <p>
+    <span class="eq">
+     <var>V</var>
+     <sub>Rd_c_</sub>
+     =  (
+     <var>C</var>
+     <sub>Rd_c</sub>
+     ·
+     <var>k</var>
+     ·  ( 100 ·
+     <var>ρ</var>
+     <sub>l</sub>
+     ·
+     <var>f</var>
+     <sub>ck</sub>
+     )
+     <sup>
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       3
+      </span>
+     </sup>
+     +
+     <var>k</var>
+     <sub>1</sub>
+     ·
+     <var>σ</var>
+     <sub>cp</sub>
+     )  ·
+     <var>b</var>
+     ·
+     <var>d</var>
+     · 10
+     <sup>-3</sup>
+     =  ( 0.12 · 1.52 ·  ( 100 · 0.00533 · 20 )
+     <sup>
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       3
+      </span>
+     </sup>
+     + 0.15 · 0 )  · 300 · 750 · 10
+     <sup>-3</sup>
+     = 90.13
+    </span>
+    kN
+   </p>
+   <p>Minimum shear resistance</p>
+   <p class="ref">(6.2b)</p>
+   <p>
+    <span class="eq">
+     <var>V</var>
+     <sub>Rd_c_min</sub>
+     =  (
+     <var>v</var>
+     <sub>min</sub>
+     +
+     <var>k</var>
+     <sub>1</sub>
+     ·
+     <var>σ</var>
+     <sub>cp</sub>
+     )  ·
+     <var>b</var>
+     ·
+     <var>d</var>
+     · 10
+     <sup>-3</sup>
+     =  ( 0.292 + 0.15 · 0 )  · 300 · 750 · 10
+     <sup>-3</sup>
+     = 65.76
+    </span>
+    kN
+   </p>
+   <p>
+    <span class="eq">
+     <var>V</var>
+     <sub>Rd_c</sub>
+     =
+     <b>max</b>
+     (
+     <var>V</var>
+     <sub>Rd_c_min</sub>
+     ;
+     <var>V</var>
+     <sub>Rd_c_</sub>
+     )  =
+     <b>max</b>
+     ( 65.76; 90.13 )  = 90.13
+    </span>
+    kN
+   </p>
+   <p>Design check</p>
+  </div>
+  <p>
+   <span class="eq">
+    <var>V</var>
+    <sub>Ed</sub>
+    = 600
+   </span>
+   kN &gt;
+   <span class="eq">
+    <var>V</var>
+    <sub>Rd_c</sub>
+    = 90.13
+   </span>
+   kN. Shear reinforcement is required!
+  </p>
+  <div class="fold">
+   <h4>
+    Shear capacity with reinforcement
+    <small class="ref">[EN 1992-1-1, §6.2.3]</small>
+   </h4>
+   <p>
+    Lever arm of internal forces -
+    <span class="eq">
+     <var>z</var>
+     = 0.9 ·
+     <var>d</var>
+     = 0.9 · 750 = 675
+    </span>
+    mm
+   </p>
+   <p class="ref">(6.6N)</p>
+   <p>
+    <span class="eq">
+     <var>ν</var>
+     <sub>1</sub>
+     = 0.6 ·
+     <span class="b1">(</span>
+     1 −
+     <span class="dvc">
+      <var>f</var>
+      <sub>ck</sub>
+      <span class="dvl">
+      </span>
+      250
+     </span>
+     <span class="b1">)</span>
+     = 0.6 ·
+     <span class="b1">(</span>
+     1 −
+     <span class="dvc">
+      20
+      <span class="dvl">
+      </span>
+      250
+     </span>
+     <span class="b1">)</span>
+     = 0.552
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     <sub>σ</sub>
+     =
+     <span class="dvc">
+      <var>σ</var>
+      <sub>cp_</sub>
+      <span class="dvl">
+      </span>
+      <var>f</var>
+      <sub>cd</sub>
+     </span>
+     =
+     <span class="dvc">
+      0
+      <span class="dvl">
+      </span>
+      13.33
+     </span>
+     = 0
+    </span>
+   </p>
+   <p>
+    Factor α
+    <sub>cw</sub>
+    depends on the value of k
+    <sub>σ</sub>
+   </p>
+   <p>
+    <span class="eq">
+     <var>α</var>
+     <sub>cw</sub>
+     = 1 +
+     <var>k</var>
+     <sub>σ</sub>
+     = 1 + 0 = 1
+    </span>
+    for 0 &lt;
+    <i>k</i>
+    <sub>σ</sub>
+    &lt; 0.25
+   </p>
+   <p class="ref">(6.9)</p>
+   <p>Maximum shear capacity at θ = 45°</p>
+   <p>
+    <span class="eq">
+     <var>V</var>
+     <sub>Rd_max_45</sub>
+     =
+     <span class="dvc">
+      <var>α</var>
+      <sub>cw</sub>
+      ·
+      <var>b</var>
+      ·
+      <var>z</var>
+      ·
+      <var>ν</var>
+      <sub>1</sub>
+      ·
+      <var>f</var>
+      <sub>cd</sub>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     · 10
+     <sup>-3</sup>
+     =
+     <span class="dvc">
+      1 · 300 · 675 · 0.552 · 13.33
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     · 10
+     <sup>-3</sup>
+     = 745.2
+    </span>
+    kN
+   </p>
+   <p>
+    <span class="eq">
+     <var>V</var>
+     <sub>Ed</sub>
+     = 600
+    </span>
+    kN ≤
+    <span class="eq">
+     <var>V</var>
+     <sub>Rd_max_45</sub>
+     = 745.2
+    </span>
+    kN. The check is satisfied!
+   </p>
+   <p>Angle of concrete struts</p>
+   <p>
+    <span class="eq">
+     <var>θ_</var>
+     = 0.5 ·
+     <b>asin</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>V</var>
+      <sub>Ed</sub>
+      <span class="dvl">
+      </span>
+      <var>V</var>
+      <sub>Rd_max_45</sub>
+     </span>
+     <span class="b1">)</span>
+     = 0.5 ·
+     <b>asin</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      600
+      <span class="dvl">
+      </span>
+      745.2
+     </span>
+     <span class="b1">)</span>
+     = 26.81
+    </span>
+    °
+   </p>
+   <p class="ref">(6.7N)</p>
+   <p>The angle is limited between 21,8° ≤ θ ≤ 45°(1 ≤ cot(θ) ≤ 2.5)</p>
+   <p>
+    <span class="eq">
+     <var>θ</var>
+     =
+     <b>max</b>
+     ( 21.8;
+     <b>min</b>
+     (
+     <var>θ_</var>
+     ; 45 )  )  =
+     <b>max</b>
+     ( 21.8;
+     <b>min</b>
+     ( 26.81; 45 )  )  = 26.81
+    </span>
+    °
+   </p>
+   <p class="ref">(6.9)</p>
+   <p>
+    Bearing capacity check at
+    <span class="eq">
+     <var>θ</var>
+     = 26.81
+    </span>
+    °
+   </p>
+   <p>
+    <span class="eq">
+     <var>V</var>
+     <sub>Rd_max</sub>
+     =
+     <span class="dvc">
+      <var>α</var>
+      <sub>cw</sub>
+      ·
+      <var>b</var>
+      ·
+      <var>z</var>
+      ·
+      <var>ν</var>
+      <sub>1</sub>
+      ·
+      <var>f</var>
+      <sub>cd</sub>
+      <span class="dvl">
+      </span>
+      <b>cot</b>
+      (
+      <var>θ</var>
+      )  +
+      <b>tan</b>
+      (
+      <var>θ</var>
+      )
+     </span>
+     · 10
+     <sup>-3</sup>
+     =
+     <span class="dvc">
+      1 · 300 · 675 · 0.552 · 13.33
+      <span class="dvl">
+      </span>
+      <b>cot</b>
+      ( 26.81 )  +
+      <b>tan</b>
+      ( 26.81 )
+     </span>
+     · 10
+     <sup>-3</sup>
+     = 600
+    </span>
+    kN
+   </p>
+  </div>
+  <p>
+   Design check:
+   <span class="eq">
+    <var>V</var>
+    <sub>Ed</sub>
+    = 600
+   </span>
+   kN ≤
+   <span class="eq">
+    <var>V</var>
+    <sub>Rd_max</sub>
+    = 600
+   </span>
+   kN
+  </p>
+  <p class="ref">(6.8)</p>
+  <p>Required shear reinforcement area</p>
+  <p>
+   <span class="eq">
+    <var>A</var>
+    <sub>sw</sub>
+    =
+    <span class="dvc">
+     <var>V</var>
+     <sub>Ed</sub>
+     · 10
+     <sup>6</sup>
+     <span class="dvl">
+     </span>
+     <var>z</var>
+     ·
+     <var>f</var>
+     <sub>ywd</sub>
+     ·
+     <b>cot</b>
+     (
+     <var>θ</var>
+     )
+    </span>
+    =
+    <span class="dvc">
+     600 · 10
+     <sup>6</sup>
+     <span class="dvl">
+     </span>
+     675 · 434.78 ·
+     <b>cot</b>
+     ( 26.81 )
+    </span>
+    = 1033.28
+   </span>
+   mm²/m
+  </p>
+  <p>
+   Shear links with
+   <span class="eq">
+    <var>n</var>
+    <sub>w</sub>
+    = 2
+   </span>
+   legs and diameter -
+   <span class="eq">
+    <var>d</var>
+    <sub>w</sub>
+    = 8
+   </span>
+   mm are provided
+  </p>
+  <p>
+   Area of one leg -
+   <span class="eq">
+    <var>A</var>
+    <sub>s1</sub>
+    =
+    <var>π</var>
+    ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>d</var>
+     <sub>w</sub>
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">2</sup>
+    = 3.14 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     8
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">2</sup>
+    = 50.27
+   </span>
+   mm²
+  </p>
+  <p>
+   Required links spacing -
+   <span class="eq">
+    <var>s</var>
+    =
+    <span class="dvc">
+     1000 ·
+     <var>n</var>
+     <sub>w</sub>
+     ·
+     <var>A</var>
+     <sub>s1</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+     <sub>sw</sub>
+    </span>
+    =
+    <span class="dvc">
+     1000 · 2 · 50.27
+     <span class="dvl">
+     </span>
+     1033.28
+    </span>
+    = 97.29
+   </span>
+   mm
+  </p>
+  <p class="ref">[EN 1992-1-1, §9.2.2]</p>
+  <p>
+   Maximum spacing -
+   <span class="eq">
+    <var>s</var>
+    <sub>max</sub>
+    =
+    <b>min</b>
+    ( 0.75 ·
+    <var>d</var>
+    ; 300 )  =
+    <b>min</b>
+    ( 0.75 · 750; 300 )  = 300
+   </span>
+   mm
+  </p>
+  <p class="ref">(9.4)</p>
+  <p>Reinforcement ratio</p>
+  <p>
+   <span class="eq">
+    <var>ρ</var>
+    <sub>w</sub>
+    =
+    <span class="dvc">
+     <var>A</var>
+     <sub>sw</sub>
+     <span class="dvl">
+     </span>
+     <var>s</var>
+     ·
+     <var>b</var>
+    </span>
+    =
+    <span class="dvc">
+     1033.28
+     <span class="dvl">
+     </span>
+     97.29 · 300
+    </span>
+    = 0.0354
+   </span>
+  </p>
+  <p class="ref">(9.5N)</p>
+  <p>
+   <span class="eq">
+    <var>ρ</var>
+    <sub>w_min</sub>
+    =
+    <span class="dvc">
+     0.08 ·
+     <span class="o0">
+      <span class="r">√</span>
+      <var>f</var>
+      <sub>ck</sub>
+     </span>
+     <span class="dvl">
+     </span>
+     <var>f</var>
+     <sub>yk</sub>
+    </span>
+    =
+    <span class="dvc">
+     0.08 ·
+     <span class="o0">
+      <span class="r">√</span>
+      20
+     </span>
+     <span class="dvl">
+     </span>
+     500
+    </span>
+    = 0.000716
+   </span>
+  </p>
+  <p class="ref">(6.18)</p>
+  <p>Additional force in tensile reinforcement</p>
+  <p>
+   <span class="eq">
+    <var>ΔF</var>
+    <sub>td</sub>
+    = 0.5 ·
+    <var>V</var>
+    <sub>Ed</sub>
+    ·
+    <b>cot</b>
+    (
+    <var>θ</var>
+    )  = 0.5 · 600 ·
+    <b>cot</b>
+    ( 26.81 )  = 593.58
+   </span>
+   kN
+  </p>
+  <p class="ref">(9.2)</p>
+  <p>Bending moment diagram shifting distance</p>
+  <p>
+   <span class="eq">
+    <var>a</var>
+    <sub>l</sub>
+    =
+    <span class="dvc">
+     <var>z</var>
+     ·
+     <b>cot</b>
+     (
+     <var>θ</var>
+     )
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    =
+    <span class="dvc">
+     675 ·
+     <b>cot</b>
+     ( 26.81 )
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    = 667.77
+   </span>
+   mm
+  </p>
+ </div>
+</div>

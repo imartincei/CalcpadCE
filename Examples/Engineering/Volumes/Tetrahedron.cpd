@@ -1,0 +1,9 @@
+'<!-- Volume $V = \tfrac{a^3}{6\sqrt{2}}$ and surface area $S = \sqrt{3}\, a^2$ of a regular tetrahedron from its edge length. -->
+'<div style = "max-width:110mm"><img style="height:60pt;" class="side" alt="tetrahedron.png" src = "../../Images/math/volume/tetrahedron.png"></div>
+'Side length
+a = ? {1}
+'Volume
+V = sqr(2)*a^3/12
+'Surface area
+S = sqr(3)*a^2
+'

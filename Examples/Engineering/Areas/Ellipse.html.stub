@@ -1,0 +1,223 @@
+<div class="calcpad-output">
+ <!-- Area $A = \pi\, a\, b$ and approximate circumference of an ellipse from its two semi-axes. -->
+ <div style="max-width:110mm;">
+  <img alt="ellipse.png" class="side" src="Images/math/area/ellipse.png" style="height:65pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">2</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-4">1</u>
+  </span>
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>a</var>
+    ·
+    <var>b</var>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   =
+   <span class="dvc">
+    3.14 · 2 · 1
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   = 1.57
+  </span>
+ </p>
+ <p>Circumference</p>
+ <p>
+  Assume -
+  <span class="eq">
+   <var>h</var>
+   =
+   <span class="dvc">
+    (
+    <var>a</var>
+    −
+    <var>b</var>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    (
+    <var>a</var>
+    +
+    <var>b</var>
+    )
+    <sup>2</sup>
+   </span>
+   =
+   <span class="dvc">
+    ( 2 − 1 )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    ( 2 + 1 )
+    <sup>2</sup>
+   </span>
+   = 0.111
+  </span>
+ </p>
+ <p>Using the Ramanujan equation</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·  (
+    <var>a</var>
+    +
+    <var>b</var>
+    )
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ·
+   <span class="b1">(</span>
+   1 +
+   <span class="dvc">
+    3 ·
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    10 +
+    <span class="o0">
+     <span class="r">√</span>
+     4 − 3 ·
+     <var>h</var>
+    </span>
+   </span>
+   <span class="b1">)</span>
+   =
+   <span class="dvc">
+    3.14 ·  ( 2 + 1 )
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ·
+   <span class="b1">(</span>
+   1 +
+   <span class="dvc">
+    3 · 0.111
+    <span class="dvl">
+    </span>
+    10 +
+    <span class="o0">
+     <span class="r">√</span>
+     4 − 3 · 0.111
+    </span>
+   </span>
+   <span class="b1">)</span>
+   = 4.84
+  </span>
+ </p>
+ <p>Using series (up to the 4-th member)</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·  (
+    <var>a</var>
+    +
+    <var>b</var>
+    )
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ·
+   <span class="b1">(</span>
+   1 +
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ·
+   <var>h</var>
+   +
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    64
+   </span>
+   ·
+   <var>h</var>
+   <sup>2</sup>
+   +
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    256
+   </span>
+   ·
+   <var>h</var>
+   <sup>3</sup>
+   <span class="b1">)</span>
+   =
+   <span class="dvc">
+    3.14 ·  ( 2 + 1 )
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ·
+   <span class="b1">(</span>
+   1 +
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   · 0.111 +
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    64
+   </span>
+   · 0.111
+   <sup>2</sup>
+   +
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    256
+   </span>
+   · 0.111
+   <sup>3</sup>
+   <span class="b1">)</span>
+   = 4.84
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

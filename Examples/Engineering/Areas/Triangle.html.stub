@@ -1,0 +1,82 @@
+<div class="calcpad-output">
+ <!-- Area and perimeter of a general triangle from three side lengths via Heron formula, with a triangle-inequality guard. -->
+ <div style="max-width:110mm;">
+  <img alt="triangle.png" class="side" src="Images/math/area/triangle.png" style="height:55pt;"/>
+ </div>
+ <p>Side lengths</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">5</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-4">4</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>c</var>
+   =
+   <u class="input-4">3</u>
+  </span>
+ </p>
+ <!--
+<-->
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   =
+   <var>a</var>
+   +
+   <var>b</var>
+   +
+   <var>c</var>
+   = 5 + 4 + 3 = 12
+  </span>
+ </p>
+ <p>Area (Heron formula)</p>
+ <p>
+  Semiperimeter -
+  <span class="eq">
+   <var>p</var>
+   = 0.5 ·
+   <var>P</var>
+   = 0.5 · 12 = 6
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>p</var>
+    ·  (
+    <var>p</var>
+    −
+    <var>a</var>
+    )  ·  (
+    <var>p</var>
+    −
+    <var>b</var>
+    )  ·  (
+    <var>p</var>
+    −
+    <var>c</var>
+    )
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    6 ·  ( 6 − 5 )  ·  ( 6 − 4 )  ·  ( 6 − 3 )
+   </span>
+   = 6
+  </span>
+ </p>
+ <!--
+<-->
+</div>

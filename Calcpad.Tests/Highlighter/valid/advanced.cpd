@@ -1,0 +1,84 @@
+' Advanced: cross-feature integration and edge cases
+#include import.cpd
+' Imported macro inside a loop
+capacities = [120*kN; 90*kN; 150*kN; 200*kN]
+demands = [100*kN; 95*kN; 140*kN; 180*kN]
+#for idx = 1 : len(capacities)
+	check$(capacities.idx; demands.idx)
+#loop
+' Imported function in a command block
+maxArea = $Sup{circleArea(r) @ r = 0 : 10}
+' Imported constant in expression with units
+pricePerUnit = IMPORTED_CONST*.EUR
+totalUSD = pricePerUnit*5/.USD
+' Imported macro as argument to $Sum
+sumDoubled = $Sum{double$(k) @ k = 1 : 5}
+' Text + math + imported macro interleaved
+"<h3>Results</h3>"
+'Capacity check for element 1:'
+check$(capacities.1; demands.1)
+'Area = 'circleArea(3)'m²'
+' Macro defined locally that calls imported macro
+#def doubleCheck$(a$; b$)
+	check$(double$(a$); b$)
+#end def
+doubleCheck$(50*kN; 90*kN)
+' Vector of imported function results built in $Repeat
+areas = vector(5)
+$Repeat{areas.i = circleArea(i) @ i = 1 : 5}
+' Custom unit from import used in vector
+prices = [10*.EUR; 20*.EUR; 30*.EUR]
+converted = $Inline{s = 0; $Repeat{s = s + take(k; prices)/.USD @ k = 1 : len(prices)}; s}
+' Nested #if using imported constant
+#if IMPORTED_CONST > 40
+	x_adv = IMPORTED_CONST + 1
+	#if x_adv > 42
+		y_adv = x_adv^2
+	#else
+		y_adv = x_adv
+	#end if
+#end if
+' Macro expansion inside #hide block
+#hide
+hidden = double$(100)
+#show
+' Conditional macro call inside $Repeat with ←
+total_ok = 0
+#for j = 1 : len(capacities)
+	#if capacities.j ≥ demands.j
+		total_ok = total_ok + 1
+	#end if
+#loop
+' Command block with units and element access
+M = [1; 2 | 3; 4]
+cellSum(m) = $Inline{s = 0; $Repeat{$Repeat{s = s + m.(i; j) @ j = 1 : n_cols(m)} @ i = 1 : n_rows(m)}; s}
+mTotal = cellSum(M)
+' Text containing computed values and units
+'Total force = 'mTotal
+' String macro that embeds math result
+#def report$(label$; value$) = '<b>'label$'</b>: 'value$
+report$('Max area'; maxArea)
+report$('Total price'; totalUSD)
+' Loop building a vector then passing to a function
+data = vector(10)
+$Repeat{data.k = sin(k*π/10) @ k = 1 : 10}
+sorted = sort(data)
+maxVal = sorted.(len(sorted))
+' Multiline macro with command block inside
+#def accumulate$(result$; v$)
+	result$ = 0
+	#for k_acc = 1 : len(v$)
+		result$ = result$ + v$.k_acc
+	#loop
+#end def
+accumulate$(runningTotal; sorted)
+' Mix: imported function → vector → $Inline → text
+radii = [1; 2; 3; 4; 5]
+areaVec = vector(5)
+$Repeat{areaVec.i = circleArea(radii.i) @ i = 1 : 5}
+totalArea = $Inline{s = 0; $Repeat{s = s + take(k; areaVec) @ k = 1 : len(areaVec)}; s}
+'Total area of 'len(radii)' circles = 'totalArea
+'Matrix syntax access in function'
+barSizes = [3; 4; 5; 6; 7; 8; 9; 10; 11; 14; 18]
+M = [4;4;3|4;5;6]
+find(barSizes; M.(1;1); 1)

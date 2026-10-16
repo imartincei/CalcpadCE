@@ -1,0 +1,49 @@
+<div class="calcpad-output">
+ <!-- Area $A = \tfrac{1}{2} a\, h_a$ of a triangle from base and corresponding height. -->
+ <div style="max-width:100mm;">
+  <img alt="triangle.png" class="side" src="Images/math/area/triangle.png" style="height:55pt;"/>
+ </div>
+ <p>
+  Base -
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-3">2</u>
+  </span>
+ </p>
+ <p>
+  Height -
+  <span class="eq">
+   <var>h</var>
+   <sub>a</sub>
+   =
+   <u class="input-4">1</u>
+  </span>
+ </p>
+ <p>
+  Area -
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>a</var>
+    ·
+    <var>h</var>
+    <sub>a</sub>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    2 · 1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 1
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

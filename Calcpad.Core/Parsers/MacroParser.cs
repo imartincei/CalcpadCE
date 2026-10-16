@@ -13,20 +13,25 @@ namespace Calcpad.Core
         {
             private readonly string _contents;
             private readonly string[] _parameters;
+            // Null entry = required
+            private readonly string[] _defaults;
             private readonly int[] _order;
 
-            internal Macro(string contents, List<string> parameters)
+            internal Macro(string contents, List<string> parameters, List<string> defaults)
             {
                 _contents = contents;
                 if (parameters is null)
                 {
                     _parameters = null;
+                    _defaults = null;
                     _order = null;
                 }
                 else
                 {
                     _parameters = [.. parameters];
+                    _defaults = [.. defaults];
                     _order = Sort(_parameters);
+                    HasDefaults = Array.Exists(_defaults, d => d is not null);
                 }
             }
 
@@ -50,20 +55,51 @@ namespace Calcpad.Core
                 return sorted.Values.Reverse().ToArray();
             }
 
-            internal string Run(List<string> arguments)
+            internal int GetParameterIndex(ReadOnlySpan<char> name)
             {
-                if (arguments.Count != ParameterCount)
+                if (_parameters is null)
+                    return -1;
+
+                for (int i = 0, len = _parameters.Length; i < len; ++i)
+                    if (name.SequenceEqual(_parameters[i]))
+                        return i;
+
+                return -1;
+            }
+
+            internal string[] ResolveArguments(List<string> positional, Dictionary<string, string> keywords)
+            {
+                if (positional.Count > ParameterCount)
                     throw Exceptions.InvalidNumberOfArguments();
 
+                var result = new string[ParameterCount];
+                positional.CopyTo(result);
+
+                foreach (var kv in keywords)
+                {
+                    var j = GetParameterIndex(kv.Key);
+                    if (j < 0)
+                        throw Exceptions.UnknownKeywordArgument(kv.Key);
+                    if (result[j] is not null)
+                        throw Exceptions.DuplicateArgument(kv.Key);
+
+                    result[j] = kv.Value;
+                }
+                MathParser.FillDefaults(result, _defaults);
+                return result;
+            }
+
+            internal string Run(string[] arguments)
+            {
                 if (ParameterCount == 0)
                     return _contents;
 
                 var sb = new StringBuilder(_contents);
-                for (int i = 0, count = arguments.Count; i < count; ++i)
+                for (int i = 0, count = _order.Length; i < count; ++i)
                 {
                     var j = _order[i];
                     var s = arguments[j];
-                    if (s[0] == ' ' && s.Length > 1)
+                    if (s.Length > 1 && s[0] == ' ')
                         sb.Replace(_parameters[j], s[1..]);
                     else
                         sb.Replace(_parameters[j], s);
@@ -72,6 +108,7 @@ namespace Calcpad.Core
             }
             internal bool IsEmpty => _contents is null;
             internal int ParameterCount => _parameters?.Length ?? 0;
+            internal bool HasDefaults { get; }
         }
 
         private enum Keywords
@@ -80,23 +117,67 @@ namespace Calcpad.Core
             Def,
             EndDef,
             Include,
+            ProjectPath,
+            LibraryPath,
         }
+        private const string DefKeyword = "#def";
+        private const string EndDefKeyword = "#end def";
+        private const string IncludeKeyword = "#include";
+        private const string ProjectPathKeyword = "#projectpath";
+        private const string LibraryPathKeyword = "#librarypath";
+        private const string FieldsMarker = "#{";
         private readonly List<int> _lineNumbers = [];
-        private static readonly Dictionary<string, Macro> Macros = new(StringComparer.Ordinal);
+        // Filesystem path comparison must match the host OS to avoid false-positive circular
+        // detection on case-sensitive filesystems (Linux) or missed detection on Windows.
+        private static readonly StringComparer PathComparer =
+            OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        private readonly HashSet<string> _includeStack = new(PathComparer);
+        private PathRoots _pathRoots = new();
+        public PathRoots PathRoots => _pathRoots;
+        private readonly Dictionary<string, Macro> _macros = new(StringComparer.Ordinal);
         public Func<string, Queue<string>, string> Include;
+        public string SourceFilePath { get; set; }
+        private readonly List<CalcpadError> _errorList = new();
+        public IReadOnlyList<CalcpadError> Errors => _errorList;
 
         private static Keywords GetKeyword(ReadOnlySpan<char> s)
         {
-            if (s.Length < 4)
+            if (s.Length < DefKeyword.Length)
                 return Keywords.None;
-            if (s.StartsWith("#def", StringComparison.OrdinalIgnoreCase))
+            if (s.StartsWith(DefKeyword, StringComparison.OrdinalIgnoreCase))
                 return Keywords.Def;
-            if (s.StartsWith("#end def", StringComparison.OrdinalIgnoreCase))
+            if (s.StartsWith(EndDefKeyword, StringComparison.OrdinalIgnoreCase))
                 return Keywords.EndDef;
-            if (s.StartsWith("#include", StringComparison.OrdinalIgnoreCase))
+            if (s.StartsWith(IncludeKeyword, StringComparison.OrdinalIgnoreCase))
                 return Keywords.Include;
+            if (s.StartsWith(ProjectPathKeyword, StringComparison.OrdinalIgnoreCase))
+                return Keywords.ProjectPath;
+            if (s.StartsWith(LibraryPathKeyword, StringComparison.OrdinalIgnoreCase))
+                return Keywords.LibraryPath;
 
             return Keywords.None;
+        }
+
+        public static bool TryGetIncludePath(ReadOnlySpan<char> line, out int start, out int length)
+        {
+            start = 0;
+            length = 0;
+            if (!line.StartsWith(IncludeKeyword, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            var pathStart = IncludeKeyword.Length;
+            var n = line.IndexOfAny('\'', '"');
+            var nf1 = line.LastIndexOf('#');
+            if (n <= pathStart || nf1 > 0 && nf1 < n)
+                n = nf1;
+
+            if (n <= pathStart)
+                n = line.Length;
+
+            var name = line[pathStart..n];
+            start = pathStart + name.Length - name.TrimStart().Length;
+            length = name.Trim().Length;
+            return length > 0;
         }
 
         private int _parsedLineNumber;
@@ -106,9 +187,12 @@ namespace Calcpad.Core
             if (includeLine == 0)
             {
                 sb = new StringBuilder(sourceCode.Length);
-                Macros.Clear();
+                _macros.Clear();
                 _lineNumbers.Clear();
+                _includeStack.Clear();
                 _parsedLineNumber = 0;
+                _errorList.Clear();
+                _pathRoots = new PathRoots();
             }
             var macroBuilder = new StringBuilder(1000);
             var macroName = string.Empty;
@@ -117,6 +201,7 @@ namespace Calcpad.Core
             var hasErrors = false;
             ReadOnlySpan<char> lineContent = "code";
             List<string> macroParameters = null;
+            List<string> macroDefaults = null;
             try
             {
                 foreach (ReadOnlySpan<char> sourceLine in sourceLines)
@@ -133,7 +218,7 @@ namespace Calcpad.Core
                         AppendLine(sourceLine);
                         continue;
                     }
-                    if (lineContent[0] == '#' && ParseKeyword(lineContent))
+                    if (lineContent[0] == '#' && ParseKeyword(lineContent, sourceLine))
                         continue;
 
                     if (macroDefCount == 1)
@@ -142,7 +227,7 @@ namespace Calcpad.Core
                         continue;
                     }
 
-                    if (Macros.Count != 0)
+                    if (_macros.Count != 0)
                     {
                         try
                         {
@@ -178,7 +263,7 @@ namespace Calcpad.Core
             }
             return hasErrors;
 
-            bool ParseKeyword(ReadOnlySpan<char> lineContent)
+            bool ParseKeyword(ReadOnlySpan<char> lineContent, ReadOnlySpan<char> sourceLine)
             {
                 var keyword = GetKeyword(lineContent);
                 switch (keyword)
@@ -192,29 +277,42 @@ namespace Calcpad.Core
                     case Keywords.EndDef:
                         ParseEndDef(lineContent);
                         return true;
+                    case Keywords.ProjectPath:
+                    case Keywords.LibraryPath:
+                        ParsePathRoot(lineContent, sourceLine);
+                        return true;
                     default:
                         return false;
                 }
             }
 
+            void ParsePathRoot(ReadOnlySpan<char> lineContent, ReadOnlySpan<char> sourceLine)
+            {
+                PathRoots.IsDeclaration(lineContent, out var isProject, out var start, out var length);
+                if (length == 0)
+                {
+                    AppendError(lineContent, string.Format(Messages.Missing_path_value_0,
+                        isProject ? "#ProjectPath" : "#LibraryPath"));
+                    return;
+                }
+
+                var rawValue = lineContent.Slice(start, length).ToString();
+                var declaringDir = !string.IsNullOrEmpty(SourceFilePath)
+                    ? Path.GetDirectoryName(SourceFilePath) : null;
+                if (!_pathRoots.TryDeclare(isProject, rawValue, declaringDir, out var error))
+                    AppendError(lineContent, error);
+                else
+                    AppendLine(sourceLine);
+            }
+
             void ParseInclude(ReadOnlySpan<char> lineContent)
             {
-                int n = lineContent.Length;
-                if (n < 9)
+                if (lineContent.Length <= IncludeKeyword.Length)
                     AppendError(lineContent, Messages.Missing_source_file_for_include);
-                n = lineContent.IndexOfAny('\'', '"');
+
+                TryGetIncludePath(lineContent, out var start, out var length);
+                var rawFileName = lineContent.Slice(start, length).ToString();
                 var nf1 = lineContent.LastIndexOf('#');
-                if (n < 9 || nf1 > 0 && nf1 < n)
-                    n = nf1;
-
-                if (n < 9)
-                    n = lineContent.Length;
-
-                var includeFileName = lineContent[8..n].Trim().ToString();
-                includeFileName = Path.GetFullPath(Environment.ExpandEnvironmentVariables(includeFileName));
-                var fileExists = File.Exists(includeFileName);
-                if (!fileExists)
-                    AppendError(lineContent, Messages.File_not_found);
 
                 Queue<string> fields = new();
                 if (nf1 > 0)
@@ -224,13 +322,51 @@ namespace Calcpad.Core
                         AppendError(lineContent, Messages.Brackets_not_closed);
                     else
                     {
-                        SplitEnumerator split = lineContent[(nf1 + 2)..nf2].EnumerateSplits(';');
+                        SplitEnumerator split = lineContent[(nf1 + FieldsMarker.Length)..nf2].EnumerateSplits(';');
                         foreach (var item in split)
                             fields.Enqueue(item.Trim().ToString());
                     }
                 }
-                if (fileExists)
-                    Parse(Include(includeFileName, fields), out _, sb, lineNumber, addLineNumbers);
+
+                var sourceDir = !string.IsNullOrEmpty(SourceFilePath)
+                    ? Path.GetDirectoryName(SourceFilePath) : null;
+                if (!_pathRoots.TryExpand(rawFileName, out var tokenExpanded, out var tokenError))
+                {
+                    AppendError(lineContent, tokenError);
+                    return;
+                }
+                var expanded = Environment.ExpandEnvironmentVariables(tokenExpanded);
+                var resolvedPath = sourceDir != null
+                    ? Path.GetFullPath(expanded, sourceDir)
+                    : Path.GetFullPath(expanded);
+                var fileExists = File.Exists(resolvedPath);
+
+                if (!_includeStack.Add(resolvedPath))
+                {
+                    AppendError(lineContent, string.Format(Messages.Circular_include_detected_0, rawFileName));
+                    return;
+                }
+                try
+                {
+                    if (fileExists)
+                    {
+                        ParseWithSourcePath(Include(resolvedPath, fields), resolvedPath);
+                        return;
+                    }
+                    AppendError(lineContent, Messages.File_not_found);
+                }
+                finally
+                {
+                    _includeStack.Remove(resolvedPath);
+                }
+            }
+
+            void ParseWithSourcePath(string content, string newSourcePath)
+            {
+                var savedSourcePath = SourceFilePath;
+                SourceFilePath = newSourcePath;
+                try { Parse(content, out _, sb, lineNumber, addLineNumbers); }
+                finally { SourceFilePath = savedSourcePath; }
             }
 
             void ParseDef(ReadOnlySpan<char> lineContent)
@@ -238,7 +374,7 @@ namespace Calcpad.Core
                 var textSpan = new TextSpan(lineContent);
                 if (macroDefCount == 0)
                 {
-                    int i = 4, len = lineContent.Length;
+                    int i = DefKeyword.Length, len = lineContent.Length;
                     var c = EatSpace(lineContent, ref i);
                     textSpan.Reset(i);
                     while (i < len)
@@ -263,30 +399,58 @@ namespace Calcpad.Core
                     if (c == '(')
                     {
                         macroParameters = [];
+                        macroDefaults = [];
+                        var seenOptional = false;
                         c = EatSpace(lineContent, ref i);
                         textSpan.Reset(i);
                         while (i < len)
                         {
+                            c = lineContent[i];
                             if (c == ' ')
-                                c = EatSpace(lineContent, ref i);
-                            if (c == ';' || c == ')')
                             {
-                                macroParameters.Add(textSpan.ToString());
-                                if (c == ')')
-                                    break;
-
                                 c = EatSpace(lineContent, ref i);
-                                textSpan.Reset(i);
+                                continue;
                             }
-                            else
+                            string defaultValue = null;
+                            if (c == '$')
                             {
-                                if (Validator.IsMacroLetter(c, textSpan.Length) || c == '$')
+                                textSpan.Expand();
+                                c = EatSpace(lineContent, ref i);
+                                if (c == '=')
+                                {
+                                    EatSpace(lineContent, ref i);
+                                    var end = MathParser.IndexOfTopLevel(lineContent[i..], ';');
+                                    if (end < 0)
+                                        end = len - i;
+
+                                    defaultValue = lineContent.Slice(i, end).Trim().ToString();
+                                    i += end;
+                                    c = i < len ? lineContent[i] : '\0';
+                                }
+                            }
+                            else if (c != ';' && c != ')')
+                            {
+                                if (Validator.IsMacroLetter(c, textSpan.Length))
                                     textSpan.Expand();
                                 else if (c != '\n')
                                     SymbolError(lineContent, c);
 
                                 c = lineContent[++i];
+                                continue;
                             }
+                            var parameterName = textSpan.ToString();
+                            if (defaultValue is not null)
+                                seenOptional = true;
+                            else if (seenOptional)
+                                throw Exceptions.RequiredParameterAfterOptional(parameterName);
+
+                            macroParameters.Add(parameterName);
+                            macroDefaults.Add(defaultValue);
+                            if (c == ')')
+                                break;
+
+                            c = EatSpace(lineContent, ref i);
+                            textSpan.Reset(i);
                         }
                         c = EatSpace(lineContent, ref i);
                     }
@@ -296,8 +460,9 @@ namespace Calcpad.Core
                     if (c == '=')
                     {
                         c = EatSpace(lineContent, ref i);
-                        AddMacro(lineContent, macroName, new Macro(lineContent[i..].ToString(), macroParameters));
+                        AddMacro(lineContent, macroName, new Macro(lineContent[i..].ToString(), macroParameters, macroDefaults));
                         macroName = string.Empty;
+                        macroDefaults = null;
                     }
                     else
                     {
@@ -329,8 +494,9 @@ namespace Calcpad.Core
                 {
                     macroBuilder.RemoveLastLineIfEmpty();
                     var macroContent = macroBuilder.ToString();
-                    AddMacro(lineContent, macroName, new Macro(macroContent, macroParameters));
+                    AddMacro(lineContent, macroName, new Macro(macroContent, macroParameters, macroDefaults));
                     macroName = string.Empty;
+                    macroDefaults = null;
                     macroBuilder.Clear();
                 }
                 --macroDefCount;
@@ -353,13 +519,22 @@ namespace Calcpad.Core
 
             void AppendError(ReadOnlySpan<char> lineContent, string errorMessage)
             {
-                sb.AppendLine(string.Format(Messages.Error_in_0_on_line_1_2, HttpUtility.HtmlEncode(lineContent.ToString()), LineHtml(lineNumber), errorMessage));
+                var marker = addLineNumbers ? $"\v{lineNumber}" : string.Empty;
+                sb.AppendLine(string.Format(Messages.Error_in_0_on_line_1_2, HttpUtility.HtmlEncode(lineContent.ToString()), LineHtml(lineNumber), errorMessage) + marker);
+                ++_parsedLineNumber;
                 hasErrors = true;
+                _errorList.Add(new CalcpadError
+                {
+                    SourceLine = lineNumber,
+                    OutputLine = _parsedLineNumber,
+                    Message = errorMessage,
+                    Source = CalcpadErrorSource.Macro,
+                });
             }
 
             void AddMacro(ReadOnlySpan<char> lineContent, string name, Macro macro)
             {
-                if (!Macros.TryAdd(name, macro))
+                if (!_macros.TryAdd(name, macro))
                     AppendError(lineContent, string.Format(Messages.Duplicate_macro_name_0, name));
             }
             static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line}\">{line}</a>]";
@@ -375,22 +550,26 @@ namespace Calcpad.Core
             return fields;
         }
 
-        private static string ApplyMacros(ReadOnlySpan<char> lineContent)
+        private string ApplyMacros(ReadOnlySpan<char> lineContent, HashSet<string> currentlyExpanding = null)
         {
             var index = lineContent.IndexOf("$");
             if (index < 0)
                 return lineContent.ToString();
 
-            index = lineContent.IndexOf("#{");
+            index = lineContent.IndexOf(FieldsMarker);
             var stringBuilder = new StringBuilder(200);
             var macroArguments = new List<string>();
+            var keywordArguments = new Dictionary<string, string>(StringComparer.Ordinal);
             var bracketCount = 0;
-            var emptyMacro = new Macro(null, null);
+            var insideArgList = false;
+            var seenKeyword = false;
+            var emptyMacro = new Macro(null, null, null);
             var macro = emptyMacro;
+            string macroKey = null;
             Queue<string> fields = null;
             if (index >= 0)
             {
-                var s = lineContent[(index + 2)..];
+                var s = lineContent[(index + FieldsMarker.Length)..];
                 lineContent = lineContent[..index];
                 var n = s.IndexOf('}');
                 if (n < 0)
@@ -401,7 +580,7 @@ namespace Calcpad.Core
             for (int i = 0, len = lineContent.Length; i < len; ++i)
             {
                 var c = lineContent[i];
-                if (macroArguments.Count < macro.ParameterCount)
+                if (insideArgList)
                 {
                     if (c == '(')
                     {
@@ -414,11 +593,31 @@ namespace Calcpad.Core
 
                     if (c == ';' && bracketCount == 1 || c == ')' && bracketCount == 0)
                     {
-                        var s = ApplyMacros(textSpan.Cut());
-                        macroArguments.Add(s);
+                        var rawArgument = textSpan.Cut().Trim();
+                        if (c == ')' && rawArgument.IsEmpty && macro.HasDefaults &&
+                            macroArguments.Count == 0 && keywordArguments.Count == 0)
+                        {
+                            insideArgList = false;
+                            textSpan.Reset(i + 1);
+                            continue;
+                        }
+                        if (TryParseKeywordArgument(rawArgument, macro, out var name, out var value))
+                        {
+                            seenKeyword = true;
+                            if (!keywordArguments.TryAdd(name.ToString(), ApplyMacros(value, currentlyExpanding)))
+                                throw Exceptions.DuplicateArgument(name.ToString());
+                        }
+                        else
+                        {
+                            if (seenKeyword)
+                                throw Exceptions.InvalidNumberOfArguments();
+
+                            var s = ApplyMacros(textSpan.Cut(), currentlyExpanding);
+                            macroArguments.Add(string.IsNullOrWhiteSpace(s) ? string.Empty : s);
+                        }
                         textSpan.Reset(i + 1);
-                        if ((macroArguments.Count == macro.ParameterCount) != (c == ')'))
-                            throw Exceptions.InvalidNumberOfArguments();
+                        if (c == ')')
+                            insideArgList = false;
                     }
                     else if (bracketCount > 1 || c != '(')
                         textSpan.Expand();
@@ -428,9 +627,16 @@ namespace Calcpad.Core
                     textSpan.Expand();
                     var macroName = textSpan.ToString();
                     int j, mlen = macroName.Length - 1;
+                    macroKey = null;
                     for (j = 0; j < mlen; ++j)
-                        if (Macros.TryGetValue(macroName[j..], out macro))
+                    {
+                        var candidate = macroName[j..];
+                        if (_macros.TryGetValue(candidate, out macro))
+                        {
+                            macroKey = candidate;
                             break;
+                        }
+                    }
 
                     if (macro.IsEmpty)
                         throw Exceptions.UndefinedMacro(macroName);
@@ -439,13 +645,16 @@ namespace Calcpad.Core
 
                     bracketCount = 0;
                     macroArguments.Clear();
+                    keywordArguments.Clear();
+                    seenKeyword = false;
+                    insideArgList = macro.ParameterCount > 0;
                     textSpan.Reset(i);
                 }
                 else
                 {
                     if (!macro.IsEmpty)
                     {
-                        var s = ApplyMacros(macro.Run(macroArguments));
+                        var s = ExpandMacro(macro, macroArguments, keywordArguments, macroKey, ref currentlyExpanding);
                         var sbLength = stringBuilder.Length;
                         SetLineInputFields(s, stringBuilder, fields, false);
                         if (stringBuilder.Length == sbLength)
@@ -477,12 +686,49 @@ namespace Calcpad.Core
                 if (!textSpan.IsEmpty)
                     stringBuilder.Append(textSpan.Cut());
             }
-            else if (macroArguments.Count == macro.ParameterCount)
+            else if (!insideArgList)
             {
-                var s = ApplyMacros(macro.Run(macroArguments));
+                var s = ExpandMacro(macro, macroArguments, keywordArguments, macroKey, ref currentlyExpanding);
                 stringBuilder.Append(s);
             }
             return stringBuilder.ToString();
+        }
+
+        private string ExpandMacro(Macro macro, List<string> macroArguments, Dictionary<string, string> keywordArguments, string macroKey, ref HashSet<string> currentlyExpanding)
+        {
+            if (currentlyExpanding != null && currentlyExpanding.Contains(macroKey))
+                throw Exceptions.CircularMacroReference(macroKey);
+            currentlyExpanding ??= new HashSet<string>(StringComparer.Ordinal);
+            currentlyExpanding.Add(macroKey);
+            var arguments = macro.ResolveArguments(macroArguments, keywordArguments);
+            try { return ApplyMacros(macro.Run(arguments), currentlyExpanding); }
+            finally { currentlyExpanding.Remove(macroKey); }
+        }
+
+        // Existing macro names stay positional so "a$ = 1" can still expand to an assignment
+        private bool TryParseKeywordArgument(ReadOnlySpan<char> arg, in Macro macro, out ReadOnlySpan<char> parameterName, out ReadOnlySpan<char> value)
+        {
+            var i = 0;
+            while (i < arg.Length && Validator.IsMacroLetter(arg[i], i))
+                ++i;
+
+            if (i > 0 && i < arg.Length && arg[i] == '$')
+            {
+                var rest = arg[(i + 1)..].TrimStart();
+                if (rest.Length > 1 && rest[0] == '=' && rest[1] != '=')
+                {
+                    parameterName = arg[..(i + 1)];
+                    if (macro.GetParameterIndex(parameterName) >= 0 ||
+                        !_macros.ContainsKey(parameterName.ToString()))
+                    {
+                        value = rest[1..].Trim();
+                        return true;
+                    }
+                }
+            }
+            parameterName = default;
+            value = default;
+            return false;
         }
 
 

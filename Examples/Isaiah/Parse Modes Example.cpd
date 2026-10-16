@@ -1,0 +1,165 @@
+'<!-- Exercises the #html, #markdown and #cpd parsing modes: raw HTML blocks, multi-line Markdown, mode nesting, inline conditions and macros. -->
+#html
+<style>
+    .note {
+        border-left: 3px solid #4a7;
+        background: #f4f9f6;
+        padding: 6px 10px;
+        margin: 8px 0;
+    }
+    .note b { color: #275; }
+    /* The "Markdown Elements - All" CSS snippet, which the report template omits.
+       Tables go through thead/tbody so Calcpad's own tables are left alone. */
+    blockquote {
+        margin: 0.8em 0;
+        padding: 2px 12px;
+        border-left: 3px solid #99a;
+        color: #445;
+    }
+    pre { background: #f6f6f6; border: 1pt solid #ddd; padding: 6px 10px; overflow-x: auto; }
+    code { background: #f2f2f2; padding: 0 2px; }
+    pre code { background: none; padding: 0; }
+    table { border-collapse: collapse; margin: 1em 0; }
+    thead th { background: #f0f0f0; border: 1pt solid #aaa; padding: 4px 8px; text-align: left; }
+    tbody td { border: 1pt solid #ccc; padding: 4px 8px; }
+    ul.contains-task-list { list-style: none; padding-left: 1.2em; }
+    li.task-list-item input[type="checkbox"] { margin-right: 6px; }
+    ins { text-decoration: underline; text-decoration-color: #4a7; }
+    del { color: #888; }
+    hr { border: 0; border-top: 1pt solid #ccc; margin: 1em 0; }
+</style>
+<div><span id="top"></span></div>
+#end html
+#markdown
+# Parse Modes
+A `#markdown` block renders **consecutive** lines together, so paragraphs,
+tables and nested lists all work.
+
+| Case | Load   | Factor |
+|------|--------|--------|
+| Dead | 5 kN   | 1.35   |
+| Live | 3 kN   | 1.5    |
+#cpd
+#pre
+#end cpd
+- Ultimate limit state
+  - 1.35 G + 1.5 Q
+- Serviceability limit state
+  - 1.0 G + 1.0 Q
+#def test$ = Hello from macro
+test$
+#cpd
+#show
+#end cpd
+Emphasis extras: ++inserted++, H~2~O, x^2^, ~~struck~~ and a bare URL
+https://calcpad-ce.org — plus a task list:
+
+- [x] Raw HTML passes through: <b>bold</b>
+- [ ] Still to check
+#end markdown
+#cpd
+"Inputs
+G = 5kN
+Q = 3kN
+γ_G = 1.35
+γ_Q = 1.5
+"Design load
+E_d = γ_G*G + γ_Q*Q
+#html
+<div class="note">
+    <b>Note:</b> a <code>#cpd</code> block inside <code>#html</code> calculates,
+    then <code>#end cpd</code> pops back to raw HTML.
+#cpd
+A = 2m*3m
+q = E_d/A
+#end cpd
+</div>
+#end html
+#markdown E_d > 10kN
+> The design load exceeds 10 kN, so this conditional Markdown block renders.
+#end markdown
+#markdown q > 100kPa
+> Skipped: this condition is false, and these lines are never parsed as Calcpad.
+#end markdown
+#for i = 1:3
+#html
+<div class="note">Pass
+#cpd
+i
+#end cpd
+of 3 &mdash; the HTML block repeats once per iteration.</div>
+#end html
+#loop
+#if E_d > 10kN
+#html
+<p class="note">Mode blocks nest inside <code>#if</code>.</p>
+#end html
+#else
+#markdown
+*Not taken.*
+#end markdown
+#end if
+#def note$(text$) = <div class="note">text$</div>
+#html
+note$(Macros expand before parsing, so they work in every mode.)
+#end html
+#md on
+'Contrast: `#md on` stays in Calcpad mode and renders **one comment line** at a time.
+#md off
+#markdown
+Contrast: `#markdown` renders whole blocks, with no `'` quotes.
+#end markdown
+#markdown
+## Styled Markdown
+
+The `<style>` block at the top of this file is the **Markdown Elements - All**
+CSS snippet, which covers what the report template leaves on browser defaults.
+
+> A blockquote carries a left rule rather than a bare indent.
+
+Fenced blocks keep the language on `code.language-*`, though nothing
+highlights them:
+
+```text
+E_d = 1.35 G + 1.5 Q
+A   = 2 m * 3 m
+```
+
+1. Ordered lists render alongside the bulleted ones above
+2. Inline `code` keeps a background of its own
+
+---
+
+A rule separates sections without needing a heading.
+#end markdown
+#markdown
+## Links
+
+An `<img>` in an `#html` or `#markdown` block resolves `{project}` and
+`{library}` the same way a `'` comment does.
+
+A bare URL autolinks in `#markdown`: https://calcpad-ce.org — and so does
+[an explicit Markdown link](https://github.com/imartincei/CalcpadCE).
+
+Every link is confirmed before anything happens, because the target comes from
+the worksheet.
+#end markdown
+#html
+<div class="note">
+    <b>http / https</b> — prompts with the URL, then opens in the browser:
+    <a href="https://github.com/imartincei/CalcpadCE">CalcpadCE on GitHub</a>
+    <br>
+    <b>file</b> — prompts with the path, then opens with the system default.
+    Must be absolute, so this one is machine-specific:
+    <a href="file:///myfile.txt">Open file</a>
+    <br>
+    <b>Other schemes are ignored</b>, since the app uses URLs for navigation:
+    <a href="mailto:someone@example.com">mailto</a>,
+    <a href="javascript:alert('blocked')">javascript</a>
+    <br>
+    <b>In-document anchors</b> scroll within the preview: <a href="#top">back to the top</a>
+    <br>
+    <b>A quoted &gt; in an attribute</b> must not break the tag:
+    <a href="https://example.com" title="Dead > Live">load comparison</a>
+</div>
+#end html

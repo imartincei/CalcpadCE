@@ -1,0 +1,28 @@
+' Scalars, operators, constants, variables
+a = 42
+b = 3.14159
+d = -100
+e_result = a + b
+f = a - b
+g_val = a*b
+h = a/b
+i_val = 2^10
+j = 5!
+k = 17\5
+l = 17 ⦼ 5
+m_val = 10 ÷ 3
+eq = 5 ≡ 5
+ne = 5 ≠ 3
+lt = 3 < 5
+gt = 5 > 3
+le = 3 ≤ 5
+ge = 5 ≥ 3
+logAnd = 1 ∧ 1
+logOr = 0 ∨ 1
+logXor = 1 ⊕ 0
+piVal = π
+eulerVal = e
+gravityConst = g
+constArrow = 0
+constArrow ← 5
+nested = ((1 + 2)*(3 + 4))/((5 - 6) + 7)

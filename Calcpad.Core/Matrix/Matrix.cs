@@ -158,13 +158,13 @@ namespace Calcpad.Core
                 else
                     for (int i = 0; i < _rowCount; ++i)
                         CopyRow1(i);
-            }      
+            }
             else
             {
                 if (_rowCount > ParallelThreshold)
                     Parallel.For(0, _rowCount, CopyRow2);
                 else
-                    for (int i = _rowCount - 1; i >= 0; --i) 
+                    for (int i = _rowCount - 1; i >= 0; --i)
                         CopyRow2(i);
             }
             return M;
@@ -458,7 +458,7 @@ namespace Calcpad.Core
                         var ar = a._rows[i];
                         for (int j = nb; j >= 0; --j)
                             cr[j] = Vector.DotProduct(ar, bColVectors[j]);
-                    });                
+                    });
                 }
                 else
                 {
@@ -2173,7 +2173,7 @@ namespace Calcpad.Core
                 throw Exceptions.IndexOutOfRange(i.ToString());
 
             --i;
-            Vector row = _type == MatrixType.Full || _type == MatrixType.LowerTriangular ? 
+            Vector row = _type == MatrixType.Full || _type == MatrixType.LowerTriangular ?
                 _rows[i] : new RowVector(this, i);
 
             var indexes = row.GetOrderIndexes(reverse, _colCount);
@@ -2210,7 +2210,7 @@ namespace Calcpad.Core
                 throw Exceptions.IndexOutOfRange(i.ToString());
 
             --i;
-            Vector row = _type == MatrixType.Full || _type == MatrixType.LowerTriangular ? 
+            Vector row = _type == MatrixType.Full || _type == MatrixType.LowerTriangular ?
                 _rows[i] : new RowVector(this, i);
 
             return row.Order(reverse);
@@ -2368,7 +2368,7 @@ namespace Calcpad.Core
             {
                 var rowProducts = new RealValue[len];
                 rowProducts[0] = p;
-                Parallel.For(1, len, i => 
+                Parallel.For(1, len, i =>
                     rowProducts[i] = _rows[i].Product()
                 );
                 p = new Vector(rowProducts).Product();
@@ -2611,7 +2611,7 @@ namespace Calcpad.Core
         // Frobenius norm
         internal RealValue FrobNorm() => Srss();
 
-        // L1 norm   
+        // L1 norm
         internal virtual RealValue L1Norm()
         {
             var norm = new ColumnVector(this, 0).L1Norm();
@@ -2630,7 +2630,7 @@ namespace Calcpad.Core
             return sig.Max();
         }
 
-        // L∞ (Infinity) or Chebyshev norm     
+        // L∞ (Infinity) or Chebyshev norm
         internal virtual RealValue InfNorm()
         {
             var norm = _rows[0].L1Norm();
@@ -2645,7 +2645,7 @@ namespace Calcpad.Core
 
         internal virtual Matrix LUDecomposition(out int[] indexes)
         {
-            var LU = GetLU(out indexes, out double _, out double _) ?? 
+            var LU = GetLU(out indexes, out double _, out double _) ??
                 throw Exceptions.MatrixSingular();
 
             return LU;
@@ -2803,7 +2803,7 @@ namespace Calcpad.Core
                 for (int i = 0; i < m; ++i)
                 {
                     var Q_i = Q._rows[i];
-                    var size = Q_i.Size;    
+                    var size = Q_i.Size;
                     var dot = Q_i[k] * v[k];
                     for (int j = k + 1; j < size; ++j)
                         dot += Q_i[j] * v[j];
@@ -2928,7 +2928,7 @@ namespace Calcpad.Core
                             rv1[k] = U_i[k] * h;
 
                         for (int j = l; j <= m; ++j)
-                        {   
+                        {
                             var U_j = U._rows[j];
                             sum = U_j[l] * U_il;
                             for (int k = l + 1; k <= n; ++k)
@@ -3091,7 +3091,7 @@ namespace Calcpad.Core
                         if (z.D < 0d)
                         {
                             sig[k] = -z;
-                            var V_k = V._rows[k];   
+                            var V_k = V._rows[k];
                             for (int j = 0; j <= n; ++j)
                                 V_k[j] = -V_k[j];
                         }
@@ -3148,7 +3148,7 @@ namespace Calcpad.Core
                         f = c * g + s * y;
                         x = c * y - s * g;
                         for (int jj = 0; jj <= m; ++jj)
-                        {   
+                        {
                             var U_jj = U._rows[jj];
                             y = U_jj[j];
                             z = U_jj[i];
@@ -3208,7 +3208,7 @@ namespace Calcpad.Core
         {
             var m = LU._rowCount;
             var start = -1;
-            // Forward substitution. Solve Ly = v by storing y in x. 
+            // Forward substitution. Solve Ly = v by storing y in x.
             for (int i = 0; i < m; ++i)
             {
                 var index = indexes[i];
@@ -3240,7 +3240,7 @@ namespace Calcpad.Core
 
         internal virtual Vector LSolve(Vector v)
         {
-            var LU = GetLU(out int[] indexes, out double minPivot, out double _) ?? 
+            var LU = GetLU(out int[] indexes, out double minPivot, out double _) ??
                 throw Exceptions.MatrixSingular();
 
             if (minPivot < 1e-15)
@@ -3253,7 +3253,7 @@ namespace Calcpad.Core
 
         internal virtual Matrix MSolve(Matrix M)
         {
-            var LU = GetLU(out int[] indexes, out double minPivot, out double _) ?? 
+            var LU = GetLU(out int[] indexes, out double minPivot, out double _) ??
                 throw Exceptions.MatrixSingular();
 
             if (minPivot < 1e-15)
@@ -3295,7 +3295,7 @@ namespace Calcpad.Core
 
         internal virtual Matrix Invert()
         {
-            var LU = GetLU(out int[] indexes, out double minPivot, out double _) ?? 
+            var LU = GetLU(out int[] indexes, out double minPivot, out double _) ??
                 throw Exceptions.MatrixSingular();
 
             if (minPivot < 1e-15)
@@ -3309,7 +3309,7 @@ namespace Calcpad.Core
         {
             if (_rowCount > ParallelThreshold)
                 return MSolveForLU(lu, indexes);
-            
+
             var vector = new Vector(_rowCount);
             var x = new RealValue[_rowCount];
             var M = new Matrix(_rowCount, _rowCount);

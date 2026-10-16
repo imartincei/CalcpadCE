@@ -1,0 +1,16 @@
+#def displayCond$(cond$)
+	x*y/4', '1
+	'<!-Once we have string manipulation, we can remove the right side to display the variable substitution-!>
+	#noc
+	cond$
+	#equ
+#end def
+x = 5
+y = 7
+#def cond1$ = x*y/4 ≤ 1
+#def cond2$ = x*y/4 > 1
+#if cond1$
+	displayCond$(cond1$)
+#else if cond2$
+	displayCond$(cond2$)
+#end if

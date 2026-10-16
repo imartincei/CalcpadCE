@@ -1,0 +1,1826 @@
+<div class="calcpad-output">
+ <!-- Combined material and geometric nonlinear analysis of a prestressed three-joint truss with a bilinear elastic-plastic stress-strain law, solved by a global Newton-Raphson iteration that updates the Jacobi matrix and the axial stiffness $E A$ at each step. -->
+ <h4>Input data</h4>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>J</sub>
+   =
+   <b class="b0">[</b>
+   0
+   <i>m</i>
+   3
+   <i>m</i>
+   9
+   <i>m</i>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   <sub>J</sub>
+   =
+   <b class="b0">[</b>
+   0
+   <i>m</i>
+   0
+   <i>m</i>
+   0
+   <i>m</i>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>n</var>
+   <sub>J</sub>
+   =
+   <b>len</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>J</sub>
+   )  = 3
+  </span>
+ </p>
+ <h4>Elements - [J1; J2]</h4>
+ <p>
+  <span class="eq">
+   <b>transp</b>
+   (
+   <b>
+    <var>E</var>
+   </b>
+   <sub>J</sub>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <var>n</var>
+   <sub>E</sub>
+   =
+   <b>n</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>E</var>
+   </b>
+   <sub>J</sub>
+   )  = 2
+  </span>
+  ,
+  <span class="eq">
+   <var>J</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  =
+   <b>
+    <var>E</var>
+   </b>
+   <sub>
+    J.
+    <var>e</var>
+    ,1
+   </sub>
+  </span>
+  ,
+  <span class="eq">
+   <var>J</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  =
+   <b>
+    <var>E</var>
+   </b>
+   <sub>
+    J.
+    <var>e</var>
+    ,2
+   </sub>
+  </span>
+ </p>
+ <p>Element endpoint coordinates</p>
+ <p>
+  <span class="eq">
+   <var>x</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>
+    J.
+    <var>J</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )
+   </sub>
+  </span>
+  ,
+  <span class="eq">
+   <var>y</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   <sub>
+    J.
+    <var>J</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )
+   </sub>
+  </span>
+  ,
+  <span class="eq">
+   <var>x</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>
+    J.
+    <var>J</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )
+   </sub>
+  </span>
+  ,
+  <span class="eq">
+   <var>y</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   <sub>
+    J.
+    <var>J</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )
+   </sub>
+  </span>
+ </p>
+ <p>
+  Element lengths -
+  <span class="eq">
+   <var>l</var>
+   (
+   <var>e</var>
+   )  =
+   <span class="o0">
+    <span class="r">√</span>
+    (
+    <var>x</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )  −
+    <var>x</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )  )
+    <sup>2</sup>
+    +  (
+    <var>y</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )  −
+    <var>y</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )  )
+    <sup>2</sup>
+   </span>
+  </span>
+ </p>
+ <p>
+  Element directions -
+  <span class="eq">
+   <var>c</var>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvc">
+    <var>x</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )  −
+    <var>x</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>l</var>
+    (
+    <var>e</var>
+    )
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <var>s</var>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvc">
+    <var>y</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )  −
+    <var>y</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>l</var>
+    (
+    <var>e</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>Transformation matrix</p>
+ <p>
+  <span class="eq">
+   <var>t</var>
+   (
+   <var>e</var>
+   )  =
+   <span class="b0">[</span>
+   <var>c</var>
+   (
+   <var>e</var>
+   ) ;
+   <var>s</var>
+   (
+   <var>e</var>
+   )
+   <span class="b0">|</span>
+   -
+   <var>s</var>
+   (
+   <var>e</var>
+   ) ;
+   <var>c</var>
+   (
+   <var>e</var>
+   )
+   <span class="b0">]</span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>T</var>
+   (
+   <var>e</var>
+   )  =
+   <b>add</b>
+   (
+   <var>t</var>
+   (
+   <var>e</var>
+   ) ;
+   <b>add</b>
+   (
+   <var>t</var>
+   (
+   <var>e</var>
+   ) ;
+   <b>matrix</b>
+   ( 4; 4 ) ; 1; 1 ) ; 3; 3 )
+  </span>
+ </p>
+ <h4>Supports - [Joint; cx; cy]</h4>
+ <p>
+  <span class="eq">
+   <b>
+    <var>c</var>
+   </b>
+   <sub>J</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+      10
+      <sup>20</sup>
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+      10
+      <sup>20</sup>
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">
+      10
+      <sup>20</sup>
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+      10
+      <sup>20</sup>
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>c</sub>
+   =
+   <b>n</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>c</var>
+   </b>
+   <sub>J</sub>
+   )  = 2
+  </span>
+ </p>
+ <h4>Material - steel</h4>
+ <p>We assume bi-linear material model</p>
+ <p>
+  Initial modulus of elasticity -
+  <span class="eq">
+   <var>E</var>
+   <sub>0</sub>
+   = 206
+   <i>GPa</i>
+  </span>
+ </p>
+ <p>
+  Yield stress -
+  <span class="eq">
+   <var>f</var>
+   <sub>y</sub>
+   = 500
+   <i>MPa</i>
+  </span>
+ </p>
+ <p>
+  Ultimate tensile stress -
+  <span class="eq">
+   <var>f</var>
+   <sub>u</sub>
+   = 600
+   <i>MPa</i>
+  </span>
+ </p>
+ <p>
+  Yield strain -
+  <span class="eq">
+   <var>ε</var>
+   <sub>y</sub>
+   =
+   <span class="dvc">
+    <var>f</var>
+    <sub>y</sub>
+    <span class="dvl">
+    </span>
+    <var>E</var>
+    <sub>0</sub>
+   </span>
+   =
+   <span class="dvc">
+    500
+    <i>MPa</i>
+    <span class="dvl">
+    </span>
+    206
+    <i>GPa</i>
+   </span>
+   = 2.43
+   <i>‰</i>
+  </span>
+ </p>
+ <p>
+  Ultimate  strain -
+  <span class="eq">
+   <var>ε</var>
+   <sub>u</sub>
+   = 20
+   <i>‰</i>
+  </span>
+ </p>
+ <p>
+  Modulus of elasticity after yield -
+  <span class="eq">
+   <var>E</var>
+   <sub>1</sub>
+   =
+   <span class="dvc">
+    <var>f</var>
+    <sub>u</sub>
+    −
+    <var>f</var>
+    <sub>y</sub>
+    <span class="dvl">
+    </span>
+    <var>ε</var>
+    <sub>u</sub>
+    −
+    <var>ε</var>
+    <sub>y</sub>
+   </span>
+   =
+   <span class="dvc">
+    600
+    <i>MPa</i>
+    − 500
+    <i>MPa</i>
+    <span class="dvl">
+    </span>
+    20
+    <i>‰</i>
+    − 2.43
+    <i>‰</i>
+   </span>
+   = 5.69
+   <i>GPa</i>
+  </span>
+ </p>
+ <p>
+  Idealized stress-strain curve -
+  <span class="eq">
+   <var>σ</var>
+   (
+   <var>ε</var>
+   )  =
+   <span class="dvcs">
+    <span class="c1">{</span>
+    <span class="dvs">
+     if
+     <var>ε</var>
+     &lt;
+     <var>ε</var>
+     <sub>y</sub>
+     :
+     <var>E</var>
+     <sub>0</sub>
+     ·
+     <var>ε</var>
+     <br/>
+     else:
+     <var>f</var>
+     <sub>y</sub>
+     +
+     <var>E</var>
+     <sub>1</sub>
+     ·  (
+     <var>ε</var>
+     −
+     <var>ε</var>
+     <sub>y</sub>
+     )
+    </span>
+   </span>
+  </span>
+ </p>
+ <!-- <span class="eq"><var>PlotWidth</var> = 200</span> , <span class="eq"><var>PlotHeight</var> = 150</span> -->
+ <svg class="plot" data-plot="svg" height="840px" style="width:198.15pt; height:155.56pt;" version="1.1" viewbox=" 0 0 1070 840" width="1070px" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+   .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+  </style>
+  <g class="plot">
+   <rect class="Frame" height="600" width="800" x="180" y="120">
+   </rect>
+   <line class="Grid" x1="180" x2="980" y1="720" y2="720">
+   </line>
+   <text class="sm end" x="161" y="738">0</text>
+   <line class="Grid" x1="180" x2="980" y1="620" y2="620">
+   </line>
+   <text class="sm end" x="161" y="638">0.1</text>
+   <line class="Grid" x1="180" x2="980" y1="520" y2="520">
+   </line>
+   <text class="sm end" x="161" y="538">0.2</text>
+   <line class="Grid" x1="180" x2="980" y1="420" y2="420">
+   </line>
+   <text class="sm end" x="161" y="438">0.3</text>
+   <line class="Grid" x1="180" x2="980" y1="320" y2="320">
+   </line>
+   <text class="sm end" x="161" y="338">0.4</text>
+   <line class="Grid" x1="180" x2="980" y1="220" y2="220">
+   </line>
+   <text class="sm end" x="161" y="238">0.5</text>
+   <line class="Grid" x1="180" x2="980" y1="120" y2="120">
+   </line>
+   <text class="sm end" x="161" y="138">0.6</text>
+   <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="180" y="772">0</text>
+   <line class="Grid" x1="280" x2="280" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="280" y="772">2.5</text>
+   <line class="Grid" x1="380" x2="380" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="380" y="772">5</text>
+   <line class="Grid" x1="480" x2="480" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="480" y="772">7.5</text>
+   <line class="Grid" x1="580" x2="580" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="580" y="772">10</text>
+   <line class="Grid" x1="680" x2="680" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="680" y="772">12.5</text>
+   <line class="Grid" x1="780" x2="780" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="780" y="772">15</text>
+   <line class="Grid" x1="880" x2="880" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="880" y="772">17.5</text>
+   <text class="sm mid" x="980" y="772">20</text>
+   <line class="Axis" x1="180" x2="980" y1="720" y2="720">
+   </line>
+   <text x="1002" y="702">x</text>
+   <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+   </line>
+   <text class="mid" x="180" y="84">y</text>
+   <text x="8" y="823">[0; 0]</text>
+   <text class="end" x="1062" y="44">[20; 0.6]</text>
+   <polyline class="Series1" points="180,720 205.81,587.1 231.61,454.19 257.42,321.29 263.87,288.06 270.32,254.84 273.55,238.23 275.16,229.92 275.97,225.77 276.77,221.61 277.58,219.93 278.39,219.82 279.19,219.7 280,219.59 281.61,219.36 283.23,219.13 286.45,218.67 289.68,218.21 296.13,217.29 309.03,215.46 334.84,211.78 360.65,208.11 386.45,204.44 412.26,200.77 438.06,197.1 463.87,193.43 489.68,189.76 515.48,186.08 541.29,182.41 567.1,178.74 592.9,175.07 618.71,171.4 644.52,167.73 670.32,164.06 696.13,160.38 721.94,156.71 747.74,153.04 773.55,149.37 799.35,145.7 825.16,142.03 850.97,138.36 876.77,134.69 902.58,131.01 928.39,127.34 954.19,123.67 980,120">
+   </polyline>
+   <polygon class="Fill1" points="180,720 180,720 205.81,587.1 231.61,454.19 257.42,321.29 263.87,288.06 270.32,254.84 273.55,238.23 275.16,229.92 275.97,225.77 276.77,221.61 277.58,219.93 278.39,219.82 279.19,219.7 280,219.59 281.61,219.36 283.23,219.13 286.45,218.67 289.68,218.21 296.13,217.29 309.03,215.46 334.84,211.78 360.65,208.11 386.45,204.44 412.26,200.77 438.06,197.1 463.87,193.43 489.68,189.76 515.48,186.08 541.29,182.41 567.1,178.74 592.9,175.07 618.71,171.4 644.52,167.73 670.32,164.06 696.13,160.38 721.94,156.71 747.74,153.04 773.55,149.37 799.35,145.7 825.16,142.03 850.97,138.36 876.77,134.69 902.58,131.01 928.39,127.34 954.19,123.67 980,120 980,720" stroke-width="0">
+   </polygon>
+  </g>
+ </svg>
+ <h4>
+  Cross section – circular with diameter
+  <span class="eq">
+   <var>Φ</var>
+   = 20
+   <i>mm</i>
+  </span>
+ </h4>
+ <p>
+  Area -
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>Φ</var>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   =
+   <span class="dvc">
+    3.14 ·  ( 20
+    <i>mm</i>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   = 3.14
+   <i>cm</i>
+   <sup class="unit">2</sup>
+  </span>
+ </p>
+ <p>Stiffness</p>
+ <p>
+  Initial -
+  <span class="eq">
+   <var>EA</var>
+   <sub>0</sub>
+   =
+   <var>E</var>
+   <sub>0</sub>
+   ·
+   <var>A</var>
+   = 206
+   <i>GPa</i>
+   · 3.14
+   <i>cm</i>
+   <sup class="unit">2</sup>
+   = 64716.8
+   <i>kN</i>
+  </span>
+  ,
+  <span class="eq">
+   <var>EA</var>
+   =
+   <var>EA</var>
+   <sub>0</sub>
+   = 64716.8
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  After yield -
+  <span class="eq">
+   <var>EA</var>
+   <sub>1</sub>
+   =
+   <var>E</var>
+   <sub>1</sub>
+   ·
+   <var>A</var>
+   = 5.69
+   <i>GPa</i>
+   · 3.14
+   <i>cm</i>
+   <sup class="unit">2</sup>
+   = 1787.76
+   <i>kN</i>
+  </span>
+ </p>
+ <h4>Load - [Joint, Fx, Fy]</h4>
+ <p>
+  <span class="eq">
+   <b>
+    <var>F</var>
+   </b>
+   <sub>J</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+      0
+      <i>kN</i>
+     </span>
+     <span class="td">
+      -70
+      <i>kN</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <var>n</var>
+   <sub>F</sub>
+   =
+   <b>n</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>F</var>
+   </b>
+   <sub>J</sub>
+   )  = 1
+  </span>
+ </p>
+ <p>
+  Prestressing force -
+  <span class="eq">
+   <var>P</var>
+   = 20
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  Initial stress -
+  <span class="eq">
+   <var>σ</var>
+   <sub>P</sub>
+   =
+   <span class="dvc">
+    <var>P</var>
+    <span class="dvl">
+    </span>
+    <var>A</var>
+   </span>
+   =
+   <span class="dvc">
+    20
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    3.14
+    <i>cm</i>
+    <sup class="unit">2</sup>
+   </span>
+   = 63.66
+   <i>MPa</i>
+  </span>
+ </p>
+ <p>
+  Initial strain -
+  <span class="eq">
+   <var>ε</var>
+   <sub>P</sub>
+   =
+   <span class="dvc">
+    <var>σ</var>
+    <sub>P</sub>
+    <span class="dvl">
+    </span>
+    <var>E</var>
+    <sub>0</sub>
+   </span>
+   =
+   <span class="dvc">
+    63.66
+    <i>MPa</i>
+    <span class="dvl">
+    </span>
+    206
+    <i>GPa</i>
+   </span>
+   = 0.000309
+  </span>
+ </p>
+ <!-- SVG drawing macros (lines, points, dimension marks and rotated text) included by the nonlinear truss worksheets to render undeformed and deformed configurations side by side. -->
+ <svg style="font-family: DejaVu Serif Condensed; font-size:11px; width:420pt; height:140pt" version="1.1" viewbox="-88.89 -35.56 497.78 106.67" xmlns="http://www.w3.org/2000/svg">
+  <line style="stroke:black; stroke-width:1.5; fill:none" x1="0" x2="106.67" y1="0" y2="0">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="0" x2="0" y1="48.33" y2="58.33">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="106.67" x2="106.67" y1="48.33" y2="58.33">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="-5" x2="111.67" y1="53.33" y2="53.33">
+  </line>
+  <circle cx="106.67" cy="53.33" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <circle cx="0" cy="53.33" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="53.33" y="51.33">3m</text>
+  <line style="stroke:black; stroke-width:1.5; fill:none" x1="106.67" x2="320" y1="0" y2="0">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="106.67" x2="106.67" y1="48.33" y2="58.33">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="320" x2="320" y1="48.33" y2="58.33">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="101.67" x2="325" y1="53.33" y2="53.33">
+  </line>
+  <circle cx="320" cy="53.33" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <circle cx="106.67" cy="53.33" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="213.33" y="51.33">6m</text>
+  <line style="stroke:darkcyan; stroke-width:3; fill:none" x1="10.67" x2="-10.67" y1="13.67" y2="13.67">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="10.67" x2="0" y1="13.67" y2="3">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="-10.67" x2="0" y1="13.67" y2="3">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:3; fill:none" x1="309.33" x2="330.67" y1="13.67" y2="13.67">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="309.33" x2="320" y1="13.67" y2="3">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="330.67" x2="320" y1="13.67" y2="3">
+  </line>
+  <polygon points="106.67,-56.33 106.67,-3 103.11,-13.67 110.22,-13.67 106.67,-3" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
+  </polygon>
+  <text text-anchor="middle" transform="rotate(-90,99.56,-38.56)" x="99.56" y="-38.56">Fy=-70kN</text>
+  <circle cx="0" cy="0" r="3" style="stroke:red; stroke-width:1; fill:white">
+  </circle>
+  <circle cx="106.67" cy="0" r="3" style="stroke:red; stroke-width:1; fill:white">
+  </circle>
+  <circle cx="320" cy="0" r="3" style="stroke:red; stroke-width:1; fill:white">
+  </circle>
+ </svg>
+ <h4>Finite element formulation</h4>
+ <!-- <span class="eq"><var>u</var> = 0</span> , <span class="eq"><var>v</var> = 0</span> , <span class="eq"><var><span class="vec">⃗</span>z</var> = <span class="b0">[</span>0; 0<span class="b0">]</span> = <b class="b0">[</b>0 0<b class="b0">]</b></span> -->
+ <p>We will formulate a 2D truss element with 3rd order geometric nonlinearity. The equilibrium equations will be derived in local CS, for the deformed state of the structure, assuming large displacements, as follows:</p>
+ <img alt="nonlin-truss-element.png" src="./Images/nonlin-truss-element.png" style="height:115pt; width:198pt;"/>
+ <p>
+  Relative displacements -
+  <span class="eq">
+   <var>u</var>
+   =
+   <var>u</var>
+   <sub>2</sub>
+   −
+   <var>u</var>
+   <sub>1</sub>
+  </span>
+  ,
+  <span class="eq">
+   <var>v</var>
+   =
+   <var>v</var>
+   <sub>2</sub>
+   −
+   <var>v</var>
+   <sub>1</sub>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   =
+   <span class="b0">[</span>
+   <var>u</var>
+   ;
+   <var>v</var>
+   <span class="b0">]</span>
+  </span>
+ </p>
+ <p>Length and elongation of the element in deformed state</p>
+ <p>
+  <span class="eq">
+   <var>l′</var>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  =
+   <span class="o0">
+    <span class="r">√</span>
+    (
+    <var>l</var>
+    (
+    <var>e</var>
+    )  +
+    <var>z</var>
+    <sub>1</sub>
+    )
+    <sup>2</sup>
+    +
+    <var>z</var>
+    <sub>2</sub>
+    <sup>2</sup>
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <var>Δl</var>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  =
+   <var>l′</var>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  −
+   <var>l</var>
+   (
+   <var>e</var>
+   )
+  </span>
+  ,
+  <span class="eq">
+   <var>ε</var>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  =
+   <span class="dvc">
+    <var>Δl</var>
+    (
+    <var>e</var>
+    ;
+    <var>z</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>l</var>
+    (
+    <var>e</var>
+    )
+   </span>
+   +
+   <var>ε</var>
+   <sub>P</sub>
+  </span>
+ </p>
+ <p>Directions of the displaced axis of the element in the deformed state</p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   <sub>d</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  =
+   <span class="dvc">
+    <var>l</var>
+    (
+    <var>e</var>
+    )  +
+    <var>z</var>
+    <sub>1</sub>
+    <span class="dvl">
+    </span>
+    <var>l′</var>
+    (
+    <var>e</var>
+    ;
+    <var>z</var>
+    )
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <var>s</var>
+   <sub>d</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  =
+   <span class="dvc">
+    <var>z</var>
+    <sub>2</sub>
+    <span class="dvl">
+    </span>
+    <var>l′</var>
+    (
+    <var>e</var>
+    ;
+    <var>z</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>
+  Axial force in element -
+  <span class="eq">
+   <var>N</var>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  =
+   <var>σ</var>
+   (
+   <var>ε</var>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  )  ·
+   <var>A</var>
+  </span>
+ </p>
+ <p>
+  Horizontal reactive force at the right end -
+  <span class="eq">
+   <var>F</var>
+   <sub>x</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  =
+   <var>N</var>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  ·
+   <var>c</var>
+   <sub>d</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )
+  </span>
+ </p>
+ <p>
+  Vertical reactive force at the right end -
+  <span class="eq">
+   <var>F</var>
+   <sub>y</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  =
+   <var>N</var>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  ·
+   <var>s</var>
+   <sub>d</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )
+  </span>
+ </p>
+ <p>Partial derivatives of element end reactive forces</p>
+ <p>
+  <span class="eq">
+   <var>F′</var>
+   <sub>x1</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>l</var>
+    (
+    <var>e</var>
+    )
+   </span>
+   −
+   <span class="dvc">
+    <var>z</var>
+    <sub>2</sub>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <var>l′</var>
+    (
+    <var>e</var>
+    ;
+    <var>z</var>
+    )
+    <sup>3</sup>
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <var>F′</var>
+   <sub>x2</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  =
+   <span class="dvc">
+    <var>z</var>
+    <sub>2</sub>
+    ·  (
+    <var>l</var>
+    (
+    <var>e</var>
+    )  +
+    <var>z</var>
+    <sub>1</sub>
+    )
+    <span class="dvl">
+    </span>
+    <var>l′</var>
+    (
+    <var>e</var>
+    ;
+    <var>z</var>
+    )
+    <sup>3</sup>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>F′</var>
+   <sub>y1</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  =
+   <var>F′</var>
+   <sub>x2</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )
+  </span>
+  ,
+  <span class="eq">
+   <var>F′</var>
+   <sub>y2</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   )  =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>l</var>
+    (
+    <var>e</var>
+    )
+   </span>
+   −
+   <span class="dvc">
+    (
+    <var>l</var>
+    (
+    <var>e</var>
+    )  +
+    <var>z</var>
+    <sub>1</sub>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <var>l′</var>
+    (
+    <var>e</var>
+    ;
+    <var>z</var>
+    )
+    <sup>3</sup>
+   </span>
+  </span>
+ </p>
+ <p>We are not going to linearize the above equations by Taylor series. We will use them further directly in their implicit form.</p>
+ <h4>Solution by Newton-Raphson’s method</h4>
+ <p>We will express the parameters of the system as a function of the vector of t he unknown displacements:</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   =
+   <b>vector</b>
+   ( 2 ·
+   <var>n</var>
+   <sub>J</sub>
+   )  ·
+   <i>mm</i>
+   =
+   <b>vector</b>
+   ( 2 · 3 )  ·
+   <i>mm</i>
+   =
+   <b class="b0">[</b>
+   0
+   <i>mm</i>
+   0
+   <i>mm</i>
+   0
+   <i>mm</i>
+   0
+   <i>mm</i>
+   0
+   <i>mm</i>
+   0
+   <i>mm</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  Initial deflection at the intermediate joint -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   <sub>4</sub>
+   = 100
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  Extracting displacements for joint
+  <var>j</var>
+  -
+  <span class="eq">
+   <var>z</var>
+   <sub>J</sub>
+   (
+   <var>j</var>
+   )  =
+   <span class="b0">[</span>
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   <sub>
+    2 ·
+    <var>j</var>
+    − 1
+   </sub>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   <sub>
+    2 ·
+    <var>j</var>
+   </sub>
+   <span class="b0">]</span>
+  </span>
+ </p>
+ <p>
+  Relative displacements for element
+  <var>e</var>
+  -
+  <span class="eq">
+   <var>z</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>t</var>
+   (
+   <var>e</var>
+   )  ·  (
+   <var>z</var>
+   <sub>J</sub>
+   (
+   <var>J</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  )  −
+   <var>z</var>
+   <sub>J</sub>
+   (
+   <var>J</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  )  )
+  </span>
+ </p>
+ <p>
+  Element reactive forces partial vector -
+  <span class="eq">
+   <var>F</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>t</var>
+   (
+   <var>e</var>
+   )  ·
+   <span class="b0">[</span>
+   <var>F</var>
+   <sub>x</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   )  ) ;
+   <var>F</var>
+   <sub>y</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   )  )
+   <span class="b0">]</span>
+  </span>
+ </p>
+ <p>Partial element Jacobi matrix</p>
+ <p>
+  <span class="eq">
+   <var>J</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>t</var>
+   (
+   <var>e</var>
+   )  ·
+   <span class="b0">[</span>
+   <var>F′</var>
+   <sub>x1</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   )  ) ;
+   <var>F′</var>
+   <sub>x2</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   )  )
+   <span class="b0">|</span>
+   <var>F′</var>
+   <sub>y1</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   )  ) ;
+   <var>F′</var>
+   <sub>y2</sub>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   )  )
+   <span class="b0">]</span>
+  </span>
+ </p>
+ <p>
+  Target precision -
+  <span class="eq">
+   <var>ε</var>
+   <sub>max</sub>
+   = 10
+   <sup>-5</sup>
+  </span>
+ </p>
+ <p>Iteratively calculate the following equations of the Newton-Raphson’s method:</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   <sub>0</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    δZ
+   </var>
+   =
+   <b>clsolve</b>
+   (
+   <var>J</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   ) ;
+   <var>F</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   )  )
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   <sub>0</sub>
+   −
+   <var>
+    <span class="vec">⃗</span>
+    δZ
+   </var>
+  </span>
+  ,
+  <span class="eq">
+   <var>ε</var>
+   =
+   <span class="dvc">
+    <b>norm</b>
+    <sub>e</sub>
+    (
+    <var>
+     <span class="vec">⃗</span>
+     δZ
+    </var>
+    )
+    <span class="dvl">
+    </span>
+    <b>norm</b>
+    <sub>e</sub>
+    (
+    <var>
+     <span class="vec">⃗</span>
+     Z
+    </var>
+    )
+   </span>
+   &lt;
+   <var>ε</var>
+   <sub>max</sub>
+  </span>
+ </p>
+ <p>
+  Convergence reached at iteration -
+  <span class="eq">
+   <var>n</var>
+   = 33
+  </span>
+  . Relative error -
+  <span class="eq">
+   <var>ε</var>
+   = 7.27×10
+   <sup>-6</sup>
+  </span>
+ </p>
+ <h4>Results</h4>
+ <p>
+  <strong>Joint displacements</strong>
+  -
+  <span class="eq">
+   <var>Z</var>
+   (
+   <var>j</var>
+   )  =
+   <b>round</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>z</var>
+    <sub>J</sub>
+    (
+    <var>j</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>δz</var>
+   </span>
+   <span class="b1">)</span>
+   ·
+   <var>δz</var>
+  </span>
+ </p>
+ <p>
+  Joint
+  <b>J2</b>
+  -
+  <var>Z</var>
+  <sub>2</sub>
+  =
+  <span class="eq">
+   <var>Z</var>
+   ( 2 )  =
+   <b class="b0">[</b>
+   -44.7
+   <i>mm</i>
+   772.72
+   <i>mm</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <strong>Reactions in supports</strong>
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   (
+   <var>i</var>
+   )  =
+   <b>row</b>
+   (
+   <b>
+    <var>c</var>
+   </b>
+   <sub>J</sub>
+   ;
+   <var>i</var>
+   )
+  </span>
+  ,
+  <span class="eq">
+   <var>j</var>
+   (
+   <var>i</var>
+   )  =
+   <b>take</b>
+   ( 1;
+   <var>r</var>
+   (
+   <var>i</var>
+   )  )
+  </span>
+  ,
+  <span class="eq">
+   <var>R</var>
+   (
+   <var>i</var>
+   )  = -
+   <var>z</var>
+   <sub>J</sub>
+   (
+   <var>j</var>
+   (
+   <var>i</var>
+   )  )  ·
+   <b>last</b>
+   (
+   <var>r</var>
+   (
+   <var>i</var>
+   ) ; 2 )
+  </span>
+ </p>
+ <p>
+  Joint
+  <b>J1</b>
+  -
+  <var>R</var>
+  <sub>1</sub>
+  =
+  <span class="eq">
+   <var>R</var>
+   ( 1 )  =
+   <b class="b0">[</b>
+   -179.81
+   <i>kN</i>
+   -47.01
+   <i>kN</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  Joint
+  <b>J3</b>
+  -
+  <var>R</var>
+  <sub>2</sub>
+  =
+  <span class="eq">
+   <var>R</var>
+   ( 2 )  =
+   <b class="b0">[</b>
+   179.81
+   <i>kN</i>
+   -22.99
+   <i>kN</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  Element yield capacity  -
+  <span class="eq">
+   <var>N</var>
+   <sub>y</sub>
+   =
+   <var>f</var>
+   <sub>y</sub>
+   ·
+   <var>A</var>
+   = 500
+   <i>MPa</i>
+   · 3.14
+   <i>cm</i>
+   <sup class="unit">2</sup>
+   = 157.08
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  Element ultimate capacity -
+  <span class="eq">
+   <var>N</var>
+   <sub>u</sub>
+   =
+   <var>f</var>
+   <sub>u</sub>
+   ·
+   <var>A</var>
+   = 600
+   <i>MPa</i>
+   · 3.14
+   <i>cm</i>
+   <sup class="unit">2</sup>
+   = 188.5
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  <strong>Element axial forces</strong>
+  -
+  <span class="eq">
+   <var>N</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>N</var>
+   (
+   <var>e</var>
+   ;
+   <var>z</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   )  )
+  </span>
+ </p>
+ <p>
+  Element
+  <b>Е1</b>
+  -
+  <var>N</var>
+  <sub>1</sub>
+  =
+  <span class="eq">
+   <var>N</var>
+   <sub>e</sub>
+   ( 1 )  = 185.86
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  Element
+  <b>Е2</b>
+  -
+  <var>N</var>
+  <sub>2</sub>
+  =
+  <span class="eq">
+   <var>N</var>
+   <sub>e</sub>
+   ( 2 )  = 181.27
+   <i>kN</i>
+  </span>
+ </p>
+ <svg style="font-family: DejaVu Serif Condensed; font-size:11px; width:420pt; height:140pt" version="1.1" viewbox="-88.89 -35.56 497.78 106.67" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="0,0 0,-53.33 -3.56,-42.67 3.56,-42.67 0,-53.33" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
+  </polygon>
+  <polygon points="320,0 320,-53.33 316.44,-42.67 323.56,-42.67 320,-53.33" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
+  </polygon>
+  <polygon points="3,0 -53.33,0 -42.67,-3.56 -42.67,3.56 -53.33,0" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
+  </polygon>
+  <polygon points="323,0 373.33,0 362.67,-3.56 362.67,3.56 373.33,0" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
+  </polygon>
+  <text text-anchor="middle" x="-35.56" y="-8.89">Rx=-179.81kN</text>
+  <text text-anchor="middle" x="355.56" y="-8.89">Rx=179.81kN</text>
+  <text text-anchor="middle" x="35.56" y="-56.89">Ry=-47.01kN</text>
+  <text text-anchor="middle" x="284.44" y="-56.89">Ry=-22.99kN</text>
+  <line style="stroke:black; stroke-width:1.5; fill:none" x1="0" x2="105.08" y1="0" y2="27.47">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="0" x2="0" y1="48.33" y2="58.33">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="105.08" x2="105.08" y1="48.33" y2="58.33">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="-5" x2="110.08" y1="53.33" y2="53.33">
+  </line>
+  <circle cx="105.08" cy="53.33" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <circle cx="0" cy="53.33" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="52.54" y="51.33">2.96m</text>
+  <line style="stroke:black; stroke-width:1.5; fill:none" x1="105.08" x2="320" y1="27.47" y2="0">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="105.08" x2="105.08" y1="48.33" y2="58.33">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="320" x2="320" y1="48.33" y2="58.33">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="100.08" x2="325" y1="53.33" y2="53.33">
+  </line>
+  <circle cx="320" cy="53.33" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <circle cx="105.08" cy="53.33" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="212.54" y="51.33">6.04m</text>
+  <line style="stroke:darkcyan; stroke-width:3; fill:none" x1="10.67" x2="-10.67" y1="13.67" y2="13.67">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="10.67" x2="0" y1="13.67" y2="3">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="-10.67" x2="0" y1="13.67" y2="3">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:3; fill:none" x1="309.33" x2="330.67" y1="13.67" y2="13.67">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="309.33" x2="320" y1="13.67" y2="3">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="330.67" x2="320" y1="13.67" y2="3">
+  </line>
+  <polygon points="105.08,-28.86 105.08,24.47 101.52,13.81 108.63,13.81 105.08,24.47" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
+  </polygon>
+  <text text-anchor="middle" transform="rotate(-90,97.97,-11.08)" x="97.97" y="-11.08">Fy=-70kN</text>
+  <circle cx="0" cy="0" r="3" style="stroke:red; stroke-width:1; fill:white">
+  </circle>
+  <circle cx="105.08" cy="27.47" r="3" style="stroke:red; stroke-width:1; fill:white">
+  </circle>
+  <text text-anchor="middle" transform="rotate(-90,101.52,59.47)" x="101.52" y="59.47">772.72mm</text>
+  <text text-anchor="middle" x="131.74" y="41.7">-44.7mm</text>
+  <circle cx="320" cy="0" r="3" style="stroke:red; stroke-width:1; fill:white">
+  </circle>
+ </svg>
+</div>

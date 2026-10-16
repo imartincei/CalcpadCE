@@ -1,0 +1,86 @@
+<div class="calcpad-output">
+ <!-- Plots a [Julia set](https://en.wikipedia.org/wiki/Julia_set) for $c = -0.4 + 0.6i$ via `$Map` over a complex grid, with `$Find` locating the escape iteration of the quadratic map $z \mapsto z^2 + c$. -->
+ <p>
+  Function:
+  <span class="eq">
+   <var>J</var>
+   (
+   <var>z</var>
+   ;
+   <var>c</var>
+   ;
+   <var>n</var>
+   )  =
+   <b class="b0">|</b>
+   <span class="cond">$Repeat</span>
+   {
+   <var>z</var>
+   =
+   <span class="dvcs">
+    <span class="c1">{</span>
+    <span class="dvs">
+     if
+     <b class="b0">|</b>
+     <var>z</var>
+     <b class="b0">|</b>
+     &lt; 2:
+     <var>z</var>
+     <sup>2</sup>
+     +
+     <var>c</var>
+     <br/>
+     else: 4
+    </span>
+   </span>
+   <span class="cond">for</span>
+   <var>i</var>
+   = 1...
+   <var>n</var>
+   }
+   <b class="b0">|</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>JuliaSet</var>
+   (
+   <var>z</var>
+   ;
+   <var>c</var>
+   )  =
+   <span class="cond">$Find</span>
+   {
+   <var>J</var>
+   (
+   <var>z</var>
+   ;
+   <var>c</var>
+   ;
+   <var>x</var>
+   )  − 2;
+   <var>x</var>
+   ∈ [1;
+   <var>n</var>
+   ]}
+  </span>
+ </p>
+ <p>
+  Plot for
+  <span class="err">
+   Error in "c = -0.4 + 0.6i" on line [
+   <a data-text="8" href="#0">8</a>
+   ]: Error parsing "i" as units.
+  </span>
+  and
+  <span class="eq">
+   <var>n</var>
+   = 100
+  </span>
+  iterations
+ </p>
+ <p class="err">
+  Error in "$Map{JuliaSet(x + 1i*y; c) @ x = -1.5 : 1.5 &amp; y = -1 : 1}" on line [
+  <a data-text="9" href="#0">9</a>
+  ]: Error parsing "i" as units.
+ </p>
+</div>

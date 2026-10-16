@@ -1,0 +1,417 @@
+<div class="calcpad-output">
+ <!-- Section properties of a hollow elliptical pipe: area, $I_x$, $I_y$, section moduli and radii of gyration from the four semi-axes. -->
+ <h3>Geometrical Properties of Elliptical Pipe</h3>
+ <div style="max-width:120mm">
+  <img alt="elliptical-pipe.png" class="side" src="Images/mechanics/sections/elliptical-pipe.png" style="height:112pt;"/>
+ </div>
+ <p>(ellipse with elliptical hole)</p>
+ <p>Dimensions</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-6">20</u>
+  </span>
+  m,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-6">10</u>
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>t</var>
+   =
+   <u class="input-7">2</u>
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   <sub>1</sub>
+   =
+   <var>a</var>
+   −
+   <var>t</var>
+   = 20 − 2 = 18
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   <sub>1</sub>
+   =
+   <var>b</var>
+   −
+   <var>t</var>
+   = 10 − 2 = 8
+  </span>
+  m
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <var>π</var>
+   ·  (
+   <var>a</var>
+   ·
+   <var>b</var>
+   −
+   <var>a</var>
+   <sub>1</sub>
+   ·
+   <var>b</var>
+   <sub>1</sub>
+   )  = 3.14 ·  ( 20 · 10 − 18 · 8 )  = 175.93
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>Centroid</p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   <sub>c</sub>
+   =
+   <var>a</var>
+   = 20
+  </span>
+  m,
+  <span class="eq">
+   <var>z</var>
+   <sub>c</sub>
+   =
+   <var>b</var>
+   = 10
+  </span>
+  m
+ </p>
+ <p>Perimeter (approx.)</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   =
+   <var>π</var>
+   ·  ( 3 ·  (
+   <var>a</var>
+   +
+   <var>b</var>
+   )  −
+   <span class="o0">
+    <span class="r">√</span>
+    ( 3 ·
+    <var>a</var>
+    +
+    <var>b</var>
+    )  ·  (
+    <var>a</var>
+    + 3 ·
+    <var>b</var>
+    )
+   </span>
+   )  = 3.14 ·  ( 3 ·  ( 20 + 10 )  −
+   <span class="o0">
+    <span class="r">√</span>
+    ( 3 · 20 + 10 )  ·  ( 20 + 3 · 10 )
+   </span>
+   )  = 96.88
+  </span>
+  m
+ </p>
+ <p>Second moments of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>y</sub>
+   =
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ·  (
+   <var>a</var>
+   ·
+   <var>b</var>
+   <sup>3</sup>
+   −
+   <var>a</var>
+   <sub>1</sub>
+   ·
+   <var>b</var>
+   <sub>1</sub>
+   <sup>3</sup>
+   )  =
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ·  ( 20 · 10
+   <sup>3</sup>
+   − 18 · 8
+   <sup>3</sup>
+   )  = 8469.73
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>z</sub>
+   =
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ·  (
+   <var>b</var>
+   ·
+   <var>a</var>
+   <sup>3</sup>
+   −
+   <var>b</var>
+   <sub>1</sub>
+   ·
+   <var>a</var>
+   <sub>1</sub>
+   <sup>3</sup>
+   )  =
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ·  ( 10 · 20
+   <sup>3</sup>
+   − 8 · 18
+   <sup>3</sup>
+   )  = 26188.3
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Polar moment of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>x</sub>
+   =
+   <var>I</var>
+   <sub>y</sub>
+   +
+   <var>I</var>
+   <sub>z</sub>
+   = 8469.73 + 26188.3 = 34658.1
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Torsional constant</p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   =
+   <span class="dvc">
+    <var>b</var>
+    <sub>1</sub>
+    <span class="dvl">
+    </span>
+    <var>b</var>
+   </span>
+   =
+   <span class="dvc">
+    8
+    <span class="dvl">
+    </span>
+    10
+   </span>
+   = 0.8
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>t</sub>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>a</var>
+    <sup>3</sup>
+    ·
+    <var>b</var>
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    <var>a</var>
+    <sup>2</sup>
+    +
+    <var>b</var>
+    <sup>2</sup>
+   </span>
+   ·  ( 1 −
+   <var>k</var>
+   <sup>4</sup>
+   )  =
+   <span class="dvc">
+    3.14 · 20
+    <sup>3</sup>
+    · 10
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    20
+    <sup>2</sup>
+    + 10
+    <sup>2</sup>
+   </span>
+   ·  ( 1 − 0.8
+   <sup>4</sup>
+   )  = 29676.7
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Torsional section modulus</p>
+ <p>
+  <span class="eq">
+   <var>W</var>
+   <sub>t</sub>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>a</var>
+    ·
+    <var>b</var>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ·  ( 1 −
+   <var>k</var>
+   <sup>4</sup>
+   )  =
+   <span class="dvc">
+    3.14 · 20 · 10
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ·  ( 1 − 0.8
+   <sup>4</sup>
+   )  = 1854.8
+  </span>
+  m
+  <sup>3</sup>
+ </p>
+ <p>Radii of gyration</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>y</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     8469.73
+     <span class="dvl">
+     </span>
+     175.93
+    </span>
+   </span>
+   = 6.94
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>z</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>z</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     26188.3
+     <span class="dvl">
+     </span>
+     175.93
+    </span>
+   </span>
+   = 12.2
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>x</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>x</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     34658.1
+     <span class="dvl">
+     </span>
+     175.93
+    </span>
+   </span>
+   = 14.04
+  </span>
+  m
+ </p>
+</div>

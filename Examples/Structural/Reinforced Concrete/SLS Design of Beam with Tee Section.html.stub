@@ -1,0 +1,2415 @@
+<div class="calcpad-output">
+ <script src="https://code.jquery.com/jquery-3.6.3.min.js">
+ </script>
+ <!-- Serviceability checks for a T-beam: same stress, crack-width and deflection verifications as the rectangular variant, with the cracked-section second moment of area derived for both flange-in-compression and web-in-compression cases. -->
+ <small>
+  According to
+  <strong>Eurocode</strong>
+  : EN 1992-1-1
+ </small>
+ <div style="max-width:180mm">
+  <h4>Static scheme</h4>
+  <p class="flip_base" id="type" style="display:none">
+   <span class="eq">
+    <var>type</var>
+    =
+    <u class="input-8">0</u>
+   </span>
+  </p>
+  <p>
+   <select class="flip_trigger" data-target="type">
+    <option value="1">Cantilever with concentrated load</option>
+    <option value="2">Cantilever with uniformly distributed load</option>
+    <option value="3">Simply supported beam with concentrated load</option>
+    <option value="0">Simply supported beam with uniformly distributed load</option>
+   </select>
+  </p>
+  <img alt="deflection-beam-uniform.png" class="side flip flip_0" src="Images/structures/rc/design/deflection-beam-uniform.png" style="width:150pt;"/>
+  <p>Simply supported beam with uniformly distributed load</p>
+  <p>
+   Beam length -
+   <span class="eq">
+    <var>L</var>
+    =
+    <u class="input-43">5.75</u>
+   </span>
+   m
+  </p>
+  <p>Exposure class:</p>
+  <p id="w_max" style="display:none">
+   <span class="eq">
+    <var>w</var>
+    <sub>max</sub>
+    =
+    <u class="input-45">0.4</u>
+   </span>
+  </p>
+  <p>
+   <select data-target="w_max">
+    <option value="0.4">X0 or XC1</option>
+    <option value="0.3">XC2, XC3, XC4, XD1, XD2, XS2 или XS3</option>
+   </select>
+  </p>
+  <p>X0 or XC1</p>
+  <p>
+  </p>
+  <h4>Bending moments</h4>
+  <p>
+   Characteristic combination (
+   <i>g</i>
+   +
+   <i>q</i>
+   ) -
+   <span class="eq">
+    <var>M</var>
+    <sub>k</sub>
+    =
+    <u class="input-60">200</u>
+   </span>
+   kNm
+  </p>
+  <p>
+   Quasi-permanent combination (
+   <i>g</i>
+   +
+   <i>ψ</i>
+   <sub>2</sub>
+   <i>q</i>
+   ) -
+   <span class="eq">
+    <var>M</var>
+    <sub>qp</sub>
+    =
+    <u class="input-61">157</u>
+   </span>
+   kNm
+  </p>
+  <p>
+  </p>
+  <img alt="beam-tsection.png" class="side" src="Images/structures/rc/design/beam-tsection.png" style="width:150pt;"/>
+  <h4>Cross section dimensions</h4>
+  <p>
+   Stem:
+   <span class="eq">
+    <var>b</var>
+    =
+    <u class="input-65">250</u>
+   </span>
+   mm,
+   <span class="eq">
+    <var>h</var>
+    =
+    <u class="input-65">550</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Flange:
+   <span class="eq">
+    <var>b</var>
+    <sub>f</sub>
+    =
+    <u class="input-66">2400</u>
+   </span>
+   mm,
+   <span class="eq">
+    <var>h</var>
+    <sub>f</sub>
+    =
+    <u class="input-66">140</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Concrete cover -
+   <span class="eq">
+    <var>c</var>
+    =
+    <u class="input-67">30</u>
+   </span>
+   mm (to bars surface)
+  </p>
+  <p>
+   <b>Tension reinforcement</b>
+  </p>
+  <p>
+   Bar count -
+   <span class="eq">
+    <var>n</var>
+    <sub>1</sub>
+    =
+    <u class="input-69">4</u>
+   </span>
+   with diameter -
+   <span class="eq">
+    <var>Φ</var>
+    <sub>1</sub>
+    =
+    <u class="input-69">20</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Reinforcement area -
+   <span class="eq">
+    <var>A</var>
+    <sub>s1</sub>
+    =
+    <span class="dvc">
+     <var>n</var>
+     <sub>1</sub>
+     ·
+     <var>π</var>
+     ·
+     <var>Φ</var>
+     <sub>1</sub>
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    =
+    <span class="dvc">
+     4 · 3.14 · 20
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    = 1256.64
+   </span>
+   mm²
+  </p>
+  <p>
+   Concrete cover to the center of reinforcement -
+   <span class="eq">
+    <var>d</var>
+    <sub>1</sub>
+    =
+    <u class="input-73">45</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Effective cross section depth -
+   <span class="eq">
+    <var>d</var>
+    =
+    <var>h</var>
+    −
+    <var>d</var>
+    <sub>1</sub>
+    = 550 − 45 = 505
+   </span>
+   mm
+  </p>
+  <p>
+   Spacing between bar centers -
+   <span class="eq">
+    <var>s</var>
+    =
+    <u class="input-77">50</u>
+   </span>
+   mm
+  </p>
+  <p>
+   <b>Compression reinforcement</b>
+  </p>
+  <p>
+   Bar count -
+   <span class="eq">
+    <var>n</var>
+    <sub>2</sub>
+    =
+    <u class="input-79">2</u>
+   </span>
+   with diameter -
+   <span class="eq">
+    <var>Φ</var>
+    <sub>2</sub>
+    =
+    <u class="input-79">8</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Reinforcement area -
+   <span class="eq">
+    <var>A</var>
+    <sub>s2</sub>
+    =
+    <span class="dvc">
+     <var>n</var>
+     <sub>2</sub>
+     ·
+     <var>π</var>
+     ·
+     <var>Φ</var>
+     <sub>2</sub>
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    =
+    <span class="dvc">
+     2 · 3.14 · 8
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    = 100.53
+   </span>
+   mm²
+  </p>
+  <p>
+   Concrete cover to the center of reinforcement -
+   <span class="eq">
+    <var>d</var>
+    <sub>2</sub>
+    =
+    <u class="input-83">45</u>
+   </span>
+   mm
+  </p>
+  <p>
+  </p>
+  <h4>Material properties</h4>
+  <p>
+   <b>Concrete</b>
+   [EN 1992-1-1, Table 3.1]
+  </p>
+  <p>
+   Characteristic compressive cylinder strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ck</sub>
+    =
+    <u class="input-87">25</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Mean value of cylinder compressive strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>cm</sub>
+    =
+    <var>f</var>
+    <sub>ck</sub>
+    + 8 = 25 + 8 = 33
+   </span>
+   MPa
+  </p>
+  <p>
+   Mean value of axial tensile strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ctm</sub>
+    = 0.3 ·
+    <var>f</var>
+    <sub>ck</sub>
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+    = 0.3 · 25
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+    = 2.56
+   </span>
+   MPa
+  </p>
+  <p>
+   Secant modulus of elasticity -
+   <span class="eq">
+    <var>E</var>
+    <sub>cm</sub>
+    = 22 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>f</var>
+     <sub>cm</sub>
+     <span class="dvl">
+     </span>
+     10
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">0.3</sup>
+    = 22 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     33
+     <span class="dvl">
+     </span>
+     10
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">0.3</sup>
+    = 31.48
+   </span>
+   GPa
+  </p>
+  <p>
+   <b>Steel</b>
+  </p>
+  <p>
+   Characteristic yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>yk</sub>
+    =
+    <u class="input-94">500</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Modulus of elasticity -
+   <span class="eq">
+    <var>E</var>
+    <sub>s</sub>
+    = 200
+   </span>
+   GPa
+  </p>
+  <p>
+   Ratio of steel to concrete moduli of elasticity -
+   <span class="eq">
+    <var>α</var>
+    =
+    <span class="dvc">
+     <var>E</var>
+     <sub>s</sub>
+     <span class="dvl">
+     </span>
+     <var>E</var>
+     <sub>cm</sub>
+    </span>
+    =
+    <span class="dvc">
+     200
+     <span class="dvl">
+     </span>
+     31.48
+    </span>
+    = 6.35
+   </span>
+  </p>
+  <p>
+  </p>
+  <div class="fold">
+   <h4>Concrete creep and shrinkage</h4>
+   <p class="ref">[EN 1992-1-1 B.1(1)]</p>
+   <p>
+    <b>Creep</b>
+   </p>
+   <p>
+    Relative humidity of the environment -
+    <span class="eq">
+     <var>RH</var>
+     =
+     <u class="input-104">60</u>
+    </span>
+    %
+   </p>
+   <p>Perimeter of cross section in contact with the atmosphere</p>
+   <p>
+    <span class="eq">
+     <var>u</var>
+     = 2 ·  (
+     <var>b</var>
+     +
+     <var>h</var>
+     )  = 2 ·  ( 250 + 550 )  = 1600
+    </span>
+    mm
+   </p>
+   <p>
+    Cross section area -
+    <span class="eq">
+     <var>A</var>
+     <sub>c</sub>
+     =
+     <var>b</var>
+     ·
+     <var>h</var>
+     = 250 · 550 = 137500
+    </span>
+    mm²
+   </p>
+   <p>Notional size of the cross section</p>
+   <p class="ref">(eq. B.6)</p>
+   <p>
+    <span class="eq">
+     <var>h</var>
+     <sub>0</sub>
+     =
+     <span class="dvc">
+      2 ·
+      <var>A</var>
+      <sub>c</sub>
+      <span class="dvl">
+      </span>
+      <var>u</var>
+     </span>
+     =
+     <span class="dvc">
+      2 · 137500
+      <span class="dvl">
+      </span>
+      1600
+     </span>
+     = 171.88
+    </span>
+    mm
+   </p>
+   <p>Relative humidity factor</p>
+   <p class="ref">(eq. B.3a)</p>
+   <p>
+    <span class="eq">
+     <var>φ</var>
+     <sub>RH</sub>
+     = 1 +
+     <span class="dvc up">
+      1 −
+      <span class="dvc">
+       <var>RH</var>
+       <span class="dvl">
+       </span>
+       100
+      </span>
+      <span class="dvl">
+      </span>
+      0.1 ·
+      <var>h</var>
+      <sub>0</sub>
+      <sup>0.333</sup>
+     </span>
+     = 1 +
+     <span class="dvc up">
+      1 −
+      <span class="dvc">
+       60
+       <span class="dvl">
+       </span>
+       100
+      </span>
+      <span class="dvl">
+      </span>
+      0.1 · 171.88
+      <sup>0.333</sup>
+     </span>
+     = 1.72
+    </span>
+   </p>
+   <p>Concrete strength factor</p>
+   <p class="ref">(eq. B.4)</p>
+   <p>
+    <span class="eq">
+     <var>β</var>
+     <sub>f_cm</sub>
+     =
+     <span class="dvc">
+      16.8
+      <span class="dvl">
+      </span>
+      <span class="o0">
+       <span class="r">√</span>
+       <var>f</var>
+       <sub>cm</sub>
+      </span>
+     </span>
+     =
+     <span class="dvc">
+      16.8
+      <span class="dvl">
+      </span>
+      <span class="o0">
+       <span class="r">√</span>
+       33
+      </span>
+     </span>
+     = 2.92
+    </span>
+   </p>
+   <p>
+    Concrete age at the moment of loading -
+    <span class="eq">
+     <var>t</var>
+     <sub>0</sub>
+     = 28
+    </span>
+    дни
+   </p>
+   <p>Concrete age factor</p>
+   <p class="ref">(eq. B.5)</p>
+   <p>
+    <span class="eq">
+     <var>β</var>
+     <sub>t0</sub>
+     =
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      0.1 +
+      <var>t</var>
+      <sub>0</sub>
+      <sup>0.2</sup>
+     </span>
+     =
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      0.1 + 28
+      <sup>0.2</sup>
+     </span>
+     = 0.488
+    </span>
+   </p>
+   <p>Notional creep coefficient</p>
+   <p class="ref">(eq. B.2)</p>
+   <p>
+    <span class="eq">
+     <var>φ</var>
+     <sub>8_t0</sub>
+     =
+     <var>φ</var>
+     <sub>RH</sub>
+     ·
+     <var>β</var>
+     <sub>f_cm</sub>
+     ·
+     <var>β</var>
+     <sub>t0</sub>
+     = 1.72 · 2.92 · 0.488 = 2.46
+    </span>
+   </p>
+   <p>Effective concrete modulus of elasticity</p>
+   <p class="ref">[EN 1992-1-1 §7.4.3(5)]</p>
+   <p>
+    <span class="eq">
+     <var>E</var>
+     <sub>c_eff</sub>
+     =
+     <span class="dvc">
+      <var>E</var>
+      <sub>cm</sub>
+      <span class="dvl">
+      </span>
+      1 +
+      <var>φ</var>
+      <sub>8_t0</sub>
+     </span>
+     =
+     <span class="dvc">
+      31.48
+      <span class="dvl">
+      </span>
+      1 + 2.46
+     </span>
+     = 9.1
+    </span>
+    GPa
+   </p>
+   <p>Effective ratio of modules of elasticity</p>
+   <p class="ref">[EN 1992-1-1 §7.4.3(6)]</p>
+   <p>
+    <span class="eq">
+     <var>α</var>
+     <sub>e</sub>
+     =
+     <span class="dvc">
+      <var>E</var>
+      <sub>s</sub>
+      <span class="dvl">
+      </span>
+      <var>E</var>
+      <sub>c_eff</sub>
+     </span>
+     =
+     <span class="dvc">
+      200
+      <span class="dvl">
+      </span>
+      9.1
+     </span>
+     = 21.97
+    </span>
+   </p>
+   <p class="ref">[EN 1992-1-1 B.2(1)]</p>
+   <p>
+    <b>Shrinkage</b>
+   </p>
+   <p>Coefficient depending on the notional size</p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     <sub>h</sub>
+     = 1 − 0.0015 ·  (
+     <var>h</var>
+     <sub>0</sub>
+     − 100 )  = 1 − 0.0015 ·  ( 171.88 − 100 )  = 0.892
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>α</var>
+     <sub>ds1</sub>
+     = 4
+    </span>
+    - for cement Class N
+   </p>
+   <p>
+    <span class="eq">
+     <var>α</var>
+     <sub>ds2</sub>
+     = 0.12
+    </span>
+    - for cement Class N
+   </p>
+   <p class="ref">(eq. B.12)</p>
+   <p>
+    <span class="eq">
+     <var>β</var>
+     <sub>RH</sub>
+     = 1.55 ·
+     <span class="b1">(</span>
+     1 −
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>RH</var>
+      <span class="dvl">
+      </span>
+      100
+     </span>
+     <span class="b1">)</span>
+     <sup class="raised">3</sup>
+     <span class="b1">)</span>
+     = 1.55 ·
+     <span class="b1">(</span>
+     1 −
+     <span class="b1">(</span>
+     <span class="dvc">
+      60
+      <span class="dvl">
+      </span>
+      100
+     </span>
+     <span class="b1">)</span>
+     <sup class="raised">3</sup>
+     <span class="b1">)</span>
+     = 1.22
+    </span>
+   </p>
+   <p>Basic drying shrinkage strain</p>
+   <p class="ref">(eq. B.11)</p>
+   <p>
+    <span class="eq">
+     <var>ε</var>
+     <sub>cd0</sub>
+     = 0.85 ·  ( 220 + 110 ·
+     <var>α</var>
+     <sub>ds1</sub>
+     )  ·
+     <var>e</var>
+     <sup>
+      <span class="dvc">
+       -
+       <var>α</var>
+       <sub>ds2</sub>
+       ·
+       <var>f</var>
+       <sub>cm</sub>
+       <span class="dvl">
+       </span>
+       10
+      </span>
+     </sup>
+     · 10
+     <sup>-6</sup>
+     ·
+     <var>β</var>
+     <sub>RH</sub>
+     = 0.85 ·  ( 220 + 110 · 4 )  · 2.72
+     <sup>
+      <span class="dvc">
+       -0.12 · 33
+       <span class="dvl">
+       </span>
+       10
+      </span>
+     </sup>
+     · 10
+     <sup>-6</sup>
+     · 1.22 = 0.000459
+    </span>
+   </p>
+   <p class="ref">[EN 1992-1-1 §3.1.4(6)]</p>
+   <p>Drying shrinkage strain in time</p>
+   <p class="ref">(eq. 3.9)</p>
+   <p>
+    <span class="eq">
+     <var>ε</var>
+     <sub>cd</sub>
+     =
+     <var>k</var>
+     <sub>h</sub>
+     ·
+     <var>ε</var>
+     <sub>cd0</sub>
+     = 0.892 · 0.000459 = 0.000409
+    </span>
+   </p>
+   <p>Autogenous shrinkage strain</p>
+   <p class="ref">(eq. 3.11)</p>
+   <p>
+    <span class="eq">
+     <var>ε</var>
+     <sub>ca</sub>
+     = 2.5 ·  (
+     <var>f</var>
+     <sub>ck</sub>
+     − 10 )  · 10
+     <sup>-6</sup>
+     = 2.5 ·  ( 25 − 10 )  · 10
+     <sup>-6</sup>
+     = 3.75×10
+     <sup>-5</sup>
+    </span>
+   </p>
+   <p>Total shrinkage strain</p>
+   <p class="ref">(eq. 3.8)</p>
+   <p>
+    <span class="eq">
+     <var>ε</var>
+     <sub>cs</sub>
+     =
+     <var>ε</var>
+     <sub>cd</sub>
+     +
+     <var>ε</var>
+     <sub>ca</sub>
+     = 0.000409 + 3.75×10
+     <sup>-5</sup>
+     = 0.000447
+    </span>
+   </p>
+  </div>
+  <p>
+  </p>
+  <div class="fold">
+   <h4>Cross section properties</h4>
+   <p>
+    Total reinforcement area -
+    <span class="eq">
+     <var>A</var>
+     <sub>s</sub>
+     =
+     <var>A</var>
+     <sub>s1</sub>
+     +
+     <var>A</var>
+     <sub>s2</sub>
+     = 1256.64 + 100.53 = 1357.17
+    </span>
+    mm²
+   </p>
+   <p>
+    Flange area -
+    <span class="eq">
+     <var>A</var>
+     <sub>f</sub>
+     =  (
+     <var>b</var>
+     <sub>f</sub>
+     −
+     <var>b</var>
+     )  ·
+     <var>h</var>
+     <sub>f</sub>
+     =  ( 2400 − 250 )  · 140 = 301000
+    </span>
+    mm²
+   </p>
+   <p>
+    T-section area -
+    <span class="eq">
+     <var>A</var>
+     <sub>c</sub>
+     =
+     <var>b</var>
+     ·
+     <var>h</var>
+     +
+     <var>A</var>
+     <sub>f</sub>
+     = 250 · 550 + 301000 = 438500
+    </span>
+    mm²
+   </p>
+   <p>Effective section area</p>
+   <p>
+    <span class="eq">
+     <var>A</var>
+     <sub>red</sub>
+     =
+     <var>A</var>
+     <sub>c</sub>
+     +
+     <var>α</var>
+     <sub>e</sub>
+     ·
+     <var>A</var>
+     <sub>s</sub>
+     = 438500 + 21.97 · 1357.17 = 468320
+    </span>
+    mm²
+   </p>
+   <p>Section modulus about the bottom edge</p>
+   <p>
+    <span class="eq">
+     <var>S</var>
+     <sub>c</sub>
+     =
+     <span class="dvc">
+      <var>b</var>
+      ·
+      <var>h</var>
+      <sup>2</sup>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     +
+     <var>A</var>
+     <sub>f</sub>
+     ·
+     <span class="b1">(</span>
+     <var>h</var>
+     −
+     <span class="dvc">
+      <var>h</var>
+      <sub>f</sub>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     <span class="b1">)</span>
+     =
+     <span class="dvc">
+      250 · 550
+      <sup>2</sup>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     + 301000 ·
+     <span class="b1">(</span>
+     550 −
+     <span class="dvc">
+      140
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     <span class="b1">)</span>
+     = 182292500
+    </span>
+    mm
+    <sup>3</sup>
+   </p>
+   <p>Effective section modulus about the bottom edge</p>
+   <p>
+    <span class="eq">
+     <var>S</var>
+     <sub>red</sub>
+     =
+     <var>S</var>
+     <sub>c</sub>
+     +
+     <var>α</var>
+     <sub>e</sub>
+     ·  (
+     <var>A</var>
+     <sub>s1</sub>
+     ·
+     <var>d</var>
+     <sub>1</sub>
+     +
+     <var>A</var>
+     <sub>s2</sub>
+     ·  (
+     <var>h</var>
+     −
+     <var>d</var>
+     <sub>2</sub>
+     )  )  = 182292500 + 21.97 ·  ( 1256.64 · 45 + 100.53 ·  ( 550 − 45 )  )  = 184650460
+    </span>
+    mm
+    <sup>3</sup>
+   </p>
+   <p>Effective depth of cross section center</p>
+   <p>
+    <span class="eq">
+     <var>z</var>
+     <sub>c</sub>
+     =
+     <span class="dvc">
+      <var>S</var>
+      <sub>red</sub>
+      <span class="dvl">
+      </span>
+      <var>A</var>
+      <sub>red</sub>
+     </span>
+     =
+     <span class="dvc">
+      184650460
+      <span class="dvl">
+      </span>
+      468320
+     </span>
+     = 394.28
+    </span>
+    mm
+   </p>
+   <p>Second moment of area of the concrete section</p>
+   <p>
+    <span class="eq">
+     <var>I</var>
+     <sub>c</sub>
+     =
+     <span class="dvc">
+      <var>b</var>
+      ·
+      <var>h</var>
+      <sup>3</sup>
+      +  (
+      <var>b</var>
+      <sub>f</sub>
+      −
+      <var>b</var>
+      )  ·
+      <var>h</var>
+      <sub>f</sub>
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      12
+     </span>
+     +
+     <var>b</var>
+     ·
+     <var>h</var>
+     ·
+     <span class="b1">(</span>
+     <var>z</var>
+     <sub>c</sub>
+     −
+     <span class="dvc">
+      <var>h</var>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     <span class="b1">)</span>
+     <sup class="raised">2</sup>
+     +
+     <var>A</var>
+     <sub>f</sub>
+     ·
+     <span class="b1">(</span>
+     <var>h</var>
+     −
+     <var>z</var>
+     <sub>c</sub>
+     −
+     <span class="dvc">
+      <var>h</var>
+      <sub>f</sub>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     <span class="b1">)</span>
+     <sup class="raised">2</sup>
+     =
+     <span class="dvc">
+      250 · 550
+      <sup>3</sup>
+      +  ( 2400 − 250 )  · 140
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      12
+     </span>
+     + 250 · 550 ·
+     <span class="b1">(</span>
+     394.28 −
+     <span class="dvc">
+      550
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     <span class="b1">)</span>
+     <sup class="raised">2</sup>
+     + 301000 ·
+     <span class="b1">(</span>
+     550 − 394.28 −
+     <span class="dvc">
+      140
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     <span class="b1">)</span>
+     <sup class="raised">2</sup>
+     = 8125757925
+    </span>
+    mm
+    <sup>4</sup>
+   </p>
+   <p>Effective second moment of area for uncracked section</p>
+   <p>
+    <span class="eq">
+     <var>I</var>
+     <sub>red</sub>
+     =
+     <var>I</var>
+     <sub>c</sub>
+     +
+     <var>α</var>
+     <sub>e</sub>
+     ·  (
+     <var>A</var>
+     <sub>s1</sub>
+     ·  (
+     <var>z</var>
+     <sub>c</sub>
+     −
+     <var>d</var>
+     <sub>1</sub>
+     )
+     <sup>2</sup>
+     +
+     <var>A</var>
+     <sub>s2</sub>
+     ·  (
+     <var>h</var>
+     −
+     <var>z</var>
+     <sub>c</sub>
+     −
+     <var>d</var>
+     <sub>2</sub>
+     )
+     <sup>2</sup>
+     )  = 8125757925 + 21.97 ·  ( 1256.64 ·  ( 394.28 − 45 )
+     <sup>2</sup>
+     + 100.53 ·  ( 550 − 394.28 − 45 )
+     <sup>2</sup>
+     )  = 11521310457
+    </span>
+    mm
+    <sup>4</sup>
+   </p>
+   <p>Uncracked section properties for SLS</p>
+   <p>Equivalent bending moment and axial force due to concrete stress about the neutral axis</p>
+   <p>
+    <span class="eq">
+     <var>N</var>
+     <sub>c</sub>
+     (
+     <var>x</var>
+     )  =
+     <span class="dvc">
+      <var>b</var>
+      <sub>f</sub>
+      ·
+      <var>x</var>
+      <sup>2</sup>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     −
+     <span class="dvc">
+      (
+      <var>x</var>
+      −
+      <var>h</var>
+      <sub>f</sub>
+      )
+      <sup>2</sup>
+      ·  (
+      <var>b</var>
+      <sub>f</sub>
+      −
+      <var>b</var>
+      )
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     ·  (
+     <var>x</var>
+     &gt;
+     <var>h</var>
+     <sub>f</sub>
+     )
+    </span>
+   </p>
+   <p>Equivalent axial force due to internal stress</p>
+   <p>
+    <span class="eq">
+     <var>N</var>
+     <sub>bal</sub>
+     (
+     <var>x</var>
+     )  =
+     <var>N</var>
+     <sub>c</sub>
+     (
+     <var>x</var>
+     )  +
+     <var>α</var>
+     <sub>e</sub>
+     ·  (
+     <var>A</var>
+     <sub>s2</sub>
+     ·  (
+     <var>x</var>
+     −
+     <var>d</var>
+     <sub>2</sub>
+     )  −
+     <var>A</var>
+     <sub>s1</sub>
+     ·  (
+     <var>d</var>
+     −
+     <var>x</var>
+     )  )
+    </span>
+   </p>
+   <p>Depth of neutral axis</p>
+   <p>
+    <span class="eq">
+     <var>x</var>
+     =
+     <span class="cond">$Root</span>
+     {
+     <var>N</var>
+     <sub>bal</sub>
+     (
+     <var>x</var>
+     )  = 0;
+     <var>x</var>
+     ∈ [0;
+     <var>h</var>
+     ]} = 96.46
+    </span>
+    mm
+   </p>
+   <p>Second moment of area for cracked section</p>
+   <p>
+    <span class="eq">
+     <var>I</var>
+     <sub>red_II</sub>
+     =
+     <span class="dvc">
+      <var>b</var>
+      <sub>f</sub>
+      ·
+      <var>x</var>
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      3
+     </span>
+     +
+     <var>α</var>
+     <sub>e</sub>
+     ·  (
+     <var>A</var>
+     <sub>s1</sub>
+     ·  (
+     <var>d</var>
+     −
+     <var>x</var>
+     )
+     <sup>2</sup>
+     +
+     <var>A</var>
+     <sub>s2</sub>
+     ·  (
+     <var>x</var>
+     −
+     <var>d</var>
+     <sub>2</sub>
+     )
+     <sup>2</sup>
+     )  =
+     <span class="dvc">
+      2400 · 96.46
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      3
+     </span>
+     + 21.97 ·  ( 1256.64 ·  ( 505 − 96.46 )
+     <sup>2</sup>
+     + 100.53 ·  ( 96.46 − 45 )
+     <sup>2</sup>
+     )  = 5332235820
+    </span>
+    mm
+    <sup>4</sup>
+   </p>
+  </div>
+  <p>
+  </p>
+  <div class="fold">
+   <h4>Control of concrete stress</h4>
+   <p>
+    <b>Characteristic combination</b>
+   </p>
+   <p>Stress at the bottom edge of the section</p>
+   <p>
+    <span class="eq">
+     <var>σ</var>
+     <sub>ct</sub>
+     =
+     <span class="dvc">
+      <var>M</var>
+      <sub>k</sub>
+      · 10
+      <sup>6</sup>
+      <span class="dvl">
+      </span>
+      <var>I</var>
+      <sub>red</sub>
+     </span>
+     ·
+     <var>z</var>
+     <sub>c</sub>
+     =
+     <span class="dvc">
+      200 · 10
+      <sup>6</sup>
+      <span class="dvl">
+      </span>
+      11521310457
+     </span>
+     · 394.28 = 6.84
+    </span>
+    MPa
+   </p>
+   <p>Check for crack opening</p>
+   <p>
+    <span class="eq">
+     <var>σ</var>
+     <sub>ct</sub>
+     = 6.84
+    </span>
+    MPa &gt;
+    <span class="eq">
+     <var>f</var>
+     <sub>ctm</sub>
+     = 2.56
+    </span>
+    MPa - section is cracked
+   </p>
+   <p>Concrete stress (cracked section)</p>
+   <p>
+    <span class="eq">
+     <var>σ</var>
+     <sub>c</sub>
+     =
+     <span class="dvc">
+      <var>M</var>
+      <sub>k</sub>
+      · 10
+      <sup>6</sup>
+      <span class="dvl">
+      </span>
+      <var>I</var>
+      <sub>red_II</sub>
+     </span>
+     ·
+     <var>x</var>
+     =
+     <span class="dvc">
+      200 · 10
+      <sup>6</sup>
+      <span class="dvl">
+      </span>
+      5332235820
+     </span>
+     · 96.46 = 3.62
+    </span>
+    MPa
+   </p>
+   <p>Reinforcement stress (cracked section)</p>
+   <p>
+    <span class="eq">
+     <var>σ</var>
+     <sub>s1</sub>
+     =
+     <span class="dvc">
+      <var>α</var>
+      <sub>e</sub>
+      ·
+      <var>M</var>
+      <sub>k</sub>
+      · 10
+      <sup>6</sup>
+      <span class="dvl">
+      </span>
+      <var>I</var>
+      <sub>red_II</sub>
+     </span>
+     ·  (
+     <var>d</var>
+     −
+     <var>x</var>
+     )  =
+     <span class="dvc">
+      21.97 · 200 · 10
+      <sup>6</sup>
+      <span class="dvl">
+      </span>
+      5332235820
+     </span>
+     ·  ( 505 − 96.46 )  = 336.68
+    </span>
+    MPa
+   </p>
+   <p>
+    <span class="eq">
+     <var>σ</var>
+     <sub>s2</sub>
+     =
+     <span class="dvc">
+      -
+      <var>α</var>
+      <sub>e</sub>
+      ·
+      <var>M</var>
+      <sub>k</sub>
+      · 10
+      <sup>6</sup>
+      <span class="dvl">
+      </span>
+      <var>I</var>
+      <sub>red_II</sub>
+     </span>
+     ·  (
+     <var>x</var>
+     −
+     <var>d</var>
+     <sub>2</sub>
+     )  =
+     <span class="dvc">
+      -21.97 · 200 · 10
+      <sup>6</sup>
+      <span class="dvl">
+      </span>
+      5332235820
+     </span>
+     ·  ( 96.46 − 45 )  = -42.41
+    </span>
+    MPa
+   </p>
+   <p>
+    <b>Stress limitation</b>
+   </p>
+   <p class="ref">[EN 1992-1-1 §7.2(2)]</p>
+   <p>
+    Concrete stress,
+    <span class="eq">
+     <var>k</var>
+     <sub>1</sub>
+     = 0.6
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>σ</var>
+     <sub>c</sub>
+     = 3.62
+    </span>
+    MPa ≤
+    <span class="eq">
+     <var>k</var>
+     <sub>1</sub>
+     ·
+     <var>f</var>
+     <sub>ck</sub>
+     = 0.6 · 25 = 15
+    </span>
+    MPa - The condition is satisfied!
+   </p>
+   <p class="ref">[EN 1992-1-1 §7.2(5)]</p>
+   <p>
+    Reinforcement stress,
+    <span class="eq">
+     <var>k</var>
+     <sub>3</sub>
+     = 0.8
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>σ</var>
+     <sub>s1</sub>
+     = 336.68
+    </span>
+    MPa ≤
+    <span class="eq">
+     <var>k</var>
+     <sub>3</sub>
+     ·
+     <var>f</var>
+     <sub>yk</sub>
+     = 0.8 · 500 = 400
+    </span>
+    MPa - The condition is satisfied
+   </p>
+   <p>
+    <b>Quasi-permanent combination</b>
+   </p>
+   <p>Concrete stress for cracked section</p>
+   <p>
+    <span class="eq">
+     <var>σ</var>
+     <sub>c</sub>
+     =
+     <span class="dvc">
+      <var>M</var>
+      <sub>qp</sub>
+      · 10
+      <sup>6</sup>
+      <span class="dvl">
+      </span>
+      <var>I</var>
+      <sub>red_II</sub>
+     </span>
+     ·
+     <var>x</var>
+     =
+     <span class="dvc">
+      157 · 10
+      <sup>6</sup>
+      <span class="dvl">
+      </span>
+      5332235820
+     </span>
+     · 96.46 = 2.84
+    </span>
+    MPa
+   </p>
+   <p class="ref">[EN 1992-1-1 §7.2(3)]</p>
+   <p>
+    Stress limitation,
+    <span class="eq">
+     <var>k</var>
+     <sub>2</sub>
+     = 0.45
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>σ</var>
+     <sub>c</sub>
+     = 2.84
+    </span>
+    MPa ≤
+    <span class="eq">
+     <var>k</var>
+     <sub>2</sub>
+     ·
+     <var>f</var>
+     <sub>ck</sub>
+     = 0.45 · 25 = 11.25
+    </span>
+    MPa - The condition is satisfied!
+   </p>
+   <p>Non-linear creep is NOT calculated!</p>
+  </div>
+  <p>
+  </p>
+  <div class="fold">
+   <h4>Control of cracks</h4>
+   <p class="ref">[EN 1992-1-1 §7.3.2(2)]</p>
+   <p>
+    <b>Minimum reinforcement area</b>
+   </p>
+   <p>
+    Allowable reinforcement stress -
+    <span class="eq">
+     <var>σ</var>
+     <sub>s</sub>
+     =
+     <var>f</var>
+     <sub>yk</sub>
+     = 500
+    </span>
+    MPa
+   </p>
+   <p>
+    Approximate value of axial tensile strength -
+    <span class="eq">
+     <var>f</var>
+     <sub>ct_eff</sub>
+     =
+     <var>f</var>
+     <sub>ctm</sub>
+     = 2.56
+    </span>
+    MPa
+   </p>
+   <p>Area of tensile zone before opening of first crack</p>
+   <p>
+    <span class="eq">
+     <var>A</var>
+     <sub>ct</sub>
+     =
+     <var>b</var>
+     ·
+     <var>z</var>
+     <sub>c</sub>
+     = 250 · 394.28 = 98570.7
+    </span>
+    mm²
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     = 1 −
+     <span class="dvc">
+      0.35 ·  (
+      <var>h</var>
+      − 300 )
+      <span class="dvl">
+      </span>
+      500
+     </span>
+     = 1 −
+     <span class="dvc">
+      0.35 ·  ( 550 − 300 )
+      <span class="dvl">
+      </span>
+      500
+     </span>
+     = 0.825
+    </span>
+    - for 300 &lt; h &lt; 800
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     <sub>c</sub>
+     = 0.4
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>h</var>
+     <sub>1</sub>
+     =
+     <var>h</var>
+     = 550
+    </span>
+    - for h ≤ 1000
+   </p>
+   <p>Minimum reinforcement</p>
+   <p>
+    <span class="eq">
+     <var>A</var>
+     <sub>s_min</sub>
+     =
+     <span class="dvc">
+      <var>k</var>
+      <sub>c</sub>
+      ·
+      <var>k</var>
+      ·
+      <var>f</var>
+      <sub>ct_eff</sub>
+      ·
+      <var>A</var>
+      <sub>ct</sub>
+      <span class="dvl">
+      </span>
+      <var>σ</var>
+      <sub>s</sub>
+     </span>
+     =
+     <span class="dvc">
+      0.4 · 0.825 · 2.56 · 98570.7
+      <span class="dvl">
+      </span>
+      500
+     </span>
+     = 166.87
+    </span>
+    mm²
+   </p>
+   <p>
+    <span class="eq">
+     <var>A</var>
+     <sub>s1</sub>
+     = 1256.64
+    </span>
+    mm² ≥
+    <span class="eq">
+     <var>A</var>
+     <sub>s_min</sub>
+     = 166.87
+    </span>
+    mm² - The condition is satisfied!
+   </p>
+   <p>
+    <b>Calculation of crack widths</b>
+   </p>
+   <p class="ref">[EN 1992-1-1 §7.3.2(3)]</p>
+   <p>Depth of the effective area</p>
+   <p>
+    <span class="eq">
+     <var>h</var>
+     <sub>c_eff</sub>
+     =
+     <b>min</b>
+     <span class="b1">(</span>
+     2.5 ·  (
+     <var>h</var>
+     −
+     <var>d</var>
+     ) ;
+     <b>min</b>
+     <span class="b1">(</span>
+     <var>h</var>
+     −
+     <span class="dvc">
+      <var>x</var>
+      <span class="dvl">
+      </span>
+      3
+     </span>
+     ;
+     <span class="dvc">
+      <var>h</var>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     <span class="b1">)</span>
+     <span class="b1">)</span>
+     =
+     <b>min</b>
+     <span class="b1">(</span>
+     2.5 ·  ( 550 − 505 ) ;
+     <b>min</b>
+     <span class="b1">(</span>
+     550 −
+     <span class="dvc">
+      96.46
+      <span class="dvl">
+      </span>
+      3
+     </span>
+     ;
+     <span class="dvc">
+      550
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     <span class="b1">)</span>
+     <span class="b1">)</span>
+     = 112.5
+    </span>
+    mm
+   </p>
+   <p>Concrete effective area within tensile zone</p>
+   <p>
+    <span class="eq">
+     <var>A</var>
+     <sub>c_eff</sub>
+     =
+     <var>b</var>
+     ·
+     <var>h</var>
+     <sub>c_eff</sub>
+     = 250 · 112.5 = 28125
+    </span>
+    mm²
+   </p>
+   <p>
+    <span class="eq">
+     <var>ρ</var>
+     <sub>p_eff</sub>
+     =
+     <span class="dvc">
+      <var>A</var>
+      <sub>s1</sub>
+      <span class="dvl">
+      </span>
+      <var>A</var>
+      <sub>c_eff</sub>
+     </span>
+     =
+     <span class="dvc">
+      1256.64
+      <span class="dvl">
+      </span>
+      28125
+     </span>
+     = 0.0447
+    </span>
+   </p>
+   <p class="ref">[EN 1992-1-1 §7.3.4(3)]</p>
+   <p>
+    For
+    <span class="eq">
+     <var>s</var>
+     = 50
+    </span>
+    mm ≤
+    <span class="eq">
+     5 ·
+     <span class="b1">(</span>
+     <var>c</var>
+     +
+     <span class="dvc">
+      <var>Φ</var>
+      <sub>1</sub>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     <span class="b1">)</span>
+     = 5 ·
+     <span class="b1">(</span>
+     30 +
+     <span class="dvc">
+      20
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     <span class="b1">)</span>
+     = 200
+    </span>
+    mm:
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     <sub>1</sub>
+     = 0.8
+    </span>
+    - for high bond bars
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     <sub>2</sub>
+     = 0.5
+    </span>
+    - for bending
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     <sub>3</sub>
+     = 3.4
+    </span>
+    ,
+    <span class="eq">
+     <var>k</var>
+     <sub>4</sub>
+     = 0.425
+    </span>
+   </p>
+   <p>Maximum final crack spacing</p>
+   <p>
+    <span class="eq">
+     <var>s</var>
+     <sub>r_max</sub>
+     =
+     <var>k</var>
+     <sub>3</sub>
+     ·
+     <var>c</var>
+     +
+     <span class="dvc">
+      <var>k</var>
+      <sub>1</sub>
+      ·
+      <var>k</var>
+      <sub>2</sub>
+      ·
+      <var>k</var>
+      <sub>4</sub>
+      ·
+      <var>Φ</var>
+      <sub>1</sub>
+      <span class="dvl">
+      </span>
+      <var>ρ</var>
+      <sub>p_eff</sub>
+     </span>
+     = 3.4 · 30 +
+     <span class="dvc">
+      0.8 · 0.5 · 0.425 · 20
+      <span class="dvl">
+      </span>
+      0.0447
+     </span>
+     = 178.1
+    </span>
+    mm
+   </p>
+   <p>The check is performed for quasi-permanent combination</p>
+   <p>Reinforcement stress</p>
+   <p>
+    <span class="eq">
+     <var>σ</var>
+     <sub>s</sub>
+     =
+     <span class="dvc">
+      <var>α</var>
+      <sub>e</sub>
+      ·
+      <var>M</var>
+      <sub>qp</sub>
+      · 10
+      <sup>6</sup>
+      <span class="dvl">
+      </span>
+      <var>I</var>
+      <sub>red_II</sub>
+     </span>
+     ·  (
+     <var>d</var>
+     −
+     <var>x</var>
+     )  =
+     <span class="dvc">
+      21.97 · 157 · 10
+      <sup>6</sup>
+      <span class="dvl">
+      </span>
+      5332235820
+     </span>
+     ·  ( 505 − 96.46 )  = 264.3
+    </span>
+    MPa
+   </p>
+   <p>
+    Long-term load factor -
+    <span class="eq">
+     <var>k</var>
+     <sub>t</sub>
+     = 0.4
+    </span>
+   </p>
+   <p class="ref">[EN 1992-1-1 §7.3.4(2)]</p>
+   <p>Difference between mean values of concrete and reinforcement strains</p>
+   <p>
+    <i>ε</i>
+    <sub>sm</sub>
+    -
+    <i>ε</i>
+    <sub>cm</sub>
+    =
+    <span class="eq">
+     <var>Δε</var>
+     =
+     <span class="dvc up">
+      <b>max</b>
+      <span class="b1">(</span>
+      <var>σ</var>
+      <sub>s</sub>
+      −
+      <span class="dvc">
+       <var>k</var>
+       <sub>t</sub>
+       ·
+       <var>f</var>
+       <sub>ct_eff</sub>
+       <span class="dvl">
+       </span>
+       <var>ρ</var>
+       <sub>p_eff</sub>
+      </span>
+      ·  ( 1 +
+      <var>α</var>
+      ·
+      <var>ρ</var>
+      <sub>p_eff</sub>
+      ) ; 0.6 ·
+      <var>σ</var>
+      <sub>s</sub>
+      <span class="b1">)</span>
+      <span class="dvl">
+      </span>
+      <var>E</var>
+      <sub>s</sub>
+      · 10
+      <sup>3</sup>
+     </span>
+     =
+     <span class="dvc up">
+      <b>max</b>
+      <span class="b1">(</span>
+      264.3 −
+      <span class="dvc">
+       0.4 · 2.56
+       <span class="dvl">
+       </span>
+       0.0447
+      </span>
+      ·  ( 1 + 6.35 · 0.0447 ) ; 0.6 · 264.3
+      <span class="b1">)</span>
+      <span class="dvl">
+      </span>
+      200 · 10
+      <sup>3</sup>
+     </span>
+     = 0.00117
+    </span>
+   </p>
+   <p class="ref">[EN 1992-1-1 §7.3.4(1)]</p>
+   <p>Crack widths</p>
+   <p>
+    <span class="eq">
+     <var>w</var>
+     <sub>k</sub>
+     =
+     <var>s</var>
+     <sub>r_max</sub>
+     ·
+     <var>Δε</var>
+     = 178.1 · 0.00117 = 0.209
+    </span>
+    mm
+   </p>
+   <p class="ref">[EN 1992-1-1 §7.3.1(5)]</p>
+   <p>Limiting crack width value</p>
+   <p class="ref">[EN 1992-1-1, Table NA.4]</p>
+   <p>
+    <span class="eq">
+     <var>w</var>
+     <sub>max</sub>
+     = 0.4
+    </span>
+    mm - for exposure classes X0, XC1
+   </p>
+   <p>Crack width limitation</p>
+  </div>
+  <p>
+   <span class="eq">
+    <var>w</var>
+    <sub>k</sub>
+    = 0.209
+   </span>
+   mm ≤
+   <span class="eq">
+    <var>w</var>
+    <sub>max</sub>
+    = 0.4
+   </span>
+   mm - The condition is satisfied!
+  </p>
+  <p>
+  </p>
+  <div class="fold">
+   <h4>Control of deflections</h4>
+   <p>Crack opening moment</p>
+   <p>
+    <span class="eq">
+     <var>M</var>
+     <sub>cr</sub>
+     =
+     <span class="dvc">
+      <var>f</var>
+      <sub>ctm</sub>
+      ·
+      <var>I</var>
+      <sub>red</sub>
+      <span class="dvl">
+      </span>
+      <var>z</var>
+      <sub>c</sub>
+     </span>
+     · 10
+     <sup>-6</sup>
+     =
+     <span class="dvc">
+      2.56 · 11521310457
+      <span class="dvl">
+      </span>
+      394.28
+     </span>
+     · 10
+     <sup>-6</sup>
+     = 74.95
+    </span>
+    kNm
+   </p>
+   <p>Coefficient for duration of loads</p>
+   <p>
+    <span class="eq">
+     <var>β</var>
+     = 0.5
+    </span>
+    - for long-term loads
+   </p>
+   <p class="ref">[EN 1992-1-1 §7.4.3(3)]</p>
+   <p>Distribution coefficient</p>
+   <p>
+    <span class="eq">
+     <var>ζ</var>
+     = 1 −
+     <var>β</var>
+     ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>M</var>
+      <sub>cr</sub>
+      <span class="dvl">
+      </span>
+      <var>M</var>
+      <sub>qp</sub>
+     </span>
+     <span class="b1">)</span>
+     <sup class="raised">2</sup>
+     = 1 − 0.5 ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      74.95
+      <span class="dvl">
+      </span>
+      157
+     </span>
+     <span class="b1">)</span>
+     <sup class="raised">2</sup>
+     = 0.886
+    </span>
+    - for cracked section
+   </p>
+   <p>
+    <b>Calculation of curvature</b>
+   </p>
+   <p>First moment of reinforcement area about centroid of uncracked section</p>
+   <p>
+    <span class="eq">
+     <var>S</var>
+     =
+     <var>A</var>
+     <sub>s1</sub>
+     ·  (
+     <var>z</var>
+     <sub>c</sub>
+     −
+     <var>d</var>
+     <sub>1</sub>
+     )  −
+     <var>A</var>
+     <sub>s2</sub>
+     ·  (
+     <var>h</var>
+     −
+     <var>z</var>
+     <sub>c</sub>
+     −
+     <var>d</var>
+     <sub>2</sub>
+     )  = 1256.64 ·  ( 394.28 − 45 )  − 100.53 ·  ( 550 − 394.28 − 45 )  = 427791
+    </span>
+    mm
+    <sup>3</sup>
+   </p>
+   <p>Curvature due to shrinkage of uncracked section</p>
+   <p class="ref">[EN 1992-1-1 §7.4.3(6)]</p>
+   <p>
+    <span class="eq">
+     <var>θ</var>
+     <sub>cs_I</sub>
+     =
+     <span class="dvc">
+      <var>ε</var>
+      <sub>cs</sub>
+      ·
+      <var>α</var>
+      <sub>e</sub>
+      ·
+      <var>S</var>
+      <span class="dvl">
+      </span>
+      <var>I</var>
+      <sub>red</sub>
+     </span>
+     =
+     <span class="dvc">
+      0.000447 · 21.97 · 427791
+      <span class="dvl">
+      </span>
+      11521310457
+     </span>
+     = 3.65×10
+     <sup>-7</sup>
+    </span>
+   </p>
+   <p>Curvature of uncracked section</p>
+   <p>
+    <span class="eq">
+     <var>θ</var>
+     <sub>I</sub>
+     =
+     <span class="dvc">
+      <var>M</var>
+      <sub>qp</sub>
+      <span class="dvl">
+      </span>
+      <var>E</var>
+      <sub>c_eff</sub>
+      ·
+      <var>I</var>
+      <sub>red</sub>
+     </span>
+     · 10
+     <sup>3</sup>
+     +
+     <var>θ</var>
+     <sub>cs_I</sub>
+     =
+     <span class="dvc">
+      157
+      <span class="dvl">
+      </span>
+      9.1 · 11521310457
+     </span>
+     · 10
+     <sup>3</sup>
+     + 3.65×10
+     <sup>-7</sup>
+     = 1.86×10
+     <sup>-6</sup>
+    </span>
+   </p>
+   <p>First moment of reinforcement area about centroid of cracked section</p>
+   <p>
+    <span class="eq">
+     <var>S</var>
+     =
+     <var>A</var>
+     <sub>s1</sub>
+     ·  (
+     <var>d</var>
+     −
+     <var>x</var>
+     )  −
+     <var>A</var>
+     <sub>s2</sub>
+     ·  (
+     <var>x</var>
+     −
+     <var>d</var>
+     <sub>2</sub>
+     )  = 1256.64 ·  ( 505 − 96.46 )  − 100.53 ·  ( 96.46 − 45 )  = 508208
+    </span>
+    mm
+    <sup>3</sup>
+   </p>
+   <p>Curvature due to shrinkage of cracked section</p>
+   <p class="ref">[EN 1992-1-1 §7.4.3(6)]</p>
+   <p>
+    <span class="eq">
+     <var>θ</var>
+     <sub>cs_II</sub>
+     =
+     <span class="dvc">
+      <var>ε</var>
+      <sub>cs</sub>
+      ·
+      <var>α</var>
+      <sub>e</sub>
+      ·
+      <var>S</var>
+      <span class="dvl">
+      </span>
+      <var>I</var>
+      <sub>red_II</sub>
+     </span>
+     =
+     <span class="dvc">
+      0.000447 · 21.97 · 508208
+      <span class="dvl">
+      </span>
+      5332235820
+     </span>
+     = 9.36×10
+     <sup>-7</sup>
+    </span>
+   </p>
+   <p>Curvature of cracked section</p>
+   <p>
+    <span class="eq">
+     <var>θ</var>
+     <sub>II</sub>
+     =
+     <span class="dvc">
+      <var>M</var>
+      <sub>qp</sub>
+      <span class="dvl">
+      </span>
+      <var>E</var>
+      <sub>c_eff</sub>
+      ·
+      <var>I</var>
+      <sub>red_II</sub>
+     </span>
+     · 10
+     <sup>3</sup>
+     +
+     <var>θ</var>
+     <sub>cs_II</sub>
+     =
+     <span class="dvc">
+      157
+      <span class="dvl">
+      </span>
+      9.1 · 5332235820
+     </span>
+     · 10
+     <sup>3</sup>
+     + 9.36×10
+     <sup>-7</sup>
+     = 4.17×10
+     <sup>-6</sup>
+    </span>
+   </p>
+   <p>Total curvature</p>
+   <p class="ref">[EN 1992-1-1 §7.4.3(3)]</p>
+   <p>
+    <span class="eq">
+     <var>θ</var>
+     =
+     <var>ζ</var>
+     ·
+     <var>θ</var>
+     <sub>II</sub>
+     +  ( 1 −
+     <var>ζ</var>
+     )  ·
+     <var>θ</var>
+     <sub>I</sub>
+     = 0.886 · 4.17×10
+     <sup>-6</sup>
+     +  ( 1 − 0.886 )  · 1.86×10
+     <sup>-6</sup>
+     = 3.91×10
+     <sup>-6</sup>
+    </span>
+   </p>
+   <p>Factor considering the static scheme</p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     =
+     <span class="dvc">
+      5
+      <span class="dvl">
+      </span>
+      48
+     </span>
+     = 0.104
+    </span>
+    - for simply supported beam with uniformly distributed load
+   </p>
+   <p>
+    Deflection due to quasi-permanent combination -
+    <span class="eq">
+     <var>δ</var>
+     =
+     <var>k</var>
+     ·
+     <var>θ</var>
+     ·
+     <var>L</var>
+     <sup>2</sup>
+     · 10
+     <sup>6</sup>
+     = 0.104 · 3.91×10
+     <sup>-6</sup>
+     · 5.75
+     <sup>2</sup>
+     · 10
+     <sup>6</sup>
+     = 13.46
+    </span>
+    mm
+   </p>
+   <p class="ref">[EN 1992-1-1 §7.4.1(4)]</p>
+   <p>
+    Maximum deflection -
+    <span class="eq">
+     <var>δ</var>
+     <sub>max</sub>
+     =
+     <span class="dvc">
+      <var>L</var>
+      · 10
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      250
+     </span>
+     =
+     <span class="dvc">
+      5.75 · 10
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      250
+     </span>
+     = 23
+    </span>
+    mm
+   </p>
+   <p>Deflection check:</p>
+  </div>
+  <p>
+   <span class="eq">
+    <var>δ</var>
+    = 13.46
+   </span>
+   mm ≤
+   <span class="eq">
+    <var>δ</var>
+    <sub>max</sub>
+    = 23
+   </span>
+   mm - The condition is satisfied!
+  </p>
+ </div>
+ <script>if(window.jQuery){$(".flip_trigger").change(function(){$(".flip").hide();$(".flip_"+$(this).val()).show();});$(".flip").hide();$(".flip_"+$(".flip_base input").val()).show();}</script>
+</div>

@@ -1,0 +1,434 @@
+<div class="calcpad-output">
+ <!-- Showcases the variadic helpers $min$, $max$, $gcd$ and $lcm$, which accept any number of comma- or semicolon-separated arguments. -->
+ <h3>Functions of multiple variables</h3>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <b>min</b>
+   ( 2; 3; -1; 5; 7; -4 )  = -4
+  </span>
+  - minimum
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   =
+   <b>max</b>
+   ( 2; 3; -1; 5; 7; -4; 9; 6 )  = 9
+  </span>
+  - maximum
+ </p>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   =
+   <b>sum</b>
+   ( 2; 3; -1; 5; 7; -4 )  = 12
+  </span>
+  - sum
+ </p>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   <sub>1</sub>
+   =
+   <b>sumsq</b>
+   ( 2; 3; -1; 5; 7; -4 )  = 104
+  </span>
+  - sum of squares
+ </p>
+ <p>
+  <span class="eq">
+   <var>s</var>
+   <sub>2</sub>
+   =
+   <b>srss</b>
+   ( 2; 3; -1; 5; 7; -4 )  = 10.2
+  </span>
+  - square root of sum of squares
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   =
+   <b>average</b>
+   ( 2; 3; -1; 5; 7; -4 )  = 2
+  </span>
+  - average
+ </p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   =
+   <b>product</b>
+   ( 2; 3; 2; 5 )  = 60
+  </span>
+  - product
+ </p>
+ <p>
+  <span class="eq">
+   <var>m</var>
+   =
+   <b>mean</b>
+   ( 2; 3; 2; 5 )  = 2.78
+  </span>
+  - geometric mean
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvcs">
+    <span class="c3">{</span>
+    <span class="dvs">
+     if
+     <var>x</var>
+     &lt;  ( -2 ) : 1
+     <br/>
+     else if
+     <var>x</var>
+     &gt; 4:
+     <var>x</var>
+     − 2
+     <br/>
+     else if
+     <var>x</var>
+     &gt; 1: 2
+     <br/>
+     else: -1
+    </span>
+   </span>
+  </span>
+  - selective evaluation
+ </p>
+ <!-- <span class="eq"><var>PlotWidth</var> = 200</span> , <span class="eq"><var>PlotHeight</var> = 120</span> -->
+ <svg class="plot" data-plot="svg" height="720px" style="width:198.15pt; height:133.33pt;" version="1.1" viewbox=" 0 0 1070 720" width="1070px" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+   .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+  </style>
+  <g class="plot">
+   <rect class="Frame" height="480" width="800" x="180" y="120">
+   </rect>
+   <line class="Grid" x1="180" x2="980" y1="600" y2="600">
+   </line>
+   <text class="sm end" x="161" y="618">-1</text>
+   <line class="Grid" x1="180" x2="980" y1="504" y2="504">
+   </line>
+   <text class="sm end" x="161" y="522">0</text>
+   <line class="Grid" x1="180" x2="980" y1="408" y2="408">
+   </line>
+   <text class="sm end" x="161" y="426">1</text>
+   <line class="Grid" x1="180" x2="980" y1="312" y2="312">
+   </line>
+   <text class="sm end" x="161" y="330">2</text>
+   <line class="Grid" x1="180" x2="980" y1="216" y2="216">
+   </line>
+   <text class="sm end" x="161" y="234">3</text>
+   <text class="sm end" x="161" y="138">4</text>
+   <line class="Grid" x1="180" x2="180" y1="120" y2="600">
+   </line>
+   <text class="sm mid" x="180" y="652">-4</text>
+   <line class="Grid" x1="260" x2="260" y1="120" y2="600">
+   </line>
+   <text class="sm mid" x="260" y="652">-3</text>
+   <line class="Grid" x1="340" x2="340" y1="120" y2="600">
+   </line>
+   <text class="sm mid" x="340" y="652">-2</text>
+   <line class="Grid" x1="420" x2="420" y1="120" y2="600">
+   </line>
+   <text class="sm mid" x="420" y="652">-1</text>
+   <line class="Grid" x1="500" x2="500" y1="120" y2="600">
+   </line>
+   <text class="sm mid" x="500" y="652">0</text>
+   <line class="Grid" x1="580" x2="580" y1="120" y2="600">
+   </line>
+   <text class="sm mid" x="580" y="652">1</text>
+   <line class="Grid" x1="660" x2="660" y1="120" y2="600">
+   </line>
+   <text class="sm mid" x="660" y="652">2</text>
+   <line class="Grid" x1="740" x2="740" y1="120" y2="600">
+   </line>
+   <text class="sm mid" x="740" y="652">3</text>
+   <line class="Grid" x1="820" x2="820" y1="120" y2="600">
+   </line>
+   <text class="sm mid" x="820" y="652">4</text>
+   <line class="Grid" x1="900" x2="900" y1="120" y2="600">
+   </line>
+   <text class="sm mid" x="900" y="652">5</text>
+   <text class="sm mid" x="980" y="652">6</text>
+   <line class="Axis" x1="180" x2="980" y1="504" y2="504">
+   </line>
+   <text x="1002" y="486">x</text>
+   <line class="Axis" x1="500" x2="500" y1="120" y2="600">
+   </line>
+   <text class="mid" x="500" y="84">y</text>
+   <text x="8" y="703">[-4; -1]</text>
+   <text class="end" x="1062" y="44">[6; 4]</text>
+   <polyline class="Series1" points="180,408 205.81,408 231.61,408 257.42,408 283.23,408 309.03,408 321.94,408 328.39,408 331.61,408 334.84,408 336.45,408 338.06,408 338.87,408 339.68,408 340.48,600 341.29,600 342.1,600 342.9,600 344.52,600 347.74,600 354.19,600 360.65,600 373.55,600 386.45,600 412.26,600 438.06,600 463.87,600 489.68,600 515.48,600 541.29,600 554.19,600 567.1,600 573.55,600 576.77,600 578.39,600 579.19,600 580,600 580.81,312 581.61,312 582.42,312 583.23,312 584.84,312 586.45,312 589.68,312 592.9,312 599.35,312 605.81,312 618.71,312 644.52,312 670.32,312 696.13,312 721.94,312 747.74,312 773.55,312 786.45,312 799.35,312 805.81,312 812.26,312 815.48,312 817.1,312 817.9,312 818.71,312 819.52,312 820.32,311.61 821.13,310.65 821.94,309.68 823.55,307.74 825.16,305.81 828.39,301.94 831.61,298.06 838.06,290.32 850.97,274.84 876.77,243.87 902.58,212.9 928.39,181.94 954.19,150.97 980,120">
+   </polyline>
+   <polygon class="Fill1" points="180,504 180,408 205.81,408 231.61,408 257.42,408 283.23,408 309.03,408 321.94,408 328.39,408 331.61,408 334.84,408 336.45,408 338.06,408 338.87,408 339.68,408 340.48,600 341.29,600 342.1,600 342.9,600 344.52,600 347.74,600 354.19,600 360.65,600 373.55,600 386.45,600 412.26,600 438.06,600 463.87,600 489.68,600 515.48,600 541.29,600 554.19,600 567.1,600 573.55,600 576.77,600 578.39,600 579.19,600 580,600 580.81,312 581.61,312 582.42,312 583.23,312 584.84,312 586.45,312 589.68,312 592.9,312 599.35,312 605.81,312 618.71,312 644.52,312 670.32,312 696.13,312 721.94,312 747.74,312 773.55,312 786.45,312 799.35,312 805.81,312 812.26,312 815.48,312 817.1,312 817.9,312 818.71,312 819.52,312 820.32,311.61 821.13,310.65 821.94,309.68 823.55,307.74 825.16,305.81 828.39,301.94 831.61,298.06 838.06,290.32 850.97,274.84 876.77,243.87 902.58,212.9 928.39,181.94 954.19,150.97 980,120 980,504" stroke-width="0">
+   </polygon>
+  </g>
+ </svg>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   (
+   <var>n</var>
+   )  =
+   <b>take</b>
+   (
+   <var>n</var>
+   ; 2; 3; -1; 5; 7; -4 )
+  </span>
+  - vector function (returns a number with specified index)
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   (
+   <var>n</var>
+   )  =
+   <var>a</var>
+   ( 7 −
+   <var>n</var>
+   )
+  </span>
+  - transpoze
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   (
+   <var>n</var>
+   )  =
+   <var>a</var>
+   (
+   <var>n</var>
+   )  ·
+   <var>b</var>
+   (
+   <var>n</var>
+   )
+  </span>
+  - dot product
+ </p>
+ <p>Output vectors to a table</p>
+ <!--0-->
+ <table class="bordered">
+  <tr>
+   <th>n</th>
+   <th>a</th>
+   <th>b</th>
+   <th>c</th>
+  </tr>
+  <tr>
+   <th>1</th>
+   <td>2</td>
+   <td>-4</td>
+   <td>-8</td>
+  </tr>
+  <tr>
+   <th>2</th>
+   <td>3</td>
+   <td>7</td>
+   <td>21</td>
+  </tr>
+  <tr>
+   <th>3</th>
+   <td>-1</td>
+   <td>5</td>
+   <td>-5</td>
+  </tr>
+  <tr>
+   <th>4</th>
+   <td>5</td>
+   <td>-1</td>
+   <td>-5</td>
+  </tr>
+  <tr>
+   <th>5</th>
+   <td>7</td>
+   <td>3</td>
+   <td>21</td>
+  </tr>
+  <tr>
+   <th>6</th>
+   <td>-4</td>
+   <td>2</td>
+   <td>-8</td>
+  </tr>
+ </table>
+ <p>Matrix</p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   <sub>1</sub>
+   (
+   <var>j</var>
+   )  =
+   <b>take</b>
+   (
+   <var>j</var>
+   ; 11; 12; 13 )
+  </span>
+  - first row
+ </p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   <sub>2</sub>
+   (
+   <var>j</var>
+   )  =
+   <b>take</b>
+   (
+   <var>j</var>
+   ; 21; 22; 23 )
+  </span>
+  - second row
+ </p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   <sub>3</sub>
+   (
+   <var>j</var>
+   )  =
+   <b>take</b>
+   (
+   <var>j</var>
+   ; 31; 32; 33 )
+  </span>
+  - third row
+ </p>
+ <p>
+  <span class="eq">
+   <var>M</var>
+   (
+   <var>i</var>
+   ;
+   <var>j</var>
+   )  =
+   <b>take</b>
+   (
+   <var>i</var>
+   ;
+   <var>R</var>
+   <sub>1</sub>
+   (
+   <var>j</var>
+   ) ;
+   <var>R</var>
+   <sub>2</sub>
+   (
+   <var>j</var>
+   ) ;
+   <var>R</var>
+   <sub>3</sub>
+   (
+   <var>j</var>
+   )  )
+  </span>
+  - assemble the whole matrix
+ </p>
+ <p>
+  <span class="eq">
+   <var>M</var>
+   ( 2; 2 )  = 22
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>M</var>
+   ( 3; 1 )  = 31
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>M</var>
+   ( 3; 3 )  = 33
+  </span>
+ </p>
+ <p>Output a matrix to a table</p>
+ <!--00-->
+ <table class="bordered">
+  <tr>
+   <th>
+   </th>
+   <th>1</th>
+   <th>2</th>
+   <th>3</th>
+  </tr>
+  <tr>
+   <th>
+    1
+    <!--0-->
+   </th>
+   <td>
+    <!--1-->
+    11
+   </td>
+   <td>
+    <!--2-->
+    12
+   </td>
+   <td>
+    <!--3-->
+    13
+   </td>
+  </tr>
+  <tr>
+   <th>
+    2
+    <!--0-->
+   </th>
+   <td>
+    <!--1-->
+    21
+   </td>
+   <td>
+    <!--2-->
+    22
+   </td>
+   <td>
+    <!--3-->
+    23
+   </td>
+  </tr>
+  <tr>
+   <th>
+    3
+    <!--0-->
+   </th>
+   <td>
+    <!--1-->
+    31
+   </td>
+   <td>
+    <!--2-->
+    32
+   </td>
+   <td>
+    <!--3-->
+    33
+   </td>
+  </tr>
+ </table>
+</div>

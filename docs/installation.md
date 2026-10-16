@@ -2,12 +2,16 @@
 
 ## Windows
 
-Installation is performed by the automated setup program [calcpad-setup-en-x64.exe](https://calcpad.eu/download/calcpad-setup-en-x64.zip). Follow the instruction of the setup wizard.
+Installation is performed by the automated [setup program](https://github.com/imartincei/CalcpadCE/releases). Follow the instruction of the setup wizard.
 The software requires a 64-bit computer with Windows 10/11 and [Microsoft .NET Desktop Runtime 10.0](https://dotnet.microsoft.com/en-us/download/dotnet/10.0).
+
+The installer also includes the command-line interface (CLI).
+After installation it can be found at:
+`%LOCALAPPDATA%\Programs\CalcpadCE\cli\Cli.exe`
 
 ## Linux
 
-1. Calcpad is a .NET application, so you need .NET 10.0 to run it on Linux.
+1. CalcpadCE is a .NET application, so you need .NET 10.0 to run it on Linux.
     Use the following commands to install .NET 10.0 runtime:
 
     ```bash
@@ -22,15 +26,15 @@ The software requires a 64-bit computer with Windows 10/11 and [Microsoft .NET D
     sudo apt remove dotnet*
     ```
 
-2. If you do not have Chromium installed, you will need it to download Calcpad and view the reports after calculation.
+2. If you do not have Chromium installed, you will need it to download CalcpadCE and view the reports after calculation.
     Install it with the following command:
 
     ```bash
     sudo snap install chromium
     ```
 
-3. Download the Calcpad setup package from the following link: <https://github.com/Proektsoftbg/Calcpad/releases/download/v7.5.9/Calcpad.7.5.9.deb>
-    Then, install Calcpad, using the following command:
+3. Download the CalcpadCE setup package from the following link: <https://github.com/imartincei/CalcpadCE/releases>
+    Then, install CalcpadCE, using the following command:
 
     ```bash
     sudo apt-get install -y <path-to-your-downloads-folder>/Calcpad.7.5.9.deb
@@ -39,13 +43,13 @@ The software requires a 64-bit computer with Windows 10/11 and [Microsoft .NET D
     Instead of <path-to-your-downloads-folder\> you must put the actual path, something like this:
 
     ```bash
-    sudo apt-get install -y /home/ned/snap/chromium/3235/Downloads/Calcpad.7.5.9.deb
+    sudo apt-get install -y /home/<user>/snap/chromium/3235/Downloads/Calcpad.7.5.9.deb
     ```
 
     If you get a message like the one below, please ignore it: N: Download is performed unsandboxed as root as file '.../Calcpad.7.5.9.deb' couldn't be accessed by user '\_apt'. - pkgAcquire::Run (13: Permission denied)
 
 And that's it.
-You can start the Calcpad command line interpreter (CLI) by simply typing:
+You can start the CalcpadCE command line interpreter (CLI) by simply typing:
 
 ```bash
 calcpad
@@ -55,8 +59,8 @@ You can use it to perform calculations in console mode:
 
 <img src="./media/image4.png" style="width:6.69306in;height:3.49583in" alt="Cli" />
 
-The Linux version does not include any GUI yet, but you can use some advanced code editors like Notepad++ and Sublime to write Calcpad code and Chromium to view the results.
-Instructions on how to install Sublime Text on Linux are provided here: 
+The Linux version does not include any GUI yet, but you can use some advanced code editors like Notepad++ and Sublime to write CalcpadCE code and Chromium to view the results.
+Instructions on how to install Sublime Text on Linux are provided here:
 
 <https://www.sublimetext.com/docs/linux_repositories.html>
 
@@ -72,11 +76,11 @@ echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sou
 sudo apt-get install sublime-text
 ```
 
-Then, goto <https://github.com/Proektsoftbg/Calcpad/tree/main/Setup/Linux/Sublime> and download the following files:
+Then, goto <https://github.com/imartincei/CalcpadCE/tree/main/Setup/Linux/Sublime> and download the following files:
 
-- calcpad.sublime-build  
-- calcpad.sublime-completions  
-- calcpad.sublime-syntax  
+- calcpad.sublime-build
+- calcpad.sublime-completions
+- calcpad.sublime-syntax
 - Monokai.sublime-color-scheme
 
 Copy them to the Sublime Text user package folder:
@@ -92,7 +96,7 @@ chromium &
 ```
 
 Put them side to side.
-Start a new \*.cpd file in Sublime Text or open an example from the /home/<user\>/Calcpad folder.
+Start a new \*.cpd file in Sublime Text or open an example from the /usr/share/CalcpadCE/Examples folder.
 Press Ctrl+B to calculate.
 If everything is OK, the results will show in Chromium:
 

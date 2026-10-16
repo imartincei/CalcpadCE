@@ -1,0 +1,6 @@
+- The VS Code extension lives in the `vscode-calcpad/` subdirectory
+- The shared frontend library lives in `calcpad-frontend/`
+- The web editor lives in `calcpad-web/`
+- The desktop wrapper lives in `calcpad-desktop/`
+- Don't use console.log, use VS Code Output
+- This branch is localhost-only; hosted-mode work (auth, S3 storage, multi-user) lives on `calcpad-experimental`

@@ -114,14 +114,14 @@ namespace Calcpad.Core
                 _values.AsSpan(0, _size).CopyTo(v._values);
             else
             {
-                var values = v._values; 
+                var values = v._values;
                 for (int i = _size - 1; i >= 0; --i)
                     values[i] = this[i];
             }
             return v;
         }
 
-        // Iterations are reversed to avoid multiple resizing 
+        // Iterations are reversed to avoid multiple resizing
         public static Vector operator -(Vector a)
         {
             var b = Clone(a);
@@ -1520,7 +1520,7 @@ namespace Calcpad.Core
                 {
                     values[index] = real;
                     ++index;
-                }                
+                }
                 else if (items[k] is Vector vector)
                 {
                     vector.Values.AsSpan(0, vector._size).CopyTo(values.AsSpan(index, vector._size));
@@ -1686,7 +1686,7 @@ namespace Calcpad.Core
             return this;
         }
 
-        // L1 or Manhattan norm  
+        // L1 or Manhattan norm
         internal virtual RealValue L1Norm()
         {
             if (_size == 0)
@@ -1703,7 +1703,7 @@ namespace Calcpad.Core
             return new(norm, u);
         }
 
-        // L2 or Euclidean norm  
+        // L2 or Euclidean norm
         internal virtual RealValue Norm()
         {
             if (_size == 0)
@@ -1722,7 +1722,7 @@ namespace Calcpad.Core
             return new(Math.Sqrt(norm), u);
         }
 
-        // Lp norm   
+        // Lp norm
         internal virtual RealValue LpNorm(int p)
         {
             if (p < 1)
@@ -1743,7 +1743,7 @@ namespace Calcpad.Core
             return new(Math.Pow(norm, 1d / p), u);
         }
 
-        // L∞ (Infinity) or Chebyshev norm  
+        // L∞ (Infinity) or Chebyshev norm
         internal virtual RealValue InfNorm()
         {
             if (_size == 0)

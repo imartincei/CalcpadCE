@@ -32,11 +32,13 @@ namespace Calcpad.Core
             Math.PI / 200.0
         ];
 
+        // Angle units never differ between US/UK, and this table is built at type-load,
+        // before any request's setting exists, so the isUs argument is irrelevant here.
         protected static readonly Unit[] AngleUnits =
         [
-            Unit.Get("deg"),
-            Unit.Get("rad"),
-            Unit.Get("grad")
+            Unit.Get("deg", false),
+            Unit.Get("rad", false),
+            Unit.Get("grad", false)
         ];
 
         protected Function3[] Functions3 =
@@ -161,34 +163,6 @@ namespace Calcpad.Core
             { "‐", 43 },
             { "not", 44},
             { "timer", 45 },
-            { "gammaln", 46 },
-            { "gamma", 47 },
-            { "erf", 48 },
-            { "erfc", 49 },
-            { "fresnelc", 50 },
-            { "fresnels", 51 },
-            { "si", 52 },
-            { "ci", 53 },
-            { "shi", 54 },
-            { "chi", 55 },
-            { "ei", 56 },
-            { "li", 57 },
-            { "dawsonf", 58 },
-            { "elliptick", 59 },
-            { "elliptice", 60 },
-            { "besselj0", 61 },
-            { "besselj1", 62 },
-            { "bessely0", 63 },
-            { "bessely1", 64 },
-            { "besseli0", 65 },
-            { "besseli1", 66 },
-            { "besselk0", 67 },
-            { "besselk1", 68 },
-            { "ai", 69 },
-            { "ai′", 70 },
-            { "bi", 71 },
-            { "bi′", 72 },
-            { "lambertw", 73 },
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
         private static readonly bool[] _isZeroPreservingFunction;
@@ -199,7 +173,7 @@ namespace Calcpad.Core
         {
             var n = FunctionIndex.Count;
             _isZeroPreservingFunction = new bool[n];
-            var calc = new RealCalculator();    
+            var calc = new RealCalculator();
             for (int i = 0; i < n; ++i)
                 _isZeroPreservingFunction[i] = calc.GetFunction(i)(RealValue.Zero).Equals(RealValue.Zero);
         }
@@ -211,49 +185,12 @@ namespace Calcpad.Core
             { "root", 1 },
             { "mod", 2 },
             { "mandelbrot", 3 },
-            { "gammainc‾", 4 },
-            { "gammainc_", 5 },
-            { "beta", 6 },
-            { "ellipticf", 7 },
-            { "ellipticei", 8 },
-            { "ellipticp", 9 },
-            { "jacobiam", 10 },
-            { "jacobisn", 11 },
-            { "jacobicn", 12 },
-            { "jacobidn", 13 },
-            { "jacobics", 14 },
-            { "jacobicd", 15 },
-            { "jacobidc", 16 },
-            { "jacobisc", 17 },
-            { "jacobisd", 18 },
-            { "jacobids", 19 },
-            { "jacobins", 20 },
-            { "jacobinc", 21 },
-            { "jacobind", 22 },
-            { "besseljn", 23 },
-            { "besselyn", 24 },
-            { "besseljv", 25 },
-            { "besselyv", 26 },
-            { "besseljv′", 27 },
-            { "besselyv′", 28 },
-            { "besseljs", 29 },
-            { "besselys", 30 },
-            { "besseljs′", 31 },
-            { "besselys′", 32 },
-            { "besselin", 33 },
-            { "besselkn", 34 },
-            { "besseliv", 35 },
-            { "besselkv", 36 },
-            { "besseliv′", 37 },
-            { "besselkv′", 38 },
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
         internal static readonly FrozenDictionary<string, int> Function3Index =
         new Dictionary<string, int>()
         {
             { "if", 0 },
-            { "betainc", 1 },
-            { "ellipticpi", 2 },
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
         internal static readonly FrozenDictionary<string, int> MultiFunctionIndex =

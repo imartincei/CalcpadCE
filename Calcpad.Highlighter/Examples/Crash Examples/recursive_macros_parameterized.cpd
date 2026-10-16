@@ -1,0 +1,15 @@
+' KNOWN ISSUE: separate from ContentResolver.ExpandMacros cycle bug.
+' Parameterized self-recursion still crashes via CalcpadTokenizer:
+'   ResolveMacroCallArgTokens -> TokenizeSingleLine -> ParseBrackets -> ResolveMacroCallArgTokens
+' The ContentResolver cycle guard does not cover this path because the tokenizer
+' re-tokenizes macro call arguments without its own cycle check.
+' Keep these cases here so the second bug isn't forgotten.
+
+' Parameterized self-reference
+#def grow$(x$) = grow$(x$)
+grow$(1)
+
+' Cycle through a parameter substitution
+#def outer$(v$) = inner$(v$)
+#def inner$(v$) = outer$(v$)
+outer$(42)

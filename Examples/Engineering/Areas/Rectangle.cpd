@@ -1,0 +1,9 @@
+'<!-- Area $A = a\, b$ and perimeter $P = 2(a + b)$ of a rectangle from its two side lengths. -->
+'<div style="max-width:100mm;"><img style="height:55pt;" class="side" alt="rectangle.png" src="../../Images/math/area/rectangle.png"></div>
+'Dimensions
+a = ? {2}', 'b = ? {1}
+'Area
+A = a*b
+'Perimeter
+P = 2*(a+b)
+'

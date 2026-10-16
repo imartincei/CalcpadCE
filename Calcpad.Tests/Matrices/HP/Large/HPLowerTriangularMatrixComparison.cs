@@ -34,7 +34,7 @@
             RandomMatrixA,
             $"c = {func}(a)",
             $"c_hp = {func}(hp(a))",
-            "r = abs(c - c_hp) ≤ 10^-14*abs(c)"
+            TestCalc.CompareWithTolerance("c", "c_hp", "10^-14")
         ];
 
         private static string[] InterpolationTestHelper(string func) => [
@@ -44,7 +44,7 @@
             RandomMatrixA,
             $"c = {func}(i; j; a)",
             $"c_hp = {func}(i; j; hp(a))",
-            "r = abs(c - c_hp) ≤ 10^-14*abs(c)"
+            TestCalc.CompareWithTolerance("c", "c_hp", "10^-14")
         ];
 
         private static readonly string[] PositiveDefiniteArray = [
@@ -58,7 +58,7 @@
             PositiveDefiniteArray.Concat([
             $"c = {func}(a)",
             $"c_hp = {func}(hp(a))",
-            $"r = abs(c - c_hp) ≤ {tol}*abs(c)",
+            TestCalc.CompareWithTolerance("c", "c_hp", tol),
             "mcount(r; 0)"
         ]).ToArray();
 
@@ -67,7 +67,7 @@
             "b = random(fill(vector(n); 1))",
             $"c = {func}(a; b)",
             $"c_hp = {func}(hp(a); hp(b))",
-            $"r = abs(c - c_hp) ≤ {tol}*abs(c)",
+            TestCalc.CompareWithTolerance("c", "c_hp", tol),
             "count(r; 0; 1)"
          ]).ToArray();
 
@@ -76,7 +76,7 @@
             "b = random(mfill(matrix(n; 2); 1))",
             $"c = {func}(a; b)",
             $"c_hp = {func}(hp(a); hp(b))",
-            $"r = abs(c - c_hp) ≤ {tol}*abs(c)",
+            TestCalc.CompareWithTolerance("c", "c_hp", tol),
             "mcount(r; 0)"
          ]).ToArray();
 
@@ -747,7 +747,7 @@
                 RandomMatrixB,
                 "c = fprod(a; b)",
                 "c_hp = fprod(hp(a); hp(b))",
-                "abs(c - c_hp) ≤ 10^-12*abs(c)"
+                TestCalc.CompareWithToleranceDirect("c", "c_hp", "10^-12")
             ]);
             Assert.Equal(1, result);
         }
@@ -788,7 +788,7 @@
                 RandomMatrixA,
                 "c = mnorm_2(a)",
                 "c_hp = mnorm_2(hp(a))",
-                "abs(c - c_hp) ≤ 10^-12*abs(c)"
+                TestCalc.CompareWithToleranceDirect("c", "c_hp", "10^-12")
             ]);
             Assert.Equal(1, result);
         }
@@ -803,7 +803,7 @@
                 RandomMatrixA,
                 "c = mnorm_i(a)",
                 "c_hp = mnorm_i(hp(a))",
-                "r = abs(c - c_hp) ≤ 10^-12*abs(c)"
+                TestCalc.CompareWithTolerance("c", "c_hp", "10^-12")
             ]);
             Assert.Equal(1, result);
         }
@@ -818,7 +818,7 @@
                 WellConditionedMatrix,
                 "c = cond_1(a)",
                 "c_hp = cond_1(hp(a))",
-                "abs(c - c_hp) ≤ 10^-12*abs(c)"
+                TestCalc.CompareWithToleranceDirect("c", "c_hp", "10^-12")
                 ]);
             Assert.Equal(1, result);
         }
@@ -833,7 +833,7 @@
                 WellConditionedMatrix,
                 "c = cond_2(a)",
                 "c_hp = cond_2(hp(a))",
-                "abs(c - c_hp) ≤ 10^-12*abs(c)"
+                TestCalc.CompareWithToleranceDirect("c", "c_hp", "10^-12")
             ]);
             Assert.Equal(1, result);
         }
@@ -848,7 +848,7 @@
                 WellConditionedMatrix,
                 "c = cond_e(a)",
                 "c_hp = cond_e(hp(a))",
-                "abs(c - c_hp) ≤ 10^-12*abs(c)"
+                TestCalc.CompareWithToleranceDirect("c", "c_hp", "10^-12")
             ]);
             Assert.Equal(1, result);
         }
@@ -863,7 +863,7 @@
                 WellConditionedMatrix,
                 "c = cond_i(a)",
                 "c_hp = cond_i(hp(a))",
-                "abs(c - c_hp) ≤ 10^-12*abs(c)"
+                TestCalc.CompareWithToleranceDirect("c", "c_hp", "10^-12")
             ]);
             Assert.Equal(1, result);
         }
@@ -878,7 +878,7 @@
                 WellConditionedMatrix,
                 "c = det(a)",
                 "c_hp = det(hp(a))",
-                "abs(c - c_hp) ≤ 10^-12*abs(c)"
+                TestCalc.CompareWithToleranceDirect("c", "c_hp", "10^-12")
             ]);
             Assert.Equal(1, result);
         }
@@ -932,7 +932,7 @@
                 WellConditionedMatrix,
                 "c = adj(a)",
                 "c_hp = adj(hp(a))",
-                "r = abs(c - c_hp) ≤ 10^-8*abs(c)",
+                TestCalc.CompareWithTolerance("c", "c_hp", "10^-8"),
                 "mcount(r; 0)"
             ]);
             Assert.Equal(0, result);
@@ -948,7 +948,7 @@
                 WellConditionedMatrix,
                 "c = cofactor(a)",
                 "c_hp = cofactor(hp(a))",
-                "r = abs(c - c_hp) ≤ 10^-8*abs(c)",
+                TestCalc.CompareWithTolerance("c", "c_hp", "10^-8"),
                 "mcount(r; 0)"
                 ]);
             Assert.Equal(0, result);
@@ -1005,7 +1005,7 @@
                 WellConditionedMatrix,
                 "c = inverse(a)",
                 "c_hp = inverse(hp(a))",
-                "r = abs(c - c_hp) ≤ 10^-8*abs(c)",
+                TestCalc.CompareWithTolerance("c", "c_hp", "10^-8"),
                 "mcount(r; 0)"
             ]);
             Assert.Equal(0, result);

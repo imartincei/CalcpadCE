@@ -6,7 +6,7 @@
 
         private const string RandomMatrixA = "a = random(column(n; 1))";
         private const string RandomMatrixB = "b = random(column(n; 1))";
-        
+
 
         private static string[] OperatorTestHelper(char o, string tol = "0") => [
             "n = 500",
@@ -34,7 +34,7 @@
             RandomMatrixA,
             $"f(a) = {func}(a)",
             $"c_hp = {func}(hp(a))",
-            "r = abs(f(a) - f(hp(a))) ≤ 10^-14*abs(f(a))"
+            TestCalc.CompareWithTolerance("f(a)", "f(hp(a))", "10^-14")
         ];
 
         private static string[] InterpolationTestHelper(string func) => [
@@ -43,7 +43,7 @@
             "j = 1",
             RandomMatrixA,
             $"f(i; j; a) = {func}(i; 1; a)",
-            "r = abs(f(i; j; a) - f(i; j; hp(a))) ≤ 10^-14*abs(f(i; j; a))"
+            TestCalc.CompareWithTolerance("f(i; j; a)", "f(i; j; hp(a))", "10^-14")
 ];
 
         [Fact]
@@ -77,7 +77,7 @@
                 $"f(a; b) = a * b",
                 "a_hp = hp(a)",
                 "b_hp = hp(b)",
-                "r = abs(f(a; b) - f(a_hp; b_hp)) ≤ 10^-14*abs(f(a; b))",
+                TestCalc.CompareWithTolerance("f(a; b)", "f(a_hp; b_hp)", "10^-14"),
                 "mcount(r; 0)"
             ]);
             Assert.Equal(0, result);
@@ -883,7 +883,7 @@
                 RandomMatrixA,
                 RandomMatrixB,
                 "f(a; b) = fprod(a; b)",
-                "abs(f(a; b) - f(hp(a); hp(b)) ≤ 10^-12*abs(f(a; b)))"
+                TestCalc.CompareWithToleranceDirect("f(a; b)", "f(hp(a); hp(b))", "10^-12")
             ]);
             Assert.Equal(1, result);
         }
@@ -922,7 +922,7 @@
                 "n = 200",
                 RandomMatrixA,
                 "f(a) = mnorm_2(a)",
-                "abs(f(a) - f(hp(a))) ≤ 10^-12*abs(f(a))"
+                TestCalc.CompareWithToleranceDirect("f(a)", "f(hp(a))", "10^-12")
             ]);
             Assert.Equal(1, result);
         }
@@ -936,7 +936,7 @@
                 "n = 500",
                 RandomMatrixA,
                 "f(a) = mnorm_i(a)",
-                "r = abs(f(a) - f(hp(a))) ≤ 10^-12*abs(f(a))"
+                TestCalc.CompareWithTolerance("f(a)", "f(hp(a))", "10^-12")
             ]);
             Assert.Equal(1, result);
         }

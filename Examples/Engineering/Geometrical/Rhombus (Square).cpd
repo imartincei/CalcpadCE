@@ -1,0 +1,20 @@
+'<!-- Section properties of a square rhombus (rotated square): area, $I_x = I_y$, section moduli and radii of gyration. -->
+"Geometrical Properties of Square Rhombus
+'<div style="max-width:120mm"><img style="height:135pt;" alt="rombus-square.png" class="side" src="../../Images/mechanics/sections/rhombus.png"></div>
+'Side length
+a = ? {1}'m
+'Diagonal length
+d = sqr(2*a^2)'m
+'Area
+A = a^2'm<sup>2</sup>
+'Centroid
+'<p><i>z</i><sub>c</sub> ='y_c = d/2'</p>
+'Perimeter
+P = 4*a'm
+'Second moments of area
+'<p><i>I</i><sub>z</sub> ='I_y = d^4/48'm<sup>4</sup></p>
+'Polar moment of area
+I_x = 2*I_y'm<sup>4</sup>
+'Radii of gyration
+'<p><i>r</i><sub>z</sub> ='r_y = sqrt(I_y/A)'</p>
+r_x = sqr(I_x/A)'m

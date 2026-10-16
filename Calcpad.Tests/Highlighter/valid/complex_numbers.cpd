@@ -1,0 +1,24 @@
+#settings {"complex": true}
+' Complex numbers: literals, arithmetic, functions, phasor
+z1 = 3 + 2i
+z2 = 5 - 4i
+z3 = 3 + 2*1i
+zAdd = z1 + z2
+zMul = z1*z2
+zDiv = z1/z2
+zPow = z1^2
+zAbs = abs(z1)
+zRe = re(z1)
+zIm = im(z1)
+zPhase = phase(z1)
+zConj = conj(z1)
+zSin = sin(z1)
+zExp = exp(z1)
+zSqrt = sqr(z1)
+#deg
+phasorVal = 5 ∠ 45
+phasorAlt = 10 < 30
+#phasor
+phasorOut = 3 + 4i
+#complex
+complexOut = 5 ∠ 90

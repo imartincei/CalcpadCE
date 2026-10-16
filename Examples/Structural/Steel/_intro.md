@@ -1,0 +1,8 @@
+[CalcpadCE](https://calcpad-ce.org) worksheets in this section compute the geometric properties of doubly-symmetric [I-sections](https://en.wikipedia.org/wiki/I-beam) — area, centroid, second moment of area, plastic and elastic section moduli, shear area and torsional constants — that feed directly into [Eurocode](https://en.wikipedia.org/wiki/Eurocode) EN 1993-1-1 verifications for cross-section resistance and stability.
+The section data can be entered manually, picked from a drop-down list of rolled IPE, IPN, HE and HD profiles, or read from a shared Excel database, so the same calculation engine serves quick checks and full design reports.
+
+The [direct entry sheet](#i-section-properties) starts from the seven dimensions $h$, $b_{f1}$, $b_{f2}$, $t_w$, $t_{f1}$, $t_{f2}$, $r$ and produces the full set of cross-section properties for an asymmetric or welded build-up I-shape.
+The [drop-down catalogue variant](#i-section-properties-and-drawing) lets the user pick a rolled section from a single list, automatically loads the dimensions, and renders an SVG drawing of the cross-section alongside the numerical results.
+The [Excel-driven version](#i-section-properties-excel) reads the dimensions from [Steel Sections EN.xlsx](https://github.com/imartincei/CalcpadCE/blob/main/Examples/Structural/Steel/Steel%20Sections%20EN.xlsx) via the `read` directive and selects the row by an integer identifier, which keeps the worksheet small and the database editable.
+
+A small SVG drawing library, [svg_drawing.cpd](https://github.com/imartincei/CalcpadCE/blob/main/Examples/Structural/Steel/svg_drawing.cpd), is included by the drawing variant to sketch the I-section with its flange widths, web thickness and root radius.

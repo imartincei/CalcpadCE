@@ -1,0 +1,44 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Server: Debug (.NET)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Server: Build (.NET)",
+            "program": "${workspaceFolder}/Calcpad.Web/backend/bin/Debug/net10.0/Calcpad.Server.dll",
+            "args": ["--urls", "http://127.0.0.1:9420"],
+            "cwd": "${workspaceFolder}/Calcpad.Web/backend",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+                "uriFormat": "%s/swagger"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "Extension: Run",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/Calcpad.Web/frontend/vscode-calcpad"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/Calcpad.Web/frontend/vscode-calcpad/dist/**/*.js"
+            ],
+            "preLaunchTask": "Extension: Compile & Sync Server"
+        },
+        {
+            "name": "Desktop: Dev (Tauri)",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "node",
+            "runtimeArgs": ["desktop.mjs", "dev"],
+            "cwd": "${workspaceFolder}/Calcpad.Web/frontend/calcpad-desktop",
+            "console": "integratedTerminal"
+        }
+    ]
+}

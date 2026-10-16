@@ -1,0 +1,155 @@
+<div class="calcpad-output">
+ <!-- Multiline quadratic-roots function returning both roots of $a x^2 + b x + c = 0$ via the discriminant, with real/complex branching. -->
+ <h3>Quadratic Equation Roots function</h3>
+ <p>Multiline code block example:</p>
+ <p>
+  <span class="eq">
+   <var>quadRoots</var>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   ;
+   <var>c</var>
+   )  =
+   <small class="arr">🞀</small>
+   <span class="block">
+    <var>D</var>
+    =
+    <var>b</var>
+    <sup>2</sup>
+    − 4 ·
+    <var>a</var>
+    ·
+    <var>c</var>
+    <br/>
+    <var>x</var>
+    <sub>1</sub>
+    =
+    <span class="dvc">
+     -
+     <var>b</var>
+     −
+     <span class="o0">
+      <span class="r">√</span>
+      <var>D</var>
+     </span>
+     <span class="dvl">
+     </span>
+     2 ·
+     <var>a</var>
+    </span>
+    <br/>
+    <var>x</var>
+    <sub>2</sub>
+    =
+    <span class="dvc">
+     -
+     <var>b</var>
+     +
+     <span class="o0">
+      <span class="r">√</span>
+      <var>D</var>
+     </span>
+     <span class="dvl">
+     </span>
+     2 ·
+     <var>a</var>
+    </span>
+    <br/>
+    <span class="b0">[</span>
+    <var>x</var>
+    <sub>1</sub>
+    ;
+    <var>x</var>
+    <sub>2</sub>
+    <span class="b0">]</span>
+    <br/>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>quadRoots</var>
+   ( 2; 3; -5 )  =
+   <b class="b0">[</b>
+   -2.5 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Inline code block example:</p>
+ <p>
+  <span class="eq">
+   <var>quadRoots</var>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   ;
+   <var>c</var>
+   )  =
+   <small class="arr">🞀</small>
+   <span class="block">
+    <var>D</var>
+    =
+    <var>b</var>
+    <sup>2</sup>
+    − 4 ·
+    <var>a</var>
+    ·
+    <var>c</var>
+    ;
+    <var>x</var>
+    <sub>1</sub>
+    =
+    <span class="dvc">
+     -
+     <var>b</var>
+     −
+     <span class="o0">
+      <span class="r">√</span>
+      <var>D</var>
+     </span>
+     <span class="dvl">
+     </span>
+     2 ·
+     <var>a</var>
+    </span>
+    ;
+    <var>x</var>
+    <sub>2</sub>
+    =
+    <span class="dvc">
+     -
+     <var>b</var>
+     +
+     <span class="o0">
+      <span class="r">√</span>
+      <var>D</var>
+     </span>
+     <span class="dvl">
+     </span>
+     2 ·
+     <var>a</var>
+    </span>
+    ;
+    <span class="b0">[</span>
+    <var>x</var>
+    <sub>1</sub>
+    ;
+    <var>x</var>
+    <sub>2</sub>
+    <span class="b0">]</span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>quadRoots</var>
+   ( 2; 3; -5 )  =
+   <b class="b0">[</b>
+   -2.5 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+</div>

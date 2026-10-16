@@ -1,0 +1,461 @@
+<div class="calcpad-output">
+ <!-- Custom multiline functions implementing decimal-to-binary, octal and hexadecimal conversions and the standard bitwise operators. -->
+ <h5>Decimal to binary:</h5>
+ <p>
+  <span class="eq">
+   <var>dec2bin</var>
+   (
+   <var>x</var>
+   ;
+   <var>n</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>n</var>
+     − 1
+    </small>
+    <span class="nary">∑</span>
+    <small>
+     <var>k</var>
+     = 0
+    </small>
+   </span>
+   <b>mod</b>
+   <span class="b1">(</span>
+   <b>floor</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    2
+    <sup>
+     <var>k</var>
+    </sup>
+   </span>
+   <span class="b1">)</span>
+   ; 2
+   <span class="b1">)</span>
+   · 10
+   <sup>
+    <var>k</var>
+   </sup>
+  </span>
+ </p>
+ <h5>Binary to decimal:</h5>
+ <p>
+  <span class="eq">
+   <var>bin2dec</var>
+   (
+   <var>x</var>
+   ;
+   <var>n</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>n</var>
+     − 1
+    </small>
+    <span class="nary">∑</span>
+    <small>
+     <var>k</var>
+     = 0
+    </small>
+   </span>
+   <b>mod</b>
+   <span class="b1">(</span>
+   <b>floor</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    10
+    <sup>
+     <var>k</var>
+    </sup>
+   </span>
+   <span class="b1">)</span>
+   ; 2
+   <span class="b1">)</span>
+   · 2
+   <sup>
+    <var>k</var>
+   </sup>
+  </span>
+ </p>
+ <p>
+  Helper function -
+  <span class="eq">
+   <var>fl</var>
+   <sub>2</sub>
+   (
+   <var>x</var>
+   )  =
+   <b>floor</b>
+   (
+   <b>log</b>
+   <sub>2</sub>
+   (
+   <var>x</var>
+   )  )
+  </span>
+ </p>
+ <h5>NOT X:</h5>
+ <p>
+  <span class="eq">
+   <var>NOT</var>
+   <sub>b</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>fl</var>
+     <sub>2</sub>
+     (
+     <var>x</var>
+     )
+    </small>
+    <span class="nary">∑</span>
+    <small>
+     <var>n</var>
+     = 0
+    </small>
+   </span>
+   2
+   <sup>
+    <var>n</var>
+   </sup>
+   ·
+   <span class="b1">(</span>
+   <b>floor</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    2
+    <sup>
+     <var>n</var>
+    </sup>
+   </span>
+   <span class="b1">)</span>
+   mod 2 + 1
+   <span class="b1">)</span>
+   mod 2
+  </span>
+ </p>
+ <h5>X AND Y:</h5>
+ <p>
+  <span class="eq">
+   <var>AND</var>
+   <sub>b</sub>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>fl</var>
+     <sub>2</sub>
+     (
+     <var>x</var>
+     )
+    </small>
+    <span class="nary">∑</span>
+    <small>
+     <var>n</var>
+     = 0
+    </small>
+   </span>
+   2
+   <sup>
+    <var>n</var>
+   </sup>
+   ·
+   <b>floor</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    2
+    <sup>
+     <var>n</var>
+    </sup>
+   </span>
+   <span class="b1">)</span>
+   mod 2 ·
+   <b>floor</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>y</var>
+    <span class="dvl">
+    </span>
+    2
+    <sup>
+     <var>n</var>
+    </sup>
+   </span>
+   <span class="b1">)</span>
+   mod 2
+  </span>
+ </p>
+ <h5>X OR Y:</h5>
+ <p>
+  <span class="eq">
+   <var>OR</var>
+   <sub>b</sub>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <b>floor</b>
+     (
+     <b>log</b>
+     <sub>2</sub>
+     (
+     <var>x</var>
+     )  )
+    </small>
+    <span class="nary">∑</span>
+    <small>
+     <var>n</var>
+     = 0
+    </small>
+   </span>
+   2
+   <sup>
+    <var>n</var>
+   </sup>
+   ·
+   <span class="b1">(</span>
+   <b>floor</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    2
+    <sup>
+     <var>n</var>
+    </sup>
+   </span>
+   <span class="b1">)</span>
+   mod 2 +
+   <b>floor</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>y</var>
+    <span class="dvl">
+    </span>
+    2
+    <sup>
+     <var>n</var>
+    </sup>
+   </span>
+   <span class="b1">)</span>
+   mod 2 −
+   <b>floor</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    2
+    <sup>
+     <var>n</var>
+    </sup>
+   </span>
+   <span class="b1">)</span>
+   mod 2 ·
+   <b>floor</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>y</var>
+    <span class="dvl">
+    </span>
+    2
+    <sup>
+     <var>n</var>
+    </sup>
+   </span>
+   <span class="b1">)</span>
+   mod 2
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <h5>X XOR Y:</h5>
+ <p>
+  <span class="eq">
+   <var>XOR</var>
+   <sub>b</sub>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>fl</var>
+     <sub>2</sub>
+     (
+     <var>x</var>
+     )
+    </small>
+    <span class="nary">∑</span>
+    <small>
+     <var>n</var>
+     = 0
+    </small>
+   </span>
+   2
+   <sup>
+    <var>n</var>
+   </sup>
+   ·
+   <span class="b1">(</span>
+   <b>floor</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    2
+    <sup>
+     <var>n</var>
+    </sup>
+   </span>
+   <span class="b1">)</span>
+   mod 2 +
+   <b>floor</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>y</var>
+    <span class="dvl">
+    </span>
+    2
+    <sup>
+     <var>n</var>
+    </sup>
+   </span>
+   <span class="b1">)</span>
+   mod 2
+   <span class="b1">)</span>
+   mod 2
+  </span>
+ </p>
+ <h5>Examples</h5>
+ <p>
+  <span class="eq">
+   <var>x</var>
+   = 74
+  </span>
+  ₁₀ ,
+  <span class="eq">
+   <var>x</var>
+   <sub>2</sub>
+   =
+   <var>dec2bin</var>
+   (
+   <var>x</var>
+   ; 7 )  = 1001010
+  </span>
+  ₂
+ </p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   = 53
+  </span>
+  ₁₀ ,
+  <span class="eq">
+   <var>y</var>
+   <sub>2</sub>
+   =
+   <var>dec2bin</var>
+   (
+   <var>y</var>
+   ; 7 )  = 0110101
+  </span>
+  ₂
+ </p>
+ <p>
+  <span class="eq">
+   <var>NOT</var>
+   <sub>b</sub>
+   (
+   <var>x</var>
+   )  =
+   <var>NOT</var>
+   <sub>b</sub>
+   ( 74 )  = 53
+  </span>
+  (0110101 ₂)
+ </p>
+ <p>
+  <span class="eq">
+   <var>AND</var>
+   <sub>b</sub>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )  =
+   <var>AND</var>
+   <sub>b</sub>
+   ( 74; 53 )  = 0
+  </span>
+  (0000000 ₂)
+ </p>
+ <p>
+  <span class="eq">
+   <var>OR</var>
+   <sub>b</sub>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )  =
+   <var>OR</var>
+   <sub>b</sub>
+   ( 74; 53 )  = 127
+  </span>
+  (1111111 ₂)
+ </p>
+ <p>
+  <span class="eq">
+   <var>XOR</var>
+   <sub>b</sub>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )  =
+   <var>XOR</var>
+   <sub>b</sub>
+   ( 74; 53 )  = 127
+  </span>
+  (1111111 ₂)
+ </p>
+ <p>
+  <span class="eq">
+   <var>XOR</var>
+   <sub>b</sub>
+   (
+   <var>x</var>
+   ;
+   <var>x</var>
+   )  =
+   <var>XOR</var>
+   <sub>b</sub>
+   ( 74; 74 )  = 0
+  </span>
+  (0000000 ₂)
+ </p>
+</div>

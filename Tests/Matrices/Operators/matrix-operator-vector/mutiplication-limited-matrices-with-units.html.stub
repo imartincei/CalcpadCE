@@ -1,0 +1,1088 @@
+<div class="calcpad-output">
+ <h1>Multiplication with matrices</h1>
+ <p>
+ </p>
+ <h3>Full-rectangular</h3>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>rectangular</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      4.5
+      <i>kg</i>
+     </span>
+     <span class="td">
+      -3.2
+      <i>kg</i>
+     </span>
+     <span class="td">
+      2.8
+      <i>kg</i>
+     </span>
+     <span class="td">
+      -1.6
+      <i>kg</i>
+     </span>
+     <span class="td">
+      0.9
+      <i>kg</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -5.7
+      <i>kg</i>
+     </span>
+     <span class="td">
+      3.4
+      <i>kg</i>
+     </span>
+     <span class="td">
+      -6.2
+      <i>kg</i>
+     </span>
+     <span class="td">
+      1.9
+      <i>kg</i>
+     </span>
+     <span class="td">
+      -4.3
+      <i>kg</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      7.1
+      <i>kg</i>
+     </span>
+     <span class="td">
+      -2.3
+      <i>kg</i>
+     </span>
+     <span class="td">
+      4.6
+      <i>kg</i>
+     </span>
+     <span class="td">
+      -8.9
+      <i>kg</i>
+     </span>
+     <span class="td">
+      3.2
+      <i>kg</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -9.2
+      <i>kg</i>
+     </span>
+     <span class="td">
+      6.5
+      <i>kg</i>
+     </span>
+     <span class="td">
+      -3.8
+      <i>kg</i>
+     </span>
+     <span class="td">
+      2.1
+      <i>kg</i>
+     </span>
+     <span class="td">
+      -7.4
+      <i>kg</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      0.4
+      <i>kg</i>
+     </span>
+     <span class="td">
+      -1.3
+      <i>kg</i>
+     </span>
+     <span class="td">
+      2.2
+      <i>kg</i>
+     </span>
+     <span class="td">
+      -3.5
+      <i>kg</i>
+     </span>
+     <span class="td">
+      6.8
+      <i>kg</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vector1
+   </var>
+   =
+   <b class="b0">[</b>
+   -9.2
+   <i>t</i>
+   6.3
+   <i>t</i>
+   0
+   <i>t</i>
+   7.1
+   <i>t</i>
+   3
+   <i>t</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>rectangular</sub>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    vector1
+   </var>
+   =
+   <b class="b0">[</b>
+   -70220
+   <i>kg</i>
+   <sup class="unit">2</sup>
+   74450
+   <i>kg</i>
+   <sup class="unit">2</sup>
+   -133400
+   <i>kg</i>
+   <sup class="unit">2</sup>
+   118300
+   <i>kg</i>
+   <sup class="unit">2</sup>
+   -16320
+   <i>kg</i>
+   <sup class="unit">2</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>matrix</var>
+   <sub>rectangular</sub>
+   ;
+   <var>vector1</var>
+   )  =
+   <var>matrix</var>
+   <sub>rectangular</sub>
+   ·
+   <var>vector1</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>rectangular</sub>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vector1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -70220
+   <i>kg</i>
+   <sup class="unit">2</sup>
+   74450
+   <i>kg</i>
+   <sup class="unit">2</sup>
+   -133400
+   <i>kg</i>
+   <sup class="unit">2</sup>
+   118300
+   <i>kg</i>
+   <sup class="unit">2</sup>
+   -16320
+   <i>kg</i>
+   <sup class="unit">2</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <h3>Column</h3>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>column</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      4.5
+      <i>min</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -3.2
+      <i>min</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      2.8
+      <i>min</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -1.6
+      <i>min</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      0.9
+      <i>min</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -5.7
+      <i>min</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      3.4
+      <i>min</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>vector5</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      4.5
+      <i>h</i>
+     </span>
+     <span class="td">
+      0.9
+      <i>h</i>
+     </span>
+     <span class="td">
+      0
+      <i>h</i>
+     </span>
+     <span class="td">
+      2
+      <i>h</i>
+     </span>
+     <span class="td">
+      4.5
+      <i>h</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>c</var>
+   </b>
+   =
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>column</sub>
+   ·
+   <b>
+    <var>vector5</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      1215
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      243
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      540
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      1215
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -864
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -172.8
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -384
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -864
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      756
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      151.2
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      336
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      756
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -432
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -86.4
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -192
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -432
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      243
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      48.6
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      108
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      243
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -1539
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -307.8
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -684
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -1539
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      918
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      183.6
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      408
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      918
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>matrix</var>
+   <sub>column</sub>
+   ;
+   <var>vector5</var>
+   )  =
+   <var>matrix</var>
+   <sub>column</sub>
+   ·
+   <var>vector5</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>c</var>
+   </b>
+   =
+   <var>f</var>
+   (
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>column</sub>
+   ;
+   <b>
+    <var>vector5</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      1215
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      243
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      540
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      1215
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -864
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -172.8
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -384
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -864
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      756
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      151.2
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      336
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      756
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -432
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -86.4
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -192
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -432
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      243
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      48.6
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      108
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      243
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -1539
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -307.8
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -684
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      -1539
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      918
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      183.6
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      0
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      408
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+      918
+      <i>min</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <h3>Symmetric</h3>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>symmetric</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      4.5
+      <i>m</i>
+     </span>
+     <span class="td">
+      -3.2
+      <i>m</i>
+     </span>
+     <span class="td">
+      2.8
+      <i>m</i>
+     </span>
+     <span class="td">
+      -1.6
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -3.2
+      <i>m</i>
+     </span>
+     <span class="td">
+      3.4
+      <i>m</i>
+     </span>
+     <span class="td">
+      -6.2
+      <i>m</i>
+     </span>
+     <span class="td">
+      1.9
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      2.8
+      <i>m</i>
+     </span>
+     <span class="td">
+      -6.2
+      <i>m</i>
+     </span>
+     <span class="td">
+      4.6
+      <i>m</i>
+     </span>
+     <span class="td">
+      -8.9
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -1.6
+      <i>m</i>
+     </span>
+     <span class="td">
+      1.9
+      <i>m</i>
+     </span>
+     <span class="td">
+      -8.9
+      <i>m</i>
+     </span>
+     <span class="td">
+      2.1
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vector6
+   </var>
+   =
+   <b class="b0">[</b>
+   2.8
+   <i>dm</i>
+   -3
+   <i>dm</i>
+   0
+   <i>dm</i>
+   1.2
+   <i>dm</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>symmetric</sub>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    vector6
+   </var>
+   =
+   <b class="b0">[</b>
+   2.03
+   <i>m</i>
+   <sup class="unit">2</sup>
+   -1.69
+   <i>m</i>
+   <sup class="unit">2</sup>
+   1.58
+   <i>m</i>
+   <sup class="unit">2</sup>
+   -0.766
+   <i>m</i>
+   <sup class="unit">2</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>matrix</var>
+   <sub>symmetric</sub>
+   ;
+   <var>vector6</var>
+   )  =
+   <var>matrix</var>
+   <sub>symmetric</sub>
+   ·
+   <var>vector6</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>symmetric</sub>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vector6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   2.03
+   <i>m</i>
+   <sup class="unit">2</sup>
+   -1.69
+   <i>m</i>
+   <sup class="unit">2</sup>
+   1.58
+   <i>m</i>
+   <sup class="unit">2</sup>
+   -0.766
+   <i>m</i>
+   <sup class="unit">2</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+</div>

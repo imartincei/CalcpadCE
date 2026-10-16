@@ -1,0 +1,4 @@
+
+# Project-local Node 22 runtime
+/.node/
+node.tar.xz

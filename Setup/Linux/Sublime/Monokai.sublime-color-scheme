@@ -21,7 +21,7 @@
             "name": "Calcpad String",
             "scope": "string.quoted.double.calcpad | string.quoted.single.calcpad",
             "foreground": "var(green)"
-        },		
+        },
 		{
             "name": "Calcpad Operator",
             "scope": "keyword.operator.arithmetic.calcpad | keyword.operator.comparison.calcpad |  keyword.operator.logical.calcpad |keyword.operator.assignment.calcpad | punctuation.separator.calcpad",
@@ -36,7 +36,7 @@
             "name": "Calcpad Method",
             "scope": "support.method.calcpad | punctuation.definition.method.calcpad",
             "foreground": "var(magenta)"
-        },         
+        },
         {
             "name": "Calcpad Function",
             "scope": "support.function.calcpad",
@@ -56,6 +56,6 @@
             "name": "Calcpad String",
             "scope": "meta.string.calcpad",
             "foreground": "var(magenta2)"
-        }  		
+        }
 	]
 }

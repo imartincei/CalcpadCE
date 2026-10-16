@@ -1,10 +1,10 @@
-# Calcpad Language Reference for Claude Code
+# CalcpadCE Language Reference for Claude Code
 
 ---
 
 ## Description
 
-Calcpad is free software for mathematical and engineering calculations. It represents a flexible and modern programmable calculator with Html report generator. It is simple and easy to use, but it also includes many advanced features:  
+CalcpadCE is free software for mathematical and engineering calculations. It represents a flexible and modern programmable calculator with Html report generator. It is simple and easy to use, but it also includes many advanced features:  
   
 - real and complex numbers (rectangular and polar-phasor formats);
 - units of measurement (SI, Imperial and USCS);
@@ -649,7 +649,7 @@ Unit names can include currency symbols: `€`, `£`, `₤`, `¥`, `¢`, `₽`, 
    For example: `a.1 = 5`, `a_k = a.k`, `a.(k + 1) = 6`.
 2. Matrix elements are accessed by the indexing operator followed by two indexes in brackets: 
    For example: `A.(1; 1) = 5`, `A_ij = A.(i; j)`, `A.(i + 1; j + 2) = 6`.
-3. Calcpad automatically maintains the structure of special matrices (diagonal, triangular, symmetric, column).
+3. CalcpadCE automatically maintains the structure of special matrices (diagonal, triangular, symmetric, column).
 4. Assigning a value to the off-diagonal or off-triangle element throws an error.
 5. Reading a value from the off-diagonal or off-triangle element returns zero.
 6. Matrices created by `_hp` suffixed functions or the `hp()` function are of "hp" type. 
@@ -755,18 +755,17 @@ x = $Root{x^2 - 10 @ x = 0 : 5}
 
 ## RESOURCES
 
-- Official Site: https://calcpad.eu/
-- GitHub: https://github.com/Proektsoftbg/Calcpad
-- Documentation: https://calcpad.eu/help/
-- Examples: https://github.com/Proektsoftbg/Calcpad/tree/main/Examples
-- Blog: https://calcpad.blog/
+- Official Site: https://calcpad-ce.org/
+- GitHub: https://github.com/imartincei/CalcpadCE
+- Documentation: https://imartincei.github.io/CalcpadCE/
+- Examples: https://github.com/imartincei/CalcpadCE/tree/main/Examples
 
 ---
 
 ## FILE EXTENSION
-- Use `.cpd` for Calcpad source files.
+- Use `.cpd` for CalcpadCE source files.
 
 ## EXECUTION
-- Press Ctrl+Shift+B to run in VS Code or the command `Calcpad: Run Calcpad File`. 
+- Press Ctrl+Shift+B to run in VS Code or the command `CalcpadCE: Run CalcpadCE File`. 
 
 ---

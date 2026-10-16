@@ -1,0 +1,78 @@
+<div class="calcpad-output">
+ <!--DXF Drawing Module - Renders to static image via dxf-viewer-->
+ <!-- Multi-diagram model: window.dxfDrawings is a dictionary keyed by diagram id; window.dxfCurrentDrawingId is the active id. initDXF creates a new entry and sets it active; addLayer/setLayer/draw* use the current id (so callers do not need to thread the id through every draw call). renderDXF captures its diagram synchronously and suffixes DOM ids with the id, so multiple diagrams can coexist on a page. -->
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>Define drawing dimensions</p>
+ <p>
+  <span class="eq">
+   <var>width</var>
+   = 10
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>height</var>
+   = 8
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>Initialize DXF drawing with units</p>
+ <script type="module">import Drawing from "https://cdn.jsdelivr.net/npm/dxf-writer@1.18.4/+esm";window.dxfDrawings = window.dxfDrawings || {};window.dxfDrawings["sample"] = new Drawing();window.dxfDrawings["sample"].setUnits("Inches");window.dxfDrawings["sample"].addLineType("DASHED", "---- ", [0.5, -0.5]);window.dxfDrawings["sample"].addLineType("DOTTED", ". ", [0.1, -0.1]);window.dxfCurrentDrawingId = "sample";</script>
+ Create a layer for border lines (ACI color 1 = Red)
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.addLayer("BORDER", 1, "CONTINUOUS"); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.setActiveLayer("BORDER"); } }</script>
+ Draw a border around the drawing
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine(0, 0, 10, 0); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine(10, 0, 10, 8); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine(10, 8, 0, 8); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine(0, 8, 0, 0); } }</script>
+ Create a layer for diagonal lines (ACI color 5 = Blue)
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.addLayer("DIAGONAL", 5, "DASHED"); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.setActiveLayer("DIAGONAL"); } }</script>
+ Draw diagonal lines
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine(0, 0, 10, 8); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine(10, 0, 0, 8); } }</script>
+ Create a layer for custom geometry (ACI color 4 = Cyan)
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.addLayer("CUSTOM", 4, "CONTINUOUS"); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.setActiveLayer("CUSTOM"); } }</script>
+ Draw a rectangle in the middle3276
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId];if (d) {  const x = 3, y = 2, w = 4, h = 4;  d.drawLine(x, y, x + w, y);  d.drawLine(x + w, y, x + w, y + h);  d.drawLine(x + w, y + h, x, y + h);  d.drawLine(x, y + h, x, y);} }</script>
+ Draw an X inside the rectangle[[3, 2, 7, 6], [7, 2, 3, 6]]
+ <!--Rows: Lines, Columns: X1, Y1, X2, Y2-->
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId];if (d) { d.drawLine(3, 2, 7, 6); }if (d) { d.drawLine(7, 2, 3, 6); }}</script>
+ Create a layer for circles (ACI color 3 = Green)
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.addLayer("CIRCLES", 3, "CONTINUOUS"); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.setActiveLayer("CIRCLES"); } }</script>
+ Draw a circle in the center of the rectangle541
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawCircle(5, 4, 1); } }</script>
+ Render the DXF as image (width in pixels)
+ <div id="dxf-render-container-sample" style="position:fixed; left:-9999px; top:0; width:1px; height:1px; overflow:hidden;">
+ </div>
+ <!-- Hidden but still in flow, with the canvas square ratio, so the box is the right     size from first layout. display:none would take no space and everything below     would jump when the drawing arrives, seconds after load. -->
+ <img id="dxf-output-img-sample" style="visibility:hidden; width:800px; max-width:100%; margin-top:30px; border:2px solid #ddd; border-radius:8px; background:#fff;"/>
+ <div id="dxf-error-message-sample" style="margin-top:20px; padding:15px; background:#f8d7da; border-radius:4px; color:#721c24; display:none;">
+  <strong>Error:</strong>
+  <span id="dxf-error-text-sample">
+  </span>
+ </div>
+ <script>console.log("PLAIN SCRIPT TEST sample");</script>
+ <script type="module">console.log("MODULE SCRIPT START sample");import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/+esm";import * as DxfViewerModule from "https://cdn.jsdelivr.net/npm/dxf-viewer@1.0.46/+esm";const DxfViewer = DxfViewerModule.default || DxfViewerModule.DxfViewer;console.log("DXF render script loaded sample, DxfViewer:", typeof DxfViewer);const dxfId = "sample";const drawing = window.dxfDrawings && window.dxfDrawings[dxfId];function showError(msg) {  document.getElementById("dxf-error-text-" + dxfId).textContent = msg;  document.getElementById("dxf-error-message-" + dxfId).style.display = "block";}async function renderToImage() {  if (!DxfViewer) { throw new Error("DxfViewer library not loaded"); }  if (!drawing) { throw new Error("DXF drawing  + dxfId +  not initialized. Call initDXF first"); }  const container = document.getElementById("dxf-render-container-" + dxfId);  if (!container) { throw new Error("Render container  + dxfId +  not found"); }  const iw = 800;  const cw = iw * 2;  const viewer = new DxfViewer(container, {    autoResize: false,    canvasWidth: cw,    canvasHeight: cw,    clearColor: new THREE.Color("#fff"),    colorCorrection: true,    preserveDrawingBuffer: true  });  const dxfString = drawing.toDxfString();  console.log(dxfString);  const blob = new Blob([dxfString], { type: "application/dxf" });  const url = URL.createObjectURL(blob);  console.log("Loading DXF " + dxfId + "...");  await viewer.Load({ url: url });  URL.revokeObjectURL(url);  const bounds = viewer.GetBounds();  const origin = viewer.GetOrigin();  if (bounds) {    const bw = bounds.maxX - bounds.minX;    const bh = bounds.maxY - bounds.minY;    const ch = Math.max(Math.round(cw * bh / Math.max(bw, 0)), 1);    viewer.SetSize(cw, ch);    viewer.FitView(      bounds.minX - origin.x, bounds.maxX - origin.x,      bounds.minY - origin.y, bounds.maxY - origin.y    );  }  viewer.Render();  const canvas = viewer.GetCanvas();  const dataUrl = canvas.toDataURL("image/png");  const img = document.getElementById("dxf-output-img-" + dxfId);  await new Promise(function(resolve) {    img.onload = resolve;    img.onerror = resolve;    img.src = dataUrl;  });  img.style.visibility = "visible";  img.dataset.dxfReady = "ok";  viewer.Destroy();  container.remove();  console.log("DXF " + dxfId + " rendered to image successfully");}setTimeout(async function() {  console.log("setTimeout fired for " + dxfId + ", drawing:", !!drawing);  try {    await renderToImage();  } catch(err) {    console.error("Failed to render DXF " + dxfId + ":", err);    showError(err.message);    const failedImg = document.getElementById("dxf-output-img-" + dxfId);    if (failedImg) {      failedImg.style.display = "none";      failedImg.dataset.dxfReady = "failed";    }  }}, 100);</script>
+</div>

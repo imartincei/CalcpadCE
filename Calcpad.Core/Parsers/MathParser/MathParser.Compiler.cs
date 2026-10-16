@@ -53,7 +53,7 @@ namespace Calcpad.Core
                 var stackBuffer = new Stack<Expression>();
                 var len = rpn.Length;
                 if (_allowAssignment && (rpn[len - 1].Content == "="))
-                { 
+                {
                     var rpn0 = rpn[0];
                     if (rpn0.Type == TokenTypes.Variable &&
                         rpn0 is VariableToken vt)
@@ -144,8 +144,9 @@ namespace Calcpad.Core
                                 throw Exceptions.InvalidFunction(t.Content);
 
                             var cf = _functions[t.Index];
-                            var cfValues = PopValues(stackBuffer, cf.ParameterCount);
-                            stackBuffer.Push(ParseFunction(cf, cfValues));
+                            var map = (t as FunctionToken)?.ArgumentMap;
+                            var cfValues = PopValues(stackBuffer, map?.Length ?? cf.ParameterCount);
+                            stackBuffer.Push(ParseFunction(cf, cfValues, map));
                             continue;
                         case TokenTypes.Vector:
                         case TokenTypes.RowDivisor:
@@ -200,7 +201,7 @@ namespace Calcpad.Core
                 return values;
             }
 
-            private static Expression ParseToken(Token t) =>
+            private Expression ParseToken(Token t) =>
                 t.Type switch
                 {
                     TokenTypes.Unit =>
@@ -361,14 +362,14 @@ namespace Calcpad.Core
                 return Expression.Call(LuDecompositionMethod, a, b);
             }
 
-            private static Expression ParseVariableToken(VariableToken t)
+            private Expression ParseVariableToken(VariableToken t)
             {
                 var v = t.Variable;
                 if (v.IsInitialized || t.Type == TokenTypes.Vector || t.Type == TokenTypes.Matrix)
                     return Expression.Property(Expression.Constant(v), typeof(Variable), nameof(Variable.Value));
                 try
                 {
-                    var u = Unit.Get(t.Content);
+                    var u = Unit.Get(t.Content, _parser.IsUs);
                     t.Type = TokenTypes.Unit;
                     v.SetValue(u);
                     return Expression.Constant(v.Value, typeof(IValue));
@@ -470,10 +471,18 @@ namespace Calcpad.Core
             private static MethodCallExpression AsMatrix(Expression a) =>
                  Expression.Call(AsMatrixMethod, a, Expression.Constant(Exceptions.Items.Argument));
 
-            private Expression ParseFunction(CustomFunction cf, Expression[] arguments)
+            private Expression ParseFunction(CustomFunction cf, Expression[] arguments, int[] map)
             {
                 if (cf.IsRecursion)
                     return Expression.Constant(RealValue.NaN, typeof(IValue));
+
+                if (map is not null)
+                    return Expression.Call(
+                        _evaluatorInstance,
+                        EvaluateCustomFunctionDefaultsMethod,
+                        Expression.Constant(cf, typeof(CustomFunction)),
+                        Expression.Constant(map),
+                        Expression.NewArrayInit(typeof(IValue), arguments));
 
                 return arguments.Length switch
                 {
@@ -534,13 +543,13 @@ namespace Calcpad.Core
                 if (t.Type == TokenTypes.VectorMultiFunction)
                     return Expression.Invoke(
                         Expression.Constant(
-                            VectorCalculator.GetMultiFunction(t.Index)), 
+                            VectorCalculator.GetMultiFunction(t.Index)),
                             argsExpression);
 
                 // TokenTypes.MatrixMultiFunction
                 return Expression.Invoke(
                     Expression.Constant(
-                        MatrixCalculator.GetMultiFunction(t.Index)), 
+                        MatrixCalculator.GetMultiFunction(t.Index)),
                         argsExpression);
             }
 
@@ -581,9 +590,9 @@ namespace Calcpad.Core
             private ConstantExpression EvaluateInterpolation(Token t, Expression[] arguments) =>
                 Expression.Constant(
                     IValue.EvaluateInterpolation(
-                        _matrixCalc, 
-                        t.Index, 
-                        EvaluateConstantParameters(arguments)), 
+                        _matrixCalc,
+                        t.Index,
+                        EvaluateConstantParameters(arguments)),
                         typeof(IValue));
 
             private ConstantExpression EvaluateMultiFunction(Token t, Expression[] arguments)
@@ -605,15 +614,15 @@ namespace Calcpad.Core
 
             private static NewExpression ParseVectorToken(Expression[] values) =>
                 Expression.New(
-                    VectorConstructor, 
+                    VectorConstructor,
                     Expression.Call(
-                        ExpandRealValuesMethod, 
-                        Expression.NewArrayInit(typeof(IValue), 
+                        ExpandRealValuesMethod,
+                        Expression.NewArrayInit(typeof(IValue),
                         values)));
 
             private static MethodCallExpression ParseMatrixToken(Expression[] values) =>
                 Expression.Call(
-                    JoinRowsMethod, 
+                    JoinRowsMethod,
                     Expression.NewArrayInit(typeof(IValue), values));
 
             private static MethodCallExpression ParseVectorIndexToken(Expression vector, Expression ii) =>

@@ -34,6 +34,9 @@ namespace PyCalcpad
                 outputFileName = Path.ChangeExtension(inputFileName, "." + outputFileName);
 
             var ext = Path.GetExtension(outputFileName);
+            if (ext == ".pdf")
+                throw new NotSupportedException("PDF export is not currently available. It is planned for a future release. In the meantime, use the CalcpadCE desktop app to export PDF, or run the standalone CalcpadCE server if you need PDF export as a background task.");
+
             var path = Path.GetDirectoryName(inputFileName);
             if (!string.IsNullOrWhiteSpace(path))
                 Directory.SetCurrentDirectory(path);
@@ -41,7 +44,8 @@ namespace PyCalcpad
             var code = Reader.Read(inputFileName);
             var macroParser = new MacroParser
             {
-                Include = Reader.Include
+                Include = Reader.Include,
+                SourceFilePath = inputFileName
             };
             var hasMacroErrors = macroParser.Parse(code, out var unwrappedCode, null, 0, true);
             string htmlResult;
@@ -54,7 +58,9 @@ namespace PyCalcpad
             }
             ExpressionParser parser = new()
             {
-                Settings = ConvertSettings(Settings)
+                Settings = ConvertSettings(Settings),
+                SourceFilePath = inputFileName,
+                PathRoots = macroParser.PathRoots
             };
             parser.Parse(unwrappedCode, true, ext == ".docx");
             htmlResult = parser.HtmlResult;
@@ -63,8 +69,6 @@ namespace PyCalcpad
                 converter.ToHtml(htmlResult, outputFileName);
             else if (ext == ".docx")
                 converter.ToOpenXml(htmlResult, outputFileName, parser.OpenXmlExpressions);
-            else if (ext == ".pdf")
-                converter.ToPdf(htmlResult, outputFileName);
             else
                 return false;
 
@@ -74,7 +78,6 @@ namespace PyCalcpad
         private static Calcpad.Core.Settings ConvertSettings(Settings settings) =>
             new()
             {
-                Units = settings.Units,
                 Math = Calculator.ConvertMathSettings(settings.Math),
                 Plot = ConvertPlotSettings(settings.Plot),
             };

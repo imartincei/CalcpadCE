@@ -135,11 +135,11 @@ namespace Calcpad.Core
         internal override string FormatPower(string sa, string sb, int level, int order)
         {
             string s;
-            if (level > 0) 
+            if (level > 0)
                 s = "<sup class=\"raised\">";
-            else if (level < 0) 
+            else if (level < 0)
                 s = "<sup class=\"unit\">";
-            else 
+            else
                 s = "<sup>";
 
             if (order == PowerOrder)
@@ -389,8 +389,8 @@ namespace Calcpad.Core
         {
             var d = value.D;
             var s = FormatReal(d, value.Units?.FormatString, zeroSmallElements && Math.Abs(d) < zeroThreshold);
-            return value.Units is null ? 
-                s : 
+            return value.Units is null ?
+                s :
                 string.Concat(s, ThinSpace, value.Units.Html);
         }
 

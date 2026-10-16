@@ -9,7 +9,7 @@ Only round brackets are allowed: "**(**" and "**)**". The software checks if the
 - Right bracket is not allowed after operator or function identifier;
 - A function identifier always must be followed by a left bracket.
 
-Calcpad uses "smart" bracket insertion while rendering the output.
+CalcpadCE uses "smart" bracket insertion while rendering the output.
 It means that brackets, which are duplicate or do not affect the order of calculations, are omitted from the output.
 On the other hand, there are places where brackets are added for clarity, although not required in the input.
 It happens mostly when negative or complex variables are substituted.

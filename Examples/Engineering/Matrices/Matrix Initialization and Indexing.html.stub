@@ -1,0 +1,668 @@
+<div class="calcpad-output">
+ <!-- Foundations of matrices in CalcpadCE: literal construction with $|$ row separators, single- and double-index access, slicing, submatrix extraction and assignment by index. -->
+ <p>Direct:</p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   1
+   <span class="b0">|</span>
+   2; 3
+   <span class="b0">|</span>
+   4; 5; 6
+   <span class="b0">|</span>
+   7; 8
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>Direct with vectors:</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <span class="b0">[</span>
+   1; 2; 4
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <span class="b0">|</span>
+   2 ·
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   + 1
+   <span class="b0">|</span>
+   3 ·
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   + 2
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">5</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">8</span>
+     <span class="td">14</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>From a custom function (with vector arguments):</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   (
+   <var>x</var>
+   )  =
+   <b>transp</b>
+   (
+   <span class="b0">[</span>
+   <var>x</var>
+   <sup>0</sup>
+   <span class="b0">|</span>
+   <var>x</var>
+   <span class="b0">|</span>
+   <var>x</var>
+   <sup>2</sup>
+   <span class="b0">|</span>
+   <var>x</var>
+   <sup>3</sup>
+   <span class="b0">|</span>
+   <var>x</var>
+   <sup>4</sup>
+   <span class="b0">]</span>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <span class="b0">[</span>
+   1; 2; 3; 4
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 3 4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <var>A</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">4</span>
+     <span class="td">8</span>
+     <span class="td">16</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">3</span>
+     <span class="td">9</span>
+     <span class="td">27</span>
+     <span class="td">81</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">4</span>
+     <span class="td">16</span>
+     <span class="td">64</span>
+     <span class="td">256</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Indexing</h3>
+ <hr/>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   <sub>3,2</sub>
+   = 3
+  </span>
+  - simple dot operator (constant index)
+ </p>
+ <p>
+  <span class="eq">
+   <var>i</var>
+   = 2
+  </span>
+  ,
+  <span class="eq">
+   <var>j</var>
+   = 3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   <sub>3,4</sub>
+   = 27
+  </span>
+  - expressions with variables
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   <sub>2,3</sub>
+   = 0
+  </span>
+  - assign a new value to an element:
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">0</span>
+     <span class="td">8</span>
+     <span class="td">16</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">3</span>
+     <span class="td">9</span>
+     <span class="td">27</span>
+     <span class="td">81</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">4</span>
+     <span class="td">16</span>
+     <span class="td">64</span>
+     <span class="td">256</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>Initalize values in a block loop</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <span class="b0">[</span>
+   1; 2; 3; 4
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 3 4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <b>matrix</b>
+   (
+   <b>len</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ) ; 7 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">4</span>
+     <span class="td">8</span>
+     <span class="td">16</span>
+     <span class="td">32</span>
+     <span class="td">64</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">3</span>
+     <span class="td">9</span>
+     <span class="td">27</span>
+     <span class="td">81</span>
+     <span class="td">243</span>
+     <span class="td">729</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">4</span>
+     <span class="td">16</span>
+     <span class="td">64</span>
+     <span class="td">256</span>
+     <span class="td">1024</span>
+     <span class="td">4096</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>Inline loop</p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <b>matrix</b>
+   (
+   <b>len</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ) ; 7 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="cond">$Repeat</span>
+   {
+   <span class="cond">$Repeat</span>
+   {
+   <b>
+    <var>B</var>
+   </b>
+   <sub>
+    <var>i</var>
+    ,
+    <var>j</var>
+   </sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>
+    <var>i</var>
+   </sub>
+   <sup>
+    <var>j</var>
+    − 1
+   </sup>
+   <span class="cond">for</span>
+   <var>j</var>
+   = 1...
+   <b>n</b>
+   <sub>cols</sub>
+   (
+   <b>
+    <var>B</var>
+   </b>
+   ) }
+   <span class="cond">for</span>
+   <var>i</var>
+   = 1...
+   <b>n</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>B</var>
+   </b>
+   ) } = 4096
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">4</span>
+     <span class="td">8</span>
+     <span class="td">16</span>
+     <span class="td">32</span>
+     <span class="td">64</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">3</span>
+     <span class="td">9</span>
+     <span class="td">27</span>
+     <span class="td">81</span>
+     <span class="td">243</span>
+     <span class="td">729</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">4</span>
+     <span class="td">16</span>
+     <span class="td">64</span>
+     <span class="td">256</span>
+     <span class="td">1024</span>
+     <span class="td">4096</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+</div>

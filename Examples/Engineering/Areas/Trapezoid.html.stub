@@ -1,0 +1,110 @@
+<div class="calcpad-output">
+ <!-- Area $A = \tfrac{1}{2}(a + b)\, h$ of a trapezoid from its two parallel sides and height. -->
+ <h3>Area and Perimeter of Trapezoid</h3>
+ <div style="max-width:90mm;">
+  <img alt="trapezoid.png" class="side" src="Images/math/area/trapezoid.png" style="height:60pt;"/>
+ </div>
+ <p>Base lengths</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-5">2</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-5">1</u>
+  </span>
+ </p>
+ <p>Height</p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-7">1</u>
+  </span>
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    (
+    <var>a</var>
+    +
+    <var>b</var>
+    )  ·
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    ( 2 + 1 )  · 1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 1.5
+  </span>
+ </p>
+ <p>Perimeter (symmetrical figure only)</p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <var>h</var>
+    <sup>2</sup>
+    +
+    <span class="dvc">
+     (
+     <var>a</var>
+     −
+     <var>b</var>
+     )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    1
+    <sup>2</sup>
+    +
+    <span class="dvc">
+     ( 2 − 1 )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   = 1.12
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   =
+   <var>a</var>
+   +
+   <var>b</var>
+   + 2 ·
+   <var>c</var>
+   = 2 + 1 + 2 · 1.12 = 5.24
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

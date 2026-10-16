@@ -1,0 +1,2639 @@
+<div class="calcpad-output">
+ <h2>Trigonometric functions</h2>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   =
+   <b class="b0">[</b>
+   -2.24 1.95 3.68 8.01 4.71 11.51 13.59 21.42 27.27 36.11 40.49 47.96 0 0 0 0 0 0 0 0
+   <span title="199 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>sin</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.783 0.929 -0.509 0.987 -1 -0.869 0.852 0.541 0.842 -1 0.341 -0.744 0 0 0 0 0 0 0 0
+   <span title="199 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   )  =
+   <b>sin</b>
+   (
+   <var>vec1</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.783 0.929 -0.509 0.987 -1 -0.869 0.852 0.541 0.842 -1 0.341 -0.744 0 0 0 0 0 0 0 0
+   <span title="199 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cos</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.622 -0.371 -0.861 -0.158 0 0.494 0.523 -0.841 -0.539 -0.0192 -0.94 -0.668 1 1 1 1 1 1 1 1
+   <span title="199 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   )  =
+   <b>cos</b>
+   (
+   <var>vec1</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.622 -0.371 -0.861 -0.158 0 0.494 0.523 -0.841 -0.539 -0.0192 -0.94 -0.668 1 1 1 1 1 1 1 1
+   <span title="199 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>tan</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1.26 -2.5 0.591 -6.24 5443746451065123 -1.76 1.63 -0.643 -1.56 52.14 -0.363 1.11 0 0 0 0 0 0 0 0
+   <span title="199 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   )  =
+   <b>tan</b>
+   (
+   <var>vec1</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1.26 -2.5 0.591 -6.24 5443746451065123 -1.76 1.63 -0.643 -1.56 52.14 -0.363 1.11 0 0 0 0 0 0 0 0
+   <span title="199 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cot</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.794 -0.4 1.69 -0.16 0 -0.568 0.614 -1.56 -0.64 0.0192 -2.76 0.897
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="199 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   )  =
+   <b>cot</b>
+   (
+   <var>vec1</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.794 -0.4 1.69 -0.16 0 -0.568 0.614 -1.56 -0.64 0.0192 -2.76 0.897
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="199 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>sec</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.61 -2.69 -1.16 -6.32 -5443746451065123 2.02 1.91 -1.19 -1.85 -52.15 -1.06 -1.5 1 1 1 1 1 1 1 1
+   <span title="199 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   )  =
+   <b>sec</b>
+   (
+   <var>vec1</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.61 -2.69 -1.16 -6.32 -5443746451065123 2.02 1.91 -1.19 -1.85 -52.15 -1.06 -1.5 1 1 1 1 1 1 1 1
+   <span title="199 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>csc</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.28 1.08 -1.96 1.01 -1 -1.15 1.17 1.85 1.19 -1 2.93 -1.34
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="199 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   )  =
+   <b>csc</b>
+   (
+   <var>vec1</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.28 1.08 -1.96 1.01 -1 -1.15 1.17 1.85 1.19 -1 2.93 -1.34
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="199 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Hyperbolic functions</h2>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   =
+   <b class="b0">[</b>
+   -1.82 3.08 5.42 11.38 2.62 43.66 67.15 108.59 146.05 199.16 491.14 346.46 0 0 0 0 0 0 0 0
+   <span title="11979 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>sinh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -3 10.86 113.18 43863 6.82 4.57×10
+   <sup>18</sup>
+   7.26×10
+   <sup>28</sup>
+   7.23×10
+   <sup>46</sup>
+   1.34×10
+   <sup>63</sup>
+   1.56×10
+   <sup>86</sup>
+   9.91×10
+   <sup>212</sup>
+   1.46×10
+   <sup>150</sup>
+   0 0 0 0 0 0 0 0
+   <span title="11979 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec2</var>
+   )  =
+   <b>sinh</b>
+   (
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -3 10.86 113.18 43863 6.82 4.57×10
+   <sup>18</sup>
+   7.26×10
+   <sup>28</sup>
+   7.23×10
+   <sup>46</sup>
+   1.34×10
+   <sup>63</sup>
+   1.56×10
+   <sup>86</sup>
+   9.91×10
+   <sup>212</sup>
+   1.46×10
+   <sup>150</sup>
+   0 0 0 0 0 0 0 0
+   <span title="11979 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cosh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   3.16 10.91 113.18 43863 6.89 4.57×10
+   <sup>18</sup>
+   7.26×10
+   <sup>28</sup>
+   7.23×10
+   <sup>46</sup>
+   1.34×10
+   <sup>63</sup>
+   1.56×10
+   <sup>86</sup>
+   9.91×10
+   <sup>212</sup>
+   1.46×10
+   <sup>150</sup>
+   1 1 1 1 1 1 1 1
+   <span title="11979 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec2</var>
+   )  =
+   <b>cosh</b>
+   (
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   3.16 10.91 113.18 43863 6.89 4.57×10
+   <sup>18</sup>
+   7.26×10
+   <sup>28</sup>
+   7.23×10
+   <sup>46</sup>
+   1.34×10
+   <sup>63</sup>
+   1.56×10
+   <sup>86</sup>
+   9.91×10
+   <sup>212</sup>
+   1.46×10
+   <sup>150</sup>
+   1 1 1 1 1 1 1 1
+   <span title="11979 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>tanh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.949 0.996 1 1 0.989 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0
+   <span title="11979 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec2</var>
+   )  =
+   <b>tanh</b>
+   (
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.949 0.996 1 1 0.989 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0
+   <span title="11979 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>coth</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.05 1 1 1 1.01 1 1 1 1 1 1 1
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="11979 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec2</var>
+   )  =
+   <b>coth</b>
+   (
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.05 1 1 1 1.01 1 1 1 1 1 1 1
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="11979 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>sech</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.316 0.0917 0.00884 2.28×10
+   <sup>-5</sup>
+   0.145 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+   <span title="11979 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec2</var>
+   )  =
+   <b>sech</b>
+   (
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.316 0.0917 0.00884 2.28×10
+   <sup>-5</sup>
+   0.145 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+   <span title="11979 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>csch</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.334 0.0921 0.00884 2.28×10
+   <sup>-5</sup>
+   0.147 0 0 0 0 0 0 0
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="11979 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec2</var>
+   )  =
+   <b>csch</b>
+   (
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.334 0.0921 0.00884 2.28×10
+   <sup>-5</sup>
+   0.147 0 0 0 0 0 0 0
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="11979 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Inverse trigonometric functions</h2>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   =
+   <b class="b0">[</b>
+   -1.82 3.08 2.75 11.38 27.42 43.66 67.15 108.59 146.05 199.16 491.14 346.46 438.31 540.99 675.62 818.75 978.06 1167.79 1370.99 1597.23
+   <span title="499979 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>asin</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span title="499979 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec3</var>
+   )  =
+   <b>asin</b>
+   (
+   <var>vec3</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span title="499979 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>acos</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span title="499979 elements skipped.">...</span>
+   1.57
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec3</var>
+   )  =
+   <b>acos</b>
+   (
+   <var>vec3</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span title="499979 elements skipped.">...</span>
+   1.57
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>atan</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.07 1.26 1.22 1.48 1.53 1.55 1.56 1.56 1.56 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57
+   <span title="499979 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec3</var>
+   )  =
+   <b>atan</b>
+   (
+   <var>vec3</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.07 1.26 1.22 1.48 1.53 1.55 1.56 1.56 1.56 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57
+   <span title="499979 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>acot</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.503 0.314 0.349 0.0876 0.0364 0.0229 0.0149 0.00921 0.00685 0.00502 0.00204 0.00289 0.00228 0.00185 0.00148 0.00122 0.00102 0.000856 0.000729 0.000626
+   <span title="499979 elements skipped.">...</span>
+   1.57
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec3</var>
+   )  =
+   <b>acot</b>
+   (
+   <var>vec3</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.503 0.314 0.349 0.0876 0.0364 0.0229 0.0149 0.00921 0.00685 0.00502 0.00204 0.00289 0.00228 0.00185 0.00148 0.00122 0.00102 0.000856 0.000729 0.000626
+   <span title="499979 elements skipped.">...</span>
+   1.57
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>asec</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   2.15 1.24 1.2 1.48 1.53 1.55 1.56 1.56 1.56 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57
+   <span title="499979 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec3</var>
+   )  =
+   <b>asec</b>
+   (
+   <var>vec3</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   2.15 1.24 1.2 1.48 1.53 1.55 1.56 1.56 1.56 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57 1.57
+   <span title="499979 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>acsc</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.583 0.331 0.372 0.088 0.0365 0.0229 0.0149 0.00921 0.00685 0.00502 0.00204 0.00289 0.00228 0.00185 0.00148 0.00122 0.00102 0.000856 0.000729 0.000626
+   <span title="499979 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec3</var>
+   )  =
+   <b>acsc</b>
+   (
+   <var>vec3</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.583 0.331 0.372 0.088 0.0365 0.0229 0.0149 0.00921 0.00685 0.00502 0.00204 0.00289 0.00228 0.00185 0.00148 0.00122 0.00102 0.000856 0.000729 0.000626
+   <span title="499979 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>atan2</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -2.46 1.01 0.975 0.957 0.507 1.31 1.37 1.38 1.39 1.39 1.49 1.43 0 0 0 0 0 0 0 0
+   <span title="11979 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   ;
+   <var>vec2</var>
+   )  =
+   <b>atan2</b>
+   (
+   <var>vec1</var>
+   ;
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -2.46 1.01 0.975 0.957 0.507 1.31 1.37 1.38 1.39 1.39 1.49 1.43 0 0 0 0 0 0 0 0
+   <span title="11979 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Inverse hyperbolic functions</h2>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   =
+   <b class="b0">[</b>
+   0.396 0.0941 -1.32 -8.32 -28.98 -90.23 -259.7 -727.36 2.09 0 0 0 0 0 0 0 0 0 0 0
+   <span title="12479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>asinh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.386 0.094 -1.09 -2.82 -4.06 -5.2 -6.25 -7.28 1.49 0 0 0 0 0 0 0 0 0 0 0
+   <span title="12479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec4</var>
+   )  =
+   <b>asinh</b>
+   (
+   <var>vec4</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.386 0.094 -1.09 -2.82 -4.06 -5.2 -6.25 -7.28 1.49 0 0 0 0 0 0 0 0 0 0 0
+   <span title="12479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>acosh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   1.37
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span title="12479 elements skipped.">...</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec4</var>
+   )  =
+   <b>acosh</b>
+   (
+   <var>vec4</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   1.37
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span title="12479 elements skipped.">...</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>atanh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.419 0.0944
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   0 0 0 0 0 0 0 0 0 0 0
+   <span title="12479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec4</var>
+   )  =
+   <b>atanh</b>
+   (
+   <var>vec4</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.419 0.0944
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   0 0 0 0 0 0 0 0 0 0 0
+   <span title="12479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>acoth</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   -0.988 -0.121 -0.0345 -0.0111 -0.00385 -0.00137 0.52
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span title="12479 elements skipped.">...</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec4</var>
+   )  =
+   <b>acoth</b>
+   (
+   <var>vec4</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   -0.988 -0.121 -0.0345 -0.0111 -0.00385 -0.00137 0.52
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span title="12479 elements skipped.">...</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>asech</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1.58 3.05
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="12479 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec4</var>
+   )  =
+   <b>asech</b>
+   (
+   <var>vec4</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1.58 3.05
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="12479 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>acsch</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1.66 3.06 -0.698 -0.12 -0.0345 -0.0111 -0.00385 -0.00137 0.461
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="12479 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec4</var>
+   )  =
+   <b>acsch</b>
+   (
+   <var>vec4</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1.66 3.06 -0.698 -0.12 -0.0345 -0.0111 -0.00385 -0.00137 0.461
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="12479 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Power and logarithmic functions</h2>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   =
+   <b class="b0">[</b>
+   -0.0726 0.898 4.28 12.45 24.95 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>ln</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   -0.108 1.45 2.52 3.22
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span title="849 elements skipped.">...</span>
+   <span class="err">-∞</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <b>ln</b>
+   (
+   <var>vec5</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   -0.108 1.45 2.52 3.22
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span title="849 elements skipped.">...</span>
+   <span class="err">-∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>log</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   -0.0469 0.632 1.1 1.4
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span title="849 elements skipped.">...</span>
+   <span class="err">-∞</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <b>log</b>
+   (
+   <var>vec5</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   -0.0469 0.632 1.1 1.4
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span title="849 elements skipped.">...</span>
+   <span class="err">-∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>log</b>
+   <sub>2</sub>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   -0.156 2.1 3.64 4.64
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span title="849 elements skipped.">...</span>
+   <span class="err">-∞</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <b>log</b>
+   <sub>2</sub>
+   (
+   <var>vec5</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   -0.156 2.1 3.64 4.64
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span class="err">-∞</span>
+   <span title="849 elements skipped.">...</span>
+   <span class="err">-∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>exp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.93 2.45 72.44 255334 68556439383 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+   <span title="849 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <b>exp</b>
+   (
+   <var>vec5</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.93 2.45 72.44 255334 68556439383 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+   <span title="849 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     vec5
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   0.947 2.07 3.53 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>vec5</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   0.947 2.07 3.53 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     vec5
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   0.947 2.07 3.53 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>vec5</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   0.947 2.07 3.53 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <sup class="nth">3</sup>
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     vec5
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   -0.417 0.965 1.62 2.32 2.92 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <sup class="nth">3</sup>
+   <span class="o0">
+    <span class="r">√</span>
+    <var>vec5</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.417 0.965 1.62 2.32 2.92 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   = 5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <sup class="nth">
+    <var>n</var>
+   </sup>
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     vec5
+    </var>
+   </span>
+   =
+   <sup class="nth">5</sup>
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     vec5
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   -0.592 0.979 1.34 1.66 1.9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   ;
+   <var>n</var>
+   )  =
+   <sup class="nth">
+    <var>n</var>
+   </sup>
+   <span class="o0">
+    <span class="r">√</span>
+    <var>vec5</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   ;
+   <var>n</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   ; 5 )  =
+   <b class="b0">[</b>
+   -0.592 0.979 1.34 1.66 1.9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Rounding functions</h2>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   =
+   <b class="b0">[</b>
+   -0.0726 0.799 4.28 12.45 24.95 43.57 68.08 101.54 144.29 199.29 265.72 2.51 438.83 547.97 0 0 0 0 0 0
+   <span title="12849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>round</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 1 4 12 25 44 68 102 144 199 266 3 439 548 0 0 0 0 0 0
+   <span title="12849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec6</var>
+   )  =
+   <b>round</b>
+   (
+   <var>vec6</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 1 4 12 25 44 68 102 144 199 266 3 439 548 0 0 0 0 0 0
+   <span title="12849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>floor</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1 0 4 12 24 43 68 101 144 199 265 2 438 547 0 0 0 0 0 0
+   <span title="12849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec6</var>
+   )  =
+   <b>floor</b>
+   (
+   <var>vec6</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1 0 4 12 24 43 68 101 144 199 265 2 438 547 0 0 0 0 0 0
+   <span title="12849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>ceiling</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 1 5 13 25 44 69 102 145 200 266 3 439 548 0 0 0 0 0 0
+   <span title="12849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec6</var>
+   )  =
+   <b>ceiling</b>
+   (
+   <var>vec6</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 1 5 13 25 44 69 102 145 200 266 3 439 548 0 0 0 0 0 0
+   <span title="12849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>trunc</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 0 4 12 24 43 68 101 144 199 265 2 438 547 0 0 0 0 0 0
+   <span title="12849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec6</var>
+   )  =
+   <b>trunc</b>
+   (
+   <var>vec6</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 0 4 12 24 43 68 101 144 199 265 2 438 547 0 0 0 0 0 0
+   <span title="12849 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Integer functions</h2>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec
+   </var>
+   <sub>int</sub>
+   =
+   <b class="b0">[</b>
+   13 16 21 28 37 48 61 76 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="1250090 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mod</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   ;
+   <var>n</var>
+   )  =
+   <b>mod</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   ; 3 )  =
+   <b class="b0">[</b>
+   -0.722 -0.683 0.748 1.19 0.908 0.668 2.11 2.19 0.0515 0.521 0.404 0.716 2.22 2.22 2.6 2.95 0 0 0 0
+   <span title="111090 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec7</var>
+   ;
+   <var>n</var>
+   )  =
+   <b>mod</b>
+   (
+   <var>vec7</var>
+   ;
+   <var>n</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   ;
+   <var>n</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   ; 3 )  =
+   <b class="b0">[</b>
+   -0.722 -0.683 0.748 1.19 0.908 0.668 2.11 2.19 0.0515 0.521 0.404 0.716 2.22 2.22 2.6 2.95 0 0 0 0
+   <span title="111090 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>gcd</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec
+   </var>
+   <sub>int</sub>
+   ;
+   <var>n</var>
+   )  =
+   <b>gcd</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec
+   </var>
+   <sub>int</sub>
+   ; 3 )  = 1
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec</var>
+   <sub>int</sub>
+   ;
+   <var>n</var>
+   )  =
+   <b>gcd</b>
+   (
+   <var>vec</var>
+   <sub>int</sub>
+   ;
+   <var>n</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec
+   </var>
+   <sub>int</sub>
+   ;
+   <var>n</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec
+   </var>
+   <sub>int</sub>
+   ; 3 )  = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>lcm</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec
+   </var>
+   <sub>int</sub>
+   )  = 187312944
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec</var>
+   <sub>int</sub>
+   )  =
+   <b>lcm</b>
+   (
+   <var>vec</var>
+   <sub>int</sub>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec
+   </var>
+   <sub>int</sub>
+   )  = 187312944
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Other functions</h2>
+ <p>
+  <span class="eq">
+   <b>sign</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1 -1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0
+   <span title="111090 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec7</var>
+   )  =
+   <b>sign</b>
+   (
+   <var>vec7</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1 -1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0
+   <span title="111090 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>random(vec7),f(vec7) = random(vec7) commented out to procude stable CI builds</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1 -1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0
+   <span title="111090 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+</div>

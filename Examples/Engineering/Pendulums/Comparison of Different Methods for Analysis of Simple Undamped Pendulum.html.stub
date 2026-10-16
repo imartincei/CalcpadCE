@@ -1,0 +1,3263 @@
+<div class="calcpad-output">
+ <!-- Side-by-side study of the simple undamped pendulum solved four ways: the small-angle analytical solution, the elliptic-integral exact period, an RK4 numerical integration and a CalcpadCE `$Find` shooting solver.
+<p>Errors and orbits are plotted together. -->
+ <table>
+  <tr>
+   <td>
+    <h4>Input parameters</h4>
+    <p>
+     Gravitational acceleration (m/s²) -
+     <span class="eq">
+      <var>g</var>
+      = 9.81
+      <span class="dvc">
+       <i>m</i>
+       <span class="dvl">
+       </span>
+       <i>s</i>
+       <sup class="unit">2</sup>
+      </span>
+     </span>
+    </p>
+    <p>
+     Pendulum length -
+     <span class="eq">
+      <var>l</var>
+      = 1
+      <i>m</i>
+     </span>
+    </p>
+    <p>
+     Pendulum mass -
+     <span class="eq">
+      <var>m</var>
+      = 1
+      <i>kg</i>
+     </span>
+    </p>
+    <p>
+     Initial angle -
+     <span class="eq">
+      <var>θ</var>
+      <sub>0</sub>
+      = -60° = -1.05
+      <i>rad</i>
+     </span>
+    </p>
+    <p>
+     Maximum simulation time -
+     <span class="eq">
+      <var>t</var>
+      <sub>max</sub>
+      = 10
+      <i>s</i>
+     </span>
+    </p>
+    <h4>Analytical solution for small rotations</h4>
+    <p class="eq">
+     <var>θ</var>
+     ≪ 1 or
+     <b>sin</b>
+     (
+     <var>θ</var>
+     ) ≈
+     <var>θ</var>
+    </p>
+   </td>
+   <td>
+    <svg style="font-family: DejaVu Serif Condensed; font-size:12px; width:150pt; height:140pt;" version="1.1" viewbox="-110 -20 170 140" xmlns="http://www.w3.org/2000/svg">
+     <defs>
+      <radialgradient cx="35%" cy="35%" id="ball">
+       <stop offset="0%" stop-color="lightcyan">
+       </stop>
+       <stop offset="100%" stop-color="lightblue">
+       </stop>
+      </radialgradient>
+      <pattern height="8" id="concrete" patternunits="userSpaceOnUse" width="8" x="4" y="4">
+       <rect fill="#eae9e8" height="8" width="8" x="0" y="0">
+       </rect>
+       <circle cx="1" cy="1" fill="#ccb" r="1.2">
+       </circle>
+       <circle cx="5" cy="2" fill="#dadad0" r="1.6">
+       </circle>
+       <circle cx="4" cy="6" fill="#aa9" r="0.8">
+       </circle>
+       <circle cx="3" cy="4" fill="#884" r="0.4">
+       </circle>
+       <circle cx="7" cy="5" fill="#cacaba" r="1.2">
+       </circle>
+       <circle cx="5" cy="3" fill="#fffded" r="0.9">
+       </circle>
+      </pattern>
+     </defs>
+     <polygon points="0,0 -16,-16 16,-16" style="stroke:black; stroke-width:1; fill:#eee">
+     </polygon>
+     <line style="stroke:goldenrod; stroke-width:1; fill:none" x1="0" x2="0" y1="0" y2="100">
+     </line>
+     <path d="M 0 20 A 20 20 0 0 1 -17.32 10" style="stroke:goldenrod; stroke-width:1; fill:none">
+     </path>
+     <text text-anchor="middle" x="19.2" y="25">-60°</text>
+     <line style="stroke:steelblue; stroke-width:2; fill:none" x1="0" x2="-86.6" y1="0" y2="50">
+     </line>
+     <text text-anchor="middle" transform="rotate(-390,-45.3,21.54)" x="-45.3" y="21.54">1m</text>
+     <circle cx="0" cy="0" r="5" style="stroke:black; stroke-width:1; fill:#eee">
+     </circle>
+     <circle cx="0" cy="0" r="1.25" style="stroke:black; stroke-width:1; fill:#eee">
+     </circle>
+     <circle cx="-86.6" cy="50" r="10" style="stroke:steelblue; stroke-width:0.5;  fill:url(#ball)">
+     </circle>
+     <polygon points="-86.6,60 -86.6,92 -90.6,81.33 -82.6,81.33 -86.6,92" style="stroke:steelblue; stroke-width:1; fill:steelblue;">
+     </polygon>
+     <text text-anchor="middle" x="-74.6" y="76">g</text>
+    </svg>
+   </td>
+  </tr>
+ </table>
+ <p>
+  Differential equation -
+  <span class="eq">
+   <var>θ″</var>
+   +
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <var>θ</var>
+   = 0
+  </span>
+ </p>
+ <p>
+  Angular frequency -
+  <span class="eq">
+   <var>ω</var>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>g</var>
+     <span class="dvl">
+     </span>
+     <var>l</var>
+    </span>
+   </span>
+   ·
+   <i>rad</i>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     9.81
+     <i>m</i>
+     <i class="unit">∕</i>
+     <i>s</i>
+     <sup class="unit">2</sup>
+     <span class="dvl">
+     </span>
+     1
+     <i>m</i>
+    </span>
+   </span>
+   ·
+   <i>rad</i>
+   = 3.13
+   <i>rad</i>
+   <i class="unit">∕</i>
+   <i>s</i>
+  </span>
+ </p>
+ <p>
+  Cyclic frequency -
+  <span class="eq">
+   <var>f</var>
+   =
+   <span class="dvc">
+    <var>ω</var>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>π</var>
+    ·
+    <i>rad</i>
+   </span>
+   =
+   <span class="dvc">
+    3.13
+    <i>rad</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    <span class="dvl">
+    </span>
+    2 · 3.14 ·
+    <i>rad</i>
+   </span>
+   = 0.498
+   <i>Hz</i>
+  </span>
+ </p>
+ <p>
+  Period -
+  <span class="eq">
+   <var>T</var>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>f</var>
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    0.498
+    <i>Hz</i>
+   </span>
+   = 2.01
+   <i>s</i>
+  </span>
+ </p>
+ <p>
+  Equation of motion -
+  <span class="eq">
+   <var>θ</var>
+   (
+   <var>t</var>
+   )  =
+   <var>θ</var>
+   <sub>0</sub>
+   ·
+   <b>cos</b>
+   (
+   <var>ω</var>
+   ·
+   <var>t</var>
+   )
+  </span>
+ </p>
+ <h4>Analytical solution for large rotations (exact)</h4>
+ <p>
+  Differential equation -
+  <span class="eq">
+   <var>θ″</var>
+   +
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <b>sin</b>
+   (
+   <var>θ</var>
+   )  = 0
+  </span>
+ </p>
+ <p>Incomplete elliptic integral of the first kind</p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   (
+   <var>φ</var>
+   ;
+   <var>k</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>φ</var>
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>0</small>
+   </span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <span class="o0">
+     <span class="r">√</span>
+     1 −
+     <var>k</var>
+     <sup>2</sup>
+     ·
+     <b>sin</b>
+     (
+     <var>θ</var>
+     )
+     <sup>2</sup>
+    </span>
+   </span>
+   d
+   <var>θ</var>
+  </span>
+ </p>
+ <p>Jacobi elliptic functions</p>
+ <p>
+  Modulus -
+  <span class="eq">
+   <var>k</var>
+   =
+   <b>sin</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>θ</var>
+    <sub>0</sub>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   <span class="b1">)</span>
+   =
+   <b>sin</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    -1.05
+    <i>rad</i>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   <span class="b1">)</span>
+   = -0.5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>am</var>
+   (
+   <var>u</var>
+   ;
+   <var>k</var>
+   )  =
+   <span class="cond">$Root</span>
+   {
+   <var>F</var>
+   (
+   <var>φ</var>
+   ;
+   <var>k</var>
+   )  =
+   <var>u</var>
+   ;
+   <var>φ</var>
+   ∈ [0; 10 ·
+   <var>π</var>
+   ]}
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>sn</var>
+   (
+   <var>u</var>
+   ;
+   <var>k</var>
+   )  =
+   <b>sin</b>
+   (
+   <var>am</var>
+   (
+   <var>u</var>
+   ;
+   <var>k</var>
+   )  )
+  </span>
+  ,
+  <span class="eq">
+   <var>cn</var>
+   (
+   <var>u</var>
+   ;
+   <var>k</var>
+   )  =
+   <b>cos</b>
+   (
+   <var>am</var>
+   (
+   <var>u</var>
+   ;
+   <var>k</var>
+   )  )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>dn</var>
+   (
+   <var>u</var>
+   ;
+   <var>k</var>
+   )  =
+   <span class="o0">
+    <span class="r">√</span>
+    1 −
+    <var>k</var>
+    ·
+    <var>sn</var>
+    (
+    <var>u</var>
+    ;
+    <var>k</var>
+    )
+    <sup>2</sup>
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <var>cd</var>
+   (
+   <var>u</var>
+   ;
+   <var>k</var>
+   )  =
+   <span class="dvc">
+    <var>cn</var>
+    (
+    <var>u</var>
+    ;
+    <var>k</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>dn</var>
+    (
+    <var>u</var>
+    ;
+    <var>k</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>
+  Period -
+  <span class="eq">
+   <var>T</var>
+   <sub>e</sub>
+   = 4 ·
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>l</var>
+     <span class="dvl">
+     </span>
+     <var>g</var>
+    </span>
+   </span>
+   ·
+   <var>F</var>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ;
+   <var>k</var>
+   <span class="b1">)</span>
+   = 4 ·
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     1
+     <i>m</i>
+     <span class="dvl">
+     </span>
+     9.81
+     <i>m</i>
+     <i class="unit">∕</i>
+     <i>s</i>
+     <sup class="unit">2</sup>
+    </span>
+   </span>
+   ·
+   <var>F</var>
+   <span class="b1">(</span>
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ; -0.5
+   <span class="b1">)</span>
+   = 2.15
+   <i>s</i>
+  </span>
+ </p>
+ <p>
+  Error -
+  <span class="eq">
+   <var>δ</var>
+   <sub>T</sub>
+   =
+   <span class="dvc">
+    <b class="b0">|</b>
+    <var>T</var>
+    −
+    <var>T</var>
+    <sub>e</sub>
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <var>T</var>
+    <sub>e</sub>
+   </span>
+   =
+   <span class="dvc">
+    <b class="b0">|</b>
+    2.01
+    <i>s</i>
+    − 2.15
+    <i>s</i>
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    2.15
+    <i>s</i>
+   </span>
+   = 6.82
+   <i>%</i>
+  </span>
+ </p>
+ <p>
+  Cyclic frequency -
+  <span class="eq">
+   <var>f</var>
+   <sub>e</sub>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>T</var>
+    <sub>e</sub>
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2.15
+    <i>s</i>
+   </span>
+   = 0.464
+   <i>Hz</i>
+  </span>
+ </p>
+ <p>
+  Angular frequency -
+  <span class="eq">
+   <var>ω</var>
+   <sub>e</sub>
+   = 2 ·
+   <var>π</var>
+   ·
+   <i>rad</i>
+   ·
+   <var>f</var>
+   <sub>e</sub>
+   = 2 · 3.14 ·
+   <i>rad</i>
+   · 0.464
+   <i>Hz</i>
+   = 2.92
+   <i>rad</i>
+   <i class="unit">∕</i>
+   <i>s</i>
+  </span>
+ </p>
+ <p>
+  Equation of motion -
+  <span class="eq">
+   <var>θ</var>
+   <sub>e</sub>
+   (
+   <var>t</var>
+   )  = 2 ·
+   <b>asin</b>
+   <span class="b1">(</span>
+   <var>k</var>
+   ·
+   <var>cd</var>
+   <span class="b1">(</span>
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>g</var>
+     <span class="dvl">
+     </span>
+     <var>l</var>
+    </span>
+   </span>
+   ·
+   <var>t</var>
+   ;
+   <var>k</var>
+   <span class="b1">)</span>
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <p>
+  Energy -
+  <span class="eq">
+   <var>E</var>
+   <sub>0</sub>
+   =
+   <var>m</var>
+   ·
+   <var>l</var>
+   ·
+   <var>g</var>
+   ·  ( 1 −
+   <b>cos</b>
+   (
+   <var>θ</var>
+   <sub>0</sub>
+   )  )  = 1
+   <i>kg</i>
+   · 1
+   <i>m</i>
+   · 9.81
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>s</i>
+   <sup class="unit">2</sup>
+   ·  ( 1 −
+   <b>cos</b>
+   ( -1.05
+   <i>rad</i>
+   )  )  = 4.9
+   <i>J</i>
+  </span>
+ </p>
+ <p>
+  Relative error
+  <span class="eq">
+   <var>δ</var>
+   <sub>T</sub>
+  </span>
+  [%] of small displacements period versus initial angle
+  <span class="eq">
+   <var>θ</var>
+   <sub>0</sub>
+  </span>
+  [°] plot
+ </p>
+ <svg class="plot" data-plot="svg" height="840px" style="width:272.22pt; height:155.56pt;" version="1.1" viewbox=" 0 0 1470 840" width="1470px" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+   .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+  </style>
+  <g class="plot">
+   <rect class="Frame" height="600" width="1200" x="180" y="120">
+   </rect>
+   <line class="Grid" x1="180" x2="1380" y1="720" y2="720">
+   </line>
+   <text class="sm end" x="161" y="738">0</text>
+   <line class="Grid" x1="180" x2="1380" y1="641.46" y2="641.46">
+   </line>
+   <text class="sm end" x="161" y="659.46">2</text>
+   <line class="Grid" x1="180" x2="1380" y1="562.92" y2="562.92">
+   </line>
+   <text class="sm end" x="161" y="580.92">4</text>
+   <line class="Grid" x1="180" x2="1380" y1="484.38" y2="484.38">
+   </line>
+   <text class="sm end" x="161" y="502.38">6</text>
+   <line class="Grid" x1="180" x2="1380" y1="405.84" y2="405.84">
+   </line>
+   <text class="sm end" x="161" y="423.84">8</text>
+   <line class="Grid" x1="180" x2="1380" y1="327.29" y2="327.29">
+   </line>
+   <text class="sm end" x="161" y="345.29">10</text>
+   <line class="Grid" x1="180" x2="1380" y1="248.75" y2="248.75">
+   </line>
+   <text class="sm end" x="161" y="266.75">12</text>
+   <line class="Grid" x1="180" x2="1380" y1="170.21" y2="170.21">
+   </line>
+   <text class="sm end" x="161" y="188.21">14</text>
+   <text class="sm mid" x="180" y="772">0</text>
+   <line class="Grid" x1="313.35" x2="313.35" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="313.35" y="772">10</text>
+   <line class="Grid" x1="446.7" x2="446.7" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="446.7" y="772">20</text>
+   <line class="Grid" x1="580.04" x2="580.04" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="580.04" y="772">30</text>
+   <line class="Grid" x1="713.39" x2="713.39" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="713.39" y="772">40</text>
+   <line class="Grid" x1="846.74" x2="846.74" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="846.74" y="772">50</text>
+   <line class="Grid" x1="980.09" x2="980.09" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="980.09" y="772">60</text>
+   <line class="Grid" x1="1113.44" x2="1113.44" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="1113.44" y="772">70</text>
+   <line class="Grid" x1="1246.79" x2="1246.79" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="1246.79" y="772">80</text>
+   <line class="Grid" x1="1380.13" x2="1380.13" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="1380.13" y="772">90</text>
+   <line class="Axis" x1="180" x2="1380" y1="720" y2="720">
+   </line>
+   <text x="1402" y="702">x</text>
+   <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+   </line>
+   <text class="mid" x="180" y="84">y</text>
+   <text x="8" y="823">[0.01; 0]</text>
+   <text class="end" x="1462" y="44">[90; 15.28]</text>
+   <polyline class="Series1" points="180.13,719.77 218.84,719.38 257.55,717.48 296.26,714.33 334.97,709.91 373.68,704.24 412.39,697.31 451.1,689.12 489.81,679.68 528.52,668.99 567.23,657.04 605.94,643.84 644.65,629.4 683.36,613.7 722.07,596.76 760.78,578.58 799.49,559.16 838.2,538.5 876.91,516.6 915.62,493.47 954.33,469.11 993.04,443.51 1031.75,416.69 1070.46,388.64 1109.17,359.36 1147.88,328.85 1186.58,297.12 1225.29,264.16 1264,229.97 1302.71,194.55 1341.42,157.89 1380.13,120">
+   </polyline>
+   <polygon class="Fill1" points="180.13,720 180.13,719.77 218.84,719.38 257.55,717.48 296.26,714.33 334.97,709.91 373.68,704.24 412.39,697.31 451.1,689.12 489.81,679.68 528.52,668.99 567.23,657.04 605.94,643.84 644.65,629.4 683.36,613.7 722.07,596.76 760.78,578.58 799.49,559.16 838.2,538.5 876.91,516.6 915.62,493.47 954.33,469.11 993.04,443.51 1031.75,416.69 1070.46,388.64 1109.17,359.36 1147.88,328.85 1186.58,297.12 1225.29,264.16 1264,229.97 1302.71,194.55 1341.42,157.89 1380.13,120 1380.13,720" stroke-width="0">
+   </polygon>
+  </g>
+ </svg>
+ <h4>Solution by forward Euler method (explicit)</h4>
+ <p>For that purpose, the II order equation is reduced to thefollowing system of I order equations</p>
+ <p>
+  <span class="eq">
+   <var>θ′</var>
+   =
+   <var>ω</var>
+  </span>
+  and
+  <span class="eq">
+   <var>ω′</var>
+   =
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <b>sin</b>
+   ( -
+   <var>θ</var>
+   )
+  </span>
+ </p>
+ <p>The solution will be performed iteratively</p>
+ <p>
+  Step size -
+  <span class="eq">
+   <var>h</var>
+   = 0.05
+   <i>s</i>
+  </span>
+ </p>
+ <p>
+  Number of steps -
+  <span class="eq">
+   <var>n</var>
+   =
+   <span class="dvc">
+    <var>t</var>
+    <sub>max</sub>
+    <span class="dvl">
+    </span>
+    <var>h</var>
+   </span>
+   =
+   <span class="dvc">
+    10
+    <i>s</i>
+    <span class="dvl">
+    </span>
+    0.05
+    <i>s</i>
+   </span>
+   = 200
+  </span>
+ </p>
+ <p>
+  For each time step
+  <span class="eq">
+   <var>n</var>
+   = 200
+  </span>
+  the values for the next step will be obtained by using the following equstions
+ </p>
+ <p class="eq" style="border-left:solid 1pt black; margin-left:24pt; padding-left:3pt;">
+  <var>θ</var>
+  <sub>n+1</sub>
+  =
+  <var>θ</var>
+  <sub>n</sub>
+  +
+  <var>h</var>
+  ·
+  <var>ω</var>
+  <sub>n</sub>
+  <br/>
+  <var>ω</var>
+  <sub>n+1</sub>
+  =
+  <var>ω</var>
+  <sub>n</sub>
+  +
+  <span class="eq">
+   <var>h</var>
+   ·
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+  </span>
+  ·
+  <b>sin</b>
+  <var>θ</var>
+  <sub>n</sub>
+ </p>
+ <p>Allocate vectors</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>fwE</sub>
+   =
+   <b>vector</b>
+   (
+   <var>n</var>
+   )  =
+   <b>vector</b>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  <br/>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>fwE</sub>
+   =
+   <b>vector</b>
+   (
+   <var>n</var>
+   )  =
+   <b>vector</b>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  <br/>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    E
+   </var>
+   <sub>fwE</sub>
+   =
+   <b>vector</b>
+   (
+   <var>n</var>
+   )  =
+   <b>vector</b>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Set initial conditions</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>fwE.1</sub>
+   =
+   <span class="dvc">
+    <var>θ</var>
+    <sub>0</sub>
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
+   =
+   <span class="dvc">
+    -1.05
+    <i>rad</i>
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
+   = -1.05
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>fwE.1</sub>
+   =
+   <span class="dvc">
+    0
+    <span class="dvl">
+    </span>
+    <i>s</i>
+   </span>
+   = 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>Perform Euler steps</p>
+ <p>
+  Rotation -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>fwE.2</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>fwE.1</sub>
+   +
+   <var>h</var>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>fwE.1</sub>
+   = -1.05 + 0.05
+   <i>s</i>
+   · 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   = -1.05
+  </span>
+ </p>
+ <p>
+  Angular velocity -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>fwE.2</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>fwE.1</sub>
+   +
+   <var>h</var>
+   ·
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <b>sin</b>
+   ( -
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>fwE.1</sub>
+   )  = 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   + 0.05
+   <i>s</i>
+   ·
+   <span class="dvc">
+    9.81
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    1
+    <i>m</i>
+   </span>
+   ·
+   <b>sin</b>
+   ( - ( -1.05 )  )  = 0.425
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  Energy -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    E
+   </var>
+   <sub>fwE.1</sub>
+   =
+   <var>m</var>
+   ·
+   <var>l</var>
+   <sup>2</sup>
+   ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>fwE.1</sub>
+   <sup>2</sup>
+   +
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·  ( 1 −
+   <b>cos</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>fwE.1</sub>
+   )  )
+   <span class="b1">)</span>
+   = 1
+   <i>kg</i>
+   · 1
+   <i>m</i>
+   <sup>2</sup>
+   ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   · 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   <sup>2</sup>
+   +
+   <span class="dvc">
+    9.81
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    1
+    <i>m</i>
+   </span>
+   ·  ( 1 −
+   <b>cos</b>
+   ( -1.05 )  )
+   <span class="b1">)</span>
+   = 4.9
+   <i>J</i>
+  </span>
+ </p>
+ <p>. . .</p>
+ <h4>Solution by backward Euler method (implicit)</h4>
+ <p>The following iterative procedure is applied:</p>
+ <p class="eq" style="border-left:solid 1pt black; margin-left:24pt; padding-left:3pt;">
+  <var>θ</var>
+  <sub>n+1</sub>
+  =
+  <var>θ</var>
+  <sub>n</sub>
+  +
+  <var>h</var>
+  ·
+  <var>ω</var>
+  <sub>n+1</sub>
+  <br/>
+  <var>ω</var>
+  <sub>n+1</sub>
+  =
+  <var>ω</var>
+  <sub>n</sub>
+  +
+  <span class="eq">
+   <var>h</var>
+   ·
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+  </span>
+  ·
+  <b>sin</b>
+  <var>θ</var>
+  <sub>n+1</sub>
+ </p>
+ <p>Allocate vectors</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>bwE</sub>
+   =
+   <b>vector</b>
+   (
+   <var>n</var>
+   )  =
+   <b>vector</b>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  <br/>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>bwE</sub>
+   =
+   <b>vector</b>
+   (
+   <var>n</var>
+   )  =
+   <b>vector</b>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  <br/>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    E
+   </var>
+   <sub>bwE</sub>
+   =
+   <b>vector</b>
+   (
+   <var>n</var>
+   )  =
+   <b>vector</b>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Set initial conditions</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>bwE.1</sub>
+   =
+   <span class="dvc">
+    <var>θ</var>
+    <sub>0</sub>
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
+   =
+   <span class="dvc">
+    -1.05
+    <i>rad</i>
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
+   = -1.05
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>bwE.1</sub>
+   =
+   <span class="dvc">
+    0
+    <span class="dvl">
+    </span>
+    <i>s</i>
+   </span>
+   = 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>Perform Euler steps</p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>θ</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>
+    bwE.
+    <var>i</var>
+   </sub>
+   +
+   <var>h</var>
+   ·
+   <span class="b1">(</span>
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>
+    bwE.
+    <var>i</var>
+   </sub>
+   +
+   <var>h</var>
+   ·
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <b>sin</b>
+   ( -
+   <var>θ</var>
+   )
+   <span class="b1">)</span>
+   −
+   <var>θ</var>
+  </span>
+ </p>
+ <p>
+  Rotation -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>bwE.2</sub>
+   =
+   <span class="cond">$Root</span>
+   {
+   <var>f</var>
+   (
+   <var>θ</var>
+   )  = 0;
+   <var>θ</var>
+   ∈ [-2 ·
+   <var>π</var>
+   ; 2 ·
+   <var>π</var>
+   ]} = -1.03
+  </span>
+ </p>
+ <p>
+  Angular velocity -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>bwE.2</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>bwE.1</sub>
+   +
+   <var>h</var>
+   ·
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <b>sin</b>
+   ( -
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>bwE.2</sub>
+   )  = 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   + 0.05
+   <i>s</i>
+   ·
+   <span class="dvc">
+    9.81
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    1
+    <i>m</i>
+   </span>
+   ·
+   <b>sin</b>
+   ( - ( -1.03 )  )  = 0.419
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  Energy -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    E
+   </var>
+   <sub>bwE.1</sub>
+   =
+   <var>m</var>
+   ·
+   <var>l</var>
+   <sup>2</sup>
+   ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>bwE.1</sub>
+   <sup>2</sup>
+   +
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·  ( 1 −
+   <b>cos</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>bwE.1</sub>
+   )  )
+   <span class="b1">)</span>
+   = 1
+   <i>kg</i>
+   · 1
+   <i>m</i>
+   <sup>2</sup>
+   ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   · 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   <sup>2</sup>
+   +
+   <span class="dvc">
+    9.81
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    1
+    <i>m</i>
+   </span>
+   ·  ( 1 −
+   <b>cos</b>
+   ( -1.05 )  )
+   <span class="b1">)</span>
+   = 4.9
+   <i>J</i>
+  </span>
+ </p>
+ <p>. . .</p>
+ <h4>Solution by Crank–Nicolson method (IMEX)</h4>
+ <p>The following iterative procedure is applied:</p>
+ <p class="eq" style="border-left:solid 1pt black; margin-left:24pt; padding-left:3pt;">
+  <var>θ</var>
+  <sub>n+1</sub>
+  =
+  <var>θ</var>
+  <sub>n</sub>
+  +
+  <span class="eq">
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+  </span>
+  (
+  <var>ω</var>
+  <sub>n</sub>
+  +
+  <var>ω</var>
+  <sub>n+1</sub>
+  )
+  <br/>
+  <var>ω</var>
+  <sub>n+1</sub>
+  =
+  <var>ω</var>
+  <sub>n</sub>
+  +
+  <span class="eq">
+   <span class="dvc">
+    <var>h</var>
+    ·
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>l</var>
+   </span>
+  </span>
+  (
+  <b>sin</b>
+  <var>θ</var>
+  <sub>n</sub>
+  +
+  <b>sin</b>
+  <var>θ</var>
+  <sub>n+1</sub>
+  )
+ </p>
+ <p>Allocate vectors</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>CN</sub>
+   =
+   <b>vector</b>
+   (
+   <var>n</var>
+   )  =
+   <b>vector</b>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  <br/>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>CN</sub>
+   =
+   <b>vector</b>
+   (
+   <var>n</var>
+   )  =
+   <b>vector</b>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  <br/>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    E
+   </var>
+   <sub>CN</sub>
+   =
+   <b>vector</b>
+   (
+   <var>n</var>
+   )  =
+   <b>vector</b>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Set initial conditions</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>CN.1</sub>
+   =
+   <span class="dvc">
+    <var>θ</var>
+    <sub>0</sub>
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
+   =
+   <span class="dvc">
+    -1.05
+    <i>rad</i>
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
+   = -1.05
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>CN.1</sub>
+   =
+   <span class="dvc">
+    0
+    <span class="dvl">
+    </span>
+    <i>s</i>
+   </span>
+   = 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>Perform Euler steps</p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>θ</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>
+    CN.
+    <var>i</var>
+   </sub>
+   +
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ·
+   <span class="b1">(</span>
+   2 ·
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>
+    CN.
+    <var>i</var>
+   </sub>
+   +
+   <span class="dvc">
+    <var>h</var>
+    ·
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>l</var>
+   </span>
+   ·  (
+   <b>sin</b>
+   ( -
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>
+    CN.
+    <var>i</var>
+   </sub>
+   )  +
+   <b>sin</b>
+   ( -
+   <var>θ</var>
+   )  )
+   <span class="b1">)</span>
+   −
+   <var>θ</var>
+  </span>
+ </p>
+ <p>
+  Rotation -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>CN.2</sub>
+   =
+   <span class="cond">$Root</span>
+   {
+   <var>f</var>
+   (
+   <var>θ</var>
+   )  = 0;
+   <var>θ</var>
+   ∈ [-2 ·
+   <var>π</var>
+   ; 2 ·
+   <var>π</var>
+   ]} = -1.04
+  </span>
+ </p>
+ <p>
+  Angular velocity -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>CN.2</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>CN.1</sub>
+   +
+   <span class="dvc">
+    <var>h</var>
+    ·
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>l</var>
+   </span>
+   ·  (
+   <b>sin</b>
+   ( -
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>CN.1</sub>
+   )  +
+   <b>sin</b>
+   ( -
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>CN.2</sub>
+   )  )  = 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   +
+   <span class="dvc">
+    0.05
+    <i>s</i>
+    · 9.81
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    2 · 1
+    <i>m</i>
+   </span>
+   ·  (
+   <b>sin</b>
+   ( - ( -1.05 )  )  +
+   <b>sin</b>
+   ( - ( -1.04 )  )  )  = 0.423
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  Energy -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    E
+   </var>
+   <sub>CN.1</sub>
+   =
+   <var>m</var>
+   ·
+   <var>l</var>
+   <sup>2</sup>
+   ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>CN.1</sub>
+   <sup>2</sup>
+   +
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·  ( 1 −
+   <b>cos</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>CN.1</sub>
+   )  )
+   <span class="b1">)</span>
+   = 1
+   <i>kg</i>
+   · 1
+   <i>m</i>
+   <sup>2</sup>
+   ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   · 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   <sup>2</sup>
+   +
+   <span class="dvc">
+    9.81
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    1
+    <i>m</i>
+   </span>
+   ·  ( 1 −
+   <b>cos</b>
+   ( -1.05 )  )
+   <span class="b1">)</span>
+   = 4.9
+   <i>J</i>
+  </span>
+ </p>
+ <p>. . .</p>
+ <h4>Solution by Runge-Kutta RK4 method (explicit)</h4>
+ <p>The following iterative procedure is applied:</p>
+ <table class="eq" style="margin-left:24pt;">
+  <tr>
+   <td>First step (k₁) -</td>
+   <td>
+    <span class="eq">
+     <var>k</var>
+     <sub>1,θ</sub>
+     =
+     <var>ω</var>
+     <sub>i</sub>
+    </span>
+    ,
+   </td>
+   <td>
+    <span class="eq">
+     <var>k</var>
+     <sub>1,ω</sub>
+     =
+     <span class="dvc">
+      <var>g</var>
+      <span class="dvl">
+      </span>
+      <var>l</var>
+     </span>
+     ·
+     <b>sin</b>
+     ( -
+     <var>θ</var>
+     <sub>i</sub>
+     )
+    </span>
+   </td>
+  </tr>
+  <tr>
+   <td>Second step (k₂) -</td>
+   <td>
+    <span class="eq">
+     <var>k</var>
+     <sub>2,θ</sub>
+     =
+     <var>ω</var>
+     <sub>i</sub>
+     + 0.5 ·
+     <var>h</var>
+     ·
+     <var>k</var>
+     <sub>1,ω</sub>
+    </span>
+    ,
+   </td>
+   <td>
+    <span class="eq">
+     <var>k</var>
+     <sub>2,ω</sub>
+     =
+     <span class="dvc">
+      <var>g</var>
+      <span class="dvl">
+      </span>
+      <var>l</var>
+     </span>
+     ·
+     <b>sin</b>
+     ( - (
+     <var>θ</var>
+     <sub>i</sub>
+     + 0.5 ·
+     <var>h</var>
+     ·
+     <var>k</var>
+     <sub>1,θ</sub>
+     )  )
+    </span>
+   </td>
+  </tr>
+  <tr>
+   <td>Third step (k₃) -</td>
+   <td>
+    <span class="eq">
+     <var>k</var>
+     <sub>3,θ</sub>
+     =
+     <var>ω</var>
+     <sub>i</sub>
+     + 0.5 ·
+     <var>h</var>
+     ·
+     <var>k</var>
+     <sub>2,ω</sub>
+    </span>
+    ,
+   </td>
+   <td>
+    <span class="eq">
+     <var>k</var>
+     <sub>3,ω</sub>
+     =
+     <span class="dvc">
+      <var>g</var>
+      <span class="dvl">
+      </span>
+      <var>l</var>
+     </span>
+     ·
+     <b>sin</b>
+     ( - (
+     <var>θ</var>
+     <sub>i</sub>
+     + 0.5 ·
+     <var>h</var>
+     ·
+     <var>k</var>
+     <sub>2,θ</sub>
+     )  )
+    </span>
+   </td>
+  </tr>
+  <tr>
+   <td>Fourth step (k₄) -</td>
+   <td>
+    <span class="eq">
+     <var>k</var>
+     <sub>4,θ</sub>
+     =
+     <var>ω</var>
+     <sub>i</sub>
+     +
+     <var>h</var>
+     ·
+     <var>k</var>
+     <sub>3,ω</sub>
+    </span>
+    ,
+   </td>
+   <td>
+    <span class="eq">
+     <var>k</var>
+     <sub>4,ω</sub>
+     =
+     <span class="dvc">
+      <var>g</var>
+      <span class="dvl">
+      </span>
+      <var>l</var>
+     </span>
+     ·
+     <b>sin</b>
+     ( - (
+     <var>θ</var>
+     <sub>i</sub>
+     +
+     <var>h</var>
+     ·
+     <var>k</var>
+     <sub>3,θ</sub>
+     )  )
+    </span>
+   </td>
+  </tr>
+ </table>
+ <p>Update values using weighted averages</p>
+ <p class="eq" style="border-left:solid 1pt black; margin-left:24pt; padding-left:3pt;">
+  <var>θ</var>
+  <sub>n+1</sub>
+  =
+  <span class="eq">
+   <var>θ</var>
+   <sub>i</sub>
+   +
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   ·  (
+   <var>k</var>
+   <sub>1,θ</sub>
+   + 2 ·
+   <var>k</var>
+   <sub>2,θ</sub>
+   + 2 ·
+   <var>k</var>
+   <sub>3,θ</sub>
+   +
+   <var>k</var>
+   <sub>4,θ</sub>
+   )
+  </span>
+  <br/>
+  <var>ω</var>
+  <sub>n+1</sub>
+  =
+  <span class="eq">
+   <var>ω</var>
+   <sub>i</sub>
+   +
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   ·  (
+   <var>k</var>
+   <sub>1,ω</sub>
+   + 2 ·
+   <var>k</var>
+   <sub>2,ω</sub>
+   + 2 ·
+   <var>k</var>
+   <sub>3,ω</sub>
+   +
+   <var>k</var>
+   <sub>4,ω</sub>
+   )
+  </span>
+ </p>
+ <p>Allocate vectors</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>RK4</sub>
+   =
+   <b>vector</b>
+   (
+   <var>n</var>
+   )  =
+   <b>vector</b>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  <br/>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>RK4</sub>
+   =
+   <b>vector</b>
+   (
+   <var>n</var>
+   )  =
+   <b>vector</b>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+  <br/>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    E
+   </var>
+   <sub>RK4</sub>
+   =
+   <b>vector</b>
+   (
+   <var>n</var>
+   )  =
+   <b>vector</b>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Set initial conditions</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>RK4.1</sub>
+   =
+   <span class="dvc">
+    <var>θ</var>
+    <sub>0</sub>
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
+   =
+   <span class="dvc">
+    -1.05
+    <i>rad</i>
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
+   = -1.05
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>RK4.1</sub>
+   =
+   <span class="dvc">
+    0
+    <span class="dvl">
+    </span>
+    <i>s</i>
+   </span>
+   = 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>Perform Runge-Kutta 4 steps</p>
+ <p>RK4 factors</p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>1,θ</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>RK4.1</sub>
+   = 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+  ,
+  <span class="eq">
+   <var>k</var>
+   <sub>1,ω</sub>
+   =
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <b>sin</b>
+   ( -
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>RK4.1</sub>
+   )  =
+   <span class="dvc">
+    9.81
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    1
+    <i>m</i>
+   </span>
+   ·
+   <b>sin</b>
+   ( - ( -1.05 )  )  = 8.49
+   <i>s</i>
+   <sup class="unit">-2</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>2,θ</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>RK4.1</sub>
+   + 0.5 ·
+   <var>h</var>
+   ·
+   <var>k</var>
+   <sub>1,ω</sub>
+   = 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   + 0.5 · 0.05
+   <i>s</i>
+   · 8.49
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   = 0.212
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>2,ω</sub>
+   =
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <b>sin</b>
+   ( - (
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>RK4.1</sub>
+   + 0.5 ·
+   <var>h</var>
+   ·
+   <var>k</var>
+   <sub>1,θ</sub>
+   )  )  =
+   <span class="dvc">
+    9.81
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    1
+    <i>m</i>
+   </span>
+   ·
+   <b>sin</b>
+   ( - ( -1.05 + 0.5 · 0.05
+   <i>s</i>
+   · 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   )  )  = 8.49
+   <i>s</i>
+   <sup class="unit">-2</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>3,θ</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>RK4.1</sub>
+   + 0.5 ·
+   <var>h</var>
+   ·
+   <var>k</var>
+   <sub>2,ω</sub>
+   = 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   + 0.5 · 0.05
+   <i>s</i>
+   · 8.49
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   = 0.212
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>3,ω</sub>
+   =
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <b>sin</b>
+   ( - (
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>RK4.1</sub>
+   + 0.5 ·
+   <var>h</var>
+   ·
+   <var>k</var>
+   <sub>2,θ</sub>
+   )  )  =
+   <span class="dvc">
+    9.81
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    1
+    <i>m</i>
+   </span>
+   ·
+   <b>sin</b>
+   ( - ( -1.05 + 0.5 · 0.05
+   <i>s</i>
+   · 0.212
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   )  )  = 8.47
+   <i>s</i>
+   <sup class="unit">-2</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>4,θ</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>RK4.1</sub>
+   +
+   <var>h</var>
+   ·
+   <var>k</var>
+   <sub>3,ω</sub>
+   = 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   + 0.05
+   <i>s</i>
+   · 8.47
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   = 0.423
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>4,ω</sub>
+   =
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <b>sin</b>
+   ( - (
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>RK4.1</sub>
+   +
+   <var>h</var>
+   ·
+   <var>k</var>
+   <sub>3,θ</sub>
+   )  )  =
+   <span class="dvc">
+    9.81
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    1
+    <i>m</i>
+   </span>
+   ·
+   <b>sin</b>
+   ( - ( -1.05 + 0.05
+   <i>s</i>
+   · 0.212
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   )  )  = 8.44
+   <i>s</i>
+   <sup class="unit">-2</sup>
+  </span>
+ </p>
+ <p>Update values using weighted averages</p>
+ <p>
+  Rotation -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>RK4.2</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>RK4.1</sub>
+   +
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   ·  (
+   <var>k</var>
+   <sub>1,θ</sub>
+   + 2 ·
+   <var>k</var>
+   <sub>2,θ</sub>
+   + 2 ·
+   <var>k</var>
+   <sub>3,θ</sub>
+   +
+   <var>k</var>
+   <sub>4,θ</sub>
+   )  = -1.05 +
+   <span class="dvc">
+    0.05
+    <i>s</i>
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   ·  ( 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   + 2 · 0.212
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   + 2 · 0.212
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   + 0.423
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   )  = -1.04
+  </span>
+ </p>
+ <p>
+  Angular velocity -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>RK4.2</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>RK4.1</sub>
+   +
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   ·  (
+   <var>k</var>
+   <sub>1,ω</sub>
+   + 2 ·
+   <var>k</var>
+   <sub>2,ω</sub>
+   + 2 ·
+   <var>k</var>
+   <sub>3,ω</sub>
+   +
+   <var>k</var>
+   <sub>4,ω</sub>
+   )  = 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   +
+   <span class="dvc">
+    0.05
+    <i>s</i>
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   ·  ( 8.49
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   + 2 · 8.49
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   + 2 · 8.47
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   + 8.44
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   )  = 0.424
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  Energy -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    E
+   </var>
+   <sub>RK4.1</sub>
+   =
+   <var>m</var>
+   ·
+   <var>l</var>
+   <sup>2</sup>
+   ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   <sub>RK4.1</sub>
+   <sup>2</sup>
+   +
+   <span class="dvc">
+    <var>g</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·  ( 1 −
+   <b>cos</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    θ
+   </var>
+   <sub>RK4.1</sub>
+   )  )
+   <span class="b1">)</span>
+   = 1
+   <i>kg</i>
+   · 1
+   <i>m</i>
+   <sup>2</sup>
+   ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   · 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   <sup>2</sup>
+   +
+   <span class="dvc">
+    9.81
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    1
+    <i>m</i>
+   </span>
+   ·  ( 1 −
+   <b>cos</b>
+   ( -1.05 )  )
+   <span class="b1">)</span>
+   = 4.9
+   <i>J</i>
+  </span>
+ </p>
+ <p>. . .</p>
+ <style>.Series3{stroke-dasharray: 10, 15;} .Series4{stroke-dasharray: 20, 10;} .Series5{stroke-dasharray: 10, 20, 40, 20;}</style>
+ <h4>Plot results</h4>
+ <table>
+  <tr>
+   <td>
+    <p>
+     Rotation
+     <var>θ</var>
+     [deg] versus time
+     <var>t</var>
+     [s] plot
+    </p>
+    <svg class="plot" data-plot="svg" height="840px" style="width:272.22pt; height:155.56pt;" version="1.1" viewbox=" 0 0 1470 840" width="1470px" xmlns="http://www.w3.org/2000/svg">
+     <style type="text/css">
+      .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+.Series4 {stroke:#f0d000;}
+circle.Series4 {fill:#f0d000;}
+.Fill4 {fill:#f0d000; fill-opacity:0.035;}
+.Series5 {stroke:MediumVioletRed;}
+circle.Series5 {fill:MediumVioletRed;}
+.Fill5 {fill:MediumVioletRed; fill-opacity:0.030;}
+     </style>
+     <g class="plot">
+      <rect class="Frame" height="600" width="1200" x="180" y="120">
+      </rect>
+      <line class="Grid" x1="180" x2="1380" y1="654.92" y2="654.92">
+      </line>
+      <text class="sm end" x="161" y="672.92">-100</text>
+      <line class="Grid" x1="180" x2="1380" y1="536.96" y2="536.96">
+      </line>
+      <text class="sm end" x="161" y="554.96">-50</text>
+      <line class="Grid" x1="180" x2="1380" y1="419" y2="419">
+      </line>
+      <text class="sm end" x="161" y="437">0</text>
+      <line class="Grid" x1="180" x2="1380" y1="301.04" y2="301.04">
+      </line>
+      <text class="sm end" x="161" y="319.04">50</text>
+      <line class="Grid" x1="180" x2="1380" y1="183.08" y2="183.08">
+      </line>
+      <text class="sm end" x="161" y="201.08">100</text>
+      <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="180" y="772">0</text>
+      <line class="Grid" x1="300.6" x2="300.6" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="300.6" y="772">1</text>
+      <line class="Grid" x1="421.21" x2="421.21" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="421.21" y="772">2</text>
+      <line class="Grid" x1="541.81" x2="541.81" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="541.81" y="772">3</text>
+      <line class="Grid" x1="662.41" x2="662.41" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="662.41" y="772">4</text>
+      <line class="Grid" x1="783.02" x2="783.02" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="783.02" y="772">5</text>
+      <line class="Grid" x1="903.62" x2="903.62" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="903.62" y="772">6</text>
+      <line class="Grid" x1="1024.22" x2="1024.22" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="1024.22" y="772">7</text>
+      <line class="Grid" x1="1144.82" x2="1144.82" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="1144.82" y="772">8</text>
+      <line class="Grid" x1="1265.43" x2="1265.43" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="1265.43" y="772">9</text>
+      <text class="sm mid" x="1386.03" y="772">10</text>
+      <line class="Axis" x1="180" x2="1380" y1="419" y2="419">
+      </line>
+      <text x="1402" y="401">x</text>
+      <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+      </line>
+      <text class="mid" x="180" y="84">y</text>
+      <text x="8" y="823">[0; -127.98]</text>
+      <text class="end" x="1462" y="44">[9.95; 126.34]</text>
+      <polyline class="Series1" points="180,560.55 181.21,560.48 182.42,560.27 183.63,559.93 184.84,559.44 186.05,558.81 187.26,558.05 188.47,557.15 189.68,556.11 190.89,554.94 192.1,553.63 193.31,552.19 194.52,550.62 196.94,547.09 199.35,543.05 201.77,538.53 204.19,533.53 209.03,522.2 213.87,509.25 218.71,494.87 228.39,462.77 238.06,427.93 257.42,358.78 267.1,328.81 271.94,315.85 276.77,304.52 279.19,299.52 281.61,294.99 284.03,290.95 286.45,287.41 287.66,285.84 288.87,284.4 290.08,283.09 291.29,281.91 292.5,280.87 293.71,279.97 294.92,279.2 296.13,278.57 297.34,278.08 298.55,277.73 299.76,277.52 300.97,277.45 302.18,277.51 303.39,277.72 304.6,278.07 305.81,278.55 307.02,279.18 308.23,279.94 309.44,280.84 310.65,281.87 311.85,283.04 313.06,284.35 314.27,285.78 315.48,287.35 317.9,290.88 320.32,294.91 322.74,299.43 325.16,304.42 330,315.74 334.84,328.69 344.52,358.63 354.19,392.36 373.55,462.62 383.23,494.73 388.06,509.12 392.9,522.09 397.74,533.43 400.16,538.44 402.58,542.97 405,547.02 407.42,550.56 408.63,552.13 409.84,553.58 411.05,554.89 412.26,556.07 413.47,557.11 414.68,558.02 415.89,558.79 417.1,559.42 418.31,559.91 419.52,560.26 420.73,560.48 421.94,560.55 423.15,560.49 424.35,560.28 425.56,559.94 426.77,559.46 427.98,558.84 429.19,558.08 430.4,557.18 431.61,556.15 432.82,554.98 434.03,553.68 435.24,552.24 436.45,550.68 438.87,547.15 441.29,543.13 443.71,538.61 446.13,533.62 450.97,522.31 455.81,509.37 460.65,495 470.32,462.93 489.68,392.68 499.35,358.92 509.03,328.94 513.87,315.96 518.71,304.61 521.13,299.6 523.55,295.07 525.97,291.02 528.39,287.47 529.6,285.89 530.81,284.45 532.02,283.13 533.23,281.95 534.44,280.91 535.65,280 536.85,279.23 538.06,278.59 539.27,278.1 540.48,277.74 541.69,277.52 542.9,277.45 544.11,277.51 545.32,277.71 546.53,278.05 547.74,278.53 548.95,279.15 550.16,279.91 551.37,280.8 552.58,281.83 553.79,283 555,284.3 556.21,285.73 557.42,287.3 559.84,290.81 562.26,294.83 564.68,299.35 567.1,304.33 571.94,315.63 576.77,328.57 586.45,358.49 605.81,427.61 615.48,462.47 625.16,494.6 630,509 634.84,521.98 639.68,533.34 642.1,538.35 644.52,542.9 646.94,546.95 649.35,550.5 650.56,552.08 651.77,553.53 652.98,554.85 654.19,556.03 655.4,557.08 656.61,557.99 657.82,558.76 659.03,559.4 660.24,559.9 661.45,560.25 662.66,560.47 663.87,560.55 665.08,560.49 666.29,560.29 667.5,559.96 668.71,559.48 669.92,558.86 671.13,558.11 672.34,557.22 673.55,556.19 674.76,555.02 675.97,553.73 677.18,552.3 678.39,550.73 680.81,547.22 683.23,543.2 685.65,538.7 688.06,533.72 692.9,522.42 697.74,509.49 702.58,495.14 712.26,463.08 721.94,428.25 741.29,359.07 750.97,329.06 755.81,316.07 760.65,304.71 763.06,299.69 765.48,295.14 767.9,291.08 770.32,287.53 771.53,285.95 772.74,284.5 773.95,283.18 775.16,281.99 776.37,280.94 777.58,280.03 778.79,279.25 780,278.61 781.21,278.11 782.42,277.75 783.63,277.53 784.84,277.45 786.05,277.5 787.26,277.7 788.47,278.04 789.68,278.51 790.89,279.13 792.1,279.88 793.31,280.77 794.52,281.79 795.73,282.95 796.94,284.25 798.15,285.68 799.35,287.24 801.77,290.74 804.19,294.76 806.61,299.26 809.03,304.24 813.87,315.53 818.71,328.45 828.39,358.34 838.06,392.05 857.42,462.32 867.1,494.46 871.94,508.88 876.77,521.87 881.61,533.25 884.03,538.27 886.45,542.82 888.87,546.88 891.29,550.44 892.5,552.02 893.71,553.48 894.92,554.8 896.13,555.99 897.34,557.04 898.55,557.96 899.76,558.74 900.97,559.38 902.18,559.88 903.39,560.24 904.6,560.47 905.81,560.55 907.02,560.5 908.23,560.3 909.44,559.97 910.65,559.5 911.85,558.89 913.06,558.14 914.27,557.25 915.48,556.23 916.69,555.07 917.9,553.78 919.11,552.35 920.32,550.79 922.74,547.29 925.16,543.28 927.58,538.78 930,533.81 934.84,522.53 939.68,509.62 944.52,495.27 954.19,463.23 973.55,392.99 983.23,359.21 992.9,329.19 997.74,316.18 1002.58,304.8 1005,299.78 1007.42,295.22 1009.84,291.15 1012.26,287.59 1013.47,286 1014.68,284.55 1015.89,283.22 1017.1,282.03 1018.31,280.98 1019.52,280.06 1020.73,279.28 1021.94,278.63 1023.15,278.13 1024.35,277.76 1025.56,277.53 1026.77,277.45 1027.98,277.5 1029.19,277.69 1030.4,278.02 1031.61,278.49 1032.82,279.1 1034.03,279.85 1035.24,280.73 1036.45,281.75 1037.66,282.91 1038.87,284.2 1040.08,285.62 1041.29,287.18 1043.71,290.68 1046.13,294.68 1048.55,299.18 1050.97,304.14 1055.81,315.42 1060.65,328.32 1070.32,358.2 1089.68,427.29 1099.35,462.16 1109.03,494.33 1113.87,508.75 1118.71,521.76 1123.55,533.15 1125.97,538.18 1128.39,542.74 1130.81,546.81 1133.23,550.38 1134.44,551.97 1135.65,553.43 1136.85,554.76 1138.06,555.95 1139.27,557 1140.48,557.93 1141.69,558.71 1142.9,559.36 1144.11,559.86 1145.32,560.23 1146.53,560.46 1147.74,560.55 1148.95,560.5 1150.16,560.31 1151.37,559.98 1152.58,559.52 1153.79,558.91 1155,558.17 1156.21,557.28 1157.42,556.27 1158.63,555.11 1159.84,553.82 1161.05,552.4 1162.26,550.85 1164.68,547.36 1167.1,543.36 1169.52,538.87 1171.94,533.9 1176.77,522.64 1181.61,509.74 1186.45,495.41 1196.13,463.38 1205.81,428.57 1225.16,359.36 1234.84,329.31 1239.68,316.29 1244.52,304.9 1246.94,299.86 1249.35,295.3 1251.77,291.22 1254.19,287.65 1255.4,286.06 1256.61,284.6 1257.82,283.27 1259.03,282.07 1260.24,281.01 1261.45,280.09 1262.66,279.3 1263.87,278.65 1265.08,278.14 1266.29,277.77 1267.5,277.54 1268.71,277.45 1269.92,277.5 1271.13,277.68 1272.34,278.01 1273.55,278.47 1274.76,279.08 1275.97,279.82 1277.18,280.7 1278.39,281.71 1279.6,282.87 1280.81,284.15 1282.02,285.57 1283.23,287.12 1285.65,290.61 1288.06,294.6 1290.48,299.09 1292.9,304.05 1297.74,315.31 1302.58,328.2 1312.26,358.05 1321.94,391.73 1341.29,462.01 1350.97,494.19 1355.81,508.63 1360.65,521.65 1365.48,533.06 1367.9,538.09 1370.32,542.66 1372.74,546.74 1375.16,550.32 1376.37,551.92 1377.58,553.38 1378.79,554.71 1380,555.91">
+      </polyline>
+      <polyline class="Series2" points="180,560.55 181.21,560.44 182.42,560.09 183.63,559.52 184.84,558.72 186.05,557.71 187.26,556.49 188.47,555.07 189.68,553.46 190.89,551.66 192.1,549.7 194.52,545.33 196.94,540.42 199.35,535.08 204.19,523.46 209.03,511.08 218.71,485.6 238.06,436.05 257.42,387.79 276.77,337.52 286.45,312.55 291.29,301.11 293.71,295.9 296.13,291.16 298.55,286.98 299.76,285.13 300.97,283.45 302.18,281.97 303.39,280.68 304.6,279.59 305.81,278.72 307.02,278.08 308.23,277.65 309.44,277.46 310.65,277.5 311.85,277.76 313.06,278.26 314.27,278.98 315.48,279.92 316.69,281.07 317.9,282.43 319.11,283.98 320.32,285.71 322.74,289.68 325.16,294.25 330,304.77 334.84,316.55 344.52,341.75 354.19,367.13 373.55,415.98 392.9,464.59 412.26,515.23 417.1,527.42 421.94,538.66 424.35,543.72 426.77,548.29 429.19,552.27 430.4,554 431.61,555.55 432.82,556.91 434.03,558.07 435.24,559.01 436.45,559.73 437.66,560.23 438.87,560.5 440.08,560.54 441.29,560.35 442.5,559.93 443.71,559.29 444.92,558.42 446.13,557.34 447.34,556.05 448.55,554.57 449.76,552.89 450.97,551.05 453.39,546.87 455.81,542.13 460.65,531.35 470.32,506.88 489.68,456.39 528.39,358.78 538.06,333.3 547.74,308.63 552.58,297.61 555,292.7 557.42,288.32 558.63,286.36 559.84,284.56 561.05,282.95 562.26,281.53 563.47,280.3 564.68,279.29 565.89,278.49 567.1,277.91 568.31,277.56 569.52,277.45 570.73,277.56 571.94,277.9 573.15,278.47 574.35,279.26 575.56,280.27 576.77,281.49 577.98,282.91 579.19,284.52 580.4,286.31 581.61,288.27 584.03,292.64 586.45,297.55 591.29,308.56 596.13,320.63 605.81,345.98 625.16,395.86 644.52,444.08 663.87,494.05 673.55,519.34 678.39,531.28 683.23,542.07 685.65,546.81 688.06,551 689.27,552.85 690.48,554.53 691.69,556.02 692.9,557.31 694.11,558.39 695.32,559.27 696.53,559.92 697.74,560.34 698.95,560.54 700.16,560.5 701.37,560.24 702.58,559.75 703.79,559.03 705,558.09 706.21,556.94 707.42,555.59 708.63,554.04 709.84,552.31 712.26,548.35 714.68,543.79 717.1,538.73 721.94,527.5 731.61,502.67 741.29,477.2 760.65,428.07 780,379.65 799.35,329.1 809.03,304.84 813.87,294.31 816.29,289.74 818.71,285.76 819.92,284.02 821.13,282.47 822.34,281.11 823.55,279.96 824.76,279 825.97,278.28 827.18,277.77 828.39,277.5 829.6,277.46 830.81,277.65 832.02,278.06 833.23,278.7 834.44,279.57 835.65,280.65 836.85,281.93 838.06,283.41 839.27,285.08 840.48,286.93 842.9,291.1 845.32,295.84 847.74,301.04 852.58,312.47 857.42,324.76 876.77,375.39 915.48,472.87 925.16,498.28 934.84,523.39 939.68,535.01 942.1,540.36 944.52,545.27 946.94,549.65 948.15,551.62 949.35,553.47 950.56,555.03 951.77,556.46 952.98,557.68 954.19,558.7 955.4,559.5 956.61,560.08 957.82,560.43 959.03,560.55 960.24,560.44 961.45,560.1 962.66,559.54 963.87,558.75 965.08,557.74 966.29,556.52 967.5,555.11 968.71,553.5 969.92,551.71 971.13,549.76 973.55,545.38 975.97,540.48 978.39,535.15 983.23,523.54 992.9,498.44 1012.26,448.27 1031.61,400.02 1050.97,350.37 1060.65,324.92 1065.48,312.62 1070.32,301.18 1072.74,295.96 1075.16,291.22 1077.58,287.03 1078.79,285.17 1080,283.49 1081.21,282 1082.42,280.71 1083.63,279.62 1084.84,278.74 1086.05,278.09 1087.26,277.66 1088.47,277.46 1089.68,277.49 1090.89,277.76 1092.1,278.25 1093.31,278.96 1094.52,279.9 1095.73,281.04 1096.94,282.39 1098.15,283.94 1099.35,285.67 1101.77,289.63 1104.19,294.18 1109.03,304.69 1128.39,354.42 1147.74,403.87 1167.1,452.17 1186.45,502.51 1196.13,527.35 1200.97,538.6 1203.39,543.66 1205.81,548.24 1208.23,552.22 1209.44,553.96 1210.65,555.52 1211.85,556.88 1213.06,558.04 1214.27,558.99 1215.48,559.72 1216.69,560.22 1217.9,560.5 1219.11,560.54 1220.32,560.36 1221.53,559.94 1222.74,559.3 1223.95,558.44 1225.16,557.37 1226.37,556.09 1227.58,554.61 1228.79,552.94 1230,551.09 1232.42,546.92 1234.84,542.19 1239.68,531.42 1244.52,519.5 1254.19,494.21 1263.87,468.88 1302.58,371.43 1312.26,346.14 1321.94,320.78 1326.77,308.71 1331.61,297.68 1334.03,292.76 1336.45,288.37 1337.66,286.41 1338.87,284.61 1340.08,282.99 1341.29,281.56 1342.5,280.33 1343.71,279.31 1344.92,278.51 1346.13,277.92 1347.34,277.57 1348.55,277.45 1349.76,277.55 1350.97,277.89 1352.18,278.45 1353.39,279.24 1354.6,280.25 1355.81,281.46 1357.02,282.87 1358.23,284.48 1359.44,286.26 1360.65,288.22 1363.06,292.59 1365.48,297.48 1370.32,308.49 1380,333.14">
+      </polyline>
+      <polyline class="Series3" points="180,560.55 184.84,560.55 187.26,560.55 188.47,560.55 189.68,560.55 190.89,560.55 192.1,557.68 193.31,557.68 194.52,557.68 195.73,557.68 196.94,557.68 198.15,551.94 199.35,551.94 200.56,551.94 201.77,551.94 202.98,551.94 204.19,543.37 205.4,543.37 206.61,543.37 207.82,543.37 209.03,543.37 210.24,532.04 211.45,532.04 212.66,532.04 213.87,532.04 216.29,518.07 218.71,518.07 221.13,518.07 223.55,501.64 224.76,501.64 225.97,501.64 227.18,501.64 228.39,482.99 229.6,482.99 230.81,482.99 232.02,482.99 233.23,482.99 234.44,462.44 235.65,462.44 236.85,462.44 238.06,462.44 240.48,440.38 242.9,440.38 247.74,417.28 250.16,417.28 252.58,393.65 255,393.65 257.42,393.65 259.84,370.06 262.26,370.06 267.1,347.1 269.52,347.1 271.94,325.3 273.15,325.3 274.35,325.3 275.56,325.3 276.77,305.19 277.98,305.19 279.19,305.19 280.4,305.19 281.61,305.19 282.82,287.19 284.03,287.19 285.24,287.19 286.45,287.19 288.87,271.67 291.29,271.67 292.5,271.67 293.71,271.67 294.92,258.89 296.13,258.89 297.34,258.89 298.55,258.89 299.76,258.89 300.97,249.05 302.18,249.05 303.39,249.05 304.6,249.05 305.81,249.05 307.02,242.27 308.23,242.27 309.44,242.27 310.65,242.27 311.85,242.27 313.06,238.65 314.27,238.65 315.48,238.65 316.69,238.65 317.9,238.65 319.11,238.23 320.32,238.23 321.53,238.23 322.74,238.23 323.95,238.23 325.16,241.03 326.37,241.03 327.58,241.03 328.79,241.03 330,241.03 331.21,247.06 332.42,247.06 333.63,247.06 334.84,247.06 336.05,247.06 337.26,256.29 338.47,256.29 339.68,256.29 340.89,256.29 342.1,256.29 343.31,268.69 344.52,268.69 345.73,268.69 346.94,268.69 348.15,268.69 349.35,284.18 350.56,284.18 351.77,284.18 352.98,284.18 354.19,284.18 355.4,302.65 356.61,302.65 357.82,302.65 359.03,302.65 361.45,323.9 363.87,323.9 373.55,373.56 392.9,458.91 412.26,541.89 414.68,541.89 417.1,565.98 418.31,565.98 419.52,565.98 420.73,565.98 421.94,587.45 423.15,587.45 424.35,587.45 425.56,587.45 426.77,587.45 427.98,605.99 429.19,605.99 430.4,605.99 431.61,605.99 434.03,621.39 436.45,621.39 437.66,621.39 438.87,621.39 440.08,633.53 441.29,633.53 442.5,633.53 443.71,633.53 444.92,633.53 446.13,642.37 447.34,642.37 448.55,642.37 449.76,642.37 450.97,642.37 452.18,647.9 453.39,647.9 454.6,647.9 455.81,647.9 457.02,647.9 458.23,650.12 459.44,650.12 460.65,650.12 461.85,650.12 463.06,650.12 464.27,649.05 465.48,649.05 466.69,649.05 467.9,649.05 469.11,649.05 470.32,644.7 471.53,644.7 472.74,644.7 473.95,644.7 475.16,644.7 476.37,637.07 477.58,637.07 478.79,637.07 480,637.07 481.21,637.07 482.42,626.13 483.63,626.13 484.84,626.13 487.26,626.13 489.68,611.89 490.89,611.89 492.1,611.89 493.31,611.89 494.52,594.34 495.73,594.34 496.94,594.34 498.15,594.34 499.35,594.34 500.56,573.5 501.77,573.5 502.98,573.5 504.19,573.5 506.61,549.47 509.03,549.47 528.39,460.61 547.74,357.07 557.42,289.9 559.84,289.9 562.26,259.21 563.47,259.21 564.68,259.21 565.89,259.21 567.1,231.23 568.31,231.23 569.52,231.23 570.73,231.23 571.94,231.23 573.15,206.31 574.35,206.31 575.56,206.31 576.77,206.31 579.19,184.66 581.61,184.66 586.45,166.32 588.87,166.32 591.29,151.24 592.5,151.24 593.71,151.24 594.92,151.24 596.13,139.34 597.34,139.34 598.55,139.34 599.76,139.34 600.97,139.34 602.18,130.47 603.39,130.47 604.6,130.47 605.81,130.47 607.02,130.47 608.23,124.52 609.44,124.52 610.65,124.52 611.85,124.52 613.06,124.52 614.27,121.37 615.48,121.37 616.69,121.37 617.9,121.37 619.11,121.37 620.32,120.94 621.53,120.94 622.74,120.94 623.95,120.94 625.16,120.94 626.37,123.18 627.58,123.18 628.79,123.18 630,123.18 631.21,123.18 632.42,128.09 633.63,128.09 634.84,128.09 636.05,128.09 637.26,128.09 638.47,135.71 639.68,135.71 640.89,135.71 642.1,135.71 643.31,135.71 644.52,146.1 645.73,146.1 646.94,146.1 648.15,146.1 649.35,146.1 650.56,159.35 651.77,159.35 652.98,159.35 654.19,159.35 656.61,175.59 659.03,175.59 661.45,175.59 663.87,194.94 665.08,194.94 666.29,194.94 667.5,194.94 668.71,217.52 669.92,217.52 671.13,217.52 672.34,217.52 673.55,217.52 674.76,243.4 675.97,243.4 677.18,243.4 678.39,243.4 680.81,272.59 683.23,272.59 702.58,378.05 721.94,498.87 760.65,720.94">
+      </polyline>
+      <polyline class="Series4" points="180,560.55 182.42,560.55 183.63,560.55 184.84,560.55 186.05,557.72 187.26,557.72 188.47,557.72 189.68,557.72 190.89,557.72 192.1,552.12 193.31,552.12 194.52,552.12 195.73,552.12 196.94,552.12 198.15,543.88 199.35,543.88 200.56,543.88 201.77,543.88 202.98,543.88 204.19,533.17 205.4,533.17 206.61,533.17 207.82,533.17 209.03,533.17 210.24,520.19 211.45,520.19 212.66,520.19 213.87,520.19 216.29,505.24 218.71,505.24 221.13,505.24 223.55,488.66 224.76,488.66 225.97,488.66 227.18,488.66 228.39,470.84 229.6,470.84 230.81,470.84 232.02,470.84 233.23,470.84 234.44,452.22 235.65,452.22 236.85,452.22 238.06,452.22 240.48,433.24 242.9,433.24 247.74,414.38 250.16,414.38 252.58,396.08 255,396.08 257.42,396.08 259.84,378.74 262.26,378.74 267.1,362.75 269.52,362.75 271.94,348.42 273.15,348.42 274.35,348.42 275.56,348.42 276.77,335.99 277.98,335.99 279.19,335.99 280.4,335.99 281.61,335.99 282.82,325.67 284.03,325.67 285.24,325.67 286.45,325.67 287.66,325.67 288.87,317.61 290.08,317.61 291.29,317.61 292.5,317.61 293.71,317.61 294.92,311.91 296.13,311.91 297.34,311.91 298.55,311.91 299.76,311.91 300.97,308.63 302.18,308.63 303.39,308.63 304.6,308.63 305.81,308.63 307.02,307.77 308.23,307.77 309.44,307.77 310.65,307.77 311.85,307.77 313.06,309.32 314.27,309.32 315.48,309.32 316.69,309.32 317.9,309.32 319.11,313.21 320.32,313.21 321.53,313.21 322.74,313.21 323.95,313.21 325.16,319.32 326.37,319.32 327.58,319.32 328.79,319.32 330,319.32 331.21,327.51 332.42,327.51 333.63,327.51 334.84,327.51 337.26,337.58 339.68,337.58 342.1,337.58 344.52,349.28 345.73,349.28 346.94,349.28 348.15,349.28 349.35,362.33 350.56,362.33 351.77,362.33 352.98,362.33 354.19,362.33 355.4,376.41 356.61,376.41 357.82,376.41 359.03,376.41 361.45,391.16 363.87,391.16 366.29,391.16 368.71,406.23 369.92,406.23 371.13,406.23 372.34,406.23 373.55,421.24 374.76,421.24 375.97,421.24 377.18,421.24 378.39,421.24 379.6,435.85 380.81,435.85 382.02,435.85 383.23,435.85 385.65,449.7 388.06,449.7 390.48,449.7 392.9,462.51 394.11,462.51 395.32,462.51 396.53,462.51 397.74,474 398.95,474 400.16,474 401.37,474 402.58,474 403.79,483.96 405,483.96 406.21,483.96 407.42,483.96 408.63,483.96 409.84,492.22 411.05,492.22 412.26,492.22 413.47,492.22 414.68,492.22 415.89,498.63 417.1,498.63 418.31,498.63 419.52,498.63 420.73,498.63 421.94,503.11 423.15,503.11 424.35,503.11 425.56,503.11 426.77,503.11 427.98,505.61 429.19,505.61 430.4,505.61 431.61,505.61 432.82,505.61 434.03,506.12 435.24,506.12 436.45,506.12 437.66,506.12 438.87,506.12 440.08,504.67 441.29,504.67 442.5,504.67 443.71,504.67 444.92,504.67 446.13,501.32 447.34,501.32 448.55,501.32 449.76,501.32 450.97,501.32 452.18,496.18 453.39,496.18 454.6,496.18 455.81,496.18 457.02,496.18 458.23,489.39 459.44,489.39 460.65,489.39 463.06,489.39 465.48,481.13 470.32,471.61 489.68,438.06 509.03,402.92 511.45,402.92 513.87,392.16 515.08,392.16 516.29,392.16 517.5,392.16 518.71,382.29 519.92,382.29 521.13,382.29 522.34,382.29 523.55,382.29 524.76,373.51 525.97,373.51 527.18,373.51 528.39,373.51 529.6,373.51 530.81,366 532.02,366 533.23,366 534.44,366 535.65,366 536.85,359.89 538.06,359.89 539.27,359.89 540.48,359.89 541.69,359.89 542.9,355.29 544.11,355.29 545.32,355.29 546.53,355.29 547.74,355.29 548.95,352.26 550.16,352.26 551.37,352.26 552.58,352.26 553.79,352.26 555,350.83 556.21,350.83 557.42,350.83 559.84,350.83 562.26,351 563.47,351 564.68,351 565.89,351 567.1,352.73 568.31,352.73 569.52,352.73 570.73,352.73 571.94,352.73 573.15,355.95 574.35,355.95 575.56,355.95 576.77,355.95 577.98,355.95 579.19,360.56 580.4,360.56 581.61,360.56 582.82,360.56 584.03,366.42 585.24,366.42 586.45,366.42 588.87,366.42 591.29,373.38 592.5,373.38 593.71,373.38 594.92,373.38 596.13,381.26 597.34,381.26 598.55,381.26 599.76,381.26 600.97,381.26 602.18,389.84 603.39,389.84 604.6,389.84 605.81,389.84 608.23,398.92 610.65,398.92 615.48,408.25 617.9,408.25 620.32,417.63 622.74,417.63 625.16,417.63 626.37,426.81 627.58,426.81 628.79,426.81 630,426.81 632.42,435.58 634.84,435.58 637.26,435.58 639.68,443.75 640.89,443.75 642.1,443.75 643.31,443.75 644.52,451.14 645.73,451.14 646.94,451.14 648.15,451.14 649.35,451.14 650.56,457.6 651.77,457.6 652.98,457.6 654.19,457.6 655.4,457.6 656.61,463 657.82,463 659.03,463 660.24,463 661.45,463 662.66,467.24 663.87,467.24 665.08,467.24 666.29,467.24 667.5,467.24 668.71,470.25 669.92,470.25 671.13,470.25 672.34,470.25 673.55,470.25 674.76,472 675.97,472 677.18,472 678.39,472 679.6,472 680.81,472.47 682.02,472.47 683.23,472.47 684.44,472.47 685.65,472.47 686.85,471.68 688.06,471.68 689.27,471.68 690.48,471.68 691.69,471.68 692.9,469.68 694.11,469.68 695.32,469.68 696.53,469.68 697.74,469.68 698.95,466.53 700.16,466.53 701.37,466.53 702.58,466.53 703.79,466.53 705,462.34 706.21,462.34 707.42,462.34 708.63,462.34 709.84,462.34 711.05,457.23 712.26,457.23 713.47,457.23 714.68,457.23 715.89,457.23 717.1,451.33 718.31,451.33 719.52,451.33 720.73,451.33 721.94,451.33 723.15,444.81 724.35,444.81 725.56,444.81 726.77,444.81 729.19,437.82 731.61,437.82 734.03,437.82 736.45,430.55 737.66,430.55 738.87,430.55 740.08,430.55 741.29,423.18 742.5,423.18 743.71,423.18 744.92,423.18 746.13,423.18 747.34,415.88 748.55,415.88 749.76,415.88 750.97,415.88 753.39,408.83 755.81,408.83 758.23,408.83 760.65,402.2 761.85,402.2 763.06,402.2 764.27,402.2 765.48,396.12 766.69,396.12 767.9,396.12 769.11,396.12 770.32,396.12 771.53,390.73 772.74,390.73 773.95,390.73 775.16,390.73 776.37,390.73 777.58,386.14 778.79,386.14 780,386.14 781.21,386.14 782.42,386.14 783.63,382.43 784.84,382.43 786.05,382.43 787.26,382.43 788.47,382.43 789.68,379.68 790.89,379.68 792.1,379.68 793.31,379.68 794.52,379.68 795.73,377.91 796.94,377.91 798.15,377.91 799.35,377.91 800.56,377.91 801.77,377.16 802.98,377.16 804.19,377.16 805.4,377.16 806.61,377.16 807.82,377.41 809.03,377.41 810.24,377.41 811.45,377.41 812.66,377.41 813.87,378.63 815.08,378.63 816.29,378.63 817.5,378.63 818.71,378.63 819.92,380.78 821.13,380.78 822.34,380.78 823.55,380.78 824.76,380.78 825.97,383.78 827.18,383.78 828.39,383.78 829.6,383.78 830.81,383.78 832.02,387.55 833.23,387.55 835.65,387.55 838.06,391.98 842.9,391.98 847.74,396.94 852.58,402.31 857.42,407.95 859.84,407.95 862.26,413.72 864.68,413.72 867.1,413.72 869.52,419.48 871.94,419.48 876.77,425.09 879.19,425.09 881.61,430.42 882.82,430.42 884.03,430.42 885.24,430.42 886.45,435.36 887.66,435.36 888.87,435.36 890.08,435.36 891.29,435.36 892.5,439.78 893.71,439.78 894.92,439.78 896.13,439.78 897.34,439.78 898.55,443.6 899.76,443.6 900.97,443.6 902.18,443.6 903.39,443.6 904.6,446.75 905.81,446.75 907.02,446.75 908.23,446.75 909.44,446.75 910.65,449.16 911.85,449.16 913.06,449.16 914.27,449.16 915.48,449.16 916.69,450.81 917.9,450.81 919.11,450.81 920.32,450.81 921.53,450.81 922.74,451.65 923.95,451.65 925.16,451.65 927.58,451.65 930,451.71 931.21,451.71 932.42,451.71 933.63,451.71 934.84,450.99 936.05,450.99 937.26,450.99 938.47,450.99 939.68,450.99 940.89,449.52 942.1,449.52 943.31,449.52 944.52,449.52 945.73,449.52 946.94,447.37 948.15,447.37 949.35,447.37 950.56,447.37 951.77,447.37 952.98,444.59 954.19,444.59 955.4,444.59 956.61,444.59 957.82,444.59 959.03,441.27 960.24,441.27 961.45,441.27 962.66,441.27 963.87,441.27 965.08,437.5 966.29,437.5 967.5,437.5 968.71,437.5 971.13,433.37 973.55,433.37 978.39,429 980.81,429 983.23,424.49 984.44,424.49 985.65,424.49 986.85,424.49 988.06,419.97 989.27,419.97 990.48,419.97 991.69,419.97 992.9,419.97 994.11,415.52 995.32,415.52 996.53,415.52 997.74,415.52 1000.16,411.27 1002.58,411.27 1005,411.27 1007.42,407.3 1008.63,407.3 1009.84,407.3 1011.05,407.3 1012.26,403.71 1013.47,403.71 1014.68,403.71 1015.89,403.71 1017.1,403.71 1018.31,400.57 1019.52,400.57 1020.73,400.57 1021.94,400.57 1023.15,400.57 1024.35,397.94 1025.56,397.94 1026.77,397.94 1027.98,397.94 1029.19,397.94 1030.4,395.87 1031.61,395.87 1032.82,395.87 1034.03,395.87 1035.24,395.87 1036.45,394.41 1037.66,394.41 1038.87,394.41 1040.08,394.41 1041.29,394.41 1042.5,393.56 1043.71,393.56 1044.92,393.56 1046.13,393.56 1047.34,393.56 1048.55,393.34 1049.76,393.34 1050.97,393.34 1052.18,393.34 1053.39,393.34 1054.6,393.74 1055.81,393.74 1057.02,393.74 1058.23,393.74 1059.44,393.74 1060.65,394.73 1061.85,394.73 1063.06,394.73 1064.27,394.73 1065.48,394.73 1066.69,396.27 1067.9,396.27 1069.11,396.27 1070.32,396.27 1071.53,396.27 1072.74,398.32 1073.95,398.32 1075.16,398.32 1077.58,398.32 1080,400.81 1081.21,400.81 1082.42,400.81 1083.63,400.81 1084.84,403.68 1086.05,403.68 1087.26,403.68 1088.47,403.68 1089.68,403.68 1090.89,406.84 1092.1,406.84 1093.31,406.84 1094.52,406.84 1096.94,410.22 1099.35,410.22 1101.77,410.22 1104.19,413.73 1105.4,413.73 1106.61,413.73 1107.82,413.73 1109.03,417.28 1110.24,417.28 1111.45,417.28 1112.66,417.28 1113.87,417.28 1115.08,420.79 1116.29,420.79 1117.5,420.79 1118.71,420.79 1121.13,424.17 1123.55,424.17 1125.97,424.17 1128.39,427.35 1129.6,427.35 1130.81,427.35 1132.02,427.35 1133.23,430.25 1134.44,430.25 1135.65,430.25 1136.85,430.25 1138.06,430.25 1139.27,432.81 1140.48,432.81 1141.69,432.81 1142.9,432.81 1145.32,434.98 1147.74,434.98 1150.16,434.98 1152.58,436.72 1153.79,436.72 1155,436.72 1156.21,436.72 1157.42,437.99 1158.63,437.99 1159.84,437.99 1161.05,437.99 1162.26,437.99 1163.47,438.79 1164.68,438.79 1165.89,438.79 1167.1,438.79 1169.52,439.09 1171.94,439.09 1174.35,439.09 1176.77,438.9 1177.98,438.9 1179.19,438.9 1180.4,438.9 1181.61,438.24 1182.82,438.24 1184.03,438.24 1185.24,438.24 1186.45,438.24 1187.66,437.14 1188.87,437.14 1190.08,437.14 1191.29,437.14 1193.71,435.64 1196.13,435.64 1200.97,433.77 1205.81,431.59 1225.16,423.83 1244.52,415.61 1246.94,415.61 1249.35,413.08 1250.56,413.08 1251.77,413.08 1252.98,413.08 1254.19,410.75 1255.4,410.75 1256.61,410.75 1257.82,410.75 1259.03,410.75 1260.24,408.67 1261.45,408.67 1262.66,408.67 1263.87,408.67 1266.29,406.89 1268.71,406.89 1271.13,406.89 1273.55,405.44 1274.76,405.44 1275.97,405.44 1277.18,405.44 1278.39,404.35 1279.6,404.35 1280.81,404.35 1282.02,404.35 1283.23,404.35 1284.44,403.63 1285.65,403.63 1286.85,403.63 1288.06,403.63 1292.9,403.3 1297.74,403.35 1302.58,403.78 1305,403.78 1306.21,403.78 1307.42,403.78 1308.63,404.55 1309.84,404.55 1311.05,404.55 1312.26,404.55 1314.68,405.66 1317.1,405.66 1319.52,405.66 1321.94,407.05 1323.15,407.05 1324.35,407.05 1325.56,407.05 1326.77,408.7 1327.98,408.7 1329.19,408.7 1330.4,408.7 1331.61,408.7 1332.82,410.56 1334.03,410.56 1335.24,410.56 1336.45,410.56 1338.87,412.57 1341.29,412.57 1380,425.03">
+      </polyline>
+      <polyline class="Series5" points="180,560.55 182.42,560.55 183.63,560.55 184.84,560.55 186.05,559.12 187.26,559.12 188.47,559.12 189.68,559.12 190.89,559.12 192.1,554.85 193.31,554.85 194.52,554.85 195.73,554.85 196.94,554.85 198.15,547.79 199.35,547.79 200.56,547.79 201.77,547.79 202.98,547.79 204.19,538.04 205.4,538.04 206.61,538.04 207.82,538.04 209.03,538.04 210.24,525.75 211.45,525.75 212.66,525.75 213.87,525.75 216.29,511.12 218.71,511.12 221.13,511.12 223.55,494.42 224.76,494.42 225.97,494.42 227.18,494.42 228.39,475.98 229.6,475.98 230.81,475.98 232.02,475.98 233.23,475.98 234.44,456.2 235.65,456.2 236.85,456.2 238.06,456.2 240.48,435.53 242.9,435.53 247.74,414.46 250.16,414.46 252.58,393.51 255,393.51 257.42,393.51 259.84,373.16 262.26,373.16 267.1,353.9 269.52,353.9 271.94,336.17 273.15,336.17 274.35,336.17 275.56,336.17 276.77,320.32 277.98,320.32 279.19,320.32 280.4,320.32 281.61,320.32 282.82,306.67 284.03,306.67 285.24,306.67 286.45,306.67 287.66,306.67 288.87,295.45 290.08,295.45 291.29,295.45 292.5,295.45 293.71,295.45 294.92,286.84 296.13,286.84 297.34,286.84 298.55,286.84 299.76,286.84 300.97,280.97 302.18,280.97 303.39,280.97 304.6,280.97 305.81,280.97 307.02,277.91 308.23,277.91 309.44,277.91 310.65,277.91 313.06,277.71 315.48,277.71 316.69,277.71 317.9,277.71 319.11,280.37 320.32,280.37 321.53,280.37 322.74,280.37 323.95,280.37 325.16,285.85 326.37,285.85 327.58,285.85 328.79,285.85 330,285.85 331.21,294.08 332.42,294.08 333.63,294.08 334.84,294.08 336.05,294.08 337.26,304.94 338.47,304.94 339.68,304.94 342.1,304.94 344.52,318.27 345.73,318.27 346.94,318.27 348.15,318.27 349.35,333.82 350.56,333.82 351.77,333.82 352.98,333.82 354.19,333.82 355.4,351.31 356.61,351.31 357.82,351.31 359.03,351.31 361.45,370.38 363.87,370.38 368.71,390.6 371.13,390.6 373.55,411.5 375.97,411.5 378.39,411.5 380.81,432.59 383.23,432.59 388.06,453.34 390.48,453.34 392.9,473.27 394.11,473.27 395.32,473.27 396.53,473.27 397.74,491.93 398.95,491.93 400.16,491.93 401.37,491.93 402.58,491.93 403.79,508.89 405,508.89 406.21,508.89 407.42,508.89 409.84,523.83 412.26,523.83 414.68,523.83 417.1,536.46 418.31,536.46 419.52,536.46 420.73,536.46 421.94,546.58 423.15,546.58 424.35,546.58 425.56,546.58 426.77,546.58 427.98,554.02 429.19,554.02 430.4,554.02 431.61,554.02 432.82,554.02 434.03,558.69 435.24,558.69 436.45,558.69 437.66,558.69 438.87,558.69 440.08,560.53 441.29,560.53 442.5,560.53 443.71,560.53 444.92,560.53 446.13,559.5 447.34,559.5 448.55,559.5 449.76,559.5 450.97,559.5 452.18,555.62 453.39,555.62 454.6,555.62 455.81,555.62 457.02,555.62 458.23,548.95 459.44,548.95 460.65,548.95 461.85,548.95 463.06,548.95 464.27,539.57 465.48,539.57 466.69,539.57 467.9,539.57 469.11,539.57 470.32,527.62 471.53,527.62 472.74,527.62 473.95,527.62 475.16,527.62 476.37,513.31 477.58,513.31 478.79,513.31 480,513.31 482.42,496.88 484.84,496.88 489.68,478.67 509.03,417.43 528.39,356.53 533.23,338.56 535.65,338.56 538.06,322.42 539.27,322.42 540.48,322.42 541.69,322.42 542.9,308.45 544.11,308.45 545.32,308.45 546.53,308.45 547.74,308.45 548.95,296.87 550.16,296.87 551.37,296.87 552.58,296.87 553.79,296.87 555,287.89 556.21,287.89 557.42,287.89 558.63,287.89 559.84,287.89 561.05,281.63 562.26,281.63 563.47,281.63 564.68,281.63 565.89,281.63 567.1,278.17 568.31,278.17 569.52,278.17 570.73,278.17 571.94,278.17 573.15,277.57 574.35,277.57 575.56,277.57 576.77,277.57 577.98,277.57 579.19,279.82 580.4,279.82 581.61,279.82 582.82,279.82 584.03,284.91 585.24,284.91 586.45,284.91 587.66,284.91 588.87,284.91 590.08,292.76 591.29,292.76 592.5,292.76 593.71,292.76 594.92,292.76 596.13,303.26 597.34,303.26 598.55,303.26 599.76,303.26 600.97,303.26 602.18,316.25 603.39,316.25 604.6,316.25 605.81,316.25 608.23,331.51 610.65,331.51 613.06,331.51 615.48,348.75 616.69,348.75 617.9,348.75 619.11,348.75 620.32,367.62 621.53,367.62 622.74,367.62 623.95,367.62 625.16,367.62 626.37,387.7 627.58,387.7 628.79,387.7 630,387.7 632.42,408.54 634.84,408.54 637.26,408.54 639.68,429.63 640.89,429.63 642.1,429.63 643.31,429.63 644.52,450.46 645.73,450.46 646.94,450.46 648.15,450.46 649.35,450.46 650.56,470.54 651.77,470.54 652.98,470.54 654.19,470.54 656.61,489.4 659.03,489.4 661.45,489.4 663.87,506.62 665.08,506.62 666.29,506.62 667.5,506.62 668.71,521.86 669.92,521.86 671.13,521.86 672.34,521.86 673.55,521.86 674.76,534.83 675.97,534.83 677.18,534.83 678.39,534.83 679.6,534.83 680.81,545.31 682.02,545.31 683.23,545.31 684.44,545.31 685.65,545.31 686.85,553.14 688.06,553.14 689.27,553.14 690.48,553.14 691.69,553.14 692.9,558.21 694.11,558.21 695.32,558.21 696.53,558.21 697.74,558.21 698.95,560.44 700.16,560.44 701.37,560.44 702.58,560.44 703.79,560.44 705,559.81 706.21,559.81 707.42,559.81 708.63,559.81 709.84,559.81 711.05,556.34 712.26,556.34 713.47,556.34 714.68,556.34 715.89,556.34 717.1,550.05 718.31,550.05 719.52,550.05 720.73,550.05 721.94,550.05 723.15,541.04 724.35,541.04 725.56,541.04 726.77,541.04 727.98,541.04 729.19,529.45 730.4,529.45 731.61,529.45 734.03,529.45 736.45,515.45 741.29,499.31 760.65,441.41 780,378.79 782.42,378.79 784.84,359.18 786.05,359.18 787.26,359.18 788.47,359.18 789.68,340.98 790.89,340.98 792.1,340.98 793.31,340.98 794.52,340.98 795.73,324.57 796.94,324.57 798.15,324.57 799.35,324.57 801.77,310.27 804.19,310.27 805.4,310.27 806.61,310.27 807.82,298.35 809.03,298.35 810.24,298.35 811.45,298.35 812.66,298.35 813.87,288.99 815.08,288.99 816.29,288.99 817.5,288.99 818.71,288.99 819.92,282.34 821.13,282.34 822.34,282.34 823.55,282.34 824.76,282.34 825.97,278.48 827.18,278.48 828.39,278.48 829.6,278.48 830.81,278.48 832.02,277.48 833.23,277.48 834.44,277.48 835.65,277.48 836.85,277.48 838.06,279.33 839.27,279.33 840.48,279.33 841.69,279.33 842.9,279.33 844.11,284.03 845.32,284.03 846.53,284.03 847.74,284.03 848.95,284.03 850.16,291.49 851.37,291.49 852.58,291.49 853.79,291.49 855,291.49 856.21,301.63 857.42,301.63 858.63,301.63 859.84,301.63 861.05,301.63 862.26,314.28 863.47,314.28 864.68,314.28 865.89,314.28 867.1,314.28 868.31,329.24 869.52,329.24 870.73,329.24 871.94,329.24 874.35,346.22 876.77,346.22 879.19,346.22 881.61,364.88 882.82,364.88 884.03,364.88 885.24,364.88 886.45,384.82 887.66,384.82 888.87,384.82 890.08,384.82 891.29,384.82 892.5,405.58 893.71,405.58 894.92,405.58 896.13,405.58 898.55,426.67 900.97,426.67 905.81,447.57 908.23,447.57 910.65,467.78 913.06,467.78 915.48,467.78 917.9,486.84 920.32,486.84 925.16,504.31 927.58,504.31 930,519.85 931.21,519.85 932.42,519.85 933.63,519.85 934.84,533.16 936.05,533.16 937.26,533.16 938.47,533.16 939.68,533.16 940.89,544 942.1,544 943.31,544 944.52,544 945.73,544 946.94,552.21 948.15,552.21 949.35,552.21 950.56,552.21 951.77,552.21 952.98,557.67 954.19,557.67 955.4,557.67 956.61,557.67 957.82,557.67 959.03,560.3 960.24,560.3 961.45,560.3 962.66,560.3 963.87,560.3 965.08,560.07 966.29,560.07 967.5,560.07 968.71,560.07 969.92,560.07 971.13,557 972.34,557 973.55,557 974.76,557 975.97,557 977.18,551.1 978.39,551.1 979.6,551.1 980.81,551.1 982.02,542.47 983.23,542.47 984.44,542.47 985.65,542.47 986.85,542.47 988.06,531.23 989.27,531.23 990.48,531.23 991.69,531.23 992.9,531.23 994.11,517.56 995.32,517.56 996.53,517.56 997.74,517.56 1000.16,501.69 1002.58,501.69 1007.42,483.94 1009.84,483.94 1012.26,464.68 1014.68,464.68 1017.1,464.68 1019.52,444.33 1021.94,444.33 1026.77,423.36 1029.19,423.36 1031.61,402.3 1032.82,402.3 1034.03,402.3 1035.24,402.3 1036.45,381.63 1037.66,381.63 1038.87,381.63 1040.08,381.63 1041.29,381.63 1042.5,361.86 1043.71,361.86 1044.92,361.86 1046.13,361.86 1048.55,343.44 1050.97,343.44 1053.39,343.44 1055.81,326.75 1057.02,326.75 1058.23,326.75 1059.44,326.75 1060.65,312.14 1061.85,312.14 1063.06,312.14 1064.27,312.14 1065.48,312.14 1066.69,299.87 1067.9,299.87 1069.11,299.87 1070.32,299.87 1071.53,299.87 1072.74,290.14 1073.95,290.14 1075.16,290.14 1076.37,290.14 1077.58,290.14 1078.79,283.1 1080,283.1 1081.21,283.1 1082.42,283.1 1083.63,283.1 1084.84,278.85 1086.05,278.85 1087.26,278.85 1088.47,278.85 1089.68,278.85 1090.89,277.45 1092.1,277.45 1093.31,277.45 1094.52,277.45 1095.73,277.45 1096.94,278.9 1098.15,278.9 1099.35,278.9 1100.56,278.9 1101.77,278.9 1102.98,283.2 1104.19,283.2 1105.4,283.2 1106.61,283.2 1107.82,283.2 1109.03,290.28 1110.24,290.28 1111.45,290.28 1112.66,290.28 1113.87,290.28 1115.08,300.05 1116.29,300.05 1117.5,300.05 1118.71,300.05 1121.13,312.36 1123.55,312.36 1125.97,312.36 1128.39,327.01 1129.6,327.01 1130.81,327.01 1132.02,327.01 1133.23,343.72 1134.44,343.72 1135.65,343.72 1136.85,343.72 1138.06,343.72 1139.27,362.17 1140.48,362.17 1141.69,362.17 1142.9,362.17 1145.32,381.96 1147.74,381.96 1167.1,444.66 1186.45,501.97 1191.29,517.8 1193.71,531.43 1196.13,531.43 1197.34,531.43 1198.55,531.43 1199.76,542.63 1200.97,542.63 1202.18,542.63 1203.39,542.63 1204.6,542.63 1205.81,551.22 1207.02,551.22 1208.23,551.22 1209.44,551.22 1210.65,551.22 1211.85,557.07 1213.06,557.07 1214.27,557.07 1215.48,557.07 1216.69,557.07 1217.9,560.1 1219.11,560.1 1220.32,560.1 1222.74,560.1 1225.16,560.28 1226.37,560.28 1227.58,560.28 1228.79,560.28 1230,557.6 1231.21,557.6 1232.42,557.6 1233.63,557.6 1234.84,557.6 1236.05,552.1 1237.26,552.1 1238.47,552.1 1239.68,552.1 1240.89,552.1 1242.1,543.84 1243.31,543.84 1244.52,543.84 1245.73,543.84 1246.94,543.84 1248.15,532.96 1249.35,532.96 1250.56,532.96 1251.77,532.96 1252.98,532.96 1254.19,519.62 1255.4,519.62 1256.61,519.62 1257.82,519.62 1259.03,519.62 1260.24,504.05 1261.45,504.05 1262.66,504.05 1263.87,504.05 1266.29,486.54 1268.71,486.54 1271.13,486.54 1273.55,467.46 1274.76,467.46 1275.97,467.46 1277.18,467.46 1278.39,447.24 1279.6,447.24 1280.81,447.24 1282.02,447.24 1283.23,447.24 1284.44,426.33 1285.65,426.33 1286.85,426.33 1288.06,426.33 1290.48,405.24 1292.9,405.24 1295.32,405.24 1297.74,384.49 1298.95,384.49 1300.16,384.49 1301.37,384.49 1302.58,364.57 1303.79,364.57 1305,364.57 1306.21,364.57 1307.42,364.57 1308.63,345.93 1309.84,345.93 1311.05,345.93 1312.26,345.93 1314.68,328.98 1317.1,328.98 1319.52,328.98 1321.94,314.06 1323.15,314.06 1324.35,314.06 1325.56,314.06 1326.77,301.45 1327.98,301.45 1329.19,301.45 1330.4,301.45 1331.61,301.45 1332.82,291.35 1334.03,291.35 1335.24,291.35 1336.45,291.35 1337.66,291.35 1338.87,283.93 1340.08,283.93 1341.29,283.93 1342.5,283.93 1343.71,283.93 1344.92,279.28 1346.13,279.28 1347.34,279.28 1348.55,279.28 1349.76,279.28 1350.97,277.47 1352.18,277.47 1353.39,277.47 1354.6,277.47 1355.81,277.47 1357.02,278.52 1358.23,278.52 1359.44,278.52 1360.65,278.52 1361.85,278.52 1363.06,282.42 1364.27,282.42 1365.48,282.42 1366.69,282.42 1367.9,282.42 1369.11,289.12 1370.32,289.12 1372.74,289.12 1375.16,298.52 1377.58,298.52 1380,298.52">
+      </polyline>
+     </g>
+    </svg>
+   </td>
+   <td>
+    <br/>
+    <br/>
+    <br/>
+    <b style="color:Tomato">╺━━</b>
+    Small rotations
+    <br/>
+    <b style="color:YellowGreen">╺━━</b>
+    Large rotations
+    <br/>
+    <b style="color:CornflowerBlue">· · · ·</b>
+    Forward Euler
+    <br/>
+    <b style="color:Gold">╺╺╺</b>
+    Backward Euler
+    <br/>
+    <b style="color:MediumVioletRed">·╺ ·╺</b>
+    Crank–Nicolson
+   </td>
+  </tr>
+ </table>
+ <p>
+  Energy
+  <var>E</var>
+  [J] versus time
+  <var>t</var>
+  [s] plot
+ </p>
+ <svg class="plot" data-plot="svg" height="840px" style="width:272.22pt; height:155.56pt;" version="1.1" viewbox=" 0 0 1470 840" width="1470px" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+   .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+.Series4 {stroke:#f0d000;}
+circle.Series4 {fill:#f0d000;}
+.Fill4 {fill:#f0d000; fill-opacity:0.035;}
+.Series5 {stroke:MediumVioletRed;}
+circle.Series5 {fill:MediumVioletRed;}
+.Fill5 {fill:MediumVioletRed; fill-opacity:0.030;}
+  </style>
+  <g class="plot">
+   <rect class="Frame" height="600" width="1200" x="180" y="120">
+   </rect>
+   <line class="Grid" x1="180" x2="1380" y1="720" y2="720">
+   </line>
+   <text class="sm end" x="161" y="738">0</text>
+   <line class="Grid" x1="180" x2="1380" y1="619.5" y2="619.5">
+   </line>
+   <text class="sm end" x="161" y="637.5">5</text>
+   <line class="Grid" x1="180" x2="1380" y1="519.01" y2="519.01">
+   </line>
+   <text class="sm end" x="161" y="537.01">10</text>
+   <line class="Grid" x1="180" x2="1380" y1="418.51" y2="418.51">
+   </line>
+   <text class="sm end" x="161" y="436.51">15</text>
+   <line class="Grid" x1="180" x2="1380" y1="318.02" y2="318.02">
+   </line>
+   <text class="sm end" x="161" y="336.02">20</text>
+   <line class="Grid" x1="180" x2="1380" y1="217.52" y2="217.52">
+   </line>
+   <text class="sm end" x="161" y="235.52">25</text>
+   <text class="sm end" x="161" y="135.03">30</text>
+   <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="180" y="772">0</text>
+   <line class="Grid" x1="300.6" x2="300.6" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="300.6" y="772">1</text>
+   <line class="Grid" x1="421.21" x2="421.21" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="421.21" y="772">2</text>
+   <line class="Grid" x1="541.81" x2="541.81" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="541.81" y="772">3</text>
+   <line class="Grid" x1="662.41" x2="662.41" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="662.41" y="772">4</text>
+   <line class="Grid" x1="783.02" x2="783.02" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="783.02" y="772">5</text>
+   <line class="Grid" x1="903.62" x2="903.62" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="903.62" y="772">6</text>
+   <line class="Grid" x1="1024.22" x2="1024.22" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="1024.22" y="772">7</text>
+   <line class="Grid" x1="1144.82" x2="1144.82" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="1144.82" y="772">8</text>
+   <line class="Grid" x1="1265.43" x2="1265.43" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="1265.43" y="772">9</text>
+   <text class="sm mid" x="1386.03" y="772">10</text>
+   <line class="Axis" x1="180" x2="1380" y1="720" y2="720">
+   </line>
+   <text x="1402" y="702">x</text>
+   <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+   </line>
+   <text class="mid" x="180" y="84">y</text>
+   <text x="8" y="823">[0; 0]</text>
+   <text class="end" x="1462" y="44">[9.95; 29.85]</text>
+   <circle class="Series1" cx="180" cy="720" r="10">
+   </circle>
+   <polyline class="Series2" points="180,621.45 218.71,621.45 257.42,621.45 296.13,621.45 334.84,621.45 373.55,621.45 412.26,621.45 450.97,621.45 489.68,621.45 528.39,621.45 567.1,621.45 605.81,621.45 644.52,621.45 683.23,621.45 721.94,621.45 760.65,621.45 799.35,621.45 838.06,621.45 876.77,621.45 915.48,621.45 954.19,621.45 992.9,621.45 1031.61,621.45 1070.32,621.45 1109.03,621.45 1147.74,621.45 1186.45,621.45 1225.16,621.45 1263.87,621.45 1302.58,621.45 1341.29,621.45 1380,621.45">
+   </polyline>
+   <polyline class="Series3" points="180,621.45 199.35,615.94 204.19,614.04 209.03,614.04 213.87,612.07 218.71,610.01 223.55,607.81 225.97,607.81 228.39,605.43 230.81,605.43 233.23,605.43 235.65,602.85 238.06,602.85 239.27,602.85 240.48,600.08 241.69,600.08 242.9,600.08 245.32,600.08 247.74,597.16 248.95,597.16 250.16,597.16 251.37,597.16 252.58,594.16 253.79,594.16 255,594.16 256.21,594.16 257.42,594.16 258.63,591.17 259.84,591.17 261.05,591.17 262.26,591.17 264.68,588.27 267.1,588.27 269.52,588.27 271.94,585.51 273.15,585.51 274.35,585.51 275.56,585.51 276.77,582.92 277.98,582.92 279.19,582.92 280.4,582.92 281.61,582.92 282.82,580.47 284.03,580.47 285.24,580.47 286.45,580.47 288.87,578.13 291.29,578.13 292.5,578.13 293.71,578.13 294.92,575.85 296.13,575.85 298.55,575.85 300.97,573.59 303.39,573.59 305.81,573.59 308.23,571.33 310.65,571.33 315.48,569.06 320.32,566.77 322.74,566.77 325.16,564.48 327.58,564.48 330,564.48 332.42,562.16 334.84,562.16 336.05,562.16 337.26,559.81 338.47,559.81 339.68,559.81 342.1,559.81 344.52,557.38 345.73,557.38 346.94,557.38 348.15,557.38 349.35,554.83 350.56,554.83 351.77,554.83 352.98,554.83 354.19,554.83 355.4,552.05 356.61,552.05 357.82,552.05 359.03,552.05 361.45,548.98 363.87,548.98 366.29,548.98 368.71,545.54 369.92,545.54 371.13,545.54 372.34,545.54 373.55,541.69 375.97,541.69 378.39,541.69 380.81,537.48 383.23,537.48 388.06,533.02 390.48,533.02 392.9,528.49 394.11,528.49 395.32,528.49 396.53,528.49 397.74,524.11 398.95,524.11 400.16,524.11 401.37,524.11 402.58,524.11 403.79,520.03 405,520.03 406.21,520.03 407.42,520.03 409.84,516.35 412.26,516.35 414.68,516.35 417.1,513.07 418.31,513.07 419.52,513.07 420.73,513.07 421.94,510.14 423.15,510.14 424.35,510.14 425.56,510.14 426.77,510.14 427.98,507.46 429.19,507.46 430.4,507.46 431.61,507.46 434.03,504.94 436.45,504.94 438.87,504.94 441.29,502.5 442.5,502.5 443.71,502.5 444.92,502.5 446.13,500.1 447.34,500.1 448.55,500.1 449.76,500.1 450.97,500.1 452.18,497.71 453.39,497.71 454.6,497.71 455.81,497.71 458.23,495.34 460.65,495.34 463.06,495.34 465.48,492.97 466.69,492.97 467.9,492.97 469.11,492.97 470.32,490.61 471.53,490.61 472.74,490.61 473.95,490.61 475.16,490.61 476.37,488.24 477.58,488.24 478.79,488.24 480,488.24 482.42,485.84 484.84,485.84 487.26,485.84 489.68,483.34 490.89,483.34 492.1,483.34 493.31,483.34 494.52,480.67 495.73,480.67 496.94,480.67 498.15,480.67 499.35,480.67 500.56,477.68 501.77,477.68 502.98,477.68 504.19,477.68 506.61,474.22 509.03,474.22 511.45,474.22 513.87,470.14 515.08,470.14 516.29,470.14 517.5,470.14 518.71,465.3 519.92,465.3 521.13,465.3 522.34,465.3 523.55,465.3 524.76,459.71 525.97,459.71 527.18,459.71 528.39,459.71 530.81,453.5 533.23,453.5 535.65,453.5 538.06,446.98 539.27,446.98 540.48,446.98 541.69,446.98 542.9,440.56 544.11,440.56 545.32,440.56 546.53,440.56 547.74,440.56 548.95,434.66 550.16,434.66 551.37,434.66 552.58,434.66 553.79,434.66 555,429.55 556.21,429.55 557.42,429.55 558.63,429.55 559.84,429.55 561.05,425.33 562.26,425.33 563.47,425.33 564.68,425.33 565.89,425.33 567.1,421.94 568.31,421.94 569.52,421.94 570.73,421.94 571.94,421.94 573.15,419.2 574.35,419.2 575.56,419.2 576.77,419.2 579.19,416.93 581.61,416.93 586.45,414.95 591.29,413.15 593.71,413.15 596.13,411.44 598.55,411.44 600.97,411.44 603.39,409.78 605.81,409.78 625.16,404.99 634.84,401.91 639.68,400.39 644.52,398.85 645.73,398.85 646.94,398.85 648.15,398.85 649.35,398.85 650.56,397.27 651.77,397.27 652.98,397.27 654.19,397.27 656.61,395.58 659.03,395.58 661.45,395.58 663.87,393.65 665.08,393.65 666.29,393.65 667.5,393.65 668.71,391.34 669.92,391.34 671.13,391.34 672.34,391.34 673.55,391.34 674.76,388.42 675.97,388.42 677.18,388.42 678.39,388.42 679.6,388.42 680.81,384.63 682.02,384.63 683.23,384.63 684.44,384.63 685.65,384.63 686.85,379.71 688.06,379.71 689.27,379.71 690.48,379.71 691.69,379.71 692.9,373.48 694.11,373.48 695.32,373.48 696.53,373.48 697.74,373.48 698.95,365.97 700.16,365.97 701.37,365.97 702.58,365.97 705,357.5 707.42,357.5 709.84,357.5 712.26,348.67 713.47,348.67 714.68,348.67 715.89,348.67 717.1,340.26 718.31,340.26 719.52,340.26 720.73,340.26 721.94,340.26 723.15,332.97 724.35,332.97 725.56,332.97 726.77,332.97 727.98,332.97 729.19,327.22 730.4,327.22 731.61,327.22 732.82,327.22 734.03,327.22 735.24,323.07 736.45,323.07 737.66,323.07 738.87,323.07 740.08,323.07 741.29,320.34 742.5,320.34 743.71,320.34 744.92,320.34 746.13,320.34 747.34,318.68 748.55,318.68 749.76,318.68 750.97,318.68 752.18,318.68 753.39,317.77 754.6,317.77 755.81,317.77 757.02,317.77 758.23,317.77 759.44,317.33 760.65,317.33 763.06,317.33 765.48,317.17 770.32,317.17 780,317.28 799.35,317.79 838.06,319.05 876.77,319.95 896.13,320.25 905.81,320.23 910.65,320.06 915.48,320.06 917.9,319.69 920.32,319.69 921.53,319.69 922.74,318.99 923.95,318.99 925.16,318.99 926.37,318.99 927.58,318.99 928.79,317.78 930,317.78 931.21,317.78 932.42,317.78 933.63,317.78 934.84,315.79 936.05,315.79 937.26,315.79 938.47,315.79 939.68,315.79 940.89,312.69 942.1,312.69 943.31,312.69 944.52,312.69 945.73,312.69 946.94,308.11 948.15,308.11 949.35,308.11 950.56,308.11 951.77,308.11 952.98,301.75 954.19,301.75 955.4,301.75 956.61,301.75 957.82,301.75 959.03,293.5 960.24,293.5 961.45,293.5 962.66,293.5 963.87,293.5 965.08,283.67 966.29,283.67 967.5,283.67 968.71,283.67 971.13,273 973.55,273 975.97,273 978.39,262.6 979.6,262.6 980.81,262.6 982.02,253.55 983.23,253.55 984.44,253.55 985.65,253.55 986.85,253.55 988.06,246.61 989.27,246.61 990.48,246.61 991.69,246.61 992.9,246.61 994.11,242.03 995.32,242.03 996.53,242.03 997.74,242.03 998.95,242.03 1000.16,239.56 1001.37,239.56 1002.58,239.56 1003.79,239.56 1005,239.56 1006.21,238.76 1007.42,238.76 1008.63,238.76 1009.84,238.76 1011.05,238.76 1012.26,239.13 1013.47,239.13 1014.68,239.13 1015.89,239.13 1017.1,239.13 1018.31,240.24 1019.52,240.24 1020.73,240.24 1021.94,240.24 1024.35,241.79 1026.77,241.79 1031.61,243.58 1050.97,249.34 1053.39,249.34 1055.81,251.21 1057.02,251.21 1058.23,251.21 1059.44,251.21 1060.65,252.97 1061.85,252.97 1063.06,252.97 1064.27,252.97 1065.48,252.97 1066.69,254.61 1067.9,254.61 1069.11,254.61 1070.32,254.61 1072.74,256.05 1075.16,256.05 1077.58,256.05 1080,257.23 1081.21,257.23 1082.42,257.23 1083.63,257.23 1084.84,258.01 1086.05,258.01 1087.26,258.01 1089.68,258.01 1092.1,258.21 1093.31,258.21 1094.52,258.21 1095.73,258.21 1096.94,257.57 1098.15,257.57 1099.35,257.57 1100.56,257.57 1101.77,257.57 1102.98,255.71 1104.19,255.71 1105.4,255.71 1106.61,255.71 1107.82,255.71 1109.03,252.19 1110.24,252.19 1111.45,252.19 1112.66,252.19 1113.87,252.19 1115.08,246.57 1116.29,246.57 1117.5,246.57 1118.71,246.57 1119.92,246.57 1121.13,238.57 1122.34,238.57 1123.55,238.57 1124.76,238.57 1125.97,238.57 1127.18,228.32 1128.39,228.32 1129.6,228.32 1130.81,228.32 1132.02,228.32 1133.23,216.51 1134.44,216.51 1135.65,216.51 1136.85,216.51 1138.06,216.51 1139.27,204.37 1140.48,204.37 1141.69,204.37 1142.9,204.37 1144.11,204.37 1145.32,193.41 1146.53,193.41 1147.74,193.41 1148.95,193.41 1150.16,193.41 1151.37,184.82 1152.58,184.82 1153.79,184.82 1155,184.82 1156.21,184.82 1157.42,179.18 1158.63,179.18 1159.84,179.18 1161.05,179.18 1162.26,179.18 1163.47,176.41 1164.68,176.41 1165.89,176.41 1167.1,176.41 1168.31,176.41 1169.52,175.97 1170.73,175.97 1171.94,175.97 1173.15,175.97 1174.35,175.97 1175.56,177.21 1176.77,177.21 1177.98,177.21 1179.19,177.21 1180.4,177.21 1181.61,179.54 1182.82,179.54 1184.03,179.54 1185.24,179.54 1186.45,179.54 1187.66,182.49 1188.87,182.49 1190.08,182.49 1191.29,182.49 1193.71,185.76 1196.13,185.76 1198.55,185.76 1200.97,189.15 1202.18,189.15 1203.39,189.15 1204.6,189.15 1205.81,192.49 1207.02,192.49 1208.23,192.49 1209.44,192.49 1210.65,192.49 1211.85,195.69 1213.06,195.69 1214.27,195.69 1215.48,195.69 1217.9,198.62 1220.32,198.62 1221.53,198.62 1222.74,198.62 1223.95,201.16 1225.16,201.16 1226.37,201.16 1227.58,201.16 1228.79,201.16 1230,203.12 1231.21,203.12 1232.42,203.12 1233.63,203.12 1234.84,203.12 1236.05,204.27 1237.26,204.27 1238.47,204.27 1239.68,204.27 1242.1,204.24 1244.52,204.24 1245.73,204.24 1246.94,204.24 1248.15,202.58 1249.35,202.58 1250.56,202.58 1251.77,202.58 1252.98,202.58 1254.19,198.73 1255.4,198.73 1256.61,198.73 1257.82,198.73 1259.03,198.73 1260.24,192.23 1261.45,192.23 1262.66,192.23 1263.87,192.23 1265.08,192.23 1266.29,182.84 1267.5,182.84 1268.71,182.84 1269.92,182.84 1271.13,182.84 1272.34,170.91 1273.55,170.91 1274.76,170.91 1275.97,170.91 1277.18,170.91 1278.39,157.54 1279.6,157.54 1280.81,157.54 1282.02,157.54 1283.23,157.54 1284.44,144.4 1285.65,144.4 1286.85,144.4 1288.06,144.4 1289.27,144.4 1290.48,133.26 1291.69,133.26 1292.9,133.26 1294.11,133.26 1295.32,133.26 1296.53,125.35 1297.74,125.35 1298.95,125.35 1300.16,125.35 1301.37,125.35 1302.58,121.06 1303.79,121.06 1305,121.06 1306.21,121.06 1307.42,121.06 1308.63,120 1309.84,120 1311.05,120 1312.26,120 1313.47,120 1314.68,121.4 1315.89,121.4 1317.1,121.4 1318.31,121.4 1319.52,121.4 1320.73,124.46 1321.94,124.46 1323.15,124.46 1324.35,124.46 1325.56,124.46 1326.77,128.51 1327.98,128.51 1329.19,128.51 1330.4,128.51 1331.61,128.51 1332.82,133.05 1334.03,133.05 1335.24,133.05 1336.45,133.05 1338.87,137.74 1341.29,137.74 1346.13,142.32 1348.55,142.32 1350.97,146.58 1353.39,146.58 1355.81,146.58 1358.23,150.3 1360.65,150.3 1363.06,153.21 1365.48,153.21 1367.9,153.21 1370.32,154.96 1372.74,154.96 1375.16,155.08 1380,155.08">
+   </polyline>
+   <polyline class="Series4" points="180,621.45 218.71,632.07 257.42,643.47 296.13,654.17 334.84,661.8 373.55,670.39 412.26,676.8 450.97,682.1 489.68,687.69 528.39,692 567.1,696.13 605.81,699.22 644.52,702.44 683.23,704.73 721.94,706.73 760.65,708.79 799.35,710.28 838.06,711.77 876.77,712.88 915.48,713.83 954.19,714.78 992.9,715.48 1031.61,716.18 1070.32,716.7 1109.03,717.21 1147.74,717.59 1186.45,717.91 1225.16,718.24 1263.87,718.47 1302.58,718.71 1341.29,718.89 1380,719.04">
+   </polyline>
+   <polyline class="Series5" points="180,621.45 218.71,621.48 257.42,621.54 296.13,621.45 334.84,621.45 373.55,621.55 412.26,621.47 450.97,621.45 489.68,621.51 528.39,621.51 567.1,621.45 605.81,621.47 644.52,621.54 683.23,621.45 721.94,621.45 760.65,621.54 799.35,621.48 838.06,621.45 876.77,621.5 915.48,621.52 954.19,621.45 992.9,621.46 1031.61,621.54 1070.32,621.45 1109.03,621.45 1147.74,621.53 1186.45,621.49 1225.16,621.45 1263.87,621.49 1302.58,621.52 1341.29,621.45 1380,621.45">
+   </polyline>
+  </g>
+ </svg>
+ <h4>Comparison of Crank–Nicolson and Runge-Kutta 4 methods</h4>
+ <style>.Series2{stroke-dasharray: 30, 10;}</style>
+ <table>
+  <tr>
+   <td>
+    <p>
+     Rotation
+     <var>θ</var>
+     [deg] versus time
+     <var>t</var>
+     [s] plot
+    </p>
+    <svg class="plot" data-plot="svg" height="840px" style="width:272.22pt; height:155.56pt;" version="1.1" viewbox=" 0 0 1470 840" width="1470px" xmlns="http://www.w3.org/2000/svg">
+     <style type="text/css">
+      .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+     </style>
+     <g class="plot">
+      <rect class="Frame" height="600" width="1200" x="180" y="120">
+      </rect>
+      <text class="sm end" x="161" y="738">-60</text>
+      <line class="Grid" x1="180" x2="1380" y1="620" y2="620">
+      </line>
+      <text class="sm end" x="161" y="638">-40</text>
+      <line class="Grid" x1="180" x2="1380" y1="520" y2="520">
+      </line>
+      <text class="sm end" x="161" y="538">-20</text>
+      <line class="Grid" x1="180" x2="1380" y1="420" y2="420">
+      </line>
+      <text class="sm end" x="161" y="438">0</text>
+      <line class="Grid" x1="180" x2="1380" y1="320" y2="320">
+      </line>
+      <text class="sm end" x="161" y="338">20</text>
+      <line class="Grid" x1="180" x2="1380" y1="220" y2="220">
+      </line>
+      <text class="sm end" x="161" y="238">40</text>
+      <text class="sm end" x="161" y="138">60</text>
+      <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="180" y="772">0</text>
+      <line class="Grid" x1="300.6" x2="300.6" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="300.6" y="772">1</text>
+      <line class="Grid" x1="421.21" x2="421.21" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="421.21" y="772">2</text>
+      <line class="Grid" x1="541.81" x2="541.81" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="541.81" y="772">3</text>
+      <line class="Grid" x1="662.41" x2="662.41" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="662.41" y="772">4</text>
+      <line class="Grid" x1="783.02" x2="783.02" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="783.02" y="772">5</text>
+      <line class="Grid" x1="903.62" x2="903.62" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="903.62" y="772">6</text>
+      <line class="Grid" x1="1024.22" x2="1024.22" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="1024.22" y="772">7</text>
+      <line class="Grid" x1="1144.82" x2="1144.82" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="1144.82" y="772">8</text>
+      <line class="Grid" x1="1265.43" x2="1265.43" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="1265.43" y="772">9</text>
+      <text class="sm mid" x="1386.03" y="772">10</text>
+      <line class="Axis" x1="180" x2="1380" y1="420" y2="420">
+      </line>
+      <text x="1402" y="402">x</text>
+      <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+      </line>
+      <text class="mid" x="180" y="84">y</text>
+      <text x="8" y="823">[0; -60]</text>
+      <text class="end" x="1462" y="44">[9.95; 60]</text>
+      <polyline class="Series1" points="180,720 218.71,561.15 257.42,353.85 276.77,247.32 286.45,194.39 291.29,170.15 296.13,149.06 298.55,140.2 300.97,132.73 302.18,129.58 303.39,126.85 304.6,124.55 305.81,122.71 307.02,121.33 308.23,120.44 309.44,120.03 310.65,120.11 311.85,120.68 313.06,121.73 314.27,123.25 315.48,125.25 316.69,127.69 317.9,130.56 319.11,133.84 320.32,137.52 322.74,145.93 325.16,155.6 330,177.9 334.84,202.87 354.19,310.06 373.55,413.6 392.9,516.62 412.26,623.95 421.94,673.6 426.77,694.01 429.19,702.44 430.4,706.11 431.61,709.4 432.82,712.28 434.03,714.73 435.24,716.72 436.45,718.26 437.66,719.31 438.87,719.89 440.08,719.97 441.29,719.57 442.5,718.68 443.71,717.31 444.92,715.48 446.13,713.19 447.34,710.46 448.55,707.31 450.97,699.85 453.39,690.99 455.81,680.95 460.65,658.11 470.32,606.26 489.68,499.24 528.39,292.38 538.06,238.37 547.74,186.1 552.58,162.74 557.42,143.05 559.84,135.09 561.05,131.66 562.26,128.64 563.47,126.05 564.68,123.9 565.89,122.21 567.1,120.99 568.31,120.25 569.52,120 570.73,120.24 571.94,120.96 573.15,122.17 574.35,123.85 575.56,125.99 576.77,128.57 577.98,131.58 579.19,134.99 581.61,142.94 586.45,162.6 596.13,211.51 605.81,265.26 644.52,473.15 663.87,579.06 673.55,632.66 678.39,657.96 683.23,680.82 685.65,690.88 688.06,699.75 690.48,707.23 691.69,710.38 692.9,713.12 694.11,715.42 695.32,717.27 696.53,718.65 697.74,719.55 698.95,719.97 700.16,719.9 701.37,719.33 702.58,718.29 703.79,716.77 705,714.78 706.21,712.35 707.42,709.48 708.63,706.2 709.84,702.53 712.26,694.13 717.1,673.74 721.94,649.94 731.61,597.32 741.29,543.35 760.65,439.22 780,336.59 799.35,229.46 809.03,178.05 813.87,155.73 816.29,146.04 818.71,137.61 819.92,133.93 821.13,130.64 822.34,127.75 823.55,125.33 824.76,123.3 825.97,121.76 827.18,120.7 828.39,120.12 829.6,120.02 830.81,120.42 832.02,121.3 833.23,122.67 834.44,124.5 835.65,126.78 836.85,129.51 838.06,132.65 840.48,140.1 842.9,148.95 847.74,170 857.42,220.28 876.77,327.58 915.48,534.18 934.84,641.23 939.68,665.87 944.52,687.6 946.94,696.9 949.35,704.98 950.56,708.3 951.77,711.32 952.98,713.92 954.19,716.08 955.4,717.77 956.61,719 957.82,719.74 959.03,720 960.24,719.77 961.45,719.05 962.66,717.85 963.87,716.17 965.08,714.04 966.29,711.46 967.5,708.46 968.71,705.05 971.13,697.11 973.55,687.85 978.39,666.16 983.23,641.55 992.9,588.36 1012.26,482.03 1031.61,379.78 1050.97,274.55 1060.65,220.61 1070.32,170.29 1075.16,149.18 1077.58,140.31 1080,132.82 1081.21,129.65 1082.42,126.91 1083.63,124.6 1084.84,122.75 1086.05,121.36 1087.26,120.45 1088.47,120.03 1089.68,120.1 1090.89,120.66 1092.1,121.69 1093.31,123.21 1094.52,125.19 1095.73,127.62 1096.94,130.48 1098.15,133.76 1099.35,137.42 1101.77,145.82 1104.19,155.47 1109.03,177.75 1128.39,283.14 1147.74,387.94 1167.1,490.29 1186.45,596.99 1196.13,649.63 1200.97,673.46 1205.81,693.9 1208.23,702.34 1209.44,706.03 1210.65,709.32 1211.85,712.21 1213.06,714.67 1214.27,716.68 1215.48,718.22 1216.69,719.29 1217.9,719.88 1219.11,719.98 1220.32,719.59 1221.53,718.71 1222.74,717.35 1223.95,715.53 1225.16,713.25 1226.37,710.53 1227.58,707.39 1230,699.95 1232.42,691.11 1234.84,681.08 1239.68,658.27 1244.52,632.99 1263.87,525.71 1302.58,319.17 1321.94,211.84 1331.61,162.87 1336.45,143.16 1338.87,135.18 1340.08,131.74 1341.29,128.72 1342.5,126.11 1343.71,123.95 1344.92,122.24 1346.13,121.01 1347.34,120.26 1348.55,120 1349.76,120.23 1350.97,120.94 1352.18,122.14 1353.39,123.8 1354.6,125.93 1355.81,128.5 1357.02,131.5 1358.23,134.9 1360.65,142.83 1365.48,162.47 1370.32,185.79 1380,238.04">
+      </polyline>
+      <polyline class="Series2" points="180,720 182.42,720 183.63,720 184.84,720 186.05,716.97 187.26,716.97 188.47,716.97 189.68,716.97 190.89,716.97 192.1,707.91 193.31,707.91 194.52,707.91 195.73,707.91 196.94,707.91 198.15,692.95 199.35,692.95 200.56,692.95 201.77,692.95 202.98,692.95 204.19,672.28 205.4,672.28 206.61,672.28 207.82,672.28 209.03,672.28 210.24,646.24 211.45,646.24 212.66,646.24 213.87,646.24 216.29,615.23 218.71,615.23 238.06,498.85 257.42,365.97 267.1,282.04 269.52,282.04 271.94,244.45 273.15,244.45 274.35,244.45 275.56,244.45 276.77,210.87 277.98,210.87 279.19,210.87 280.4,210.87 281.61,210.87 282.82,181.94 284.03,181.94 285.24,181.94 286.45,181.94 288.87,158.16 291.29,158.16 292.5,158.16 293.71,158.16 294.92,139.91 296.13,139.91 297.34,139.91 298.55,139.91 299.76,139.91 300.97,127.46 302.18,127.46 303.39,127.46 304.6,127.46 305.81,127.46 307.02,120.99 308.23,120.99 309.44,120.99 310.65,120.99 311.85,120.99 313.06,120.56 314.27,120.56 315.48,120.56 316.69,120.56 317.9,120.56 319.11,126.19 320.32,126.19 321.53,126.19 322.74,126.19 323.95,126.19 325.16,137.81 326.37,137.81 327.58,137.81 328.79,137.81 330,137.81 331.21,155.25 332.42,155.25 333.63,155.25 334.84,155.25 337.26,178.27 339.68,178.27 342.1,178.27 344.52,206.51 345.73,206.51 346.94,206.51 348.15,206.51 349.35,239.48 350.56,239.48 351.77,239.48 352.98,239.48 354.19,239.48 355.4,276.54 356.61,276.54 357.82,276.54 359.03,276.54 361.45,316.95 363.87,316.95 368.71,359.81 371.13,359.81 373.55,404.11 375.97,404.11 378.39,404.11 380.81,448.79 383.23,448.79 388.06,492.78 390.48,492.78 392.9,535.03 394.11,535.03 395.32,535.03 396.53,535.03 397.74,574.55 398.95,574.55 400.16,574.55 401.37,574.55 402.58,574.55 403.79,610.51 405,610.51 406.21,610.51 407.42,610.51 409.84,642.17 412.26,642.17 414.68,642.17 417.1,668.94 418.31,668.94 419.52,668.94 420.73,668.94 421.94,690.38 423.15,690.38 424.35,690.38 425.56,690.38 426.77,690.38 427.98,706.16 429.19,706.16 430.4,706.16 431.61,706.16 432.82,706.16 434.03,716.06 435.24,716.06 436.45,716.06 437.66,716.06 438.87,716.06 440.08,719.94 441.29,719.94 442.5,719.94 443.71,719.94 444.92,719.94 446.13,717.76 447.34,717.76 448.55,717.76 449.76,717.76 450.97,717.76 452.18,709.54 453.39,709.54 454.6,709.54 455.81,709.54 457.02,709.54 458.23,695.4 459.44,695.4 460.65,695.4 461.85,695.4 463.06,695.4 464.27,675.52 465.48,675.52 466.69,675.52 467.9,675.52 469.11,675.52 470.32,650.21 471.53,650.21 472.74,650.21 473.95,650.21 475.16,650.21 476.37,619.87 477.58,619.87 478.79,619.87 480,619.87 482.42,585.06 484.84,585.06 489.68,546.45 528.39,287.6 533.23,249.51 535.65,249.51 538.06,215.32 539.27,215.32 540.48,215.32 541.69,215.32 542.9,185.7 544.11,185.7 545.32,185.7 546.53,185.7 547.74,185.7 548.95,161.17 550.16,161.17 551.37,161.17 552.58,161.17 553.79,161.17 555,142.13 556.21,142.13 557.42,142.13 558.63,142.13 559.84,142.13 561.05,128.86 562.26,128.86 563.47,128.86 564.68,128.86 565.89,128.86 567.1,121.53 568.31,121.53 569.52,121.53 570.73,121.53 571.94,121.53 573.15,120.25 574.35,120.25 575.56,120.25 576.77,120.25 577.98,120.25 579.19,125.04 580.4,125.04 581.61,125.04 582.82,125.04 584.03,135.82 585.24,135.82 586.45,135.82 587.66,135.82 588.87,135.82 590.08,152.45 591.29,152.45 592.5,152.45 593.71,152.45 594.92,152.45 596.13,174.71 597.34,174.71 598.55,174.71 599.76,174.71 600.97,174.71 602.18,202.24 603.39,202.24 604.6,202.24 605.81,202.24 608.23,234.58 610.65,234.58 613.06,234.58 615.48,271.11 616.69,271.11 617.9,271.11 619.11,271.11 620.32,311.1 621.53,311.1 622.74,311.1 623.95,311.1 625.16,311.1 627.58,353.67 630,353.67 634.84,397.83 639.68,442.53 642.1,442.53 644.52,486.68 646.94,486.68 649.35,486.68 651.77,529.23 654.19,529.23 659.03,569.2 661.45,569.2 663.87,605.7 665.08,605.7 666.29,605.7 667.5,605.7 668.71,638 669.92,638 671.13,638 672.34,638 673.55,638 674.76,665.49 675.97,665.49 677.18,665.49 678.39,665.49 680.81,687.7 683.23,687.7 684.44,687.7 685.65,687.7 686.85,704.29 688.06,704.29 689.27,704.29 690.48,704.29 691.69,704.29 692.9,715.03 694.11,715.03 695.32,715.03 696.53,715.03 697.74,715.03 698.95,719.76 700.16,719.76 701.37,719.76 702.58,719.76 703.79,719.76 705,718.43 706.21,718.43 707.42,718.43 708.63,718.43 709.84,718.43 711.05,711.06 712.26,711.06 713.47,711.06 714.68,711.06 715.89,711.06 717.1,697.74 718.31,697.74 719.52,697.74 720.73,697.74 721.94,697.74 723.15,678.65 724.35,678.65 725.56,678.65 726.77,678.65 729.19,654.08 731.61,654.08 741.29,590.2 760.65,467.49 780,334.78 799.35,219.87 804.19,189.57 806.61,189.57 809.03,164.29 810.24,164.29 811.45,164.29 812.66,164.29 813.87,144.46 815.08,144.46 816.29,144.46 817.5,144.46 818.71,144.46 819.92,130.37 821.13,130.37 822.34,130.37 823.55,130.37 824.76,130.37 825.97,122.2 827.18,122.2 828.39,122.2 829.6,122.2 830.81,122.2 832.02,120.07 833.23,120.07 834.44,120.07 835.65,120.07 836.85,120.07 838.06,124 839.27,124 840.48,124 841.69,124 842.9,124 844.11,133.94 845.32,133.94 846.53,133.94 847.74,133.94 848.95,133.94 850.16,149.77 851.37,149.77 852.58,149.77 855,149.77 857.42,171.26 858.63,171.26 859.84,171.26 861.05,171.26 862.26,198.07 863.47,198.07 864.68,198.07 865.89,198.07 867.1,198.07 868.31,229.77 869.52,229.77 870.73,229.77 871.94,229.77 874.35,265.75 876.77,265.75 896.13,391.57 915.48,523.39 925.16,600.81 927.58,600.81 930,633.74 931.21,633.74 932.42,633.74 933.63,633.74 934.84,661.94 936.05,661.94 937.26,661.94 938.47,661.94 939.68,661.94 940.89,684.91 942.1,684.91 943.31,684.91 944.52,684.91 945.73,684.91 946.94,702.31 948.15,702.31 949.35,702.31 950.56,702.31 951.77,702.31 952.98,713.88 954.19,713.88 955.4,713.88 956.61,713.88 957.82,713.88 959.03,719.46 960.24,719.46 961.45,719.46 962.66,719.46 963.87,719.46 965.08,718.99 966.29,718.99 967.5,718.99 968.71,718.99 969.92,718.99 971.13,712.46 972.34,712.46 973.55,712.46 974.76,712.46 975.97,712.46 977.18,699.97 978.39,699.97 979.6,699.97 980.81,699.97 982.02,681.67 983.23,681.67 984.44,681.67 985.65,681.67 986.85,681.67 988.06,657.85 989.27,657.85 990.48,657.85 991.69,657.85 992.9,657.85 994.11,628.88 995.32,628.88 996.53,628.88 997.74,628.88 1000.16,595.26 1002.58,595.26 1012.26,516.81 1031.61,384.6 1050.97,259.86 1053.39,259.86 1055.81,224.5 1057.02,224.5 1058.23,224.5 1059.44,224.5 1060.65,193.53 1061.85,193.53 1063.06,193.53 1064.27,193.53 1065.48,193.53 1066.69,167.53 1067.9,167.53 1069.11,167.53 1070.32,167.53 1072.74,146.91 1075.16,146.91 1076.37,146.91 1077.58,146.91 1078.79,131.99 1080,131.99 1081.21,131.99 1082.42,131.99 1083.63,131.99 1084.84,122.98 1086.05,122.98 1087.26,122.98 1088.47,122.98 1089.68,122.98 1090.89,120 1092.1,120 1093.31,120 1094.52,120 1095.73,120 1096.94,123.08 1098.15,123.08 1099.35,123.08 1100.56,123.08 1101.77,123.08 1102.98,132.19 1104.19,132.19 1105.4,132.19 1106.61,132.19 1107.82,132.19 1109.03,147.2 1110.24,147.2 1111.45,147.2 1112.66,147.2 1113.87,147.2 1115.08,167.91 1116.29,167.91 1117.5,167.91 1118.71,167.91 1121.13,194 1123.55,194 1128.39,225.04 1147.74,341.5 1167.1,474.39 1186.45,595.83 1196.13,658.28 1198.55,658.28 1200.97,682.01 1202.18,682.01 1203.39,682.01 1204.6,682.01 1205.81,700.21 1207.02,700.21 1208.23,700.21 1209.44,700.21 1210.65,700.21 1211.85,712.61 1213.06,712.61 1214.27,712.61 1215.48,712.61 1216.69,712.61 1217.9,719.04 1219.11,719.04 1220.32,719.04 1221.53,719.04 1222.74,719.04 1223.95,719.42 1225.16,719.42 1226.37,719.42 1227.58,719.42 1228.79,719.42 1230,713.74 1231.21,713.74 1232.42,713.74 1233.63,713.74 1234.84,713.74 1236.05,702.08 1237.26,702.08 1238.47,702.08 1239.68,702.08 1240.89,702.08 1242.1,684.59 1243.31,684.59 1244.52,684.59 1246.94,684.59 1249.35,661.52 1250.56,661.52 1251.77,661.52 1252.98,661.52 1254.19,633.24 1255.4,633.24 1256.61,633.24 1257.82,633.24 1259.03,633.24 1260.24,600.24 1261.45,600.24 1262.66,600.24 1263.87,600.24 1266.29,563.14 1268.71,563.14 1273.55,522.71 1275.97,522.71 1278.39,479.84 1280.81,479.84 1283.23,479.84 1285.65,435.53 1288.06,435.53 1292.9,390.85 1297.74,346.87 1300.16,346.87 1302.58,304.64 1303.79,304.64 1305,304.64 1306.21,304.64 1307.42,304.64 1308.63,265.14 1309.84,265.14 1311.05,265.14 1312.26,265.14 1314.68,229.22 1317.1,229.22 1319.52,229.22 1321.94,197.6 1323.15,197.6 1324.35,197.6 1325.56,197.6 1326.77,170.86 1327.98,170.86 1329.19,170.86 1330.4,170.86 1331.61,170.86 1332.82,149.47 1334.03,149.47 1335.24,149.47 1336.45,149.47 1337.66,149.47 1338.87,133.74 1340.08,133.74 1341.29,133.74 1342.5,133.74 1343.71,133.74 1344.92,123.89 1346.13,123.89 1347.34,123.89 1348.55,123.89 1349.76,123.89 1350.97,120.05 1352.18,120.05 1353.39,120.05 1354.6,120.05 1355.81,120.05 1357.02,122.28 1358.23,122.28 1359.44,122.28 1360.65,122.28 1361.85,122.28 1363.06,130.55 1364.27,130.55 1365.48,130.55 1366.69,130.55 1367.9,130.55 1369.11,144.74 1370.32,144.74 1372.74,144.74 1375.16,164.66 1377.58,164.66 1380,164.66">
+      </polyline>
+      <polyline class="Series3" points="180,720 182.42,720 183.63,720 184.84,720 186.05,716.96 187.26,716.96 188.47,716.96 189.68,716.96 190.89,716.96 192.1,707.89 193.31,707.89 194.52,707.89 195.73,707.89 196.94,707.89 198.15,692.89 199.35,692.89 200.56,692.89 201.77,692.89 202.98,692.89 204.19,672.18 205.4,672.18 206.61,672.18 207.82,672.18 209.03,672.18 210.24,646.06 211.45,646.06 212.66,646.06 213.87,646.06 216.29,614.97 218.71,614.97 238.06,498.22 257.42,365 267.1,280.99 269.52,280.99 271.94,243.43 273.15,243.43 274.35,243.43 275.56,243.43 276.77,209.91 277.98,209.91 279.19,209.91 280.4,209.91 281.61,209.91 282.82,181.08 284.03,181.08 285.24,181.08 286.45,181.08 288.87,157.45 291.29,157.45 292.5,157.45 293.71,157.45 294.92,139.38 296.13,139.38 297.34,139.38 298.55,139.38 299.76,139.38 300.97,127.13 302.18,127.13 303.39,127.13 304.6,127.13 305.81,127.13 307.02,120.86 308.23,120.86 309.44,120.86 310.65,120.86 313.06,120.67 315.48,120.67 316.69,120.67 317.9,120.67 319.11,126.54 320.32,126.54 321.53,126.54 322.74,126.54 323.95,126.54 325.16,138.4 326.37,138.4 327.58,138.4 328.79,138.4 330,138.4 331.21,156.1 332.42,156.1 333.63,156.1 334.84,156.1 337.26,179.39 339.68,179.39 342.1,179.39 344.52,207.89 345.73,207.89 346.94,207.89 348.15,207.89 349.35,241.12 350.56,241.12 351.77,241.12 352.98,241.12 354.19,241.12 355.4,278.44 356.61,278.44 357.82,278.44 359.03,278.44 361.45,319.09 363.87,319.09 368.71,362.14 371.13,362.14 373.55,406.6 375.97,406.6 378.39,406.6 380.81,451.39 383.23,451.39 388.06,495.42 390.48,495.42 392.9,537.62 394.11,537.62 395.32,537.62 396.53,537.62 397.74,577.03 398.95,577.03 400.16,577.03 401.37,577.03 402.58,577.03 403.79,612.79 405,612.79 406.21,612.79 407.42,612.79 409.84,644.18 412.26,644.18 414.68,644.18 417.1,670.64 418.31,670.64 419.52,670.64 420.73,670.64 421.94,691.71 423.15,691.71 424.35,691.71 425.56,691.71 426.77,691.71 427.98,707.09 429.19,707.09 430.4,707.09 431.61,707.09 432.82,707.09 434.03,716.55 435.24,716.55 436.45,716.55 437.66,716.55 438.87,716.55 440.08,719.99 441.29,719.99 442.5,719.99 443.71,719.99 444.92,719.99 446.13,717.34 447.34,717.34 448.55,717.34 449.76,717.34 450.97,717.34 452.18,708.66 453.39,708.66 454.6,708.66 455.81,708.66 457.02,708.66 458.23,694.04 459.44,694.04 460.65,694.04 463.06,694.04 465.48,673.69 470.32,647.91 489.68,542.92 528.39,283.56 533.23,245.75 535.65,245.75 538.06,211.95 539.27,211.95 540.48,211.95 541.69,211.95 542.9,182.8 544.11,182.8 545.32,182.8 546.53,182.8 547.74,182.8 548.95,158.82 550.16,158.82 551.37,158.82 552.58,158.82 553.79,158.82 555,140.38 556.21,140.38 557.42,140.38 558.63,140.38 559.84,140.38 561.05,127.74 562.26,127.74 563.47,127.74 564.68,127.74 565.89,127.74 567.1,121.09 568.31,121.09 569.52,121.09 570.73,121.09 571.94,121.09 573.15,120.49 574.35,120.49 575.56,120.49 576.77,120.49 577.98,120.49 579.19,125.97 580.4,125.97 581.61,125.97 582.82,125.97 584.03,137.45 585.24,137.45 586.45,137.45 587.66,137.45 588.87,137.45 590.08,154.78 591.29,154.78 592.5,154.78 593.71,154.78 594.92,154.78 596.13,177.71 597.34,177.71 598.55,177.71 599.76,177.71 600.97,177.71 602.18,205.89 603.39,205.89 604.6,205.89 605.81,205.89 608.23,238.83 610.65,238.83 613.06,238.83 615.48,275.91 616.69,275.91 617.9,275.91 619.11,275.91 620.32,316.36 621.53,316.36 622.74,316.36 623.95,316.36 625.16,316.36 627.58,359.29 630,359.29 634.84,403.69 639.68,448.49 642.1,448.49 644.52,492.6 646.94,492.6 649.35,492.6 651.77,534.95 654.19,534.95 659.03,574.57 661.45,574.57 663.87,610.59 665.08,610.59 666.29,610.59 667.5,610.59 668.71,642.29 669.92,642.29 671.13,642.29 672.34,642.29 673.55,642.29 674.76,669.08 675.97,669.08 677.18,669.08 678.39,669.08 680.81,690.51 683.23,690.51 684.44,690.51 685.65,690.51 686.85,706.27 688.06,706.27 689.27,706.27 690.48,706.27 691.69,706.27 692.9,716.12 694.11,716.12 695.32,716.12 696.53,716.12 697.74,716.12 698.95,719.95 700.16,719.95 701.37,719.95 702.58,719.95 703.79,719.95 705,717.7 706.21,717.7 707.42,717.7 708.63,717.7 709.84,717.7 711.05,709.4 712.26,709.4 713.47,709.4 714.68,709.4 715.89,709.4 717.1,695.16 718.31,695.16 719.52,695.16 720.73,695.16 721.94,695.16 723.15,675.18 724.35,675.18 725.56,675.18 726.77,675.18 729.19,649.74 731.61,649.74 741.29,584.31 760.65,460.07 780,327.32 782.42,327.32 784.84,286.13 786.05,286.13 787.26,286.13 788.47,286.13 789.68,248.1 790.89,248.1 792.1,248.1 793.31,248.1 794.52,248.1 795.73,214.01 796.94,214.01 798.15,214.01 799.35,214.01 801.77,184.55 804.19,184.55 806.61,184.55 809.03,160.21 810.24,160.21 811.45,160.21 812.66,160.21 813.87,141.4 815.08,141.4 816.29,141.4 817.5,141.4 818.71,141.4 819.92,128.38 821.13,128.38 822.34,128.38 823.55,128.38 824.76,128.38 825.97,121.34 827.18,121.34 828.39,121.34 829.6,121.34 830.81,121.34 832.02,120.35 833.23,120.35 834.44,120.35 835.65,120.35 836.85,120.35 838.06,125.43 839.27,125.43 840.48,125.43 841.69,125.43 842.9,125.43 844.11,136.53 845.32,136.53 846.53,136.53 847.74,136.53 848.95,136.53 850.16,153.48 851.37,153.48 852.58,153.48 855,153.48 857.42,176.06 858.63,176.06 859.84,176.06 861.05,176.06 862.26,203.91 863.47,203.91 864.68,203.91 865.89,203.91 867.1,203.91 868.31,236.56 869.52,236.56 870.73,236.56 871.94,236.56 874.35,273.39 876.77,273.39 896.13,400.79 915.48,532.27 925.16,608.37 927.58,608.37 930,640.37 931.21,640.37 932.42,640.37 933.63,640.37 934.84,667.5 936.05,667.5 937.26,667.5 938.47,667.5 939.68,667.5 940.89,689.29 942.1,689.29 943.31,689.29 944.52,689.29 945.73,689.29 946.94,705.42 948.15,705.42 949.35,705.42 950.56,705.42 951.77,705.42 952.98,715.66 954.19,715.66 955.4,715.66 956.61,715.66 957.82,715.66 959.03,719.88 960.24,719.88 961.45,719.88 962.66,719.88 963.87,719.88 965.08,718.03 966.29,718.03 967.5,718.03 968.71,718.03 969.92,718.03 971.13,710.12 972.34,710.12 973.55,710.12 974.76,710.12 975.97,710.12 977.18,696.26 978.39,696.26 979.6,696.26 980.81,696.26 982.02,676.64 983.23,676.64 984.44,676.64 985.65,676.64 986.85,676.64 988.06,651.55 989.27,651.55 990.48,651.55 991.69,651.55 992.9,651.55 994.11,621.39 995.32,621.39 996.53,621.39 997.74,621.39 1000.16,586.7 1002.58,586.7 1012.26,506.6 1031.61,373.6 1050.97,250.45 1053.39,250.45 1055.81,216.09 1057.02,216.09 1058.23,216.09 1059.44,216.09 1060.65,186.31 1061.85,186.31 1063.06,186.31 1064.27,186.31 1065.48,186.31 1066.69,161.63 1067.9,161.63 1069.11,161.63 1070.32,161.63 1071.53,161.63 1072.74,142.45 1073.95,142.45 1075.16,142.45 1076.37,142.45 1077.58,142.45 1078.79,129.05 1080,129.05 1081.21,129.05 1082.42,129.05 1083.63,129.05 1084.84,121.61 1086.05,121.61 1087.26,121.61 1088.47,121.61 1089.68,121.61 1090.89,120.23 1092.1,120.23 1093.31,120.23 1094.52,120.23 1095.73,120.23 1096.94,124.92 1098.15,124.92 1099.35,124.92 1100.56,124.92 1101.77,124.92 1102.98,135.63 1104.19,135.63 1105.4,135.63 1106.61,135.63 1107.82,135.63 1109.03,152.21 1110.24,152.21 1111.45,152.21 1112.66,152.21 1113.87,152.21 1115.08,174.43 1116.29,174.43 1117.5,174.43 1118.71,174.43 1121.13,201.95 1123.55,201.95 1128.39,234.3 1147.74,353.61 1167.1,486.95 1186.45,606.14 1196.13,665.89 1198.55,665.89 1200.97,688.04 1202.18,688.04 1203.39,688.04 1204.6,688.04 1205.81,704.55 1207.02,704.55 1208.23,704.55 1209.44,704.55 1210.65,704.55 1211.85,715.18 1213.06,715.18 1214.27,715.18 1215.48,715.18 1216.69,715.18 1217.9,719.79 1219.11,719.79 1220.32,719.79 1221.53,719.79 1222.74,719.79 1223.95,718.33 1225.16,718.33 1226.37,718.33 1227.58,718.33 1228.79,718.33 1230,710.81 1231.21,710.81 1232.42,710.81 1233.63,710.81 1234.84,710.81 1236.05,697.34 1237.26,697.34 1238.47,697.34 1239.68,697.34 1240.89,697.34 1242.1,678.09 1243.31,678.09 1244.52,678.09 1246.94,678.09 1249.35,653.34 1250.56,653.34 1251.77,653.34 1252.98,653.34 1254.19,623.49 1255.4,623.49 1256.61,623.49 1257.82,623.49 1259.03,623.49 1260.24,589.08 1261.45,589.08 1262.66,589.08 1263.87,589.08 1266.29,550.76 1268.71,550.76 1273.55,509.37 1275.97,509.37 1278.39,465.82 1280.81,465.82 1283.23,465.82 1285.65,421.17 1288.06,421.17 1292.9,376.48 1297.74,332.85 1300.16,332.85 1302.58,291.32 1303.79,291.32 1305,291.32 1306.21,291.32 1307.42,291.32 1308.63,252.83 1309.84,252.83 1311.05,252.83 1312.26,252.83 1314.68,218.19 1317.1,218.19 1319.52,218.19 1321.94,188.09 1323.15,188.09 1324.35,188.09 1325.56,188.09 1326.77,163.07 1327.98,163.07 1329.19,163.07 1330.4,163.07 1331.61,163.07 1332.82,143.52 1334.03,143.52 1335.24,143.52 1336.45,143.52 1337.66,143.52 1338.87,129.74 1340.08,129.74 1341.29,129.74 1342.5,129.74 1343.71,129.74 1344.92,121.91 1346.13,121.91 1347.34,121.91 1348.55,121.91 1349.76,121.91 1350.97,120.14 1352.18,120.14 1353.39,120.14 1354.6,120.14 1355.81,120.14 1357.02,124.43 1358.23,124.43 1359.44,124.43 1360.65,124.43 1361.85,124.43 1363.06,134.75 1364.27,134.75 1365.48,134.75 1366.69,134.75 1367.9,134.75 1369.11,150.96 1370.32,150.96 1372.74,150.96 1375.16,172.82 1377.58,172.82 1380,172.82">
+      </polyline>
+     </g>
+    </svg>
+   </td>
+   <td>
+    <br/>
+    <br/>
+    <br/>
+    <b style="color:Tomato">╺━━</b>
+    Theoretical (large rot.)
+    <br/>
+    <b style="color:YellowGreen">╺╺╺</b>
+    Crank–Nicolson (IMEX)
+    <br/>
+    <b style="color:CornflowerBlue">· · · ·</b>
+    Runge-Kutta 4 (explicit)
+   </td>
+  </tr>
+  <tr>
+   <td>
+    <p>
+     Absolute error Δθ [°] versus time
+     <var>t</var>
+     [s] plot
+    </p>
+    <svg class="plot" data-plot="svg" height="840px" style="width:272.22pt; height:155.56pt;" version="1.1" viewbox=" 0 0 1470 840" width="1470px" xmlns="http://www.w3.org/2000/svg">
+     <style type="text/css">
+      .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+     </style>
+     <g class="plot">
+      <rect class="Frame" height="600" width="1200" x="180" y="120">
+      </rect>
+      <line class="Grid" x1="180" x2="1380" y1="698.66" y2="698.66">
+      </line>
+      <text class="sm end" x="161" y="716.66">-15</text>
+      <line class="Grid" x1="180" x2="1380" y1="603.11" y2="603.11">
+      </line>
+      <text class="sm end" x="161" y="621.11">-10</text>
+      <line class="Grid" x1="180" x2="1380" y1="507.55" y2="507.55">
+      </line>
+      <text class="sm end" x="161" y="525.55">-5</text>
+      <line class="Grid" x1="180" x2="1380" y1="412" y2="412">
+      </line>
+      <text class="sm end" x="161" y="430">0</text>
+      <line class="Grid" x1="180" x2="1380" y1="316.45" y2="316.45">
+      </line>
+      <text class="sm end" x="161" y="334.45">5</text>
+      <line class="Grid" x1="180" x2="1380" y1="220.89" y2="220.89">
+      </line>
+      <text class="sm end" x="161" y="238.89">10</text>
+      <line class="Grid" x1="180" x2="1380" y1="125.34" y2="125.34">
+      </line>
+      <text class="sm end" x="161" y="143.34">15</text>
+      <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="180" y="772">0</text>
+      <line class="Grid" x1="300.6" x2="300.6" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="300.6" y="772">1</text>
+      <line class="Grid" x1="421.21" x2="421.21" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="421.21" y="772">2</text>
+      <line class="Grid" x1="541.81" x2="541.81" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="541.81" y="772">3</text>
+      <line class="Grid" x1="662.41" x2="662.41" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="662.41" y="772">4</text>
+      <line class="Grid" x1="783.02" x2="783.02" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="783.02" y="772">5</text>
+      <line class="Grid" x1="903.62" x2="903.62" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="903.62" y="772">6</text>
+      <line class="Grid" x1="1024.22" x2="1024.22" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="1024.22" y="772">7</text>
+      <line class="Grid" x1="1144.82" x2="1144.82" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="1144.82" y="772">8</text>
+      <line class="Grid" x1="1265.43" x2="1265.43" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="1265.43" y="772">9</text>
+      <text class="sm mid" x="1386.03" y="772">10</text>
+      <line class="Axis" x1="180" x2="1380" y1="412" y2="412">
+      </line>
+      <text x="1402" y="394">x</text>
+      <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+      </line>
+      <text class="mid" x="180" y="84">y</text>
+      <text x="8" y="823">[0; -16.17]</text>
+      <text class="end" x="1462" y="44">[9.95; 15.23]</text>
+      <polyline class="Series1" points="180,412 189.68,457.9 194.52,489.14 196.94,528.88 199.35,514.93 200.56,537.63 201.77,560.94 202.98,584.77 204.19,530.07 205.4,554.74 206.61,579.72 207.82,604.96 209.03,630.41 210.24,556.46 211.45,582.18 212.66,607.99 213.87,633.84 216.29,567.08 218.71,618.71 221.13,670.11 223.55,585.91 225.97,636.62 228.39,537.59 230.81,587.54 233.23,637.14 235.65,526.2 236.85,550.75 238.06,575.24 240.48,456.64 242.9,505.34 245.32,553.99 247.74,431.98 248.95,456.33 250.16,480.72 252.58,359.83 255,408.94 257.42,458.33 259.84,343.23 261.05,368.22 262.26,393.3 264.68,287.78 267.1,338.61 269.52,389.8 271.94,297.62 273.15,323.44 274.35,349.3 276.77,272.67 279.19,324.25 281.61,375.41 284.03,315.21 285.24,339.99 286.45,364.41 287.66,388.4 288.87,321 290.08,343.92 291.29,366.17 292.5,387.68 293.71,408.34 294.92,358.32 296.13,377.01 297.34,394.56 298.55,410.88 299.76,425.87 300.97,391.87 302.18,403.91 303.39,414.36 304.6,423.14 305.81,430.18 307.02,410.68 308.23,414.1 309.44,415.66 310.65,415.36 313.06,407.54 315.48,394.09 317.9,373.78 320.32,368.71 321.53,353.28 322.74,336.55 323.95,318.62 325.16,343.98 326.37,323.94 327.58,302.99 328.79,281.24 330,258.76 331.21,302.32 332.42,278.66 333.63,254.52 334.84,229.98 336.05,205.1 337.26,267.93 338.47,242.54 339.68,216.99 342.1,165.51 344.52,221.73 346.94,170.02 349.35,244.45 351.77,193.16 354.19,142.2 356.61,233.3 357.82,208.16 359.03,183.1 361.45,287.72 363.87,238.23 366.29,189.03 368.71,303.86 369.92,279.45 371.13,255.08 373.55,375.72 375.97,327.08 378.39,278.4 380.81,400.42 382.02,375.96 383.23,351.46 385.65,470.4 388.06,420.91 390.48,371.08 392.9,482.35 394.11,457.11 395.32,431.77 397.74,531.9 400.16,480.61 402.58,429.04 405,514.75 407.42,463.04 409.84,532.57 412.26,481.62 414.68,431.57 415.89,509.36 417.1,485.21 418.31,461.54 419.52,438.42 420.73,415.94 421.94,476.12 423.15,455.17 424.35,435.11 425.56,416.07 426.77,398.12 427.98,441.68 429.19,426.24 430.4,412.18 431.61,399.61 432.82,388.61 434.03,417.09 435.24,409.45 436.45,403.59 437.66,399.55 438.87,397.36 440.08,411.87 441.29,413.41 442.5,416.81 443.71,422.04 444.92,429.06 446.13,429.48 447.34,439.91 448.55,451.94 450.97,480.46 455.81,521.28 460.65,554.52 461.85,578 463.06,601.99 464.27,550.43 465.48,575.2 466.69,600.27 467.9,625.59 469.11,651.09 470.32,579.99 471.53,605.74 472.74,631.57 475.16,683.3 477.58,619.03 480,670.51 482.42,588.64 483.63,614.1 484.84,639.47 487.26,689.93 489.68,592.45 490.89,617.35 492.1,642.16 494.52,532.64 496.94,581.75 499.35,630.65 501.77,512.74 502.98,537.07 504.19,561.4 506.61,439.58 509.03,488.28 511.45,537.12 513.87,415.99 515.08,440.6 516.29,465.28 518.71,349.13 521.13,399.08 523.55,449.4 525.97,342.67 527.18,368.16 528.39,393.74 530.81,299.54 533.23,351.17 534.44,377.04 535.65,402.91 538.06,323.89 540.48,375.23 542.9,312.71 545.32,362.36 546.53,386.65 547.74,410.49 548.95,340.04 550.16,362.75 551.37,384.77 552.58,406.01 553.79,426.38 555,373 556.21,391.33 557.42,408.49 558.63,424.39 559.84,438.92 561.05,401.27 562.26,412.81 563.47,422.72 564.68,430.94 565.89,437.41 567.1,414.08 568.31,416.9 569.52,417.86 570.73,416.95 571.94,414.17 573.15,404.67 574.35,398.25 576.77,380.2 581.61,343.57 586.45,309.62 587.66,288.41 588.87,266.4 590.08,307.3 591.29,284 592.5,260.18 593.71,235.9 594.92,211.24 596.13,271.33 597.34,246.09 598.55,220.64 600.97,169.32 603.39,222.89 605.81,171.15 608.23,243.12 610.65,191.72 613.06,140.64 615.48,229.57 617.9,179.25 620.32,282.14 622.74,232.54 625.16,183.25 627.58,296.92 628.79,272.48 630,248.08 632.42,368.17 634.84,319.52 637.26,270.86 639.68,392.96 640.89,368.54 642.1,344.07 644.52,463.71 646.94,414.33 649.35,364.62 651.77,477.19 652.98,452.01 654.19,426.74 656.61,528.66 659.03,477.47 660.24,451.76 661.45,425.99 663.87,513.84 666.29,462.1 668.71,533.95 671.13,482.81 673.55,432.41 675.97,488.28 677.18,464.28 678.39,440.78 679.6,417.86 680.81,480.5 682.02,458.98 683.23,438.31 684.44,418.57 685.65,399.87 686.85,445.72 688.06,429.38 689.27,414.38 690.48,400.8 691.69,388.73 692.9,419.28 694.11,410.48 695.32,403.42 696.53,398.14 697.74,394.7 698.95,411.2 700.16,411.48 701.37,413.63 702.58,417.62 705,425.95 707.42,446.22 712.26,476.72 713.47,494.64 714.68,513.67 715.89,533.69 717.1,503.71 718.31,525.46 719.52,547.93 720.73,571.03 721.94,594.69 723.15,545.87 724.35,570.41 725.56,595.28 726.77,620.44 727.98,645.82 729.19,577.46 730.4,603.23 731.61,628.93 734.03,680.64 736.45,618.98 738.87,670.55 741.29,591.04 743.71,642 746.13,692.59 748.55,597.09 749.76,622.05 750.97,646.92 753.39,538.89 755.81,588.09 758.23,637.06 760.65,520.04 761.85,544.39 763.06,568.72 765.48,447.19 767.9,495.87 770.32,544.65 772.74,423.16 773.95,447.72 775.16,472.35 777.58,355.23 780,405.06 782.42,455.25 784.84,347 786.05,372.43 787.26,397.95 789.68,301.79 792.1,353.36 794.52,405.07 796.94,323.85 799.35,375.32 801.77,310.47 804.19,360.53 805.4,385.08 806.61,409.23 807.82,336.31 809.03,359.43 810.24,381.93 811.45,403.7 812.66,424.67 813.87,368.93 815.08,387.99 816.29,405.95 817.5,422.72 818.71,438.18 819.92,398.37 821.13,410.96 822.34,421.98 823.55,431.25 824.76,439.01 825.97,413.68 827.18,417.74 828.39,419.96 829.6,420.31 830.81,418.79 832.02,407.27 833.23,402.06 834.44,395.07 835.65,386.33 836.85,375.92 838.06,378.94 839.27,365.41 840.48,350.46 842.9,316.65 845.32,316.3 847.74,274.18 848.95,251.94 850.16,289.53 851.37,266.06 852.58,242.07 853.79,217.67 855,192.9 856.21,249.95 857.42,224.64 858.63,199.13 859.84,173.48 862.26,224.4 864.68,172.66 867.1,120.98 869.52,190.63 871.94,139.44 874.35,226.15 875.56,200.88 876.77,175.7 879.19,125.62 881.61,227.09 882.82,202.35 884.03,177.7 886.45,290.12 888.87,241.22 891.29,192.48 893.71,311.99 894.92,287.67 896.13,263.35 898.55,385.44 900.97,336.61 905.81,407.59 908.23,358 910.65,471.78 913.06,421.46 915.48,370.76 917.9,474.04 919.11,448.38 920.32,422.65 922.74,512.59 925.16,460.86 926.37,435 927.58,409.2 930,483.72 932.42,433.02 934.84,491.13 937.26,443 938.47,419.68 939.68,396.96 940.89,462.76 942.1,441.51 943.31,421.13 944.52,401.72 945.73,383.37 946.94,432.69 948.15,416.78 949.35,401.78 950.56,389.13 951.77,377.57 952.98,411.84 954.19,403.6 955.4,397.11 956.61,392.43 957.82,389.59 959.03,409.94 960.24,410.83 961.45,413.58 962.66,418.17 963.87,424.57 966.29,440.76 968.71,465.26 973.55,506.05 978.39,541.19 980.81,587.17 983.23,565.35 984.44,590.01 985.65,614.98 986.85,640.22 988.06,574.6 989.27,600.21 990.48,625.93 992.9,677.59 995.32,618.58 997.74,670.21 1000.16,593.11 1001.37,618.69 1002.58,644.19 1005,694.9 1007.42,601.46 1008.63,626.48 1009.84,651.41 1012.26,544.95 1014.68,594.24 1017.1,643.28 1019.52,527.25 1021.94,575.96 1026.77,503.46 1029.19,552.2 1031.61,430.43 1032.82,454.95 1034.03,479.54 1036.45,361.53 1038.87,411.23 1041.29,461.3 1043.71,351.6 1044.92,376.96 1046.13,402.43 1048.55,304.36 1050.97,355.84 1052.18,381.67 1053.39,407.52 1055.81,324.11 1058.23,375.7 1060.65,308.52 1063.06,358.92 1064.27,383.71 1065.48,408.13 1066.69,332.73 1067.9,356.24 1069.11,379.17 1070.32,401.44 1071.53,422.96 1072.74,364.84 1073.95,384.59 1075.16,403.31 1076.37,420.89 1077.58,437.24 1078.79,395.25 1080,408.85 1081.21,420.94 1082.42,431.43 1083.63,440.25 1084.84,412.9 1086.05,418.2 1087.26,421.67 1088.47,423.28 1089.68,423.02 1090.89,409.5 1092.1,405.52 1094.52,392.16 1099.35,357.2 1109.03,295.23 1128.39,189.91 1129.6,164.22 1130.81,138.61 1133.23,223.04 1135.65,172.46 1138.06,122.25 1140.48,221.88 1141.69,197.09 1142.9,172.38 1145.32,283.47 1147.74,234.51 1150.16,185.72 1152.58,304.52 1153.79,280.2 1155,255.88 1157.42,377.88 1159.84,329.1 1162.26,280.14 1164.68,400.71 1165.89,376.01 1167.1,351.22 1169.52,466.15 1171.94,415.96 1174.35,365.39 1176.77,470.32 1177.98,444.72 1179.19,419.03 1181.61,511.03 1184.03,459.31 1186.45,407.6 1188.87,484.35 1191.29,433.39 1193.71,493.77 1196.13,445.06 1197.34,421.38 1198.55,398.24 1199.76,466.46 1200.97,444.68 1202.18,423.7 1203.39,403.63 1204.6,384.55 1205.81,436.14 1207.02,419.36 1208.23,403.88 1209.44,389.79 1210.65,377.18 1211.85,413.53 1213.06,404.13 1214.27,396.46 1215.48,390.55 1216.69,386.46 1217.9,408.79 1219.11,408.42 1220.32,409.91 1222.74,418.45 1225.16,435.58 1226.37,445.97 1227.58,457.96 1228.79,471.47 1230,464.7 1231.21,480.97 1232.42,498.48 1234.84,536.81 1237.26,534.34 1239.68,579.45 1240.89,602.93 1242.1,560.05 1243.31,584.45 1244.52,609.22 1245.73,634.29 1246.94,659.6 1248.15,596.94 1249.35,622.58 1250.56,648.34 1251.77,674.16 1254.19,617.81 1256.61,669.49 1259.03,720.98 1261.45,646.04 1262.66,671.5 1263.87,696.88 1266.29,605.54 1268.71,655.61 1271.13,705.33 1273.55,600.19 1274.76,624.78 1275.97,649.3 1278.39,534.35 1280.81,583.09 1283.23,631.75 1285.65,511.04 1286.85,535.38 1288.06,559.75 1290.48,437.79 1292.9,486.82 1295.32,536.1 1297.74,417.6 1298.95,442.52 1300.16,467.54 1302.58,356.46 1305,407.16 1307.42,458.23 1309.84,358.63 1312.26,410.26 1314.68,324.69 1317.1,376.35 1319.52,427.7 1321.94,357.55 1324.35,407.22 1325.56,431.52 1326.77,353.19 1327.98,376.52 1329.19,399.24 1330.4,421.28 1331.61,442.54 1332.82,381.15 1334.03,400.57 1335.24,418.93 1336.45,436.13 1337.66,452.06 1338.87,406.49 1340.08,419.61 1341.29,431.19 1342.5,441.14 1343.71,449.41 1344.92,418.28 1346.13,422.98 1347.34,425.85 1348.55,426.86 1349.76,425.99 1350.97,408.61 1353.39,397.66 1355.81,379.7 1360.65,333.46 1370.32,255.1 1380,131.55">
+      </polyline>
+      <polyline class="Series2" points="180,412 189.68,457.87 194.52,489.05 196.94,528.79 199.35,514.7 200.56,537.4 201.77,560.71 202.98,584.54 204.19,529.66 205.4,554.32 206.61,579.3 207.82,604.55 209.03,629.99 210.24,555.78 211.45,581.51 212.66,607.31 213.87,633.16 216.29,566.07 218.71,617.7 221.13,669.09 223.55,584.49 225.97,635.2 228.39,535.71 230.81,585.66 233.23,635.25 235.65,523.82 236.85,548.37 238.06,572.86 240.48,453.76 242.9,502.47 245.32,551.11 247.74,428.65 248.95,453 250.16,477.39 252.58,356.14 255,405.25 257.42,454.64 259.84,339.3 261.05,364.29 262.26,389.37 264.68,283.77 267.1,334.6 269.52,385.79 271.94,293.7 273.15,319.52 274.35,345.38 276.77,269 279.19,320.59 281.61,371.75 284.03,311.96 285.24,336.74 286.45,361.16 287.66,385.15 288.87,318.3 290.08,341.21 291.29,363.47 292.5,384.97 293.71,405.63 294.92,356.28 296.13,374.97 297.34,392.52 298.55,408.84 299.76,423.83 300.97,390.57 302.18,402.62 303.39,413.07 304.6,421.85 305.81,428.89 307.02,410.2 308.23,413.63 309.44,415.19 310.65,414.89 311.85,412.72 313.06,407.94 314.27,402.1 315.48,394.49 317.9,374.18 320.32,370.03 321.53,354.6 322.74,337.87 323.95,319.94 325.16,346.25 326.37,326.21 327.58,305.26 328.79,283.51 330,261.03 331.21,305.58 332.42,281.91 333.63,257.77 334.84,233.23 336.05,208.35 337.26,272.19 338.47,246.8 339.68,221.24 342.1,169.77 344.52,227.01 346.94,175.29 349.35,250.73 351.77,199.44 354.19,148.48 356.61,240.56 357.82,215.41 359.03,190.36 361.45,295.88 363.87,246.38 366.29,197.19 368.71,312.8 369.92,288.39 371.13,264.01 373.55,385.27 375.97,336.63 378.39,287.95 380.81,410.36 382.02,385.9 383.23,361.4 385.65,480.46 388.06,430.98 390.48,381.15 392.9,492.26 394.11,467.02 395.32,441.68 397.74,541.35 400.16,490.06 402.58,438.49 405,523.46 407.42,471.75 409.84,540.27 412.26,489.33 414.68,439.28 415.89,515.84 417.1,491.7 418.31,468.03 419.52,444.91 420.73,422.42 421.94,481.21 423.15,460.25 424.35,440.2 425.56,421.15 426.77,403.2 427.98,445.23 429.19,429.78 430.4,415.73 431.61,403.16 432.82,392.16 434.03,418.99 435.24,411.35 436.45,405.49 437.66,401.45 438.87,399.25 440.08,412.05 441.29,413.59 442.5,416.99 443.71,422.22 444.92,429.24 446.13,427.89 447.34,438.32 448.55,450.35 450.97,478.86 453.39,479.5 455.81,517.89 457.02,538.54 458.23,504.16 459.44,526.4 460.65,549.31 461.85,572.8 463.06,596.78 464.27,543.42 465.48,568.19 466.69,593.26 467.9,618.58 469.11,644.08 470.32,571.21 471.53,596.97 472.74,622.79 475.16,674.52 477.58,608.55 480,660.04 482.42,576.57 483.63,602.03 484.84,627.4 487.26,677.86 489.68,578.94 490.89,603.84 492.1,628.65 494.52,517.92 496.94,567.03 499.35,615.93 501.77,497.09 502.98,521.43 504.19,545.75 506.61,423.35 509.03,472.06 511.45,520.89 513.87,399.59 515.08,424.2 516.29,448.88 518.71,332.98 521.13,382.92 523.55,433.25 525.97,327.2 527.18,352.69 528.39,378.27 530.81,285.18 533.23,336.81 534.44,362.68 535.65,388.55 538.06,311.01 540.48,362.35 542.9,301.64 545.32,351.29 546.53,375.58 547.74,399.42 548.95,331.05 550.16,353.76 551.37,375.78 552.58,397.02 553.79,417.39 555,366.29 556.21,384.62 557.42,401.79 558.63,417.68 559.84,432.22 561.05,397.01 562.26,408.55 563.47,418.46 564.68,426.69 565.89,433.15 567.1,412.37 568.31,415.2 569.52,416.15 570.73,415.24 571.94,412.47 573.15,405.59 574.35,399.17 576.77,381.12 581.61,347.15 584.03,355.59 586.45,315.87 587.66,294.65 588.87,272.65 590.08,316.19 591.29,292.89 592.5,269.06 593.71,244.79 594.92,220.13 596.13,282.8 597.34,257.55 598.55,232.11 600.97,180.78 603.39,236.82 605.81,185.09 608.23,259.36 609.44,233.63 610.65,207.96 613.06,156.89 615.48,247.9 616.69,222.69 617.9,197.57 620.32,302.24 622.74,252.64 625.16,203.35 627.58,318.41 628.79,293.97 630,269.57 632.42,390.57 634.84,341.93 637.26,293.27 639.68,415.76 640.89,391.34 642.1,366.87 644.52,486.34 646.94,436.95 649.35,387.24 651.77,499.05 652.98,473.87 654.19,448.6 656.61,549.19 659.03,498.01 660.24,472.3 661.45,446.52 663.87,532.52 666.29,480.79 668.71,550.34 671.13,499.2 673.55,448.8 674.76,526.41 675.97,501.99 677.18,477.99 678.39,454.49 679.6,431.57 680.81,491.23 682.02,469.72 683.23,449.05 684.44,429.31 685.65,410.61 686.85,453.25 688.06,436.92 689.27,421.91 690.48,408.33 691.69,396.26 692.9,423.46 694.11,414.66 695.32,407.59 696.53,402.32 697.74,398.87 698.95,411.91 700.16,412.19 701.37,414.34 702.58,418.34 705,423.15 707.42,443.41 709.84,469.96 712.26,470.38 713.47,488.3 714.68,507.32 715.89,527.35 717.1,493.86 718.31,515.61 719.52,538.08 720.73,561.18 721.94,584.84 723.15,532.59 724.35,557.13 725.56,582 726.77,607.16 727.98,632.54 729.19,560.88 730.4,586.65 731.61,612.35 734.03,664.06 736.45,599.3 738.87,650.87 741.29,568.54 743.71,619.5 746.13,670.08 748.55,572.13 749.76,597.09 750.97,621.96 753.39,511.95 755.81,561.15 758.23,610.11 760.65,491.69 761.85,516.03 763.06,540.36 765.48,418.06 767.9,466.74 770.32,515.53 772.74,393.98 773.95,418.54 775.16,443.17 777.58,326.72 780,376.55 782.42,426.74 784.84,319.89 786.05,345.32 787.26,370.84 789.68,276.76 792.1,328.32 794.52,380.04 796.94,301.48 799.35,352.96 801.77,291.28 804.19,341.34 805.4,365.89 806.61,390.04 807.82,320.71 809.03,343.83 810.24,366.33 811.45,388.1 812.66,409.07 813.87,357.23 815.08,376.29 816.29,394.25 817.5,411.01 818.71,426.48 819.92,390.8 821.13,403.39 822.34,414.41 823.55,423.67 824.76,431.43 825.97,410.38 827.18,414.45 828.39,416.67 829.6,417.02 830.81,415.5 832.02,408.35 833.23,403.14 834.44,396.14 835.65,387.41 836.85,377 838.06,384.42 839.27,370.9 840.48,355.94 842.9,322.13 845.32,326.17 847.74,284.05 848.95,261.81 850.16,303.72 851.37,280.24 852.58,256.26 853.79,231.85 855,207.08 856.21,268.31 857.42,242.99 858.63,217.49 859.84,191.84 862.26,246.71 864.68,194.98 867.1,143.29 869.52,216.59 870.73,190.96 871.94,165.4 874.35,255.34 876.77,204.89 879.19,154.81 881.61,258.98 882.82,234.25 884.03,209.59 886.45,324.06 888.87,275.16 891.29,226.42 893.71,347.23 894.92,322.91 896.13,298.58 898.55,421.14 900.97,372.31 905.81,442.87 908.23,393.27 910.65,505.75 913.06,455.43 915.48,404.73 917.9,505.87 920.32,454.48 922.74,541.51 925.16,489.78 927.58,438.11 930,509.08 932.42,458.37 933.63,433.38 934.84,512.38 936.05,488.09 937.26,464.25 938.47,440.93 939.68,418.21 940.89,479.48 942.1,458.23 943.31,437.85 944.52,418.44 945.73,400.09 946.94,444.57 948.15,428.66 949.35,413.66 950.56,401 951.77,389.45 952.98,418.66 954.19,410.41 955.4,403.93 956.61,399.24 957.82,396.4 959.03,411.55 960.24,412.44 961.45,415.19 962.66,419.78 963.87,426.18 965.08,427.24 966.29,437.1 967.5,448.58 968.71,461.6 973.55,497.12 975.97,536.81 978.39,527.04 979.6,549.73 980.81,573.02 982.02,521.85 983.23,546.12 984.44,570.78 985.65,595.76 986.85,620.99 988.06,550.52 989.27,576.13 990.48,601.85 992.9,653.51 995.32,589.96 997.74,641.6 1000.16,560.41 1001.37,585.99 1002.58,611.49 1005,662.2 1007.42,565.23 1008.63,590.25 1009.84,615.18 1012.26,505.91 1014.68,555.21 1017.1,604.24 1019.52,486.25 1020.73,510.62 1021.94,534.96 1024.35,412.78 1026.77,461.43 1029.19,510.17 1031.61,388.41 1032.82,412.93 1034.03,437.51 1036.45,320.54 1038.87,370.25 1041.29,420.32 1043.71,312.67 1044.92,338.03 1046.13,363.5 1048.55,268.42 1050.97,319.9 1052.18,345.73 1053.39,371.59 1055.81,291.99 1058.23,343.58 1060.65,280.91 1063.06,331.31 1064.27,356.1 1065.48,380.52 1066.69,310.19 1067.9,333.7 1069.11,356.63 1070.32,378.9 1071.53,400.42 1072.74,347.8 1073.95,367.55 1075.16,386.26 1076.37,403.84 1077.58,420.2 1078.79,384 1080,397.6 1082.42,420.18 1084.84,407.66 1086.05,412.96 1087.26,416.42 1088.47,418.04 1089.68,417.78 1090.89,410.37 1092.1,406.4 1094.52,393.04 1099.35,364.23 1109.03,314.38 1128.39,225.33 1129.6,199.64 1130.81,174.03 1133.23,262.89 1135.65,212.3 1138.06,162.1 1140.48,265.4 1141.69,240.61 1142.9,215.9 1145.32,329.77 1147.74,280.81 1150.16,232.02 1152.58,352.55 1153.79,328.23 1155,303.91 1157.42,426.5 1159.84,377.72 1162.26,328.76 1164.68,448.72 1165.89,424.02 1167.1,399.24 1169.52,512.38 1171.94,462.19 1174.35,411.61 1176.77,513.64 1177.98,488.03 1179.19,462.35 1181.61,550.42 1184.03,498.7 1186.45,446.99 1188.87,518.95 1191.29,467.99 1193.71,522.87 1196.13,474.16 1197.34,450.47 1198.55,427.34 1199.76,489.5 1200.97,467.72 1202.18,446.74 1203.39,426.66 1204.6,407.59 1205.81,452.7 1207.02,435.92 1208.23,420.44 1209.44,406.35 1210.65,393.74 1211.85,423.33 1213.06,413.94 1214.27,406.26 1215.48,400.35 1216.69,396.27 1217.9,411.66 1219.11,411.28 1220.32,412.78 1221.53,416.13 1222.74,421.32 1223.95,422.71 1225.16,431.42 1226.37,441.81 1227.58,453.8 1228.79,467.31 1230,453.52 1231.21,469.79 1232.42,487.3 1234.84,525.64 1237.26,516.23 1239.68,561.35 1240.89,584.82 1242.1,535.21 1243.31,559.61 1244.52,584.38 1245.73,609.44 1246.94,634.75 1248.15,565.66 1249.35,591.31 1250.56,617.06 1251.77,642.88 1254.19,580.54 1256.61,632.22 1259.03,683.71 1261.45,603.37 1262.66,628.83 1263.87,654.21 1266.29,558.23 1268.71,608.31 1271.13,658.03 1273.55,549.2 1274.76,573.79 1275.97,598.31 1278.39,480.78 1280.81,529.52 1283.23,578.18 1285.65,456.14 1286.85,480.48 1288.06,504.84 1290.48,382.87 1292.9,431.9 1295.32,481.19 1297.74,364.03 1298.95,388.95 1300.16,413.97 1302.58,305.54 1305,356.24 1307.42,407.31 1309.84,311.57 1312.26,363.2 1314.68,282.55 1317.1,334.22 1319.52,385.56 1321.94,321.22 1323.15,346.22 1324.35,370.89 1325.56,395.19 1326.77,323.39 1327.98,346.72 1329.19,369.45 1330.4,391.48 1331.61,412.74 1332.82,358.42 1334.03,377.85 1335.24,396.2 1336.45,413.4 1337.66,429.33 1338.87,391.23 1340.08,404.34 1341.29,415.92 1342.5,425.88 1343.71,434.14 1344.92,410.73 1346.13,415.43 1347.34,418.3 1348.55,419.31 1349.76,418.44 1350.97,408.93 1353.39,397.98 1355.81,380.01 1360.65,341.68 1370.32,278.88 1380,162.74">
+      </polyline>
+     </g>
+    </svg>
+   </td>
+   <td>
+    <br/>
+    <br/>
+    <br/>
+    <p>
+     <b style="color:Tomato">╺━━</b>
+     Crank–Nicolson (IMEX)
+     <br/>
+     <b style="color:YellowGreen">╺╺╺</b>
+     Runge-Kutta 4 (explicit)
+    </p>
+   </td>
+  </tr>
+  <tr>
+   <td>
+    <p>
+     Energy
+     <var>E</var>
+     [J] versus time
+     <var>t</var>
+     [s] plot
+    </p>
+    <svg class="plot" data-plot="svg" height="840px" style="width:272.22pt; height:155.56pt;" version="1.1" viewbox=" 0 0 1470 840" width="1470px" xmlns="http://www.w3.org/2000/svg">
+     <style type="text/css">
+      .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+.Series4 {stroke:#f0d000;}
+circle.Series4 {fill:#f0d000;}
+.Fill4 {fill:#f0d000; fill-opacity:0.035;}
+     </style>
+     <g class="plot">
+      <rect class="Frame" height="600" width="1200" x="180" y="120">
+      </rect>
+      <line class="Grid" x1="180" x2="1380" y1="641.05" y2="641.05">
+      </line>
+      <text class="sm end" x="161" y="659.05">4.9</text>
+      <line class="Grid" x1="180" x2="1380" y1="520.57" y2="520.57">
+      </line>
+      <text class="sm end" x="161" y="538.57">4.9</text>
+      <line class="Grid" x1="180" x2="1380" y1="400.1" y2="400.1">
+      </line>
+      <text class="sm end" x="161" y="418.1">4.9</text>
+      <line class="Grid" x1="180" x2="1380" y1="279.63" y2="279.63">
+      </line>
+      <text class="sm end" x="161" y="297.63">4.9</text>
+      <line class="Grid" x1="180" x2="1380" y1="159.16" y2="159.16">
+      </line>
+      <text class="sm end" x="161" y="177.16">4.9</text>
+      <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="180" y="772">0</text>
+      <line class="Grid" x1="300.6" x2="300.6" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="300.6" y="772">1</text>
+      <line class="Grid" x1="421.21" x2="421.21" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="421.21" y="772">2</text>
+      <line class="Grid" x1="541.81" x2="541.81" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="541.81" y="772">3</text>
+      <line class="Grid" x1="662.41" x2="662.41" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="662.41" y="772">4</text>
+      <line class="Grid" x1="783.02" x2="783.02" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="783.02" y="772">5</text>
+      <line class="Grid" x1="903.62" x2="903.62" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="903.62" y="772">6</text>
+      <line class="Grid" x1="1024.22" x2="1024.22" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="1024.22" y="772">7</text>
+      <line class="Grid" x1="1144.82" x2="1144.82" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="1144.82" y="772">8</text>
+      <line class="Grid" x1="1265.43" x2="1265.43" y1="120" y2="720">
+      </line>
+      <text class="sm mid" x="1265.43" y="772">9</text>
+      <text class="sm mid" x="1386.03" y="772">10</text>
+      <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+      </line>
+      <text class="mid" x="180" y="84">y</text>
+      <text x="8" y="823">[0; 4.9]</text>
+      <text class="end" x="1462" y="44">[9.95; 4.9]</text>
+      <polyline class="Series1" points="180,120.01 218.71,120.01 257.42,120.01 296.13,120.01 334.84,120.01 373.55,120.01 412.26,120.01 450.97,120.01 489.68,120.01 528.39,120.01 567.1,120.01 605.81,120.01 644.52,120.01 683.23,120.01 721.94,120.01 760.65,120.01 799.35,120.01 838.06,120.01 876.77,120.01 915.48,120.01 954.19,120.01 992.9,120.01 1031.61,120.01 1070.32,120.01 1109.03,120.01 1147.74,120.01 1186.45,120.01 1225.16,120.01 1263.87,120.01 1302.58,120.01 1341.29,120.01 1380,120.01">
+      </polyline>
+      <polyline class="Series2" points="180,120.01 184.84,120.01 187.26,120.11 188.47,120.11 189.68,120.11 190.89,120.11 192.1,122.76 193.31,122.76 194.52,122.76 195.73,122.76 196.94,122.76 198.15,134.4 199.35,134.4 200.56,134.4 201.77,134.4 202.98,134.4 204.19,163.72 205.4,163.72 206.61,163.72 207.82,163.72 209.03,163.72 210.24,218.58 211.45,218.58 212.66,218.58 213.87,218.58 216.29,302.28 218.71,302.28 228.39,527.52 238.06,632.77 239.27,632.77 240.48,702.24 241.69,702.24 242.9,702.24 244.11,702.24 245.32,702.24 246.53,718.77 247.74,718.77 248.95,718.77 250.16,718.77 251.37,718.77 252.58,678.11 253.79,678.11 255,678.11 256.21,678.11 257.42,678.11 258.63,590.61 259.84,590.61 261.05,590.61 262.26,590.61 264.68,477.14 267.1,477.14 276.77,262.87 286.45,191.51 287.66,191.51 288.87,148.39 290.08,148.39 291.29,148.39 292.5,148.39 293.71,148.39 294.92,127.76 296.13,127.76 297.34,127.76 298.55,127.76 299.76,127.76 300.97,120.97 302.18,120.97 303.39,120.97 304.6,120.97 305.81,120.97 307.02,120 308.23,120 309.44,120 310.65,120 313.06,120 315.48,120 316.69,120 317.9,120 319.11,120.64 320.32,120.64 321.53,120.64 322.74,120.64 323.95,120.64 325.16,126.18 326.37,126.18 327.58,126.18 328.79,126.18 330,126.18 331.21,144.32 332.42,144.32 333.63,144.32 334.84,144.32 336.05,144.32 337.26,183.82 338.47,183.82 339.68,183.82 342.1,183.82 344.52,251.08 354.19,346.27 363.87,575.67 366.29,575.67 368.71,668.24 369.92,668.24 371.13,668.24 372.34,668.24 373.55,716.42 374.76,716.42 375.97,716.42 377.18,716.42 378.39,716.42 379.6,708.01 380.81,708.01 382.02,708.01 383.23,708.01 384.44,708.01 385.65,645.19 386.85,645.19 388.06,645.19 390.48,645.19 392.9,543.61 402.58,426.42 412.26,228.61 414.68,228.61 417.1,169.74 418.31,169.74 419.52,169.74 420.73,169.74 421.94,137.25 423.15,137.25 424.35,137.25 425.56,137.25 426.77,137.25 427.98,123.67 429.19,123.67 430.4,123.67 431.61,123.67 432.82,123.67 434.03,120.22 435.24,120.22 436.45,120.22 438.87,120.22 440.08,120.01 441.29,120.01 443.71,120.01 446.13,120.04 448.55,120.04 449.76,120.04 450.97,120.04 452.18,122.03 453.39,122.03 454.6,122.03 455.81,122.03 457.02,122.03 458.23,131.91 459.44,131.91 460.65,131.91 461.85,131.91 463.06,131.91 464.27,158.2 465.48,158.2 470.32,209.13 480,288.85 489.68,511.2 499.35,619.63 500.56,695.39 501.77,695.39 502.98,695.39 504.19,695.39 505.4,695.39 506.61,719.96 507.82,719.96 509.03,719.96 510.24,719.96 511.45,719.96 512.66,687.03 513.87,687.03 518.71,605.02 528.39,493.75 538.06,275.21 547.74,199.77 548.95,152.91 550.16,152.91 551.37,152.91 552.58,152.91 553.79,152.91 555,129.62 556.21,129.62 557.42,129.62 558.63,129.62 559.84,129.62 561.05,121.42 562.26,121.42 563.47,121.42 564.68,121.42 565.89,121.42 567.1,120.01 568.31,120.01 569.52,120.01 571.94,120.01 574.35,120 576.77,120 577.98,120 579.19,120.4 580.4,120.4 581.61,120.4 582.82,120.4 584.03,124.84 585.24,124.84 586.45,124.84 587.66,124.84 588.87,124.84 590.08,140.67 591.29,140.67 592.5,140.67 593.71,140.67 594.92,140.67 596.13,176.69 597.34,176.69 598.55,176.69 599.76,176.69 600.97,176.69 602.18,239.85 603.39,239.85 604.6,239.85 605.81,239.85 608.23,331.43 610.65,331.43 615.48,443.89 625.16,560.29 630,657.48 631.21,657.48 632.42,712.93 633.63,712.93 634.84,712.93 636.05,712.93 637.26,712.93 638.47,712.69 639.68,712.69 640.89,712.69 642.1,712.69 643.31,712.69 644.52,656.84 654.19,559.39 663.87,330.59 673.55,239.22 678.39,176.29 679.6,176.29 680.81,140.47 682.02,140.47 683.23,140.47 684.44,140.47 685.65,140.47 686.85,124.77 688.06,124.77 689.27,124.77 690.48,124.77 691.69,124.77 692.9,120.38 694.11,120.38 695.32,120.38 697.74,120.38 702.58,120 705,120.01 707.42,120.01 708.63,120.01 709.84,120.01 711.05,121.45 712.26,121.45 713.47,121.45 714.68,121.45 715.89,121.45 717.1,129.74 718.31,129.74 719.52,129.74 720.73,129.74 721.94,129.74 723.15,153.18 724.35,153.18 725.56,153.18 726.77,153.18 727.98,153.18 729.19,200.26 730.4,200.26 731.61,200.26 736.45,275.94 741.29,377.99 750.97,494.7 755.81,605.83 758.23,605.83 760.65,687.52 761.85,687.52 763.06,687.52 764.27,687.52 765.48,720 766.69,720 767.9,720 769.11,720 770.32,720 771.53,694.97 772.74,694.97 773.95,694.97 775.16,694.97 776.37,694.97 777.58,618.85 778.79,618.85 780,618.85 784.84,510.25 789.68,392.97 799.35,288.1 804.19,208.6 806.61,208.6 809.03,157.9 810.24,157.9 811.45,157.9 812.66,157.9 813.87,131.77 815.08,131.77 816.29,131.77 817.5,131.77 818.71,131.77 819.92,121.99 821.13,121.99 822.34,121.99 823.55,121.99 824.76,121.99 825.97,120.04 827.18,120.04 828.39,120.04 830.81,120.04 833.23,120.01 838.06,120.23 840.48,120.23 841.69,120.23 842.9,120.23 844.11,123.73 845.32,123.73 846.53,123.73 847.74,123.73 848.95,123.73 850.16,137.43 851.37,137.43 852.58,137.43 853.79,137.43 855,137.43 856.21,170.1 857.42,170.1 858.63,170.1 859.84,170.1 861.05,170.1 862.26,229.21 863.47,229.21 864.68,229.21 865.89,229.21 867.1,229.21 868.31,317.02 869.52,317.02 870.73,317.02 871.94,317.02 874.35,427.37 876.77,427.37 879.19,427.37 881.61,544.53 882.82,544.53 884.03,544.53 885.24,544.53 886.45,645.88 887.66,645.88 888.87,645.88 890.08,645.88 891.29,645.88 892.5,708.31 893.71,708.31 894.92,708.31 896.13,708.31 897.34,708.31 898.55,716.25 899.76,716.25 900.97,716.25 902.18,716.25 903.39,716.25 904.6,667.65 905.81,667.65 907.02,667.65 908.23,667.65 909.44,667.65 910.65,574.8 911.85,574.8 913.06,574.8 914.27,574.8 915.48,574.8 917.9,459.55 920.32,459.55 925.16,345.4 927.58,345.4 930,250.42 931.21,250.42 932.42,250.42 933.63,250.42 934.84,183.39 936.05,183.39 937.26,183.39 938.47,183.39 939.68,183.39 940.89,144.1 942.1,144.1 943.31,144.1 944.52,144.1 945.73,144.1 946.94,126.1 948.15,126.1 949.35,126.1 950.56,126.1 951.77,126.1 952.98,120.62 954.19,120.62 955.4,120.62 956.61,120.62 957.82,120.62 959.03,120 960.24,120 961.45,120 963.87,120 966.29,120 967.5,120 968.71,120 969.92,120 971.13,121 972.34,121 973.55,121 974.76,121 975.97,121 977.18,127.86 978.39,127.86 979.6,127.86 980.81,127.86 982.02,148.64 983.23,148.64 984.44,148.64 985.65,148.64 986.85,148.64 988.06,191.97 989.27,191.97 990.48,191.97 991.69,191.97 992.9,191.97 994.11,263.56 995.32,263.56 996.53,263.56 997.74,263.56 1000.16,362.39 1002.58,362.39 1007.42,478.1 1009.84,478.1 1012.26,591.45 1013.47,591.45 1014.68,591.45 1015.89,591.45 1017.1,591.45 1018.31,678.65 1019.52,678.65 1020.73,678.65 1021.94,678.65 1023.15,678.65 1024.35,718.87 1025.56,718.87 1026.77,718.87 1027.98,718.87 1029.19,718.87 1030.4,701.87 1031.61,701.87 1032.82,701.87 1034.03,701.87 1035.24,701.87 1036.45,632.03 1037.66,632.03 1038.87,632.03 1040.08,632.03 1041.29,632.03 1042.5,526.59 1043.71,526.59 1044.92,526.59 1046.13,526.59 1048.55,409.12 1050.97,409.12 1053.39,409.12 1055.81,301.5 1057.02,301.5 1058.23,301.5 1059.44,301.5 1060.65,218.02 1061.85,218.02 1063.06,218.02 1064.27,218.02 1065.48,218.02 1066.69,163.38 1067.9,163.38 1069.11,163.38 1070.32,163.38 1071.53,163.38 1072.74,134.25 1073.95,134.25 1075.16,134.25 1076.37,134.25 1077.58,134.25 1078.79,122.71 1080,122.71 1081.21,122.71 1082.42,122.71 1083.63,122.71 1084.84,120.1 1086.05,120.1 1087.26,120.1 1089.68,120.1 1094.52,120.01 1096.94,120.11 1099.35,120.11 1100.56,120.11 1101.77,120.11 1102.98,122.81 1104.19,122.81 1105.4,122.81 1106.61,122.81 1107.82,122.81 1109.03,134.56 1110.24,134.56 1111.45,134.56 1112.66,134.56 1113.87,134.56 1115.08,164.05 1116.29,164.05 1117.5,164.05 1118.71,164.05 1121.13,219.14 1123.55,219.14 1128.39,303.07 1138.06,410.99 1142.9,528.46 1147.74,633.5 1148.95,633.5 1150.16,633.5 1151.37,702.6 1152.58,702.6 1153.79,702.6 1155,702.6 1156.21,702.6 1157.42,718.66 1158.63,718.66 1159.84,718.66 1161.05,718.66 1162.26,718.66 1163.47,677.57 1164.68,677.57 1165.89,677.57 1167.1,677.57 1169.52,589.76 1171.94,589.76 1176.77,476.19 1186.45,360.61 1191.29,262.17 1193.71,191.05 1196.13,191.05 1197.34,191.05 1198.55,191.05 1199.76,148.14 1200.97,148.14 1202.18,148.14 1203.39,148.14 1204.6,148.14 1205.81,127.66 1207.02,127.66 1208.23,127.66 1209.44,127.66 1210.65,127.66 1211.85,120.95 1213.06,120.95 1214.27,120.95 1215.48,120.95 1216.69,120.95 1217.9,120 1219.11,120 1220.32,120 1222.74,120 1225.16,120 1226.37,120 1227.58,120 1228.79,120 1230,120.66 1231.21,120.66 1232.42,120.66 1233.63,120.66 1234.84,120.66 1236.05,126.26 1237.26,126.26 1238.47,126.26 1239.68,126.26 1240.89,126.26 1242.1,144.54 1243.31,144.54 1244.52,144.54 1245.73,144.54 1246.94,144.54 1248.15,184.25 1249.35,184.25 1254.19,251.74 1263.87,347.14 1268.71,461.46 1273.55,576.55 1274.76,576.55 1275.97,576.55 1277.18,576.55 1278.39,668.83 1279.6,668.83 1280.81,668.83 1282.02,668.83 1283.23,668.83 1284.44,716.59 1285.65,716.59 1286.85,716.59 1288.06,716.59 1289.27,716.59 1290.48,707.71 1291.69,707.71 1292.9,707.71 1294.11,707.71 1295.32,707.71 1296.53,644.5 1297.74,644.5 1302.58,542.69 1312.26,425.47 1317.1,315.39 1319.52,315.39 1321.94,228.02 1323.15,228.02 1324.35,228.02 1325.56,228.02 1326.77,169.38 1327.98,169.38 1329.19,169.38 1330.4,169.38 1331.61,169.38 1332.82,137.08 1334.03,137.08 1335.24,137.08 1336.45,137.08 1337.66,137.08 1338.87,123.61 1340.08,123.61 1341.29,123.61 1342.5,123.61 1343.71,123.61 1344.92,120.21 1346.13,120.21 1347.34,120.21 1348.55,120.21 1350.97,120.01 1355.81,120.01 1358.23,120.05 1359.44,120.05 1360.65,120.05 1361.85,120.05 1363.06,122.07 1364.27,122.07 1365.48,122.07 1366.69,122.07 1367.9,122.07 1369.11,132.04 1370.32,132.04 1371.53,132.04 1372.74,132.04 1373.95,132.04 1375.16,158.51 1376.37,158.51 1377.58,158.51 1380,158.51">
+      </polyline>
+      <polyline class="Series3" points="180,120.01 218.71,120.98 257.42,120.74 296.13,122.05 334.84,122.42 373.55,122.16 412.26,124.16 450.97,123.71 489.68,124.35 528.39,125.33 567.1,125.47 605.81,126.42 644.52,126.38 683.23,127.61 721.94,127.73 760.65,127.62 799.35,129.57 838.06,129.23 876.77,129.94 915.48,130.5 954.19,130.97 992.9,131.8 1031.61,131.58 1070.32,133.16 1109.03,133.29 1147.74,133.15 1186.45,134.92 1225.16,134.62 1263.87,135.5 1302.58,136.16 1341.29,136.5 1380,137.15">
+      </polyline>
+      <circle class="Series4" cx="180" cy="710.72" r="10">
+      </circle>
+     </g>
+    </svg>
+   </td>
+   <td>
+    <br/>
+    <br/>
+    <br/>
+    <b style="color:Tomato">╺━━</b>
+    Theoretical (large rot.)
+    <br/>
+    <b style="color:YellowGreen">╺╺╺</b>
+    Crank–Nicolson (IMEX)
+    <br/>
+    <b style="color:CornflowerBlue">· · · ·</b>
+    Runge-Kutta 4 (explicit)
+   </td>
+  </tr>
+ </table>
+</div>

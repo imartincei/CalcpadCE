@@ -1,0 +1,2981 @@
+<div class="calcpad-output">
+ <p>
+  <span class="eq">
+   <var>m</var>
+   = 250
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   = 250
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>w</var>
+   =
+   <span class="dvc">
+    <var>m</var>
+    <span class="dvl">
+    </span>
+    20
+   </span>
+   =
+   <span class="dvc">
+    250
+    <span class="dvl">
+    </span>
+    20
+   </span>
+   = 12.5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <b>symmetric</b>
+   (
+   <var>n</var>
+   )  =
+   <b>symmetric</b>
+   ( 250 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋱</span>
+     <span class="td">⋮</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="cond">$Repeat</span>
+   {
+   <span class="cond">$Repeat</span>
+   {
+   <b>
+    <var>A</var>
+   </b>
+   <sub>
+    <var>i</var>
+    ,
+    <var>j</var>
+   </sub>
+   =
+   <var>m</var>
+   ·
+   <var>n</var>
+   ·
+   <span class="b1">(</span>
+   1 −
+   <span class="b1">|</span>
+   <span class="dvc">
+    <var>i</var>
+    <span class="dvl">
+    </span>
+    <var>m</var>
+   </span>
+   −
+   <span class="dvc">
+    <var>j</var>
+    <span class="dvl">
+    </span>
+    <var>n</var>
+   </span>
+   <span class="b1">|</span>
+   ·
+   <var>w</var>
+   <span class="b1">)</span>
+   <span class="cond">for</span>
+   <var>j</var>
+   =
+   <var>i</var>
+   ...
+   <b>min</b>
+   (
+   <var>i</var>
+   +
+   <var>w</var>
+   ;
+   <var>n</var>
+   ) }
+   <span class="cond">for</span>
+   <var>i</var>
+   = 1...
+   <var>m</var>
+   } = 62500
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <b>hp</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">37500</span>
+     <span class="td">34375</span>
+     <span class="td">31250</span>
+     <span class="td">28125</span>
+     <span class="td">25000</span>
+     <span class="td">21875</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">37500</span>
+     <span class="td">34375</span>
+     <span class="td">31250</span>
+     <span class="td">28125</span>
+     <span class="td">25000</span>
+     <span class="td">21875</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">37500</span>
+     <span class="td">34375</span>
+     <span class="td">31250</span>
+     <span class="td">28125</span>
+     <span class="td">25000</span>
+     <span class="td">21875</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">37500</span>
+     <span class="td">34375</span>
+     <span class="td">31250</span>
+     <span class="td">28125</span>
+     <span class="td">25000</span>
+     <span class="td">21875</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">37500</span>
+     <span class="td">34375</span>
+     <span class="td">31250</span>
+     <span class="td">28125</span>
+     <span class="td">25000</span>
+     <span class="td">21875</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">37500</span>
+     <span class="td">34375</span>
+     <span class="td">31250</span>
+     <span class="td">28125</span>
+     <span class="td">25000</span>
+     <span class="td">21875</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">37500</span>
+     <span class="td">34375</span>
+     <span class="td">31250</span>
+     <span class="td">28125</span>
+     <span class="td">25000</span>
+     <span class="td">21875</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">37500</span>
+     <span class="td">34375</span>
+     <span class="td">31250</span>
+     <span class="td">28125</span>
+     <span class="td">25000</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">37500</span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">37500</span>
+     <span class="td">34375</span>
+     <span class="td">31250</span>
+     <span class="td">28125</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">34375</span>
+     <span class="td">37500</span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">37500</span>
+     <span class="td">34375</span>
+     <span class="td">31250</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">31250</span>
+     <span class="td">34375</span>
+     <span class="td">37500</span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">37500</span>
+     <span class="td">34375</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">28125</span>
+     <span class="td">31250</span>
+     <span class="td">34375</span>
+     <span class="td">37500</span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">37500</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">25000</span>
+     <span class="td">28125</span>
+     <span class="td">31250</span>
+     <span class="td">34375</span>
+     <span class="td">37500</span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">40625</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">21875</span>
+     <span class="td">25000</span>
+     <span class="td">28125</span>
+     <span class="td">31250</span>
+     <span class="td">34375</span>
+     <span class="td">37500</span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">43750</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">21875</span>
+     <span class="td">25000</span>
+     <span class="td">28125</span>
+     <span class="td">31250</span>
+     <span class="td">34375</span>
+     <span class="td">37500</span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">46875</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">21875</span>
+     <span class="td">25000</span>
+     <span class="td">28125</span>
+     <span class="td">31250</span>
+     <span class="td">34375</span>
+     <span class="td">37500</span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">50000</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">21875</span>
+     <span class="td">25000</span>
+     <span class="td">28125</span>
+     <span class="td">31250</span>
+     <span class="td">34375</span>
+     <span class="td">37500</span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">53125</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">21875</span>
+     <span class="td">25000</span>
+     <span class="td">28125</span>
+     <span class="td">31250</span>
+     <span class="td">34375</span>
+     <span class="td">37500</span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">56250</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">21875</span>
+     <span class="td">25000</span>
+     <span class="td">28125</span>
+     <span class="td">31250</span>
+     <span class="td">34375</span>
+     <span class="td">37500</span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">59375</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">21875</span>
+     <span class="td">25000</span>
+     <span class="td">28125</span>
+     <span class="td">31250</span>
+     <span class="td">34375</span>
+     <span class="td">37500</span>
+     <span class="td">40625</span>
+     <span class="td">43750</span>
+     <span class="td">46875</span>
+     <span class="td">50000</span>
+     <span class="td">53125</span>
+     <span class="td">56250</span>
+     <span class="td">59375</span>
+     <span class="td">62500</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋱</span>
+     <span class="td">⋮</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">62500</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    λ
+   </var>
+   <sub>std</sub>
+   =
+   <b>eigenvals</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>w</var>
+   )  =
+   <b>eigenvals</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 12.5 )  =
+   <b class="b0">[</b>
+   -70805.9 -70797.2 -65476.2 -65381.2 -56896.1 -56485.4 -45457.2 -44427.6 -41014.4 -41006.2 -38943.8 -38910.1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    λ
+   </var>
+   <sub>hp</sub>
+   =
+   <b>eigenvals</b>
+   (
+   <b>
+    <var>B</var>
+   </b>
+   ;
+   <var>w</var>
+   )  =
+   <b>eigenvals</b>
+   (
+   <b>
+    <var>B</var>
+   </b>
+   ; 12.5 )  =
+   <b class="b0">[</b>
+   -70805.9 -70797.2 -65476.2 -65381.2 -56896.1 -56485.4 -45457.2 -44427.6 -41014.4 -41006.2 -38943.8 -38910.1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="dvc">
+    <b>mnorm</b>
+    <sub>e</sub>
+    (
+    <var>
+     <span class="vec">⃗</span>
+     λ
+    </var>
+    <sub>std</sub>
+    −
+    <var>
+     <span class="vec">⃗</span>
+     λ
+    </var>
+    <sub>hp</sub>
+    )
+    <span class="dvl">
+    </span>
+    <b>mnorm</b>
+    <sub>e</sub>
+    (
+    <var>
+     <span class="vec">⃗</span>
+     λ
+    </var>
+    <sub>hp</sub>
+    )
+   </span>
+   = 4.31×10
+   <sup>-15</sup>
+  </span>
+  &lt; 0.5%
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>λ</var>
+   </b>
+   <sub>std</sub>
+   =
+   <b>eigenvecs</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>w</var>
+   )  =
+   <b>eigenvecs</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 12.5 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0183</span>
+     <span class="td">0.0138</span>
+     <span class="td">0.00749</span>
+     <span class="td">
+      9.11×10
+      <sup>-5</sup>
+     </span>
+     <span class="td">-0.00735</span>
+     <span class="td">-0.0138</span>
+     <span class="td">-0.0183</span>
+     <span class="td">-0.0202</span>
+     <span class="td">-0.0192</span>
+     <span class="td">-0.0153</span>
+     <span class="td">-0.00904</span>
+     <span class="td">-0.00118</span>
+     <span class="td">0.0072</span>
+     <span class="td">0.015</span>
+     <span class="td">0.0258</span>
+     <span class="td">0.0321</span>
+     <span class="td">0.0331</span>
+     <span class="td">0.0285</span>
+     <span class="td">0.0191</span>
+     <span class="td">0.00621</span>
+     <span class="td">⋯</span>
+     <span class="td">0.0183</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.00239</span>
+     <span class="td">-0.00862</span>
+     <span class="td">-0.0128</span>
+     <span class="td">-0.0144</span>
+     <span class="td">-0.0131</span>
+     <span class="td">-0.00925</span>
+     <span class="td">-0.0033</span>
+     <span class="td">0.00389</span>
+     <span class="td">0.0113</span>
+     <span class="td">0.0177</span>
+     <span class="td">0.0223</span>
+     <span class="td">0.0241</span>
+     <span class="td">0.023</span>
+     <span class="td">0.0188</span>
+     <span class="td">0.0113</span>
+     <span class="td">0.000596</span>
+     <span class="td">-0.0116</span>
+     <span class="td">-0.0231</span>
+     <span class="td">-0.0321</span>
+     <span class="td">-0.0369</span>
+     <span class="td">⋯</span>
+     <span class="td">0.00239</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.0377</span>
+     <span class="td">-0.0293</span>
+     <span class="td">-0.0169</span>
+     <span class="td">-0.00206</span>
+     <span class="td">0.0131</span>
+     <span class="td">0.0264</span>
+     <span class="td">0.036</span>
+     <span class="td">0.0404</span>
+     <span class="td">0.0391</span>
+     <span class="td">0.032</span>
+     <span class="td">0.0202</span>
+     <span class="td">0.00529</span>
+     <span class="td">-0.0108</span>
+     <span class="td">-0.0258</span>
+     <span class="td">-0.0485</span>
+     <span class="td">-0.0623</span>
+     <span class="td">-0.0654</span>
+     <span class="td">-0.0576</span>
+     <span class="td">-0.0401</span>
+     <span class="td">-0.0157</span>
+     <span class="td">⋯</span>
+     <span class="td">0.0377</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.000895</span>
+     <span class="td">0.0146</span>
+     <span class="td">0.0244</span>
+     <span class="td">0.0289</span>
+     <span class="td">0.0275</span>
+     <span class="td">0.0207</span>
+     <span class="td">0.00943</span>
+     <span class="td">-0.00462</span>
+     <span class="td">-0.0193</span>
+     <span class="td">-0.0325</span>
+     <span class="td">-0.0422</span>
+     <span class="td">-0.0468</span>
+     <span class="td">-0.0456</span>
+     <span class="td">-0.0385</span>
+     <span class="td">-0.0261</span>
+     <span class="td">-0.0062</span>
+     <span class="td">0.0174</span>
+     <span class="td">0.0405</span>
+     <span class="td">0.059</span>
+     <span class="td">0.0698</span>
+     <span class="td">⋯</span>
+     <span class="td">0.000895</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.0581</span>
+     <span class="td">-0.0476</span>
+     <span class="td">-0.0298</span>
+     <span class="td">-0.00756</span>
+     <span class="td">0.0158</span>
+     <span class="td">0.0366</span>
+     <span class="td">0.052</span>
+     <span class="td">0.0599</span>
+     <span class="td">0.0592</span>
+     <span class="td">0.0503</span>
+     <span class="td">0.0346</span>
+     <span class="td">0.0144</span>
+     <span class="td">-0.00749</span>
+     <span class="td">-0.0282</span>
+     <span class="td">-0.0643</span>
+     <span class="td">-0.0878</span>
+     <span class="td">-0.0954</span>
+     <span class="td">-0.0867</span>
+     <span class="td">-0.0634</span>
+     <span class="td">-0.0297</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0581</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.00971</span>
+     <span class="td">-0.0144</span>
+     <span class="td">-0.033</span>
+     <span class="td">-0.0434</span>
+     <span class="td">-0.0446</span>
+     <span class="td">-0.0367</span>
+     <span class="td">-0.0213</span>
+     <span class="td">-0.000983</span>
+     <span class="td">0.021</span>
+     <span class="td">0.0414</span>
+     <span class="td">0.057</span>
+     <span class="td">0.0657</span>
+     <span class="td">0.0663</span>
+     <span class="td">0.0587</span>
+     <span class="td">0.0472</span>
+     <span class="td">0.0218</span>
+     <span class="td">-0.0116</span>
+     <span class="td">-0.0462</span>
+     <span class="td">-0.0758</span>
+     <span class="td">-0.0949</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.00971</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0773</span>
+     <span class="td">0.0693</span>
+     <span class="td">0.048</span>
+     <span class="td">0.0181</span>
+     <span class="td">-0.0145</span>
+     <span class="td">-0.044</span>
+     <span class="td">-0.0656</span>
+     <span class="td">-0.0766</span>
+     <span class="td">-0.0765</span>
+     <span class="td">-0.0668</span>
+     <span class="td">-0.05</span>
+     <span class="td">-0.029</span>
+     <span class="td">-0.00638</span>
+     <span class="td">0.0157</span>
+     <span class="td">0.0674</span>
+     <span class="td">0.105</span>
+     <span class="td">0.122</span>
+     <span class="td">0.115</span>
+     <span class="td">0.088</span>
+     <span class="td">0.0465</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0773</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.0385</span>
+     <span class="td">0.00105</span>
+     <span class="td">0.0354</span>
+     <span class="td">0.0586</span>
+     <span class="td">0.0673</span>
+     <span class="td">0.0608</span>
+     <span class="td">0.0417</span>
+     <span class="td">0.0143</span>
+     <span class="td">-0.0155</span>
+     <span class="td">-0.0427</span>
+     <span class="td">-0.0633</span>
+     <span class="td">-0.0752</span>
+     <span class="td">-0.0779</span>
+     <span class="td">-0.0723</span>
+     <span class="td">-0.0761</span>
+     <span class="td">-0.0543</span>
+     <span class="td">-0.014</span>
+     <span class="td">0.0343</span>
+     <span class="td">0.0794</span>
+     <span class="td">0.111</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0385</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.00937</span>
+     <span class="td">0.011</span>
+     <span class="td">0.00253</span>
+     <span class="td">-0.0106</span>
+     <span class="td">-0.0193</span>
+     <span class="td">-0.0167</span>
+     <span class="td">-0.00333</span>
+     <span class="td">0.0132</span>
+     <span class="td">0.0225</span>
+     <span class="td">0.0184</span>
+     <span class="td">0.00279</span>
+     <span class="td">-0.015</span>
+     <span class="td">-0.0238</span>
+     <span class="td">-0.018</span>
+     <span class="td">0.00338</span>
+     <span class="td">0.0252</span>
+     <span class="td">0.031</span>
+     <span class="td">0.0151</span>
+     <span class="td">-0.0136</span>
+     <span class="td">-0.0367</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.00937</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.00982</span>
+     <span class="td">0.00344</span>
+     <span class="td">0.0141</span>
+     <span class="td">0.0149</span>
+     <span class="td">0.00459</span>
+     <span class="td">-0.0102</span>
+     <span class="td">-0.0199</span>
+     <span class="td">-0.0175</span>
+     <span class="td">-0.00401</span>
+     <span class="td">0.0125</span>
+     <span class="td">0.0214</span>
+     <span class="td">0.0166</span>
+     <span class="td">0.000599</span>
+     <span class="td">-0.0168</span>
+     <span class="td">-0.0291</span>
+     <span class="td">-0.0191</span>
+     <span class="td">0.00638</span>
+     <span class="td">0.0303</span>
+     <span class="td">0.0359</span>
+     <span class="td">0.0181</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.00982</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0203</span>
+     <span class="td">0.0276</span>
+     <span class="td">0.0125</span>
+     <span class="td">-0.0142</span>
+     <span class="td">-0.0338</span>
+     <span class="td">-0.0322</span>
+     <span class="td">-0.00913</span>
+     <span class="td">0.0207</span>
+     <span class="td">0.0374</span>
+     <span class="td">0.0286</span>
+     <span class="td">-0.00178</span>
+     <span class="td">-0.0359</span>
+     <span class="td">-0.0526</span>
+     <span class="td">-0.0408</span>
+     <span class="td">0.00323</span>
+     <span class="td">0.0506</span>
+     <span class="td">0.0676</span>
+     <span class="td">0.0413</span>
+     <span class="td">-0.0122</span>
+     <span class="td">-0.0577</span>
+     <span class="td">⋯</span>
+     <span class="td">0.0203</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.025</span>
+     <span class="td">0.0024</span>
+     <span class="td">0.0259</span>
+     <span class="td">0.0297</span>
+     <span class="td">0.0112</span>
+     <span class="td">-0.0172</span>
+     <span class="td">-0.0359</span>
+     <span class="td">-0.0314</span>
+     <span class="td">-0.00508</span>
+     <span class="td">0.0269</span>
+     <span class="td">0.0439</span>
+     <span class="td">0.0343</span>
+     <span class="td">0.00287</span>
+     <span class="td">-0.0317</span>
+     <span class="td">-0.0603</span>
+     <span class="td">-0.0441</span>
+     <span class="td">0.00468</span>
+     <span class="td">0.0523</span>
+     <span class="td">0.0655</span>
+     <span class="td">0.034</span>
+     <span class="td">⋯</span>
+     <span class="td">0.025</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>λ</var>
+   </b>
+   <sub>hp</sub>
+   =
+   <b>eigenvecs</b>
+   (
+   <b>
+    <var>B</var>
+   </b>
+   ;
+   <var>w</var>
+   )  =
+   <b>eigenvecs</b>
+   (
+   <b>
+    <var>B</var>
+   </b>
+   ; 12.5 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.0183</span>
+     <span class="td">-0.0138</span>
+     <span class="td">-0.00749</span>
+     <span class="td">
+      -9.11×10
+      <sup>-5</sup>
+     </span>
+     <span class="td">0.00735</span>
+     <span class="td">0.0138</span>
+     <span class="td">0.0183</span>
+     <span class="td">0.0202</span>
+     <span class="td">0.0192</span>
+     <span class="td">0.0153</span>
+     <span class="td">0.00904</span>
+     <span class="td">0.00118</span>
+     <span class="td">-0.0072</span>
+     <span class="td">-0.015</span>
+     <span class="td">-0.0258</span>
+     <span class="td">-0.0321</span>
+     <span class="td">-0.0331</span>
+     <span class="td">-0.0285</span>
+     <span class="td">-0.0191</span>
+     <span class="td">-0.00621</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0183</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.00239</span>
+     <span class="td">0.00862</span>
+     <span class="td">0.0128</span>
+     <span class="td">0.0144</span>
+     <span class="td">0.0131</span>
+     <span class="td">0.00925</span>
+     <span class="td">0.0033</span>
+     <span class="td">-0.00389</span>
+     <span class="td">-0.0113</span>
+     <span class="td">-0.0177</span>
+     <span class="td">-0.0223</span>
+     <span class="td">-0.0241</span>
+     <span class="td">-0.023</span>
+     <span class="td">-0.0188</span>
+     <span class="td">-0.0113</span>
+     <span class="td">-0.000596</span>
+     <span class="td">0.0116</span>
+     <span class="td">0.0231</span>
+     <span class="td">0.0321</span>
+     <span class="td">0.0369</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.00239</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.0377</span>
+     <span class="td">-0.0293</span>
+     <span class="td">-0.0169</span>
+     <span class="td">-0.00206</span>
+     <span class="td">0.0131</span>
+     <span class="td">0.0264</span>
+     <span class="td">0.036</span>
+     <span class="td">0.0404</span>
+     <span class="td">0.0391</span>
+     <span class="td">0.032</span>
+     <span class="td">0.0202</span>
+     <span class="td">0.00529</span>
+     <span class="td">-0.0108</span>
+     <span class="td">-0.0258</span>
+     <span class="td">-0.0485</span>
+     <span class="td">-0.0623</span>
+     <span class="td">-0.0654</span>
+     <span class="td">-0.0576</span>
+     <span class="td">-0.0401</span>
+     <span class="td">-0.0157</span>
+     <span class="td">⋯</span>
+     <span class="td">0.0377</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.000895</span>
+     <span class="td">0.0146</span>
+     <span class="td">0.0244</span>
+     <span class="td">0.0289</span>
+     <span class="td">0.0275</span>
+     <span class="td">0.0207</span>
+     <span class="td">0.00943</span>
+     <span class="td">-0.00462</span>
+     <span class="td">-0.0193</span>
+     <span class="td">-0.0325</span>
+     <span class="td">-0.0422</span>
+     <span class="td">-0.0468</span>
+     <span class="td">-0.0456</span>
+     <span class="td">-0.0385</span>
+     <span class="td">-0.0261</span>
+     <span class="td">-0.0062</span>
+     <span class="td">0.0174</span>
+     <span class="td">0.0405</span>
+     <span class="td">0.059</span>
+     <span class="td">0.0698</span>
+     <span class="td">⋯</span>
+     <span class="td">0.000895</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0581</span>
+     <span class="td">0.0476</span>
+     <span class="td">0.0298</span>
+     <span class="td">0.00756</span>
+     <span class="td">-0.0158</span>
+     <span class="td">-0.0366</span>
+     <span class="td">-0.052</span>
+     <span class="td">-0.0599</span>
+     <span class="td">-0.0592</span>
+     <span class="td">-0.0503</span>
+     <span class="td">-0.0346</span>
+     <span class="td">-0.0144</span>
+     <span class="td">0.00749</span>
+     <span class="td">0.0282</span>
+     <span class="td">0.0643</span>
+     <span class="td">0.0878</span>
+     <span class="td">0.0954</span>
+     <span class="td">0.0867</span>
+     <span class="td">0.0634</span>
+     <span class="td">0.0297</span>
+     <span class="td">⋯</span>
+     <span class="td">0.0581</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.00971</span>
+     <span class="td">0.0144</span>
+     <span class="td">0.033</span>
+     <span class="td">0.0434</span>
+     <span class="td">0.0446</span>
+     <span class="td">0.0367</span>
+     <span class="td">0.0213</span>
+     <span class="td">0.000983</span>
+     <span class="td">-0.021</span>
+     <span class="td">-0.0414</span>
+     <span class="td">-0.057</span>
+     <span class="td">-0.0657</span>
+     <span class="td">-0.0663</span>
+     <span class="td">-0.0587</span>
+     <span class="td">-0.0472</span>
+     <span class="td">-0.0218</span>
+     <span class="td">0.0116</span>
+     <span class="td">0.0462</span>
+     <span class="td">0.0758</span>
+     <span class="td">0.0949</span>
+     <span class="td">⋯</span>
+     <span class="td">0.00971</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0773</span>
+     <span class="td">0.0693</span>
+     <span class="td">0.048</span>
+     <span class="td">0.0181</span>
+     <span class="td">-0.0145</span>
+     <span class="td">-0.044</span>
+     <span class="td">-0.0656</span>
+     <span class="td">-0.0766</span>
+     <span class="td">-0.0765</span>
+     <span class="td">-0.0668</span>
+     <span class="td">-0.05</span>
+     <span class="td">-0.029</span>
+     <span class="td">-0.00638</span>
+     <span class="td">0.0157</span>
+     <span class="td">0.0674</span>
+     <span class="td">0.105</span>
+     <span class="td">0.122</span>
+     <span class="td">0.115</span>
+     <span class="td">0.088</span>
+     <span class="td">0.0465</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0773</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.0385</span>
+     <span class="td">0.00105</span>
+     <span class="td">0.0354</span>
+     <span class="td">0.0586</span>
+     <span class="td">0.0673</span>
+     <span class="td">0.0608</span>
+     <span class="td">0.0417</span>
+     <span class="td">0.0143</span>
+     <span class="td">-0.0155</span>
+     <span class="td">-0.0427</span>
+     <span class="td">-0.0633</span>
+     <span class="td">-0.0752</span>
+     <span class="td">-0.0779</span>
+     <span class="td">-0.0723</span>
+     <span class="td">-0.0761</span>
+     <span class="td">-0.0543</span>
+     <span class="td">-0.014</span>
+     <span class="td">0.0343</span>
+     <span class="td">0.0794</span>
+     <span class="td">0.111</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0385</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.00937</span>
+     <span class="td">-0.011</span>
+     <span class="td">-0.00253</span>
+     <span class="td">0.0106</span>
+     <span class="td">0.0193</span>
+     <span class="td">0.0167</span>
+     <span class="td">0.00333</span>
+     <span class="td">-0.0132</span>
+     <span class="td">-0.0225</span>
+     <span class="td">-0.0184</span>
+     <span class="td">-0.00279</span>
+     <span class="td">0.015</span>
+     <span class="td">0.0238</span>
+     <span class="td">0.018</span>
+     <span class="td">-0.00338</span>
+     <span class="td">-0.0252</span>
+     <span class="td">-0.031</span>
+     <span class="td">-0.0151</span>
+     <span class="td">0.0136</span>
+     <span class="td">0.0367</span>
+     <span class="td">⋯</span>
+     <span class="td">0.00937</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.00982</span>
+     <span class="td">-0.00344</span>
+     <span class="td">-0.0141</span>
+     <span class="td">-0.0149</span>
+     <span class="td">-0.00459</span>
+     <span class="td">0.0102</span>
+     <span class="td">0.0199</span>
+     <span class="td">0.0175</span>
+     <span class="td">0.00401</span>
+     <span class="td">-0.0125</span>
+     <span class="td">-0.0214</span>
+     <span class="td">-0.0166</span>
+     <span class="td">-0.000599</span>
+     <span class="td">0.0168</span>
+     <span class="td">0.0291</span>
+     <span class="td">0.0191</span>
+     <span class="td">-0.00638</span>
+     <span class="td">-0.0303</span>
+     <span class="td">-0.0359</span>
+     <span class="td">-0.0181</span>
+     <span class="td">⋯</span>
+     <span class="td">0.00982</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.0203</span>
+     <span class="td">-0.0276</span>
+     <span class="td">-0.0125</span>
+     <span class="td">0.0142</span>
+     <span class="td">0.0338</span>
+     <span class="td">0.0322</span>
+     <span class="td">0.00913</span>
+     <span class="td">-0.0207</span>
+     <span class="td">-0.0374</span>
+     <span class="td">-0.0286</span>
+     <span class="td">0.00178</span>
+     <span class="td">0.0359</span>
+     <span class="td">0.0526</span>
+     <span class="td">0.0408</span>
+     <span class="td">-0.00323</span>
+     <span class="td">-0.0506</span>
+     <span class="td">-0.0676</span>
+     <span class="td">-0.0413</span>
+     <span class="td">0.0122</span>
+     <span class="td">0.0577</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0203</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.025</span>
+     <span class="td">-0.0024</span>
+     <span class="td">-0.0259</span>
+     <span class="td">-0.0297</span>
+     <span class="td">-0.0112</span>
+     <span class="td">0.0172</span>
+     <span class="td">0.0359</span>
+     <span class="td">0.0314</span>
+     <span class="td">0.00508</span>
+     <span class="td">-0.0269</span>
+     <span class="td">-0.0439</span>
+     <span class="td">-0.0343</span>
+     <span class="td">-0.00287</span>
+     <span class="td">0.0317</span>
+     <span class="td">0.0603</span>
+     <span class="td">0.0441</span>
+     <span class="td">-0.00468</span>
+     <span class="td">-0.0523</span>
+     <span class="td">-0.0655</span>
+     <span class="td">-0.034</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.025</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="dvc">
+    <b>mnorm</b>
+    <sub>e</sub>
+    (
+    <b>
+     <var>λ</var>
+    </b>
+    <sub>std</sub>
+    −
+    <b>
+     <var>λ</var>
+    </b>
+    <sub>hp</sub>
+    )
+    <span class="dvl">
+    </span>
+    <b>mnorm</b>
+    <sub>e</sub>
+    (
+    <b>
+     <var>λ</var>
+    </b>
+    <sub>hp</sub>
+    )
+   </span>
+   = 1.63
+  </span>
+  &lt; 0.5%
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>λ</var>
+   </b>
+   <sub>std</sub>
+   =
+   <b>eigen</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>w</var>
+   )  =
+   <b>eigen</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 12.5 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-70805.9</span>
+     <span class="td">0.0183</span>
+     <span class="td">0.0138</span>
+     <span class="td">0.00749</span>
+     <span class="td">
+      9.11×10
+      <sup>-5</sup>
+     </span>
+     <span class="td">-0.00735</span>
+     <span class="td">-0.0138</span>
+     <span class="td">-0.0183</span>
+     <span class="td">-0.0202</span>
+     <span class="td">-0.0192</span>
+     <span class="td">-0.0153</span>
+     <span class="td">-0.00904</span>
+     <span class="td">-0.00118</span>
+     <span class="td">0.0072</span>
+     <span class="td">0.015</span>
+     <span class="td">0.0258</span>
+     <span class="td">0.0321</span>
+     <span class="td">0.0331</span>
+     <span class="td">0.0285</span>
+     <span class="td">0.0191</span>
+     <span class="td">⋯</span>
+     <span class="td">0.0183</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-70797.2</span>
+     <span class="td">-0.00239</span>
+     <span class="td">-0.00862</span>
+     <span class="td">-0.0128</span>
+     <span class="td">-0.0144</span>
+     <span class="td">-0.0131</span>
+     <span class="td">-0.00925</span>
+     <span class="td">-0.0033</span>
+     <span class="td">0.00389</span>
+     <span class="td">0.0113</span>
+     <span class="td">0.0177</span>
+     <span class="td">0.0223</span>
+     <span class="td">0.0241</span>
+     <span class="td">0.023</span>
+     <span class="td">0.0188</span>
+     <span class="td">0.0113</span>
+     <span class="td">0.000596</span>
+     <span class="td">-0.0116</span>
+     <span class="td">-0.0231</span>
+     <span class="td">-0.0321</span>
+     <span class="td">⋯</span>
+     <span class="td">0.00239</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-65476.2</span>
+     <span class="td">-0.0377</span>
+     <span class="td">-0.0293</span>
+     <span class="td">-0.0169</span>
+     <span class="td">-0.00206</span>
+     <span class="td">0.0131</span>
+     <span class="td">0.0264</span>
+     <span class="td">0.036</span>
+     <span class="td">0.0404</span>
+     <span class="td">0.0391</span>
+     <span class="td">0.032</span>
+     <span class="td">0.0202</span>
+     <span class="td">0.00529</span>
+     <span class="td">-0.0108</span>
+     <span class="td">-0.0258</span>
+     <span class="td">-0.0485</span>
+     <span class="td">-0.0623</span>
+     <span class="td">-0.0654</span>
+     <span class="td">-0.0576</span>
+     <span class="td">-0.0401</span>
+     <span class="td">⋯</span>
+     <span class="td">0.0377</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-65381.2</span>
+     <span class="td">0.000895</span>
+     <span class="td">0.0146</span>
+     <span class="td">0.0244</span>
+     <span class="td">0.0289</span>
+     <span class="td">0.0275</span>
+     <span class="td">0.0207</span>
+     <span class="td">0.00943</span>
+     <span class="td">-0.00462</span>
+     <span class="td">-0.0193</span>
+     <span class="td">-0.0325</span>
+     <span class="td">-0.0422</span>
+     <span class="td">-0.0468</span>
+     <span class="td">-0.0456</span>
+     <span class="td">-0.0385</span>
+     <span class="td">-0.0261</span>
+     <span class="td">-0.0062</span>
+     <span class="td">0.0174</span>
+     <span class="td">0.0405</span>
+     <span class="td">0.059</span>
+     <span class="td">⋯</span>
+     <span class="td">0.000895</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-56896.1</span>
+     <span class="td">-0.0581</span>
+     <span class="td">-0.0476</span>
+     <span class="td">-0.0298</span>
+     <span class="td">-0.00756</span>
+     <span class="td">0.0158</span>
+     <span class="td">0.0366</span>
+     <span class="td">0.052</span>
+     <span class="td">0.0599</span>
+     <span class="td">0.0592</span>
+     <span class="td">0.0503</span>
+     <span class="td">0.0346</span>
+     <span class="td">0.0144</span>
+     <span class="td">-0.00749</span>
+     <span class="td">-0.0282</span>
+     <span class="td">-0.0643</span>
+     <span class="td">-0.0878</span>
+     <span class="td">-0.0954</span>
+     <span class="td">-0.0867</span>
+     <span class="td">-0.0634</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0581</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-56485.4</span>
+     <span class="td">0.00971</span>
+     <span class="td">-0.0144</span>
+     <span class="td">-0.033</span>
+     <span class="td">-0.0434</span>
+     <span class="td">-0.0446</span>
+     <span class="td">-0.0367</span>
+     <span class="td">-0.0213</span>
+     <span class="td">-0.000983</span>
+     <span class="td">0.021</span>
+     <span class="td">0.0414</span>
+     <span class="td">0.057</span>
+     <span class="td">0.0657</span>
+     <span class="td">0.0663</span>
+     <span class="td">0.0587</span>
+     <span class="td">0.0472</span>
+     <span class="td">0.0218</span>
+     <span class="td">-0.0116</span>
+     <span class="td">-0.0462</span>
+     <span class="td">-0.0758</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.00971</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-45457.2</span>
+     <span class="td">0.0773</span>
+     <span class="td">0.0693</span>
+     <span class="td">0.048</span>
+     <span class="td">0.0181</span>
+     <span class="td">-0.0145</span>
+     <span class="td">-0.044</span>
+     <span class="td">-0.0656</span>
+     <span class="td">-0.0766</span>
+     <span class="td">-0.0765</span>
+     <span class="td">-0.0668</span>
+     <span class="td">-0.05</span>
+     <span class="td">-0.029</span>
+     <span class="td">-0.00638</span>
+     <span class="td">0.0157</span>
+     <span class="td">0.0674</span>
+     <span class="td">0.105</span>
+     <span class="td">0.122</span>
+     <span class="td">0.115</span>
+     <span class="td">0.088</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0773</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-44427.6</span>
+     <span class="td">-0.0385</span>
+     <span class="td">0.00105</span>
+     <span class="td">0.0354</span>
+     <span class="td">0.0586</span>
+     <span class="td">0.0673</span>
+     <span class="td">0.0608</span>
+     <span class="td">0.0417</span>
+     <span class="td">0.0143</span>
+     <span class="td">-0.0155</span>
+     <span class="td">-0.0427</span>
+     <span class="td">-0.0633</span>
+     <span class="td">-0.0752</span>
+     <span class="td">-0.0779</span>
+     <span class="td">-0.0723</span>
+     <span class="td">-0.0761</span>
+     <span class="td">-0.0543</span>
+     <span class="td">-0.014</span>
+     <span class="td">0.0343</span>
+     <span class="td">0.0794</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0385</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-41014.4</span>
+     <span class="td">0.00937</span>
+     <span class="td">0.011</span>
+     <span class="td">0.00253</span>
+     <span class="td">-0.0106</span>
+     <span class="td">-0.0193</span>
+     <span class="td">-0.0167</span>
+     <span class="td">-0.00333</span>
+     <span class="td">0.0132</span>
+     <span class="td">0.0225</span>
+     <span class="td">0.0184</span>
+     <span class="td">0.00279</span>
+     <span class="td">-0.015</span>
+     <span class="td">-0.0238</span>
+     <span class="td">-0.018</span>
+     <span class="td">0.00338</span>
+     <span class="td">0.0252</span>
+     <span class="td">0.031</span>
+     <span class="td">0.0151</span>
+     <span class="td">-0.0136</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.00937</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-41006.2</span>
+     <span class="td">-0.00982</span>
+     <span class="td">0.00344</span>
+     <span class="td">0.0141</span>
+     <span class="td">0.0149</span>
+     <span class="td">0.00459</span>
+     <span class="td">-0.0102</span>
+     <span class="td">-0.0199</span>
+     <span class="td">-0.0175</span>
+     <span class="td">-0.00401</span>
+     <span class="td">0.0125</span>
+     <span class="td">0.0214</span>
+     <span class="td">0.0166</span>
+     <span class="td">0.000599</span>
+     <span class="td">-0.0168</span>
+     <span class="td">-0.0291</span>
+     <span class="td">-0.0191</span>
+     <span class="td">0.00638</span>
+     <span class="td">0.0303</span>
+     <span class="td">0.0359</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.00982</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-38943.8</span>
+     <span class="td">0.0203</span>
+     <span class="td">0.0276</span>
+     <span class="td">0.0125</span>
+     <span class="td">-0.0142</span>
+     <span class="td">-0.0338</span>
+     <span class="td">-0.0322</span>
+     <span class="td">-0.00913</span>
+     <span class="td">0.0207</span>
+     <span class="td">0.0374</span>
+     <span class="td">0.0286</span>
+     <span class="td">-0.00178</span>
+     <span class="td">-0.0359</span>
+     <span class="td">-0.0526</span>
+     <span class="td">-0.0408</span>
+     <span class="td">0.00323</span>
+     <span class="td">0.0506</span>
+     <span class="td">0.0676</span>
+     <span class="td">0.0413</span>
+     <span class="td">-0.0122</span>
+     <span class="td">⋯</span>
+     <span class="td">0.0203</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-38910.1</span>
+     <span class="td">-0.025</span>
+     <span class="td">0.0024</span>
+     <span class="td">0.0259</span>
+     <span class="td">0.0297</span>
+     <span class="td">0.0112</span>
+     <span class="td">-0.0172</span>
+     <span class="td">-0.0359</span>
+     <span class="td">-0.0314</span>
+     <span class="td">-0.00508</span>
+     <span class="td">0.0269</span>
+     <span class="td">0.0439</span>
+     <span class="td">0.0343</span>
+     <span class="td">0.00287</span>
+     <span class="td">-0.0317</span>
+     <span class="td">-0.0603</span>
+     <span class="td">-0.0441</span>
+     <span class="td">0.00468</span>
+     <span class="td">0.0523</span>
+     <span class="td">0.0655</span>
+     <span class="td">⋯</span>
+     <span class="td">0.025</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>λ</var>
+   </b>
+   <sub>hp</sub>
+   =
+   <b>eigen</b>
+   (
+   <b>
+    <var>B</var>
+   </b>
+   ;
+   <var>w</var>
+   )  =
+   <b>eigen</b>
+   (
+   <b>
+    <var>B</var>
+   </b>
+   ; 12.5 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-70805.9</span>
+     <span class="td">-0.0183</span>
+     <span class="td">-0.0138</span>
+     <span class="td">-0.00749</span>
+     <span class="td">
+      -9.11×10
+      <sup>-5</sup>
+     </span>
+     <span class="td">0.00735</span>
+     <span class="td">0.0138</span>
+     <span class="td">0.0183</span>
+     <span class="td">0.0202</span>
+     <span class="td">0.0192</span>
+     <span class="td">0.0153</span>
+     <span class="td">0.00904</span>
+     <span class="td">0.00118</span>
+     <span class="td">-0.0072</span>
+     <span class="td">-0.015</span>
+     <span class="td">-0.0258</span>
+     <span class="td">-0.0321</span>
+     <span class="td">-0.0331</span>
+     <span class="td">-0.0285</span>
+     <span class="td">-0.0191</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0183</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-70797.2</span>
+     <span class="td">0.00239</span>
+     <span class="td">0.00862</span>
+     <span class="td">0.0128</span>
+     <span class="td">0.0144</span>
+     <span class="td">0.0131</span>
+     <span class="td">0.00925</span>
+     <span class="td">0.0033</span>
+     <span class="td">-0.00389</span>
+     <span class="td">-0.0113</span>
+     <span class="td">-0.0177</span>
+     <span class="td">-0.0223</span>
+     <span class="td">-0.0241</span>
+     <span class="td">-0.023</span>
+     <span class="td">-0.0188</span>
+     <span class="td">-0.0113</span>
+     <span class="td">-0.000596</span>
+     <span class="td">0.0116</span>
+     <span class="td">0.0231</span>
+     <span class="td">0.0321</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.00239</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-65476.2</span>
+     <span class="td">-0.0377</span>
+     <span class="td">-0.0293</span>
+     <span class="td">-0.0169</span>
+     <span class="td">-0.00206</span>
+     <span class="td">0.0131</span>
+     <span class="td">0.0264</span>
+     <span class="td">0.036</span>
+     <span class="td">0.0404</span>
+     <span class="td">0.0391</span>
+     <span class="td">0.032</span>
+     <span class="td">0.0202</span>
+     <span class="td">0.00529</span>
+     <span class="td">-0.0108</span>
+     <span class="td">-0.0258</span>
+     <span class="td">-0.0485</span>
+     <span class="td">-0.0623</span>
+     <span class="td">-0.0654</span>
+     <span class="td">-0.0576</span>
+     <span class="td">-0.0401</span>
+     <span class="td">⋯</span>
+     <span class="td">0.0377</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-65381.2</span>
+     <span class="td">0.000895</span>
+     <span class="td">0.0146</span>
+     <span class="td">0.0244</span>
+     <span class="td">0.0289</span>
+     <span class="td">0.0275</span>
+     <span class="td">0.0207</span>
+     <span class="td">0.00943</span>
+     <span class="td">-0.00462</span>
+     <span class="td">-0.0193</span>
+     <span class="td">-0.0325</span>
+     <span class="td">-0.0422</span>
+     <span class="td">-0.0468</span>
+     <span class="td">-0.0456</span>
+     <span class="td">-0.0385</span>
+     <span class="td">-0.0261</span>
+     <span class="td">-0.0062</span>
+     <span class="td">0.0174</span>
+     <span class="td">0.0405</span>
+     <span class="td">0.059</span>
+     <span class="td">⋯</span>
+     <span class="td">0.000895</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-56896.1</span>
+     <span class="td">0.0581</span>
+     <span class="td">0.0476</span>
+     <span class="td">0.0298</span>
+     <span class="td">0.00756</span>
+     <span class="td">-0.0158</span>
+     <span class="td">-0.0366</span>
+     <span class="td">-0.052</span>
+     <span class="td">-0.0599</span>
+     <span class="td">-0.0592</span>
+     <span class="td">-0.0503</span>
+     <span class="td">-0.0346</span>
+     <span class="td">-0.0144</span>
+     <span class="td">0.00749</span>
+     <span class="td">0.0282</span>
+     <span class="td">0.0643</span>
+     <span class="td">0.0878</span>
+     <span class="td">0.0954</span>
+     <span class="td">0.0867</span>
+     <span class="td">0.0634</span>
+     <span class="td">⋯</span>
+     <span class="td">0.0581</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-56485.4</span>
+     <span class="td">-0.00971</span>
+     <span class="td">0.0144</span>
+     <span class="td">0.033</span>
+     <span class="td">0.0434</span>
+     <span class="td">0.0446</span>
+     <span class="td">0.0367</span>
+     <span class="td">0.0213</span>
+     <span class="td">0.000983</span>
+     <span class="td">-0.021</span>
+     <span class="td">-0.0414</span>
+     <span class="td">-0.057</span>
+     <span class="td">-0.0657</span>
+     <span class="td">-0.0663</span>
+     <span class="td">-0.0587</span>
+     <span class="td">-0.0472</span>
+     <span class="td">-0.0218</span>
+     <span class="td">0.0116</span>
+     <span class="td">0.0462</span>
+     <span class="td">0.0758</span>
+     <span class="td">⋯</span>
+     <span class="td">0.00971</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-45457.2</span>
+     <span class="td">0.0773</span>
+     <span class="td">0.0693</span>
+     <span class="td">0.048</span>
+     <span class="td">0.0181</span>
+     <span class="td">-0.0145</span>
+     <span class="td">-0.044</span>
+     <span class="td">-0.0656</span>
+     <span class="td">-0.0766</span>
+     <span class="td">-0.0765</span>
+     <span class="td">-0.0668</span>
+     <span class="td">-0.05</span>
+     <span class="td">-0.029</span>
+     <span class="td">-0.00638</span>
+     <span class="td">0.0157</span>
+     <span class="td">0.0674</span>
+     <span class="td">0.105</span>
+     <span class="td">0.122</span>
+     <span class="td">0.115</span>
+     <span class="td">0.088</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0773</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-44427.6</span>
+     <span class="td">-0.0385</span>
+     <span class="td">0.00105</span>
+     <span class="td">0.0354</span>
+     <span class="td">0.0586</span>
+     <span class="td">0.0673</span>
+     <span class="td">0.0608</span>
+     <span class="td">0.0417</span>
+     <span class="td">0.0143</span>
+     <span class="td">-0.0155</span>
+     <span class="td">-0.0427</span>
+     <span class="td">-0.0633</span>
+     <span class="td">-0.0752</span>
+     <span class="td">-0.0779</span>
+     <span class="td">-0.0723</span>
+     <span class="td">-0.0761</span>
+     <span class="td">-0.0543</span>
+     <span class="td">-0.014</span>
+     <span class="td">0.0343</span>
+     <span class="td">0.0794</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0385</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-41014.4</span>
+     <span class="td">-0.00937</span>
+     <span class="td">-0.011</span>
+     <span class="td">-0.00253</span>
+     <span class="td">0.0106</span>
+     <span class="td">0.0193</span>
+     <span class="td">0.0167</span>
+     <span class="td">0.00333</span>
+     <span class="td">-0.0132</span>
+     <span class="td">-0.0225</span>
+     <span class="td">-0.0184</span>
+     <span class="td">-0.00279</span>
+     <span class="td">0.015</span>
+     <span class="td">0.0238</span>
+     <span class="td">0.018</span>
+     <span class="td">-0.00338</span>
+     <span class="td">-0.0252</span>
+     <span class="td">-0.031</span>
+     <span class="td">-0.0151</span>
+     <span class="td">0.0136</span>
+     <span class="td">⋯</span>
+     <span class="td">0.00937</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-41006.2</span>
+     <span class="td">0.00982</span>
+     <span class="td">-0.00344</span>
+     <span class="td">-0.0141</span>
+     <span class="td">-0.0149</span>
+     <span class="td">-0.00459</span>
+     <span class="td">0.0102</span>
+     <span class="td">0.0199</span>
+     <span class="td">0.0175</span>
+     <span class="td">0.00401</span>
+     <span class="td">-0.0125</span>
+     <span class="td">-0.0214</span>
+     <span class="td">-0.0166</span>
+     <span class="td">-0.000599</span>
+     <span class="td">0.0168</span>
+     <span class="td">0.0291</span>
+     <span class="td">0.0191</span>
+     <span class="td">-0.00638</span>
+     <span class="td">-0.0303</span>
+     <span class="td">-0.0359</span>
+     <span class="td">⋯</span>
+     <span class="td">0.00982</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-38943.8</span>
+     <span class="td">-0.0203</span>
+     <span class="td">-0.0276</span>
+     <span class="td">-0.0125</span>
+     <span class="td">0.0142</span>
+     <span class="td">0.0338</span>
+     <span class="td">0.0322</span>
+     <span class="td">0.00913</span>
+     <span class="td">-0.0207</span>
+     <span class="td">-0.0374</span>
+     <span class="td">-0.0286</span>
+     <span class="td">0.00178</span>
+     <span class="td">0.0359</span>
+     <span class="td">0.0526</span>
+     <span class="td">0.0408</span>
+     <span class="td">-0.00323</span>
+     <span class="td">-0.0506</span>
+     <span class="td">-0.0676</span>
+     <span class="td">-0.0413</span>
+     <span class="td">0.0122</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.0203</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-38910.1</span>
+     <span class="td">0.025</span>
+     <span class="td">-0.0024</span>
+     <span class="td">-0.0259</span>
+     <span class="td">-0.0297</span>
+     <span class="td">-0.0112</span>
+     <span class="td">0.0172</span>
+     <span class="td">0.0359</span>
+     <span class="td">0.0314</span>
+     <span class="td">0.00508</span>
+     <span class="td">-0.0269</span>
+     <span class="td">-0.0439</span>
+     <span class="td">-0.0343</span>
+     <span class="td">-0.00287</span>
+     <span class="td">0.0317</span>
+     <span class="td">0.0603</span>
+     <span class="td">0.0441</span>
+     <span class="td">-0.00468</span>
+     <span class="td">-0.0523</span>
+     <span class="td">-0.0655</span>
+     <span class="td">⋯</span>
+     <span class="td">-0.025</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="dvc">
+    <b>mnorm</b>
+    <sub>e</sub>
+    (
+    <b>
+     <var>λ</var>
+    </b>
+    <sub>std</sub>
+    −
+    <b>
+     <var>λ</var>
+    </b>
+    <sub>hp</sub>
+    )
+    <span class="dvl">
+    </span>
+    <b>mnorm</b>
+    <sub>e</sub>
+    (
+    <b>
+     <var>λ</var>
+    </b>
+    <sub>hp</sub>
+    )
+   </span>
+   = 3×10
+   <sup>-5</sup>
+  </span>
+  &lt; 0.5%
+ </p>
+ <p>
+ </p>
+</div>

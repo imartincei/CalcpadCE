@@ -27,7 +27,7 @@ f(m1; m2) = m1 - m2
 c1 = f(m1; m2)
 
 
-"For matrix multiplication we need to make m2 a matrix row 
+"For matrix multiplication we need to make m2 a matrix row
 #hide
 matrix_row = matrix_hp(1; 5)
 matrix_row.(1; 1) = 17

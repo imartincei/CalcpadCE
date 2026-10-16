@@ -1,0 +1,22 @@
+"Test: Multiple definitions on one line separated by inline comments"
+'A code region after a closing quote is its own definition, e.g.
+'name(x) = expr' text 'name_2(x) = expr should define both names.
+
+k(m) = m
+k_2(m) = m^2
+α_2 = 1
+ν = 0.3
+a = 1
+b = 1
+
+A(m; n) = k_2(m) + α_2*k_2(n)' => 'A_1(m; n) = 1/A(m; n)^2
+B(m; n) = k_2(m) + ν*α_2*k_2(n)' => 'B_1(m; n) = B(m; n)/A(m; n)^2
+C(m; n) = ν*k_2(m) + α_2*k_2(n)' => 'C_1(m; n) = C(m; n)/A(m; n)^2
+S_a(m; x) = sin(k(m)*π/a*x)/k(m)', 'S_b(n; y) = sin(k(n)*π/b*y)/k(n)
+
+' The second-of-line definitions must resolve as defined functions
+r_1 = A_1(1; 2) + B_1(1; 2) + C_1(1; 2) + S_a(1; 2) + S_b(1; 2)
+
+' A plain variable after a comment on the same line should also define
+p = 3' comment 'q = p + 1
+r_2 = q

@@ -1,0 +1,18 @@
+#include Helper.cpd
+hide$hideOutput = 0unhide$
+'Input Vector
+v1 = [1; 2; 3]
+#hide
+'Result Vector
+v2 = vector(len(v1))
+#end hide
+#for i = 1 : len(v1)
+	#hide i > 2
+	#val
+	'Calculations showing iteration 'i' 
+	#end val
+	v2.i = v1.i*2
+	#end hide
+#loop
+'Final results for each iteration
+v2

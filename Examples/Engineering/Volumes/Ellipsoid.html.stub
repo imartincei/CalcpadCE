@@ -1,0 +1,136 @@
+<div class="calcpad-output">
+ <!-- Volume $V = \tfrac{4}{3}\pi\, a\, b\, c$ and approximate surface area of an ellipsoid from its three semi-axes. -->
+ <div style="max-width:110mm">
+  <img alt="ellipsoid.png" class="side" src="Images/math/volume/ellipsoid.png" style="height:70pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">3</u>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-5">2</u>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   =
+   <u class="input-6">1</u>
+  </span>
+ </p>
+ <p>Volume</p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <span class="dvc">
+    4
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   ·
+   <var>π</var>
+   ·
+   <var>a</var>
+   ·
+   <var>b</var>
+   ·
+   <var>c</var>
+   =
+   <span class="dvc">
+    4
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   · 3.14 · 3 · 2 · 1 = 25.13
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   = 1.61
+  </span>
+ </p>
+ <p>Surface area (approx.)</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   = 4 ·
+   <var>π</var>
+   ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    (
+    <var>a</var>
+    ·
+    <var>b</var>
+    )
+    <sup>
+     <var>p</var>
+    </sup>
+    +  (
+    <var>a</var>
+    ·
+    <var>c</var>
+    )
+    <sup>
+     <var>p</var>
+    </sup>
+    +  (
+    <var>b</var>
+    ·
+    <var>c</var>
+    )
+    <sup>
+     <var>p</var>
+    </sup>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   <span class="b1">)</span>
+   <sup class="raised">
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     <var>p</var>
+    </span>
+   </sup>
+   = 4 · 3.14 ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    ( 3 · 2 )
+    <sup>1.61</sup>
+    +  ( 3 · 1 )
+    <sup>1.61</sup>
+    +  ( 2 · 1 )
+    <sup>1.61</sup>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   <span class="b1">)</span>
+   <sup class="raised">
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1.61
+    </span>
+   </sup>
+   = 48.97
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

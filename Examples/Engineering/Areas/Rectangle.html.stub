@@ -1,0 +1,44 @@
+<div class="calcpad-output">
+ <!-- Area $A = a\, b$ and perimeter $P = 2(a + b)$ of a rectangle from its two side lengths. -->
+ <div style="max-width:100mm;">
+  <img alt="rectangle.png" class="side" src="Images/math/area/rectangle.png" style="height:55pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">2</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-4">1</u>
+  </span>
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <var>a</var>
+   ·
+   <var>b</var>
+   = 2 · 1 = 2
+  </span>
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   = 2 ·  (
+   <var>a</var>
+   +
+   <var>b</var>
+   )  = 2 ·  ( 2 + 1 )  = 6
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

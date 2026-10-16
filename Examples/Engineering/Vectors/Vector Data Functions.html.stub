@@ -1,0 +1,573 @@
+<div class="calcpad-output">
+ <!-- Reference for the data-oriented vector toolkit: $sort$, $rsort$, $order$ and $revorder$ for ranking, $find$, $count$ and $search$ for lookup, plus the standard reductions ($sum$, $product$, $min$, $max$, $mean$ and friends) used to condense a series into a single number. -->
+ <style>em {font-family:"Times New Roman";}</style>
+ <p>
+  <b>Sort</b>
+  (
+  <em>vector</em>
+  ) and
+  <b>Rsort</b>
+  (
+  <em>vector</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <span class="b0">[</span>
+   4; 0; 2; 3; -1; 1
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   4 0 2 3 -1 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>sort</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1 0 1 2 3 4
+   <b class="b0">]</b>
+  </span>
+  - vector sorted in ascending order
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>rsort</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   )  =
+   <b class="b0">[</b>
+   4 3 2 1 0 -1
+   <b class="b0">]</b>
+  </span>
+  - vector sorted in descending order
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b class="b0">[</b>
+   4 0 2 3 -1 1
+   <b class="b0">]</b>
+  </span>
+  - remained unchanged
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Order</b>
+  (
+  <em>vector</em>
+  ) and
+  <b>Revorder</b>
+  (
+  <em>vector</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>a</sub>
+   =
+   <span class="b0">[</span>
+   4; 0; 2; 3; -1; 1
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   4 0 2 3 -1 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   <sub>a</sub>
+   =
+   <span class="b0">[</span>
+   1; 2; 3; 4; 5; 6
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 3 4 5 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    i
+   </var>
+   <sub>asc</sub>
+   =
+   <b>order</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>a</sub>
+   )  =
+   <b class="b0">[</b>
+   5 2 6 3 4 1
+   <b class="b0">]</b>
+  </span>
+  - indexes in ascending order of
+  <em>x</em>
+  -values
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    i
+   </var>
+   <sub>desc</sub>
+   =
+   <b>revorder</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>a</sub>
+   )  =
+   <b class="b0">[</b>
+   1 4 3 6 2 5
+   <b class="b0">]</b>
+  </span>
+  - indexes in descending order of
+  <em>x</em>
+  -values
+ </p>
+ <p>
+  Sorts points by ascending order of
+  <em>x</em>
+  -values
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>b</sub>
+   =
+   <b>extract</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>a</sub>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    i
+   </var>
+   <sub>asc</sub>
+   )  =
+   <b class="b0">[</b>
+   -1 0 1 2 3 4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   <sub>b</sub>
+   =
+   <b>extract</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   <sub>a</sub>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    i
+   </var>
+   <sub>asc</sub>
+   )  =
+   <b class="b0">[</b>
+   5 2 6 3 4 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Reverse</b>
+  (
+  <em>vector</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <b>reverse</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3; 4; 5
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   5 4 3 2 1
+   <b class="b0">]</b>
+  </span>
+  - the elements of the vector in reverse order
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Count</b>
+  (
+  <em>vector</em>
+  ;
+  <em>value</em>
+  ;
+  <em>starting index</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <b>count</b>
+   (
+   <span class="b0">[</span>
+   0; 1; 2; 1; 4; 1
+   <span class="b0">]</span>
+   ; 1; 4 )  = 2
+  </span>
+  - the number of elements equal to 1 and index ≥ 4
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Search</b>
+  (
+  <em>vector</em>
+  ;
+  <em>value</em>
+  ;
+  <em>starting index</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <span class="b0">[</span>
+   0; 1; 2; 1; 4; 1
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   0 1 2 1 4 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>search</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 1; 3 )  = 4
+  </span>
+  - the index of the first element in
+  <em>a</em>
+  with value 1 and index ≥ 3
+ </p>
+ <p>
+  <span class="eq">
+   <b>search</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 1; 7 )  = 0
+  </span>
+  - when the index is out of range or nothing is found, returns 0
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Find</b>
+  (
+  <em>vector</em>
+  ;
+  <em>value</em>
+  ;
+  <em>starting index</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <span class="b0">[</span>
+   0; 1; 2; 1; 4; 1
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   0 1 2 1 4 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>find</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 1; 2 )  =
+   <b class="b0">[</b>
+   2 4 6
+   <b class="b0">]</b>
+  </span>
+  - the indexes of all elements with value 1, from the 2nd onwards
+ </p>
+ <p>
+  <span class="eq">
+   <b>find</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 3; 2 )  =
+   <b class="b0">[</b>
+   <b class="b0">]</b>
+  </span>
+  - if the indexes are out of range or nothing is found, returns 0
+ </p>
+ <p>
+  <span class="eq">
+   <b>find</b>
+   <sub>lt</sub>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 3; 2 )  =
+   <b class="b0">[</b>
+   2 3 4 6
+   <b class="b0">]</b>
+  </span>
+  - the indexes of all elements, from the 2nd onwards, that are &lt; 3
+ </p>
+ <p>
+  <span class="eq">
+   <b>find</b>
+   <sub>ge</sub>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 3; 2 )  =
+   <b class="b0">[</b>
+   5
+   <b class="b0">]</b>
+  </span>
+  - the indexes of all elements, from the 2nd onwards, that are ≥ 3
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Lookup</b>
+  (
+  <em>vector_a</em>
+  ;
+  <em>vector_b</em>
+  ;
+  <em>value</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <span class="b0">[</span>
+   0; 1; 0; 0; 1; 2
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   0 1 0 0 1 2
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <span class="b0">[</span>
+   1; 2; 3; 4; 5; 6
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 3 4 5 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>lookup</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ; 0 )  =
+   <b class="b0">[</b>
+   1 3 4
+   <b class="b0">]</b>
+  </span>
+  - the values ​​from vector
+  <em>b</em>
+  for which the corresponding values ​​in vector
+  <em>a</em>
+  are equal to 0
+ </p>
+ <p>
+  <span class="eq">
+   <b>lookup</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ; 2 )  =
+   <b class="b0">[</b>
+   6
+   <b class="b0">]</b>
+  </span>
+  - the values ​​from vector
+  <em>b</em>
+  for which the corresponding values ​​in vector
+  <em>a</em>
+  are equal to 2
+ </p>
+ <p>
+  <span class="eq">
+   <b>lookup</b>
+   <sub>ge</sub>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ; 1 )  =
+   <b class="b0">[</b>
+   2 5 6
+   <b class="b0">]</b>
+  </span>
+  - the values ​​from vector
+  <em>b</em>
+  for which the corresponding values ​​in vector
+  <em>a</em>
+  are ≥ 1
+ </p>
+ <p>
+  <span class="eq">
+   <b>lookup</b>
+   <sub>ne</sub>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ; 1 )  =
+   <b class="b0">[</b>
+   1 3 4 6
+   <b class="b0">]</b>
+  </span>
+  - the values ​​from vector
+  <em>b</em>
+  for which the corresponding values ​​in vector
+  <em>a</em>
+  are ≠ 1
+ </p>
+</div>

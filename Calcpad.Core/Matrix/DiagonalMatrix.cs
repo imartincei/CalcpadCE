@@ -97,7 +97,7 @@ namespace Calcpad.Core
             {
                 var cRow = new RowVector(b, i) * diag[i];
                 c.Rows[i] = new LargeVector(cRow.Values);
-            }            
+            }
             return c;
         }
 
@@ -144,7 +144,7 @@ namespace Calcpad.Core
                 var aRow = a.Rows[i];
                 var len = aRow.Length;
                 var aRaw = aRow.Raw;
-                var size = Math.Min(aRow.Size, diagSize - i); 
+                var size = Math.Min(aRow.Size, diagSize - i);
                 var cRaw = new RealValue[len];
                 for (int j = size - 1; j >= 0; --j)
                     cRaw[j] = aRaw[j] * diag[i + j];
@@ -248,7 +248,7 @@ namespace Calcpad.Core
                     throw Exceptions.MatrixSingular();
         }
 
-        // L∞ (Infinity) or Chebyshev norm     
+        // L∞ (Infinity) or Chebyshev norm
         internal override RealValue InfNorm() => _rows[0].InfNorm();
 
         internal Vector EigenValues(int count)

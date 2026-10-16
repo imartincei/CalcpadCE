@@ -1,0 +1,13 @@
+'Recursive #include test - main file
+'This file includes level1.cpd which includes level2.cpd which includes level3.cpd
+
+#include https://gist.githubusercontent.com/imartincei/406725afbfc82176193428eb10b0a8f3/raw/0121b72873d5dda3a13bdc73ad5eb54402100d19/gistfile1.txt
+
+#include import.cpd
+
+#read E from https://gist.github.com/imartincei/c834617afefead62dad00ac101cc7939/raw/160452148858a5e5c0fe83fd10bda480ac91d5af/test.xlsx@R1C1:R2C3 TYPE=R
+
+'Back in main after includes
+z = x + y + w + v
+'z should equal 1 + 2 + 3 + 10 = 16
+z

@@ -1,0 +1,1214 @@
+<div class="calcpad-output">
+ <!-- HP foundations: literal vectors wrapped with $hp(...)$, the corresponding creational helpers, indexing and the broadcast operators on packed storage. -->
+ <p>Direct:</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   <b>cos</b>
+   ( 0 ) ; 2; 3; 2 · 2; 6 − 1
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   1 2 3 4 5
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Direct with another vector:</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   0;
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 6; 7; 8
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   0 1 2 3 4 5 6 7 8
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>From a custom function:</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   (
+   <var>x</var>
+   )  =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1;
+   <var>x</var>
+   ;
+   <var>x</var>
+   <sup>2</sup>
+   ;
+   <var>x</var>
+   <sup>3</sup>
+   ;
+   <var>x</var>
+   <sup>4</sup>
+   <span class="b0">]</span>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   ( 2 )  =
+   <b class="b0">[</b>
+   1 2 4 8 16
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   ( 3 )  =
+   <b class="b0">[</b>
+   1 3 9 27 81
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>By creational functions:</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>vector</b>
+   <sub>hp</sub>
+   ( 5 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+  - creates an empty vector with 5 elements
+ </p>
+ <p>
+  <span class="eq">
+   <b>fill</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 5 )  =
+   <b class="b0">[</b>
+   5 5 5 5 5
+   <b class="b0">]</b>
+  </span>
+  - fills the vector with a value of 5
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>range</b>
+   <sub>hp</sub>
+   ( 0; 10; 2 )  =
+   <b class="b0">[</b>
+   0 2 4 6 8 10
+   <b class="b0">]</b>
+  </span>
+  - creates a vector from a range of values, starting from 0 to 10 with step 2
+ </p>
+ <p>
+ </p>
+ <h3>Indexing</h3>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   2; 4; 6; 8; 10
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   2 4 6 8 10
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sub>2</sub>
+   = 4
+  </span>
+  - simple dot operator (constant index)
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   = 3
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sub>3</sub>
+   = 6
+  </span>
+  - variable index
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sub>5</sub>
+   = 10
+  </span>
+  - expression index
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sub>5</sub>
+   = 0
+  </span>
+  - assign a new value to element:
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b class="b0">[</b>
+   2 4 6 8 0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>vector</b>
+   <sub>hp</sub>
+   ( 6 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>vector</b>
+   <sub>hp</sub>
+   ( 6 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Initalize values in a block loop</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b class="b0">[</b>
+   1 4 9 16 25 36
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Inline loop</p>
+ <p>
+  <span class="eq">
+   <span class="cond">$Repeat</span>
+   {
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   <sub>
+    <var>k</var>
+   </sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sub>
+    <var>k</var>
+    − 1
+   </sub>
+   <span class="cond">for</span>
+   <var>k</var>
+   = 2...
+   <b>len</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   ) } = 25
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   0 1 4 9 16 25
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Vector operators</h3>
+ <h4>Vector-vector</h4>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3; 0
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   1 2 3 0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   0; 4; 5; 6; 7
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   0 4 5 6 7
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Arithmetic:</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ! =
+   <b class="b0">[</b>
+   1 2 6 1
+   <b class="b0">]</b>
+  </span>
+  - factorial
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sup>
+    <small class="nth">⊙</small>
+    <var>
+     <span class="vec">⃗</span>
+     b
+    </var>
+   </sup>
+   =
+   <b class="b0">[</b>
+   1 16 243 0 0
+   <b class="b0">]</b>
+  </span>
+  - exponentiation
+ </p>
+ <p>
+  <span class="eq">
+   <span class="dvc">
+    <var>
+     <span class="vec">⃗</span>
+     a
+    </var>
+    <span class="dvl">
+    </span>
+    <var>
+     <span class="vec">⃗</span>
+     b
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   <span class="err">+∞</span>
+   0.5 0.6 0 0
+   <b class="b0">]</b>
+  </span>
+  - floating point division
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   \
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   0 0 0 0
+   <b class="b0">]</b>
+  </span>
+  - integer division
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <em>/</em>
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   <span class="err">+∞</span>
+   0.5 0.6 0 0
+   <b class="b0">]</b>
+  </span>
+  - division bar
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   mod
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   2 3 0 0
+   <b class="b0">]</b>
+  </span>
+  - modulo(⦼, remainder)
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <small class="nth">⊙</small>
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   0 8 15 0 0
+   <b class="b0">]</b>
+  </span>
+  - multiplication
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   −
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   1 -2 -2 -6 -7
+   <b class="b0">]</b>
+  </span>
+  - subtraction
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   +
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   1 6 8 6 7
+   <b class="b0">]</b>
+  </span>
+  - addition
+ </p>
+ <p>Relational (comparison):</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ≡
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   0 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+  - equal to
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ≠
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   1 1 1 1 1
+   <b class="b0">]</b>
+  </span>
+  - unequal to
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   &lt;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   0 1 1 1 1
+   <b class="b0">]</b>
+  </span>
+  - less then
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   &gt;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   1 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+  - greater than
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ≤
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   0 1 1 1 1
+   <b class="b0">]</b>
+  </span>
+  - less or equal
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ≥
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   1 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+  - greater or equal
+ </p>
+ <p>Logical:</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   and
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   0 1 1 0 0
+   <b class="b0">]</b>
+  </span>
+  - logical "and"
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   or
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   1 1 1 1 1
+   <b class="b0">]</b>
+  </span>
+  - logical "or"
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   xor
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   1 0 0 1 1
+   <b class="b0">]</b>
+  </span>
+  - logical "xor"
+ </p>
+ <p>
+ </p>
+ <h4>Vector-scalar</h4>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3; 0
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   1 2 3 0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   = 2
+  </span>
+ </p>
+ <p>Arithmetic:</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sup>
+    <small class="nth">⊙</small>
+    2
+   </sup>
+   =
+   <b class="b0">[</b>
+   1 4 9 0
+   <b class="b0">]</b>
+  </span>
+  - exponentiation
+ </p>
+ <p>
+  <span class="eq">
+   <span class="dvc">
+    <var>
+     <span class="vec">⃗</span>
+     a
+    </var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <b class="b0">[</b>
+   0.5 1 1.5 0
+   <b class="b0">]</b>
+  </span>
+  - floating point division
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   \2 =
+   <b class="b0">[</b>
+   0 1 1 0
+   <b class="b0">]</b>
+  </span>
+  - integer division
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <em>/</em>
+   2 =
+   <b class="b0">[</b>
+   0.5 1 1.5 0
+   <b class="b0">]</b>
+  </span>
+  - division bar
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   mod 2 =
+   <b class="b0">[</b>
+   1 0 1 0
+   <b class="b0">]</b>
+  </span>
+  - modulo(⦼, remainder)
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   · 2 =
+   <b class="b0">[</b>
+   2 4 6 0
+   <b class="b0">]</b>
+  </span>
+  - multiplication
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   − 2 =
+   <b class="b0">[</b>
+   -1 0 1 -2
+   <b class="b0">]</b>
+  </span>
+  - subtraction
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   + 2 =
+   <b class="b0">[</b>
+   3 4 5 2
+   <b class="b0">]</b>
+  </span>
+  - addition
+ </p>
+ <p>Relational (comparison):</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ≡ 2 =
+   <b class="b0">[</b>
+   0 1 0 0
+   <b class="b0">]</b>
+  </span>
+  - equal to
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ≠ 2 =
+   <b class="b0">[</b>
+   1 0 1 1
+   <b class="b0">]</b>
+  </span>
+  - unequal to
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   &lt; 2 =
+   <b class="b0">[</b>
+   1 0 0 1
+   <b class="b0">]</b>
+  </span>
+  - less then
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   &gt; 2 =
+   <b class="b0">[</b>
+   0 0 1 0
+   <b class="b0">]</b>
+  </span>
+  - greater than
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ≤ 2 =
+   <b class="b0">[</b>
+   1 1 0 1
+   <b class="b0">]</b>
+  </span>
+  - less or equal
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ≥ 2 =
+   <b class="b0">[</b>
+   0 1 1 0
+   <b class="b0">]</b>
+  </span>
+  - greater or equal
+ </p>
+ <p>Logical:</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   and 2 =
+   <b class="b0">[</b>
+   1 1 1 0
+   <b class="b0">]</b>
+  </span>
+  - logical "and"
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   or 2 =
+   <b class="b0">[</b>
+   1 1 1 1
+   <b class="b0">]</b>
+  </span>
+  - logical "or"
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   xor 2 =
+   <b class="b0">[</b>
+   0 0 0 1
+   <b class="b0">]</b>
+  </span>
+  - logical "xor"
+ </p>
+ <p>
+ </p>
+ <h4>Scalar-vector</h4>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   = 2
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   0; 4; 5; 6; 7
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   0 4 5 6 7
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Arithmetic:</p>
+ <p>
+  <span class="eq">
+   2
+   <sup>
+    <var>
+     <span class="vec">⃗</span>
+     b
+    </var>
+   </sup>
+   =
+   <b class="b0">[</b>
+   1 16 32 64 128
+   <b class="b0">]</b>
+  </span>
+  - exponentiation
+ </p>
+ <p>
+  <span class="eq">
+   <span class="dvc">
+    2
+    <span class="dvl">
+    </span>
+    <var>
+     <span class="vec">⃗</span>
+     b
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   <span class="err">+∞</span>
+   0.5 0.4 0.333 0.286
+   <b class="b0">]</b>
+  </span>
+  - floating point division
+ </p>
+ <p>
+  <span class="eq">
+   2\
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   0 0 0 0
+   <b class="b0">]</b>
+  </span>
+  - integer division
+ </p>
+ <p>
+  <span class="eq">
+   2
+   <em>/</em>
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   <span class="err">+∞</span>
+   0.5 0.4 0.333 0.286
+   <b class="b0">]</b>
+  </span>
+  - division bar
+ </p>
+ <p>
+  <span class="eq">
+   2 mod
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   2 2 2 2
+   <b class="b0">]</b>
+  </span>
+  - modulo(⦼, remainder)
+ </p>
+ <p>
+  <span class="eq">
+   2 ·
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   0 8 10 12 14
+   <b class="b0">]</b>
+  </span>
+  - multiplication
+ </p>
+ <p>
+  <span class="eq">
+   2 −
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   2 -2 -3 -4 -5
+   <b class="b0">]</b>
+  </span>
+  - subtraction
+ </p>
+ <p>
+  <span class="eq">
+   2 +
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   2 6 7 8 9
+   <b class="b0">]</b>
+  </span>
+  - addition
+ </p>
+ <p>Relational (comparison):</p>
+ <p>
+  <span class="eq">
+   2 ≡
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   0 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+  - equal to
+ </p>
+ <p>
+  <span class="eq">
+   2 ≠
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   1 1 1 1 1
+   <b class="b0">]</b>
+  </span>
+  - unequal to
+ </p>
+ <p>
+  <span class="eq">
+   2 &lt;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   0 1 1 1 1
+   <b class="b0">]</b>
+  </span>
+  - less then
+ </p>
+ <p>
+  <span class="eq">
+   2 &gt;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   1 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+  - greater than
+ </p>
+ <p>
+  <span class="eq">
+   2 ≤
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   0 1 1 1 1
+   <b class="b0">]</b>
+  </span>
+  - less or equal
+ </p>
+ <p>
+  <span class="eq">
+   2 ≥
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   1 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+  - greater or equal
+ </p>
+ <p>Logical:</p>
+ <p>
+  <span class="eq">
+   2 and
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   0 1 1 1 1
+   <b class="b0">]</b>
+  </span>
+  - logical "and"
+ </p>
+ <p>
+  <span class="eq">
+   2 or
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   1 1 1 1 1
+   <b class="b0">]</b>
+  </span>
+  - logical "or
+ </p>
+ <p>
+  <span class="eq">
+   2 xor
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   1 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+  - logical "xor"
+ </p>
+</div>

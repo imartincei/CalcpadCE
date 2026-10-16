@@ -1,0 +1,789 @@
+<div class="calcpad-output">
+ <!-- Fits a 10-point dataset with linear, quadratic and quintic polynomial models built from the normal equations $X^T\, X\, a = X^T y$.
+<p>All three curves are then plotted together so the residual pattern of each model is immediately visible. -->
+ <p>Point coordinates</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <span class="b0">[</span>
+   0; 1; 2; 3; 4; 5; 6; 7; 8; 9
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   0 1 2 3 4 5 6 7 8 9
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   =
+   <span class="b0">[</span>
+   400; 450; 440; 400; 380; 330; 250; 200; 150; 160
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   400 450 440 400 380 330 250 200 150 160
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  Number of points -
+  <span class="eq">
+   <var>n</var>
+   =
+   <b>len</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  = 10
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    e
+   </var>
+   =
+   <b>fill</b>
+   (
+   <b>vector</b>
+   (
+   <var>n</var>
+   ) ; 1 )  =
+   <b>fill</b>
+   (
+   <b>vector</b>
+   ( 10 ) ; 1 )  =
+   <b class="b0">[</b>
+   1 1 1 1 1 1 1 1 1 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <h4>Linear fit</h4>
+ <p>
+  <span class="eq">
+   <b>
+    <var>X</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   <var>
+    <span class="vec">⃗</span>
+    e
+   </var>
+   <span class="b0">|</span>
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <b>copy</b>
+   (
+   <b>
+    <var>X</var>
+   </b>
+   ·
+   <b>transp</b>
+   (
+   <b>
+    <var>X</var>
+   </b>
+   ) ;
+   <b>symmetric</b>
+   (
+   <b>n</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>X</var>
+   </b>
+   )  ) ; 1; 1 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">10</span>
+     <span class="td">45</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">45</span>
+     <span class="td">285</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>
+    <var>X</var>
+   </b>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   =
+   <b class="b0">[</b>
+   3160 11240
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sub>L</sub>
+   =
+   <b>clsolve</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  =
+   <b class="b0">[</b>
+   478.55 -36.12
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   <sub>L</sub>
+   (
+   <var>x</var>
+   )  =
+   <b>dot</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sub>L</sub>
+   ;
+   <span class="b0">[</span>
+   1;
+   <var>x</var>
+   <span class="b0">]</span>
+   )
+  </span>
+ </p>
+ <h4>Quadratic fit</h4>
+ <p>
+  <span class="eq">
+   <b>
+    <var>X</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   <var>
+    <span class="vec">⃗</span>
+    e
+   </var>
+   <span class="b0">|</span>
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <span class="b0">|</span>
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sup>
+    <small class="nth">⊙</small>
+    2
+   </sup>
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">4</span>
+     <span class="td">9</span>
+     <span class="td">16</span>
+     <span class="td">25</span>
+     <span class="td">36</span>
+     <span class="td">49</span>
+     <span class="td">64</span>
+     <span class="td">81</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <b>copy</b>
+   (
+   <b>
+    <var>X</var>
+   </b>
+   ·
+   <b>transp</b>
+   (
+   <b>
+    <var>X</var>
+   </b>
+   ) ;
+   <b>symmetric</b>
+   (
+   <b>n</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>X</var>
+   </b>
+   )  ) ; 1; 1 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">10</span>
+     <span class="td">45</span>
+     <span class="td">285</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">45</span>
+     <span class="td">285</span>
+     <span class="td">2025</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">285</span>
+     <span class="td">2025</span>
+     <span class="td">15333</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>
+    <var>X</var>
+   </b>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   =
+   <b class="b0">[</b>
+   3160 11240 61500
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sub>Q</sub>
+   =
+   <b>clsolve</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  =
+   <b class="b0">[</b>
+   439 -6.46 -3.3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   <sub>Q</sub>
+   (
+   <var>x</var>
+   )  =
+   <b>dot</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sub>Q</sub>
+   ;
+   <span class="b0">[</span>
+   1;
+   <var>x</var>
+   ;
+   <var>x</var>
+   <sup>2</sup>
+   <span class="b0">]</span>
+   )
+  </span>
+ </p>
+ <h4>Poly(5) fit</h4>
+ <p>
+  <span class="eq">
+   <b>
+    <var>X</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   <var>
+    <span class="vec">⃗</span>
+    e
+   </var>
+   <span class="b0">|</span>
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <span class="b0">|</span>
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sup>
+    <small class="nth">⊙</small>
+    2
+   </sup>
+   <span class="b0">|</span>
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sup>
+    <small class="nth">⊙</small>
+    3
+   </sup>
+   <span class="b0">|</span>
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sup>
+    <small class="nth">⊙</small>
+    4
+   </sup>
+   <span class="b0">|</span>
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sup>
+    <small class="nth">⊙</small>
+    5
+   </sup>
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">4</span>
+     <span class="td">9</span>
+     <span class="td">16</span>
+     <span class="td">25</span>
+     <span class="td">36</span>
+     <span class="td">49</span>
+     <span class="td">64</span>
+     <span class="td">81</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">8</span>
+     <span class="td">27</span>
+     <span class="td">64</span>
+     <span class="td">125</span>
+     <span class="td">216</span>
+     <span class="td">343</span>
+     <span class="td">512</span>
+     <span class="td">729</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">16</span>
+     <span class="td">81</span>
+     <span class="td">256</span>
+     <span class="td">625</span>
+     <span class="td">1296</span>
+     <span class="td">2401</span>
+     <span class="td">4096</span>
+     <span class="td">6561</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">32</span>
+     <span class="td">243</span>
+     <span class="td">1024</span>
+     <span class="td">3125</span>
+     <span class="td">7776</span>
+     <span class="td">16807</span>
+     <span class="td">32768</span>
+     <span class="td">59049</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <b>copy</b>
+   (
+   <b>
+    <var>X</var>
+   </b>
+   ·
+   <b>transp</b>
+   (
+   <b>
+    <var>X</var>
+   </b>
+   ) ;
+   <b>symmetric</b>
+   (
+   <b>n</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>X</var>
+   </b>
+   )  ) ; 1; 1 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">10</span>
+     <span class="td">45</span>
+     <span class="td">285</span>
+     <span class="td">2025</span>
+     <span class="td">15333</span>
+     <span class="td">120825</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">45</span>
+     <span class="td">285</span>
+     <span class="td">2025</span>
+     <span class="td">15333</span>
+     <span class="td">120825</span>
+     <span class="td">978405</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">285</span>
+     <span class="td">2025</span>
+     <span class="td">15333</span>
+     <span class="td">120825</span>
+     <span class="td">978405</span>
+     <span class="td">8080425</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2025</span>
+     <span class="td">15333</span>
+     <span class="td">120825</span>
+     <span class="td">978405</span>
+     <span class="td">8080425</span>
+     <span class="td">67731333</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">15333</span>
+     <span class="td">120825</span>
+     <span class="td">978405</span>
+     <span class="td">8080425</span>
+     <span class="td">67731333</span>
+     <span class="td">574304985</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">120825</span>
+     <span class="td">978405</span>
+     <span class="td">8080425</span>
+     <span class="td">67731333</span>
+     <span class="td">574304985</span>
+     <span class="td">4914341925</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>
+    <var>X</var>
+   </b>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   =
+   <b class="b0">[</b>
+   3160 11240 61500 396380 2811780 21200540
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sub>C</sub>
+   =
+   <b>clsolve</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  =
+   <b class="b0">[</b>
+   401.17 88.36 -54.04 12.51 -1.54 0.0731
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   <sub>C</sub>
+   (
+   <var>x</var>
+   )  =
+   <b>dot</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sub>C</sub>
+   ;
+   <span class="b0">[</span>
+   1;
+   <var>x</var>
+   ;
+   <var>x</var>
+   <sup>2</sup>
+   ;
+   <var>x</var>
+   <sup>3</sup>
+   ;
+   <var>x</var>
+   <sup>4</sup>
+   ;
+   <var>x</var>
+   <sup>5</sup>
+   <span class="b0">]</span>
+   )
+  </span>
+ </p>
+ <h4>Plot</h4>
+ <p class="err">Unexpected error: Index was outside the bounds of the array. Please check the expression consistency.</p>
+</div>

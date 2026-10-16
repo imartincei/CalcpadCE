@@ -1,0 +1,368 @@
+<div class="calcpad-output">
+ <!-- Section properties of a trapezoid: area, centroid offsets, $I_x$, $I_y$, section moduli and radii of gyration from the two parallel sides and height. -->
+ <h3>Geometrical Properties of Trapezoid</h3>
+ <div style="max-width:130mm">
+  <img alt="Trapezoid.png" class="side" src="Images/mechanics/sections/trapezoid.png" style="height:135pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-5">2</u>
+  </span>
+  m,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-5">1</u>
+  </span>
+  m
+ </p>
+ <p>Height</p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-7">1</u>
+  </span>
+  m
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>h</var>
+    ·  (
+    <var>a</var>
+    +
+    <var>b</var>
+    )
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    1 ·  ( 2 + 1 )
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 1.5
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>Centroid</p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    2
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 1
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>c</sub>
+   =
+   <span class="dvc up">
+    <var>h</var>
+    ·
+    <span class="dvc">
+     <var>a</var>
+     + 2 ·
+     <var>b</var>
+     <span class="dvl">
+     </span>
+     <var>a</var>
+     +
+     <var>b</var>
+    </span>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   =
+   <span class="dvc up">
+    1 ·
+    <span class="dvc">
+     2 + 2 · 1
+     <span class="dvl">
+     </span>
+     2 + 1
+    </span>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   = 0.444
+  </span>
+  m
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   =
+   <var>a</var>
+   +
+   <var>b</var>
+   + 2 ·
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <var>h</var>
+    <sup>2</sup>
+    +
+    <span class="dvc">
+     (
+     <var>b</var>
+     −
+     <var>a</var>
+     )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   = 2 + 1 + 2 ·
+   <span class="o1">
+    <span class="r1">
+    </span>
+    1
+    <sup>2</sup>
+    +
+    <span class="dvc">
+     ( 1 − 2 )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   = 5.24
+  </span>
+  m
+ </p>
+ <p>Second moments of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>y</sub>
+   =
+   <span class="dvc up">
+    <var>h</var>
+    <sup>3</sup>
+    ·
+    <span class="dvc">
+     <var>a</var>
+     <sup>2</sup>
+     + 4 ·
+     <var>a</var>
+     ·
+     <var>b</var>
+     +
+     <var>b</var>
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     <var>a</var>
+     +
+     <var>b</var>
+    </span>
+    <span class="dvl">
+    </span>
+    36
+   </span>
+   =
+   <span class="dvc up">
+    1
+    <sup>3</sup>
+    ·
+    <span class="dvc">
+     2
+     <sup>2</sup>
+     + 4 · 2 · 1 + 1
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     2 + 1
+    </span>
+    <span class="dvl">
+    </span>
+    36
+   </span>
+   = 0.12
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>z</sub>
+   =
+   <span class="dvc">
+    <var>h</var>
+    ·  (
+    <var>a</var>
+    +
+    <var>b</var>
+    )  ·  (
+    <var>a</var>
+    <sup>2</sup>
+    +
+    <var>b</var>
+    <sup>2</sup>
+    )
+    <span class="dvl">
+    </span>
+    48
+   </span>
+   =
+   <span class="dvc">
+    1 ·  ( 2 + 1 )  ·  ( 2
+    <sup>2</sup>
+    + 1
+    <sup>2</sup>
+    )
+    <span class="dvl">
+    </span>
+    48
+   </span>
+   = 0.312
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Polar moment of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>x</sub>
+   =
+   <var>I</var>
+   <sub>y</sub>
+   +
+   <var>I</var>
+   <sub>z</sub>
+   = 0.12 + 0.312 = 0.433
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Radii of gyration</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>y</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.12
+     <span class="dvl">
+     </span>
+     1.5
+    </span>
+   </span>
+   = 0.283
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>z</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>z</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.312
+     <span class="dvl">
+     </span>
+     1.5
+    </span>
+   </span>
+   = 0.456
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>x</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>x</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.433
+     <span class="dvl">
+     </span>
+     1.5
+    </span>
+   </span>
+   = 0.537
+  </span>
+  m
+ </p>
+</div>

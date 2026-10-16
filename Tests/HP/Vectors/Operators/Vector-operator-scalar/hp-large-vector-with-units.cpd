@@ -111,7 +111,7 @@ b = -3h^-1
 c = x > b
 f(x; b) = x > b','c = f(x; b)
 
-"Less than or equal 
+"Less than or equal
 x
 b = -7s^-1
 c = x ≤ b
@@ -124,7 +124,7 @@ c = y ≥ b
 f(y; b) = y ≥ b','c = f(y; b)
 
 '<h1>Logical operators</h1>
-"Logical AND 
+"Logical AND
 y
 b = 0min^-1
 c = y ∧ b

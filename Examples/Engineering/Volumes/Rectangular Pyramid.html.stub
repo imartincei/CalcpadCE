@@ -1,0 +1,152 @@
+<div class="calcpad-output">
+ <!-- Volume $V = \tfrac{1}{3} a\, b\, h$ and surface area of a rectangular-base pyramid. -->
+ <div style="max-width:130mm">
+  <img alt="rectangular-pyramid.png" class="side" src="Images/math/volume/rectangular-pyramid.png" style="height:65pt;"/>
+ </div>
+ <p>Dimensions of base</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">3</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-4">2</u>
+  </span>
+ </p>
+ <p>Height</p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-6">1</u>
+  </span>
+ </p>
+ <p>Volume</p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   ·
+   <var>a</var>
+   ·
+   <var>b</var>
+   ·
+   <var>h</var>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   · 3 · 2 · 1 = 2
+  </span>
+ </p>
+ <p>Area of side faces</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   <sub>o</sub>
+   =
+   <var>a</var>
+   ·
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <var>h</var>
+    <sup>2</sup>
+    +
+    <span class="dvc">
+     <var>b</var>
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   +
+   <var>b</var>
+   ·
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <var>h</var>
+    <sup>2</sup>
+    +
+    <span class="dvc">
+     <var>a</var>
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   = 3 ·
+   <span class="o1">
+    <span class="r1">
+    </span>
+    1
+    <sup>2</sup>
+    +
+    <span class="dvc">
+     2
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   + 2 ·
+   <span class="o1">
+    <span class="r1">
+    </span>
+    1
+    <sup>2</sup>
+    +
+    <span class="dvc">
+     3
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   = 7.85
+  </span>
+ </p>
+ <p>Area of base</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <var>a</var>
+   ·
+   <var>b</var>
+   = 3 · 2 = 6
+  </span>
+ </p>
+ <p>Total surface area</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   =
+   <var>S</var>
+   <sub>o</sub>
+   +
+   <var>A</var>
+   = 7.85 + 6 = 13.85
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

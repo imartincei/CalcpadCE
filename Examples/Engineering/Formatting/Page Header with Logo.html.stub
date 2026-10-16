@@ -1,0 +1,143 @@
+<div class="calcpad-output">
+ <!-- Builds a print-ready page header from a logo SVG and a small HTML table, the standard recipe for branded engineering reports. -->
+ <style>.header{width: 100%; max-width:170mm;} .header th{border: solid 1pt lightgray; text-align:left; font-size:90%;} .header th p{line-height:1em; } .logo{width:80pt; height:17.6pt; float:right; margin-top:3pt;} .addr{margin-bottom:8pt;} .pr{font-size:130%;}</style>
+ <table class="header">
+  <thead>
+   <tr>
+    <th rowspan="3">
+     <img alt="logo" class="logo" src="https://raw.githubusercontent.com/imartincei/CalcpadCE/refs/heads/main/docs/media/logo.svg"/>
+     <h4 style="margin:0;">
+      My Company
+      <sup>®</sup>
+     </h4>
+     <p class="addr">
+      <small>
+       123 Street, 1234 City, tel. +123 4567890
+       <br/>
+       email:
+       <a href="mailto:info@example.com">info@example.com</a>
+      </small>
+     </p>
+     <p>
+      <small>Project:</small>
+      <b class="pr">24 Kensington Road Residential</b>
+     </p>
+     <p>
+      <small>Client:</small>
+      Dream Home Development Ltd
+     </p>
+    </th>
+    <th>
+     <small>Date:</small>
+     <br/>
+     11/2024
+    </th>
+    <th>
+     <small>Page:</small>
+     <br/>
+    </th>
+   </tr>
+   <tr>
+    <th>
+     <small>Job No:</small>
+     <br/>
+     1001
+    </th>
+    <th>
+     <small>Revision:</small>
+     <br/>
+     0
+    </th>
+   </tr>
+   <tr>
+    <th>
+     <small>Design by:</small>
+     <br/>
+     ABC
+    </th>
+    <th>
+     <small>Check by:</small>
+     <br/>
+     DEF
+    </th>
+   </tr>
+  </thead>
+  <tbody>
+   <tr>
+    <td colspan="4" style="padding-top:6pt;">
+     <p>Your worksheet content goes here.</p>
+     <p>
+      Line -
+      <span class="eq">
+       <var>n</var>
+       = 1
+      </span>
+     </p>
+     <p>
+      Line -
+      <span class="eq">
+       <var>n</var>
+       = 2
+      </span>
+     </p>
+     <p>
+      Line -
+      <span class="eq">
+       <var>n</var>
+       = 3
+      </span>
+     </p>
+     <p>
+      Line -
+      <span class="eq">
+       <var>n</var>
+       = 4
+      </span>
+     </p>
+     <p>
+      Line -
+      <span class="eq">
+       <var>n</var>
+       = 5
+      </span>
+     </p>
+     <p>
+      Line -
+      <span class="eq">
+       <var>n</var>
+       = 6
+      </span>
+     </p>
+     <p>
+      Line -
+      <span class="eq">
+       <var>n</var>
+       = 7
+      </span>
+     </p>
+     <p>
+      Line -
+      <span class="eq">
+       <var>n</var>
+       = 8
+      </span>
+     </p>
+     <p>
+      Line -
+      <span class="eq">
+       <var>n</var>
+       = 9
+      </span>
+     </p>
+     <p>
+      Line -
+      <span class="eq">
+       <var>n</var>
+       = 10
+      </span>
+     </p>
+    </td>
+   </tr>
+  </tbody>
+ </table>
+</div>

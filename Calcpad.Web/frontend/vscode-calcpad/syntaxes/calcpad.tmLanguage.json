@@ -1,0 +1,62 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Calcpad",
+  "scopeName": "source.calcpad",
+  "fileTypes": ["cpd", "cpdz"],
+  "patterns": [
+    { "include": "#html-block" },
+    { "include": "#markdown-block" },
+    { "include": "#cpd-block" }
+  ],
+  "repository": {
+    "html-block": {
+      "begin": "(?i)^\\s*(#html)\\b.*$",
+      "end": "(?i)^\\s*(#end\\s+(?:html|cpd|markdown))\\b.*$",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.block.calcpad" }
+      },
+      "endCaptures": {
+        "1": { "name": "keyword.control.block.calcpad" }
+      },
+      "contentName": "meta.embedded.block.html",
+      "patterns": [
+        { "include": "#html-block" },
+        { "include": "#markdown-block" },
+        { "include": "#cpd-block" },
+        { "include": "text.html.basic" }
+      ]
+    },
+    "markdown-block": {
+      "begin": "(?i)^\\s*(#markdown)\\b.*$",
+      "end": "(?i)^\\s*(#end\\s+(?:html|cpd|markdown))\\b.*$",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.block.calcpad" }
+      },
+      "endCaptures": {
+        "1": { "name": "keyword.control.block.calcpad" }
+      },
+      "contentName": "meta.embedded.block.markdown",
+      "patterns": [
+        { "include": "#html-block" },
+        { "include": "#markdown-block" },
+        { "include": "#cpd-block" },
+        { "include": "text.html.markdown" }
+      ]
+    },
+    "cpd-block": {
+      "begin": "(?i)^\\s*(#cpd)\\b.*$",
+      "end": "(?i)^\\s*(#end\\s+(?:html|cpd|markdown))\\b.*$",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.block.calcpad" }
+      },
+      "endCaptures": {
+        "1": { "name": "keyword.control.block.calcpad" }
+      },
+      "patterns": [
+        { "include": "#html-block" },
+        { "include": "#markdown-block" },
+        { "include": "#cpd-block" }
+      ]
+    }
+  }
+}

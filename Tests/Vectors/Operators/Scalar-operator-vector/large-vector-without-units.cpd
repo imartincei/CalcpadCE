@@ -7,7 +7,7 @@ z = vector(9999999)
 	x.i = ((i - 1)^2 - 10*cos(i) + 3*(-1)^(i - 1) - 5*sin(i))/4.0
 	#if x.i > 50
 		x.i = exp(0.1*i)
-		
+
 	#end if
 #loop
 #for i = 6 : 13
@@ -78,7 +78,7 @@ f(v) = v!','c = f(v)
 	x.i = ((i - 1)^2 - 10*cos(i) + 3*(-1)^(i - 1) - 5*sin(i))/4.0
 	#if x.i > 50
 		x.i = exp(0.1*i)
-		
+
 	#end if
 #loop
 #for i = 6 : 10
@@ -112,7 +112,7 @@ x
 c = b > x
 f(b; x) = b > x','c = f(b; x)
 
-"Less than or equal 
+"Less than or equal
 b = -2
 x
 c = b ≤ x
@@ -125,7 +125,7 @@ c = b ≥ y
 f(b; y) = b ≥ y','c = f(b; y)
 
 '<h1>Logical operators</h1>
-"Logical AND 
+"Logical AND
 b = -6.67
 y
 c = b ∧ y

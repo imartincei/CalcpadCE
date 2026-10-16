@@ -3,8 +3,8 @@
 namespace Calcpad.Core
 {
     internal static class HpFFT
-    {   
-        /*Replaces re[n], im[n] by its discrete Fourier transform, if isign is input as 1; 
+    {
+        /*Replaces re[n], im[n] by its discrete Fourier transform, if isign is input as 1;
         or replaces re[n], im[n] by n times its inverse discrete Fourier transform, if isign is input as −1.
         n MUST be an integer power of 2 (this is not checked for!).*/
         internal static void Transform(double[] re, double[] im, int isign)

@@ -1,0 +1,48 @@
+<div class="calcpad-output">
+ <!-- Iterative greatest common divisor built around a $while$ block, implementing the classical [Euclid algorithm](https://en.wikipedia.org/wiki/Euclidean_algorithm). -->
+ <p>Custom function:</p>
+ <p>
+  <span class="eq">
+   <var>mygcd</var>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   )  =
+   <small class="arr">🞀</small>
+   <span class="block">
+    <span class="cond">while</span>
+    <var>b</var>
+    &gt; 0
+    <br/>
+    <var>t</var>
+    =
+    <var>b</var>
+    <br/>
+    <var>b</var>
+    =
+    <var>a</var>
+    mod
+    <var>b</var>
+    <br/>
+    <var>a</var>
+    =
+    <var>t</var>
+   </span>
+  </span>
+ </p>
+ <p>Example:</p>
+ <p>
+  <span class="eq">
+   <var>mygcd</var>
+   ( 1071; 462 )  = 21
+  </span>
+ </p>
+ <p>Internal gcd function:</p>
+ <p>
+  <span class="eq">
+   <b>gcd</b>
+   ( 1071; 462 )  = 21
+  </span>
+ </p>
+</div>

@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 
-namespace Calcpad.Wpf
+namespace Calcpad.Cli
 {
     internal class Zip
     {

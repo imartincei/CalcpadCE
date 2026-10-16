@@ -75,7 +75,7 @@ namespace Calcpad.Core
         {
             Variable.SetNumber(x);
             // Since vectors and matrices are not supported in complex mode,
-            // the result will always be a scalar   
+            // the result will always be a scalar
             var result = (IScalarValue)Function();
             Units = result.Units;
 
@@ -110,11 +110,11 @@ namespace Calcpad.Core
             double x1 = Math.Min(left, right), y1 = f(x1) - target;
             if (Math.Abs(y1) <= precision)
                 return x1;
-            
+
             double x2 = Math.Max(left, right), y2 = f(x2) - target;
             if (Math.Abs(y2) <= precision)
                 return x2;
-            
+
             double eps1 = precision * 1e-3, eps2 = precision * (x2 - x1);
             if (Math.Abs(target) >= 1)
                 eps1 *= Math.Abs(target);
@@ -124,7 +124,7 @@ namespace Calcpad.Core
             var side = 0;
             var x0 = x1;
             var bisection = true;
-            var threshold = x2 - x1; 
+            var threshold = x2 - x1;
             const double C = 16;
             const int n = 100;
             for (int i = 1; i <= n; ++i)
@@ -164,7 +164,7 @@ namespace Calcpad.Core
                 err = Math.Abs(y3);
                 if (err <= eps1 || x2 - x1 <= eps2)
                     return x3;
-                
+
                 x0 = x3;
                 if (Math.Sign(y1) == Math.Sign(y3))
                 {
@@ -180,7 +180,7 @@ namespace Calcpad.Core
                         side = 1;
 
                     x1 = x3; y1 = y3;
-                }   
+                }
                 else
                 {
                     if (side == -1)
@@ -501,7 +501,7 @@ namespace Calcpad.Core
                 var t = sum + y;
                 c = (t - sum) - y;
                 sum = t;
-                // End 
+                // End
                 if (double.IsInfinity(sum))
                     break;
             }
@@ -572,7 +572,7 @@ namespace Calcpad.Core
                 var t = sum + y;
                 c = (t - sum) - y;
                 sum = t;
-                // End 
+                // End
                 if (IsInfinity(sum))
                     break;
             }

@@ -5,8 +5,8 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <RootNamespace>PyCalcpad</RootNamespace>
     <OutputType>Library</OutputType>
-    <Authors>Nedelcho Ganchovski</Authors>
-    <Company>Proektsoft EOOD</Company>
+    <Authors>CalcpadCE Contributors</Authors>
+    <Company>CalcpadCE Community</Company>
     <GenerateRuntimeConfigFiles>true</GenerateRuntimeConfigFiles>
   </PropertyGroup>
 
@@ -14,6 +14,13 @@
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="$(FontsDir)*.ttf;$(FontsDir)*.otf;$(FontsDir)*-LICENSE"
+      CopyToPublishDirectory="PreserveNewest"
+      CopyToOutputDirectory="PreserveNewest"
+      Link="Fonts\%(Filename)%(Extension)" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Calcpad.Core\Calcpad.Core.csproj" />

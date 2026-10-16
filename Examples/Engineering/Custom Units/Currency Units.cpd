@@ -1,0 +1,14 @@
+'<!-- Defines USD, EUR and other currencies as custom units with cross-rates, so monetary expressions auto-convert and round consistently across the worksheet. -->
+'<p><b>Definition</b></p>
+.EUR = 1
+.USD = 0.92EUR
+.BGN = 0.511291881196218EUR
+'<p><b>Conversion</b></p>
+10BGN|USD
+20EUR|BGN
+30EUR|USD
+'<p><b>Usage</b></p>
+'Unit price - 'p = 15USD/m
+'Order length -'L = 100m
+'Total price in USD -'P = p*L|USD
+'Total price in EUR -'P|EUR

@@ -1,0 +1,84 @@
+#local
+#include Helper.cpd
+debug = 1
+#global
+'<h4>For Loops with Vectors</h4>
+myArray1 = [1; 2; 3; 4]
+myArray2 = vector(len(myArray1))
+#for i = 1 : len(myArray1)
+	i
+	myArray2.i = 2*myArray1.i
+#loop
+myArray2
+sum(myArray1)
+'
+'<h4>For Loops with Matrices</h4>
+myMatrix = [1; 2; 3|4; 5; 6]
+myArray3 = vector(n_rows(myMatrix)*n_cols(myMatrix))
+#for i = 1 : n_rows(myMatrix)
+	#for j = 1 : n_cols(myMatrix)
+		i
+		j
+		myArray3.((i - 1)*n_cols(myMatrix) + j) = 3*myMatrix.(i; j)
+	#loop
+#loop
+myArray3
+'<h4>Hiding all but the first iteration</h4>
+n = 10
+hide$myArray4 = vector(10)unhide$
+#for i = 1 : n
+	hideC$(i ≠ 1)
+	myArray4.i = i*2
+	unhideC$(i ≠ 1)
+#loop
+cmt$('Use ... to indicate that more code is running in the background. Provide a short description of what the loop does.')
+'...'note$('Makes a vector of length n with each index value being doubled')
+myArray4
+'
+'<h4>Jagged Matricies</h4>
+cmt$('Need to check if value is undefined to that loop can be avoided, otherwise get unit errors. Find works.')
+find([1; 0/0; 4]; 0/0; 1)
+
+myArray5 = [1; 2; 5|2; 0; 0/0|0/0; 0/0; 0/0|4; 4; 0/0]
+'OR'
+l_rows = [3; 2; 0; 2]
+myArray5 = [1; 2; 5|2; 0|0/0|4; 4]
+fillUndefM(myArray5; l_rows)
+myArray6 = mfill(matrix(n_rows(myArray5); n_cols(myArray5)); 0/0)
+#for i = 1 : n_rows(myArray5)
+	#for j = 1 : n_cols(myArray5)
+		myArray6.(i; j) = myArray5.(i; j)*2
+	#loop
+#loop
+myArray6
+'<h4>3D Arrays</h4>
+n = 10
+r = 4
+c = 4
+#hide
+M = matrix(r; c)
+T = matrix(r; c)
+#for i = 1 : n
+	#for j = 1 : r
+		#for k = 1 : c
+			M.(j; k) = i*j*k
+		#loop
+	#loop
+	#if i ≡ 1
+		T = M
+	#end if
+	T = stack(T; M)
+#loop
+#show
+T
+#for i = 1 : n
+	hide$
+	range_start = r*(i - 1) + 1
+	range_end = r*i
+	unhide$
+	sub = submatrix(T; range_start; range_end; 1; c)
+#loop
+
+'<h4>Inline Arrays</h4>
+$Block{a = vector(5); $Repeat{a.i = i^2 @ i = 1 : 5}; a}
+$Block{m = matrix(5; 5); $Repeat{$Repeat{m.(i; j) = i*j @ i = 1 : 5} @ j = 1 : 5}; m}

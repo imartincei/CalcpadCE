@@ -1,0 +1,3848 @@
+<div class="calcpad-output">
+ <h1>Arithmetic operators</h1>
+ <h3>Addition</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b class="b0">[</b>
+   -1.77
+   <i>cm</i>
+   -3.04
+   <i>cm</i>
+   -0.812
+   <i>cm</i>
+   -1.08
+   <i>cm</i>
+   2.15
+   <i>cm</i>
+   2.88
+   <i>cm</i>
+   7.12
+   <i>cm</i>
+   8.85
+   <i>cm</i>
+   14.09
+   <i>cm</i>
+   0 0 0 0 0 0 0 0 0 0 0
+   <span title="129 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = -5
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   +
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   +  ( -5
+   <i>m</i>
+   )  =
+   <b class="b0">[</b>
+   -501.77
+   <i>cm</i>
+   -503.04
+   <i>cm</i>
+   -500.81
+   <i>cm</i>
+   -501.08
+   <i>cm</i>
+   -497.85
+   <i>cm</i>
+   -497.12
+   <i>cm</i>
+   -492.88
+   <i>cm</i>
+   -491.15
+   <i>cm</i>
+   -485.91
+   <i>cm</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   <span title="129 elements skipped.">...</span>
+   -5
+   <i>m</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>x</var>
+   +
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ; -5
+   <i>m</i>
+   )  =
+   <b class="b0">[</b>
+   -501.77
+   <i>cm</i>
+   -503.04
+   <i>cm</i>
+   -500.81
+   <i>cm</i>
+   -501.08
+   <i>cm</i>
+   -497.85
+   <i>cm</i>
+   -497.12
+   <i>cm</i>
+   -492.88
+   <i>cm</i>
+   -491.15
+   <i>cm</i>
+   -485.91
+   <i>cm</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   -5
+   <i>m</i>
+   <span title="129 elements skipped.">...</span>
+   -5
+   <i>m</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Subtraction</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b class="b0">[</b>
+   -1.77
+   <i>cm</i>
+   -3.04
+   <i>cm</i>
+   -0.812
+   <i>cm</i>
+   -1.08
+   <i>cm</i>
+   2.15
+   <i>cm</i>
+   2.88
+   <i>cm</i>
+   7.12
+   <i>cm</i>
+   8.85
+   <i>cm</i>
+   14.09
+   <i>cm</i>
+   0 0 0 0 0 0 0 0 0 0 0
+   <span title="129 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 3.14
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   −
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   − 3.14
+   <i>m</i>
+   =
+   <b class="b0">[</b>
+   -315.77
+   <i>cm</i>
+   -317.04
+   <i>cm</i>
+   -314.81
+   <i>cm</i>
+   -315.08
+   <i>cm</i>
+   -311.85
+   <i>cm</i>
+   -311.12
+   <i>cm</i>
+   -306.88
+   <i>cm</i>
+   -305.15
+   <i>cm</i>
+   -299.91
+   <i>cm</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   <span title="129 elements skipped.">...</span>
+   -3.14
+   <i>m</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>x</var>
+   −
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ; 3.14
+   <i>m</i>
+   )  =
+   <b class="b0">[</b>
+   -315.77
+   <i>cm</i>
+   -317.04
+   <i>cm</i>
+   -314.81
+   <i>cm</i>
+   -315.08
+   <i>cm</i>
+   -311.85
+   <i>cm</i>
+   -311.12
+   <i>cm</i>
+   -306.88
+   <i>cm</i>
+   -305.15
+   <i>cm</i>
+   -299.91
+   <i>cm</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   -3.14
+   <i>m</i>
+   <span title="129 elements skipped.">...</span>
+   -3.14
+   <i>m</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Multiplication</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   =
+   <b class="b0">[</b>
+   8.98
+   <i>m</i>
+   7.21
+   <i>m</i>
+   2.94
+   <i>m</i>
+   2.17
+   <i>m</i>
+   -1.1
+   <i>m</i>
+   -0.867
+   <i>m</i>
+   -3.13
+   <i>m</i>
+   -1.9
+   <i>m</i>
+   -3.16
+   <i>m</i>
+   -0.929
+   <i>m</i>
+   -1.19
+   <i>m</i>
+   2.04
+   <i>m</i>
+   0 0 0 0 0 0 0 0
+   <span title="479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 8.9
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ·
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   · 8.9
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   =
+   <b class="b0">[</b>
+   79.91
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   64.15
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   26.15
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   19.3
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -9.78
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -7.72
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -27.89
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -16.91
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -28.17
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -8.27
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -10.61
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   18.2
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   <span title="479 elements skipped.">...</span>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>y</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>y</var>
+   ·
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ; 8.9
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   79.91
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   64.15
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   26.15
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   19.3
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -9.78
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -7.72
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -27.89
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -16.91
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -28.17
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -8.27
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   -10.61
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   18.2
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>MA</i>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   <span title="479 elements skipped.">...</span>
+   0
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Division</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   =
+   <b class="b0">[</b>
+   8.98
+   <i>m</i>
+   7.21
+   <i>m</i>
+   2.94
+   <i>m</i>
+   2.17
+   <i>m</i>
+   -1.1
+   <i>m</i>
+   -0.867
+   <i>m</i>
+   -3.13
+   <i>m</i>
+   -1.9
+   <i>m</i>
+   -3.16
+   <i>m</i>
+   -0.929
+   <i>m</i>
+   -1.19
+   <i>m</i>
+   2.04
+   <i>m</i>
+   0 0 0 0 0 0 0 0
+   <span title="479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = -10
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <span class="dvc">
+    <var>
+     <span class="vec">⃗</span>
+     y
+    </var>
+    <span class="dvl">
+    </span>
+    <var>b</var>
+   </span>
+   =
+   <span class="dvc">
+    <var>
+     <span class="vec">⃗</span>
+     y
+    </var>
+    <span class="dvl">
+    </span>
+    -10
+    <i>MA</i>
+    <sup class="unit">-1</sup>
+   </span>
+   =
+   <b class="b0">[</b>
+   -0.898
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   -0.721
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   -0.294
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   -0.217
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.11
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.0867
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.313
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.19
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.316
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.0929
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.119
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   -0.204
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   <span title="479 elements skipped.">...</span>
+   0
+   <i>MA</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>y</var>
+   ;
+   <var>b</var>
+   )  =
+   <span class="dvc">
+    <var>y</var>
+    <span class="dvl">
+    </span>
+    <var>b</var>
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ; -10
+   <i>MA</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   -0.898
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   -0.721
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   -0.294
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   -0.217
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.11
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.0867
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.313
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.19
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.316
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.0929
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0.119
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   -0.204
+   <i>m</i>
+   <i>·</i>
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   0
+   <i>MA</i>
+   <span title="479 elements skipped.">...</span>
+   0
+   <i>MA</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Exponentiation</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   =
+   <b class="b0">[</b>
+   2.23
+   <i>mm</i>
+   -1.04
+   <i>mm</i>
+   -0.812
+   <i>mm</i>
+   -3.08
+   <i>mm</i>
+   -1.85
+   <i>mm</i>
+   -3.12
+   <i>mm</i>
+   -0.884
+   <i>mm</i>
+   -1.15
+   <i>mm</i>
+   2.09
+   <i>mm</i>
+   2.82
+   <i>mm</i>
+   7.06
+   <i>mm</i>
+   8.79
+   <i>mm</i>
+   14.03
+   <i>mm</i>
+   16.77
+   <i>mm</i>
+   23.01
+   <i>mm</i>
+   0 0 0 0 0
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = -2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   <sup>
+    <small class="nth">⊙</small>
+    <var>b</var>
+   </sup>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   <sup>
+    <small class="nth">⊙</small>
+    -2
+   </sup>
+   =
+   <b class="b0">[</b>
+   0.201
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.921
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   1.52
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.105
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.292
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.103
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   1.28
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.757
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.23
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.126
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.0201
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.0129
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.00508
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.00355
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.00189
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="9999978 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>z</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>z</var>
+   <sup>
+    <var>b</var>
+   </sup>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ; -2 )  =
+   <b class="b0">[</b>
+   0.201
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.921
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   1.52
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.105
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.292
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.103
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   1.28
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.757
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.23
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.126
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.0201
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.0129
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.00508
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.00355
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   0.00189
+   <i>mm</i>
+   <sup class="unit">-2</sup>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span class="err">+∞</span>
+   <span title="9999978 elements skipped.">...</span>
+   <span class="err">+∞</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Division bar</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   =
+   <b class="b0">[</b>
+   2.23
+   <i>mm</i>
+   -1.04
+   <i>mm</i>
+   -0.812
+   <i>mm</i>
+   -3.08
+   <i>mm</i>
+   -1.85
+   <i>mm</i>
+   -3.12
+   <i>mm</i>
+   -0.884
+   <i>mm</i>
+   -1.15
+   <i>mm</i>
+   2.09
+   <i>mm</i>
+   2.82
+   <i>mm</i>
+   7.06
+   <i>mm</i>
+   8.79
+   <i>mm</i>
+   14.03
+   <i>mm</i>
+   16.77
+   <i>mm</i>
+   23.01
+   <i>mm</i>
+   0 0 0 0 0
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 1
+   <i>A</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   <em>/</em>
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   <em>/</em>
+   1
+   <i>A</i>
+   <sup class="unit">-1</sup>
+   =
+   <b class="b0">[</b>
+   2.23
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -1.04
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -0.812
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -3.08
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -1.85
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -3.12
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -0.884
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -1.15
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   2.09
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   2.82
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   7.06
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   8.79
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   14.03
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   16.77
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   23.01
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   0
+   <i>A</i>
+   0
+   <i>A</i>
+   0
+   <i>A</i>
+   0
+   <i>A</i>
+   0
+   <i>A</i>
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <i>A</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>z</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>z</var>
+   <em>/</em>
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ; 1
+   <i>A</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   2.23
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -1.04
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -0.812
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -3.08
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -1.85
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -3.12
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -0.884
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   -1.15
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   2.09
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   2.82
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   7.06
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   8.79
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   14.03
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   16.77
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   23.01
+   <i>mm</i>
+   <i>·</i>
+   <i>A</i>
+   0
+   <i>A</i>
+   0
+   <i>A</i>
+   0
+   <i>A</i>
+   0
+   <i>A</i>
+   0
+   <i>A</i>
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <i>A</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Integer division</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b class="b0">[</b>
+   -1.77
+   <i>cm</i>
+   -3.04
+   <i>cm</i>
+   -0.812
+   <i>cm</i>
+   -1.08
+   <i>cm</i>
+   2.15
+   <i>cm</i>
+   2.88
+   <i>cm</i>
+   7.12
+   <i>cm</i>
+   8.85
+   <i>cm</i>
+   14.09
+   <i>cm</i>
+   0 0 0 0 0 0 0 0 0 0 0
+   <span title="129 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 3.7
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   \
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   \3.7
+   <i>m</i>
+   =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   <span title="129 elements skipped.">...</span>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>x</var>
+   \
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ; 3.7
+   <i>m</i>
+   )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   <span title="129 elements skipped.">...</span>
+   0
+   <i>m</i>
+   <sup class="unit">-1</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Modulo (remainder)</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b class="b0">[</b>
+   -1.77
+   <i>cm</i>
+   -3.04
+   <i>cm</i>
+   -0.812
+   <i>cm</i>
+   -1.08
+   <i>cm</i>
+   2.15
+   <i>cm</i>
+   2.88
+   <i>cm</i>
+   7.12
+   <i>cm</i>
+   8.85
+   <i>cm</i>
+   14.09
+   <i>cm</i>
+   0 0 0 0 0 0 0 0 0 0 0
+   <span title="129 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 2.7
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   mod
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   mod 2.7 =
+   <b class="b0">[</b>
+   -1.77
+   <i>cm</i>
+   -0.342
+   <i>cm</i>
+   -0.812
+   <i>cm</i>
+   -1.08
+   <i>cm</i>
+   2.15
+   <i>cm</i>
+   0.183
+   <i>cm</i>
+   1.72
+   <i>cm</i>
+   0.75
+   <i>cm</i>
+   0.585
+   <i>cm</i>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span title="129 elements skipped.">...</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>x</var>
+   mod
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ; 2.7 )  =
+   <b class="b0">[</b>
+   -1.77
+   <i>cm</i>
+   -0.342
+   <i>cm</i>
+   -0.812
+   <i>cm</i>
+   -1.08
+   <i>cm</i>
+   2.15
+   <i>cm</i>
+   0.183
+   <i>cm</i>
+   1.72
+   <i>cm</i>
+   0.75
+   <i>cm</i>
+   0.585
+   <i>cm</i>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span title="129 elements skipped.">...</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Factorial</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   =
+   <b>vector</b>
+   ( 250 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="229 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   =
+   <b>range</b>
+   ( 1; 20; 1 )  =
+   <b class="b0">[</b>
+   1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   ! =
+   <b class="b0">[</b>
+   1 2 6 24 120 720 5040 40320 362880 3628800 39916800 479001600 6227020800 87178291200 1307674368000 20922789888000 355687428096000 6402373705728000 1.22×10
+   <sup>17</sup>
+   2.43×10
+   <sup>18</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>v</var>
+   )  =
+   <var>v</var>
+   !
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 2 6 24 120 720 5040 40320 362880 3628800 39916800 479001600 6227020800 87178291200 1307674368000 20922789888000 355687428096000 6402373705728000 1.22×10
+   <sup>17</sup>
+   2.43×10
+   <sup>18</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h1>Relational operators</h1>
+ <h3>Equal to</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   =
+   <b class="b0">[</b>
+   2.98
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   2.21
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -1.06
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -0.831
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -3.1
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -1.87
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -3.13
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -0.9
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -1.16
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   2.07
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   0 0 0 0 0 0 0 0 0 0
+   <span title="479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 8.2
+   <i>min</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ≡
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ≡ 8.2
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>y</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>y</var>
+   ≡
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ; 8.2
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Not equal to</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   =
+   <b class="b0">[</b>
+   7.23
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.96
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.19
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -1.08
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -0.849
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -3.12
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -1.88
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -3.15
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -0.915
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -1.18
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.06
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.79
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   7.03
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   8.77
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   14.01
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   16.75
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   22.99
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   0 0 0
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 0
+   <i>min</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ≠
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ≠ 0
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   =
+   <b class="b0">[</b>
+   1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>z</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>z</var>
+   ≠
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ; 0
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Less than</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   =
+   <b class="b0">[</b>
+   7.23
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.96
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.19
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -1.08
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -0.849
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -3.12
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -1.88
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -3.15
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -0.915
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -1.18
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.06
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.79
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   7.03
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   8.77
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   14.01
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   16.75
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   22.99
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   0 0 0
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 4
+   <i>h</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   &lt;
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   &lt; 4
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   =
+   <b class="b0">[</b>
+   0 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 1 1 1
+   <span title="9999978 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>z</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>z</var>
+   &lt;
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ; 4
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   0 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 1 1 1
+   <span title="9999978 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Greater than</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b class="b0">[</b>
+   -1.77
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -3.04
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -0.812
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -1.08
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   2.15
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   2.88
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   7.12
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   8.85
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   14.09
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   16.82
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   23.06
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   26.79
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   34.03
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   0 0 0 0 0 0 0
+   <span title="129 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = -3
+   <i>h</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   &gt;
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   &gt;  ( -3
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+   <span title="129 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>x</var>
+   &gt;
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ; -3
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+   <span title="129 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Less than or equal</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b class="b0">[</b>
+   -1.77
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -3.04
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -0.812
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -1.08
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   2.15
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   2.88
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   7.12
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   8.85
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   14.09
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   16.82
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   23.06
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   26.79
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   34.03
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   0 0 0 0 0 0 0
+   <span title="129 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = -7
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ≤
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ≤  ( -7
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="129 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>x</var>
+   ≤
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ; -7
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="129 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Greater than or equal</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   =
+   <b class="b0">[</b>
+   2.98
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   2.21
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -1.06
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -0.831
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -3.1
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -1.87
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -3.13
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -0.9
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -1.16
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   2.07
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   0 0 0 0 0 0 0 0 0 0
+   <span title="479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = -19.3
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ≥
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ≥  ( -19.3
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+   <span title="479 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>y</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>y</var>
+   ≥
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ; -19.3
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+   <span title="479 elements skipped.">...</span>
+   1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h1>Logical operators</h1>
+ <h3>Logical AND</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   =
+   <b class="b0">[</b>
+   2.98
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   2.21
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -1.06
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -0.831
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -3.1
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -1.87
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -3.13
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -0.9
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   -1.16
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   2.07
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   0 0 0 0 0 0 0 0 0 0
+   <span title="479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 0
+   <i>min</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   and
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   and 0
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>y</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>y</var>
+   and
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   ; 0
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="479 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Logical OR</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   =
+   <b class="b0">[</b>
+   7.23
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.96
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.19
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -1.08
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -0.849
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -3.12
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -1.88
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -3.15
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -0.915
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -1.18
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.06
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.79
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   7.03
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   8.77
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   14.01
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   16.75
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   22.99
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   0 0 0
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 0
+   <i>min</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   or
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   or 0
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   =
+   <b class="b0">[</b>
+   1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>z</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>z</var>
+   or
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ; 0
+   <i>min</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Logical XOR</h3>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   =
+   <b class="b0">[</b>
+   7.23
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.96
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.19
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -1.08
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -0.849
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -3.12
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -1.88
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -3.15
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -0.915
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   -1.18
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.06
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   2.79
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   7.03
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   8.77
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   14.01
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   16.75
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   22.99
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   0 0 0
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 0
+   <i>h</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   xor
+   <var>b</var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   xor 0
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   =
+   <b class="b0">[</b>
+   1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>z</var>
+   ;
+   <var>b</var>
+   )  =
+   <var>z</var>
+   xor
+   <var>b</var>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ;
+   <var>b</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    z
+   </var>
+   ; 0
+   <i>h</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0
+   <span title="9999978 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h1>Combined operations</h1>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b class="b0">[</b>
+   -1.77
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -3.04
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -0.812
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -1.08
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   2.15
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   2.88
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   7.12
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   8.85
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   14.09
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   16.82
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   23.06
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   26.79
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   34.03
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   0 0 0 0 0 0 0
+   <span title="129 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   = 2.7
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   +
+   <var>y</var>
+   · 2 ≤ 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   + 2.7
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   · 2 ≤ 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="129 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )  =
+   <var>x</var>
+   +
+   <var>y</var>
+   · 2
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ;
+   <var>y</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ; 2.7
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   3.63
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   2.36
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   4.59
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   4.32
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   7.55
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   8.28
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   12.52
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   14.25
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   19.49
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   22.22
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   28.46
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   32.19
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   39.43
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5.4
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5.4
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5.4
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5.4
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5.4
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5.4
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5.4
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   <span title="129 elements skipped.">...</span>
+   5.4
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   −
+   <span class="dvc">
+    <var>y</var>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   ≥ 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   −
+   <span class="dvc">
+    2.7
+    <i>s</i>
+    <sup class="unit">-1</sup>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   ≥ 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   =
+   <b class="b0">[</b>
+   0 0 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0
+   <span title="129 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )  =
+   <var>x</var>
+   −
+   <span class="dvc">
+    <var>y</var>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ;
+   <var>y</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ; 2.7
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   -2.67
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -3.94
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -1.71
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -1.98
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   1.25
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   1.98
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   6.22
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   7.95
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   13.19
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   15.92
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   22.16
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   25.89
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   33.13
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -0.9
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -0.9
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -0.9
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -0.9
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -0.9
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -0.9
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -0.9
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   <span title="129 elements skipped.">...</span>
+   -0.9
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   = 4 ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   + 5
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   ≡ 0
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="129 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )  = 4 ·
+   <var>x</var>
+   + 5
+   <i>s</i>
+   <sup class="unit">-1</sup>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ;
+   <var>y</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ; 2.7
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   -2.09
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   -7.17
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   1.75
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   0.676
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   13.6
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   16.53
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   33.47
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   40.4
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   61.34
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   72.28
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   97.23
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   112.18
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   141.13
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   5
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   <span title="129 elements skipped.">...</span>
+   5
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sup>
+    <small class="nth">⊙</small>
+    2
+   </sup>
+   +
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>y</var>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ≤ 1
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   <span class="b1">)</span>
+   ·
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sup>
+    <small class="nth">⊙</small>
+    2
+   </sup>
+   +
+   <span class="b1">(</span>
+   <span class="dvc">
+    2.7
+    <i>s</i>
+    <sup class="unit">-1</sup>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ≤ 1
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   <span class="b1">)</span>
+   ·
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   =
+   <b class="b0">[</b>
+   4.14
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   10.25
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   1.66
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   2.17
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   5.62
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   9.31
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   51.64
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   79.33
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   199.39
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   283.94
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   532.64
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   718.96
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   1159.24
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   1
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   1
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   1
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   1
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   1
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   1
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   1
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   <span title="129 elements skipped.">...</span>
+   1
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   ;
+   <var>y</var>
+   )  =
+   <var>x</var>
+   <sup>2</sup>
+   +
+   <var>y</var>
+   <sup>4</sup>
+   ·
+   <var>s</var>
+   <sup class="unit">2</sup>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ;
+   <var>y</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ; 2.7
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   )  =
+   <b class="b0">[</b>
+   56.28
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   62.4
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   53.8
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   54.31
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   57.77
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   61.46
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   103.79
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   131.47
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   251.54
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   336.09
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   584.79
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   771.1
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   1211.38
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   53.14
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   53.14
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   53.14
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   53.14
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   53.14
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   53.14
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   53.14
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   <span title="129 elements skipped.">...</span>
+   53.14
+   <i>s</i>
+   <sup class="unit">-2</sup>
+   <b class="b0">]</b>
+  </span>
+ </p>
+</div>

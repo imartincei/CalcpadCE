@@ -1,0 +1,9357 @@
+<div class="calcpad-output">
+ <h1>Matrix functions</h1>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">-2</span>
+     <span class="td">5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">8</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-1</span>
+     <span class="td">-1</span>
+     <span class="td">5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-1</span>
+     <span class="td">-2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">-2</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Creational functions</h3>
+ <p>
+  <span class="eq">
+   <b>matrix</b>
+   <sub>hp</sub>
+   ( 5; 5 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>identity</b>
+   <sub>hp</sub>
+   ( 500 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">⋯</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋮</span>
+     <span class="td">⋱</span>
+     <span class="td">⋮</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">⋯</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>diagonal</b>
+   <sub>hp</sub>
+   ( 5; 4 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">4</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">4</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">4</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   <sub>column</sub>
+   =
+   <b>column</b>
+   <sub>hp</sub>
+   ( 24; 0 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">⋮</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <b>mfill</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   <sub>column</sub>
+   ; 2 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">⋮</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   <sub>utriang</sub>
+   =
+   <b>utriang</b>
+   <sub>hp</sub>
+   ( 10 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mfill</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   <sub>utriang</sub>
+   ; 3 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   <sub>ltriang</sub>
+   =
+   <b>ltriang</b>
+   <sub>hp</sub>
+   ( 4 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mfill</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   <sub>ltriang</sub>
+   ; 1 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   <sub>symmetric</sub>
+   =
+   <b>symmetric</b>
+   <sub>hp</sub>
+   ( 17 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mfill</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   <sub>symmetric</sub>
+   ; 7 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>vec2diag</b>
+   (
+   <span class="b0">[</span>
+   12; -0.5; 4; -13.5; 1
+   <span class="b0">]</span>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">12</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">-0.5</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">4</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-13.5</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>vec2col</b>
+   (
+   <span class="b0">[</span>
+   1; -3.2; -4; 0; -3.14; 5
+   <span class="b0">]</span>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-3.2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-3.14</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>join</b>
+   <sub>cols</sub>
+   (
+   <span class="b0">[</span>
+   1; 23; 0; 4.6; -3; 5
+   <span class="b0">]</span>
+   ;
+   <span class="b0">[</span>
+   2; -3; 4.5; 1.2; 0
+   <span class="b0">]</span>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">23</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">4.5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4.6</span>
+     <span class="td">1.2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-3</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>join</b>
+   <sub>rows</sub>
+   (
+   <span class="b0">[</span>
+   0; -1; -3.6; 2.8; 11
+   <span class="b0">]</span>
+   ;
+   <span class="b0">[</span>
+   11; 50000; -23; -4.5; -1
+   <span class="b0">]</span>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">-1</span>
+     <span class="td">-3.6</span>
+     <span class="td">2.8</span>
+     <span class="td">11</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">11</span>
+     <span class="td">50000</span>
+     <span class="td">-23</span>
+     <span class="td">-4.5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Structural functions</h3>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">-2</span>
+     <span class="td">5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">8</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>augment</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <b>
+    <var>B</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">6</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">4</span>
+     <span class="td">-2</span>
+     <span class="td">5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">2</span>
+     <span class="td">8</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>stack</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <b>
+    <var>B</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">-2</span>
+     <span class="td">5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">8</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mresize</b>
+   (
+   <b>
+    <var>C</var>
+   </b>
+   ; 4; 4 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-1</span>
+     <span class="td">-1</span>
+     <span class="td">5</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-1</span>
+     <span class="td">-2</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">-2</span>
+     <span class="td">3</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mfill</b>
+   (
+   <b>
+    <var>C</var>
+   </b>
+   ; 3 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>fill</b>
+   <sub>row</sub>
+   (
+   <b>
+    <var>C</var>
+   </b>
+   ; 1; 1 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>fill</b>
+   <sub>col</sub>
+   (
+   <b>
+    <var>C</var>
+   </b>
+   ; 1; 2 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>copy</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <b>
+    <var>C</var>
+   </b>
+   ; 2; 2 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>add</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <b>
+    <var>C</var>
+   </b>
+   ; 1; 1 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">-6</span>
+     <span class="td">5</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">6</span>
+     <span class="td">-8</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">1</span>
+     <span class="td">-2</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>n</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = 3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>n</b>
+   <sub>cols</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = 3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>row</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 2 )  =
+   <b class="b0">[</b>
+   4 5 -1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>col</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 1 )  =
+   <b class="b0">[</b>
+   1 4 2
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">-6</span>
+     <span class="td">5</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">6</span>
+     <span class="td">-8</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">1</span>
+     <span class="td">-2</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   <sub>submatrix</sub>
+   =
+   <b>submatrix</b>
+   (
+   <b>
+    <var>C</var>
+   </b>
+   ; 1; 3; 1; 3 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">-6</span>
+     <span class="td">5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">6</span>
+     <span class="td">-8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">1</span>
+     <span class="td">-2</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 1; 1; 2; 2
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   1 2 1 1 2 2
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>extract</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>extract</b>
+   <sub>cols</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">4</span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">2</span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Math functions</h3>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">-2</span>
+     <span class="td">5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">8</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <b>hprod</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <b>
+    <var>B</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">16</span>
+     <span class="td">-10</span>
+     <span class="td">-5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">-24</span>
+     <span class="td">-49</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <b>matrix</b>
+   <sub>hp</sub>
+   ( 3; 3 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="cond">$Repeat</span>
+   {
+   <span class="cond">$Repeat</span>
+   {
+   <b>
+    <var>C</var>
+   </b>
+   <sub>
+    <var>i</var>
+    ,
+    <var>j</var>
+   </sub>
+   =
+   <b>
+    <var>A</var>
+   </b>
+   <sub>
+    <var>i</var>
+    ,
+    <var>j</var>
+   </sub>
+   ·
+   <b>
+    <var>B</var>
+   </b>
+   <sub>
+    <var>i</var>
+    ,
+    <var>j</var>
+   </sub>
+   <span class="cond">for</span>
+   <var>j</var>
+   = 1...3}
+   <span class="cond">for</span>
+   <var>i</var>
+   = 1...3} = -49
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">16</span>
+     <span class="td">-10</span>
+     <span class="td">-5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">-24</span>
+     <span class="td">-49</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   =
+   <b>fprod</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <b>
+    <var>B</var>
+   </b>
+   )  = -65
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="cond">$Repeat</span>
+   {
+   <span class="cond">$Repeat</span>
+   {
+   <var>f</var>
+   =
+   <var>f</var>
+   +
+   <b>
+    <var>A</var>
+   </b>
+   <sub>
+    <var>i</var>
+    ,
+    <var>j</var>
+   </sub>
+   ·
+   <b>
+    <var>B</var>
+   </b>
+   <sub>
+    <var>i</var>
+    ,
+    <var>j</var>
+   </sub>
+   <span class="cond">for</span>
+   <var>j</var>
+   = 1...3}
+   <span class="cond">for</span>
+   <var>i</var>
+   = 1...3} = -65
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <b>kprod</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <b>
+    <var>B</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">-42</span>
+     <span class="td">-7</span>
+     <span class="td">-7</span>
+     <span class="td">24</span>
+     <span class="td">4</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">-2</span>
+     <span class="td">5</span>
+     <span class="td">-28</span>
+     <span class="td">14</span>
+     <span class="td">-35</span>
+     <span class="td">16</span>
+     <span class="td">-8</span>
+     <span class="td">20</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">8</span>
+     <span class="td">7</span>
+     <span class="td">-14</span>
+     <span class="td">-56</span>
+     <span class="td">-49</span>
+     <span class="td">8</span>
+     <span class="td">32</span>
+     <span class="td">28</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">24</span>
+     <span class="td">4</span>
+     <span class="td">4</span>
+     <span class="td">30</span>
+     <span class="td">5</span>
+     <span class="td">5</span>
+     <span class="td">-6</span>
+     <span class="td">-1</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">16</span>
+     <span class="td">-8</span>
+     <span class="td">20</span>
+     <span class="td">20</span>
+     <span class="td">-10</span>
+     <span class="td">25</span>
+     <span class="td">-4</span>
+     <span class="td">2</span>
+     <span class="td">-5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">32</span>
+     <span class="td">28</span>
+     <span class="td">10</span>
+     <span class="td">40</span>
+     <span class="td">35</span>
+     <span class="td">-2</span>
+     <span class="td">-8</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">12</span>
+     <span class="td">2</span>
+     <span class="td">2</span>
+     <span class="td">-18</span>
+     <span class="td">-3</span>
+     <span class="td">-3</span>
+     <span class="td">-42</span>
+     <span class="td">-7</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">-4</span>
+     <span class="td">10</span>
+     <span class="td">-12</span>
+     <span class="td">6</span>
+     <span class="td">-15</span>
+     <span class="td">-28</span>
+     <span class="td">14</span>
+     <span class="td">-35</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">16</span>
+     <span class="td">14</span>
+     <span class="td">-6</span>
+     <span class="td">-24</span>
+     <span class="td">-21</span>
+     <span class="td">-14</span>
+     <span class="td">-56</span>
+     <span class="td">-49</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mfill</b>
+   (
+   <b>
+    <var>C</var>
+   </b>
+   ; 0 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="cond">$Repeat</span>
+   {
+   <span class="cond">$Repeat</span>
+   {
+   <b>copy</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   <sub>
+    <var>i</var>
+    ,
+    <var>j</var>
+   </sub>
+   ·
+   <b>
+    <var>B</var>
+   </b>
+   ;
+   <b>
+    <var>C</var>
+   </b>
+   ; 3 ·
+   <var>i</var>
+   − 2; 3 ·
+   <var>j</var>
+   − 2 )
+   <span class="cond">for</span>
+   <var>j</var>
+   = 1...3}
+   <span class="cond">for</span>
+   <var>i</var>
+   = 1...3} =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">-42</span>
+     <span class="td">-7</span>
+     <span class="td">-7</span>
+     <span class="td">24</span>
+     <span class="td">4</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">-2</span>
+     <span class="td">5</span>
+     <span class="td">-28</span>
+     <span class="td">14</span>
+     <span class="td">-35</span>
+     <span class="td">16</span>
+     <span class="td">-8</span>
+     <span class="td">20</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">8</span>
+     <span class="td">7</span>
+     <span class="td">-14</span>
+     <span class="td">-56</span>
+     <span class="td">-49</span>
+     <span class="td">8</span>
+     <span class="td">32</span>
+     <span class="td">28</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">24</span>
+     <span class="td">4</span>
+     <span class="td">4</span>
+     <span class="td">30</span>
+     <span class="td">5</span>
+     <span class="td">5</span>
+     <span class="td">-6</span>
+     <span class="td">-1</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">16</span>
+     <span class="td">-8</span>
+     <span class="td">20</span>
+     <span class="td">20</span>
+     <span class="td">-10</span>
+     <span class="td">25</span>
+     <span class="td">-4</span>
+     <span class="td">2</span>
+     <span class="td">-5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">32</span>
+     <span class="td">28</span>
+     <span class="td">10</span>
+     <span class="td">40</span>
+     <span class="td">35</span>
+     <span class="td">-2</span>
+     <span class="td">-8</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">12</span>
+     <span class="td">2</span>
+     <span class="td">2</span>
+     <span class="td">-18</span>
+     <span class="td">-3</span>
+     <span class="td">-3</span>
+     <span class="td">-42</span>
+     <span class="td">-7</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">-4</span>
+     <span class="td">10</span>
+     <span class="td">-12</span>
+     <span class="td">6</span>
+     <span class="td">-15</span>
+     <span class="td">-28</span>
+     <span class="td">14</span>
+     <span class="td">-35</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">16</span>
+     <span class="td">14</span>
+     <span class="td">-6</span>
+     <span class="td">-24</span>
+     <span class="td">-21</span>
+     <span class="td">-14</span>
+     <span class="td">-56</span>
+     <span class="td">-49</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mnorm</b>
+   <sub>e</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = 13.04
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>sum</var>
+   <sub>squared</sub>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="cond">$Repeat</span>
+   {
+   <span class="cond">$Repeat</span>
+   {
+   <var>sum</var>
+   <sub>squared</sub>
+   =
+   <var>sum</var>
+   <sub>squared</sub>
+   +
+   <b class="b0">|</b>
+   <b>
+    <var>A</var>
+   </b>
+   <sub>
+    <var>i</var>
+    ,
+    <var>j</var>
+   </sub>
+   <sup>2</sup>
+   <b class="b0">|</b>
+   <span class="cond">for</span>
+   <var>j</var>
+   = 1...3}
+   <span class="cond">for</span>
+   <var>i</var>
+   = 1...3} = 170
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>frobenius</var>
+   <sub>norm</sub>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>sum</var>
+    <sub>squared</sub>
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    0
+   </span>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>det</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = -308
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>det</sub>
+   =
+   <b>
+    <var>A</var>
+   </b>
+   <sub>1,1</sub>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   <sub>2,2</sub>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   <sub>3,3</sub>
+   +
+   <b>
+    <var>A</var>
+   </b>
+   <sub>1,2</sub>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   <sub>2,3</sub>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   <sub>3,1</sub>
+   +
+   <b>
+    <var>A</var>
+   </b>
+   <sub>1,3</sub>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   <sub>2,1</sub>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   <sub>3,2</sub>
+   −
+   <b>
+    <var>A</var>
+   </b>
+   <sub>1,3</sub>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   <sub>2,2</sub>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   <sub>3,1</sub>
+   −
+   <b>
+    <var>A</var>
+   </b>
+   <sub>1,2</sub>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   <sub>2,1</sub>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   <sub>3,3</sub>
+   −
+   <b>
+    <var>A</var>
+   </b>
+   <sub>1,1</sub>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   <sub>2,3</sub>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   <sub>3,2</sub>
+   = -308
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">|</span>
+   4; 5; 6
+   <span class="b0">|</span>
+   7; 8; 9
+   <span class="b0">]</span>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>rank</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   )  = 2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   <sub>2,1</sub>
+   =
+   <b>
+    <var>M</var>
+   </b>
+   <sub>2,1</sub>
+   − 4 ·
+   <b>
+    <var>M</var>
+   </b>
+   <sub>1,1</sub>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   <sub>2,2</sub>
+   =
+   <b>
+    <var>M</var>
+   </b>
+   <sub>2,2</sub>
+   − 4 ·
+   <b>
+    <var>M</var>
+   </b>
+   <sub>1,2</sub>
+   = -3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   <sub>2,3</sub>
+   =
+   <b>
+    <var>M</var>
+   </b>
+   <sub>2,3</sub>
+   − 4 ·
+   <b>
+    <var>M</var>
+   </b>
+   <sub>1,3</sub>
+   = -6
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   <sub>3,1</sub>
+   =
+   <b>
+    <var>M</var>
+   </b>
+   <sub>3,1</sub>
+   − 7 ·
+   <b>
+    <var>M</var>
+   </b>
+   <sub>1,1</sub>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   <sub>3,2</sub>
+   =
+   <b>
+    <var>M</var>
+   </b>
+   <sub>3,2</sub>
+   − 7 ·
+   <b>
+    <var>M</var>
+   </b>
+   <sub>1,2</sub>
+   = -6
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   <sub>3,3</sub>
+   =
+   <b>
+    <var>M</var>
+   </b>
+   <sub>3,3</sub>
+   − 7 ·
+   <b>
+    <var>M</var>
+   </b>
+   <sub>1,3</sub>
+   = -12
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   <sub>3,1</sub>
+   =
+   <b>
+    <var>M</var>
+   </b>
+   <sub>3,1</sub>
+   − 2 ·
+   <b>
+    <var>M</var>
+   </b>
+   <sub>2,1</sub>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   <sub>3,2</sub>
+   =
+   <b>
+    <var>M</var>
+   </b>
+   <sub>3,2</sub>
+   − 2 ·
+   <b>
+    <var>M</var>
+   </b>
+   <sub>2,2</sub>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   <sub>3,3</sub>
+   =
+   <b>
+    <var>M</var>
+   </b>
+   <sub>3,3</sub>
+   − 2 ·
+   <b>
+    <var>M</var>
+   </b>
+   <sub>2,3</sub>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">-3</span>
+     <span class="td">-6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>trace</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = -1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>trace</sub>
+   =
+   <b>
+    <var>A</var>
+   </b>
+   <sub>1,1</sub>
+   +
+   <b>
+    <var>A</var>
+   </b>
+   <sub>2,2</sub>
+   +
+   <b>
+    <var>A</var>
+   </b>
+   <sub>3,3</sub>
+   = -1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>trace</sub>
+   =
+   <b>sum</b>
+   (
+   <b>diag2vec</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  )  = -1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <b>transp</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">4</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-7</span>
+     <span class="td">5</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">-1</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   <b>col</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 1 )
+   <span class="b0">|</span>
+   <b>col</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 2 )
+   <span class="b0">|</span>
+   <b>col</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 3 )
+   <span class="b0">]</span>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">4</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-7</span>
+     <span class="td">5</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">-1</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>row</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 2 )  =
+   <b class="b0">[</b>
+   4 5 -1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>row</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 3 )  =
+   <b class="b0">[</b>
+   2 -3 -7
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mnorm</b>
+   <sub>1</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = 15
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>max</b>
+   (
+   <b>norm</b>
+   <sub>1</sub>
+   (
+   <b>col</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 1 )  ) ;
+   <b>norm</b>
+   <sub>1</sub>
+   (
+   <b>col</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 2 )  ) ;
+   <b>norm</b>
+   <sub>1</sub>
+   (
+   <b>col</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 3 )  )  )  = 15
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   =
+   <b>n</b>
+   <sub>cols</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = 3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>mn1</var>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="cond">$Repeat</span>
+   {
+   <var>mn1</var>
+   =
+   <b>max</b>
+   (
+   <var>mn1</var>
+   ;
+   <b>norm</b>
+   <sub>1</sub>
+   (
+   <b>col</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>k</var>
+   )  )  )
+   <span class="cond">for</span>
+   <var>k</var>
+   = 1...
+   <var>n</var>
+   } = 15
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mnorm</b>
+   <sub>2</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = 9.57
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>gram</var>
+   </b>
+   <sub>matrix</sub>
+   =
+   <b>
+    <var>A</var>
+   </b>
+   ·
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-19</span>
+     <span class="td">-54</span>
+     <span class="td">-17</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">22</span>
+     <span class="td">0</span>
+     <span class="td">18</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-24</span>
+     <span class="td">-8</span>
+     <span class="td">60</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>max(eigenvals(gram_matrix))</p>
+ <p>
+  <span class="eq">
+   <b>mnorm</b>
+   <sub>i</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = 12
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>max</b>
+   (
+   <b>norm</b>
+   <sub>1</sub>
+   (
+   <b>row</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 1 )  ) ;
+   <b>norm</b>
+   <sub>1</sub>
+   (
+   <b>row</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 2 )  ) ;
+   <b>norm</b>
+   <sub>1</sub>
+   (
+   <b>row</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 3 )  )  )  = 12
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   =
+   <b>n</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = 3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>mn1</var>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="cond">$Repeat</span>
+   {
+   <var>mn1</var>
+   =
+   <b>max</b>
+   (
+   <var>mn1</var>
+   ;
+   <b>norm</b>
+   <sub>1</sub>
+   (
+   <b>row</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>k</var>
+   )  )  )
+   <span class="cond">for</span>
+   <var>k</var>
+   = 1...
+   <var>n</var>
+   } = 12
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>L</var>
+   <sub>p</sub>
+   (
+   <var>v</var>
+   ;
+   <var>p</var>
+   )  =
+   <span class="b2">(</span>
+   <span class="dvr">
+    <small>
+     <b>len</b>
+     (
+     <var>v</var>
+     )
+    </small>
+    <span class="nary">∑</span>
+    <small>
+     <var>k</var>
+     = 1
+    </small>
+   </span>
+   <b class="b0">|</b>
+   <b>take</b>
+   (
+   <var>k</var>
+   ;
+   <var>v</var>
+   )
+   <b class="b0">|</b>
+   <sup>
+    <var>p</var>
+   </sup>
+   <span class="b2">)</span>
+   <sup class="raised">
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     <var>p</var>
+    </span>
+   </sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3; 7; -2; 10
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   1 2 3 7 -2 10
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>L</var>
+   <sub>p</sub>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   ; 100 )  = 10
+  </span>
+ </p>
+ <p>
+  <span class="eq">10 + 5 = 15</span>
+ </p>
+ <p>
+  <span class="eq">
+   ( 10
+   <sup>2</sup>
+   + 5
+   <sup>2</sup>
+   )
+   <sup>
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </sup>
+   = 11.18
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cond</b>
+   <sub>e</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = 3.84
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>mnorm</var>
+   <sub>inv</sub>
+   =
+   <b>mnorm</b>
+   <sub>e</sub>
+   (
+   <b>inverse</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  )  = 0.294
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>cond</var>
+   =
+   <b>mnorm</b>
+   <sub>e</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  ·
+   <var>mnorm</var>
+   <sub>inv</sub>
+   =
+   <b>mnorm</b>
+   <sub>e</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  · 0.294 = 3.84
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cond</b>
+   <sub>1</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = 4.24
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>mnorm</var>
+   <sub>inv</sub>
+   =
+   <b>mnorm</b>
+   <sub>1</sub>
+   (
+   <b>inverse</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  )  = 0.282
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>cond1</var>
+   =
+   <b>mnorm</b>
+   <sub>1</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  ·
+   <var>mnorm</var>
+   <sub>inv</sub>
+   =
+   <b>mnorm</b>
+   <sub>1</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  · 0.282 = 4.24
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cond</b>
+   <sub>2</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = 2.33
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>mnorm</var>
+   <sub>inv</sub>
+   =
+   <b>mnorm</b>
+   <sub>2</sub>
+   (
+   <b>inverse</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  )  = 0.244
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>cond2</var>
+   =
+   <b>mnorm</b>
+   <sub>2</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  ·
+   <var>mnorm</var>
+   <sub>inv</sub>
+   =
+   <b>mnorm</b>
+   <sub>2</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  · 0.244 = 2.33
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cond</b>
+   <sub>i</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  = 4.36
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>mnorm</var>
+   <sub>inv</sub>
+   =
+   <b>mnorm</b>
+   <sub>i</sub>
+   (
+   <b>inverse</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  )  = 0.364
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>cond</var>
+   <sub>i</sub>
+   =
+   <b>mnorm</b>
+   <sub>i</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  ·
+   <var>mnorm</var>
+   <sub>inv</sub>
+   =
+   <b>mnorm</b>
+   <sub>i</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  · 0.364 = 4.36
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">-7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>adj</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-38</span>
+     <span class="td">-61</span>
+     <span class="td">-13</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">26</span>
+     <span class="td">-15</span>
+     <span class="td">17</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-22</span>
+     <span class="td">-11</span>
+     <span class="td">33</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <b>cofactor</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-38</span>
+     <span class="td">26</span>
+     <span class="td">-22</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-61</span>
+     <span class="td">-15</span>
+     <span class="td">-11</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-13</span>
+     <span class="td">17</span>
+     <span class="td">33</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   <sub>adjugate</sub>
+   =
+   <b>transp</b>
+   (
+   <b>
+    <var>C</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-38</span>
+     <span class="td">-61</span>
+     <span class="td">-13</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">26</span>
+     <span class="td">-15</span>
+     <span class="td">17</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-22</span>
+     <span class="td">-11</span>
+     <span class="td">33</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cofactor</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-38</span>
+     <span class="td">26</span>
+     <span class="td">-22</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-61</span>
+     <span class="td">-15</span>
+     <span class="td">-11</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-13</span>
+     <span class="td">17</span>
+     <span class="td">33</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>cofactor</var>
+   </b>
+   <sub>transp</sub>
+   =
+   <b>inverse</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  ·
+   <b>det</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-38</span>
+     <span class="td">-61</span>
+     <span class="td">-13</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">26</span>
+     <span class="td">-15</span>
+     <span class="td">17</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-22</span>
+     <span class="td">-11</span>
+     <span class="td">33</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>transp</b>
+   (
+   <b>
+    <var>cofactor</var>
+   </b>
+   <sub>transp</sub>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-38</span>
+     <span class="td">26</span>
+     <span class="td">-22</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-61</span>
+     <span class="td">-15</span>
+     <span class="td">-11</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-13</span>
+     <span class="td">17</span>
+     <span class="td">33</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   <sub>sym</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">5</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">4</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>m</var>
+   </b>
+   <sub>definitive</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">5</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cholesky</b>
+   (
+   <b>
+    <var>m</var>
+   </b>
+   <sub>definitive</sub>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">0.5</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">2.18</span>
+     <span class="td">1.15</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1.92</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>L</var>
+   </b>
+   =
+   <b>ltriang</b>
+   <sub>hp</sub>
+   ( 3 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>L</var>
+   </b>
+   <sub>1,1</sub>
+   =
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <b>
+     <var>m</var>
+    </b>
+    <sub>definitive.1,1</sub>
+    −
+    <span class="dvr">
+     <small>
+      <var>i</var>
+     </small>
+     <span class="nary">∑</span>
+     <small>
+      <var>k</var>
+      = 1
+     </small>
+    </span>
+    <b>
+     <var>L</var>
+    </b>
+    <sub>
+     <var>i</var>
+     ,
+     <var>k</var>
+    </sub>
+    <sup>2</sup>
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    4 − 0
+   </span>
+   = 2
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>L</var>
+   </b>
+   <sub>2,1</sub>
+   =
+   <span class="dvc">
+    <b>
+     <var>m</var>
+    </b>
+    <sub>definitive.2,1</sub>
+    −
+    <span class="dvr">
+     <small>
+      <var>i</var>
+     </small>
+     <span class="nary">∑</span>
+     <small>
+      <var>k</var>
+      = 1
+     </small>
+    </span>
+    <b>
+     <var>L</var>
+    </b>
+    <sub>
+     <var>i</var>
+     ,
+     <var>k</var>
+    </sub>
+    ·
+    <b>
+     <var>L</var>
+    </b>
+    <sub>
+     <var>j</var>
+     ,
+     <var>k</var>
+    </sub>
+    <span class="dvl">
+    </span>
+    <b>
+     <var>L</var>
+    </b>
+    <sub>1,1</sub>
+   </span>
+   =
+   <span class="dvc">
+    1 − 0
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 0.5
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>L</var>
+   </b>
+   <sub>2,2</sub>
+   =
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <b>
+     <var>m</var>
+    </b>
+    <sub>definitive.2,2</sub>
+    −
+    <span class="dvr">
+     <small>
+      <var>i</var>
+     </small>
+     <span class="nary">∑</span>
+     <small>
+      <var>k</var>
+      = 1
+     </small>
+    </span>
+    <b>
+     <var>L</var>
+    </b>
+    <sub>
+     <var>i</var>
+     ,
+     <var>k</var>
+    </sub>
+    <sup>2</sup>
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    5 − 0.25
+   </span>
+   = 2.18
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>L</var>
+   </b>
+   <sub>3,1</sub>
+   =
+   <span class="dvc">
+    <b>
+     <var>m</var>
+    </b>
+    <sub>definitive.3,1</sub>
+    −
+    <span class="dvr">
+     <small>
+      <var>i</var>
+     </small>
+     <span class="nary">∑</span>
+     <small>
+      <var>k</var>
+      = 1
+     </small>
+    </span>
+    <b>
+     <var>L</var>
+    </b>
+    <sub>
+     <var>i</var>
+     ,
+     <var>k</var>
+    </sub>
+    ·
+    <b>
+     <var>L</var>
+    </b>
+    <sub>
+     <var>j</var>
+     ,
+     <var>k</var>
+    </sub>
+    <span class="dvl">
+    </span>
+    <b>
+     <var>L</var>
+    </b>
+    <sub>1,1</sub>
+   </span>
+   =
+   <span class="dvc">
+    2 − 0
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 1
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>L</var>
+   </b>
+   <sub>3,2</sub>
+   =
+   <span class="dvc">
+    <b>
+     <var>m</var>
+    </b>
+    <sub>definitive.3,2</sub>
+    −
+    <span class="dvr">
+     <small>
+      <var>i</var>
+     </small>
+     <span class="nary">∑</span>
+     <small>
+      <var>k</var>
+      = 1
+     </small>
+    </span>
+    <b>
+     <var>L</var>
+    </b>
+    <sub>
+     <var>i</var>
+     ,
+     <var>k</var>
+    </sub>
+    ·
+    <b>
+     <var>L</var>
+    </b>
+    <sub>
+     <var>j</var>
+     ,
+     <var>k</var>
+    </sub>
+    <span class="dvl">
+    </span>
+    <b>
+     <var>L</var>
+    </b>
+    <sub>2,2</sub>
+   </span>
+   =
+   <span class="dvc">
+    3 − 0.5
+    <span class="dvl">
+    </span>
+    2.18
+   </span>
+   = 1.15
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>L</var>
+   </b>
+   <sub>3,3</sub>
+   =
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <b>
+     <var>m</var>
+    </b>
+    <sub>definitive.3,3</sub>
+    −
+    <span class="dvr">
+     <small>
+      <var>i</var>
+     </small>
+     <span class="nary">∑</span>
+     <small>
+      <var>k</var>
+      = 1
+     </small>
+    </span>
+    <b>
+     <var>L</var>
+    </b>
+    <sub>
+     <var>i</var>
+     ,
+     <var>k</var>
+    </sub>
+    <sup>2</sup>
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    6 − 2.32
+   </span>
+   = 1.92
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>L</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.5</span>
+     <span class="td">2.18</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1.15</span>
+     <span class="td">1.92</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+  =
+  <span class="eq">
+   <b>transp</b>
+   (
+   <b>
+    <var>L</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">0.5</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">2.18</span>
+     <span class="td">1.15</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1.92</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cholesky</b>
+   (
+   <b>
+    <var>m</var>
+   </b>
+   <sub>definitive</sub>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">0.5</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">2.18</span>
+     <span class="td">1.15</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1.92</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   8; -3; 7; 2
+   <span class="b0">|</span>
+   5; 11; -1; 6
+   <span class="b0">|</span>
+   -4; 9; 10; 3
+   <span class="b0">|</span>
+   2; -7; 4; 1
+   <span class="b0">]</span>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">-3</span>
+     <span class="td">7</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">11</span>
+     <span class="td">-1</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">9</span>
+     <span class="td">10</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>LU</var>
+   </b>
+   =
+   <b>lu</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">-3</span>
+     <span class="td">7</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.625</span>
+     <span class="td">12.88</span>
+     <span class="td">-5.38</span>
+     <span class="td">4.75</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.5</span>
+     <span class="td">0.583</span>
+     <span class="td">16.63</span>
+     <span class="td">1.23</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.25</span>
+     <span class="td">-0.485</span>
+     <span class="td">-0.0216</span>
+     <span class="td">2.83</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>D</var>
+   </b>
+   =
+   <b>not</b>
+   (
+   <b>identity</b>
+   <sub>hp</sub>
+   ( 4 )  )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>L</var>
+   </b>
+   =
+   <b>hprod</b>
+   (
+   <b>mfill</b>
+   (
+   <b>ltriang</b>
+   <sub>hp</sub>
+   ( 4 ) ; 1 ) ;
+   <b>
+    <var>LU</var>
+   </b>
+   )
+   <sup>
+    <b>
+     <var>D</var>
+    </b>
+   </sup>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.625</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.5</span>
+     <span class="td">0.583</span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.25</span>
+     <span class="td">-0.485</span>
+     <span class="td">-0.0216</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>U</var>
+   </b>
+   =
+   <b>hprod</b>
+   (
+   <b>mfill</b>
+   (
+   <b>utriang</b>
+   <sub>hp</sub>
+   ( 4 ) ; 1 ) ;
+   <b>
+    <var>LU</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">-3</span>
+     <span class="td">7</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">12.88</span>
+     <span class="td">-5.38</span>
+     <span class="td">4.75</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">16.63</span>
+     <span class="td">1.23</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">2.83</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>extract</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>L</var>
+   </b>
+   ·
+   <b>
+    <var>U</var>
+   </b>
+   ;
+   <b>order</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    ind
+   </var>
+   )  )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">-3</span>
+     <span class="td">7</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">11</span>
+     <span class="td">-1</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">9</span>
+     <span class="td">10</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>QR</var>
+   </b>
+   =
+   <b>qr</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   <sub>symmetric</sub>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.73</span>
+     <span class="td">0.054</span>
+     <span class="td">0.213</span>
+     <span class="td">0.647</span>
+     <span class="td">-5.48</span>
+     <span class="td">-3.1</span>
+     <span class="td">-4.56</span>
+     <span class="td">-1.1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.365</span>
+     <span class="td">-0.783</span>
+     <span class="td">-0.464</span>
+     <span class="td">-0.194</span>
+     <span class="td">0</span>
+     <span class="td">-4.94</span>
+     <span class="td">5.1</span>
+     <span class="td">-5.19</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.548</span>
+     <span class="td">0.547</span>
+     <span class="td">-0.249</span>
+     <span class="td">-0.582</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-2.86</span>
+     <span class="td">5.79</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.183</span>
+     <span class="td">-0.29</span>
+     <span class="td">0.823</span>
+     <span class="td">-0.453</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-1.16</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>Q</var>
+   </b>
+   =
+   <b>submatrix</b>
+   (
+   <b>
+    <var>QR</var>
+   </b>
+   ; 1; 4; 1; 4 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.73</span>
+     <span class="td">0.054</span>
+     <span class="td">0.213</span>
+     <span class="td">0.647</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.365</span>
+     <span class="td">-0.783</span>
+     <span class="td">-0.464</span>
+     <span class="td">-0.194</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.548</span>
+     <span class="td">0.547</span>
+     <span class="td">-0.249</span>
+     <span class="td">-0.582</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.183</span>
+     <span class="td">-0.29</span>
+     <span class="td">0.823</span>
+     <span class="td">-0.453</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>R</var>
+   </b>
+   =
+   <b>submatrix</b>
+   (
+   <b>
+    <var>QR</var>
+   </b>
+   ; 1; 4; 5; 8 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-5.48</span>
+     <span class="td">-3.1</span>
+     <span class="td">-4.56</span>
+     <span class="td">-1.1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">-4.94</span>
+     <span class="td">5.1</span>
+     <span class="td">-5.19</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-2.86</span>
+     <span class="td">5.79</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-1.16</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   <sub>symmetric</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">-1</span>
+     <span class="td">6</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+  , B = M_symmetric
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>Q</var>
+   </b>
+   ·
+   <b>
+    <var>R</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">-1</span>
+     <span class="td">6</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>round</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   <sub>symmetric</sub>
+   · 10
+   <sup>14</sup>
+   )  · 10
+   <sup>-14</sup>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">10.43</span>
+     <span class="td">
+      -5.95×10
+      <sup>-10</sup>
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -5.95×10
+      <sup>-10</sup>
+     </span>
+     <span class="td">7.84</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">3.41</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0.323</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <b>
+    <var>V</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0613</span>
+     <span class="td">0.691</span>
+     <span class="td">-0.123</span>
+     <span class="td">-0.709</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.351</span>
+     <span class="td">0.481</span>
+     <span class="td">0.741</span>
+     <span class="td">0.31</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.603</span>
+     <span class="td">0.486</span>
+     <span class="td">-0.269</span>
+     <span class="td">0.572</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.713</span>
+     <span class="td">0.234</span>
+     <span class="td">-0.603</span>
+     <span class="td">0.271</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <h4>Eigenvalues and eigenvectors</h4>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   <sub>symmetric</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">10.43</span>
+     <span class="td">
+      -5.95×10
+      <sup>-10</sup>
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -5.95×10
+      <sup>-10</sup>
+     </span>
+     <span class="td">7.84</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">3.41</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0.323</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">5</span>
+     <span class="td">-1</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">-1</span>
+     <span class="td">6</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">-3</span>
+     <span class="td">7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>sort</b>
+   (
+   <b>diag2vec</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   <sub>symmetric</sub>
+   )  )  =
+   <b class="b0">[</b>
+   0.323 3.41 7.84 10.43
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <b>eigenvals</b>
+   (
+   <b>
+    <var>B</var>
+   </b>
+   )  =
+   <b class="b0">[</b>
+   0.323 3.41 7.84 10.43
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>extract</b>
+   <sub>cols</sub>
+   (
+   <b>
+    <var>V</var>
+   </b>
+   ;
+   <b>order</b>
+   (
+   <b>diag2vec</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   <sub>symmetric</sub>
+   )  )  )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.709</span>
+     <span class="td">-0.123</span>
+     <span class="td">0.691</span>
+     <span class="td">0.0613</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.31</span>
+     <span class="td">0.741</span>
+     <span class="td">0.481</span>
+     <span class="td">-0.351</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.572</span>
+     <span class="td">-0.269</span>
+     <span class="td">0.486</span>
+     <span class="td">0.603</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.271</span>
+     <span class="td">-0.603</span>
+     <span class="td">0.234</span>
+     <span class="td">-0.713</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>eigenvecs</b>
+   (
+   <b>
+    <var>B</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.709</span>
+     <span class="td">-0.31</span>
+     <span class="td">-0.572</span>
+     <span class="td">-0.271</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.123</span>
+     <span class="td">0.741</span>
+     <span class="td">-0.269</span>
+     <span class="td">-0.603</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.691</span>
+     <span class="td">-0.481</span>
+     <span class="td">-0.486</span>
+     <span class="td">-0.234</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.0613</span>
+     <span class="td">0.351</span>
+     <span class="td">-0.603</span>
+     <span class="td">0.713</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>SVD</var>
+   </b>
+   =
+   <b>svd</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.0101</span>
+     <span class="td">0.806</span>
+     <span class="td">0.344</span>
+     <span class="td">0.482</span>
+     <span class="td">17.33</span>
+     <span class="td">-0.00512</span>
+     <span class="td">-0.891</span>
+     <span class="td">-0.305</span>
+     <span class="td">-0.337</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.666</span>
+     <span class="td">-0.1</span>
+     <span class="td">0.666</span>
+     <span class="td">-0.321</span>
+     <span class="td">13.15</span>
+     <span class="td">0.444</span>
+     <span class="td">-0.346</span>
+     <span class="td">0.806</span>
+     <span class="td">0.18</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.696</span>
+     <span class="td">0.282</span>
+     <span class="td">-0.66</span>
+     <span class="td">-0.0152</span>
+     <span class="td">10.37</span>
+     <span class="td">0.832</span>
+     <span class="td">0.0652</span>
+     <span class="td">-0.487</span>
+     <span class="td">0.256</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.269</span>
+     <span class="td">0.511</span>
+     <span class="td">-0.0468</span>
+     <span class="td">-0.815</span>
+     <span class="td">2.05</span>
+     <span class="td">0.332</span>
+     <span class="td">0.286</span>
+     <span class="td">0.139</span>
+     <span class="td">-0.888</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>U</var>
+   </b>
+   =
+   <b>submatrix</b>
+   (
+   <b>
+    <var>SVD</var>
+   </b>
+   ; 1; 4; 1; 4 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.0101</span>
+     <span class="td">0.806</span>
+     <span class="td">0.344</span>
+     <span class="td">0.482</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.666</span>
+     <span class="td">-0.1</span>
+     <span class="td">0.666</span>
+     <span class="td">-0.321</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.696</span>
+     <span class="td">0.282</span>
+     <span class="td">-0.66</span>
+     <span class="td">-0.0152</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.269</span>
+     <span class="td">0.511</span>
+     <span class="td">-0.0468</span>
+     <span class="td">-0.815</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>V</var>
+   </b>
+   =
+   <b>submatrix</b>
+   (
+   <b>
+    <var>SVD</var>
+   </b>
+   ; 1; 4; 6; 9 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.00512</span>
+     <span class="td">-0.891</span>
+     <span class="td">-0.305</span>
+     <span class="td">-0.337</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.444</span>
+     <span class="td">-0.346</span>
+     <span class="td">0.806</span>
+     <span class="td">0.18</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.832</span>
+     <span class="td">0.0652</span>
+     <span class="td">-0.487</span>
+     <span class="td">0.256</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.332</span>
+     <span class="td">0.286</span>
+     <span class="td">0.139</span>
+     <span class="td">-0.888</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    σ
+   </var>
+   =
+   <b>col</b>
+   (
+   <b>
+    <var>SVD</var>
+   </b>
+   ; 5 )  =
+   <b class="b0">[</b>
+   17.33 13.15 10.37 2.05
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>Σ</var>
+   </b>
+   =
+   <b>vec2diag</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    σ
+   </var>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">17.33</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">13.15</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">10.37</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">2.05</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">-3</span>
+     <span class="td">7</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">11</span>
+     <span class="td">-1</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">9</span>
+     <span class="td">10</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>U</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.0101</span>
+     <span class="td">0.806</span>
+     <span class="td">0.344</span>
+     <span class="td">0.482</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.666</span>
+     <span class="td">-0.1</span>
+     <span class="td">0.666</span>
+     <span class="td">-0.321</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.696</span>
+     <span class="td">0.282</span>
+     <span class="td">-0.66</span>
+     <span class="td">-0.0152</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.269</span>
+     <span class="td">0.511</span>
+     <span class="td">-0.0468</span>
+     <span class="td">-0.815</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+  .
+  <span class="eq">
+   <b>
+    <var>Σ</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">17.33</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">13.15</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">10.37</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">2.05</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+  .
+  <span class="eq">
+   <b>transp</b>
+   (
+   <b>
+    <var>V</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.00512</span>
+     <span class="td">0.444</span>
+     <span class="td">0.832</span>
+     <span class="td">0.332</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.891</span>
+     <span class="td">-0.346</span>
+     <span class="td">0.0652</span>
+     <span class="td">0.286</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.305</span>
+     <span class="td">0.806</span>
+     <span class="td">-0.487</span>
+     <span class="td">0.139</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.337</span>
+     <span class="td">0.18</span>
+     <span class="td">0.256</span>
+     <span class="td">-0.888</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-38</span>
+     <span class="td">26</span>
+     <span class="td">-22</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-61</span>
+     <span class="td">-15</span>
+     <span class="td">-11</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-13</span>
+     <span class="td">17</span>
+     <span class="td">33</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>inverse</var>
+   </b>
+   <sub>C</sub>
+   =
+   <span class="dvc">
+    <b>adj</b>
+    (
+    <b>
+     <var>C</var>
+    </b>
+    )
+    <span class="dvl">
+    </span>
+    <b>det</b>
+    (
+    <b>
+     <var>C</var>
+    </b>
+    )
+   </span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.00325</span>
+     <span class="td">-0.013</span>
+     <span class="td">-0.00649</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0227</span>
+     <span class="td">-0.0162</span>
+     <span class="td">0.00974</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.013</span>
+     <span class="td">0.00325</span>
+     <span class="td">0.0227</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>inverse</b>
+   (
+   <b>
+    <var>C</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.00325</span>
+     <span class="td">-0.013</span>
+     <span class="td">-0.00649</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0227</span>
+     <span class="td">-0.0162</span>
+     <span class="td">0.00974</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.013</span>
+     <span class="td">0.00325</span>
+     <span class="td">0.0227</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   8; 6; -4
+   <span class="b0">|</span>
+   6; 12; -3
+   <span class="b0">|</span>
+   -4; -3; 9
+   <span class="b0">]</span>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">6</span>
+     <span class="td">-4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">12</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">-3</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   10; 20; 30
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   10 20 30
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b>lsolve</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  =
+   <b class="b0">[</b>
+   2.5 1.67 5
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b class="b0">[</b>
+   10 20 30
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <b>copy</b>
+   (
+   <span class="b0">[</span>
+   8; 6; -4
+   <span class="b0">|</span>
+   6; 12; -3
+   <span class="b0">|</span>
+   -4; -3; 9
+   <span class="b0">]</span>
+   ;
+   <b>symmetric</b>
+   <sub>hp</sub>
+   ( 3 ) ; 1; 1 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">6</span>
+     <span class="td">-4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">12</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">-3</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b class="b0">[</b>
+   10 20 30
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b>lsolve</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  =
+   <b class="b0">[</b>
+   2.5 1.67 5
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b>clsolve</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  =
+   <b class="b0">[</b>
+   2.5 1.67 5
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b>slsolve</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  =
+   <b class="b0">[</b>
+   2.5 1.67 5
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b class="b0">[</b>
+   10 20 30
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Data functions</h3>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   8; -3; 7; 2
+   <span class="b0">|</span>
+   5; 11; -1; 6
+   <span class="b0">|</span>
+   -4; 9; 10; 3
+   <span class="b0">|</span>
+   2; -7; 4; 1
+   <span class="b0">]</span>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">-3</span>
+     <span class="td">7</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">11</span>
+     <span class="td">-1</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">9</span>
+     <span class="td">10</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">6</span>
+     <span class="td">-4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">12</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">-3</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <b>sort</b>
+   <sub>cols</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 3 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">6</span>
+     <span class="td">-4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">12</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">-3</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <b>rsort</b>
+   <sub>cols</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 3 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">6</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-3</span>
+     <span class="td">12</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">9</span>
+     <span class="td">-3</span>
+     <span class="td">-4</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">6</span>
+     <span class="td">-4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">12</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">-3</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>order</b>
+   <sub>cols</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 2 )  =
+   <b class="b0">[</b>
+   3 1 2
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <b>extract</b>
+   <sub>cols</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">8</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-3</span>
+     <span class="td">6</span>
+     <span class="td">12</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">9</span>
+     <span class="td">-4</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>revorder</b>
+   <sub>cols</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 2 )  =
+   <b class="b0">[</b>
+   2 1 3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <b>extract</b>
+   <sub>cols</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">8</span>
+     <span class="td">-4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">12</span>
+     <span class="td">6</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-3</span>
+     <span class="td">-4</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>order</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 2 )  =
+   <b class="b0">[</b>
+   3 1 2
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <b>extract</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">-3</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">6</span>
+     <span class="td">-4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">12</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>revorder</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 2 )  =
+   <b class="b0">[</b>
+   2 1 3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>B</var>
+   </b>
+   =
+   <b>extract</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">12</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">6</span>
+     <span class="td">-4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">-3</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">6</span>
+     <span class="td">-4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">12</span>
+     <span class="td">-3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">-3</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   =
+   <b>mcount</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   ; 6 )  = 2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">-3</span>
+     <span class="td">7</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">11</span>
+     <span class="td">-1</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">9</span>
+     <span class="td">10</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>msearch</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   ; 8; 1; 1 )  =
+   <b class="b0">[</b>
+   1 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    C
+   </var>
+   =
+   <b>msearch</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   ; 11; 1; 2 )  =
+   <b class="b0">[</b>
+   2 2
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    d
+   </var>
+   =
+   <b>msearch</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   ; 9; 2; 1 )  =
+   <b class="b0">[</b>
+   3 2
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">8</span>
+     <span class="td">-3</span>
+     <span class="td">7</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">11</span>
+     <span class="td">-1</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4</span>
+     <span class="td">9</span>
+     <span class="td">10</span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">-7</span>
+     <span class="td">4</span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>b</var>
+   </b>
+   =
+   <b>mfind</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   ; 7 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>c</var>
+   </b>
+   =
+   <b>mfind</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   ; -7 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>hlookup</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   ; 5; 2; 4 )  =
+   <b class="b0">[</b>
+   2
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>hlookup</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   ; -1; 2; 3 )  =
+   <b class="b0">[</b>
+   10
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>vlookup</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   ; -4; 1; 4 )  =
+   <b class="b0">[</b>
+   3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>vlookup</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   ; 10; 3; 1 )  =
+   <b class="b0">[</b>
+   -4
+   <b class="b0">]</b>
+  </span>
+ </p>
+</div>

@@ -1,0 +1,245 @@
+<div class="calcpad-output">
+ <!-- Section properties of a solid circle: area, $I_x = I_y = \pi d^4 / 64$, section modulus and radius of gyration. -->
+ <h3>Geometrical Properties of Circle</h3>
+ <div style="max-width:120mm">
+  <img alt="circle.png" class="side" src="Images/mechanics/sections/circle.png" style="height:135pt;"/>
+ </div>
+ <p>Diameter</p>
+ <p>
+  <span class="eq">
+   <var>d</var>
+   =
+   <u class="input-5">1</u>
+  </span>
+  m
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>d</var>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   =
+   <span class="dvc">
+    3.14 · 1
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   = 0.785
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>Centroid</p>
+ <p>
+  <i>z</i>
+  <sub>c</sub>
+  =
+  <span class="eq">
+   <var>y</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    <var>d</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 0.5
+  </span>
+  m
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   =
+   <var>π</var>
+   ·
+   <var>d</var>
+   = 3.14 · 1 = 3.14
+  </span>
+  m
+ </p>
+ <p>Second moments of area</p>
+ <p>
+  <i>I</i>
+  <sub>z</sub>
+  =
+  <span class="eq">
+   <var>I</var>
+   <sub>y</sub>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>d</var>
+    <sup>4</sup>
+    <span class="dvl">
+    </span>
+    64
+   </span>
+   =
+   <span class="dvc">
+    3.14 · 1
+    <sup>4</sup>
+    <span class="dvl">
+    </span>
+    64
+   </span>
+   = 0.0491
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Polar moment of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>x</sub>
+   = 2 ·
+   <var>I</var>
+   <sub>y</sub>
+   = 2 · 0.0491 = 0.0982
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Radii of gyration</p>
+ <p>
+  <i>r</i>
+  <sub>z</sub>
+  =
+  <span class="eq">
+   <var>r</var>
+   <sub>y</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.0491
+     <span class="dvl">
+     </span>
+     0.785
+    </span>
+   </span>
+   = 0.25
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>x</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>x</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.0982
+     <span class="dvl">
+     </span>
+     0.785
+    </span>
+   </span>
+   = 0.354
+  </span>
+  m
+ </p>
+ <p>Torsional constant</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>t</sub>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>d</var>
+    <sup>4</sup>
+    <span class="dvl">
+    </span>
+    32
+   </span>
+   =
+   <span class="dvc">
+    3.14 · 1
+    <sup>4</sup>
+    <span class="dvl">
+    </span>
+    32
+   </span>
+   = 0.0982
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Torsional section modulus</p>
+ <p>
+  <span class="eq">
+   <var>W</var>
+   <sub>t</sub>
+   =
+   <span class="dvc">
+    2 ·
+    <var>I</var>
+    <sub>t</sub>
+    <span class="dvl">
+    </span>
+    <var>d</var>
+   </span>
+   =
+   <span class="dvc">
+    2 · 0.0982
+    <span class="dvl">
+    </span>
+    1
+   </span>
+   = 0.196
+  </span>
+  m
+  <sup>3</sup>
+ </p>
+</div>

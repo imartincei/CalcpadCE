@@ -6,10 +6,10 @@ namespace Calcpad.Core
 {
     internal class TextWriter : OutputWriter
     {
-        internal TextWriter(MathSettings settings, bool phasor) : base(settings, phasor) 
+        internal TextWriter(MathSettings settings, bool phasor) : base(settings, phasor)
         {
             AngleUnits =
-            [           
+            [
                 "°",
                 "",
                 " grad"

@@ -193,7 +193,7 @@ b = hp([3; 0; -6.9; 8.2])
 c = a > b
 c = f(a; b)
 
-"Less than or equal 
+"Less than or equal
 a = hp([5; -2.1; 0; 7.8; -4.6])
 b = hp([-7; 1.3; 0; 4.5; -9])
 c = a ≤ b
@@ -222,7 +222,7 @@ c = a ≥ b
 c = f(a; b)
 
 '<h1>Logical operators</h1>
-"Logical AND 
+"Logical AND
 a = hp([0; 16.7; 0; 22.3; 13.5])
 b = hp([-18; 21.2; 0; -19.3; 25])
 c = a ∧ b

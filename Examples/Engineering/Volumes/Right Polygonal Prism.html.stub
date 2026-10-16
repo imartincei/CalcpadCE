@@ -1,0 +1,107 @@
+<div class="calcpad-output">
+ <!-- Volume and surface area of a right prism with a regular $n$-gon base, from side length and height. -->
+ <div style="max-width:130mm">
+  <img alt="polygonal-prism.png" class="side" src="Images/math/volume/polygonal-prism.png" style="height:65pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  Number of sides -
+  <span class="eq">
+   <var>n</var>
+   =
+   <u class="input-4">6</u>
+  </span>
+ </p>
+ <p>
+  Side length -
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-5">1</u>
+  </span>
+ </p>
+ <p>
+  Height -
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-6">2</u>
+  </span>
+ </p>
+ <!--
+<-->
+ <p>Area of base</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>a</var>
+    <sup>2</sup>
+    ·
+    <var>n</var>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ·
+   <b>cot</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    180
+    <span class="dvl">
+    </span>
+    <var>n</var>
+   </span>
+   <span class="b1">)</span>
+   =
+   <span class="dvc">
+    1
+    <sup>2</sup>
+    · 6
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ·
+   <b>cot</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    180
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   <span class="b1">)</span>
+   = 2.6
+  </span>
+ </p>
+ <p>Volume</p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <var>A</var>
+   ·
+   <var>h</var>
+   = 2.6 · 2 = 5.2
+  </span>
+ </p>
+ <p>Surface area</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   = 2 ·
+   <var>A</var>
+   +
+   <var>n</var>
+   ·
+   <var>a</var>
+   ·
+   <var>h</var>
+   = 2 · 2.6 + 6 · 1 · 2 = 17.2
+  </span>
+ </p>
+ <!--
+<-->
+</div>

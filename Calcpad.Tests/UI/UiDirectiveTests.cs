@@ -1,0 +1,968 @@
+using System.Linq;
+using System.Text.RegularExpressions;
+
+namespace Calcpad.Tests
+{
+    public partial class UiDirectiveTests
+    {
+        [GeneratedRegex(@"(?m)^(\s*)#UI\s*(\{[^}]*\})?\s*")]
+        private static partial Regex UiPrefix();
+
+        private static string Render(string source, bool enableUi, Dictionary<string, string> overrides = null)
+        {
+            var parser = new ExpressionParser
+            {
+                Settings = new Settings(),
+                EnableUi = enableUi,
+                UiOverrides = overrides,
+                // Mirrors CalcpadService's default (hideErrorLines ?? enableUi): input mode
+                // has no source editor for "on line [N]" to point at.
+                ShowErrorLines = !enableUi
+            };
+            parser.Parse(source, true, false);
+            return parser.HtmlResult;
+        }
+
+        /// <summary>
+        /// Renders the source in report mode and compares it against the same source with
+        /// every #UI prefix removed. The two must be identical - in report mode the keyword
+        /// is a no-op.
+        /// </summary>
+        private static void AssertReportMatchesPlainSource(string source)
+        {
+            var plain = UiPrefix().Replace(source, "$1");
+            Assert.Equal(Render(plain, enableUi: false), Render(source, enableUi: false));
+        }
+
+        [Theory]
+        [InlineData("#UI L = 10m\nA = L * 2m")]
+        [InlineData("#UI {\"type\": \"checkbox\"} flag = 1\nflag * 2")]
+        [InlineData("#UI {\"type\": \"dropdown\", \"keys\": [\"Low\", \"High\"], \"values\": [\"1\", \"3\"]} grade = 1")]
+        [InlineData("#UI {\"type\": \"radio\", \"keys\": [\"Steel\", \"Concrete\"], \"values\": [\"200GPa\", \"25GPa\"]} E = 200GPa")]
+        [InlineData("#UI v = [1; 2; 3]")]
+        [InlineData("#UI M = [1; 2; 3 | 4; 5; 6]")]
+        [InlineData("#UI Z = vector(5)")]
+        [InlineData("#UI G = matrix(3; 4)")]
+        [InlineData("#UI {\"type\": \"datagrid\", \"rows\": 3, \"columns\": 4} M = [1; 2; 3 | 4; 5; 6]")]
+        public void ReportMode_IsIdenticalToSourceWithoutTheKeyword(string source) =>
+            AssertReportMatchesPlainSource(source);
+
+        [Fact]
+        public void ReportMode_EmitsNoUiMarkup()
+        {
+            var html = Render("#UI {\"type\": \"checkbox\"} flag = 1\n#UI v = [1; 2; 3]", enableUi: false);
+            Assert.DoesNotContain("calcpad-ui", html);
+            Assert.DoesNotContain("data-ui-", html);
+            Assert.DoesNotContain("<input", html);
+        }
+
+        [Fact]
+        public void ReportStyle_AddsClass_AndIsTheOnlyDifference()
+        {
+            var styled = Render("#UI {\"reportStyle\": \"boxed\"} P = 25kN", enableUi: false);
+            var plain = Render("P = 25kN", enableUi: false);
+            Assert.Contains("class=\"boxed\"", styled);
+            Assert.Equal(plain, styled.Replace(" class=\"boxed\"", ""));
+        }
+
+        [Fact]
+        public void ReportStyle_IsNotEmittedInUiMode() =>
+            Assert.DoesNotContain("boxed", Render("#UI {\"reportStyle\": \"boxed\"} P = 25kN", enableUi: true));
+
+        [Fact]
+        public void Entry_IsAutoDetected_AndKeepsTheUnitOutsideTheInput()
+        {
+            var html = Render("#UI L = 10m", enableUi: true);
+            Assert.Contains("class=\"calcpad-ui-input\"", html);
+            Assert.Contains("data-ui-var=\"L:1\"", html);
+            Assert.Contains("value=\"10\"", html);
+            Assert.DoesNotContain("value=\"10 m\"", html);
+        }
+
+        /// <summary>
+        /// Only the number belongs in the input. A compound unit wraps its parts in a span
+        /// and the angle units carry no markup at all, so neither the first tag nor the
+        /// first &lt;i&gt; marks where the value ends.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI q = 3kN/m", "3")]
+        [InlineData("#UI a = 9.81m/s^2", "9.81")]
+        [InlineData("#UI T = 20°C", "20")]
+        [InlineData("#UI t = 12°", "12")]
+        [InlineData("#UI r = 50%", "50")]
+        [InlineData("#UI z = -3.5", "-3.5")]
+        [InlineData("#UI n = 4", "4")]
+        public void Entry_HoldsTheValueWithoutAnyOfTheUnit(string source, string value)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.Contains($"value=\"{value}\"", html);
+            // Unit markup that ended up inside the attribute would arrive encoded.
+            Assert.DoesNotContain("&lt;", html);
+        }
+
+        /// <summary>
+        /// An entry rewrites the number in place, so it can only annotate a literal value -
+        /// never something computed.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI {\"type\": \"entry\"} k = sin(2)")]
+        [InlineData("#UI k = 1 + 2")]
+        [InlineData("#UI k = 2*L\nL = 1m")]
+        public void AssignedExpression_IsAnError(string source)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.Contains("does not support expressions", html);
+            Assert.DoesNotContain("calcpad-ui", html);
+        }
+
+        /// <summary>
+        /// A grid replaces its whole right hand side when edited, and so does a control that
+        /// allows expressions, so neither needs a literal it can rewrite.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI v = [1; sqrt(4)]")]
+        [InlineData("#UI G = matrix(2; 2) + 1")]
+        [InlineData("#UI {\"allowExpression\": true} k = 1 + 2")]
+        public void AssignedExpression_IsAllowedWhereTheWholeValueIsReplaced(string source)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.DoesNotContain("does not support expressions", html);
+            Assert.Contains("calcpad-ui", html);
+        }
+
+        [Fact]
+        public void InlineComment_IsNotMistakenForTheAssignment()
+        {
+            // A control is often labelled with an inline comment that contains its own
+            // '=', as in Circle.cpd. Taking the first '=' made the label the variable
+            // name, and that name became the control key written back to the document.
+            var html = Render("#UI '2&middot;<i>r</i> ='d = 1", enableUi: true);
+            Assert.Contains("data-ui-var=\"d:1\"", html);
+            Assert.DoesNotContain("data-ui-var=\"'2", html);
+        }
+
+        [Theory]
+        [InlineData("#UI 'label ='x = 1", "x:1")]
+        [InlineData("#UI \"label =\"y = 2", "y:1")]
+        [InlineData("#UI 'a ='  z  = 3", "z:1")]
+        public void InlineComment_IsStrippedFromTheVariableName(string source, string key) =>
+            Assert.Contains($"data-ui-var=\"{key}\"", Render(source, enableUi: true));
+
+        [Fact]
+        public void InlineComment_LeavesTheReportUnchanged() =>
+            AssertReportMatchesPlainSource("#UI '2&middot;<i>r</i> ='d = 1\nA = d*2");
+
+        [Fact]
+        public void InlineComment_DoesNotBreakOverrides()
+        {
+            var overrides = new Dictionary<string, string> { ["d:1"] = "4" };
+            var html = Render("#UI '2&middot;<i>r</i> ='d = 1\nA = d*2", enableUi: false, overrides);
+            Assert.Contains("8", html);
+        }
+
+        [Fact]
+        public void MultipleAssignments_EachGetTheirOwnControl()
+        {
+            var html = Render("#UI '2&middot;<i>r</i> ='d = 1','x = 2'", enableUi: true);
+            Assert.Contains("data-ui-var=\"d:1\"", html);
+            Assert.Contains("data-ui-var=\"x:1\"", html);
+            Assert.Equal(2, Regex.Matches(html, "calcpad-ui-input").Count);
+        }
+
+        [Fact]
+        public void MultipleAssignments_ShareTheJsonProperties()
+        {
+            var html = Render("#UI {\"type\": \"checkbox\", \"style\": \"sw\"} a = 1', 'b = 0", enableUi: true);
+            Assert.Equal(2, Regex.Matches(html, "class=\"calcpad-ui-checkbox sw\"").Count);
+        }
+
+        [Fact]
+        public void MultipleAssignments_AreOverriddenSeparately()
+        {
+            var overrides = new Dictionary<string, string> { ["x:1"] = "9" };
+            var html = Render("#UI d = 1', 'x = 2\nS = d + x", enableUi: false, overrides);
+            // d keeps its default, only x is replaced: 1 + 9.
+            Assert.Contains("10", html);
+        }
+
+        [Fact]
+        public void SameNameTwiceOnOneLine_GetsTwoKeys()
+        {
+            var html = Render("#UI d = 1', 'd = 2", enableUi: true);
+            Assert.Contains("data-ui-var=\"d:1\"", html);
+            Assert.Contains("data-ui-var=\"d:2\"", html);
+        }
+
+        [Fact]
+        public void MultipleAssignments_LeaveTheReportUnchanged() =>
+            AssertReportMatchesPlainSource("#UI '2&middot;<i>r</i> ='d = 1','x = 2'\nA = d*x");
+
+        [Fact]
+        public void MultipleAssignments_SkipSegmentsThatAssignNothing()
+        {
+            // The trailing 'd' is an output expression, not a declaration.
+            var html = Render("#UI d = 1', 'd", enableUi: true);
+            Assert.Single(Regex.Matches(html, "calcpad-ui-input"));
+        }
+
+        [Fact]
+        public void MultipleDatagrids_EachEmitTheirOwnContainer()
+        {
+            var html = Render("#UI v = [1; 2]', 'w = [3; 4; 5]", enableUi: true);
+            Assert.Contains("data-ui-values=\"1;2\"", html);
+            Assert.Contains("data-ui-values=\"3;4;5\"", html);
+            Assert.Equal(2, Regex.Matches(html, "class=\"calcpad-ui-datagrid\"").Count);
+        }
+
+        [Fact]
+        public void ControlBinding_ReportsTheSourceLine()
+        {
+            // A host writes an edited value back to this line, so it has to be the
+            // 1 based source line the rest of the markup uses, not the output index.
+            var html = Render("'first\n'second\n#UI L = 10m", enableUi: true);
+            Assert.Contains("data-ui-var=\"L:1\" data-ui-line=\"3\"", html);
+        }
+
+        [Fact]
+        public void Style_IsAppendedToTheControlClass() =>
+            Assert.Contains("class=\"calcpad-ui-input highlight\"",
+                Render("#UI {\"style\": \"highlight\"} d = 2m", enableUi: true));
+
+        [Fact]
+        public void Entry_KeepsTheVariableNameInUiMode() =>
+            Assert.Contains(" = ", Render("#UI L = 10m", enableUi: true));
+
+        /// <summary>
+        /// A control stands on its own in a form - the name and the unit of the value behind it
+        /// are not drawn. The same line in a report is an ordinary equation and shows both.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI {\"type\": \"radio\", \"keys\": [\"Steel\"], \"values\": [\"200GPa\"]} E = 200GPa", "E", "GPa")]
+        [InlineData("#UI {\"type\": \"checkbox\"} flag = 1m", "flag", "m")]
+        [InlineData("#UI {\"type\": \"datagrid\"} v = [1m; 2m; 3m]", "v", "m")]
+        public void Control_DropsTheNameAndUnitInUiMode_ButKeepsThemInTheReport(string source, string name, string unit)
+        {
+            var uiHtml = Render(source, enableUi: true);
+            Assert.DoesNotContain("<var>", uiHtml);
+            Assert.DoesNotContain($"<i>{unit}</i>", uiHtml);
+
+            var reportHtml = Render(source, enableUi: false);
+            Assert.Contains($">{name}</var>", reportHtml);
+            Assert.Contains($"<i>{unit}</i>", reportHtml);
+        }
+
+        [Fact]
+        public void Datagrid_LeavesNoEquationBehindInUiMode() =>
+            Assert.DoesNotContain("<span class=\"eq\">", Render("#UI v = [1; 2; 3]", enableUi: true));
+
+        [Fact]
+        public void Checkbox_IsCheckedWhenTheValueIsOne()
+        {
+            Assert.Contains("type=\"checkbox\" class=\"calcpad-ui-checkbox\" data-ui-var=\"flag:1\" data-ui-line=\"1\" checked",
+                Render("#UI {\"type\": \"checkbox\"} flag = 1", enableUi: true));
+            Assert.DoesNotContain("checked",
+                Render("#UI {\"type\": \"checkbox\"} flag = 0", enableUi: true));
+        }
+
+        [Fact]
+        public void Dropdown_MarksTheMatchingOptionSelected()
+        {
+            var html = Render("#UI {\"type\": \"dropdown\", \"keys\": [\"Low\", \"Med\"], \"values\": [\"1\", \"2\"]} grade = 2", enableUi: true);
+            Assert.Contains("<option value=\"1\">Low</option>", html);
+            Assert.Contains("<option value=\"2\" selected>Med</option>", html);
+        }
+
+        [Fact]
+        public void Radio_GroupsByControlKey()
+        {
+            var html = Render("#UI {\"type\": \"radio\", \"keys\": [\"A\", \"B\"], \"values\": [\"1\", \"2\"]} r = 1", enableUi: true);
+            Assert.Contains("name=\"ui-radio-r:1\" value=\"1\" checked", html);
+            Assert.Contains("name=\"ui-radio-r:1\" value=\"2\"", html);
+        }
+
+        [Fact]
+        public void Radio_ChecksTheOptionMatchingAUnitValue()
+        {
+            var html = Render("#UI {\"type\": \"radio\", \"keys\": [\"Steel\", \"Concrete\"], \"values\": [\"200GPa\", \"25GPa\"]} E = 200GPa", enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("value=\"200GPa\" checked", html);
+            Assert.Contains("value=\"25GPa\">", html);
+        }
+
+        [Fact]
+        public void Radio_OverrideReplacesTheWholeValueWithItsUnit()
+        {
+            var overrides = new Dictionary<string, string> { ["E:1"] = "25GPa" };
+            var html = Render("#UI {\"type\": \"radio\", \"keys\": [\"Steel\", \"Concrete\"], \"values\": [\"200GPa\", \"25GPa\"]} E = 200GPa\nE", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("value=\"25GPa\" checked", html);
+        }
+
+        [Fact]
+        public void Dropdown_OverrideReplacesTheWholeValueWithItsUnit()
+        {
+            var overrides = new Dictionary<string, string> { ["E:1"] = "25GPa" };
+            var html = Render("#UI {\"type\": \"dropdown\", \"keys\": [\"Steel\", \"Concrete\"], \"values\": [\"200GPa\", \"25GPa\"]} E = 200GPa\nE", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("<option value=\"25GPa\" selected>", html);
+        }
+
+        [Theory]
+        [InlineData("#UI v = [1; 2; 3]", 1, 3, "1;2;3")]
+        [InlineData("#UI M = [1; 2; 3 | 4; 5; 6]", 2, 3, "1;2;3|4;5;6")]
+        [InlineData("#UI Z = vector(5)", 1, 5, "0;0;0;0;0")]
+        [InlineData("#UI G = matrix(3; 4)", 3, 4, "0;0;0;0|0;0;0;0|0;0;0;0")]
+        public void Datagrid_AutoDetectsShapeAndValues(string source, int rows, int columns, string values)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.Contains($"data-ui-rows=\"{rows}\" data-ui-columns=\"{columns}\"", html);
+            Assert.Contains($"data-ui-values=\"{values}\"", html);
+        }
+
+        [Theory]
+        [InlineData("#UI r = 3\n#UI c = 4\n#UI {\"type\": \"datagrid\"} G = matrix(r; c)", 3, 4)]
+        [InlineData("x = [1; 2; 3]\ny = [1; 2]\n#UI G = matrix(len(x); len(y))", 3, 2)]
+        [InlineData("n = 5\n#UI Z = vector(n)", 1, 5)]
+        public void Datagrid_ComputedSize_TakesItsShapeFromTheValue(string source, int rows, int columns)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains($"data-ui-rows=\"{rows}\" data-ui-columns=\"{columns}\"", html);
+        }
+
+        [Fact]
+        public void Datagrid_ComputedSize_KeepsTheEnteredValues()
+        {
+            // There is no literal in the source to write into, so the entered one replaces
+            // the whole constructor call.
+            var overrides = new Dictionary<string, string> { ["G:1"] = "[1; 2 | 3; 4]" };
+            var html = Render("#UI r = 2\n#UI {\"type\": \"datagrid\"} G = matrix(r; r)\nG", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("data-ui-values=\"1;2|3;4\"", html);
+        }
+
+        /// <summary>
+        /// The source sizes the grid, even once values have been entered - the entered ones are
+        /// fitted to the shape it asks for. Without this the saved literal, which replaces the
+        /// whole constructor call, would go on deciding the shape and editing the source would
+        /// stop resizing the grid.
+        /// </summary>
+        [Theory]
+        // Shrinks: the cells outside the new shape are trimmed off.
+        [InlineData(2, 2, "[1; 2; 3; 4 | 5; 6; 7; 8 | 9; 10; 11; 12]", "1;2|5;6")]
+        [InlineData(1, 2, "[1; 2; 3; 4 | 5; 6; 7; 8 | 9; 10; 11; 12]", "1;2")]
+        // Grows: the written values stay put and the new cells come in as zeros.
+        [InlineData(3, 3, "[1; 2 | 3; 4]", "1;2;0|3;4;0|0;0;0")]
+        public void Datagrid_ComputedSize_FitsTheEnteredValuesToTheSourceShape(int rows, int columns, string saved, string values)
+        {
+            var overrides = new Dictionary<string, string>
+            {
+                ["x:1"] = rows.ToString(),
+                ["y:1"] = columns.ToString(),
+                ["M:1"] = saved
+            };
+            var html = Render("#UI x = 3\n#UI y = 4\n#UI M = matrix(x; y)", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains($"data-ui-rows=\"{rows}\" data-ui-columns=\"{columns}\"", html);
+            Assert.Contains($"data-ui-values=\"{values}\"", html);
+        }
+
+        [Fact]
+        public void Datagrid_LiteralSize_FitsTheEnteredValuesToTheSourceShape()
+        {
+            var overrides = new Dictionary<string, string> { ["M:1"] = "[1; 2; 3 | 4; 5; 6]" };
+            var html = Render("#UI {\"type\": \"datagrid\"} M = matrix(1; 2)", enableUi: true, overrides);
+            Assert.Contains("data-ui-rows=\"1\" data-ui-columns=\"2\"", html);
+            Assert.Contains("data-ui-values=\"1;2\"", html);
+        }
+
+        [Fact]
+        public void Datagrid_ComputedSize_FitsTheEnteredValuesOfAVector()
+        {
+            var overrides = new Dictionary<string, string> { ["n:1"] = "2", ["Z:1"] = "[7; 8; 9]" };
+            var html = Render("#UI n = 3\n#UI Z = vector(n)", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("data-ui-rows=\"1\" data-ui-columns=\"2\"", html);
+            Assert.Contains("data-ui-values=\"7;8\"", html);
+        }
+
+        /// <summary>
+        /// The trimmed values are what the document calculates with, in a report as much as in
+        /// a form - the grid and the results it feeds cannot disagree about the matrix.
+        /// </summary>
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Datagrid_FittedOverride_DrivesTheResults(bool enableUi)
+        {
+            var overrides = new Dictionary<string, string>
+            {
+                ["x:1"] = "2",
+                ["y:1"] = "2",
+                ["M:1"] = "[1; 2; 3; 4 | 5; 6; 7; 8 | 9; 10; 11; 12]"
+            };
+            var html = Render("#UI x = 3\n#UI y = 4\n#UI M = matrix(x; y)\ns = sum(M)", enableUi, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("14", html);
+        }
+
+        [Fact]
+        public void Datagrid_EmitsTheContainerOutsideTheParagraph()
+        {
+            var html = Render("#UI v = [1; 2; 3]", enableUi: true);
+            Assert.Matches(@"</p>\s*<div class=""calcpad-ui-datagrid""", html);
+        }
+
+        [Theory]
+        // Grows: the written values stay put and the new cells come in as zeros.
+        [InlineData(2, 3, "[1; 2; 3 | 4; 5; 6]", "1;2;3|4;5;6")]
+        [InlineData(3, 4, "[1; 2; 3 | 4; 5; 6]", "1;2;3;0|4;5;6;0|0;0;0;0")]
+        [InlineData(2, 2, "[1; 2; 3]", "1;2|0;0")]
+        // Shrinks: the cells outside the declared shape are dropped.
+        [InlineData(1, 2, "[1; 2; 3 | 4; 5; 6]", "1;2")]
+        [InlineData(2, 2, "[1; 2; 3 | 4; 5; 6]", "1;2|4;5")]
+        public void Datagrid_DeclaredShape_PadsAndTruncatesTheLiteral(int rows, int columns, string literal, string values)
+        {
+            var html = Render(
+                $"#UI {{\"type\": \"datagrid\", \"rows\": {rows}, \"columns\": {columns}}} T = {literal}",
+                enableUi: true);
+            Assert.Contains($"data-ui-rows=\"{rows}\" data-ui-columns=\"{columns}\"", html);
+            Assert.Contains($"data-ui-values=\"{values}\"", html);
+        }
+
+        [Fact]
+        public void Datagrid_DeclaredShape_DoesNotReshapeTheReport()
+        {
+            // The shape describes the grid the form draws, not the document. A report
+            // renders the literal exactly as written, same as any other mode.
+            AssertReportMatchesPlainSource(
+                "#UI {\"type\": \"datagrid\", \"rows\": 3, \"columns\": 4} M = [1; 2; 3 | 4; 5; 6]\nM");
+        }
+
+        [Fact]
+        public void Datagrid_EmitsHeaders()
+        {
+            var html = Render(
+                "#UI {\"type\": \"datagrid\", \"columnHeaders\": [\"a\", \"b\"], \"rowHeaders\": [\"r1\"]} T = [1; 2]",
+                enableUi: true);
+            Assert.Contains("data-ui-col-headers=\"[&quot;a&quot;,&quot;b&quot;]\"", html);
+            Assert.Contains("data-ui-row-headers=\"[&quot;r1&quot;]\"", html);
+        }
+
+        [Theory]
+        // No literal to read, so the cells come from the value the line produced.
+        [InlineData("#UI {\"type\": \"datagrid\"} G = matrix(2; 2) + 5", "5;5|5;5")]
+        [InlineData("#UI {\"type\": \"datagrid\"} Z = vector(3) + 2", "2;2;2")]
+        public void Datagrid_SeedsItsCellsFromTheComputedValue(string source, string values)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains($"data-ui-values=\"{values}\"", html);
+        }
+
+        [Fact]
+        public void Datagrid_KeepsTheUnitAsideWhenTheCellsAreNumbersOnly()
+        {
+            var html = Render("#UI {\"type\": \"datagrid\"} U = matrix(1; 2) + 5m", enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("data-ui-values=\"5;5\"", html);
+            Assert.Contains("data-ui-cell-units=\"[[&quot;m&quot;,&quot;m&quot;]]\"", html);
+        }
+
+        [Theory]
+        // Written as a literal rather than computed: the unit comes off the cells just the same.
+        [InlineData("#UI {\"type\": \"datagrid\"} M = [1m; 2m]", "1;2", "[[&quot;m&quot;,&quot;m&quot;]]")]
+        [InlineData("#UI {\"type\": \"datagrid\"} M = [1m; 2]", "1;2", "[[&quot;m&quot;,&quot;&quot;]]")]
+        [InlineData("#UI {\"type\": \"datagrid\"} M = [1kN/m; 2kN/m | 3kN/m; 4kN/m]", "1;2|3;4",
+            "[[&quot;kN/m&quot;,&quot;kN/m&quot;],[&quot;kN/m&quot;,&quot;kN/m&quot;]]")]
+        public void Datagrid_KeepsTheUnitAsideWhenTheLiteralCarriesIt(string source, string values, string units)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains($"data-ui-values=\"{values}\"", html);
+            Assert.Contains($"data-ui-cell-units=\"{units}\"", html);
+        }
+
+        /// <summary>
+        /// The entered literal carries the units back in, so they have to come off again on the
+        /// way out - otherwise the cells would show "5m", which the numeric grid rejects.
+        /// </summary>
+        [Fact]
+        public void Datagrid_EnteredValuesKeepTheUnitAside()
+        {
+            var overrides = new Dictionary<string, string> { ["M:1"] = "[5m; 9m]" };
+            var html = Render("#UI {\"type\": \"datagrid\"} M = matrix(1; 2) + 1m", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("data-ui-values=\"5;9\"", html);
+            Assert.Contains("data-ui-cell-units=\"[[&quot;m&quot;,&quot;m&quot;]]\"", html);
+        }
+
+        /// <summary>
+        /// The computed value is the grid's only source here, and its unit has to come off the
+        /// cells the same as a literal's would - the numeric grid rejects "5m" outright.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI {\"type\": \"datagrid\"} M = matrix(2; 2)*5m", "0;0|0;0", "[[&quot;m&quot;,&quot;m&quot;],[&quot;m&quot;,&quot;m&quot;]]")]
+        [InlineData("#UI {\"type\": \"datagrid\", \"forceUnits\": true} M = matrix(1; 2) + 5kN/m", "5;5", "[[&quot;kN/m&quot;,&quot;kN/m&quot;]]")]
+        [InlineData("#UI {\"type\": \"datagrid\"} M = vector(3)*5m", "0;0;0", "[[&quot;m&quot;,&quot;m&quot;,&quot;m&quot;]]")]
+        public void Datagrid_ComputedValueKeepsTheUnitOutOfTheCells(string source, string values, string units)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains($"data-ui-values=\"{values}\"", html);
+            Assert.Contains($"data-ui-cell-units=\"{units}\"", html);
+        }
+
+        /// <summary>
+        /// A round trip: the literal the grid posts back carries the units, and they come off
+        /// again so the cells stay numeric and the unit survives the next edit.
+        /// </summary>
+        [Fact]
+        public void Datagrid_ComputedValueSurvivesAnEditedValue()
+        {
+            var overrides = new Dictionary<string, string> { ["M:1"] = "[7m; 5m | 5m; 5m]" };
+            var html = Render("#UI {\"type\": \"datagrid\"} M = matrix(2; 2)*5m", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("data-ui-values=\"7;5|5;5\"", html);
+            Assert.Contains("data-ui-cell-units=\"[[&quot;m&quot;,&quot;m&quot;],[&quot;m&quot;,&quot;m&quot;]]\"", html);
+        }
+
+        /// <summary>
+        /// A cell the value never reached would otherwise have no unit of its own, and filling
+        /// the grid in would write a literal mixing "5m" with a bare "0".
+        /// </summary>
+        [Theory]
+        [InlineData("#UI {\"type\": \"datagrid\", \"rows\": 3, \"columns\": 3} M = matrix(2; 2)*5m",
+            "[[&quot;m&quot;,&quot;m&quot;,&quot;m&quot;],[&quot;m&quot;,&quot;m&quot;,&quot;m&quot;],[&quot;m&quot;,&quot;m&quot;,&quot;m&quot;]]")]
+        [InlineData("#UI {\"type\": \"datagrid\", \"rows\": 2, \"columns\": 3} M = [1m; 2m]",
+            "[[&quot;m&quot;,&quot;m&quot;,&quot;m&quot;],[&quot;m&quot;,&quot;m&quot;,&quot;m&quot;]]")]
+        public void Datagrid_PadsTheUnitsOverTheWholeGrid(string source, string units)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.Contains($"data-ui-cell-units=\"{units}\"", html);
+        }
+
+        [Fact]
+        public void Datagrid_UnitlessLiteralHasNoCellUnits()
+        {
+            var html = Render("#UI {\"type\": \"datagrid\"} M = [1; 2]", enableUi: true);
+            Assert.Contains("data-ui-values=\"1;2\"", html);
+            Assert.DoesNotContain("data-ui-cell-units", html);
+        }
+
+        [Fact]
+        public void Datagrid_ForceUnitsFalse_LeavesTheUnitsInTheLiteralCells()
+        {
+            var html = Render("#UI {\"type\": \"datagrid\", \"forceUnits\": false} M = [1m; 2m]", enableUi: true);
+            Assert.Contains("data-ui-values=\"1m;2m\"", html);
+            Assert.DoesNotContain("data-ui-cell-units", html);
+        }
+
+        [Fact]
+        public void Datagrid_WritesTheUnitIntoTheCellsWhenTheUserTypesIt()
+        {
+            var html = Render("#UI {\"type\": \"datagrid\", \"forceUnits\": false} U = matrix(1; 2) + 5m", enableUi: true);
+            Assert.Contains("data-ui-values=\"5m;5m\"", html);
+            Assert.DoesNotContain("data-ui-cell-units", html);
+        }
+
+        [Fact]
+        public void Datagrid_EmitsTheDeclaredWidths()
+        {
+            var html = Render(
+                "#UI {\"type\": \"datagrid\", \"width\": \"100%\", \"rowHeaderWidth\": 140, \"columnWidths\": [2, 1]} T = [1; 2]",
+                enableUi: true);
+            Assert.Contains("data-ui-width=\"100%\"", html);
+            Assert.Contains("data-ui-row-header-width=\"140\"", html);
+            Assert.Contains("data-ui-column-widths=\"[2,1]\"", html);
+        }
+
+        [Theory]
+        [InlineData("\"75%\"", "75%")]
+        [InlineData("\"33.5 %\"", "33.5%")]
+        [InlineData("\"100%\"", "100%")]
+        [InlineData("\"full\"", "100%")]
+        [InlineData("320", "320")]
+        [InlineData("319.6", "320")]
+        public void Datagrid_WidthTakesPixelsOrAnyPercentage(string declared, string emitted)
+        {
+            var html = Render($"#UI {{\"type\": \"datagrid\", \"width\": {declared}}} T = [1; 2]", enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains($"data-ui-width=\"{emitted}\"", html);
+        }
+
+        [Theory]
+        [InlineData("\"wide\"")]
+        [InlineData("\"0%\"")]
+        [InlineData("\"%\"")]
+        [InlineData("-10")]
+        public void Datagrid_WidthIsReportedWhenItIsNeitherPixelsNorAPercentage(string declared)
+        {
+            var html = Render($"#UI {{\"type\": \"datagrid\", \"width\": {declared}}} T = [1; 2]", enableUi: true);
+            Assert.Contains("'width' must", html);
+        }
+
+        [Fact]
+        public void Entry_ForceUnitsFalse_PutsTheUnitInTheBox()
+        {
+            var html = Render("#UI {\"forceUnits\": false} q = 3kN/m", enableUi: true);
+            Assert.Contains("data-ui-force-units=\"0\"", html);
+            Assert.Contains("value=\"3kN/m\"", html);
+            Assert.DoesNotContain("<i>kN", html);
+        }
+
+        /// <summary>
+        /// Every entry reads "name = box", whichever of the three input modes it is in. Only the
+        /// option controls, which stand on their own, drop the name.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI q = 3kN/m")]
+        [InlineData("#UI {\"forceUnits\": false} q = 3kN/m")]
+        [InlineData("#UI {\"allowExpression\": true} q = 3kN/m")]
+        public void Entry_KeepsTheVariableNameInEveryMode(string source)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.Contains("<var>q</var> = <input", html);
+        }
+
+        /// <summary>The box already holds it, so the substituted form in front of it is noise.</summary>
+        [Fact]
+        public void Entry_AllowExpression_DropsTheSubstitutedEquation()
+        {
+            var html = Render("#UI {\"allowExpression\": true} A = 2*3", enableUi: true);
+            Assert.Contains("<var>A</var> = <input", html);
+            Assert.DoesNotContain("2 \u00b7 3", html);
+        }
+
+        [Fact]
+        public void Entry_ForceUnitsFalse_OverrideReplacesTheWholeValue()
+        {
+            var overrides = new Dictionary<string, string> { ["q"] = "4MN/m" };
+            var html = Render("#UI {\"forceUnits\": false} q = 3kN/m\nq", enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("value=\"4MN/m\"", html);
+        }
+
+        [Fact]
+        public void Entry_AllowExpression_ShowsTheSourceNotTheResult()
+        {
+            var html = Render("#UI {\"allowExpression\": true} k = 1 + 2", enableUi: true);
+            Assert.Contains("data-ui-allow-expression=\"1\"", html);
+            Assert.Contains("value=\"1 + 2\"", html);
+        }
+
+        [Fact]
+        public void Entry_AllowExpression_KeepsTheControlWhenTheLineErrors()
+        {
+            var overrides = new Dictionary<string, string> { ["k"] = "1 +" };
+            var html = Render("#UI {\"allowExpression\": true} k = 1 + 2", enableUi: true, overrides);
+            Assert.Contains("class=\"calcpad-ui-input\"", html);
+            Assert.Contains("value=\"1 +\"", html);
+            Assert.Contains("<p class=\"err\"", html);
+        }
+
+        /// <summary>
+        /// A grid over a single value renders as an empty 0x0 one, and a box over a matrix as an
+        /// empty input beside the rendered value, so the declared type is checked against it.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI {\"type\": \"datagrid\"} x = 5", "'datagrid' requires a vector or matrix")]
+        [InlineData("#UI {\"type\": \"datagrid\"} x = 5m", "'datagrid' requires a vector or matrix")]
+        [InlineData("#UI {\"type\": \"datagrid\", \"rows\": 2, \"columns\": 2} x = -2.5kN/m", "'datagrid' requires a vector or matrix")]
+        [InlineData("#UI {\"type\": \"entry\"} v = [1; 2]", "'entry' cannot hold a vector or matrix")]
+        [InlineData("#UI {\"type\": \"entry\"} M = matrix(2; 2)", "'entry' cannot hold a vector or matrix")]
+        [InlineData("#UI {\"type\": \"checkbox\"} f = [1]", "'checkbox' cannot hold a vector or matrix")]
+        [InlineData("#UI {\"type\": \"dropdown\", \"keys\": [\"A\"], \"values\": [\"1\"]} v = vector(3)",
+            "'dropdown' cannot hold a vector or matrix")]
+        public void DeclaredType_IsReportedWhenTheValueContradictsIt(string source, string expected)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.Contains(expected, html);
+            Assert.DoesNotContain("calcpad-ui-", html);
+        }
+
+        /// <summary>
+        /// Only a literal settles the shape. A computed right hand side is left alone - a grid
+        /// takes its cells from the value once the line runs - and so is text edited as written.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI {\"type\": \"datagrid\"} M = 2*vector(3)", "calcpad-ui-datagrid")]
+        [InlineData("#UI {\"type\": \"datagrid\", \"rows\": 2, \"columns\": 2} M = A\nA = [1; 2 | 3; 4]", "calcpad-ui-datagrid")]
+        [InlineData("#UI {\"type\": \"datagrid\"} M = [1; 2]", "calcpad-ui-datagrid")]
+        [InlineData("#UI {\"type\": \"entry\"} x = 5m", "calcpad-ui-input")]
+        // The box holds the literal as written, whatever its shape.
+        [InlineData("#UI {\"type\": \"entry\", \"allowExpression\": true} v = [1; 2]", "calcpad-ui-input")]
+        public void DeclaredType_IsAcceptedWhenTheValueCanBeIt(string source, string control)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.DoesNotContain("vector or matrix value", html);
+            Assert.Contains(control, html);
+        }
+
+        /// <summary>
+        /// Grid geometry on a control that is not a grid is silently ignored otherwise, so it
+        /// is reported whether the type was declared or auto-detected from the value.
+        /// </summary>
+        [Theory]
+        [InlineData("#UI {\"type\": \"entry\", \"width\": 300} x = 1", "width")]
+        [InlineData("#UI {\"type\": \"checkbox\", \"rowHeaderWidth\": 40} x = 1", "rowHeaderWidth")]
+        [InlineData("#UI {\"width\": \"100%\"} x = 1", "width")]
+        [InlineData("#UI {\"columnHeaders\": [\"a\"]} x = 1", "columnHeaders")]
+        [InlineData("#UI {\"rows\": 2, \"columns\": 2} x = 1", "rows")]
+        public void GridProperties_AreReportedOnControlsThatAreNotGrids(string source, string name)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.Contains($"'{name}' only applies to a datagrid", html);
+            Assert.DoesNotContain("calcpad-ui-", html);
+        }
+
+        [Theory]
+        [InlineData("#UI {\"type\": \"datagrid\", \"width\": 300, \"rowHeaderWidth\": 40} M = matrix(2; 2)")]
+        [InlineData("#UI {\"width\": 300, \"columnWidths\": [2, 1]} T = [1; 2]")]
+        [InlineData("#UI {\"rowHeaders\": [\"r1\"]} Z = vector(3)")]
+        public void GridProperties_AreAcceptedOnAGrid(string source)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.DoesNotContain("only applies to a datagrid", html);
+            Assert.Contains("calcpad-ui-datagrid", html);
+        }
+
+        [Theory]
+        [InlineData("#UI {\"type\": \"dropdown\", \"keys\": [\"A\"], \"values\": [\"1\"], \"forceUnits\": false} x = 1", "forceUnits")]
+        [InlineData("#UI {\"type\": \"checkbox\", \"allowExpression\": true} x = 1", "allowExpression")]
+        public void ModeProperties_AreReportedOnTypesThatAlreadyReplaceTheValue(string source, string name)
+        {
+            var html = Render(source, enableUi: true);
+            Assert.Contains($"'{name}' does not apply", html);
+        }
+
+        [Fact]
+        public void Datagrid_HeadersKeepTheirCommas()
+        {
+            var html = Render(
+                "#UI {\"type\": \"datagrid\", \"columnHeaders\": [\"Force, kN\", \"b\"]} T = [1; 2]",
+                enableUi: true);
+            Assert.Contains("data-ui-col-headers=\"[&quot;Force, kN&quot;,&quot;b&quot;]\"", html);
+        }
+
+        [Fact]
+        public void Override_ReplacesTheValueAndPropagatesToDependents()
+        {
+            var overrides = new Dictionary<string, string> { ["L"] = "12" };
+            var html = Render("#UI L = 10m\nA = L * 2m", enableUi: true, overrides);
+            Assert.Contains("value=\"12\"", html);
+            Assert.Contains("24", html);
+        }
+
+        [Fact]
+        public void Override_PreservesTheUnit() =>
+            Assert.DoesNotContain("10",
+                Render("#UI L = 10m\nL", enableUi: true, new Dictionary<string, string> { ["L"] = "12" }));
+
+        [Fact]
+        public void Override_AppliesInReportModeToo() =>
+            Assert.Contains("24",
+                Render("#UI L = 10m\nA = L * 2m", enableUi: false, new Dictionary<string, string> { ["L"] = "12" }));
+
+        [Fact]
+        public void Override_ReplacesTheWholeDatagridLiteral()
+        {
+            var overrides = new Dictionary<string, string> { ["v"] = "[7; 8; 9]" };
+            Assert.Contains("data-ui-values=\"7;8;9\"", Render("#UI v = [1; 2; 3]", enableUi: true, overrides));
+        }
+
+        [Theory]
+        [InlineData("#UI {\"type\": \"dropdown\", \"keys\": [\"A\"]} x = 1")]
+        [InlineData("#UI {\"type\": \"radio\", \"values\": [\"1\"]} x = 1")]
+        [InlineData("#UI {\"type\": \"dropdown\", \"keys\": [\"A\", \"B\"], \"values\": [\"1\"]} x = 1")]
+        [InlineData("#UI {\"type\": \"entry\" x = 1")]
+        [InlineData("#UI {not json} x = 1")]
+        [InlineData("#UI {\"mode\": \"string\"} x = 1")]
+        [InlineData("#UI name$ = 1")]
+        [InlineData("#UI x")]
+        [InlineData("#UI {\"type\": \"slider\"} x = 1")]
+        [InlineData("#UI {\"rows\": -1} x = 1")]
+        [InlineData("#UI {\"type\": \"datagrid\", \"columns\": 2, \"columnHeaders\": [\"a\", \"b\", \"c\"]} T = [1; 2]")]
+        [InlineData("#UI {\"rows\": \"two\"} x = 1")]
+        [InlineData("#UI {\"style\": 5} x = 1")]
+        public void InvalidDirective_ReportsAnError(string source) =>
+            Assert.Contains("err", Render(source, enableUi: true));
+
+        /// <summary>
+        /// A rejected payload must not leave a half configured control behind - the line
+        /// renders as it would without the keyword, plus the error.
+        /// </summary>
+        [Fact]
+        public void InvalidDirective_RendersNoControl() =>
+            Assert.DoesNotContain("calcpad-ui-", Render("#UI {\"type\": \"slider\"} x = 1", enableUi: true));
+
+        [Fact]
+        public void ParserAndLinter_RejectTheSameProperties()
+        {
+            var properties = new UiDto { Type = "slider", Rows = -1, Mode = "string" };
+            var messages = properties.Validate().Select(e => e.Message).ToArray();
+            Assert.Equal(3, messages.Length);
+            foreach (var message in messages)
+                Assert.Contains(message, Render("#UI {\"type\": \"slider\", \"rows\": -1, \"mode\": \"string\"} x = 1", enableUi: true));
+        }
+
+        [Fact]
+        public void InactiveConditionalBranch_RendersNoControl()
+        {
+            var html = Render("#if 0\n#UI L = 10m\n#end if", enableUi: true);
+            Assert.DoesNotContain("calcpad-ui-input", html);
+        }
+
+        [Fact]
+        public void ActiveConditionalBranch_RendersTheControl() =>
+            Assert.Contains("calcpad-ui-input", Render("#if 1\n#UI L = 10m\n#end if", enableUi: true));
+
+        [Fact]
+        public void SkippedUiLine_DoesNotAttachItsControlToTheNextLine()
+        {
+            var html = Render("#if 0\n#UI L = 10m\n#end if\nW = 5m", enableUi: true);
+            Assert.DoesNotContain("data-ui-", html);
+            Assert.DoesNotContain("<input", html);
+        }
+
+        [Fact]
+        public void RedefinedVariable_GetsADistinctKeyPerOccurrence()
+        {
+            var html = Render("#UI x = 1\nx = x + 1\n#UI x = 5", enableUi: true);
+            Assert.Contains("data-ui-var=\"x:1\"", html);
+            Assert.Contains("data-ui-var=\"x:2\"", html);
+        }
+
+        [Fact]
+        public void KeyedOverride_AppliesToThatOccurrenceOnly()
+        {
+            var overrides = new Dictionary<string, string> { ["x:2"] = "50" };
+            var html = Render("#UI x = 1\n#UI x = 5", enableUi: true, overrides);
+            Assert.Contains("value=\"1\"", html);
+            Assert.Contains("value=\"50\"", html);
+            Assert.DoesNotContain("value=\"5\"", html);
+        }
+
+        [Fact]
+        public void BareOverride_AppliesToEveryOccurrenceOfThatName()
+        {
+            var overrides = new Dictionary<string, string> { ["x"] = "7" };
+            var html = Render("#UI x = 1\n#UI x = 5", enableUi: true, overrides);
+            Assert.Equal(2, Regex.Matches(html, "value=\"7\"").Count);
+        }
+
+        [Fact]
+        public void LoopedControl_GetsOneKeyPerPass()
+        {
+            var html = Render("#repeat 3\n#UI x = 1\n#loop", enableUi: true);
+            Assert.Contains("data-ui-var=\"x:1:1\"", html);
+            Assert.Contains("data-ui-var=\"x:1:2\"", html);
+            Assert.Contains("data-ui-var=\"x:1:3\"", html);
+        }
+
+        [Fact]
+        public void NestedLoops_JoinThePassNumbers()
+        {
+            var html = Render("#repeat 2\n#repeat 2\n#UI x = 1\n#loop\n#loop", enableUi: true);
+            Assert.Contains("data-ui-var=\"x:1:1.1\"", html);
+            Assert.Contains("data-ui-var=\"x:1:1.2\"", html);
+            Assert.Contains("data-ui-var=\"x:1:2.1\"", html);
+            Assert.Contains("data-ui-var=\"x:1:2.2\"", html);
+        }
+
+        [Fact]
+        public void ControlNumbering_IsUnaffectedByLoopIterationCount()
+        {
+            // The declaration ordinal is keyed on the source line, so re-running the line
+            // must not advance the count for whatever follows the loop.
+            Assert.Contains("data-ui-var=\"b:1\"", Render("#repeat 2\n#UI a = 1\n#loop\n#UI b = 2", enableUi: true));
+            Assert.Contains("data-ui-var=\"b:1\"", Render("#repeat 9\n#UI a = 1\n#loop\n#UI b = 2", enableUi: true));
+        }
+
+        [Fact]
+        public void DeclarationOverride_CoversEveryPassOfALoop()
+        {
+            var overrides = new Dictionary<string, string> { ["x:1"] = "4" };
+            var html = Render("#repeat 3\n#UI x = 1\n#loop", enableUi: true, overrides);
+            Assert.Equal(3, Regex.Matches(html, "value=\"4\"").Count);
+        }
+
+        [Fact]
+        public void PassOverride_AppliesToThatIterationOnly()
+        {
+            var overrides = new Dictionary<string, string> { ["x:1:2"] = "4" };
+            var html = Render("#repeat 3\n#UI x = 1\n#loop", enableUi: true, overrides);
+            Assert.Single(Regex.Matches(html, "value=\"4\""));
+            Assert.Equal(2, Regex.Matches(html, "value=\"1\"").Count);
+        }
+
+        [Fact]
+        public void ControlNumbering_IsStableAcrossConditionalBranches()
+        {
+            const string source = "#if {0}\n#UI a = 1\n#end if\n#UI b = 2";
+            Assert.Contains("data-ui-var=\"b:1\"", Render(string.Format(source, "1"), enableUi: true));
+            Assert.Contains("data-ui-var=\"b:1\"", Render(string.Format(source, "0"), enableUi: true));
+        }
+
+        [Fact]
+        public void UiStateDoesNotLeakToTheFollowingLine()
+        {
+            var html = Render("#UI L = 10m\nW = 5m", enableUi: true);
+            Assert.Contains("data-ui-var=\"L:1\"", html);
+            Assert.DoesNotContain("data-ui-var=\"W:1\"", html);
+            Assert.Single(Regex.Matches(html, "calcpad-ui-input"));
+        }
+
+        [Fact]
+        public void ErrorLine_IsHiddenInInputModeAndShownInReportMode()
+        {
+            const string source = "#UI x = y";
+            var uiHtml = Render(source, enableUi: true);
+            Assert.Contains("Error in", uiHtml);
+            Assert.DoesNotContain("on line", uiHtml);
+            Assert.DoesNotContain("data-text=", uiHtml);
+
+            var reportHtml = Render(source, enableUi: false);
+            Assert.Contains("Error in", reportHtml);
+            Assert.Contains("on line", reportHtml);
+            Assert.Contains("data-text=", reportHtml);
+        }
+
+        [Fact]
+        public void Datagrid_SizeLimit_ExplicitlyDeclaredSizeTooLarge()
+        {
+            var html = Render("#UI {\"type\": \"datagrid\", \"rows\": 100001, \"columns\": 1} x = vector(100001)", enableUi: true);
+            Assert.Contains("Error", html);
+            Assert.Contains("datagrid size cannot exceed", html);
+            Assert.Contains("100000", html);
+            Assert.DoesNotContain("calcpad-ui-datagrid", html);
+        }
+
+        [Fact]
+        public void Datagrid_SizeLimit_AutoDetectedLiteralTooLarge()
+        {
+            var html = Render("#UI M = matrix(1000; 1000)", enableUi: true);
+            Assert.Contains("Error", html);
+            Assert.Contains("datagrid size cannot exceed", html);
+            Assert.Contains("#Read", html);
+            Assert.DoesNotContain("calcpad-ui-datagrid", html);
+        }
+
+        [Fact]
+        public void Datagrid_SizeLimit_ComputedSizeTooLarge()
+        {
+            var html = Render("#UI M = matrix(500; 300)", enableUi: true);
+            Assert.Contains("Error", html);
+            Assert.Contains("datagrid size cannot exceed", html);
+            Assert.DoesNotContain("calcpad-ui-datagrid", html);
+        }
+
+        [Fact]
+        public void Datagrid_SizeLimit_UnderLimitIsAllowed()
+        {
+            var html = Render("#UI M = matrix(300; 300)", enableUi: true);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("data-ui-rows=\"300\" data-ui-columns=\"300\"", html);
+        }
+    }
+}

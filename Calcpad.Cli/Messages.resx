@@ -59,13 +59,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Welcome_To_Calcpad_Command_Line_Interpreter" xml:space="preserve">
-    <value> Welcome to Calcpad VM command line interpreter v.{0}.{1}.{2}!</value>
+    <value> Welcome to CalcpadCE command line interpreter v.{0}!</value>
   </data>
   <data name="Press_Any_Key_When_Ready" xml:space="preserve">
     <value>Press any key when ready.</value>
-  </data>
-  <data name="Copyright_2023_By_Proektsoft_EOOD" xml:space="preserve">
-    <value> Copyright: © 2026 by Proektsoft EOOD.</value>
   </data>
   <data name="Commands" xml:space="preserve">
     <value>Commands</value>
@@ -102,5 +99,8 @@
   </data>
   <data name="InvalidOutputExtensionMustBeHtmlDocxOrPdf" xml:space="preserve">
     <value>Invalid output extension.. Must be 'html', 'docx' or 'pdf'.</value>
+  </data>
+  <data name="PdfExportNotAvailable" xml:space="preserve">
+    <value>PDF export is not currently available in the CLI. It is planned for a future release. In the meantime, use the CalcpadCE desktop app to export PDF, or run the standalone CalcpadCE server if you need PDF export as a background task.</value>
   </data>
 </root>

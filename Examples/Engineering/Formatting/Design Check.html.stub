@@ -1,0 +1,65 @@
+<div class="calcpad-output">
+ <!-- Reusable check function that flips between `ok` and `err` CSS classes based on a utilisation ratio, the canonical pattern for engineering design checks. -->
+ <h3>Design check example</h3>
+ <p>
+ </p>
+ <p>
+  Stress -
+  <span class="eq">
+   <var>σ</var>
+   = 200
+   <i>MPa</i>
+  </span>
+ </p>
+ <p>
+  Resitance -
+  <span class="eq">
+   <var>f</var>
+   <sub>y</sub>
+   = 205
+   <i>MPa</i>
+  </span>
+ </p>
+ <p>
+  Design check:
+  <span class="eq">
+   <var>σ</var>
+   = 200
+   <i>MPa</i>
+  </span>
+  ≤
+  <span class="eq">
+   <var>f</var>
+   <sub>y</sub>
+   = 205
+   <i>MPa</i>
+  </span>
+  <span class="ok">The check is satisfied ✔</span>
+  <p>
+  </p>
+  <p>
+   Stress -
+   <span class="eq">
+    <var>σ</var>
+    = 210
+    <i>MPa</i>
+   </span>
+  </p>
+  <p>
+   Design check:
+   <span class="eq">
+    <var>σ</var>
+    = 210
+    <i>MPa</i>
+   </span>
+   &gt;
+   <span class="eq">
+    <var>f</var>
+    <sub>y</sub>
+    = 205
+    <i>MPa</i>
+   </span>
+   <span class="err">The check is NOT satisfied ✖</span>
+  </p>
+ </p>
+</div>

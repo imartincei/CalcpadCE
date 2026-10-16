@@ -1,0 +1,2 @@
+- Use code comments sparingly.
+- Do not write long code comments. Take the comment you were going to write and reduce it by 75%.

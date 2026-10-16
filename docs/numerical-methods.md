@@ -1,12 +1,12 @@
-﻿# Numerical methods
+# Numerical Methods
 
-Calcpad has a built in "**Solver**" module, which can solve more difficult problems using numerical methods.
+CalcpadCE has a built in "**Solver**" module, which can solve more difficult problems using numerical methods.
 It can work only with real numbers but not complex.
 It includes the following functions:
 
-## Root finding
+## Root Finding
 
-```matlab
+```calcpad
 $Root{f(x) = const @ x = a : b}
 $Root{f(x) @ x = a : b}
 ```
@@ -30,7 +30,7 @@ In some cases, it is possible to develop an automated procedure for interval spl
 
 ## Minimum
 
-```matlab
+```calcpad
 $Inf{f(x) @ x = a : b}
 ```
 
@@ -43,26 +43,26 @@ If you use different name for the argument, instead of *x*, it will add "\_inf" 
 
 ## Maximum
 
-```matlab
+```calcpad
 $Sup{f(x) @ x = a : b}
 ```
 
 It works like the minimum finding function, but it finds the greatest value instead.
 The value of *x* where the maximum is located is stored in a variable named $x_{sup}$.
 
-## Numerical integration
+## Numerical Integration
 
-```matlab
+```calcpad
 $Area{f(x) @ x = a : b}
 ```
 
 It calculates the value of the definite integral of a function f(*x*) within the specified interval \[*a*, *b*\]. Adaptive Gauss-Lobbato quadrature with Kronrod extension is applied for that purpose ([Gander & Gautschi](https://www.researchgate.net/publication/226706221_Adaptive_Quadrature-Revisited), 2000).
 
-```matlab
+```calcpad
 $Integral{f(x) @ x = a : b}
 ```
 
-This command is similar to the above, but it uses the Tanh-Sinh quadrature ([Takahasi & Mori](https://ems.press/content/serial-article-files/41766), 1974) which has been additionally improved by [Michashki & Mosig](https://www.tandfonline.com/doi/epdf/10.1080/09205071.2015.1129915?needAccess=true) (2016) and [Van Engelen](https://www.genivia.com/files/qthsh.pdf) (2022). Further improvements have been made in Calcpad by precomputing and caching the abscissas and weights.
+This command is similar to the above, but it uses the Tanh-Sinh quadrature ([Takahasi & Mori](https://ems.press/content/serial-article-files/41766), 1974) which has been additionally improved by [Michashki & Mosig](https://www.tandfonline.com/doi/epdf/10.1080/09205071.2015.1129915?needAccess=true) (2016) and [Van Engelen](https://www.genivia.com/files/qthsh.pdf) (2022). Further improvements have been made in CalcpadCE by precomputing and caching the abscissas and weights.
 This algorithm significantly outperforms \$Area for **continuous** and **smooth** functions.
 However, if the function does not satisfy these requirements, you **should not** use the \$Integral method.
 Then, you have two options:
@@ -70,9 +70,9 @@ Then, you have two options:
 1. Divide the interval \[*a*, *b*\] into smaller parts by using the points of discontinuities, apply the method for each part separately, and sum up the results;
 2. If you are not sure where the discontinuities are, use the \$Area method instead.
 
-## Numerical differentiation
+## Numerical Differentiation
 
-It finds the value of the first derivative of a real function f(*x*) at the specified point *x* = *a*. The geometric representation of derivative is the slope of the tangent to the function at point *a*. There are two methods that you can use in Calcpad for that purpose:
+It finds the value of the first derivative of a real function f(*x*) at the specified point *x* = *a*. The geometric representation of derivative is the slope of the tangent to the function at point *a*. There are two methods that you can use in CalcpadCE for that purpose:
 
 - `$Slope{f(x) @ x = a}` uses symmetric two-point finite difference with [Richardson extrapolation](https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.1911.0009). It evaluates the derivative within the specified *Precision*. The function must be locally continuous, smooth and differentiable in the neighborhood of *a*. It can also contain other numerical methods.
 In general, finite differences are susceptible to floating point round-off errors due to the subtraction of close values.
@@ -83,13 +83,13 @@ Although Richardson extrapolation can improve this significantly, the accuracy f
     Unlike `$Slope`, it cannot contain other numerical methods and should be defined only by analytic expressions.
     This limits the applicability of this method but, when possible, you can use it instead of `$Slope` to achieve higher accuracy, if needed.
 
-## General considerations
+## General Considerations
 
 Unlike the plotting command, you can include numerical methods in expressions.
 They return values which can be used for further calculations.
 For example, you can store the result into a variable:
 
-```matlab
+```calcpad
 y_min = $Inf{f(x) @ x = a : b}
 ```
 

@@ -1,0 +1,87 @@
+' HTML, CSS, JS, SVG in comments and macros
+"Title Comment in Double Quotes"
+'Text comment in single quotes'
+' HTML elements
+'<h1>Heading 1</h1>'
+'<h3>Heading 3</h3>'
+'<p>Paragraph text</p>'
+'<p style="color:blue; font-weight:bold">Styled paragraph</p>'
+'<span class="highlight">Inline span</span>'
+'<br>'
+'<hr>'
+'<a href="https://calcpad.eu">Link</a>'
+'<img src="image.png" alt="Image">'
+'<div id="container"><p>Nested div</p></div>'
+'<table><tr><th>Header</th></tr><tr><td>Cell</td></tr></table>'
+'<ul><li>Item 1</li><li>Item 2</li></ul>'
+'<input type="text" name="field" value="default">'
+'<select><option value="1">One</option><option value="2">Two</option></select>'
+' CSS in style block
+'<style>'
+'  .ok { color: green; font-weight: bold; }'
+'  .err { color: red; font-weight: bold; }'
+'  .highlight { background: yellow; padding: 2px 4px; }'
+'  .calcpad-table { border-collapse: collapse; width: 100%; }'
+'  .calcpad-table th, .calcpad-table td { border: 1px solid #000; padding: 8px; }'
+'  div > p { margin: 0; }'
+'  .a + .b ~ .c { display: none; }'
+'</style>'
+' Inline CSS
+'<p style="margin:10px; padding:5px; border:1px solid gray; border-radius:8px; background:lightyellow">Boxed content</p>'
+' JavaScript
+'<script>'
+'  var counter = 0;'
+'  function increment() { counter++; return counter; }'
+'  document.addEventListener("DOMContentLoaded", function() {'
+'    var divs = document.querySelectorAll("div");'
+'    divs.forEach(function(d) { d.style.color = "black"; });'
+'  });'
+'  var html = "<div class=test>Hello</div>";'
+'  var tpl = `<span>${name}</span>`;'
+'  var x = "</script>";'
+'  if (a > b && c < d) { return true; }'
+'</script>'
+' SVG graphics
+'<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">'
+'  <circle cx="100" cy="100" r="80" fill="lightblue" stroke="navy" stroke-width="2"/>'
+'  <rect x="10" y="10" width="50" height="50" fill="red" opacity="0.5"/>'
+'  <line x1="0" y1="0" x2="200" y2="200" stroke="black" stroke-width="1"/>'
+'  <polyline points="10,10 50,50 90,10" fill="none" stroke="green" stroke-width="2"/>'
+'  <polygon points="100,10 150,190 50,190" fill="orange" stroke="black"/>'
+'  <text x="50" y="120" font-size="14" fill="darkblue">SVG Text</text>'
+'  <path d="M10 80 C 40 10, 65 10, 95 80 S 150 150, 180 80" fill="none" stroke="purple" stroke-width="2"/>'
+'  <ellipse cx="100" cy="150" rx="60" ry="30" fill="pink" stroke="magenta"/>'
+'</svg>'
+' Regular comment after HTML (should be Comment, not HtmlContent)
+' HTML comment blocks
+'<!-- Single line HTML comment -->'
+'<!--'
+'  Multiline HTML comment'
+'  spanning several lines'
+'-->'
+' Macro-generated HTML
+#def note$(text$) = '<em>' text$ '</em>'
+#def error$(msg$) = '<span class="err">ERROR: ' msg$ '</span>'
+#def ref$(text$) = '<span style="color:blue; font-style:italic">[' text$ ']</span>'
+#def hide$ = '<div style="display:none">'
+#def unhide$ = '</div>'
+#def break$ = '<p style="page-break-before:always"></p>'
+note$('Annotation text')
+error$('Something went wrong')
+ref$('ACI 318-19 Section 22.2')
+hide$'Hidden content'unhide$
+break$
+' SVG macro
+#def svgCircle$(cx$; cy$; r$; color$)
+	'<svg width="200" height="200">'
+	'<circle cx="cx$" cy="cy$" r="r$" fill="color$"/>'
+	'</svg>'
+#end def
+svgCircle$(100; 100; 50; lightgreen)
+' Table generation macro
+#def tableRow$(col1$; col2$; col3$) = '<tr><td>'col1$'</td><td>'col2$'</td><td>'col3$'</td></tr>'
+'<table class="calcpad-table">'
+'<tr><th>Name</th><th>Value</th><th>Unit</th></tr>'
+tableRow$('Force'; '100'; 'kN')
+tableRow$('Moment'; '50'; 'kN·m')
+'</table>'

@@ -1,0 +1,7 @@
+'<!-- Defines a function, plots it, and calculates values. -->
+f(x) = x^2 - 3*x + 4
+
+$Plot{f(x) @ x = 0 : 3}
+
+f(0.75)
+f(1.25)

@@ -1,5 +1,5 @@
 '<h2>Trigonometric functions</h2>
-#rad 
+#rad
 #hide
 vec1 = vector_hp(220)
 #for i = 1 : 12
@@ -198,12 +198,5 @@ isHp(vec8)
 '<h2>Other functions</h2>
 sign(vec7)','f(vec7) = sign(vec7)
 c = f(vec7)
-random(vec7)','f(vec7) = random(vec7)
+'random(vec7),f(vec7) = random(vec7) commented out to procude stable CI builds
 c = f(vec7)
-
-
-
-
-
-
-

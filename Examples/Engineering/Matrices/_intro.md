@@ -1,0 +1,6 @@
+[CalcpadCE](https://calcpad-ce.org) treats matrices as first-class values: a two-dimensional grid of numbers that flows through the same arithmetic, comparison and function calls as scalars and vectors, with row–column rules that keep formulas readable on the worksheet.
+
+The six worksheets in this group walk through the full [matrix](https://en.wikipedia.org/wiki/Matrix_(mathematics)) toolkit step by step.
+The journey starts with [literal construction with `|` row separators and the indexing/slicing notation](#matrix-initialization-and-indexing), then covers the [creational helpers](#matrix-creational-functions) ($matrix$, $identity$, $diagonal$, random, banded) used to assemble structured matrices.
+[Data functions](#matrix-data-functions) handle row- and column-wise sorting, ordering, lookup and reductions; [math functions](#matrix-math-functions) provide the linear-algebra primitives — Hadamard product, determinant, inverse, transpose, norms and decomposition helpers — and [structural functions](#matrix-structural-functions) expose row/column counts, resizing, joining, reshaping and submatrix extraction.
+The tour closes with [matrix and matrix–vector operators](#matrix-operators), the element-wise versus algebraic multiplication rules, and the comparison and logical operations that broadcast across whole grids.

@@ -1,0 +1,33 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/CalcpadVuePanel/*"],
+      "@calcpad-vue/*": ["../calcpad-frontend/src/vue/*"]
+    },
+    "types": ["vite/client", "node"],
+    "typeRoots": ["./node_modules/@types", "./node_modules"]
+  },
+  "include": [
+    "src/CalcpadVuePanel/**/*.ts",
+    "src/CalcpadVuePanel/**/*.vue",
+    "src/CalcpadVuePanel/env.d.ts",
+    "../calcpad-frontend/src/vue/**/*.ts",
+    "../calcpad-frontend/src/vue/**/*.vue"
+  ],
+  "exclude": [
+    "node_modules",
+    "out",
+    "src/extension.ts",
+    "src/calcpad*.ts"
+  ]
+}

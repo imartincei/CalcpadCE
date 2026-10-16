@@ -57,18 +57,18 @@ namespace Calcpad.Core
         {
             private static readonly bool[,] CorrectOrder =
             {
-            // None  Const   Units   Oper    BrOp    BrCl   Error  
-            {true,  true,   true,   true,   true,   true},  // None 
+            // None  Const   Units   Oper    BrOp    BrCl   Error
+            {true,  true,   true,   true,   true,   true},  // None
             {true,  false,  false,  true,   false,  true},  // Const
             {true,  false,  false,  true,   false,  true},  // Unit
             {true,  true,   true,   false,  true,   false}, // Oper
             {true,  true,   true,   false,  true,   false}, // BrOp
-            {true,  false,  false,  true,   false,  true},  // BrCl  
+            {true,  false,  false,  true,   false,  true},  // BrCl
             };
 
             internal static void Check(Queue<Token> input)
             {
-                // Initializes the correct sequence of token types. 
+                // Initializes the correct sequence of token types.
                 // Value if true if type in row can precede type in column
                 // Text and heading are hot included. They are checked separately.
                 var countOfBrackets = 0;
@@ -110,15 +110,15 @@ namespace Calcpad.Core
             _ => -1,
         };
 
-        internal static Unit Parse(ReadOnlySpan<char> expression, Dictionary<string, Unit> units)
+        internal static Unit Parse(ReadOnlySpan<char> expression, Dictionary<string, Unit> units, bool isUs)
         {
-            var input = GetInput(expression, units);
+            var input = GetInput(expression, units, isUs);
             UnitValidator.Check(input);
             var rpn = GetRpn(input);
             return Evaluate(rpn);
         }
 
-        private static Queue<Token> GetInput(ReadOnlySpan<char> expression, Dictionary<string, Unit> units)
+        private static Queue<Token> GetInput(ReadOnlySpan<char> expression, Dictionary<string, Unit> units, bool isUs)
         {
             // Tokenize input string
             // It is converted to a queue of recognizable tokens
@@ -197,7 +197,7 @@ namespace Calcpad.Core
                 if (pt == TokenTypes.Units)
                 {
                     if (units is null || !units.TryGetValue(literal, out var u))
-                        Unit.TryGet(literal, out u);
+                        Unit.TryGet(literal, isUs, out u);
 
                     if (u is null)
                         throw Exceptions.InvalidUnits(literal);

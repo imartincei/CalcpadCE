@@ -1,0 +1,4974 @@
+<div class="calcpad-output">
+ <!-- Plane frame with linearly tapered members: each element stiffness coefficient is obtained by integrating $1 / EA(x)$, $x / EI(x)$ and $1 / GA_Q(x)$ along the element length. -->
+ <!-- SVG drawing macros (lines, rectangles, circles, text and dimension marks) included by the frame worksheets to render the structural scheme directly into the report. -->
+ <h4>Joint coordinates - xJ; yJ</h4>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>J</sub>
+   =
+   <b class="b0">[</b>
+   0
+   <i>m</i>
+   0
+   <i>m</i>
+   8
+   <i>m</i>
+   16
+   <i>m</i>
+   16
+   <i>m</i>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   <sub>J</sub>
+   =
+   <b class="b0">[</b>
+   0
+   <i>m</i>
+   8
+   <i>m</i>
+   10
+   <i>m</i>
+   8
+   <i>m</i>
+   0
+   <i>m</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>J</sub>
+   =
+   <b>len</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>J</sub>
+   )  = 5
+  </span>
+ </p>
+ <h4>Elements - [J1; J2]</h4>
+ <p>
+  <span class="eq">
+   <b>transp</b>
+   (
+   <b>
+    <var>e</var>
+   </b>
+   <sub>J</sub>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">3</span>
+     <span class="td">3</span>
+     <span class="td">5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">2</span>
+     <span class="td">4</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>E</sub>
+   =
+   <b>n</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>e</var>
+   </b>
+   <sub>J</sub>
+   )  = 4
+  </span>
+ </p>
+ <p>Element endpoint coordinates</p>
+ <p>
+  <span class="eq">
+   <var>x</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>
+    J.
+    <b>
+     <var>e</var>
+    </b>
+    <sub>
+     J.
+     <var>e</var>
+     ,1
+    </sub>
+   </sub>
+  </span>
+  ,
+  <span class="eq">
+   <var>y</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   <sub>
+    J.
+    <b>
+     <var>e</var>
+    </b>
+    <sub>
+     J.
+     <var>e</var>
+     ,1
+    </sub>
+   </sub>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>x</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>
+    J.
+    <b>
+     <var>e</var>
+    </b>
+    <sub>
+     J.
+     <var>e</var>
+     ,2
+    </sub>
+   </sub>
+  </span>
+  ,
+  <span class="eq">
+   <var>y</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    y
+   </var>
+   <sub>
+    J.
+    <b>
+     <var>e</var>
+    </b>
+    <sub>
+     J.
+     <var>e</var>
+     ,2
+    </sub>
+   </sub>
+  </span>
+ </p>
+ <p>
+  Element length -
+  <span class="eq">
+   <var>l</var>
+   (
+   <var>e</var>
+   )  =
+   <span class="o0">
+    <span class="r">√</span>
+    (
+    <var>x</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )  −
+    <var>x</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )  )
+    <sup>2</sup>
+    +  (
+    <var>y</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )  −
+    <var>y</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )  )
+    <sup>2</sup>
+   </span>
+  </span>
+ </p>
+ <p>Element directions</p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvc">
+    <var>x</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )  −
+    <var>x</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>l</var>
+    (
+    <var>e</var>
+    )
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <var>s</var>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvc">
+    <var>y</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )  −
+    <var>y</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>l</var>
+    (
+    <var>e</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>Transformation matrix</p>
+ <p>
+  Diagonal 3x3 block -
+  <span class="eq">
+   <var>t</var>
+   (
+   <var>e</var>
+   )  =
+   <span class="b0">[</span>
+   <var>c</var>
+   (
+   <var>e</var>
+   ) ;
+   <var>s</var>
+   (
+   <var>e</var>
+   ) ; 0
+   <span class="b0">|</span>
+   -
+   <var>s</var>
+   (
+   <var>e</var>
+   ) ;
+   <var>c</var>
+   (
+   <var>e</var>
+   ) ; 0
+   <span class="b0">|</span>
+   0; 0; 1
+   <span class="b0">]</span>
+  </span>
+ </p>
+ <p>Generation of the full transformation matrix</p>
+ <p>
+  <span class="eq">
+   <var>T</var>
+   (
+   <var>e</var>
+   )  =
+   <b>add</b>
+   (
+   <var>t</var>
+   (
+   <var>e</var>
+   ) ;
+   <b>add</b>
+   (
+   <var>t</var>
+   (
+   <var>e</var>
+   ) ;
+   <b>matrix</b>
+   ( 6; 6 ) ; 1; 1 ) ; 4; 4 )
+  </span>
+ </p>
+ <h4>Supports - [Joint; cx; cy; cr]</h4>
+ <p>
+  <span class="eq">
+   <b>
+    <var>c</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+      10
+      <sup>20</sup>
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+      10
+      <sup>20</sup>
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+      0
+      <i>kNm</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">
+      10
+      <sup>20</sup>
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+      10
+      <sup>20</sup>
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+      10
+      <sup>20</sup>
+      <i>kNm</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>c</sub>
+   =
+   <b>n</b>
+   <sub>rows</sub>
+   (
+   <b>
+    <var>c</var>
+   </b>
+   )  = 2
+  </span>
+ </p>
+ <h4>Loads - [Element, qx, qy]</h4>
+ <p>
+  <span class="eq">
+   <b>
+    <var>q</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+      10
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+      0
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">
+      0
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+      -20
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">
+      0
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+      -10
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>Load values on elements</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    q
+   </var>
+   <sub>x</sub>
+   =
+   <b class="b0">[</b>
+   10
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   0
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   0
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   0
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    q
+   </var>
+   <sub>y</sub>
+   =
+   <b class="b0">[</b>
+   0
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   -20
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   -10
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   0
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <h4>Scheme of the structure</h4>
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="0,150 0,30 -10,30 -10,150" style="stroke:magenta; stroke-width:1; stroke-opacity:0.3; fill:magenta; fill-opacity:0.1;">
+  </polygon>
+  <text text-anchor="middle" transform="rotate(-90,-15,90)" x="-15" y="90">qx=10</text>
+  <line style="stroke:black; stroke-width:1.5; fill:none" x1="0" x2="0" y1="150" y2="30">
+  </line>
+  <polygon points="120,0 0,30 0,10 120,-20" style="stroke:dodgerblue; stroke-width:1; stroke-opacity:0.4; fill:dodgerblue; fill-opacity:0.15;">
+  </polygon>
+  <text text-anchor="middle" transform="rotate(-14.04,60,-10)" x="60" y="-10">qy=20</text>
+  <line style="stroke:black; stroke-width:1.5; fill:none" x1="120" x2="0" y1="0" y2="30">
+  </line>
+  <polygon points="120,0 240,30 240,20 120,-10" style="stroke:dodgerblue; stroke-width:1; stroke-opacity:0.4; fill:dodgerblue; fill-opacity:0.15;">
+  </polygon>
+  <text text-anchor="middle" transform="rotate(-345.96,180,0)" x="180" y="0">qy=10</text>
+  <line style="stroke:black; stroke-width:1.5; fill:none" x1="120" x2="240" y1="0" y2="30">
+  </line>
+  <line style="stroke:black; stroke-width:1.5; fill:none" x1="240" x2="240" y1="150" y2="30">
+  </line>
+  <g id="frame">
+   <line style="stroke:black; stroke-width:1.5; fill:none" x1="0" x2="0" y1="150" y2="30">
+   </line>
+   <line style="stroke:black; stroke-width:1.5; fill:none" x1="120" x2="0" y1="0" y2="30">
+   </line>
+   <line style="stroke:black; stroke-width:1.5; fill:none" x1="120" x2="240" y1="0" y2="30">
+   </line>
+   <line style="stroke:black; stroke-width:1.5; fill:none" x1="240" x2="240" y1="150" y2="30">
+   </line>
+   <line style="stroke:green; stroke-width:2; fill:none" x1="8" x2="-8" y1="158" y2="158">
+   </line>
+   <line style="stroke:green; stroke-width:1; fill:none" x1="8" x2="0" y1="158" y2="150">
+   </line>
+   <line style="stroke:green; stroke-width:1; fill:none" x1="-8" x2="0" y1="158" y2="150">
+   </line>
+   <line style="stroke:green; stroke-width:1; fill:none" x1="240" x2="240" y1="150" y2="158">
+   </line>
+   <line style="stroke:green; stroke-width:2; fill:none" x1="232" x2="248" y1="158" y2="158">
+   </line>
+  </g>
+  <text text-anchor="middle" x="12" y="99">e1</text>
+  <text text-anchor="middle" x="72" y="24">e2</text>
+  <text text-anchor="middle" x="168" y="24">e3</text>
+  <text text-anchor="middle" x="228" y="99">e4</text>
+  <circle cx="0" cy="150" r="2" style="stroke:none; fill:crimson">
+  </circle>
+  <text text-anchor="middle" x="-10.5" y="144">J1</text>
+  <circle cx="0" cy="30" r="2" style="stroke:none; fill:crimson">
+  </circle>
+  <text text-anchor="middle" x="-10.5" y="24">J2</text>
+  <circle cx="120" cy="0" r="2" style="stroke:none; fill:crimson">
+  </circle>
+  <text text-anchor="middle" x="120" y="-6">J3</text>
+  <circle cx="240" cy="30" r="2" style="stroke:none; fill:crimson">
+  </circle>
+  <text text-anchor="middle" x="250.5" y="24">J4</text>
+  <circle cx="240" cy="150" r="2" style="stroke:none; fill:crimson">
+  </circle>
+  <text text-anchor="middle" x="250.5" y="144">J5</text>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="265" x2="275" y1="30" y2="30">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="265" x2="275" y1="150" y2="150">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="270" x2="270" y1="25" y2="155">
+  </line>
+  <circle cx="270" cy="30" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <circle cx="270" cy="150" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" transform="rotate(-90,268,90)" x="268" y="90">8</text>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="265" x2="275" y1="0" y2="0">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="265" x2="275" y1="30" y2="30">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="270" x2="270" y1="-5" y2="35">
+  </line>
+  <circle cx="270" cy="0" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <circle cx="270" cy="30" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" transform="rotate(-90,268,15)" x="268" y="15">2</text>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="0" x2="0" y1="167.5" y2="177.5">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="240" x2="240" y1="167.5" y2="177.5">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="-5" x2="245" y1="172.5" y2="172.5">
+  </line>
+  <circle cx="240" cy="172.5" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <circle cx="0" cy="172.5" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="120" y="170.5">16</text>
+ </svg>
+ <h4>Materials</h4>
+ <p>
+  Modules of elasticity -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    E
+   </var>
+   =
+   <span class="b0">[</span>
+   45; 35
+   <span class="b0">]</span>
+   ·
+   <i>GPa</i>
+   =
+   <b class="b0">[</b>
+   45
+   <i>GPa</i>
+   35
+   <i>GPa</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  Poisson coefficients -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ν
+   </var>
+   =
+   <span class="b0">[</span>
+   0.2; 0.2
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   0.2 0.2
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  Shear modules -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    G
+   </var>
+   =
+   <span class="dvc">
+    <var>
+     <span class="vec">⃗</span>
+     E
+    </var>
+    <span class="dvl">
+    </span>
+    2 ·  ( 1 +
+    <var>
+     <span class="vec">⃗</span>
+     ν
+    </var>
+    )
+   </span>
+   =
+   <b class="b0">[</b>
+   18.75
+   <i>GPa</i>
+   14.58
+   <i>GPa</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  Assignment on elements -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    e
+   </var>
+   <sub>M</sub>
+   =
+   <span class="b0">[</span>
+   1; 2; 2; 1
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 2 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <h4>Cross-sections</h4>
+ <p>
+  Section S1 -
+  <span class="eq">
+   <var>b</var>
+   <sub>1</sub>
+   = 300
+   <i>mm</i>
+  </span>
+  ,
+  <span class="eq">
+   <var>h</var>
+   <sub>1</sub>
+   = 300
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  Section S2 -
+  <span class="eq">
+   <var>b</var>
+   <sub>2</sub>
+   = 300
+   <i>mm</i>
+  </span>
+  ,
+  <span class="eq">
+   <var>h</var>
+   <sub>2</sub>
+   = 900
+   <i>mm</i>
+  </span>
+ </p>
+ <p>General representation</p>
+ <p>
+  Width -
+  <span class="eq">
+   <var>b</var>
+   (
+   <var>ξ</var>
+   ;
+   <var>z</var>
+   )  =
+   <var>b</var>
+   <sub>1</sub>
+   +  (
+   <var>b</var>
+   <sub>2</sub>
+   −
+   <var>b</var>
+   <sub>1</sub>
+   )  ·
+   <var>ξ</var>
+  </span>
+ </p>
+ <p>
+  Height -
+  <span class="eq">
+   <var>h</var>
+   (
+   <var>ξ</var>
+   )  =
+   <var>h</var>
+   <sub>1</sub>
+   +  (
+   <var>h</var>
+   <sub>2</sub>
+   −
+   <var>h</var>
+   <sub>1</sub>
+   )  ·
+   <var>ξ</var>
+  </span>
+ </p>
+ <h4>Cross section properties</h4>
+ <p>
+  Area -
+  <span class="eq">
+   <var>A</var>
+   (
+   <var>ξ</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>h</var>
+     (
+     <var>ξ</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>mm</i>
+    </small>
+   </span>
+   <var>b</var>
+   (
+   <var>ξ</var>
+   ;
+   <var>z</var>
+   )  d
+   <var>z</var>
+  </span>
+ </p>
+ <p>
+  First moment of area -
+  <span class="eq">
+   <var>S</var>
+   (
+   <var>ξ</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>h</var>
+     (
+     <var>ξ</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>mm</i>
+    </small>
+   </span>
+   <var>b</var>
+   (
+   <var>ξ</var>
+   ;
+   <var>z</var>
+   )  ·
+   <var>z</var>
+   d
+   <var>z</var>
+  </span>
+ </p>
+ <p>
+  Centroid -
+  <span class="eq">
+   <var>z</var>
+   <sub>c</sub>
+   (
+   <var>ξ</var>
+   )  =
+   <span class="dvc">
+    <var>S</var>
+    (
+    <var>ξ</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>A</var>
+    (
+    <var>ξ</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>
+  Second moment of area -
+  <span class="eq">
+   <var>I</var>
+   (
+   <var>ξ</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>h</var>
+     (
+     <var>ξ</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>mm</i>
+    </small>
+   </span>
+   <var>b</var>
+   (
+   <var>ξ</var>
+   ;
+   <var>z</var>
+   )  ·  (
+   <var>z</var>
+   −
+   <var>z</var>
+   <sub>c</sub>
+   (
+   <var>ξ</var>
+   )  )
+   <sup>2</sup>
+   d
+   <var>z</var>
+  </span>
+ </p>
+ <p>
+  First moment of area below z -
+  <span class="eq">
+   <var>S</var>
+   <sub>1</sub>
+   (
+   <var>ξ</var>
+   ;
+   <var>z</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>z</var>
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0.1
+     <i>mm</i>
+    </small>
+   </span>
+   <var>b</var>
+   (
+   <var>ξ</var>
+   ;
+   <var>ζ</var>
+   )  ·  (
+   <var>z</var>
+   <sub>c</sub>
+   (
+   <var>ξ</var>
+   )  −
+   <var>ζ</var>
+   )  d
+   <var>ζ</var>
+  </span>
+ </p>
+ <p>
+  Shear area -
+  <span class="eq">
+   <var>A</var>
+   <sub>Q</sub>
+   (
+   <var>ξ</var>
+   )  =
+   <span class="dvc">
+    <var>I</var>
+    (
+    <var>ξ</var>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <span class="dvr">
+     <small>
+      <var>h</var>
+      (
+      <var>ξ</var>
+      )  − 0.1
+      <i>mm</i>
+     </small>
+     <span class="nary">
+      <em>∫</em>
+     </span>
+     <small>
+      0.1
+      <i>mm</i>
+     </small>
+    </span>
+    <span class="dvc">
+     <var>S</var>
+     <sub>1</sub>
+     (
+     <var>ξ</var>
+     ;
+     <var>z</var>
+     )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+     (
+     <var>ξ</var>
+     ;
+     <var>z</var>
+     )
+    </span>
+    d
+    <var>z</var>
+   </span>
+  </span>
+ </p>
+ <h4>Element stiffness matrix</h4>
+ <p>Elastic properties for element "e"</p>
+ <p>
+  <span class="eq">
+   <var>EA</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    E
+   </var>
+   <sub>
+    <var>
+     <span class="vec">⃗</span>
+     e
+    </var>
+    <sub>
+     M.
+     <var>e</var>
+    </sub>
+   </sub>
+   ·
+   <var>A</var>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+    (
+    <var>e</var>
+    )
+   </span>
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>EI</var>
+   <sub>e</sub>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    E
+   </var>
+   <sub>
+    <var>
+     <span class="vec">⃗</span>
+     e
+    </var>
+    <sub>
+     M.
+     <var>e</var>
+    </sub>
+   </sub>
+   ·
+   <var>I</var>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+    (
+    <var>e</var>
+    )
+   </span>
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>GA</var>
+   <sub>Q</sub>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    G
+   </var>
+   <sub>
+    <var>
+     <span class="vec">⃗</span>
+     e
+    </var>
+    <sub>
+     M.
+     <var>e</var>
+    </sub>
+   </sub>
+   ·
+   <var>A</var>
+   <sub>Q</sub>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    <var>l</var>
+    (
+    <var>e</var>
+    )
+   </span>
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <p>Stiffness matrix for element with variable cross-section</p>
+ <p>
+  Displacement due to F
+  <sub>x</sub>
+  = 1 in primary system -
+  <span class="eq">
+   <var>u</var>
+   <sub>F</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>l</var>
+     (
+     <var>e</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>EA</var>
+    <sub>e</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+  </span>
+ </p>
+ <p>
+  Displacement due to F
+  <sub>y1</sub>
+  = 1 in primary system, with account of shear deflections -
+  <span class="eq">
+   <var>v</var>
+   <sub>F1</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>l</var>
+     (
+     <var>e</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    <var>x</var>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <var>EI</var>
+    <sub>e</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+   +
+   <span class="dvr">
+    <small>
+     <var>l</var>
+     (
+     <var>e</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>GA</var>
+    <sub>Q</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+  </span>
+ </p>
+ <p>
+  Rotation due to F
+  <sub>y1</sub>
+  = 1 in primary system -
+  <span class="eq">
+   <var>φ</var>
+   <sub>F1</sub>
+   (
+   <var>e</var>
+   )  = -
+   <span class="dvr">
+    <small>
+     <var>l</var>
+     (
+     <var>e</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    <var>EI</var>
+    <sub>e</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+  </span>
+  + 0
+ </p>
+ <p>
+  Displacement due to M
+  <sub>1</sub>
+  = 1 in primary system -
+  <span class="eq">
+   <var>v</var>
+   <sub>M1</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>φ</var>
+   <sub>F1</sub>
+   (
+   <var>e</var>
+   )
+  </span>
+ </p>
+ <p>
+  Rotation due to M
+  <sub>1</sub>
+  = 1 in primary system -
+  <span class="eq">
+   <var>φ</var>
+   <sub>M1</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>l</var>
+     (
+     <var>e</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>EI</var>
+    <sub>e</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+  </span>
+  + 0
+ </p>
+ <p>
+  Determinant -
+  <span class="eq">
+   <var>D</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>φ</var>
+   <sub>M1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>v</var>
+   <sub>F1</sub>
+   (
+   <var>e</var>
+   )  −
+   <var>φ</var>
+   <sub>F1</sub>
+   (
+   <var>e</var>
+   )
+   <sup>2</sup>
+  </span>
+ </p>
+ <p>
+  Displacement due to F
+  <sub>y2</sub>
+  = 1 in primary system -
+  <span class="eq">
+   <var>v</var>
+   <sub>F2</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>l</var>
+     (
+     <var>e</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    (
+    <var>l</var>
+    (
+    <var>e</var>
+    )  −
+    <var>x</var>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <var>EI</var>
+    <sub>e</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+   +
+   <span class="dvr">
+    <small>
+     <var>l</var>
+     (
+     <var>e</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>GA</var>
+    <sub>Q</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+  </span>
+ </p>
+ <p>
+  Rotation due to F
+  <sub>2</sub>
+  = 1 in primary system -
+  <span class="eq">
+   <var>φ</var>
+   <sub>F2</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>l</var>
+     (
+     <var>e</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    <var>l</var>
+    (
+    <var>e</var>
+    )  −
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    <var>EI</var>
+    <sub>e</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+  </span>
+  + 0
+ </p>
+ <p>
+  Displacement due to M
+  <sub>2</sub>
+  = 1 in primary system -
+  <span class="eq">
+   <var>v</var>
+   <sub>M2</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>φ</var>
+   <sub>F2</sub>
+   (
+   <var>e</var>
+   )
+  </span>
+ </p>
+ <p>
+  Rotation due to M
+  <sub>2</sub>
+  = 1 in primary system -
+  <span class="eq">
+   <var>φ</var>
+   <sub>M2</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>φ</var>
+   <sub>M1</sub>
+   (
+   <var>e</var>
+   )
+  </span>
+ </p>
+ <p>
+  Determinant -
+  <span class="eq">
+   <var>D</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>φ</var>
+   <sub>M2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>v</var>
+   <sub>F2</sub>
+   (
+   <var>e</var>
+   )  −
+   <var>φ</var>
+   <sub>F2</sub>
+   (
+   <var>e</var>
+   )
+   <sup>2</sup>
+  </span>
+ </p>
+ <p>3x3 blocks of the stiffness matrix for element "e"</p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>ii</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="b1">[</span>
+   <span class="dvc">
+    <var>D</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>u</var>
+    <sub>F</sub>
+    (
+    <var>e</var>
+    )
+   </span>
+   ·
+   <var>kN</var>
+   ·
+   <var>m</var>
+   <span class="b0">|</span>
+   0;
+   <var>φ</var>
+   <sub>M1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>kNm</var>
+   ; -
+   <var>φ</var>
+   <sub>F1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>kN</var>
+   <span class="b0">|</span>
+   0; -
+   <var>φ</var>
+   <sub>F1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>kN</var>
+   ;
+   <var>v</var>
+   <sub>F1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <span class="dvc">
+    <var>kN</var>
+    <span class="dvl">
+    </span>
+    <var>m</var>
+   </span>
+   <span class="b1">]</span>
+   ·
+   <span class="dvc">
+    <var>kN</var>
+    <sup class="unit">-2</sup>
+    <span class="dvl">
+    </span>
+    <var>D</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>ij</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="b1">[</span>
+   <span class="dvc">
+    -
+    <var>D</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>u</var>
+    <sub>F</sub>
+    (
+    <var>e</var>
+    )
+   </span>
+   ·
+   <var>kN</var>
+   ·
+   <var>m</var>
+   <span class="b0">|</span>
+   0; -
+   <var>φ</var>
+   <sub>M2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>kNm</var>
+   ;
+   <var>φ</var>
+   <sub>F2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>kN</var>
+   <span class="b0">|</span>
+   0;  (
+   <var>φ</var>
+   <sub>F2</sub>
+   (
+   <var>e</var>
+   )  −
+   <var>φ</var>
+   <sub>M2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>l</var>
+   (
+   <var>e</var>
+   )  )  ·
+   <var>kN</var>
+   ; - (
+   <var>v</var>
+   <sub>F2</sub>
+   (
+   <var>e</var>
+   )  −
+   <var>φ</var>
+   <sub>F2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>l</var>
+   (
+   <var>e</var>
+   )  )  ·
+   <span class="dvc">
+    <var>kN</var>
+    <span class="dvl">
+    </span>
+    <var>m</var>
+   </span>
+   <span class="b1">]</span>
+   ·
+   <span class="dvc">
+    <var>kN</var>
+    <sup class="unit">-2</sup>
+    <span class="dvl">
+    </span>
+    <var>D</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>ji</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="b1">[</span>
+   <span class="dvc">
+    -
+    <var>D</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>u</var>
+    <sub>F</sub>
+    (
+    <var>e</var>
+    )
+   </span>
+   ·
+   <var>kN</var>
+   ·
+   <var>m</var>
+   <span class="b0">|</span>
+   0; -
+   <var>φ</var>
+   <sub>M1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>kNm</var>
+   ;
+   <var>φ</var>
+   <sub>F1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>kN</var>
+   <span class="b0">|</span>
+   0;  (
+   <var>φ</var>
+   <sub>F1</sub>
+   (
+   <var>e</var>
+   )  +
+   <var>φ</var>
+   <sub>M1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>l</var>
+   (
+   <var>e</var>
+   )  )  ·
+   <var>kN</var>
+   ; - (
+   <var>v</var>
+   <sub>F1</sub>
+   (
+   <var>e</var>
+   )  +
+   <var>φ</var>
+   <sub>F1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>l</var>
+   (
+   <var>e</var>
+   )  )  ·
+   <span class="dvc">
+    <var>kN</var>
+    <span class="dvl">
+    </span>
+    <var>m</var>
+   </span>
+   <span class="b1">]</span>
+   ·
+   <span class="dvc">
+    <var>kN</var>
+    <sup class="unit">-2</sup>
+    <span class="dvl">
+    </span>
+    <var>D</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>jj</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="b1">[</span>
+   <span class="dvc">
+    <var>D</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>u</var>
+    <sub>F</sub>
+    (
+    <var>e</var>
+    )
+   </span>
+   ·
+   <var>kN</var>
+   ·
+   <var>m</var>
+   <span class="b0">|</span>
+   0;
+   <var>φ</var>
+   <sub>M2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>kNm</var>
+   ; -
+   <var>φ</var>
+   <sub>F2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>kN</var>
+   <span class="b0">|</span>
+   0; -
+   <var>φ</var>
+   <sub>F2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>kN</var>
+   ;
+   <var>v</var>
+   <sub>F2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <span class="dvc">
+    <var>kN</var>
+    <span class="dvl">
+    </span>
+    <var>m</var>
+   </span>
+   <span class="b1">]</span>
+   ·
+   <span class="dvc">
+    <var>kN</var>
+    <sup class="unit">-2</sup>
+    <span class="dvl">
+    </span>
+    <var>D</var>
+    <sub>2</sub>
+    (
+    <var>e</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>Full element stiffness matrix</p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   )  =
+   <b>stack</b>
+   (
+   <b>augment</b>
+   (
+   <var>k</var>
+   <sub>ii</sub>
+   (
+   <var>e</var>
+   ) ;
+   <var>k</var>
+   <sub>ij</sub>
+   (
+   <var>e</var>
+   )  ) ;
+   <b>augment</b>
+   (
+   <var>k</var>
+   <sub>ji</sub>
+   (
+   <var>e</var>
+   ) ;
+   <var>k</var>
+   <sub>jj</sub>
+   (
+   <var>e</var>
+   )  )  )
+  </span>
+ </p>
+ <p>Stiffness matrices obtained in local coordinates</p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>E</sub>
+   ( 1 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">921617</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-921617</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">4741.71</span>
+     <span class="td">9483.42</span>
+     <span class="td">0</span>
+     <span class="td">-4741.71</span>
+     <span class="td">28450.3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">9483.42</span>
+     <span class="td">36052.8</span>
+     <span class="td">0</span>
+     <span class="td">-9483.42</span>
+     <span class="td">39814.6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-921617</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">921617</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">-4741.71</span>
+     <span class="td">-9483.42</span>
+     <span class="td">0</span>
+     <span class="td">4741.71</span>
+     <span class="td">-28450.3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">28450.3</span>
+     <span class="td">39814.6</span>
+     <span class="td">0</span>
+     <span class="td">-28450.3</span>
+     <span class="td">187788</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>k</var>
+   <sub>E</sub>
+   ( 2 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">695411</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-695411</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">3370.35</span>
+     <span class="td">6948.16</span>
+     <span class="td">0</span>
+     <span class="td">-3370.35</span>
+     <span class="td">20844.5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">6948.16</span>
+     <span class="td">27216.3</span>
+     <span class="td">0</span>
+     <span class="td">-6948.16</span>
+     <span class="td">30079.7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-695411</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">695411</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">-3370.35</span>
+     <span class="td">-6948.16</span>
+     <span class="td">0</span>
+     <span class="td">3370.35</span>
+     <span class="td">-20844.5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">20844.5</span>
+     <span class="td">30079.7</span>
+     <span class="td">0</span>
+     <span class="td">-20844.5</span>
+     <span class="td">141808</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>Stiffness matrices obtained in global coordinates</p>
+ <p>
+  <span class="eq">
+   <b>transp</b>
+   (
+   <var>T</var>
+   ( 1 )  )  ·
+   <var>k</var>
+   <sub>E</sub>
+   ( 1 )  ·
+   <var>T</var>
+   ( 1 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4741.71</span>
+     <span class="td">0</span>
+     <span class="td">-9483.42</span>
+     <span class="td">-4741.71</span>
+     <span class="td">0</span>
+     <span class="td">-28450.3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">921617</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-921617</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-9483.42</span>
+     <span class="td">0</span>
+     <span class="td">36052.8</span>
+     <span class="td">9483.42</span>
+     <span class="td">0</span>
+     <span class="td">39814.6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4741.71</span>
+     <span class="td">0</span>
+     <span class="td">9483.42</span>
+     <span class="td">4741.71</span>
+     <span class="td">0</span>
+     <span class="td">28450.3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">-921617</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">921617</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-28450.3</span>
+     <span class="td">0</span>
+     <span class="td">39814.6</span>
+     <span class="td">28450.3</span>
+     <span class="td">0</span>
+     <span class="td">187788</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>transp</b>
+   (
+   <var>T</var>
+   ( 2 )  )  ·
+   <var>k</var>
+   <sub>E</sub>
+   ( 2 )  ·
+   <var>T</var>
+   ( 2 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">654703</span>
+     <span class="td">162833</span>
+     <span class="td">1685.18</span>
+     <span class="td">-654703</span>
+     <span class="td">-162833</span>
+     <span class="td">5055.53</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">162833</span>
+     <span class="td">44078.6</span>
+     <span class="td">-6740.7</span>
+     <span class="td">-162833</span>
+     <span class="td">-44078.6</span>
+     <span class="td">-20222.1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1685.18</span>
+     <span class="td">-6740.7</span>
+     <span class="td">27216.3</span>
+     <span class="td">-1685.18</span>
+     <span class="td">6740.7</span>
+     <span class="td">30079.7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-654703</span>
+     <span class="td">-162833</span>
+     <span class="td">-1685.18</span>
+     <span class="td">654703</span>
+     <span class="td">162833</span>
+     <span class="td">-5055.53</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-162833</span>
+     <span class="td">-44078.6</span>
+     <span class="td">6740.7</span>
+     <span class="td">162833</span>
+     <span class="td">44078.6</span>
+     <span class="td">20222.1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5055.53</span>
+     <span class="td">-20222.1</span>
+     <span class="td">30079.7</span>
+     <span class="td">-5055.53</span>
+     <span class="td">20222.1</span>
+     <span class="td">141808</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <h4>Global stiffness matrix</h4>
+ <p>
+  <span class="eq">
+   <b>
+    <var>K</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      10
+      <sup>20</sup>
+     </span>
+     <span class="td">0</span>
+     <span class="td">-9483.42</span>
+     <span class="td">-4741.71</span>
+     <span class="td">0</span>
+     <span class="td">-28450.3</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+      10
+      <sup>20</sup>
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-921617</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-9483.42</span>
+     <span class="td">0</span>
+     <span class="td">36052.8</span>
+     <span class="td">9483.42</span>
+     <span class="td">0</span>
+     <span class="td">39814.6</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-4741.71</span>
+     <span class="td">0</span>
+     <span class="td">9483.42</span>
+     <span class="td">659445</span>
+     <span class="td">162833</span>
+     <span class="td">23394.7</span>
+     <span class="td">-654703</span>
+     <span class="td">-162833</span>
+     <span class="td">-1685.18</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">-921617</span>
+     <span class="td">0</span>
+     <span class="td">162833</span>
+     <span class="td">965696</span>
+     <span class="td">20222.1</span>
+     <span class="td">-162833</span>
+     <span class="td">-44078.6</span>
+     <span class="td">6740.7</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-28450.3</span>
+     <span class="td">0</span>
+     <span class="td">39814.6</span>
+     <span class="td">23394.7</span>
+     <span class="td">20222.1</span>
+     <span class="td">329596</span>
+     <span class="td">5055.53</span>
+     <span class="td">-20222.1</span>
+     <span class="td">30079.7</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-654703</span>
+     <span class="td">-162833</span>
+     <span class="td">5055.53</span>
+     <span class="td">1309406</span>
+     <span class="td">0</span>
+     <span class="td">3370.35</span>
+     <span class="td">-654703</span>
+     <span class="td">162833</span>
+     <span class="td">5055.53</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-162833</span>
+     <span class="td">-44078.6</span>
+     <span class="td">-20222.1</span>
+     <span class="td">0</span>
+     <span class="td">88157.3</span>
+     <span class="td">0</span>
+     <span class="td">162833</span>
+     <span class="td">-44078.6</span>
+     <span class="td">20222.1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-1685.18</span>
+     <span class="td">6740.7</span>
+     <span class="td">30079.7</span>
+     <span class="td">3370.35</span>
+     <span class="td">0</span>
+     <span class="td">54432.6</span>
+     <span class="td">-1685.18</span>
+     <span class="td">-6740.7</span>
+     <span class="td">30079.7</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-654703</span>
+     <span class="td">162833</span>
+     <span class="td">-1685.18</span>
+     <span class="td">659445</span>
+     <span class="td">-162833</span>
+     <span class="td">23394.7</span>
+     <span class="td">-4741.71</span>
+     <span class="td">0</span>
+     <span class="td">9483.42</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">162833</span>
+     <span class="td">-44078.6</span>
+     <span class="td">-6740.7</span>
+     <span class="td">-162833</span>
+     <span class="td">965696</span>
+     <span class="td">-20222.1</span>
+     <span class="td">0</span>
+     <span class="td">-921617</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">5055.53</span>
+     <span class="td">20222.1</span>
+     <span class="td">30079.7</span>
+     <span class="td">23394.7</span>
+     <span class="td">-20222.1</span>
+     <span class="td">329596</span>
+     <span class="td">-28450.3</span>
+     <span class="td">0</span>
+     <span class="td">39814.6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-4741.71</span>
+     <span class="td">0</span>
+     <span class="td">-28450.3</span>
+     <span class="td">
+      10
+      <sup>20</sup>
+     </span>
+     <span class="td">0</span>
+     <span class="td">-9483.42</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-921617</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+      10
+      <sup>20</sup>
+     </span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">9483.42</span>
+     <span class="td">0</span>
+     <span class="td">39814.6</span>
+     <span class="td">-9483.42</span>
+     <span class="td">0</span>
+     <span class="td">
+      10
+      <sup>20</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <h4>Element load vector</h4>
+ <p>Load functions</p>
+ <p>
+  Shear -
+  <span class="eq">
+   <var>q</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )  = -
+   <var>
+    <span class="vec">⃗</span>
+    q
+   </var>
+   <sub>
+    x.
+    <var>e</var>
+   </sub>
+   ·
+   <var>s</var>
+   (
+   <var>e</var>
+   )  +
+   <var>
+    <span class="vec">⃗</span>
+    q
+   </var>
+   <sub>
+    y.
+    <var>e</var>
+   </sub>
+   ·
+   <var>c</var>
+   (
+   <var>e</var>
+   )
+  </span>
+ </p>
+ <p>
+  Axial -
+  <span class="eq">
+   <var>n</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )  =
+   <var>
+    <span class="vec">⃗</span>
+    q
+   </var>
+   <sub>
+    x.
+    <var>e</var>
+   </sub>
+   ·
+   <var>c</var>
+   (
+   <var>e</var>
+   )  +
+   <var>
+    <span class="vec">⃗</span>
+    q
+   </var>
+   <sub>
+    y.
+    <var>e</var>
+   </sub>
+   ·
+   <var>s</var>
+   (
+   <var>e</var>
+   )
+  </span>
+ </p>
+ <p>Functions of internal forces in primary system</p>
+ <p>
+  Axial forces -
+  <span class="eq">
+   <var>N</var>
+   <sub>0</sub>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )  = -
+   <span class="dvr">
+    <small>
+     <var>x</var>
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <var>n</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  d
+   <var>ξ</var>
+  </span>
+ </p>
+ <p>
+  Shear forces -
+  <span class="eq">
+   <var>Q</var>
+   <sub>0</sub>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>x</var>
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <var>q</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  d
+   <var>ξ</var>
+  </span>
+ </p>
+ <p>
+  Bending moments -
+  <span class="eq">
+   <var>M</var>
+   <sub>0</sub>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>x</var>
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <var>q</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  ·  (
+   <var>x</var>
+   −
+   <var>ξ</var>
+   )  d
+   <var>ξ</var>
+  </span>
+ </p>
+ <p>Reactions at element ends</p>
+ <p>
+  Displacements along “x“ due to axial loads -
+  <span class="eq">
+   <var>u</var>
+   <sub>n</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>l</var>
+     (
+     <var>e</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    <var>N</var>
+    <sub>0</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>EA</var>
+    <sub>e</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+  </span>
+ </p>
+ <p>
+  Displacements along “y“ due to lateral loads -
+  <span class="eq">
+   <var>v</var>
+   <sub>q</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>l</var>
+     (
+     <var>e</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    <var>M</var>
+    <sub>0</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )  ·
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    <var>EI</var>
+    <sub>e</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+   +
+   <span class="dvr">
+    <small>
+     <var>l</var>
+     (
+     <var>e</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    <var>Q</var>
+    <sub>0</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>GA</var>
+    <sub>Q</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+  </span>
+ </p>
+ <p>
+  Rotations due to lateral loads -
+  <span class="eq">
+   <var>φ</var>
+   <sub>q</sub>
+   (
+   <var>e</var>
+   )  = -
+   <span class="dvr">
+    <small>
+     <var>l</var>
+     (
+     <var>e</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    <var>M</var>
+    <sub>0</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>EI</var>
+    <sub>e</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+  </span>
+ </p>
+ <p>Element endpoint loads in local coordinate system</p>
+ <p>For joint “1”:</p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   <sub>x1</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvc">
+    -
+    <var>u</var>
+    <sub>n</sub>
+    (
+    <var>e</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>u</var>
+    <sub>F</sub>
+    (
+    <var>e</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   <sub>y1</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvc">
+    <var>φ</var>
+    <sub>M1</sub>
+    (
+    <var>e</var>
+    )  ·
+    <var>v</var>
+    <sub>q</sub>
+    (
+    <var>e</var>
+    )  −
+    <var>φ</var>
+    <sub>F1</sub>
+    (
+    <var>e</var>
+    )  ·
+    <var>φ</var>
+    <sub>q</sub>
+    (
+    <var>e</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>D</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>M</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="dvc">
+    <var>v</var>
+    <sub>F1</sub>
+    (
+    <var>e</var>
+    )  ·
+    <var>φ</var>
+    <sub>q</sub>
+    (
+    <var>e</var>
+    )  −
+    <var>φ</var>
+    <sub>F1</sub>
+    (
+    <var>e</var>
+    )  ·
+    <var>v</var>
+    <sub>q</sub>
+    (
+    <var>e</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>D</var>
+    <sub>1</sub>
+    (
+    <var>e</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>For joint “2”:</p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   <sub>x2</sub>
+   (
+   <var>e</var>
+   )  = -
+   <var>F</var>
+   <sub>x1</sub>
+   (
+   <var>e</var>
+   )  −
+   <var>N</var>
+   <sub>0</sub>
+   (
+   <var>e</var>
+   ;
+   <var>l</var>
+   (
+   <var>e</var>
+   )  )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   <sub>y2</sub>
+   (
+   <var>e</var>
+   )  = -
+   <var>F</var>
+   <sub>y1</sub>
+   (
+   <var>e</var>
+   )  +
+   <var>Q</var>
+   <sub>0</sub>
+   (
+   <var>e</var>
+   ;
+   <var>l</var>
+   (
+   <var>e</var>
+   )  )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>M</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  = -
+   <var>M</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  +
+   <var>F</var>
+   <sub>y1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>l</var>
+   (
+   <var>e</var>
+   )  −
+   <var>M</var>
+   <sub>0</sub>
+   (
+   <var>e</var>
+   ;
+   <var>l</var>
+   (
+   <var>e</var>
+   )  )
+  </span>
+ </p>
+ <p>Element endpoint loads in global coordinate system</p>
+ <p>For joint “1”:</p>
+ <p>
+  <span class="eq">
+   <var>F′</var>
+   <sub>x1</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>F</var>
+   <sub>x1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>c</var>
+   (
+   <var>e</var>
+   )  −
+   <var>F</var>
+   <sub>y1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>s</var>
+   (
+   <var>e</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>F′</var>
+   <sub>y1</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>F</var>
+   <sub>x1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>s</var>
+   (
+   <var>e</var>
+   )  +
+   <var>F</var>
+   <sub>y1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>c</var>
+   (
+   <var>e</var>
+   )
+  </span>
+ </p>
+ <p>For joint “2”:</p>
+ <p>
+  <span class="eq">
+   <var>F′</var>
+   <sub>x2</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>F</var>
+   <sub>x2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>c</var>
+   (
+   <var>e</var>
+   )  −
+   <var>F</var>
+   <sub>y2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>s</var>
+   (
+   <var>e</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>F′</var>
+   <sub>y2</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>F</var>
+   <sub>x2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>s</var>
+   (
+   <var>e</var>
+   )  +
+   <var>F</var>
+   <sub>y2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>c</var>
+   (
+   <var>e</var>
+   )
+  </span>
+ </p>
+ <p>Element load vector</p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="b0">[</span>
+   <var>F′</var>
+   <sub>x1</sub>
+   (
+   <var>e</var>
+   ) ;
+   <var>F′</var>
+   <sub>y1</sub>
+   (
+   <var>e</var>
+   ) ;
+   <var>M</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>m</var>
+   <sup class="unit">-1</sup>
+   ;
+   <var>F′</var>
+   <sub>x2</sub>
+   (
+   <var>e</var>
+   ) ;
+   <var>F′</var>
+   <sub>y2</sub>
+   (
+   <var>e</var>
+   ) ;
+   <var>M</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>m</var>
+   <sup class="unit">-1</sup>
+   <span class="b0">]</span>
+   ·
+   <var>kN</var>
+   <sup class="unit">-1</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   <sub>E</sub>
+   ( 1 )  =
+   <b class="b0">[</b>
+   31.43 0 -25.11 48.57 0 93.68
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   <sub>E</sub>
+   ( 2 )  =
+   <b class="b0">[</b>
+   -0.675 -64.96 51.75 0.675 -99.97 -193.14
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   <sub>E</sub>
+   ( 3 )  =
+   <b class="b0">[</b>
+   0.338 -32.48 -25.88 -0.338 -49.98 96.57
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   <sub>E</sub>
+   ( 4 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <h4>Global load vector</h4>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    F
+   </var>
+   =
+   <b class="b0">[</b>
+   31.43 0 -25.11 49.25 -99.97 -99.46 -0.338 -97.44 25.88 -0.338 -49.98 96.57 0 0 0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <h4>Results</h4>
+ <p>
+  <strong>Solution of the system of equations</strong>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   =
+   <b>clsolve</b>
+   (
+   <b>
+    <var>K</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    F
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 0 -0.00122 0.0112 -0.000145 -0.0022 0.0146 -0.0139 0.00199 0.0179 -0.000124 -0.000536 0 0 0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <strong>Joint displacements</strong>
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>J</sub>
+   (
+   <var>j</var>
+   )  =
+   <b>slice</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    Z
+   </var>
+   ; 3 ·
+   <var>j</var>
+   − 2; 3 ·
+   <var>j</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   (
+   <var>j</var>
+   )  =
+   <b>round</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>z</var>
+    <sub>J</sub>
+    (
+    <var>j</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>δz</var>
+   </span>
+   <span class="b1">)</span>
+   ·
+   <var>δz</var>
+   · 1000 ·
+   <span class="b0">[</span>
+   <var>mm</var>
+   ;
+   <var>mm</var>
+   ; 1
+   <span class="b0">]</span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   ( 1 )  =
+   <b class="b0">[</b>
+   0
+   <i>mm</i>
+   0
+   <i>mm</i>
+   -1.22
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   ( 2 )  =
+   <b class="b0">[</b>
+   11.23
+   <i>mm</i>
+   -0.145
+   <i>mm</i>
+   -2.2
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   ( 3 )  =
+   <b class="b0">[</b>
+   14.55
+   <i>mm</i>
+   -13.87
+   <i>mm</i>
+   1.99
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   ( 4 )  =
+   <b class="b0">[</b>
+   17.86
+   <i>mm</i>
+   -0.124
+   <i>mm</i>
+   -0.536
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   ( 5 )  =
+   <b class="b0">[</b>
+   0
+   <i>mm</i>
+   0
+   <i>mm</i>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <strong>Support reactions</strong>
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   (
+   <var>i</var>
+   )  =
+   <b>row</b>
+   (
+   <b>
+    <var>c</var>
+   </b>
+   ;
+   <var>i</var>
+   )
+  </span>
+  ,
+  <span class="eq">
+   <var>j</var>
+   (
+   <var>i</var>
+   )  =
+   <b>take</b>
+   ( 1;
+   <var>r</var>
+   (
+   <var>i</var>
+   )  )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   (
+   <var>i</var>
+   )  = -
+   <var>z</var>
+   <sub>J</sub>
+   (
+   <var>j</var>
+   (
+   <var>i</var>
+   )  )  ·
+   <span class="b0">[</span>
+   <var>m</var>
+   ;
+   <var>m</var>
+   ; 1
+   <span class="b0">]</span>
+   ·
+   <b>last</b>
+   (
+   <var>r</var>
+   (
+   <var>i</var>
+   ) ; 3 )
+  </span>
+ </p>
+ <p>
+  Joint
+  <b>J1 -</b>
+  <span class="eq">
+   <var>R</var>
+   ( 1 )  =
+   <b class="b0">[</b>
+   -10.56
+   <i>kN</i>
+   133.56
+   <i>kN</i>
+   0
+   <i>kNm</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  Joint
+  <b>J5 -</b>
+  <span class="eq">
+   <var>R</var>
+   ( 2 )  =
+   <b class="b0">[</b>
+   -69.44
+   <i>kN</i>
+   113.82
+   <i>kN</i>
+   148.05
+   <i>kNm</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <strong>Element end forces</strong>
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   )  =
+   <span class="b0">[</span>
+   <var>z</var>
+   <sub>J</sub>
+   (
+   <b>
+    <var>e</var>
+   </b>
+   <sub>
+    J.
+    <var>e</var>
+    ,1
+   </sub>
+   ) ;
+   <var>z</var>
+   <sub>J</sub>
+   (
+   <b>
+    <var>e</var>
+   </b>
+   <sub>
+    J.
+    <var>e</var>
+    ,2
+   </sub>
+   )
+   <span class="b0">]</span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   )  =
+   <b>col</b>
+   (
+   <var>k</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>T</var>
+   (
+   <var>e</var>
+   )  ·
+   <var>z</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   )  −
+   <var>T</var>
+   (
+   <var>e</var>
+   )  ·
+   <var>F</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   ) ; 1 )  ·
+   <span class="b0">[</span>
+   1; 1;
+   <var>m</var>
+   ; 1; 1;
+   <var>m</var>
+   <span class="b0">]</span>
+   ·
+   <var>kN</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   <sub>E</sub>
+   ( 1 )  =
+   <b class="b0">[</b>
+   133.56
+   <i>kN</i>
+   10.56
+   <i>kN</i>
+   1.78×10
+   <sup>-14</sup>
+   <i>kNm</i>
+   -133.56
+   <i>kN</i>
+   69.44
+   <i>kN</i>
+   -235.56
+   <i>kNm</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   <sub>E</sub>
+   ( 2 )  =
+   <b class="b0">[</b>
+   59.76
+   <i>kN</i>
+   -47.27
+   <i>kN</i>
+   34.36
+   <i>kNm</i>
+   -99.76
+   <i>kN</i>
+   -112.73
+   <i>kN</i>
+   235.56
+   <i>kNm</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   <sub>E</sub>
+   ( 3 )  =
+   <b class="b0">[</b>
+   74.98
+   <i>kN</i>
+   -13.58
+   <i>kN</i>
+   -34.36
+   <i>kNm</i>
+   -94.98
+   <i>kN</i>
+   93.58
+   <i>kN</i>
+   -407.5
+   <i>kNm</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>R</var>
+   <sub>E</sub>
+   ( 4 )  =
+   <b class="b0">[</b>
+   113.82
+   <i>kN</i>
+   69.44
+   <i>kN</i>
+   148.05
+   <i>kNm</i>
+   -113.82
+   <i>kN</i>
+   -69.44
+   <i>kN</i>
+   407.5
+   <i>kNm</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <strong>Element internal forces</strong>
+ </p>
+ <p>
+  <span class="eq">
+   <var>N</var>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )  = -
+   <b>take</b>
+   ( 1;
+   <var>R</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   )  )  +
+   <var>N</var>
+   <sub>0</sub>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>Q</var>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )  =
+   <b>take</b>
+   ( 2;
+   <var>R</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   )  )  +
+   <var>Q</var>
+   <sub>0</sub>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>M</var>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )  = -
+   <b>take</b>
+   ( 3;
+   <var>R</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   )  )  +
+   <b>take</b>
+   ( 2;
+   <var>R</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   )  )  ·
+   <var>x</var>
+   +
+   <var>M</var>
+   <sub>0</sub>
+   (
+   <var>e</var>
+   ;
+   <var>x</var>
+   )
+  </span>
+ </p>
+ <p>
+  <strong>Axial forces diagram, kN</strong>
+ </p>
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
+  <use href="#frame">
+  </use>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="15" y1="150" y2="150">
+  </line>
+  <text text-anchor="middle" transform="rotate(-0,30,150)" x="30" y="150">-133.56</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="15" y1="150" y2="150">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="150" y2="138">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="150" y2="138">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="138" y2="126">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="138" y2="126">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="126" y2="114">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="126" y2="114">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="114" y2="102">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="114" y2="102">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="102" y2="90">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="102" y2="90">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="90" y2="78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="90" y2="78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="78" y2="66">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="78" y2="66">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="66" y2="54">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="66" y2="54">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="54" y2="42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="54" y2="42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="42" y2="30">
+  </line>
+  <text text-anchor="middle" transform="rotate(-0,30,30)" x="30" y="30">-133.56</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15" x2="15" y1="42" y2="30">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="15" y1="30" y2="30">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120" x2="118.37" y1="0" y2="-6.51">
+  </line>
+  <text text-anchor="middle" transform="rotate(-104.04,114.73,-21.06)" x="114.73" y="-21.06">-59.76</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120" x2="118.37" y1="0" y2="-6.51">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="118.37" x2="106.26" y1="-6.51" y2="-3.95">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="118.37" x2="106.26" y1="-6.51" y2="-3.95">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="106.26" x2="94.15" y1="-3.95" y2="-1.38">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="106.26" x2="94.15" y1="-3.95" y2="-1.38">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="94.15" x2="82.05" y1="-1.38" y2="1.18">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="94.15" x2="82.05" y1="-1.38" y2="1.18">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="82.05" x2="69.94" y1="1.18" y2="3.75">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="82.05" x2="69.94" y1="1.18" y2="3.75">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="69.94" x2="57.83" y1="3.75" y2="6.31">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="69.94" x2="57.83" y1="3.75" y2="6.31">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="57.83" x2="45.72" y1="6.31" y2="8.87">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="57.83" x2="45.72" y1="6.31" y2="8.87">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="45.72" x2="33.61" y1="8.87" y2="11.44">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="45.72" x2="33.61" y1="8.87" y2="11.44">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="33.61" x2="21.5" y1="11.44" y2="14">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="33.61" x2="21.5" y1="11.44" y2="14">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="21.5" x2="9.39" y1="14" y2="16.57">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="21.5" x2="9.39" y1="14" y2="16.57">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="9.39" x2="-2.72" y1="16.57" y2="19.13">
+  </line>
+  <text text-anchor="middle" transform="rotate(-104.04,-6.36,4.58)" x="-6.36" y="4.58">-99.76</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="9.39" x2="-2.72" y1="16.57" y2="19.13">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="-2.72" y1="30" y2="19.13">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120" x2="117.96" y1="0" y2="8.17">
+  </line>
+  <text text-anchor="middle" transform="rotate(-75.96,114.32,22.72)" x="114.32" y="22.72">-74.98</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120" x2="117.96" y1="0" y2="8.17">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="117.96" x2="129.9" y1="8.17" y2="11.39">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="117.96" x2="129.9" y1="8.17" y2="11.39">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="129.9" x2="141.85" y1="11.39" y2="14.6">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="129.9" x2="141.85" y1="11.39" y2="14.6">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="141.85" x2="153.79" y1="14.6" y2="17.82">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="141.85" x2="153.79" y1="14.6" y2="17.82">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="153.79" x2="165.74" y1="17.82" y2="21.04">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="153.79" x2="165.74" y1="17.82" y2="21.04">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="165.74" x2="177.69" y1="21.04" y2="24.26">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="165.74" x2="177.69" y1="21.04" y2="24.26">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="177.69" x2="189.63" y1="24.26" y2="27.48">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="177.69" x2="189.63" y1="24.26" y2="27.48">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="189.63" x2="201.58" y1="27.48" y2="30.69">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="189.63" x2="201.58" y1="27.48" y2="30.69">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="201.58" x2="213.52" y1="30.69" y2="33.91">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="201.58" x2="213.52" y1="30.69" y2="33.91">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="213.52" x2="225.47" y1="33.91" y2="37.13">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="213.52" x2="225.47" y1="33.91" y2="37.13">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="225.47" x2="237.41" y1="37.13" y2="40.35">
+  </line>
+  <text text-anchor="middle" transform="rotate(-75.96,233.77,54.9)" x="233.77" y="54.9">-94.98</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="225.47" x2="237.41" y1="37.13" y2="40.35">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="237.41" y1="30" y2="40.35">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="252.78" y1="150" y2="150">
+  </line>
+  <text text-anchor="middle" transform="rotate(-0,267.78,150)" x="267.78" y="150">-113.82</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="252.78" y1="150" y2="150">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="150" y2="138">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="150" y2="138">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="138" y2="126">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="138" y2="126">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="126" y2="114">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="126" y2="114">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="114" y2="102">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="114" y2="102">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="102" y2="90">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="102" y2="90">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="90" y2="78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="90" y2="78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="78" y2="66">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="78" y2="66">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="66" y2="54">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="66" y2="54">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="54" y2="42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="54" y2="42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="42" y2="30">
+  </line>
+  <text text-anchor="middle" transform="rotate(-0,267.78,30)" x="267.78" y="30">-113.82</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="252.78" x2="252.78" y1="42" y2="30">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="252.78" y1="30" y2="30">
+  </line>
+ </svg>
+ <p>
+  <strong>Shear forces diagram, kN</strong>
+ </p>
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
+  <use href="#frame">
+  </use>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="-1.4" y1="150" y2="150">
+  </line>
+  <text text-anchor="middle" transform="rotate(-0,-16.4,150)" x="-16.4" y="150">10.56</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="-1.4" y1="150" y2="150">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-1.4" x2="-0.34" y1="150" y2="138">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-1.4" x2="-0.34" y1="150" y2="138">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-0.34" x2="0.72" y1="138" y2="126">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-0.34" x2="0.72" y1="138" y2="126">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0.72" x2="1.79" y1="126" y2="114">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0.72" x2="1.79" y1="126" y2="114">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="1.79" x2="2.85" y1="114" y2="102">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="1.79" x2="2.85" y1="114" y2="102">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="2.85" x2="3.92" y1="102" y2="90">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="2.85" x2="3.92" y1="102" y2="90">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="3.92" x2="4.98" y1="90" y2="78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="3.92" x2="4.98" y1="90" y2="78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="4.98" x2="6.05" y1="78" y2="66">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="4.98" x2="6.05" y1="78" y2="66">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="6.05" x2="7.11" y1="66" y2="54">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="6.05" x2="7.11" y1="66" y2="54">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="7.11" x2="8.18" y1="54" y2="42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="7.11" x2="8.18" y1="54" y2="42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="8.18" x2="9.24" y1="42" y2="30">
+  </line>
+  <text text-anchor="middle" transform="rotate(-0,24.24,30)" x="24.24" y="30">-69.44</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="8.18" x2="9.24" y1="42" y2="30">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="9.24" y1="30" y2="30">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120" x2="118.47" y1="0" y2="-6.1">
+  </line>
+  <text text-anchor="middle" transform="rotate(-104.04,114.84,-20.65)" x="114.84" y="-20.65">-47.27</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120" x2="118.47" y1="0" y2="-6.1">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="118.47" x2="106.99" y1="-6.1" y2="-1.04">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="118.47" x2="106.99" y1="-6.1" y2="-1.04">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="106.99" x2="95.51" y1="-1.04" y2="4.03">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="106.99" x2="95.51" y1="-1.04" y2="4.03">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="95.51" x2="84.02" y1="4.03" y2="9.09">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="95.51" x2="84.02" y1="4.03" y2="9.09">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="84.02" x2="72.54" y1="9.09" y2="14.16">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="84.02" x2="72.54" y1="9.09" y2="14.16">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="72.54" x2="61.06" y1="14.16" y2="19.23">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="72.54" x2="61.06" y1="14.16" y2="19.23">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="61.06" x2="49.57" y1="19.23" y2="24.29">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="61.06" x2="49.57" y1="19.23" y2="24.29">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="49.57" x2="38.09" y1="24.29" y2="29.36">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="49.57" x2="38.09" y1="24.29" y2="29.36">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="38.09" x2="26.61" y1="29.36" y2="34.42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="38.09" x2="26.61" y1="29.36" y2="34.42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="26.61" x2="15.12" y1="34.42" y2="39.49">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="26.61" x2="15.12" y1="34.42" y2="39.49">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15.12" x2="3.64" y1="39.49" y2="44.55">
+  </line>
+  <text text-anchor="middle" transform="rotate(-104.04,7.28,59.1)" x="7.28" y="59.1">112.73</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="15.12" x2="3.64" y1="39.49" y2="44.55">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="3.64" y1="30" y2="44.55">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120" x2="119.56" y1="0" y2="1.75">
+  </line>
+  <text text-anchor="middle" transform="rotate(-75.96,115.92,16.31)" x="115.92" y="16.31">-13.58</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120" x2="119.56" y1="0" y2="1.75">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="119.56" x2="131.3" y1="1.75" y2="5.79">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="119.56" x2="131.3" y1="1.75" y2="5.79">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="131.3" x2="143.05" y1="5.79" y2="9.82">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="131.3" x2="143.05" y1="5.79" y2="9.82">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="143.05" x2="154.79" y1="9.82" y2="13.85">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="143.05" x2="154.79" y1="9.82" y2="13.85">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="154.79" x2="166.53" y1="13.85" y2="17.88">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="154.79" x2="166.53" y1="13.85" y2="17.88">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="166.53" x2="178.27" y1="17.88" y2="21.92">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="166.53" x2="178.27" y1="17.88" y2="21.92">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="178.27" x2="190.01" y1="21.92" y2="25.95">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="178.27" x2="190.01" y1="21.92" y2="25.95">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="190.01" x2="201.75" y1="25.95" y2="29.98">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="190.01" x2="201.75" y1="25.95" y2="29.98">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="201.75" x2="213.5" y1="29.98" y2="34.01">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="201.75" x2="213.5" y1="29.98" y2="34.01">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="213.5" x2="225.24" y1="34.01" y2="38.05">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="213.5" x2="225.24" y1="34.01" y2="38.05">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="225.24" x2="236.98" y1="38.05" y2="42.08">
+  </line>
+  <text text-anchor="middle" transform="rotate(-75.96,233.34,56.63)" x="233.34" y="56.63">-93.58</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="225.24" x2="236.98" y1="38.05" y2="42.08">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="236.98" y1="30" y2="42.08">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="230.76" y1="150" y2="150">
+  </line>
+  <text text-anchor="middle" transform="rotate(-0,215.76,150)" x="215.76" y="150">69.44</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="230.76" y1="150" y2="150">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="150" y2="138">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="150" y2="138">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="138" y2="126">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="138" y2="126">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="126" y2="114">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="126" y2="114">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="114" y2="102">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="114" y2="102">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="102" y2="90">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="102" y2="90">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="90" y2="78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="90" y2="78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="78" y2="66">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="78" y2="66">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="66" y2="54">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="66" y2="54">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="54" y2="42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="54" y2="42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="42" y2="30">
+  </line>
+  <text text-anchor="middle" transform="rotate(-0,215.76,30)" x="215.76" y="30">69.44</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.76" x2="230.76" y1="42" y2="30">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="230.76" y1="30" y2="30">
+  </line>
+ </svg>
+ <p>
+  <strong>Bending moments diagram, kNm</strong>
+ </p>
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
+  <use href="#frame">
+  </use>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="-0" y1="150" y2="150">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="-0" y1="150" y2="150">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-0" x2="0.33" y1="150" y2="138">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-0" x2="0.33" y1="150" y2="138">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0.33" x2="0.26" y1="138" y2="126">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0.33" x2="0.26" y1="138" y2="126">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0.26" x2="-0.22" y1="126" y2="114">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0.26" x2="-0.22" y1="126" y2="114">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-0.22" x2="-1.11" y1="114" y2="102">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-0.22" x2="-1.11" y1="114" y2="102">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-1.11" x2="-2.41" y1="102" y2="90">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-1.11" x2="-2.41" y1="102" y2="90">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-2.41" x2="-4.11" y1="90" y2="78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-2.41" x2="-4.11" y1="90" y2="78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-4.11" x2="-6.22" y1="78" y2="66">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-4.11" x2="-6.22" y1="78" y2="66">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-6.22" x2="-8.74" y1="66" y2="54">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-6.22" x2="-8.74" y1="66" y2="54">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-8.74" x2="-11.67" y1="54" y2="42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-8.74" x2="-11.67" y1="54" y2="42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-11.67" x2="-15" y1="42" y2="30">
+  </line>
+  <text text-anchor="middle" transform="rotate(-0,-30,30)" x="-30" y="30">-235.56</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="-11.67" x2="-15" y1="42" y2="30">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="-15" y1="30" y2="30">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120" x2="120.53" y1="0" y2="2.12">
+  </line>
+  <text text-anchor="middle" transform="rotate(-104.04,124.17,16.67)" x="124.17" y="16.67">-34.36</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120" x2="120.53" y1="0" y2="2.12">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120.53" x2="109.03" y1="2.12" y2="7.12">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120.53" x2="109.03" y1="2.12" y2="7.12">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="109.03" x2="97.33" y1="7.12" y2="11.31">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="109.03" x2="97.33" y1="7.12" y2="11.31">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="97.33" x2="85.42" y1="11.31" y2="14.68">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="97.33" x2="85.42" y1="11.31" y2="14.68">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="85.42" x2="73.31" y1="14.68" y2="17.23">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="85.42" x2="73.31" y1="14.68" y2="17.23">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="73.31" x2="60.99" y1="17.23" y2="18.97">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="73.31" x2="60.99" y1="17.23" y2="18.97">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="60.99" x2="48.47" y1="18.97" y2="19.9">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="60.99" x2="48.47" y1="18.97" y2="19.9">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="48.47" x2="35.75" y1="19.9" y2="20.01">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="48.47" x2="35.75" y1="19.9" y2="20.01">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="35.75" x2="22.83" y1="20.01" y2="19.3">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="35.75" x2="22.83" y1="20.01" y2="19.3">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="22.83" x2="9.7" y1="19.3" y2="17.78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="22.83" x2="9.7" y1="19.3" y2="17.78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="9.7" x2="-3.64" y1="17.78" y2="15.45">
+  </line>
+  <text text-anchor="middle" transform="rotate(-104.04,-7.28,0.9)" x="-7.28" y="0.9">235.56</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="9.7" x2="-3.64" y1="17.78" y2="15.45">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="-3.64" y1="30" y2="15.45">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120" x2="119.47" y1="0" y2="2.12">
+  </line>
+  <text text-anchor="middle" transform="rotate(-75.96,115.83,16.67)" x="115.83" y="16.67">34.36</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="120" x2="119.47" y1="0" y2="2.12">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="119.47" x2="131.69" y1="2.12" y2="4.23">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="119.47" x2="131.69" y1="2.12" y2="4.23">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="131.69" x2="144.02" y1="4.23" y2="5.92">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="131.69" x2="144.02" y1="4.23" y2="5.92">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="144.02" x2="156.45" y1="5.92" y2="7.21">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="144.02" x2="156.45" y1="5.92" y2="7.21">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="156.45" x2="168.98" y1="7.21" y2="8.09">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="156.45" x2="168.98" y1="7.21" y2="8.09">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="168.98" x2="181.61" y1="8.09" y2="8.57">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="168.98" x2="181.61" y1="8.09" y2="8.57">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="181.61" x2="194.34" y1="8.57" y2="8.63">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="181.61" x2="194.34" y1="8.57" y2="8.63">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="194.34" x2="207.18" y1="8.63" y2="8.29">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="194.34" x2="207.18" y1="8.63" y2="8.29">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="207.18" x2="220.11" y1="8.29" y2="7.55">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="207.18" x2="220.11" y1="8.29" y2="7.55">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="220.11" x2="233.15" y1="7.55" y2="6.39">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="220.11" x2="233.15" y1="7.55" y2="6.39">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="233.15" x2="246.29" y1="6.39" y2="4.83">
+  </line>
+  <text text-anchor="middle" transform="rotate(-75.96,249.93,-9.73)" x="249.93" y="-9.73">-407.5</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="233.15" x2="246.29" y1="6.39" y2="4.83">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="246.29" y1="30" y2="4.83">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="230.57" y1="150" y2="150">
+  </line>
+  <text text-anchor="middle" transform="rotate(-0,215.57,150)" x="215.57" y="150">-148.05</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="230.57" y1="150" y2="150">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.57" x2="234.11" y1="150" y2="138">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="230.57" x2="234.11" y1="150" y2="138">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="234.11" x2="237.65" y1="138" y2="126">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="234.11" x2="237.65" y1="138" y2="126">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="237.65" x2="241.19" y1="126" y2="114">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="237.65" x2="241.19" y1="126" y2="114">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="241.19" x2="244.72" y1="114" y2="102">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="241.19" x2="244.72" y1="114" y2="102">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="244.72" x2="248.26" y1="102" y2="90">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="244.72" x2="248.26" y1="102" y2="90">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="248.26" x2="251.8" y1="90" y2="78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="248.26" x2="251.8" y1="90" y2="78">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="251.8" x2="255.34" y1="78" y2="66">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="251.8" x2="255.34" y1="78" y2="66">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="255.34" x2="258.87" y1="66" y2="54">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="255.34" x2="258.87" y1="66" y2="54">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="258.87" x2="262.41" y1="54" y2="42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="258.87" x2="262.41" y1="54" y2="42">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="262.41" x2="265.95" y1="42" y2="30">
+  </line>
+  <text text-anchor="middle" transform="rotate(-0,280.95,30)" x="280.95" y="30">407.5</text>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="262.41" x2="265.95" y1="42" y2="30">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="265.95" y1="30" y2="30">
+  </line>
+ </svg>
+ <p>
+  <strong>Deformed shape</strong>
+ </p>
+ <p>Shape function in relative coordinates ξ = x/l (approximate)</p>
+ <p>
+  <span class="eq">
+   <var>Φ</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  = 1 − 3 ·
+   <var>ξ</var>
+   <sup>2</sup>
+   + 2 ·
+   <var>ξ</var>
+   <sup>3</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>Φ</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  =
+   <var>ξ</var>
+   ·
+   <var>l</var>
+   (
+   <var>e</var>
+   )  ·
+   <var>m</var>
+   <sup class="unit">-1</sup>
+   ·  ( 1 − 2 ·
+   <var>ξ</var>
+   +
+   <var>ξ</var>
+   <sup>2</sup>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>Φ</var>
+   <sub>3</sub>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  =
+   <var>ξ</var>
+   <sup>2</sup>
+   ·  ( 3 − 2 ·
+   <var>ξ</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>Φ</var>
+   <sub>4</sub>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  =
+   <var>ξ</var>
+   <sup>2</sup>
+   ·
+   <var>l</var>
+   (
+   <var>e</var>
+   )  ·
+   <var>m</var>
+   <sup class="unit">-1</sup>
+   ·  ( -1 +
+   <var>ξ</var>
+   )
+  </span>
+ </p>
+ <p>Element endpoint displacements and rotations</p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>E,loc</sub>
+   (
+   <var>e</var>
+   )  =
+   <var>T</var>
+   (
+   <var>e</var>
+   )  ·
+   <var>z</var>
+   <sub>E</sub>
+   (
+   <var>e</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>u</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  =
+   <b>take</b>
+   ( 1;
+   <var>z</var>
+   <sub>E,loc</sub>
+   (
+   <var>e</var>
+   )  )
+  </span>
+  ,
+  <span class="eq">
+   <var>v</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  =
+   <b>take</b>
+   ( 2;
+   <var>z</var>
+   <sub>E,loc</sub>
+   (
+   <var>e</var>
+   )  )
+  </span>
+  ,
+  <span class="eq">
+   <var>φ</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  =
+   <b>take</b>
+   ( 3;
+   <var>z</var>
+   <sub>E,loc</sub>
+   (
+   <var>e</var>
+   )  )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>u</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  =
+   <b>take</b>
+   ( 4;
+   <var>z</var>
+   <sub>E,loc</sub>
+   (
+   <var>e</var>
+   )  )
+  </span>
+  ,
+  <span class="eq">
+   <var>v</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  =
+   <b>take</b>
+   ( 5;
+   <var>z</var>
+   <sub>E,loc</sub>
+   (
+   <var>e</var>
+   )  )
+  </span>
+  ,
+  <span class="eq">
+   <var>φ</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  =
+   <b>take</b>
+   ( 6;
+   <var>z</var>
+   <sub>E,loc</sub>
+   (
+   <var>e</var>
+   )  )
+  </span>
+ </p>
+ <p>Displacement functions (approximate)</p>
+ <p>
+  <span class="eq">
+   <var>x</var>
+   <sub>m</sub>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  = 0.5 ·
+   <var>ξ</var>
+   ·
+   <var>l</var>
+   (
+   <var>e</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>u</var>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  =
+   <var>u</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  ·  ( 1 −
+   <var>ξ</var>
+   )  +
+   <var>u</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>ξ</var>
+   +
+   <span class="dvc">
+    <var>n</var>
+    <sub>E</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    <sub>m</sub>
+    (
+    <var>e</var>
+    ;
+    <var>ξ</var>
+    )  )  ·
+    <i>m</i>
+    <span class="dvl">
+    </span>
+    <var>EA</var>
+    <sub>e</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    <sub>m</sub>
+    (
+    <var>e</var>
+    ;
+    <var>ξ</var>
+    )  )
+   </span>
+   ·
+   <var>ξ</var>
+   ·  ( 1 −
+   <var>ξ</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>v</var>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  =
+   <var>v</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>Φ</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  +
+   <var>φ</var>
+   <sub>1</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>Φ</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  +
+   <var>v</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>Φ</var>
+   <sub>3</sub>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  +
+   <var>φ</var>
+   <sub>2</sub>
+   (
+   <var>e</var>
+   )  ·
+   <var>Φ</var>
+   <sub>4</sub>
+   (
+   <var>e</var>
+   ;
+   <var>ξ</var>
+   )  +
+   <span class="dvc">
+    <var>q</var>
+    <sub>E</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    <sub>m</sub>
+    (
+    <var>e</var>
+    ;
+    <var>ξ</var>
+    )  )  ·
+    <var>l</var>
+    (
+    <var>e</var>
+    )
+    <sup>4</sup>
+    <span class="dvl">
+    </span>
+    24 ·
+    <var>EI</var>
+    <sub>e</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    <sub>m</sub>
+    (
+    <var>e</var>
+    ;
+    <var>ξ</var>
+    )  )
+   </span>
+   ·
+   <span class="dvc">
+    <var>ξ</var>
+    <sup>2</sup>
+    ·  ( 1 −
+    <var>ξ</var>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+   +
+   <span class="dvc">
+    <var>q</var>
+    <sub>E</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    <sub>m</sub>
+    (
+    <var>e</var>
+    ;
+    <var>ξ</var>
+    )  )  ·
+    <var>l</var>
+    (
+    <var>e</var>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>GA</var>
+    <sub>Q</sub>
+    (
+    <var>e</var>
+    ;
+    <var>x</var>
+    <sub>m</sub>
+    (
+    <var>e</var>
+    ;
+    <var>ξ</var>
+    )  )
+   </span>
+   ·
+   <span class="dvc">
+    <var>ξ</var>
+    ·  ( 1 −
+    <var>ξ</var>
+    )
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+  </span>
+ </p>
+ <p>Deformed shape, mm</p>
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:390pt; height:275pt" version="1.1" viewbox="-45 -30 330 210" xmlns="http://www.w3.org/2000/svg">
+  <use href="#frame" style="opacity:0.4;">
+  </use>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="0" y1="150" y2="150">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0" x2="0.73" y1="150" y2="138.01">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="0.73" x2="1.52" y1="138.01" y2="126.02">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="1.52" x2="2.2" y1="126.02" y2="114.02">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="2.2" x2="2.74" y1="114.02" y2="102.03">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="2.74" x2="3.2" y1="102.03" y2="90.04">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="3.2" x2="3.65" y1="90.04" y2="78.05">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="3.65" x2="4.13" y1="78.05" y2="66.06">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="4.13" x2="4.7" y1="66.06" y2="54.06">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="4.7" x2="5.41" y1="54.06" y2="42.07">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="5.41" x2="6.29" y1="42.07" y2="30.08">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="128.15" x2="128.15" y1="7.76" y2="7.76">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="128.15" x2="116.44" y1="7.76" y2="11.91">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="116.44" x2="104.65" y1="11.91" y2="15.73">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="104.65" x2="92.68" y1="15.73" y2="18.81">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="92.68" x2="80.52" y1="18.81" y2="21.15">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="80.52" x2="68.21" y1="21.15" y2="22.91">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="68.21" x2="55.82" y1="22.91" y2="24.32">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="55.82" x2="43.39" y1="24.32" y2="25.56">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="43.39" x2="30.96" y1="25.56" y2="26.83">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="30.96" x2="18.58" y1="26.83" y2="28.29">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="18.58" x2="6.29" y1="28.29" y2="30.08">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="128.15" x2="128.15" y1="7.76" y2="7.76">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="128.15" x2="140.31" y1="7.76" y2="10.08">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="140.31" x2="152.47" y1="10.08" y2="12.4">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="152.47" x2="164.68" y1="12.4" y2="14.53">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="164.68" x2="176.94" y1="14.53" y2="16.47">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="176.94" x2="189.22" y1="16.47" y2="18.33">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="189.22" x2="201.49" y1="18.33" y2="20.21">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="201.49" x2="213.73" y1="20.21" y2="22.22">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="213.73" x2="225.91" y1="22.22" y2="24.48">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="225.91" x2="238.01" y1="24.48" y2="27.07">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="238.01" x2="250" y1="27.07" y2="30.07">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="240" y1="150" y2="150">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240" x2="240.26" y1="150" y2="138.01">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240.26" x2="240.96" y1="138.01" y2="126.01">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="240.96" x2="242.01" y1="126.01" y2="114.02">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="242.01" x2="243.29" y1="114.02" y2="102.03">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="243.29" x2="244.7" y1="102.03" y2="90.03">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="244.7" x2="246.13" y1="90.03" y2="78.04">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="246.13" x2="247.49" y1="78.04" y2="66.05">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="247.49" x2="248.65" y1="66.05" y2="54.06">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="248.65" x2="249.53" y1="54.06" y2="42.06">
+  </line>
+  <line style="stroke:red; stroke-width:1; fill:red" x1="249.53" x2="250" y1="42.06" y2="30.07">
+  </line>
+  <text text-anchor="middle" x="21.29" y="30.08">11.23</text>
+  <text text-anchor="middle" transform="rotate(-90,6.29,45.08)" x="6.29" y="45.08">-0.14</text>
+  <text text-anchor="middle" x="143.15" y="7.76">14.55</text>
+  <text text-anchor="middle" transform="rotate(-90,128.15,22.76)" x="128.15" y="22.76">-13.87</text>
+  <text text-anchor="middle" x="265" y="30.07">17.86</text>
+  <text text-anchor="middle" transform="rotate(-90,250,45.07)" x="250" y="45.07">-0.12</text>
+ </svg>
+</div>

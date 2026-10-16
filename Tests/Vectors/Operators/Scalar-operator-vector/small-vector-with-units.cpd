@@ -194,7 +194,7 @@ b = [0J]
 c = a > b
 c = f(a; b)
 
-"Less than or equal 
+"Less than or equal
 a = 0J/s
 b = [5W; -2.1W; 0W; 7.8W; -4.6W]
 c = a ≤ b
@@ -227,7 +227,7 @@ c = a ≥ b
 c = f(a; b)
 
 '<h1>Logical operators</h1>
-"Logical AND 
+"Logical AND
 a = 0V*s
 b = [0Wb; 16.7Wb; 0Wb; 22.3Wb; 13.5Wb; -18Wb; 21.2Wb; 0Wb; -19.3Wb; 25Wb]
 c = a ∧ b

@@ -1,0 +1,134 @@
+# Linter and Diagnostics
+
+CalcpadCE checks your document as you write and flags problems before you ever run it.
+Each diagnostic has a short, stable code (like `CPD-3301`) so you can look up exactly what it means.
+
+Diagnostics appear as squiggles in the editor and entries in the Problems panel.
+
+## Diagnostic codes
+
+Every diagnostic has a `CPD-` code.
+The tables below group them by the kind of problem.
+
+### Includes
+
+| Code | Severity | Meaning |
+| ---- | -------- | ------- |
+| CPD-1101 | Error | Malformed `#include` statement |
+| CPD-1102 | Error | Missing `#include` filename |
+| CPD-1103 | Warning | Deprecated `#include` input values |
+
+### Macro definitions
+
+| Code | Severity | Meaning |
+| ---- | -------- | ------- |
+| CPD-2201 | Error | Duplicate macro definition |
+| CPD-2202 | Error | Macro name must end with `$` |
+| CPD-2203 | Error | Macro parameter must end with `$` |
+| CPD-2204 | Error | Invalid macro name (must start with a letter) |
+| CPD-2205 | Error | Malformed `#def` syntax |
+| CPD-2206 | Error | Unmatched `#def` or `#end def` |
+| CPD-2207 | Error | Nested macro definition not allowed |
+| CPD-2208 | Error | Macro parameter must start with a letter |
+| CPD-2209 | Warning | Macro definition inside a control block has no effect |
+| CPD-2210 | Error | Invalid character in macro name |
+| CPD-2211 | Error | Invalid character in macro parameter |
+| CPD-2212 | Error | Duplicate macro parameter |
+| CPD-2213 | Error | Required parameter after optional parameter |
+
+### Brackets and blocks
+
+| Code | Severity | Meaning |
+| ---- | -------- | ------- |
+| CPD-3101 | Error | Unmatched opening parenthesis |
+| CPD-3102 | Error | Unmatched closing parenthesis |
+| CPD-3103 | Error | Unmatched opening square bracket |
+| CPD-3104 | Error | Unmatched closing square bracket |
+| CPD-3105 | Error | Unmatched opening curly brace or control block |
+| CPD-3106 | Error | Unmatched closing curly brace |
+
+### Naming
+
+| Code | Severity | Meaning |
+| ---- | -------- | ------- |
+| CPD-3201 | Error | Invalid variable name (must start with a letter) |
+| CPD-3202 | Error | Invalid function name |
+| CPD-3203 | Error | Function name conflicts with a built-in function |
+| CPD-3204 | Error | Variable name conflicts with a keyword |
+| CPD-3205 | Error | Variable name conflicts with a built-in constant |
+| CPD-3206 | Error | Function must have at least one parameter |
+| CPD-3207 | Error | Required parameter after optional parameter in function definition |
+
+### Usage
+
+| Code | Severity | Meaning |
+| ---- | -------- | ------- |
+| CPD-3301 | Error | Undefined variable |
+| CPD-3302 | Error | Function called with the wrong number of parameters |
+| CPD-3303 | Error | Undefined macro |
+| CPD-3304 | Error | Macro called with the wrong number of parameters |
+| CPD-3305 | Error | Undefined function |
+| CPD-3306 | Warning | Invalid element access |
+| CPD-3307 | Error | Too few parameters |
+| CPD-3308 | Error | Too many parameters |
+| CPD-3309 | Warning | Parameter type mismatch |
+| CPD-3310 | Error | Undefined unit |
+| CPD-3311 | Error | Empty parameter in a function call |
+| CPD-3312 | Information | Unused variable |
+| CPD-3313 | Error | Redefinition of existing function |
+| CPD-3314 | Error | Unknown keyword argument in a macro call |
+| CPD-3315 | Error | Unknown keyword argument in a function call |
+
+### Semantics
+
+| Code | Severity | Meaning |
+| ---- | -------- | ------- |
+| CPD-3401 | Error | Invalid operator usage |
+| CPD-3402 | Error | Unknown command name |
+| CPD-3403 | Error | Unknown directive |
+| CPD-3404 | Warning | Invalid assignment |
+| CPD-3405 | Error | `#` directive not allowed inside a command block |
+| CPD-3406 | Error | Invalid command syntax |
+| CPD-3407 | Error | Incomplete expression |
+| CPD-3408 | Error | Command variable mismatch |
+| CPD-3409 | Error | Reassignment of a constant |
+| CPD-3410 | Error | Outer-scope assignment (`←`) to an undefined variable |
+| CPD-3411 | Warning | Invalid `paramType` value in a metadata comment |
+| CPD-3412 | Warning | Invalid metadata-comment JSON |
+| CPD-3413 | Warning | Invalid #settings JSON |
+| CPD-3414 | Warning | Invalid PDF settings in a metadata comment |
+| CPD-3415 | Warning | Invalid `#UI` format |
+| CPD-3416 | Warning | `uiOverrides` metadata comment not on the first line |
+| CPD-3417 | Warning | Duplicate `uiOverrides` metadata comment |
+| CPD-3418 | Warning | `uiOverrides` sharing a comment with another key |
+| CPD-3419 | Warning | Deprecated stored input value |
+
+### Formatting
+
+| Code | Severity | Meaning |
+| ---- | -------- | ------- |
+| CPD-3601 | Warning | Invalid format specifier |
+
+## Suppressing diagnostics (lint-ignore)
+
+To silence specific diagnostics in a section, wrap it in `LintIgnore` / `EndLintIgnore` markers and list the codes to ignore:
+
+```text
+'<!--{"LintIgnore": ["CPD-3301"]}-->
+prototype_var = 5
+'<!--{"EndLintIgnore": []}-->
+```
+
+Leave the list empty (`"LintIgnore": []`) to suppress *all* diagnostics inside the region.
+
+These markers are one kind of [metadata comment](new-metadata-comments.md); the **Properties** panel tab can write them for you with a code picker.
+
+## Choosing how much to show
+
+The [**Minimum Severity**](new-settings.md#linter) setting hides diagnostics below the level you choose.
+Set it to `warning` to see only warnings and errors, or `error` for errors alone.
+
+## See also
+
+- [Using the VS Code Extension](new-vscode-extension.md) · [Using the Desktop App](new-desktop-app.md)
+- [Programming](programming.md) · [Writing Math](writing-math.md)

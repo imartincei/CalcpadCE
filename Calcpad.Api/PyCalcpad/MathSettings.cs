@@ -23,7 +23,7 @@ namespace PyCalcpad
         public bool IsComplex { get; set; }
         public bool Substitute { get; set; }
         public bool FormatEquations { get; set; }
-        public bool ZeroSmallMatrixElements { get; set; } 
+        public bool ZeroSmallMatrixElements { get; set; }
         public int MaxOutputCount
         {
             get => _maxOutputCount;

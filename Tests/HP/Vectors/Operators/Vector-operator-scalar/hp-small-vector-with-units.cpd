@@ -227,7 +227,7 @@ b1 = 25.8A*s
 c1 = a ≥ b1
 c1 = f(a; b1)
 
-'<h1> Logical operators </h1> 
+'<h1> Logical operators </h1>
 "Logical AND"
 a = hp([0Wb; 16.7Wb; 0Wb; 22.3Wb; 13.5Wb; -18Wb; 21.2Wb; 0Wb; -19.3Wb; 25Wb])
 b = 0V*s
@@ -292,7 +292,7 @@ b1 = 21cm
 c = a
 c1 = f(a)
 
-'<h1> Complex operations </h1> 
+'<h1> Complex operations </h1>
 x = hp([6S; -2.5S; 0S; 4.3S; -8.1S; 8.6S; 0S; -5.2S; 1.9S])
 y = 2.7A/V
 

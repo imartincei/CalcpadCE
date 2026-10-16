@@ -1,0 +1,146 @@
+<div class="calcpad-output">
+ <!-- Recursive multiline definition of the [Fibonacci](https://en.wikipedia.org/wiki/Fibonacci_number) function $fib(n)$, illustrating self-referential calls and conditional base cases. -->
+ <p>Function:</p>
+ <p>
+  <span class="eq">
+   <var>fib</var>
+   (
+   <var>n</var>
+   )  =
+   <span class="dvcs">
+    <span class="c1">{</span>
+    <span class="dvs">
+     if
+     <var>n</var>
+     ≡ 1: 1
+     <br/>
+     else:
+     <small class="arr">🞀</small>
+     <span class="block">
+      <var>a</var>
+      = 0
+      <br/>
+      <var>b</var>
+      = 1
+      <br/>
+      <span class="cond">$Repeat</span>
+      <small class="arr">🞀</small>
+      <span class="block">
+       <span class="cond">for</span>
+       <var>k</var>
+       = 1...
+       <var>n</var>
+       − 1
+       <br/>
+       <var>c</var>
+       =
+       <var>a</var>
+       +
+       <var>b</var>
+       <br/>
+       <var>a</var>
+       ←
+       <var>b</var>
+       <br/>
+       <var>b</var>
+       ←
+       <var>c</var>
+       <br/>
+      </span>
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>Results:</p>
+ <p>
+  <span class="eq">
+   <var>fib</var>
+   (
+   <var>i</var>
+   )  =
+   <var>fib</var>
+   ( 1 )  = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>fib</var>
+   (
+   <var>i</var>
+   )  =
+   <var>fib</var>
+   ( 2 )  = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>fib</var>
+   (
+   <var>i</var>
+   )  =
+   <var>fib</var>
+   ( 3 )  = 2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>fib</var>
+   (
+   <var>i</var>
+   )  =
+   <var>fib</var>
+   ( 4 )  = 3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>fib</var>
+   (
+   <var>i</var>
+   )  =
+   <var>fib</var>
+   ( 5 )  = 5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>fib</var>
+   (
+   <var>i</var>
+   )  =
+   <var>fib</var>
+   ( 6 )  = 8
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>fib</var>
+   (
+   <var>i</var>
+   )  =
+   <var>fib</var>
+   ( 7 )  = 13
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>fib</var>
+   (
+   <var>i</var>
+   )  =
+   <var>fib</var>
+   ( 8 )  = 21
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>fib</var>
+   (
+   <var>i</var>
+   )  =
+   <var>fib</var>
+   ( 9 )  = 34
+  </span>
+ </p>
+</div>

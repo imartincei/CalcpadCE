@@ -1,0 +1,29 @@
+name: Build PR docs
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - '.github/**'
+      - 'Examples/**'
+      - 'Resources/Fonts/**'
+      - 'docs/**'
+      - 'mkdocs.yml'
+
+concurrency: preview-${{ github.ref }}
+
+jobs:
+  build:
+    uses: ./.github/workflows/docs-build.yml
+
+  save-pr-number:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Save PR number
+        run: echo "${{ github.event.number }}" > pr-number.txt
+
+      - name: Upload PR number
+        uses: actions/upload-artifact@v7
+        with:
+          name: pr-number
+          path: pr-number.txt

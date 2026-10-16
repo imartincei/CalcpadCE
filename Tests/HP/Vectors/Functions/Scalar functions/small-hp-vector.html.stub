@@ -1,0 +1,2475 @@
+<div class="calcpad-output">
+ <h2>Trigonometric functions</h2>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   -3.5; 7.8; 4.25;
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ; 0; 10; -2.3; 6.75
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   -3.5; 7.8; 4.25;
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ; 0; 10; -2.3; 6.75
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   -3.5 7.8 4.25 1.57 0 10 -2.3 6.75
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cos</b>
+   ( 1.57 )  = 0.000796
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cos</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>pi</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   <span class="b1">)</span>
+   =
+   <b>cos</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   <span class="b1">)</span>
+   = 6.12×10
+   <sup>-17</sup>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>sin</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.351 0.999 -0.895 1 0 -0.544 -0.746 0.45
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   )  =
+   <b>sin</b>
+   (
+   <var>vec1</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.351 0.999 -0.895 1 0 -0.544 -0.746 0.45
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cos</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.936 0.054 -0.446 0 1 -0.839 -0.666 0.893
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   )  =
+   <b>cos</b>
+   (
+   <var>vec1</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.936 0.054 -0.446 0 1 -0.839 -0.666 0.893
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>tan</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.375 18.51 2.01 1.63×10
+   <sup>16</sup>
+   0 0.648 1.12 0.504
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   )  =
+   <b>tan</b>
+   (
+   <var>vec1</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.375 18.51 2.01 1.63×10
+   <sup>16</sup>
+   0 0.648 1.12 0.504
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cot</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -2.67 0.054 0.498 0
+   <span class="err">+∞</span>
+   1.54 0.893 1.98
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   )  =
+   <b>cot</b>
+   (
+   <var>vec1</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -2.67 0.054 0.498 0
+   <span class="err">+∞</span>
+   1.54 0.893 1.98
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>sec</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.07 18.53 -2.24 1.63×10
+   <sup>16</sup>
+   1 -1.19 -1.5 1.12
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   )  =
+   <b>sec</b>
+   (
+   <var>vec1</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.07 18.53 -2.24 1.63×10
+   <sup>16</sup>
+   1 -1.19 -1.5 1.12
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>csc</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   2.85 1 -1.12 1
+   <span class="err">+∞</span>
+   -1.84 -1.34 2.22
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   )  =
+   <b>csc</b>
+   (
+   <var>vec1</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   2.85 1 -1.12 1
+   <span class="err">+∞</span>
+   -1.84 -1.34 2.22
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Hyperbolic functions</h2>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   -3.5; 7.8; 4.25;
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ; 0; 10; -2.3; 6.75
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   -3.5; 7.8; 4.25;
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ; 0; 10; -2.3; 6.75
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   -3.5 7.8 4.25 0.785 0 10 -2.3 6.75
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>sinh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -16.54 1220.3 35.05 0.869 0 11013.2 -4.94 427.03
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec2</var>
+   )  =
+   <b>sinh</b>
+   (
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -16.54 1220.3 35.05 0.869 0 11013.2 -4.94 427.03
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>cosh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   16.57 1220.3 35.06 1.32 1 11013.2 5.04 427.03
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec2</var>
+   )  =
+   <b>cosh</b>
+   (
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   16.57 1220.3 35.06 1.32 1 11013.2 5.04 427.03
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>tanh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.998 1 1 0.656 0 1 -0.98 1
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec2</var>
+   )  =
+   <b>tanh</b>
+   (
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.998 1 1 0.656 0 1 -0.98 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>coth</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1 1 1 1.52
+   <span class="err">+∞</span>
+   1 -1.02 1
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec2</var>
+   )  =
+   <b>coth</b>
+   (
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1 1 1 1.52
+   <span class="err">+∞</span>
+   1 -1.02 1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>sech</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.0603 0.000819 0.0285 0.755 1 9.08×10
+   <sup>-5</sup>
+   0.199 0.00234
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec2</var>
+   )  =
+   <b>sech</b>
+   (
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.0603 0.000819 0.0285 0.755 1 9.08×10
+   <sup>-5</sup>
+   0.199 0.00234
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>csch</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.0604 0.000819 0.0285 1.15
+   <span class="err">+∞</span>
+   9.08×10
+   <sup>-5</sup>
+   -0.203 0.00234
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec2</var>
+   )  =
+   <b>csch</b>
+   (
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.0604 0.000819 0.0285 1.15
+   <span class="err">+∞</span>
+   9.08×10
+   <sup>-5</sup>
+   -0.203 0.00234
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Inverse trigonometric functions</h2>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   -3.5; 7.8; 4.25;
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   ; 0; 10; -2.3; 6.75
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   -3.5; 7.8; 4.25;
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   ; 0; 10; -2.3; 6.75
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   -3.5 7.8 4.25 1.05 0 10 -2.3 6.75
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>asin</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   0
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec3</var>
+   )  =
+   <b>asin</b>
+   (
+   <var>vec3</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   0
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>acos</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   1.57
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec3</var>
+   )  =
+   <b>acos</b>
+   (
+   <var>vec3</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   1.57
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>atan</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.29 1.44 1.34 0.808 0 1.47 -1.16 1.42
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec3</var>
+   )  =
+   <b>atan</b>
+   (
+   <var>vec3</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.29 1.44 1.34 0.808 0 1.47 -1.16 1.42
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>acot</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.278 0.128 0.231 0.762 1.57 0.0997 -0.41 0.147
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec3</var>
+   )  =
+   <b>acot</b>
+   (
+   <var>vec3</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.278 0.128 0.231 0.762 1.57 0.0997 -0.41 0.147
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>asec</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1.86 1.44 1.33 0.301
+   <span class="err">+∞</span>
+   1.47 2.02 1.42
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec3</var>
+   )  =
+   <b>asec</b>
+   (
+   <var>vec3</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1.86 1.44 1.33 0.301
+   <span class="err">+∞</span>
+   1.47 2.02 1.42
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>acsc</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.29 0.129 0.238 1.27
+   <span class="err">+∞</span>
+   0.1 -0.45 0.149
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec3</var>
+   )  =
+   <b>acsc</b>
+   (
+   <var>vec3</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.29 0.129 0.238 1.27
+   <span class="err">+∞</span>
+   0.1 -0.45 0.149
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>atan2</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -2.36 0.785 0.785 0.464 0 0.785 -2.36 0.785
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec1</var>
+   ;
+   <var>vec2</var>
+   )  =
+   <b>atan2</b>
+   (
+   <var>vec1</var>
+   ;
+   <var>vec2</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec1
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vec2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -2.36 0.785 0.785 0.464 0 0.785 -2.36 0.785
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Inverse hyperbolic functions</h2>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   -3.5; 7.8; 4.25;
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   ; 0; 10; -2.3; 6.75
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   -3.5; 7.8; 4.25;
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   ; 0; 10; -2.3; 6.75
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   -3.5 7.8 4.25 0.524 0 10 -2.3 6.75
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>asinh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.97 2.75 2.15 0.502 0 3 -1.57 2.61
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec4</var>
+   )  =
+   <b>asinh</b>
+   (
+   <var>vec4</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.97 2.75 2.15 0.502 0 3 -1.57 2.61
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>acosh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   2.74 2.13
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   2.99
+   <span class="err">Undefined</span>
+   2.6
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec4</var>
+   )  =
+   <b>acosh</b>
+   (
+   <var>vec4</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   2.74 2.13
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   2.99
+   <span class="err">Undefined</span>
+   2.6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>atanh</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   0.581 0
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec4</var>
+   )  =
+   <b>atanh</b>
+   (
+   <var>vec4</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   0.581 0
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>acoth</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.294 0.129 0.24
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   0.1 -0.466 0.149
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec4</var>
+   )  =
+   <b>acoth</b>
+   (
+   <var>vec4</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.294 0.129 0.24
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   0.1 -0.466 0.149
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>asech</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   1.26
+   <span class="err">+∞</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec4</var>
+   )  =
+   <b>asech</b>
+   (
+   <var>vec4</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   1.26
+   <span class="err">+∞</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>acsch</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.282 0.128 0.233 1.4
+   <span class="err">+∞</span>
+   0.0998 -0.422 0.148
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec4</var>
+   )  =
+   <b>acsch</b>
+   (
+   <var>vec4</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.282 0.128 0.233 1.4
+   <span class="err">+∞</span>
+   0.0998 -0.422 0.148
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Power and logarithmic functions</h2>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   -3.5; 7.8; 2.67;
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    10
+   </span>
+   ; 0; 15; -1.8; 5.25
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   -3.5; 7.8; 2.67;
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    10
+   </span>
+   ; 0; 15; -1.8; 5.25
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   -3.5 7.8 2.67 0.314 0 15 -1.8 5.25
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>ln</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   2.05 0.982 -1.16
+   <span class="err">-∞</span>
+   2.71
+   <span class="err">Undefined</span>
+   1.66
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <b>ln</b>
+   (
+   <var>vec5</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   2.05 0.982 -1.16
+   <span class="err">-∞</span>
+   2.71
+   <span class="err">Undefined</span>
+   1.66
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>log</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   0.892 0.427 -0.503
+   <span class="err">-∞</span>
+   1.18
+   <span class="err">Undefined</span>
+   0.72
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <b>log</b>
+   (
+   <var>vec5</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   0.892 0.427 -0.503
+   <span class="err">-∞</span>
+   1.18
+   <span class="err">Undefined</span>
+   0.72
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>log</b>
+   <sub>2</sub>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   2.96 1.42 -1.67
+   <span class="err">-∞</span>
+   3.91
+   <span class="err">Undefined</span>
+   2.39
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <b>log</b>
+   <sub>2</sub>
+   (
+   <var>vec5</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   2.96 1.42 -1.67
+   <span class="err">-∞</span>
+   3.91
+   <span class="err">Undefined</span>
+   2.39
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>exp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.0302 2440.6 14.44 1.37 1 3269017 0.165 190.57
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <b>exp</b>
+   (
+   <var>vec5</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.0302 2440.6 14.44 1.37 1 3269017 0.165 190.57
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     vec5
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   2.79 1.63 0.56 0 3.87
+   <span class="err">Undefined</span>
+   2.29
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>vec5</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   2.79 1.63 0.56 0 3.87
+   <span class="err">Undefined</span>
+   2.29
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     vec5
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   2.79 1.63 0.56 0 3.87
+   <span class="err">Undefined</span>
+   2.29
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>vec5</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   <span class="err">Undefined</span>
+   2.79 1.63 0.56 0 3.87
+   <span class="err">Undefined</span>
+   2.29
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <sup class="nth">3</sup>
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     vec5
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   -1.52 1.98 1.39 0.68 0 2.47 -1.22 1.74
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   )  =
+   <sup class="nth">3</sup>
+   <span class="o0">
+    <span class="r">√</span>
+    <var>vec5</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -1.52 1.98 1.39 0.68 0 2.47 -1.22 1.74
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   = 5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <sup class="nth">
+    <var>n</var>
+   </sup>
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     vec5
+    </var>
+   </span>
+   =
+   <sup class="nth">5</sup>
+   <span class="o0">
+    <span class="r">√</span>
+    <var>
+     <span class="vec">⃗</span>
+     vec5
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   -1.28 1.51 1.22 0.793 0 1.72 -1.12 1.39
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec5</var>
+   ;
+   <var>n</var>
+   )  =
+   <sup class="nth">
+    <var>n</var>
+   </sup>
+   <span class="o0">
+    <span class="r">√</span>
+    <var>vec5</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   ;
+   <var>n</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec5
+   </var>
+   ; 5 )  =
+   <b class="b0">[</b>
+   -1.28 1.51 1.22 0.793 0 1.72 -1.12 1.39
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Rounding functions</h2>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   6.5; -2; 3.14; 0; 7; -1.25;
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ; -4
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   6.5; -2; 3.14; 0; 7; -1.25;
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ; -4
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   6.5 -2 3.14 0 7 -1.25 1.57 -4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>round</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   7 -2 3 0 7 -1 2 -4
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec6</var>
+   )  =
+   <b>round</b>
+   (
+   <var>vec6</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   7 -2 3 0 7 -1 2 -4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>floor</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   6 -2 3 0 7 -2 1 -4
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec6</var>
+   )  =
+   <b>floor</b>
+   (
+   <var>vec6</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   6 -2 3 0 7 -2 1 -4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>ceiling</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   7 -2 4 0 7 -1 2 -4
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec6</var>
+   )  =
+   <b>ceiling</b>
+   (
+   <var>vec6</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   7 -2 4 0 7 -1 2 -4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>trunc</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   6 -2 3 0 7 -1 1 -4
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec6</var>
+   )  =
+   <b>trunc</b>
+   (
+   <var>vec6</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   6 -2 3 0 7 -1 1 -4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h2>Integer functions</h2>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   5.29; -5; 8;
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ; -1.5; 0; 4.7; -10
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b>hp</b>
+   <span class="b1">(</span>
+   <span class="b1">[</span>
+   5.29; -5; 8;
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ; -1.5; 0; 4.7; -10
+   <span class="b1">]</span>
+   <span class="b1">)</span>
+   =
+   <b class="b0">[</b>
+   5.29 -5 8 1.57 -1.5 0 4.7 -10
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mod</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   ;
+   <var>n</var>
+   )  =
+   <b>mod</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   ; 5 )  =
+   <b class="b0">[</b>
+   0.29 0 3 1.57 -1.5 0 4.7 0
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec7</var>
+   ;
+   <var>n</var>
+   )  =
+   <b>mod</b>
+   (
+   <var>vec7</var>
+   ;
+   <var>n</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   ;
+   <var>n</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   ; 5 )  =
+   <b class="b0">[</b>
+   0.29 0 3 1.57 -1.5 0 4.7 0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vec8
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   5; 5; 8; 1; 0; 4; 10
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   5 5 8 1 0 4 10
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   = 3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>gcd</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec8
+   </var>
+   ;
+   <var>n</var>
+   )  =
+   <b>gcd</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec8
+   </var>
+   ; 3 )  = 1
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec8</var>
+   ;
+   <var>n</var>
+   )  =
+   <b>gcd</b>
+   (
+   <var>vec8</var>
+   ;
+   <var>n</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec8
+   </var>
+   ;
+   <var>n</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec8
+   </var>
+   ; 3 )  = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>lcm</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec8
+   </var>
+   ;
+   <var>n</var>
+   )  =
+   <b>lcm</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec8
+   </var>
+   ; 3 )  = 0
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec8</var>
+   ;
+   <var>n</var>
+   )  =
+   <b>lcm</b>
+   (
+   <var>vec8</var>
+   ;
+   <var>n</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec8
+   </var>
+   ;
+   <var>n</var>
+   )  =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec8
+   </var>
+   ; 3 )  = 0
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <h2>Other functions</h2>
+ <p>
+  <span class="eq">
+   <b>sign</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 -1 1 1 -1 0 1 -1
+   <b class="b0">]</b>
+  </span>
+  ,
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>vec7</var>
+   )  =
+   <b>sign</b>
+   (
+   <var>vec7</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 -1 1 1 -1 0 1 -1
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>random(vec7),f(vec7) = random(vec7) commented out to procude stable CI builds</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vec7
+   </var>
+   )  =
+   <b class="b0">[</b>
+   1 -1 1 1 -1 0 1 -1
+   <b class="b0">]</b>
+  </span>
+ </p>
+</div>

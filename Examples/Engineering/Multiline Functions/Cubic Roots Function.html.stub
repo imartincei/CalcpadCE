@@ -1,0 +1,444 @@
+<div class="calcpad-output">
+ <!-- Multiline cubic-roots function returning all three roots of $x^3 + a x^2 + b x + c = 0$ via the [Cardano formula](https://en.wikipedia.org/wiki/Cubic_equation), with discriminant-based real/complex branching. -->
+ <h3>Cubic Equation Roots Function</h3>
+ <p>
+  For solving equations of type:
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   )  =
+   <var>x</var>
+   <sup>3</sup>
+   +
+   <var>a</var>
+   ·
+   <var>x</var>
+   <sup>2</sup>
+   +
+   <var>b</var>
+   ·
+   <var>x</var>
+   +
+   <var>c</var>
+  </span>
+  = 0
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>cubicRoots</var>
+   <sub>1</sub>
+   (
+   <var>a</var>
+   ;
+   <var>Q</var>
+   ;
+   <var>R</var>
+   )  =
+   <small class="arr">🞀</small>
+   <span class="block">
+    <var>A</var>
+    = -
+    <b>sign</b>
+    (
+    <var>R</var>
+    )  ·  (
+    <b class="b0">|</b>
+    <var>R</var>
+    <b class="b0">|</b>
+    +
+    <span class="o0">
+     <span class="r">√</span>
+     <var>R</var>
+     <sup>2</sup>
+     −
+     <var>Q</var>
+     <sup>3</sup>
+    </span>
+    )
+    <sup>
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+    <br/>
+    <var>x</var>
+    <sub>1</sub>
+    =
+    <span class="dvcs">
+     <span class="c3">{</span>
+     <span class="dvs">
+      if
+      <var>A</var>
+      ≡ 0:
+      <span class="dvc">
+       -
+       <var>a</var>
+       <span class="dvl">
+       </span>
+       3
+      </span>
+      <br/>
+      else:
+      <var>A</var>
+      +
+      <span class="dvc">
+       <var>Q</var>
+       <span class="dvl">
+       </span>
+       <var>A</var>
+      </span>
+      −
+      <span class="dvc">
+       <var>a</var>
+       <span class="dvl">
+       </span>
+       3
+      </span>
+     </span>
+    </span>
+    <br/>
+    <var>x</var>
+    =
+    <b>hp</b>
+    (
+    <span class="b0">[</span>
+    <var>x</var>
+    <sub>1</sub>
+    ;
+    <var>x</var>
+    <sub>1</sub>
+    ;
+    <var>x</var>
+    <sub>1</sub>
+    <span class="b0">]</span>
+    )
+    <br/>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>cubicRoots</var>
+   <sub>3</sub>
+   (
+   <var>a</var>
+   ;
+   <var>Q</var>
+   ;
+   <var>R</var>
+   )  =
+   <small class="arr">🞀</small>
+   <span class="block">
+    <var>θ</var>
+    =
+    <b>acos</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>R</var>
+     <span class="dvl">
+     </span>
+     <span class="o0">
+      <span class="r">√</span>
+      <var>Q</var>
+      <sup>3</sup>
+     </span>
+    </span>
+    <span class="b1">)</span>
+    <br/>
+    <var>x</var>
+    <sub>1</sub>
+    = -2 ·
+    <span class="o0">
+     <span class="r">√</span>
+     <var>Q</var>
+    </span>
+    ·
+    <b>cos</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>θ</var>
+     <span class="dvl">
+     </span>
+     3
+    </span>
+    <span class="b1">)</span>
+    −
+    <span class="dvc">
+     <var>a</var>
+     <span class="dvl">
+     </span>
+     3
+    </span>
+    <br/>
+    <var>x</var>
+    <sub>2</sub>
+    = -2 ·
+    <span class="o0">
+     <span class="r">√</span>
+     <var>Q</var>
+    </span>
+    ·
+    <b>cos</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>θ</var>
+     − 2 ·
+     <var>π</var>
+     <span class="dvl">
+     </span>
+     3
+    </span>
+    <span class="b1">)</span>
+    −
+    <span class="dvc">
+     <var>a</var>
+     <span class="dvl">
+     </span>
+     3
+    </span>
+    <br/>
+    <var>x</var>
+    <sub>3</sub>
+    = -2 ·
+    <span class="o0">
+     <span class="r">√</span>
+     <var>Q</var>
+    </span>
+    ·
+    <b>cos</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>θ</var>
+     + 2 ·
+     <var>π</var>
+     <span class="dvl">
+     </span>
+     3
+    </span>
+    <span class="b1">)</span>
+    −
+    <span class="dvc">
+     <var>a</var>
+     <span class="dvl">
+     </span>
+     3
+    </span>
+    <br/>
+    <var>x</var>
+    =
+    <b>hp</b>
+    (
+    <span class="b0">[</span>
+    <var>x</var>
+    <sub>1</sub>
+    ;
+    <var>x</var>
+    <sub>2</sub>
+    ;
+    <var>x</var>
+    <sub>3</sub>
+    <span class="b0">]</span>
+    )
+    <br/>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>cubicRoots</var>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   ;
+   <var>c</var>
+   )  =
+   <small class="arr">🞀</small>
+   <span class="block">
+    <var>Q</var>
+    =
+    <span class="dvc">
+     <var>a</var>
+     <sup>2</sup>
+     − 3 ·
+     <var>b</var>
+     <span class="dvl">
+     </span>
+     9
+    </span>
+    <br/>
+    <var>R</var>
+    =
+    <span class="dvc">
+     2 ·
+     <var>a</var>
+     <sup>3</sup>
+     − 9 ·
+     <var>a</var>
+     ·
+     <var>b</var>
+     + 27 ·
+     <var>c</var>
+     <span class="dvl">
+     </span>
+     54
+    </span>
+    <br/>
+    <var>x</var>
+    =
+    <span class="dvcs">
+     <span class="c1">{</span>
+     <span class="dvs">
+      if
+      <var>R</var>
+      <sup>2</sup>
+      &lt;
+      <var>Q</var>
+      <sup>3</sup>
+      :
+      <var>cubicRoots</var>
+      <sub>3</sub>
+      (
+      <var>a</var>
+      ;
+      <var>Q</var>
+      ;
+      <var>R</var>
+      )
+      <br/>
+      else:
+      <var>cubicRoots</var>
+      <sub>1</sub>
+      (
+      <var>a</var>
+      ;
+      <var>Q</var>
+      ;
+      <var>R</var>
+      )
+     </span>
+    </span>
+    <br/>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <var>cubicRoots</var>
+   ( -6; 11; -6 )  =
+   <b class="b0">[</b>
+   1 2 3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Plot</p>
+ <svg class="plot" data-plot="svg" height="840px" style="width:198.15pt; height:155.56pt;" version="1.1" viewbox=" 0 0 1070 840" width="1070px" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+   .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+.Series4 {stroke:#f0d000;}
+circle.Series4 {fill:#f0d000;}
+.Fill4 {fill:#f0d000; fill-opacity:0.035;}
+  </style>
+  <g class="plot">
+   <rect class="Frame" height="600" width="800" x="180" y="120">
+   </rect>
+   <line class="Grid" x1="180" x2="980" y1="660" y2="660">
+   </line>
+   <text class="sm end" x="161" y="678">-1.5</text>
+   <line class="Grid" x1="180" x2="980" y1="580" y2="580">
+   </line>
+   <text class="sm end" x="161" y="598">-1</text>
+   <line class="Grid" x1="180" x2="980" y1="500" y2="500">
+   </line>
+   <text class="sm end" x="161" y="518">-0.5</text>
+   <line class="Grid" x1="180" x2="980" y1="420" y2="420">
+   </line>
+   <text class="sm end" x="161" y="438">0</text>
+   <line class="Grid" x1="180" x2="980" y1="340" y2="340">
+   </line>
+   <text class="sm end" x="161" y="358">0.5</text>
+   <line class="Grid" x1="180" x2="980" y1="260" y2="260">
+   </line>
+   <text class="sm end" x="161" y="278">1</text>
+   <line class="Grid" x1="180" x2="980" y1="180" y2="180">
+   </line>
+   <text class="sm end" x="161" y="198">1.5</text>
+   <line class="Grid" x1="180.33" x2="180.33" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="180.33" y="772">0.5</text>
+   <line class="Grid" x1="247" x2="247" y1="120" y2="720">
+   </line>
+   <line class="Grid" x1="313.67" x2="313.67" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="313.67" y="772">1</text>
+   <line class="Grid" x1="380.33" x2="380.33" y1="120" y2="720">
+   </line>
+   <line class="Grid" x1="447" x2="447" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="447" y="772">1.5</text>
+   <line class="Grid" x1="513.67" x2="513.67" y1="120" y2="720">
+   </line>
+   <line class="Grid" x1="580.33" x2="580.33" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="580.33" y="772">2</text>
+   <line class="Grid" x1="647" x2="647" y1="120" y2="720">
+   </line>
+   <line class="Grid" x1="713.67" x2="713.67" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="713.67" y="772">2.5</text>
+   <line class="Grid" x1="780.33" x2="780.33" y1="120" y2="720">
+   </line>
+   <line class="Grid" x1="847" x2="847" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="847" y="772">3</text>
+   <line class="Grid" x1="913.67" x2="913.67" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="980.33" y="772">3.5</text>
+   <line class="Axis" x1="180" x2="980" y1="420" y2="420">
+   </line>
+   <text x="1002" y="402">x</text>
+   <text x="8" y="823">[0.5; -1.88]</text>
+   <text class="end" x="1062" y="44">[3.5; 1.87]</text>
+   <polyline class="Series1" points="180.33,720 206.14,637.57 231.95,567.75 257.75,509.67 270.66,484.77 283.56,462.48 296.46,442.69 309.37,425.29 322.27,410.17 335.17,397.23 341.62,391.54 348.08,386.36 354.53,381.66 360.98,377.44 367.43,373.68 373.88,370.37 380.33,367.5 386.78,365.05 393.24,363 399.69,361.35 406.14,360.08 412.59,359.18 419.04,358.63 425.49,358.42 431.95,358.54 438.4,358.96 444.85,359.69 451.3,360.71 464.2,363.54 477.11,367.35 490.01,372.02 502.91,377.46 515.82,383.56 541.62,397.26 567.43,412.28 593.24,427.72 619.04,442.74 644.85,456.44 657.75,462.54 670.66,467.98 683.56,472.65 696.46,476.46 709.37,479.29 715.82,480.31 722.27,481.04 728.72,481.46 735.17,481.58 741.62,481.37 748.08,480.82 754.53,479.92 760.98,478.65 767.43,477 773.88,474.95 780.33,472.5 786.78,469.63 793.24,466.32 799.69,462.56 806.14,458.34 812.59,453.64 819.04,448.46 825.49,442.77 838.4,429.83 851.3,414.71 864.2,397.31 877.11,377.52 890.01,355.23 902.91,330.33 928.72,272.25 954.53,202.43 980.33,120">
+   </polyline>
+   <polygon class="Fill1" points="180.33,420 180.33,720 206.14,637.57 231.95,567.75 257.75,509.67 270.66,484.77 283.56,462.48 296.46,442.69 309.37,425.29 322.27,410.17 335.17,397.23 341.62,391.54 348.08,386.36 354.53,381.66 360.98,377.44 367.43,373.68 373.88,370.37 380.33,367.5 386.78,365.05 393.24,363 399.69,361.35 406.14,360.08 412.59,359.18 419.04,358.63 425.49,358.42 431.95,358.54 438.4,358.96 444.85,359.69 451.3,360.71 464.2,363.54 477.11,367.35 490.01,372.02 502.91,377.46 515.82,383.56 541.62,397.26 567.43,412.28 593.24,427.72 619.04,442.74 644.85,456.44 657.75,462.54 670.66,467.98 683.56,472.65 696.46,476.46 709.37,479.29 715.82,480.31 722.27,481.04 728.72,481.46 735.17,481.58 741.62,481.37 748.08,480.82 754.53,479.92 760.98,478.65 767.43,477 773.88,474.95 780.33,472.5 786.78,469.63 793.24,466.32 799.69,462.56 806.14,458.34 812.59,453.64 819.04,448.46 825.49,442.77 838.4,429.83 851.3,414.71 864.2,397.31 877.11,377.52 890.01,355.23 902.91,330.33 928.72,272.25 954.53,202.43 980.33,120 980.33,420" stroke-width="0">
+   </polygon>
+   <circle class="Series2" cx="313.67" cy="420" r="10">
+   </circle>
+   <circle class="Series3" cx="580.33" cy="420" r="10">
+   </circle>
+   <circle class="Series4" cx="847" cy="420" r="10">
+   </circle>
+  </g>
+ </svg>
+</div>

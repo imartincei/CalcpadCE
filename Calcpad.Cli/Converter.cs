@@ -1,5 +1,4 @@
 ﻿using Calcpad.OpenXml;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,20 +11,26 @@ namespace Calcpad.Cli
         private readonly StringBuilder _sb = new();
         private readonly string _htmlWorksheet;
         private readonly bool _isSilent;
+        private readonly bool _isBodyOnly;
 
-        internal Converter(bool isSilent)
+        internal Converter(bool isSilent, bool isBodyOnly = false)
         {
-            var appUrl = $"file:///{Program.AppPath.Replace("\\", "/")}doc/";
             var templatePath =  $"{Program.AppPath}doc{Path.DirectorySeparatorChar}template{Program.AddCultureExt("html")}";
-            _htmlWorksheet = File.ReadAllText(templatePath).Replace("jquery", appUrl + "jquery");
-            _isSilent = isSilent;   
+            _htmlWorksheet = File.ReadAllText(templatePath);
+            _isSilent = isSilent;
+            _isBodyOnly = isBodyOnly;
         }
 
         internal void ToHtml(string html, string path)
         {
-            File.WriteAllText(path, HtmlApplyWorksheet(html));
-            if (!_isSilent && File.Exists(path))
-                Run(path);
+            if (_isBodyOnly)
+                File.WriteAllText(path, $"<div class=\"calcpad-output\">{html}</div>");
+            else
+            {
+                File.WriteAllText(path, HtmlApplyWorksheet(html));
+                if (!_isSilent && File.Exists(path))
+                    Run(path);
+            }
         }
 
         internal void ToOpenXml(string html, string path, List<string> expressions)
@@ -35,48 +40,7 @@ namespace Calcpad.Cli
             if (!_isSilent && File.Exists(path))
                 Run(path);
         }
-        internal void ToPdf(string html, string path)
-        {
-            var htmlFile = Path.ChangeExtension(path, ".html");
-            File.WriteAllText(htmlFile, HtmlApplyWorksheet(html));
-            
-            string wkhtmltopdfPath;
-
-            if (OperatingSystem.IsWindows())
-            {
-                wkhtmltopdfPath = Program.AppPath + "wkhtmltopdf.exe";
-            }
-            else
-            {
-                wkhtmltopdfPath = "/usr/bin/wkhtmltopdf";
-                
-                if (!File.Exists("/usr/bin/wkhtmltopdf"))
-                {
-                    throw new DirectoryNotFoundException("wkhtmltopdf not found.");
-                }
-            }
-            
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = wkhtmltopdfPath
-            };
-            const string s = " --enable-local-file-access --disable-smart-shrinking --page-size A4  --margin-bottom 15 --margin-left 15 --margin-right 10 --margin-top 15 ";
-            if (htmlFile.Contains(' ', StringComparison.Ordinal))
-                startInfo.Arguments = s + '\"' + htmlFile + "\" \"" + path + '\"';
-            else
-                startInfo.Arguments = s + htmlFile + " " + path;
-
-            startInfo.UseShellExecute = true;
-            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            var process = Process.Start(startInfo);
-            process?.WaitForExit();
-            
-            File.Delete(htmlFile);
-            if (!_isSilent && File.Exists(path))
-                Run(path);
-        }
-
-        private static void Run(string fileName) 
+        private static void Run(string fileName)
         {
             Process process = new()
             {
@@ -90,7 +54,7 @@ namespace Calcpad.Cli
 
         private string HtmlApplyWorksheet(string s)
         {
-            
+
             _sb.Append(_htmlWorksheet);
             _sb.Append(s);
             _sb.Append(" </body></html>");

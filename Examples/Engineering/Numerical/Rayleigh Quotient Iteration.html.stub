@@ -1,0 +1,701 @@
+<div class="calcpad-output">
+ <!-- Computes the dominant eigenpair of a $3\times 3$ symmetric matrix via Rayleigh-quotient iteration.
+<p>Each step solves a shifted linear system, normalises the iterate and rebuilds the eigenvalue from the quotient, achieving cubic convergence within a handful of steps. -->
+ <p>Input matrix</p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <b>copy</b>
+   (
+   <span class="b0">[</span>
+   4; 12; -16
+   <span class="b0">|</span>
+   12; 37; -43
+   <span class="b0">|</span>
+   -16; -43; 98
+   <span class="b0">]</span>
+   ;
+   <b>symmetric</b>
+   ( 3 ) ; 1; 1 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">12</span>
+     <span class="td">-16</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">12</span>
+     <span class="td">37</span>
+     <span class="td">-43</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-16</span>
+     <span class="td">-43</span>
+     <span class="td">98</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  Initial guess: eigenvalue -
+  <span class="eq">
+   <var>λ</var>
+   <sub>0</sub>
+   = 1
+  </span>
+  , eigenvector -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b class="b0">[</b>
+   1 0 0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <h4>Iteration - 1</h4>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b>unit</b>
+   (
+   <b>inverse</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   −
+   <var>λ</var>
+   <sub>0</sub>
+   ·
+   <b>
+    <var>I</var>
+   </b>
+   )  ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b>unit</b>
+   (
+   <b>inverse</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   − 1 ·
+   <b>
+    <var>I</var>
+   </b>
+   )  ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.96 0.278 -0.0351
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>λ</var>
+   =
+   <b>transp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  ·
+   <b>
+    <var>A</var>
+   </b>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   = 0.0225
+  </span>
+ </p>
+ <!-- <span class="eq"><var>λ</var><sub>0</sub> = <var>λ</var> = 0.0225</span> -->
+ <h4>Iteration - 2</h4>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b>unit</b>
+   (
+   <b>inverse</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   −
+   <var>λ</var>
+   <sub>0</sub>
+   ·
+   <b>
+    <var>I</var>
+   </b>
+   )  ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b>unit</b>
+   (
+   <b>inverse</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   − 0.0225 ·
+   <b>
+    <var>I</var>
+   </b>
+   )  ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0.963 -0.265 0.0411
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>λ</var>
+   =
+   <b>transp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  ·
+   <b>
+    <var>A</var>
+   </b>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   = 0.0188
+  </span>
+ </p>
+ <!-- <span class="eq"><var>λ</var><sub>0</sub> = <var>λ</var> = 0.0188</span> -->
+ <h4>Iteration - 3</h4>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   =
+   <b>unit</b>
+   (
+   <b>inverse</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   −
+   <var>λ</var>
+   <sub>0</sub>
+   ·
+   <b>
+    <var>I</var>
+   </b>
+   )  ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b>unit</b>
+   (
+   <b>inverse</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   − 0.0188 ·
+   <b>
+    <var>I</var>
+   </b>
+   )  ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -0.963 0.265 -0.0411
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>λ</var>
+   =
+   <b>transp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  ·
+   <b>
+    <var>A</var>
+   </b>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   = 0.0188
+  </span>
+ </p>
+ <!-- <span class="eq"><var>λ</var><sub>1</sub> = <var>λ</var> = 0.0188</span> ,  <span class="eq"><var><span class="vec">⃗</span>x</var><sub>1</sub> = <var><span class="vec">⃗</span>x</var> = <b class="b0">[</b>-0.963 0.265 -0.0411<b class="b0">]</b></span> -->
+ <h4>Results</h4>
+ <p>
+  Eigenvalue 1 -
+  <span class="eq">
+   <var>λ</var>
+   <sub>1</sub>
+   = 0.0188
+  </span>
+ </p>
+ <p>
+  Eigenvector 1 -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>1</sub>
+   =
+   <b class="b0">[</b>
+   -0.963 0.265 -0.0411
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  Deflation -
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <b>
+    <var>A</var>
+   </b>
+   −
+   <var>λ</var>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ·
+   <b>transp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b>
+    <var>A</var>
+   </b>
+   − 0.0188 ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ·
+   <b>transp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3.98</span>
+     <span class="td">12</span>
+     <span class="td">-16</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">12</span>
+     <span class="td">37</span>
+     <span class="td">-43</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-16</span>
+     <span class="td">-43</span>
+     <span class="td">98</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  Eigenvalue 2 -
+  <span class="eq">
+   <var>λ</var>
+   <sub>2</sub>
+   = 15.5
+  </span>
+ </p>
+ <p>
+  Eigenvector 2 -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>2</sub>
+   =
+   <b class="b0">[</b>
+   0.213 0.849 0.484
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  Deflation -
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <b>
+    <var>A</var>
+   </b>
+   −
+   <var>λ</var>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ·
+   <b>transp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <b>
+    <var>A</var>
+   </b>
+   − 15.5 ·
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   ·
+   <b>transp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3.28</span>
+     <span class="td">9.2</span>
+     <span class="td">-17.6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">9.2</span>
+     <span class="td">25.82</span>
+     <span class="td">-49.37</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-17.6</span>
+     <span class="td">-49.37</span>
+     <span class="td">94.37</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  Eigenvalue 3 -
+  <span class="eq">
+   <var>λ</var>
+   <sub>3</sub>
+   = 123.48
+  </span>
+ </p>
+ <p>
+  Eigenvector 3 -
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>3</sub>
+   =
+   <b class="b0">[</b>
+   -0.163 -0.457 0.874
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  Solution with CalcpadCE -
+  <span class="eq">
+   <b>
+    <var>E</var>
+   </b>
+   =
+   <b>eigen</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   <sub>1</sub>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0188</span>
+     <span class="td">0.963</span>
+     <span class="td">-0.265</span>
+     <span class="td">0.0411</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">15.5</span>
+     <span class="td">-0.213</span>
+     <span class="td">-0.849</span>
+     <span class="td">-0.484</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">123.48</span>
+     <span class="td">-0.163</span>
+     <span class="td">-0.457</span>
+     <span class="td">0.874</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>(symmetric QL algorithm with implicit shifts)</p>
+ <p>Difference</p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>R</var>
+   </b>
+   =
+   <b>
+    <var>E</var>
+   </b>
+   −
+   <span class="b0">[</span>
+   <var>λ</var>
+   <sub>1</sub>
+   ; -
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>1</sub>
+   <span class="b0">|</span>
+   <var>λ</var>
+   <sub>2</sub>
+   ; -
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>2</sub>
+   <span class="b0">|</span>
+   <var>λ</var>
+   <sub>3</sub>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>3</sub>
+   <span class="b0">]</span>
+   =
+   <b>
+    <var>E</var>
+   </b>
+   −
+   <span class="b0">[</span>
+   0.0188; -
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>1</sub>
+   <span class="b0">|</span>
+   15.5; -
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>2</sub>
+   <span class="b0">|</span>
+   123.48;
+   <var>
+    <span class="vec">⃗</span>
+    x
+   </var>
+   <sub>3</sub>
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      -7.22×10
+      <sup>-16</sup>
+     </span>
+     <span class="td">
+      -2.22×10
+      <sup>-16</sup>
+     </span>
+     <span class="td">
+      -3.33×10
+      <sup>-16</sup>
+     </span>
+     <span class="td">
+      -1.11×10
+      <sup>-16</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      1.01×10
+      <sup>-13</sup>
+     </span>
+     <span class="td">
+      7.23×10
+      <sup>-8</sup>
+     </span>
+     <span class="td">
+      -1.98×10
+      <sup>-8</sup>
+     </span>
+     <span class="td">
+      2.88×10
+      <sup>-9</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      2.84×10
+      <sup>-14</sup>
+     </span>
+     <span class="td">
+      3.19×10
+      <sup>-9</sup>
+     </span>
+     <span class="td">
+      8.94×10
+      <sup>-9</sup>
+     </span>
+     <span class="td">
+      5.27×10
+      <sup>-9</sup>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>mnorm</b>
+   <sub>e</sub>
+   (
+   <b>
+    <var>R</var>
+   </b>
+   )  = 7.58×10
+   <sup>-8</sup>
+  </span>
+ </p>
+</div>

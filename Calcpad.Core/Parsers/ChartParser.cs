@@ -46,7 +46,7 @@ namespace Calcpad.Core
             for (int j = 0; j < n; ++j)
                 if (string.IsNullOrWhiteSpace(input[j]))
                     return string.Format(Messages.Missing_0_in_plot_command_1, Parts[j], script.ToString());
-            
+
             string result;
             if (calculate)
             {

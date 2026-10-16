@@ -1,0 +1,210 @@
+<div class="calcpad-output">
+ <!-- Section properties of a regular hexagon: area, $I_x = I_y$, section moduli and radii of gyration in closed form. -->
+ <h3>Geometrical Properties of Regular Hexagon</h3>
+ <div style="max-width:120mm">
+  <img alt="hexagon.png" class="side" src="Images/mechanics/sections/hexagon.png" style="height:135pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-5">1</u>
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    3
+   </span>
+   ·
+   <var>a</var>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    3
+   </span>
+   · 1 = 1.73
+  </span>
+  m
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   = 1.5 ·
+   <var>a</var>
+   ·
+   <var>h</var>
+   = 1.5 · 1 · 1.73 = 2.6
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>Centroid</p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   <sub>c</sub>
+   =
+   <var>a</var>
+   = 1
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    1.73
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 0.866
+  </span>
+  m
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   = 6 ·
+   <var>a</var>
+   = 6 · 1 = 6
+  </span>
+  m
+ </p>
+ <p>Second moments of area</p>
+ <p>
+  <i>I</i>
+  <sub>z</sub>
+  =
+  <span class="eq">
+   <var>I</var>
+   <sub>y</sub>
+   =
+   <span class="dvc">
+    5 ·
+    <span class="o0">
+     <span class="r">√</span>
+     3
+    </span>
+    ·
+    <var>a</var>
+    <sup>4</sup>
+    <span class="dvl">
+    </span>
+    16
+   </span>
+   =
+   <span class="dvc">
+    5 ·
+    <span class="o0">
+     <span class="r">√</span>
+     3
+    </span>
+    · 1
+    <sup>4</sup>
+    <span class="dvl">
+    </span>
+    16
+   </span>
+   = 0.541
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Polar moment of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>x</sub>
+   = 2 ·
+   <var>I</var>
+   <sub>y</sub>
+   = 2 · 0.541 = 1.08
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Radii of gyration</p>
+ <p>
+  <i>r</i>
+  <sub>z</sub>
+  =
+  <span class="eq">
+   <var>r</var>
+   <sub>y</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.541
+     <span class="dvl">
+     </span>
+     2.6
+    </span>
+   </span>
+   = 0.456
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>x</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>x</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     1.08
+     <span class="dvl">
+     </span>
+     2.6
+    </span>
+   </span>
+   = 0.645
+  </span>
+  m
+ </p>
+</div>

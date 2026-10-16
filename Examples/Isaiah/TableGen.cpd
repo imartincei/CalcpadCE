@@ -1,0 +1,163 @@
+#def genTableCSS$(headerBg$; rowBg$; cellBg$; borderColor$; padding$)
+	#val
+	'<style>
+	'.calcpad-table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+	'.calcpad-table thead tr { background-color: headerBg$; }
+	'.calcpad-table th, .calcpad-table td { border: 1px solid borderColor$; padding: padding$px; }
+	'.calcpad-table th { text-align: center; font-weight: bold; }
+	'.calcpad-table tbody td:first-child { font-weight: bold; background-color: rowBg$; }
+	'.calcpad-table.no-index tbody td:first-child { font-weight: normal; background-color: cellBg$; }
+	'.calcpad-table tbody td { text-align: center; background-color: cellBg$;}
+	'</style>
+	#equ
+#end def
+'
+#def genTableStart$(id$; M$; header$; index$)
+	#val
+	'<script>
+	'function d(v) { return v == null ? "none" : v; }
+	'function parseParam(v) {
+	'    if (v == null) return "none";
+	'    if (Array.isArray(v)) return v;
+	'    if (typeof v === "string") return v;
+	'    return "none";
+	'}
+	'window.tableData = {
+	'    matrix: 'M$',
+	'    headers: parseParam(header$),
+	'    indices: parseParam(index$)
+	'};
+	'</script>
+	'<div id="id$"></div>
+	'<script>
+	'function compareWithOperator(value, operatorSymbol, compareValue) {
+	'    switch (operatorSymbol) {
+	'        case "≡":
+	'            return value === compareValue;
+	'        case "≠":
+	'            return value !== compareValue;
+	'        case "≤":
+	'            return value <= compareValue;
+	'        case "≥":
+	'            return value >= compareValue;
+	'        default:
+	'    }
+	'}
+	'(function() {
+	'    const data = window.tableData;
+	'    const matrix = data.matrix;
+	'    let headers = data.headers;
+	'    let indices = data.indices;
+	'    const showHeaders = headers !== "none";
+	'    const showIndices = indices !== "none";
+	'
+	'    if (showHeaders && typeof headers === "string") {
+	'        headers = headers.split(",").map(function(s) { return s.trim(); });
+	'    }
+	'
+	'    if (showIndices && typeof indices === "string") {
+	'        var baseText = indices;
+	'        indices = [];
+	'        for (var i = 0; i < matrix.length; i++) {
+	'            indices.push(baseText + " " + (i + 1));
+	'        }
+	'    }
+	'
+	'    const rowCount = showIndices ? indices.length : matrix.length;
+	'    let html = showIndices ? "<table class=\"calcpad-table\">" : "<table class=\"calcpad-table no-index\">";
+	'    if (showHeaders) {
+	'        html += "<thead><tr>";
+	'        if (showIndices) { html += "<th></th>"; }
+	'
+	'        for (let col = 0; col < headers.length; col++) {
+	'            html += "<th>" + headers[col] + "</th>";
+	'        }
+	'        html += "</tr></thead>";
+	'    }
+	'    html += "<tbody>";
+	'
+#end def
+'
+#def genTableEnd$(id$)
+	'    html += "</tbody></table>";
+	'    document.getElementById("id$").innerHTML = html;
+	'})();
+	'</script>
+	#equ
+#end def
+#def genTable$(id$; M$; header$; index$; zeroBlack$)
+	genTableStart$(id$; M$; header$; index$)
+	'    for (let row = 0; row < rowCount; row++) {
+	'        html += "<tr>";
+	'        if (showIndices) { html += "<td>" + indices[row] + "</td>"; }
+	'
+	'        for (let col = 0; col < matrix[row].length; col++) {
+	'            const value = matrix[row][col];
+	'            let bgColor;
+	'            if ((zeroBlack$ && value === 0) || isNaN(value)) {
+	'                bgColor = "black";
+	'            }
+	'            html += "<td style=\"background-color: " + bgColor + ";\">" + value + "</td>";
+	'        }
+	'        html += "</tr>";
+	'    }
+	genTableEnd$(id$)
+#end def
+'
+#def genTableColor$(id$; M$; header$; index$; operator$; value$; passColor$; failColor$; zeroBlack$)
+	genTableStart$(id$; M$; header$; index$)
+	'    for (let row = 0; row < rowCount; row++) {
+	'        html += "<tr>";
+	'        if (showIndices) { html += "<td>" + indices[row] + "</td>"; }
+	'
+	'        for (let col = 0; col < matrix[row].length; col++) {
+	'            const value = matrix[row][col];
+	'            let bgColor;
+	'            if ((zeroBlack$ && value === 0) || isNaN(value)) {
+	'                bgColor = "black";
+	'            } else {
+	'                bgColor = compareWithOperator(value, operator$, value$) ? "passColor$" : "failColor$";
+	'            }
+	'            html += "<td style=\"background-color: " + bgColor + ";\">" + value + "</td>";
+	'        }
+	'        html += "</tr>";
+	'    }
+	genTableEnd$(id$)
+#end def
+'
+#def genTableColorRange$(id$; M$; header$; index$; rowIndVector$; colIndVector$; operator$; value$; passColor$; failColor$; zeroBlack$)
+	genTableStart$(id$; M$; header$; index$)
+	'    const rowIndVector = parseParam('rowIndVector$');
+	'    const colIndVector = parseParam('colIndVector$');
+	'    const applyAllRows = !Array.isArray(rowIndVector);
+	'    const applyAllCols = !Array.isArray(colIndVector);
+	'    for (let row = 0; row < rowCount; row++) {
+	'        html += "<tr>";
+	'        if (showIndices) { html += "<td>" + indices[row] + "</td>"; }
+	'
+	'        for (let col = 0; col < matrix[row].length; col++) {
+	'            const value = matrix[row][col];
+	'            const inRowRange = applyAllRows || rowIndVector.indexOf(row + 1) !== -1;
+	'            const inColRange = applyAllCols || colIndVector.indexOf(col + 1) !== -1;
+	'            let bgColor;
+	'            if ((zeroBlack$ && value === 0) || isNaN(value)) {
+	'                bgColor = "black";
+	'            } else if (inRowRange && inColRange) {
+	'                bgColor = compareWithOperator(value, operator$, value$) ? "passColor$" : "failColor$";
+	'            }
+	'            html += "<td style=\"background-color: " + bgColor + ";\">" + value + "</td>";
+	'        }
+	'        html += "</tr>";
+	'    }
+	genTableEnd$(id$)
+#end def
+#local
+M = [0; 2; 3|4; 5; 6|1; 4; 0/0]
+long = [1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8|1;2;3;4|5;6;7;8]
+genTableCSS$(#dfdfdf; #dfdfdf; #ffffff; #000000; 10)
+'Headers and indices accept arrays, e.g. ["Row 1", "Row 2"], comma-separated strings, e.g. "Row 1, Row 2", or "none"/empty to hide.'
+genTable$(table1; M; ["Col 1", "Col 2", "Col 3"]; ["Row 1", "Row 2", "Row 3"]; true)
+genTableColor$(table2; M; ["Col 1", "Col 2", "Col 3"]; "Row"; "≤"; 1; lime; pink; true)
+genTable$(table3; M; "none"; "none"; true)
+genTableColor$(table4; M; ; ; "≤"; 1; lime; pink; true)
+genTable$(table5; long; "none"; "Row"; true)

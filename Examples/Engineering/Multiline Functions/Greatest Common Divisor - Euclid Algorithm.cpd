@@ -1,0 +1,11 @@
+'<!-- Iterative greatest common divisor built around a $while$ block, implementing the classical [Euclid algorithm](https://en.wikipedia.org/wiki/Euclidean_algorithm). -->
+'Custom function:
+mygcd(a; b) = $while{
+  b > 0;
+  t = b;
+  b = a⦼b;
+  a = t}
+'Example:
+mygcd(1071; 462)
+'Internal gcd function:
+gcd(1071; 462)

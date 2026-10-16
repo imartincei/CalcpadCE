@@ -1,0 +1,15 @@
+'<!-- Volume $V = \tfrac{1}{3} a\, b\, h$ and surface area of a rectangular-base pyramid. -->
+'<div style = "max-width:130mm"><img style="height:65pt;" class="side" alt="rectangular-pyramid.png" src = "../../Images/math/volume/rectangular-pyramid.png"></div>
+'Dimensions of base
+a = ? {3}','b = ? {2}
+'Height
+h = ? {1}
+'Volume
+V = 1/3*a*b*h
+'Area of side faces
+S_o = a*sqr(h^2 + b^2/4) + b*sqr(h^2 + a^2/4)
+'Area of base
+A = a*b
+'Total surface area
+S = S_o + A
+'

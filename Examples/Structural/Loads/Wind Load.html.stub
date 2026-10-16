@@ -1,0 +1,3881 @@
+<div class="calcpad-output">
+ <!-- Eurocode EN 1991-1-4 wind on a rectangular building with duopitch roof: peak velocity pressure, zone-by-zone external pressure coefficients and reduction to line loads on columns, beams and purlins. -->
+ <small>
+  According to
+  <strong>Eurocode</strong>
+  : EN 1991-1-4
+ </small>
+ <div style="max-width:180mm">
+  <img alt="wind-3d.png" class="side" src="Images/structures/loads/wind-3d.png" style="width:225pt;"/>
+  <p>
+  </p>
+  <p>
+  </p>
+  <h4>Dimensions of the building</h4>
+  <p>
+   Width -
+   <span class="eq">
+    <var>B</var>
+    =
+    <u class="input-8">12</u>
+   </span>
+   m
+  </p>
+  <p>
+   Length -
+   <span class="eq">
+    <var>L</var>
+    =
+    <u class="input-9">30</u>
+   </span>
+   m
+  </p>
+  <p>
+   Height at roof ridge -
+   <span class="eq">
+    <var>h</var>
+    <sub>1</sub>
+    =
+    <u class="input-10">9</u>
+   </span>
+   m
+  </p>
+  <p>
+   Height at roof eaves -
+   <span class="eq">
+    <var>h</var>
+    <sub>2</sub>
+    =
+    <u class="input-11">8</u>
+   </span>
+   m
+  </p>
+  <p>Pitch angle</p>
+  <p>
+   <span class="eq">
+    <var>α</var>
+    =
+    <b>atan</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     (
+     <var>h</var>
+     <sub>1</sub>
+     −
+     <var>h</var>
+     <sub>2</sub>
+     )  · 2
+     <span class="dvl">
+     </span>
+     <var>B</var>
+    </span>
+    <span class="b1">)</span>
+    =
+    <b>atan</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     ( 9 − 8 )  · 2
+     <span class="dvl">
+     </span>
+     12
+    </span>
+    <span class="b1">)</span>
+    = 9.46
+   </span>
+   °
+  </p>
+  <p>Spacing between:</p>
+  <p>
+   - frames -
+   <span class="eq">
+    <var>a</var>
+    =
+    <u class="input-15">6</u>
+   </span>
+   m
+  </p>
+  <p>
+   - wind columns -
+   <span class="eq">
+    <var>b</var>
+    =
+    <u class="input-16">4</u>
+   </span>
+   m
+  </p>
+  <p>
+   - side beams -
+   <span class="eq">
+    <var>c</var>
+    <sub>s</sub>
+    =
+    <u class="input-17">2</u>
+   </span>
+   m
+  </p>
+  <p>
+   - purlins -
+   <span class="eq">
+    <var>c</var>
+    <sub>p</sub>
+    =
+    <u class="input-18">1</u>
+   </span>
+   m
+  </p>
+  <p>(If the above distances are ≤ 0, the corresponding loads will not be calculated)</p>
+  <p>
+   Reference area for side beams -
+   <span class="eq">
+    <var>A</var>
+    <sub>sa</sub>
+    =
+    <var>c</var>
+    <sub>s</sub>
+    ·
+    <var>a</var>
+    = 2 · 6 = 12
+   </span>
+   m²,
+   <span class="eq">
+    <var>A</var>
+    <sub>sb</sub>
+    =
+    <var>c</var>
+    <sub>s</sub>
+    ·
+    <var>b</var>
+    = 2 · 4 = 8
+   </span>
+   m²
+  </p>
+  <p>
+   Reference area for purlins -
+   <span class="eq">
+    <var>A</var>
+    <sub>p</sub>
+    =
+    <var>c</var>
+    <sub>p</sub>
+    ·
+    <var>a</var>
+    = 1 · 6 = 6
+   </span>
+   m²
+  </p>
+  <p>
+  </p>
+  <p>
+  </p>
+  <h4>Basic velocity pressure</h4>
+  <p>
+   Fundamental value of the basic wind velocity -
+   <span class="eq">
+    <var>v</var>
+    <sub>b_0</sub>
+    =
+    <u class="input-31">26</u>
+   </span>
+   kN/m²
+  </p>
+  <p>
+   Directional factor -
+   <span class="eq">
+    <var>C</var>
+    <sub>dir</sub>
+    = 1
+   </span>
+  </p>
+  <p>
+   Seasonal factor -
+   <span class="eq">
+    <var>C</var>
+    <sub>season</sub>
+    = 1
+   </span>
+  </p>
+  <p class="ref">[EN 1991-1-4 (4.1)]</p>
+  <p>
+   Basic wind velocity -
+   <span class="eq">
+    <var>v</var>
+    <sub>b</sub>
+    =
+    <var>C</var>
+    <sub>dir</sub>
+    ·
+    <var>C</var>
+    <sub>season</sub>
+    ·
+    <var>v</var>
+    <sub>b_0</sub>
+    = 1 · 1 · 26 = 26
+   </span>
+   m/s
+  </p>
+  <p>
+   Orography factor -
+   <span class="eq">
+    <var>C</var>
+    <sub>0</sub>
+    = 1
+   </span>
+  </p>
+  <p id="C" style="display:none;">
+   <span class="eq">
+    <var>C</var>
+    =
+    <u class="input-39">4</u>
+   </span>
+  </p>
+  <p class="ref">[EN 1991-1-4, Table 4.1]</p>
+  <p>Terrain categories</p>
+  <p>
+   <select data-target="C">
+    <option value="0">0. Sea or coastal area...</option>
+    <option value="1">I. Lakes or flat and horizontal area...</option>
+    <option value="2">II. Area with low vegetation...</option>
+    <option value="3">III. Area with regular cover of vegetation or buildings...</option>
+    <option value="4">IV. Area in which at least 15 % of the surface is covered with buildings with h &gt; 15 m</option>
+   </select>
+  </p>
+  <p class="ref">[EN 1991-1-4, Table 4.1]</p>
+  <p>
+   Terrain category - IV:
+   <span class="eq">
+    <var>z</var>
+    <sub>0</sub>
+    = 1
+   </span>
+   m,
+   <span class="eq">
+    <var>z</var>
+    <sub>min</sub>
+    = 10
+   </span>
+   m,
+   <span class="eq">
+    <var>z</var>
+    <sub>max</sub>
+    = 200
+   </span>
+   m
+  </p>
+  <p>Area in which at least 15 % of the surface is covered with buildings and their average height exceeds 15 m.</p>
+  <p>
+   Reference height -
+   <span class="eq">
+    <var>z</var>
+    =
+    <var>h</var>
+    <sub>1</sub>
+    = 9
+   </span>
+   m
+  </p>
+  <p class="ref">[EN 1991-1-4 (4.5)]</p>
+  <p>
+   Terrain factor -
+   <span class="eq">
+    <var>k</var>
+    <sub>r</sub>
+    = 0.19 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>z</var>
+     <sub>0</sub>
+     <span class="dvl">
+     </span>
+     0.05
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">0.07</sup>
+    = 0.19 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     0.05
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">0.07</sup>
+    = 0.234
+   </span>
+  </p>
+  <p class="ref">[EN 1991-1-4 (4.4)]</p>
+  <p>
+   Roughness factor -
+   <span class="eq">
+    <var>C</var>
+    <sub>r</sub>
+    =
+    <var>k</var>
+    <sub>r</sub>
+    ·
+    <b>ln</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>z</var>
+     <sub>min</sub>
+     <span class="dvl">
+     </span>
+     <var>z</var>
+     <sub>0</sub>
+    </span>
+    <span class="b1">)</span>
+    = 0.234 ·
+    <b>ln</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     10
+     <span class="dvl">
+     </span>
+     1
+    </span>
+    <span class="b1">)</span>
+    = 0.54
+   </span>
+  </p>
+  <p>
+   Turbulence factor -
+   <span class="eq">
+    <var>k</var>
+    <sub>I</sub>
+    = 1
+   </span>
+  </p>
+  <p class="ref">[EN 1991-1-4 (4.7)]</p>
+  <p>
+   Turbulence intensity -
+   <span class="eq">
+    <var>I</var>
+    <sub>v</sub>
+    =
+    <span class="dvc down">
+     <var>k</var>
+     <sub>I</sub>
+     <span class="dvl">
+     </span>
+     <var>C</var>
+     <sub>0</sub>
+     ·
+     <b>ln</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>z</var>
+      <sub>min</sub>
+      <span class="dvl">
+      </span>
+      <var>z</var>
+      <sub>0</sub>
+     </span>
+     <span class="b1">)</span>
+    </span>
+    =
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 ·
+     <b>ln</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      10
+      <span class="dvl">
+      </span>
+      1
+     </span>
+     <span class="b1">)</span>
+    </span>
+    = 0.434
+   </span>
+  </p>
+  <p>Basic velocity pressure</p>
+  <p class="ref">[EN 1991-1-4 (4.10)]</p>
+  <p>
+   <span class="eq">
+    <var>q</var>
+    <sub>b</sub>
+    =
+    <span class="dvc">
+     1.25
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    ·
+    <var>v</var>
+    <sub>b</sub>
+    <sup>2</sup>
+    · 10
+    <sup>-3</sup>
+    =
+    <span class="dvc">
+     1.25
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    · 26
+    <sup>2</sup>
+    · 10
+    <sup>-3</sup>
+    = 0.422
+   </span>
+   kN/m²
+  </p>
+  <p>Exposure factor</p>
+  <p>
+   <span class="eq">
+    <var>C</var>
+    <sub>e</sub>
+    =  ( 1 + 7 ·
+    <var>I</var>
+    <sub>v</sub>
+    )  ·
+    <var>C</var>
+    <sub>r</sub>
+    <sup>2</sup>
+    ·
+    <var>C</var>
+    <sub>0</sub>
+    <sup>2</sup>
+    =  ( 1 + 7 · 0.434 )  · 0.54
+    <sup>2</sup>
+    · 1
+    <sup>2</sup>
+    = 1.18
+   </span>
+  </p>
+  <p>
+   <b>Peak velocity pressure</b>
+  </p>
+  <p class="ref">[EN 1991-1-4 (4.8)]</p>
+  <p>
+   <span class="eq">
+    <var>q</var>
+    <sub>p</sub>
+    =
+    <var>C</var>
+    <sub>e</sub>
+    ·
+    <var>q</var>
+    <sub>b</sub>
+    = 1.18 · 0.422 = 0.497
+   </span>
+   kN/m²
+  </p>
+  <p>
+   Building height -
+   <span class="eq">
+    <var>h</var>
+    <sub>1</sub>
+    = 9
+   </span>
+   &lt; 15 m
+  </p>
+  <p class="ref">[EN 1991-1-4, p. 6.2(1)]</p>
+  <p>
+   Size factor -
+   <span class="eq">
+    <var>C</var>
+    <sub>s</sub>
+    = 1
+   </span>
+   , Dynamic factor -
+   <span class="eq">
+    <var>C</var>
+    <sub>d</sub>
+    = 1
+   </span>
+  </p>
+  <p>
+   Structural factor -
+   <span class="eq">
+    <var>C</var>
+    <sub>s</sub>
+    ·
+    <var>C</var>
+    <sub>d</sub>
+    = 1 · 1 = 1
+   </span>
+  </p>
+  <p>
+   Internal pressure coefficient -
+   <span class="eq">
+    <var>C</var>
+    <sub>pi</sub>
+    =
+    <u class="input-98">-0.3</u>
+   </span>
+  </p>
+  <p class="ref">[EN 1991-1-4 Fig.7.13, Note 2]</p>
+  <p>(should be taken the relevant value of -0.3 and +0.2)</p>
+  <!--
+<p><span class="eq"><var>C</var><sub>pe,A</sub> = 0</span><span class="eq"><var>C</var><sub>pe,B</sub> = 0</span><span class="eq"><var>C</var><sub>pe,C</sub> = 0</span><span class="eq"><var>C</var><sub>pe,D</sub> = 0</span><span class="eq"><var>C</var><sub>pe,E</sub> = 0</span></p>
+<p><span class="eq"><var>C</var><sub>pe,F</sub> = 0</span><span class="eq"><var>C</var><sub>pe,G</sub> = 0</span><span class="eq"><var>C</var><sub>pe,H</sub> = 0</span><span class="eq"><var>C</var><sub>pe,I</sub> = 0</span><span class="eq"><var>C</var><sub>pe,J</sub> = 0</span></p>
+<p><span class="eq"><var>w</var><sub>c,A</sub> = 0</span><span class="eq"><var>w</var><sub>c,B</sub> = 0</span><span class="eq"><var>w</var><sub>c,C</sub> = 0</span><span class="eq"><var>w</var><sub>c,D</sub> = 0</span><span class="eq"><var>w</var><sub>c,E</sub> = 0</span></p>
+<p><span class="eq"><var>w</var><sub>s,A</sub> = 0</span><span class="eq"><var>w</var><sub>s,B</sub> = 0</span><span class="eq"><var>w</var><sub>s,C</sub> = 0</span><span class="eq"><var>w</var><sub>s,D</sub> = 0</span><span class="eq"><var>w</var><sub>s,E</sub> = 0</span></p>
+<p><span class="eq"><var>w</var><sub>b,F</sub> = 0</span><span class="eq"><var>w</var><sub>b,G</sub> = 0</span><span class="eq"><var>w</var><sub>b,H</sub> = 0</span><span class="eq"><var>w</var><sub>b,I</sub> = 0</span><span class="eq"><var>w</var><sub>b,J</sub> = 0</span></p>
+<p><span class="eq"><var>w</var><sub>s,F</sub> = 0</span><span class="eq"><var>w</var><sub>s,G</sub> = 0</span><span class="eq"><var>w</var><sub>s,H</sub> = 0</span><span class="eq"><var>w</var><sub>s,I</sub> = 0</span><span class="eq"><var>w</var><sub>s,J</sub> = 0</span></p>
+<-->
+  <p>
+  </p>
+  <p>
+  </p>
+  <h4>Wind in transverse direction</h4>
+  <p>
+   <span class="eq">
+    <var>e</var>
+    =
+    <b>min</b>
+    (
+    <var>L</var>
+    ; 2 ·
+    <var>h</var>
+    <sub>1</sub>
+    )  =
+    <b>min</b>
+    ( 30; 2 · 9 )  = 18
+   </span>
+   m
+  </p>
+  <p>
+  </p>
+  <p>
+   <b>Walls</b>
+  </p>
+  <!-- <span class="eq"><var>case</var> = 2</span> -->
+  <p>
+   <span class="eq">
+    <var>e</var>
+    = 18
+   </span>
+   m &lt;
+   <span class="eq">
+    5 ·
+    <var>B</var>
+    = 5 · 12 = 60
+   </span>
+   m
+  </p>
+  <img alt="wind-0-wall-2.png" src="Images/structures/loads/wind-0-wall-2.png" style="width:200pt;"/>
+  <p>
+   <span class="eq">
+    <span class="dvc">
+     <var>e</var>
+     <span class="dvl">
+     </span>
+     5
+    </span>
+    =
+    <span class="dvc">
+     18
+     <span class="dvl">
+     </span>
+     5
+    </span>
+    = 3.6
+   </span>
+   m,
+   <span class="eq">
+    <var>B</var>
+    −
+    <span class="dvc">
+     <var>e</var>
+     <span class="dvl">
+     </span>
+     5
+    </span>
+    = 12 −
+    <span class="dvc">
+     18
+     <span class="dvl">
+     </span>
+     5
+    </span>
+    = 8.4
+   </span>
+   m
+  </p>
+  <p>
+   <span class="eq">
+    <span class="dvc">
+     <var>h</var>
+     <sub>1</sub>
+     <span class="dvl">
+     </span>
+     <var>B</var>
+    </span>
+    =
+    <span class="dvc">
+     9
+     <span class="dvl">
+     </span>
+     12
+    </span>
+    = 0.75
+   </span>
+  </p>
+  <div class="fold">
+   <p>
+    <b>Results</b>
+   </p>
+   <p>
+    <b>External pressure coefficients</b>
+   </p>
+   <p>
+    Zone A -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,A</sub>
+     = -1.2
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,A</sub>
+     = -1.4
+    </span>
+   </p>
+   <p>
+    Zone B -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,B</sub>
+     = -0.8
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,B</sub>
+     = -1.1
+    </span>
+   </p>
+   <p>
+    Zone D -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,D</sub>
+     = 0.7 +
+     <span class="dvc up">
+      0.1 ·
+      <span class="b1">(</span>
+      <span class="dvc">
+       <var>h</var>
+       <sub>1</sub>
+       <span class="dvl">
+       </span>
+       <var>B</var>
+      </span>
+      − 0.25
+      <span class="b1">)</span>
+      <span class="dvl">
+      </span>
+      0.75
+     </span>
+     = 0.7 +
+     <span class="dvc up">
+      0.1 ·
+      <span class="b1">(</span>
+      <span class="dvc">
+       9
+       <span class="dvl">
+       </span>
+       12
+      </span>
+      − 0.25
+      <span class="b1">)</span>
+      <span class="dvl">
+      </span>
+      0.75
+     </span>
+     = 0.767
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,D</sub>
+     = 1
+    </span>
+   </p>
+   <p>
+    Zone E -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,E</sub>
+     = -0.3 −
+     <span class="dvc up">
+      0.2 ·
+      <span class="b1">(</span>
+      <span class="dvc">
+       <var>h</var>
+       <sub>1</sub>
+       <span class="dvl">
+       </span>
+       <var>B</var>
+      </span>
+      − 0.25
+      <span class="b1">)</span>
+      <span class="dvl">
+      </span>
+      0.75
+     </span>
+     = -0.3 −
+     <span class="dvc up">
+      0.2 ·
+      <span class="b1">(</span>
+      <span class="dvc">
+       9
+       <span class="dvl">
+       </span>
+       12
+      </span>
+      − 0.25
+      <span class="b1">)</span>
+      <span class="dvl">
+      </span>
+      0.75
+     </span>
+     = -0.433
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,E</sub>
+     =
+     <var>C</var>
+     <sub>pe,10,E</sub>
+     = -0.433
+    </span>
+   </p>
+   <p>
+    <b>Surface loads</b>
+   </p>
+   <p>
+    Zone D -
+    <span class="eq">
+     <var>w</var>
+     <sub>D</sub>
+     =  (
+     <var>C</var>
+     <sub>s</sub>
+     ·
+     <var>C</var>
+     <sub>d</sub>
+     ·
+     <var>C</var>
+     <sub>pe,10,D</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( 1 · 1 · 0.767 −  ( -0.3 )  )  · 0.497 = 0.53
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone E -
+    <span class="eq">
+     <var>w</var>
+     <sub>E</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,E</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -0.433 −  ( -0.3 )  )  · 0.497 = -0.0663
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone A -
+    <span class="eq">
+     <var>w</var>
+     <sub>A</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,A</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -1.2 −  ( -0.3 )  )  · 0.497 = -0.447
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone B -
+    <span class="eq">
+     <var>w</var>
+     <sub>B</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,B</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -0.8 −  ( -0.3 )  )  · 0.497 = -0.248
+    </span>
+    kN/m²
+   </p>
+   <p>
+    <b>Loads on main columns</b>
+   </p>
+   <p>
+    Windward side -
+    <span class="eq">
+     <var>w</var>
+     <sub>c,D</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,D</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( 0.767 −  ( -0.3 )  )  · 0.497 · 6 = 3.18
+    </span>
+    kN/m
+   </p>
+   <p>
+    Leeward side -
+    <span class="eq">
+     <var>w</var>
+     <sub>c,E</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,E</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -0.433 −  ( -0.3 )  )  · 0.497 · 6 = -0.398
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Loads on wind columns</b>
+   </p>
+   <p>
+    Zone A -
+    <span class="eq">
+     <var>w</var>
+     <sub>c,A</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,A</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>b</var>
+     =  ( -1.2 −  ( -0.3 )  )  · 0.497 · 4 = -1.79
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone B -
+    <span class="eq">
+     <var>w</var>
+     <sub>c,B</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,B</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>b</var>
+     =  ( -0.8 −  ( -0.3 )  )  · 0.497 · 4 = -0.994
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Coefficients for side beams</b>
+   </p>
+   <p>
+    Zone A -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,A</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,A</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,A</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,A</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>sb</sub>
+     )  = -1.4 −  ( -1.4 −  ( -1.2 )  )  ·
+     <b>log</b>
+     ( 8 )  = -1.22
+    </span>
+   </p>
+   <p>
+    Zone B -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,B</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,B</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,B</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,B</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>sb</sub>
+     )  = -1.1 −  ( -1.1 −  ( -0.8 )  )  ·
+     <b>log</b>
+     ( 8 )  = -0.829
+    </span>
+   </p>
+   <p>
+    Zone D -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,D</sub>
+     =
+     <var>C</var>
+     <sub>pe,10,D</sub>
+     = 0.767
+    </span>
+   </p>
+   <p>
+    Zone E -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,E</sub>
+     =
+     <var>C</var>
+     <sub>pe,10,E</sub>
+     = -0.433
+    </span>
+   </p>
+   <p>
+    <b>Loads on side beams</b>
+   </p>
+   <p>
+    Zone A -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,A</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,A</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>s</sub>
+     =  ( -1.22 −  ( -0.3 )  )  · 0.497 · 2 = -0.914
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone B -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,B</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,B</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>s</sub>
+     =  ( -0.829 −  ( -0.3 )  )  · 0.497 · 2 = -0.526
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone D -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,D</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,D</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>s</sub>
+     =  ( 0.767 −  ( -0.3 )  )  · 0.497 · 2 = 1.06
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone E -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,E</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,E</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>s</sub>
+     =  ( -0.433 −  ( -0.3 )  )  · 0.497 · 2 = -0.133
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Table</b>
+   </p>
+  </div>
+  <table class="bordered centered">
+   <tr>
+    <th rowspan="2">Zone</th>
+    <th colspan="3">
+     Pressure coefficients
+     <sup>1)</sup>
+    </th>
+    <th colspan="3">
+     Loading
+     <sup>4)</sup>
+    </th>
+   </tr>
+   <tr>
+    <th>
+     <i>C</i>
+     <sub>pe,10</sub>
+     <br/>
+     (for 10 m²)
+    </th>
+    <th>
+     <i>C</i>
+     <sub>pe,1</sub>
+     <br/>
+     (for 1 m²)
+    </th>
+    <th>
+     <i>C</i>
+     <sub>pe</sub>
+     <br/>
+     (side beams)
+    </th>
+    <th>
+     Surface
+     <sup>2)</sup>
+     ,
+     <br/>
+     kN/m²
+    </th>
+    <th>
+     Columns
+     <sup>3)</sup>
+     ,
+     <br/>
+     kN/m
+    </th>
+    <th>
+     Side beams
+     <sup>3)</sup>
+     ,
+     <br/>
+     kN/m
+    </th>
+   </tr>
+   <tr>
+    <td>Zone A</td>
+    <td>-1.2</td>
+    <td>-1.4</td>
+    <td>-1.22</td>
+    <td>-0.45</td>
+    <td>-1.79</td>
+    <td>-0.91</td>
+   </tr>
+   <tr>
+    <td>Zone B</td>
+    <td>-0.8</td>
+    <td>-1.1</td>
+    <td>-0.83</td>
+    <td>-0.25</td>
+    <td>-0.99</td>
+    <td>-0.53</td>
+   </tr>
+   <tr>
+    <td>Zone D</td>
+    <td>0.77</td>
+    <td>1</td>
+    <td>0.77</td>
+    <td>0.53</td>
+    <td>3.18</td>
+    <td>1.06</td>
+   </tr>
+   <tr>
+    <td>Zone E</td>
+    <td>-0.43</td>
+    <td>-0.43</td>
+    <td>-0.43</td>
+    <td>-0.07</td>
+    <td>-0.4</td>
+    <td>-0.13</td>
+   </tr>
+  </table>
+  <br/>
+  <p>
+   <b>Roof</b>
+  </p>
+  <img alt="wind-0-roof.png" src="Images/structures/loads/wind-0-roof.png" style="width:200pt;"/>
+  <p>
+   <span class="eq">
+    <var>e</var>
+    = 18
+   </span>
+   m,
+   <span class="eq">
+    <span class="dvc">
+     <var>e</var>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    =
+    <span class="dvc">
+     18
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    = 4.5
+   </span>
+   m,
+   <span class="eq">
+    <span class="dvc">
+     <var>e</var>
+     <span class="dvl">
+     </span>
+     10
+    </span>
+    =
+    <span class="dvc">
+     18
+     <span class="dvl">
+     </span>
+     10
+    </span>
+    = 1.8
+   </span>
+   m
+  </p>
+  <p>(Four possible combinations for minimum and maximum loads on both slopes are required: { + , + }; { + , – }; { – , + }; { – , – })</p>
+  <div class="fold">
+   <p>
+    <b>Minimum values (–)</b>
+   </p>
+   <p>
+    <b>External pressure coefficients</b>
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     =
+     <span class="dvc">
+      15 −
+      <var>α</var>
+      <span class="dvl">
+      </span>
+      10
+     </span>
+     =
+     <span class="dvc">
+      15 − 9.46
+      <span class="dvl">
+      </span>
+      10
+     </span>
+     = 0.554
+    </span>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     = -0.9 − 0.8 ·
+     <var>k</var>
+     = -0.9 − 0.8 · 0.554 = -1.34
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,F</sub>
+     = -2 − 0.5 ·
+     <var>k</var>
+     = -2 − 0.5 · 0.554 = -2.28
+    </span>
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     = -0.8 − 0.4 ·
+     <var>k</var>
+     = -0.8 − 0.4 · 0.554 = -1.02
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,G</sub>
+     = -1.5 − 0.5 ·
+     <var>k</var>
+     = -1.5 − 0.5 · 0.554 = -1.78
+    </span>
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     = -0.3 − 0.3 ·
+     <var>k</var>
+     = -0.3 − 0.3 · 0.554 = -0.466
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,H</sub>
+     = -0.3 − 0.9 ·
+     <var>k</var>
+     = -0.3 − 0.9 · 0.554 = -0.798
+    </span>
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     = -0.4 − 0.2 ·
+     <var>k</var>
+     = -0.4 − 0.2 · 0.554 = -0.511
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,I</sub>
+     = -0.4 − 0.2 ·
+     <var>k</var>
+     = -0.4 − 0.2 · 0.554 = -0.511
+    </span>
+   </p>
+   <p>
+    Zone J -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,J</sub>
+     = -1 + 0.4 ·
+     <var>k</var>
+     = -1 + 0.4 · 0.554 = -0.778
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,J</sub>
+     = -1.5 + 0.9 ·
+     <var>k</var>
+     = -1.5 + 0.9 · 0.554 = -1
+    </span>
+   </p>
+   <p>
+    <b>Surface loads</b>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>w</var>
+     <sub>F</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -1.34 −  ( -0.3 )  )  · 0.497 = -0.518
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>w</var>
+     <sub>G</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -1.02 −  ( -0.3 )  )  · 0.497 = -0.359
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>w</var>
+     <sub>H</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -0.466 −  ( -0.3 )  )  · 0.497 = -0.0826
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>w</var>
+     <sub>I</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -0.511 −  ( -0.3 )  )  · 0.497 = -0.105
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone J -
+    <span class="eq">
+     <var>w</var>
+     <sub>J</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,J</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -0.778 −  ( -0.3 )  )  · 0.497 = -0.238
+    </span>
+    kN/m²
+   </p>
+   <p>
+    <b>Loads on girders</b>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,F</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -1.34 −  ( -0.3 )  )  · 0.497 · 6 = -3.11
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,G</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -1.02 −  ( -0.3 )  )  · 0.497 · 6 = -2.15
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,H</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -0.466 −  ( -0.3 )  )  · 0.497 · 6 = -0.495
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,I</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -0.511 −  ( -0.3 )  )  · 0.497 · 6 = -0.628
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone J -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,J</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,J</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -0.778 −  ( -0.3 )  )  · 0.497 · 6 = -1.43
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Coefficients for purlins</b>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,F</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,F</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,F</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = -2.28 −  ( -2.28 −  ( -1.34 )  )  ·
+     <b>log</b>
+     ( 6 )  = -1.55
+    </span>
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,G</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,G</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,G</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = -1.78 −  ( -1.78 −  ( -1.02 )  )  ·
+     <b>log</b>
+     ( 6 )  = -1.19
+    </span>
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,H</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,H</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,H</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = -0.798 −  ( -0.798 −  ( -0.466 )  )  ·
+     <b>log</b>
+     ( 6 )  = -0.54
+    </span>
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,I</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,I</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,I</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = -0.511 −  ( -0.511 −  ( -0.511 )  )  ·
+     <b>log</b>
+     ( 6 )  = -0.511
+    </span>
+   </p>
+   <p>
+    Zone J -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,J</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,J</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,J</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,J</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = -1 −  ( -1 −  ( -0.778 )  )  ·
+     <b>log</b>
+     ( 6 )  = -0.828
+    </span>
+   </p>
+   <p>
+    <b>Loads on purlins</b>
+   </p>
+   <p>(use for purlins design only and not for load take-down)</p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,F</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,F</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( -1.55 −  ( -0.3 )  )  · 0.497 · 1 = -0.621
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,G</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,G</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( -1.19 −  ( -0.3 )  )  · 0.497 · 1 = -0.442
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,H</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,H</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( -0.54 −  ( -0.3 )  )  · 0.497 · 1 = -0.119
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,I</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,I</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( -0.511 −  ( -0.3 )  )  · 0.497 · 1 = -0.105
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone J -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,J</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,J</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( -0.828 −  ( -0.3 )  )  · 0.497 · 1 = -0.262
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Table</b>
+   </p>
+  </div>
+  <table class="bordered centered">
+   <tr>
+    <th rowspan="2">Zone</th>
+    <th colspan="3">
+     Pressure coefficients
+     <sup>1)</sup>
+    </th>
+    <th colspan="3">
+     Loading
+     <sup>4)</sup>
+    </th>
+   </tr>
+   <tr>
+    <th>
+     <i>C</i>
+     <sub>pe,10</sub>
+     <br/>
+     (for 10 m²)
+    </th>
+    <th>
+     <i>C</i>
+     <sub>pe,1</sub>
+     <br/>
+     (for 1 m²)
+    </th>
+    <th>
+     <i>C</i>
+     <sub>pe</sub>
+     <br/>
+     (purlins)
+    </th>
+    <th>
+     Surface
+     <sup>2)</sup>
+     ,
+     <br/>
+     kN/m²
+    </th>
+    <th>
+     Girders
+     <sup>3)</sup>
+     ,
+     <br/>
+     kN/m
+    </th>
+    <th>
+     Purlins
+     <sup>3)</sup>
+     ,
+     <br/>
+     kN/m
+    </th>
+   </tr>
+   <tr>
+    <td>Zone F</td>
+    <td>-1.34</td>
+    <td>-2.28</td>
+    <td>-1.55</td>
+    <td>-0.52</td>
+    <td>-3.11</td>
+    <td>-0.62</td>
+   </tr>
+   <tr>
+    <td>Zone G</td>
+    <td>-1.02</td>
+    <td>-1.78</td>
+    <td>-1.19</td>
+    <td>-0.36</td>
+    <td>-2.15</td>
+    <td>-0.44</td>
+   </tr>
+   <tr>
+    <td>Zone H</td>
+    <td>-0.47</td>
+    <td>-0.8</td>
+    <td>-0.54</td>
+    <td>-0.08</td>
+    <td>-0.5</td>
+    <td>-0.12</td>
+   </tr>
+   <tr>
+    <td>Zone I</td>
+    <td>-0.51</td>
+    <td>-0.51</td>
+    <td>-0.51</td>
+    <td>-0.1</td>
+    <td>-0.63</td>
+    <td>-0.1</td>
+   </tr>
+   <tr>
+    <td>Zone J</td>
+    <td>-0.78</td>
+    <td>-1</td>
+    <td>-0.83</td>
+    <td>-0.24</td>
+    <td>-1.43</td>
+    <td>-0.26</td>
+   </tr>
+  </table>
+  <br/>
+  <div class="fold">
+   <p>
+    <b>Maximum values (+)</b>
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     =
+     <span class="dvc">
+      15 −
+      <var>α</var>
+      <span class="dvl">
+      </span>
+      10
+     </span>
+     =
+     <span class="dvc">
+      15 − 9.46
+      <span class="dvl">
+      </span>
+      10
+     </span>
+     = 0.554
+    </span>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     = 0.2 − 0.2 ·
+     <var>k</var>
+     = 0.2 − 0.2 · 0.554 = 0.0892
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,F</sub>
+     =
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     = 0.0892
+    </span>
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     = 0.2 − 0.2 ·
+     <var>k</var>
+     = 0.2 − 0.2 · 0.554 = 0.0892
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,G</sub>
+     =
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     = 0.0892
+    </span>
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     = 0.2 − 0.2 ·
+     <var>k</var>
+     = 0.2 − 0.2 · 0.554 = 0.0892
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,H</sub>
+     =
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     = 0.0892
+    </span>
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     = 0 − 0.6 ·
+     <var>k</var>
+     = 0 − 0.6 · 0.554 = -0.332
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,I</sub>
+     =
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     = -0.332
+    </span>
+   </p>
+   <p>
+    Zone J -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,J</sub>
+     = 0 + 0.2 ·
+     <var>k</var>
+     = 0 + 0.2 · 0.554 = 0.111
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,J</sub>
+     =
+     <var>C</var>
+     <sub>pe,10,J</sub>
+     = 0.111
+    </span>
+   </p>
+   <p>
+    <b>Surface loads</b>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>w</var>
+     <sub>F</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 = 0.193
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>w</var>
+     <sub>G</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 = 0.193
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>w</var>
+     <sub>H</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 = 0.193
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>w</var>
+     <sub>I</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -0.332 −  ( -0.3 )  )  · 0.497 = -0.016
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone J -
+    <span class="eq">
+     <var>w</var>
+     <sub>J</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,J</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( 0.111 −  ( -0.3 )  )  · 0.497 = 0.204
+    </span>
+    kN/m²
+   </p>
+   <p>
+    <b>Loads on girders</b>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,F</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 · 6 = 1.16
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,G</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 · 6 = 1.16
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,H</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 · 6 = 1.16
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,I</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -0.332 −  ( -0.3 )  )  · 0.497 · 6 = -0.0962
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone J -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,J</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,J</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( 0.111 −  ( -0.3 )  )  · 0.497 · 6 = 1.22
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Coefficients for purlins</b>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,F</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,F</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,F</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = 0.0892 −  ( 0.0892 − 0.0892 )  ·
+     <b>log</b>
+     ( 6 )  = 0.0892
+    </span>
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,G</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,G</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,G</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = 0.0892 −  ( 0.0892 − 0.0892 )  ·
+     <b>log</b>
+     ( 6 )  = 0.0892
+    </span>
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,H</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,H</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,H</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = 0.0892 −  ( 0.0892 − 0.0892 )  ·
+     <b>log</b>
+     ( 6 )  = 0.0892
+    </span>
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,I</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,I</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,I</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = -0.332 −  ( -0.332 −  ( -0.332 )  )  ·
+     <b>log</b>
+     ( 6 )  = -0.332
+    </span>
+   </p>
+   <p>
+    Zone J -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,J</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,J</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,J</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,J</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = 0.111 −  ( 0.111 − 0.111 )  ·
+     <b>log</b>
+     ( 6 )  = 0.111
+    </span>
+   </p>
+   <p>
+    <b>Loads on purlins</b>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,F</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,F</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 · 1 = 0.193
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,G</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,G</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 · 1 = 0.193
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,H</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,H</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 · 1 = 0.193
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,I</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,I</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( -0.332 −  ( -0.3 )  )  · 0.497 · 1 = -0.016
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone J -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,J</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,J</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( 0.111 −  ( -0.3 )  )  · 0.497 · 1 = 0.204
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Table</b>
+   </p>
+  </div>
+  <table class="bordered centered">
+   <tr>
+    <th rowspan="2">Zone</th>
+    <th colspan="3">
+     Pressure coefficients
+     <sup>1)</sup>
+    </th>
+    <th colspan="3">
+     Loading
+     <sup>4)</sup>
+    </th>
+   </tr>
+   <tr>
+    <th>
+     <i>C</i>
+     <sub>pe,10</sub>
+     <br/>
+     (for 10 m²)
+    </th>
+    <th>
+     <i>C</i>
+     <sub>pe,1</sub>
+     <br/>
+     (for 1 m²)
+    </th>
+    <th>
+     <i>C</i>
+     <sub>pe</sub>
+     <br/>
+     (purlins)
+    </th>
+    <th>
+     Surface
+     <sup>2)</sup>
+     ,
+     <br/>
+     kN/m²
+    </th>
+    <th>
+     Girders
+     <sup>3)</sup>
+     ,
+     <br/>
+     kN/m
+    </th>
+    <th>
+     Purlins
+     <sup>3)</sup>
+     ,
+     <br/>
+     kN/m
+    </th>
+   </tr>
+   <tr>
+    <td>Zone F</td>
+    <td>0.09</td>
+    <td>0.09</td>
+    <td>0.09</td>
+    <td>0.19</td>
+    <td>1.16</td>
+    <td>0.19</td>
+   </tr>
+   <tr>
+    <td>Zone G</td>
+    <td>0.09</td>
+    <td>0.09</td>
+    <td>0.09</td>
+    <td>0.19</td>
+    <td>1.16</td>
+    <td>0.19</td>
+   </tr>
+   <tr>
+    <td>Zone H</td>
+    <td>0.09</td>
+    <td>0.09</td>
+    <td>0.09</td>
+    <td>0.19</td>
+    <td>1.16</td>
+    <td>0.19</td>
+   </tr>
+   <tr>
+    <td>Zone I</td>
+    <td>-0.33</td>
+    <td>-0.33</td>
+    <td>-0.33</td>
+    <td>-0.02</td>
+    <td>-0.1</td>
+    <td>-0.02</td>
+   </tr>
+   <tr>
+    <td>Zone J</td>
+    <td>0.11</td>
+    <td>0.11</td>
+    <td>0.11</td>
+    <td>0.2</td>
+    <td>1.22</td>
+    <td>0.2</td>
+   </tr>
+  </table>
+  <p>
+  </p>
+  <p>
+  </p>
+  <h4>Wind in longitudinal direction</h4>
+  <p>
+   <span class="eq">
+    <var>e</var>
+    =
+    <b>min</b>
+    (
+    <var>B</var>
+    ; 2 ·
+    <var>h</var>
+    <sub>1</sub>
+    )  =
+    <b>min</b>
+    ( 12; 2 · 9 )  = 12
+   </span>
+  </p>
+  <p>
+  </p>
+  <p>
+   <b>Side walls</b>
+  </p>
+  <!-- <span class="eq"><var>case</var> = 1</span> -->
+  <p>
+   <span class="eq">
+    <var>e</var>
+    = 12
+   </span>
+   m ≤
+   <span class="eq">
+    <var>L</var>
+    = 30
+   </span>
+   m
+  </p>
+  <img alt="wind-90-wall-1.png" src="Images/structures/loads/wind-90-wall-1.png" style="width:200pt;"/>
+  <p>
+   <span class="eq">
+    <span class="dvc">
+     <var>e</var>
+     <span class="dvl">
+     </span>
+     5
+    </span>
+    =
+    <span class="dvc">
+     12
+     <span class="dvl">
+     </span>
+     5
+    </span>
+    = 2.4
+   </span>
+   m,
+   <span class="eq">
+    <span class="dvc">
+     4
+     <span class="dvl">
+     </span>
+     5
+    </span>
+    ·
+    <var>e</var>
+    =
+    <span class="dvc">
+     4
+     <span class="dvl">
+     </span>
+     5
+    </span>
+    · 12 = 9.6
+   </span>
+   m,
+   <span class="eq">
+    <var>L</var>
+    −
+    <var>e</var>
+    = 30 − 12 = 18
+   </span>
+   m
+  </p>
+  <p>
+   <span class="eq">
+    <span class="dvc">
+     <var>h</var>
+     <sub>1</sub>
+     <span class="dvl">
+     </span>
+     <var>L</var>
+    </span>
+    =
+    <span class="dvc">
+     9
+     <span class="dvl">
+     </span>
+     30
+    </span>
+    = 0.3
+   </span>
+  </p>
+  <div class="fold">
+   <p>
+    <b>Results</b>
+   </p>
+   <p>
+    <b>External pressure coefficients</b>
+   </p>
+   <p>
+    Zone A -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,A</sub>
+     = -1.2
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,A</sub>
+     = -1.4
+    </span>
+   </p>
+   <p>
+    Zone B -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,B</sub>
+     = -0.8
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,B</sub>
+     = -1.1
+    </span>
+   </p>
+   <p>
+    Zone C -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,C</sub>
+     = -0.5
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,C</sub>
+     = -0.5
+    </span>
+   </p>
+   <p>
+    Zone D -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,D</sub>
+     = 0.7 +
+     <span class="dvc up">
+      0.1 ·
+      <span class="b1">(</span>
+      <span class="dvc">
+       <var>h</var>
+       <sub>1</sub>
+       <span class="dvl">
+       </span>
+       <var>L</var>
+      </span>
+      − 0.25
+      <span class="b1">)</span>
+      <span class="dvl">
+      </span>
+      0.75
+     </span>
+     = 0.7 +
+     <span class="dvc up">
+      0.1 ·
+      <span class="b1">(</span>
+      <span class="dvc">
+       9
+       <span class="dvl">
+       </span>
+       30
+      </span>
+      − 0.25
+      <span class="b1">)</span>
+      <span class="dvl">
+      </span>
+      0.75
+     </span>
+     = 0.707
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,D</sub>
+     = 1
+    </span>
+   </p>
+   <p>
+    Zone E -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,E</sub>
+     = -0.3 −
+     <span class="dvc up">
+      0.2 ·
+      <span class="b1">(</span>
+      <span class="dvc">
+       <var>h</var>
+       <sub>1</sub>
+       <span class="dvl">
+       </span>
+       <var>L</var>
+      </span>
+      − 0.25
+      <span class="b1">)</span>
+      <span class="dvl">
+      </span>
+      0.75
+     </span>
+     = -0.3 −
+     <span class="dvc up">
+      0.2 ·
+      <span class="b1">(</span>
+      <span class="dvc">
+       9
+       <span class="dvl">
+       </span>
+       30
+      </span>
+      − 0.25
+      <span class="b1">)</span>
+      <span class="dvl">
+      </span>
+      0.75
+     </span>
+     = -0.313
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,E</sub>
+     =
+     <var>C</var>
+     <sub>pe,10,E</sub>
+     = -0.313
+    </span>
+   </p>
+   <p>
+    <b>Surface loads</b>
+   </p>
+   <p>
+    Zone A -
+    <span class="eq">
+     <var>w</var>
+     <sub>A</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,A</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -1.2 −  ( -0.3 )  )  · 0.497 = -0.447
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone B -
+    <span class="eq">
+     <var>w</var>
+     <sub>B</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,B</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -0.8 −  ( -0.3 )  )  · 0.497 = -0.248
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone C -
+    <span class="eq">
+     <var>w</var>
+     <sub>C</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,C</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -0.5 −  ( -0.3 )  )  · 0.497 = -0.0994
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone D -
+    <span class="eq">
+     <var>w</var>
+     <sub>D</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,D</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( 0.707 −  ( -0.3 )  )  · 0.497 = 0.5
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone E -
+    <span class="eq">
+     <var>w</var>
+     <sub>E</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,E</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -0.313 −  ( -0.3 )  )  · 0.497 = -0.00663
+    </span>
+    kN/m²
+   </p>
+   <p>
+    <b>Loads on main columns</b>
+   </p>
+   <p>
+    Zone A -
+    <span class="eq">
+     <var>w</var>
+     <sub>c,A</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,A</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -1.2 −  ( -0.3 )  )  · 0.497 · 6 = -2.68
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone B -
+    <span class="eq">
+     <var>w</var>
+     <sub>c,B</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,B</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -0.8 −  ( -0.3 )  )  · 0.497 · 6 = -1.49
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone C -
+    <span class="eq">
+     <var>w</var>
+     <sub>c,C</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,C</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -0.5 −  ( -0.3 )  )  · 0.497 · 6 = -0.596
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Loads on wind columns</b>
+   </p>
+   <p>
+    Windward side -
+    <span class="eq">
+     <var>w</var>
+     <sub>c,D</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,D</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>b</var>
+     =  ( 0.707 −  ( -0.3 )  )  · 0.497 · 4 = 2
+    </span>
+    kN/m
+   </p>
+   <p>
+    Leeward side -
+    <span class="eq">
+     <var>w</var>
+     <sub>c,E</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,E</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>b</var>
+     =  ( -0.313 −  ( -0.3 )  )  · 0.497 · 4 = -0.0265
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Coefficients for side beams</b>
+   </p>
+   <p>
+    Zone A -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,A</sub>
+     =
+     <var>C</var>
+     <sub>pe,10,A</sub>
+     = -1.2
+    </span>
+   </p>
+   <p>
+    Zone B -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,B</sub>
+     =
+     <var>C</var>
+     <sub>pe,10,B</sub>
+     = -0.8
+    </span>
+   </p>
+   <p>
+    Zone C -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,C</sub>
+     =
+     <var>C</var>
+     <sub>pe,10,C</sub>
+     = -0.5
+    </span>
+   </p>
+   <p>
+    Zone D -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,D</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,D</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,D</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,D</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>sb</sub>
+     )  = 1 −  ( 1 − 0.707 )  ·
+     <b>log</b>
+     ( 8 )  = 0.735
+    </span>
+   </p>
+   <p>
+    Zone E -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,E</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,E</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,E</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,E</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>sb</sub>
+     )  = -0.313 −  ( -0.313 −  ( -0.313 )  )  ·
+     <b>log</b>
+     ( 8 )  = -0.313
+    </span>
+   </p>
+   <p>
+    <b>Loads on side beams</b>
+   </p>
+   <p>
+    Zone A -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,A</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,A</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>s</sub>
+     =  ( -1.2 −  ( -0.3 )  )  · 0.497 · 2 = -0.894
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone B -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,B</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,B</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>s</sub>
+     =  ( -0.8 −  ( -0.3 )  )  · 0.497 · 2 = -0.497
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone C -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,C</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,C</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>s</sub>
+     =  ( -0.5 −  ( -0.3 )  )  · 0.497 · 2 = -0.199
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone D -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,D</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,D</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>s</sub>
+     =  ( 0.735 −  ( -0.3 )  )  · 0.497 · 2 = 1.03
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone E -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,E</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,E</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>s</sub>
+     =  ( -0.313 −  ( -0.3 )  )  · 0.497 · 2 = -0.0133
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Table</b>
+   </p>
+  </div>
+  <table class="bordered centered">
+   <tr>
+    <th rowspan="2">Zone</th>
+    <th colspan="3">
+     Pressure coefficients
+     <sup>1)</sup>
+    </th>
+    <th colspan="3">
+     Loading
+     <sup>4)</sup>
+    </th>
+   </tr>
+   <tr>
+    <th>
+     <i>C</i>
+     <sub>pe,10</sub>
+     <br/>
+     (for 10 m²)
+    </th>
+    <th>
+     <i>C</i>
+     <sub>pe,1</sub>
+     <br/>
+     (for 1 m²)
+    </th>
+    <th>
+     <i>C</i>
+     <sub>pe</sub>
+     <br/>
+     (side beams)
+    </th>
+    <th>
+     Surface
+     <sup>2)</sup>
+     ,
+     <br/>
+     kN/m²
+    </th>
+    <th>
+     Columns
+     <sup>3)</sup>
+     ,
+     <br/>
+     kN/m
+    </th>
+    <th>
+     Side beams
+     <sup>3)</sup>
+     ,
+     <br/>
+     kN/m
+    </th>
+   </tr>
+   <tr>
+    <td>Zone A</td>
+    <td>-1.2</td>
+    <td>-1.4</td>
+    <td>-1.2</td>
+    <td>-0.45</td>
+    <td>-2.68</td>
+    <td>-0.89</td>
+   </tr>
+   <tr>
+    <td>Zone B</td>
+    <td>-0.8</td>
+    <td>-1.1</td>
+    <td>-0.8</td>
+    <td>-0.25</td>
+    <td>-1.49</td>
+    <td>-0.5</td>
+   </tr>
+   <tr>
+    <td>Zone C</td>
+    <td>-0.5</td>
+    <td>-0.5</td>
+    <td>-0.5</td>
+    <td>-0.1</td>
+    <td>-0.6</td>
+    <td>-0.2</td>
+   </tr>
+   <tr>
+    <td>Zone D</td>
+    <td>0.71</td>
+    <td>1</td>
+    <td>0.74</td>
+    <td>0.5</td>
+    <td>2</td>
+    <td>1.03</td>
+   </tr>
+   <tr>
+    <td>Zone E</td>
+    <td>-0.31</td>
+    <td>-0.31</td>
+    <td>-0.31</td>
+    <td>-0.01</td>
+    <td>-0.03</td>
+    <td>-0.01</td>
+   </tr>
+  </table>
+  <br/>
+  <p>
+   <b>Roof</b>
+  </p>
+  <img alt="wind-90-roof.png" src="Images/structures/loads/wind-90-roof.png" style="width:300pt;"/>
+  <p>
+   <span class="eq">
+    <var>e</var>
+    = 12
+   </span>
+   m,
+   <span class="eq">
+    <span class="dvc">
+     <var>e</var>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    =
+    <span class="dvc">
+     12
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    = 3
+   </span>
+   m,
+   <span class="eq">
+    <span class="dvc">
+     <var>e</var>
+     <span class="dvl">
+     </span>
+     10
+    </span>
+    =
+    <span class="dvc">
+     12
+     <span class="dvl">
+     </span>
+     10
+    </span>
+    = 1.2
+   </span>
+   m
+  </p>
+  <div class="fold">
+   <p>
+    <b>Results</b>
+   </p>
+   <p>
+    <b>External pressure coefficients</b>
+   </p>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     =
+     <span class="dvc">
+      15 −
+      <var>α</var>
+      <span class="dvl">
+      </span>
+      10
+     </span>
+     =
+     <span class="dvc">
+      15 − 9.46
+      <span class="dvl">
+      </span>
+      10
+     </span>
+     = 0.554
+    </span>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     = -1.3 − 0.3 ·
+     <var>k</var>
+     = -1.3 − 0.3 · 0.554 = -1.47
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,F</sub>
+     = -2 − 0.2 ·
+     <var>k</var>
+     = -2 − 0.2 · 0.554 = -2.11
+    </span>
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     = -1.3
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,G</sub>
+     = -2
+    </span>
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     = -0.6 − 0.1 ·
+     <var>k</var>
+     = -0.6 − 0.1 · 0.554 = -0.655
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,H</sub>
+     = -1.2
+    </span>
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     = -0.5 − 0.1 ·
+     <var>k</var>
+     = -0.5 − 0.1 · 0.554 = -0.555
+    </span>
+    ,
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,1,I</sub>
+     = -0.5 − 0.1 ·
+     <var>k</var>
+     = -0.5 − 0.1 · 0.554 = -0.555
+    </span>
+   </p>
+   <p>
+    <b>Surface loads</b>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>w</var>
+     <sub>F</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -1.47 −  ( -0.3 )  )  · 0.497 = -0.579
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>w</var>
+     <sub>G</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -1.3 −  ( -0.3 )  )  · 0.497 = -0.497
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>w</var>
+     <sub>H</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -0.655 −  ( -0.3 )  )  · 0.497 = -0.177
+    </span>
+    kN/m²
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>w</var>
+     <sub>I</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     =  ( -0.555 −  ( -0.3 )  )  · 0.497 = -0.127
+    </span>
+    kN/m²
+   </p>
+   <p>
+    <b>Loads on girders</b>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,F</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -1.47 −  ( -0.3 )  )  · 0.497 · 6 = -3.48
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,G</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -1.3 −  ( -0.3 )  )  · 0.497 · 6 = -2.98
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,H</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -0.655 −  ( -0.3 )  )  · 0.497 · 6 = -1.06
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>w</var>
+     <sub>b,I</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>a</var>
+     =  ( -0.555 −  ( -0.3 )  )  · 0.497 · 6 = -0.761
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Coefficients for purlins</b>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,F</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,F</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,F</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,F</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = -2.11 −  ( -2.11 −  ( -1.47 )  )  ·
+     <b>log</b>
+     ( 6 )  = -1.61
+    </span>
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,G</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,G</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,G</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,G</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = -2 −  ( -2 −  ( -1.3 )  )  ·
+     <b>log</b>
+     ( 6 )  = -1.46
+    </span>
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,H</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,H</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,H</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,H</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = -1.2 −  ( -1.2 −  ( -0.655 )  )  ·
+     <b>log</b>
+     ( 6 )  = -0.776
+    </span>
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>C</var>
+     <sub>pe,I</sub>
+     =
+     <var>C</var>
+     <sub>pe,1,I</sub>
+     −  (
+     <var>C</var>
+     <sub>pe,1,I</sub>
+     −
+     <var>C</var>
+     <sub>pe,10,I</sub>
+     )  ·
+     <b>log</b>
+     (
+     <var>A</var>
+     <sub>p</sub>
+     )  = -0.555 −  ( -0.555 −  ( -0.555 )  )  ·
+     <b>log</b>
+     ( 6 )  = -0.555
+    </span>
+   </p>
+   <p>
+    <b>Loads on purlins</b>
+   </p>
+   <p>
+    Zone F -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,F</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,F</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( -1.61 −  ( -0.3 )  )  · 0.497 · 1 = -0.651
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone G -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,G</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,G</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( -1.46 −  ( -0.3 )  )  · 0.497 · 1 = -0.574
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone H -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,H</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,H</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( -0.776 −  ( -0.3 )  )  · 0.497 · 1 = -0.237
+    </span>
+    kN/m
+   </p>
+   <p>
+    Zone I -
+    <span class="eq">
+     <var>w</var>
+     <sub>s,I</sub>
+     =  (
+     <var>C</var>
+     <sub>pe,I</sub>
+     −
+     <var>C</var>
+     <sub>pi</sub>
+     )  ·
+     <var>q</var>
+     <sub>p</sub>
+     ·
+     <var>c</var>
+     <sub>p</sub>
+     =  ( -0.555 −  ( -0.3 )  )  · 0.497 · 1 = -0.127
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Table</b>
+   </p>
+  </div>
+  <table class="bordered centered">
+   <tr>
+    <th rowspan="2">Zone</th>
+    <th colspan="3">
+     Pressure coefficients
+     <sup>1)</sup>
+    </th>
+    <th colspan="3">
+     Loading
+     <sup>4)</sup>
+    </th>
+   </tr>
+   <tr>
+    <th>
+     <i>C</i>
+     <sub>pe,10</sub>
+     <br/>
+     (for 10 m²)
+    </th>
+    <th>
+     <i>C</i>
+     <sub>pe,1</sub>
+     <br/>
+     (for 1 m²)
+    </th>
+    <th>
+     <i>C</i>
+     <sub>pe</sub>
+     <br/>
+     (purlins)
+    </th>
+    <th>
+     Surface
+     <sup>2)</sup>
+     ,
+     <br/>
+     kN/m²
+    </th>
+    <th>
+     Girders
+     <sup>3)</sup>
+     ,
+     <br/>
+     kN/m
+    </th>
+    <th>
+     Purlins
+     <sup>3)</sup>
+     ,
+     <br/>
+     kN/m
+    </th>
+   </tr>
+   <tr>
+    <td>Zone F</td>
+    <td>-1.47</td>
+    <td>-2.11</td>
+    <td>-1.61</td>
+    <td>-0.58</td>
+    <td>-3.48</td>
+    <td>-0.65</td>
+   </tr>
+   <tr>
+    <td>Zone G</td>
+    <td>-1.3</td>
+    <td>-2</td>
+    <td>-1.46</td>
+    <td>-0.5</td>
+    <td>-2.98</td>
+    <td>-0.57</td>
+   </tr>
+   <tr>
+    <td>Zone H</td>
+    <td>-0.66</td>
+    <td>-1.2</td>
+    <td>-0.78</td>
+    <td>-0.18</td>
+    <td>-1.06</td>
+    <td>-0.24</td>
+   </tr>
+   <tr>
+    <td>Zone I</td>
+    <td>-0.56</td>
+    <td>-0.56</td>
+    <td>-0.56</td>
+    <td>-0.13</td>
+    <td>-0.76</td>
+    <td>-0.13</td>
+   </tr>
+  </table>
+  <h4>Notes</h4>
+  <p>
+   <sup>1)</sup>
+   External pressure coefficients are determined according to
+   <br/>
+   EN 1991-1-4, Table 7.1 - for  vertical walls and Tables 7.4 a, b and 7.2 - for roof.
+   <br/>
+   <sup>2)</sup>
+   Surface loads are calculated with coefficient
+   <i>C</i>
+   <sub>pe,10</sub>
+   . These loads should be applied only for global analysis of the structure. For design of separate structural elements, values of
+   <i>C</i>
+   <sub>pe</sub>
+   =
+   <i>C</i>
+   <sub>pe,1</sub>
+   - (
+   <i>C</i>
+   <sub>pe,1</sub>
+   -
+   <i>C</i>
+   <sub>pe,10</sub>
+   )·log(
+   <i>A</i>
+   )) is used instead of
+   <i>C</i>
+   <sub>pe,10</sub>
+   for the respective reference area
+   <i>A</i>
+   .
+   <br/>
+   <sup>3)</sup>
+   Thus, the given loads on beams, columns, purlins and siding should be used only for design of the respective elements. These loads cannot be used for load take-down and calculation of other elements.
+   <br/>
+   <sup>4)</sup>
+   Positive values (+) mean pressure towards the given surface and negative values (-) are in the opposite direction. The pressure is always perpendicular to the respective surface.
+  </p>
+ </div>
+</div>

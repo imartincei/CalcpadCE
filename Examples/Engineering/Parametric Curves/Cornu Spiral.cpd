@@ -1,0 +1,14 @@
+'<!-- Plots the [Cornu (Euler) spiral](https://en.wikipedia.org/wiki/Euler_spiral) from the Fresnel integrals $C(t)$ and $S(t)$, the clothoid used as a transition curve in highway and railway alignment. -->
+'(also <strong>Clothoid</strong> or <strong>Euler Spiral</strong>)
+#rad
+'The equations is defined by the Fresnel integrals:
+x(t) = $Integral{cos(s^2) @ s = 0 : t}
+y(t) = $Integral{sin(s^2) @ s = 0 : t}
+#hide
+PlotWidth = 440
+PlotHeight = 400
+#post
+$Plot{x(t)|y(t) @ t = 0 : 2*π}
+#pre
+
+'Tip: Click "<b>Calculate</b>" to see the respective plot.

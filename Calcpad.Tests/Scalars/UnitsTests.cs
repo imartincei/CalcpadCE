@@ -944,6 +944,38 @@
         [Trait("Category", "Energy")]
         public void Test_TWh() => Test("TWh|J", 3.6e+15);
 
+        [Fact]
+        [Trait("Category", "Energy Apparent")]
+        public void Test_VAh() => Test("VAh|J", 3600d);
+
+        [Fact]
+        [Trait("Category", "Energy Apparent")]
+        public void Test_kVAh() => Test("kVAh|J", 3600000d);
+
+        [Fact]
+        [Trait("Category", "Energy Apparent")]
+        public void Test_MVAh() => Test("MVAh|J", 3600000000d);
+
+        [Fact]
+        [Trait("Category", "Energy Apparent")]
+        public void Test_GVAh() => Test("GVAh|J", 3600000000000d);
+
+        [Fact]
+        [Trait("Category", "Energy Reactive")]
+        public void Test_VARh() => Test("VARh|J", 3600d);
+
+        [Fact]
+        [Trait("Category", "Energy Reactive")]
+        public void Test_kVARh() => Test("kVARh|J", 3600000d);
+
+        [Fact]
+        [Trait("Category", "Energy Reactive")]
+        public void Test_MVARh() => Test("MVARh|J", 3600000000d);
+
+        [Fact]
+        [Trait("Category", "Energy Reactive")]
+        public void Test_GVARh() => Test("GVARh|J", 3600000000000d);
+
 
         [Fact]
         [Trait("Category", "Energy")]
@@ -1003,7 +1035,7 @@
         public void Test_kcal() => Test("kcal|J", 4186.8);
         #endregion
 
-        #region Power   
+        #region Power
         [Fact]
         [Trait("Category", "Power")]
         public void Test_W() => Test("W|kg*m^2*s^-3", 1d);
@@ -1759,7 +1791,38 @@
 
         [Fact]
         [Trait("Category", "Mechanical Formulas")]
-        public void Test_ton_ft_s2() => Test("100ton*32.17404855643045ft/s^2", "224kip");
+        public void Test_ton_ft_s2()
+        {
+            // Settings.IsUs defaults to true (US) — go through ExpressionParser rather than
+            // TestCalc/MathParser directly, since only ExpressionParser.Parse reads it.
+            var parser = new ExpressionParser { Settings = new Settings() };
+            parser.Parse("r = 100ton*32.17404855643045ft/s^2", true, false);
+            Assert.Contains("200", parser.HtmlResult);
+        }
+
+        [Fact]
+        [Trait("Category", "Mechanical Formulas")]
+        public void Test_ton_ft_s2_UK()
+        {
+            var parser = new ExpressionParser { Settings = new Settings() };
+            parser.Parse("#settings {\"isUs\": false}\nr = 100ton*32.17404855643045ft/s^2", true, false);
+            Assert.Contains("224", parser.HtmlResult);
+        }
+
+        [Fact]
+        [Trait("Category", "Mechanical Formulas")]
+        public async Task ConcurrentParsers_DoNotShareIsUsSetting()
+        {
+            var tasks = Enumerable.Range(0, 32).Select(i => Task.Run(() =>
+            {
+                var isUs = i % 2 == 0;
+                var parser = new ExpressionParser { Settings = new Settings() };
+                parser.Parse($"#settings {{\"isUs\": {(isUs ? "true" : "false")}}}\nr = 100ton*32.17404855643045ft/s^2", true, false);
+                Assert.Contains(isUs ? "200" : "224", parser.HtmlResult);
+            }));
+
+            await Task.WhenAll(tasks);
+        }
 
         [Fact]
         [Trait("Category", "Mechanical Formulas")]

@@ -1,0 +1,72 @@
+<div class="calcpad-output">
+ <div style="display:none">
+  <span class="eq">
+   <var>hideOutput</var>
+   = 0
+  </span>
+ </div>
+ <p>Input Vector</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v1
+   </var>
+   =
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ Calculations showing iteration 1
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v2
+   </var>
+   <sub>1</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    v1
+   </var>
+   <sub>1</sub>
+   · 2 = 1 · 2 = 2
+  </span>
+ </p>
+ Calculations showing iteration 2
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v2
+   </var>
+   <sub>2</sub>
+   =
+   <var>
+    <span class="vec">⃗</span>
+    v1
+   </var>
+   <sub>2</sub>
+   · 2 = 2 · 2 = 4
+  </span>
+ </p>
+ <p>Final results for each iteration</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v2
+   </var>
+   =
+   <b class="b0">[</b>
+   2 4 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+</div>

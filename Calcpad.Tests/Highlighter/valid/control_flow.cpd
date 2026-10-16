@@ -1,0 +1,89 @@
+' Control flow: if/else/for/while/repeat/break/continue
+' Simple if
+x = 10
+#if x > 5
+	result1 = 1
+#end if
+' If/else
+#if x > 20
+	result2 = 1
+#else
+	result2 = 0
+#end if
+' If/else if/else
+#if x > 20
+	result3 = 3
+#else if x > 10
+	result3 = 2
+#else if x > 5
+	result3 = 1
+#else
+	result3 = 0
+#end if
+' Nested if blocks
+#if x > 5
+	#if x > 8
+		nested = 2
+	#else
+		nested = 1
+	#end if
+#end if
+' Simple repeat
+counter = 0
+#repeat 5
+	counter = counter + 1
+#loop
+' For loop
+forSum = 0
+#for i = 1 : 10
+	forSum = forSum + i
+#loop
+' While loop
+whileCount = 0
+#while whileCount < 5
+	whileCount = whileCount + 1
+#loop
+' Nested for loops
+matSum = 0
+#for row = 1 : 3
+	#for col_idx = 1 : 3
+		matSum = matSum + row*col_idx
+	#loop
+#loop
+' For loop variable persists (global scope)
+lastI = i
+lastRow = row
+' Break in loop
+breakTest = 0
+#repeat 10
+	breakTest = breakTest + 1
+	#if breakTest ≡ 5
+		#break
+	#end if
+#loop
+' Continue in loop
+skipSum = 0
+#for k = 1 : 10
+	#if k ≡ 5
+		#continue
+	#end if
+	skipSum = skipSum + k
+#loop
+' While with complex condition
+wVal = 1
+#while wVal < 100 ∧ wVal > 0
+	wVal = wVal*2
+#loop
+' If with comparison operators
+#if 5 ≡ 5
+	eqCheck = 1
+#end if
+#if 5 ≠ 3
+	neCheck = 1
+#end if
+#if 3 ≤ 5
+	leCheck = 1
+#end if
+#if 5 ≥ 3
+	geCheck = 1
+#end if

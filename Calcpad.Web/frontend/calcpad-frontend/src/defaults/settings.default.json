@@ -1,0 +1,73 @@
+{
+    "core": {
+        "math": {
+            "formatString": "",
+            "decimals": 2,
+            "degrees": 0,
+            "isComplex": false,
+            "substitute": true,
+            "formatEquations": true,
+            "zeroSmallMatrixElements": true,
+            "showHiddenOutput": false,
+            "maxOutputCount": 20,
+            "precision": 1e-14,
+            "tol": 0.000001
+        },
+        "plot": {
+            "imagePath": "",
+            "imageUri": "",
+            "screenScaleFactor": 2,
+            "lightDirection": "NorthWest",
+            "vectorGraphics": false,
+            "colorScale": "Rainbow",
+            "smoothScale": false,
+            "shadows": true,
+            "isAdaptive": true,
+            "width": 500,
+            "height": 300,
+            "step": 0
+        },
+        "server": {
+            "url": "",
+            "mode": "auto"
+        },
+        "isUs": true
+    },
+    "extras": {
+        "previewTheme": "system",
+        "colorTheme": "System",
+        "darkBackground": "#1e1e1e",
+        "commentFormat": "auto",
+        "formattingHotkeys": true,
+        "quickTyping": true,
+        "previewCursorSync": false,
+        "autoRun": true,
+        "autoInputMode": true,
+        "previewUiOverrides": false,
+        "linterMinSeverity": "information",
+        "logLevel": "warning",
+        "maxOutputLines": 1000,
+        "maxPreviewSizeMB": 24,
+        "maxPreviewConsoleMessages": 500,
+        "prettifyIndentStyle": "tab",
+        "prettifyIndentSize": 4,
+        "prettifyTrimTrailingWhitespace": true,
+        "writeMode": "reportOnly",
+        "dotnetPath": "dotnet",
+        "editorFontFamily": "JuliaMono",
+        "pdfSettings": {
+            "format": "Letter",
+            "orientation": "portrait",
+            "marginTop": "0.75in",
+            "marginBottom": "0.75in",
+            "marginLeft": "0.5in",
+            "marginRight": "0.5in",
+            "showPageNumbers": true,
+            "showDate": true,
+            "documentTitle": "",
+            "dateTimeFormat": "M/d/yyyy h:mm tt",
+            "headerFooterLines": "both",
+            "lineColor": "#b3b3b3"
+        }
+    }
+}

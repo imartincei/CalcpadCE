@@ -1,0 +1,50 @@
+<div class="calcpad-output">
+ <p>
+  <span class="eq">
+   <var>x</var>
+   = 5
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   = 7
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <span class="dvc">
+    <var>x</var>
+    ·
+    <var>y</var>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   =
+   <span class="dvc">
+    5 · 7
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   = 8.75
+  </span>
+  ,
+  <span class="eq">1 = 1</span>
+ </p>
+ <!---Once we have string manipulation, we can remove the right side to display the variable substitution-!-->
+ <p>
+  <span class="eq">
+   <span class="dvc">
+    <var>x</var>
+    ·
+    <var>y</var>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   &gt; 1
+  </span>
+ </p>
+</div>

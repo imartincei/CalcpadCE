@@ -1,0 +1,11 @@
+#def test$ = 35
+#def st$ = 'st'
+#def hi$ = 'hi'
+#def test2$(sta$; t$; stat$)
+st$t$
+st$
+stat$
+test$
+hi$
+#end def
+test2$(1;2;3)

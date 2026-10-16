@@ -1,0 +1,84 @@
+<div class="calcpad-output">
+ <!-- Eurocode EN 1991-1-3 snow load on monopitch and duopitch roofs: shape coefficient $\mu_1$ selected from the pitch angle and combined with exposure and thermal factors. -->
+ <small>
+  According to
+  <strong>Eurocode</strong>
+  : EN 1991-1-3
+ </small>
+ <div style="max-width:180mm">
+  <img alt="snow.png" src="Images/structures/loads/snow.png" style="width:200pt;"/>
+  <br/>
+  <br/>
+  <p>
+   Characteristic snow load on the ground -
+   <span class="eq">
+    <var>s</var>
+    <sub>k</sub>
+    =
+    <u class="input-5">1</u>
+   </span>
+   kN/m
+   <sup>2</sup>
+  </p>
+  <p>
+   Roof pitch angle -
+   <span class="eq">
+    <var>α</var>
+    =
+    <u class="input-6">0</u>
+   </span>
+   <sup>o</sup>
+  </p>
+  <p>
+   Snow shape coefficient -
+   <span class="eq">
+    <var>μ</var>
+    <sub>1</sub>
+    = 0.8
+   </span>
+   (α ≤ 30
+   <sup>o</sup>
+   )
+  </p>
+  <p>
+   Exposure factor -
+   <span class="eq">
+    <var>C</var>
+    <sub>e</sub>
+    =
+    <u class="input-16">1</u>
+   </span>
+  </p>
+  <p>
+   Thermal factor -
+   <span class="eq">
+    <var>C</var>
+    <sub>t</sub>
+    =
+    <u class="input-17">1</u>
+   </span>
+  </p>
+  <p class="ref">[EN 1991-1-3, Clause 5.2 (3)a]</p>
+  <p>Snow load on roof</p>
+  <p>
+   <span class="eq">
+    <var>s</var>
+    =
+    <var>μ</var>
+    <sub>1</sub>
+    ·
+    <var>C</var>
+    <sub>e</sub>
+    ·
+    <var>C</var>
+    <sub>t</sub>
+    ·
+    <var>s</var>
+    <sub>k</sub>
+    = 0.8 · 1 · 1 · 1 = 0.8
+   </span>
+   kN/m
+   <sup>2</sup>
+  </p>
+ </div>
+</div>

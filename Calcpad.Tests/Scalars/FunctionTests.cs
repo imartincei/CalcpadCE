@@ -616,7 +616,7 @@
         }
         #endregion
 
-        #region Complex 
+        #region Complex
         [Fact]
         [Trait("Category", "Complex")]
         public void Abs()

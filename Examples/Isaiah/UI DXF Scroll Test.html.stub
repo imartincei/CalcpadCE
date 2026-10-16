@@ -1,0 +1,269 @@
+<div class="calcpad-output">
+ <h3>Scroll Anchoring Test - #UI with an asynchronously rendered drawing</h3>
+ <p>
+  Every #UI edit re-renders the whole document. The drawing below is not part of that
+  <p>render: its script imports a viewer from a CDN, draws to a canvas and only makes the</p>
+  <p>image visible once all of that has finished - seconds after the page has loaded. Until</p>
+  <p>then the image occupies no height at all.</p>
+ </p>
+ <p>
+  <b>What to check.</b>
+  Scroll so a line of the filler text sits exactly at the top of
+  <p>the preview, then change one of the inputs. That line must stay where it is, both</p>
+  <p>
+   through the re-render and at the moment the drawing appears. Changing
+   <b>Height</b>
+  </p>
+  <p>changes the drawing aspect ratio, so the image comes back a different height - the</p>
+  <p>case a remembered scroll offset can never get right.</p>
+ </p>
+ <p>
+ </p>
+ <h3>Inputs above the drawing</h3>
+ <p>
+ </p>
+ <p>
+  Width
+  <span class="eq">
+   <var>width</var>
+   = 10
+  </span>
+ </p>
+ <p>
+  Height
+  <span class="eq">
+   <var>height</var>
+   = 8
+  </span>
+ </p>
+ <p>
+  Image width (px)
+  <span class="eq">
+   <var>imgWidth</var>
+   = 800
+  </span>
+ </p>
+ <p>
+  Border colour
+  <span class="eq">
+   <var>border</var>
+   = 1
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Filler</h3>
+ <p>
+  Enough text above the drawing that the top of the viewport lands in the middle of it,
+  <p>and enough below that the page can be scrolled past the drawing entirely.</p>
+ </p>
+ <p>
+ </p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>Filler line - the anchor the restore has to land back on.</p>
+ <p>
+ </p>
+ <h3>Drawing</h3>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <script type="module">import Drawing from "https://cdn.jsdelivr.net/npm/dxf-writer@1.18.4/+esm";window.dxfDrawings = window.dxfDrawings || {};window.dxfDrawings["scrolltest"] = new Drawing();window.dxfDrawings["scrolltest"].setUnits("Inches");window.dxfDrawings["scrolltest"].addLineType("DASHED", "---- ", [0.5, -0.5]);window.dxfCurrentDrawingId = "scrolltest";</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.addLayer("BORDER", 1, "CONTINUOUS"); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.setActiveLayer("BORDER"); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine(0, 0, 10, 0); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine(10, 0, 10, 8); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine(10, 8, 0, 8); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine(0, 8, 0, 0); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.addLayer("DIAGONAL", 5, "DASHED"); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.setActiveLayer("DIAGONAL"); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine(0, 0, 10, 8); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawLine(10, 0, 0, 8); } }</script>
+ <script type="module">{ const d = window.dxfDrawings && window.dxfDrawings[window.dxfCurrentDrawingId]; if (d) { d.drawCircle(5, 4, 2); } }</script>
+ <div id="dxf-render-container-scrolltest" style="position:fixed; left:-9999px; top:0; width:1px; height:1px; overflow:hidden;">
+ </div>
+ <img id="dxf-output-img-scrolltest" style="visibility:hidden; aspect-ratio:1/1; width:800px; max-width:100%; margin-top:30px; border:2px solid #ddd; border-radius:8px; background:#fff;"/>
+ <div id="dxf-error-message-scrolltest" style="margin-top:20px; padding:15px; background:#f8d7da; border-radius:4px; color:#721c24; display:none;">
+  <strong>Error:</strong>
+  <span id="dxf-error-text-scrolltest">
+  </span>
+ </div>
+ <script type="module">import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/+esm";import * as DxfViewerModule from "https://cdn.jsdelivr.net/npm/dxf-viewer@1.0.46/+esm";const DxfViewer = DxfViewerModule.default || DxfViewerModule.DxfViewer;const dxfId = "scrolltest";const drawing = window.dxfDrawings && window.dxfDrawings[dxfId];function showError(msg) {  document.getElementById("dxf-error-text-" + dxfId).textContent = msg;  document.getElementById("dxf-error-message-" + dxfId).style.display = "block";}async function renderToImage() {  if (!DxfViewer) { throw new Error("DxfViewer library not loaded"); }  if (!drawing) { throw new Error("DXF drawing  + dxfId +  not initialized. Call initDXF first"); }  const container = document.getElementById("dxf-render-container-" + dxfId);  if (!container) { throw new Error("Render container  + dxfId +  not found"); }  const iw = 800;  const cw = iw * 2;  const viewer = new DxfViewer(container, {    autoResize: false,    canvasWidth: cw,    canvasHeight: cw,    clearColor: new THREE.Color("#fff"),    colorCorrection: true,    preserveDrawingBuffer: true  });  const blob = new Blob([drawing.toDxfString()], { type: "application/dxf" });  const url = URL.createObjectURL(blob);  await viewer.Load({ url: url });  URL.revokeObjectURL(url);  const bounds = viewer.GetBounds();  const origin = viewer.GetOrigin();  if (bounds) {    const bw = bounds.maxX - bounds.minX;    const bh = bounds.maxY - bounds.minY;    const ch = Math.max(Math.round(cw * bh / Math.max(bw, 0.001)), 1);    viewer.SetSize(cw, ch);    viewer.FitView(      bounds.minX - origin.x, bounds.maxX - origin.x,      bounds.minY - origin.y, bounds.maxY - origin.y    );  }  viewer.Render();  const dataUrl = viewer.GetCanvas().toDataURL("image/png");  const img = document.getElementById("dxf-output-img-" + dxfId);  await new Promise(function(resolve) {    img.onload = resolve;    img.onerror = resolve;    img.src = dataUrl;  });  img.style.visibility = "visible";  img.dataset.dxfReady = "ok";  viewer.Destroy();  container.remove();  console.log("DXF " + dxfId + " rendered to image successfully");}setTimeout(async function() {  try {    await renderToImage();  } catch(err) {    console.error("Failed to render DXF " + dxfId + ":", err);    showError(err.message);  }}, 100);</script>
+ <p>
+ </p>
+ <h3>Inputs below the drawing</h3>
+ <p>
+  Editing these is the harder case: the drawing above them is still re-rendering when
+  <p>the replacement document loads, so everything here starts life at the wrong offset.</p>
+ </p>
+ <p>
+ </p>
+ <p>
+  Scale
+  <span class="eq">
+   <var>scale</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  Include diagonals
+  <span class="eq">
+   <var>diagonals</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>points</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   0; 0
+   <span class="b0">|</span>
+   5; 4
+   <span class="b0">|</span>
+   10; 8
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">10</span>
+     <span class="td">8</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>area</var>
+   =
+   <var>width</var>
+   ·
+   <var>height</var>
+   ·
+   <var>scale</var>
+   <sup>2</sup>
+   = 10 · 8 · 1
+   <sup>2</sup>
+   = 80
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>perimeter</var>
+   = 2 ·  (
+   <var>width</var>
+   +
+   <var>height</var>
+   )  ·
+   <var>scale</var>
+   = 2 ·  ( 10 + 8 )  · 1 = 36
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Trailing filler</h3>
+ <p>
+ </p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+ <p>Trailing filler line.</p>
+</div>

@@ -250,6 +250,12 @@
   <data name="Circular_reference_detected_for_function_0" xml:space="preserve">
         <value>Circular reference detected for function "{0}".</value>
     </data>
+  <data name="Circular_reference_detected_for_macro_0" xml:space="preserve">
+        <value>Circular reference detected for macro "{0}".</value>
+    </data>
+  <data name="Circular_include_detected_0" xml:space="preserve">
+        <value>Circular #include detected: "{0}".</value>
+    </data>
   <data name="Invalid_function_definition_exception" xml:space="preserve">
         <value>Invalid function definition. It has to match the pattern: "f(x; y; z...) = expression".</value>
     </data>
@@ -274,11 +280,20 @@
   <data name="Condition_result_is_invalid_0" xml:space="preserve">
         <value>Condition result is invalid: {0}.</value>
     </data>
+  <data name="Duplicate_argument_0" xml:space="preserve">
+        <value>Duplicate argument for parameter "{0}".</value>
+    </data>
   <data name="Duplicate_macro_parameter_names_0_and_1" xml:space="preserve">
         <value>Duplicate macro parameter names: {0} and {1}.</value>
     </data>
   <data name="Macro_not_defined_0" xml:space="preserve">
         <value>Macro not defined: {0}.</value>
+    </data>
+  <data name="Required_parameter_after_optional_0" xml:space="preserve">
+        <value>Required parameter "{0}" cannot follow an optional parameter.</value>
+    </data>
+  <data name="Unknown_keyword_argument_0" xml:space="preserve">
+        <value>Unknown keyword argument: "{0}".</value>
     </data>
   <data name="Missing_0_in_surface_map_command" xml:space="preserve">
         <value>Missing {0} in surface map command.</value>
@@ -325,6 +340,9 @@
   <data name="Error_in_0_on_line_1_2" xml:space="preserve">
         <value>Error in "{0}" on line {1}: {2}</value>
     </data>
+  <data name="Error_in_0_1" xml:space="preserve">
+        <value>Error in "{0}": {1}</value>
+    </data>
   <data name="Number_of_iterations_exceeds_the_maximum_0" xml:space="preserve">
         <value>Number of iterations exceeds the maximum {0}.&lt;/p&gt;</value>
     </data>
@@ -348,6 +366,9 @@
     </data>
   <data name="Invalid_macro_name_0" xml:space="preserve">
         <value>Invalid macro name: "{0}".</value>
+    </data>
+  <data name="Invalid_variable_name_0" xml:space="preserve">
+        <value>Invalid variable name: "{0}".</value>
     </data>
   <data name="Invalid_inside_macro_definition" xml:space="preserve">
         <value>Invalid inside macro definition.</value>
@@ -520,6 +541,9 @@
   <data name="Invalid_keyword_0" xml:space="preserve">
     <value>Invalid keyword: {0}.</value>
   </data>
+  <data name="Invalid_JSON_in_0" xml:space="preserve">
+    <value>Invalid JSON in {0}.</value>
+  </data>
   <data name="_must_be_matrix" xml:space="preserve">
     <value> must be matrix.</value>
   </data>
@@ -573,5 +597,68 @@
   </data>
   <data name="CannotModifyConstant" xml:space="preserve">
     <value>Cannot modify constant "{0}".</value>
+  </data>
+  <data name="Improper_format_for_UI_keyword_Missing_closing_brace" xml:space="preserve">
+    <value>Improper format for #UI keyword. Missing closing brace '}'.</value>
+  </data>
+  <data name="The_UI_keyword_requires_a_variable_assignment" xml:space="preserve">
+    <value>The #UI keyword requires a variable assignment.</value>
+  </data>
+  <data name="UI_expressions_require_allowExpression" xml:space="preserve">
+    <value>#UI does not support expressions unless 'allowExpression' is true.</value>
+  </data>
+  <data name="Only_numbers_are_supported_by_the_UI_keyword" xml:space="preserve">
+    <value>Only numbers are supported by the #UI keyword.</value>
+  </data>
+  <data name="The_UI_0_requires_both_keys_and_values_arrays" xml:space="preserve">
+    <value>#UI {0} requires both 'keys' and 'values' arrays.</value>
+  </data>
+  <data name="The_UI_0_keys_and_values_arrays_must_have_the_same_length" xml:space="preserve">
+    <value>#UI {0} has {1} keys but {2} values, the 'keys' and 'values' arrays must have the same length.</value>
+  </data>
+  <data name="The_UI_type_0_is_not_recognized_expected_one_of_1" xml:space="preserve">
+    <value>'{0}' is not a recognized #UI type, expected one of {1}.</value>
+  </data>
+  <data name="The_UI_0_must_not_be_negative" xml:space="preserve">
+    <value>#UI '{0}' must not be negative.</value>
+  </data>
+  <data name="The_UI_0_has_1_entries_but_the_grid_has_2_3" xml:space="preserve">
+    <value>#UI '{0}' has {1} entries but the grid has {2} {3}.</value>
+  </data>
+  <data name="The_UI_0_does_not_apply_to_1" xml:space="preserve">
+    <value>#UI '{0}' does not apply to a {1}, which always replaces the whole value.</value>
+  </data>
+  <data name="The_UI_datagrid_requires_a_vector_or_matrix_value" xml:space="preserve">
+    <value>#UI 'datagrid' requires a vector or matrix value.</value>
+  </data>
+  <data name="The_UI_0_cannot_hold_a_vector_or_matrix_value" xml:space="preserve">
+    <value>#UI '{0}' cannot hold a vector or matrix value. Use a datagrid.</value>
+  </data>
+  <data name="The_UI_0_only_applies_to_a_datagrid" xml:space="preserve">
+    <value>#UI '{0}' only applies to a datagrid.</value>
+  </data>
+  <data name="The_UI_width_must_be_a_number_or_a_percentage" xml:space="preserve">
+    <value>#UI 'width' must be a number of pixels or a percentage, e.g. "75%".</value>
+  </data>
+  <data name="Datagrid_size_cannot_exceed_0_cells" xml:space="preserve">
+    <value>#UI datagrid size cannot exceed {0} cells. Use #Read to import larger data sets from a file instead.</value>
+  </data>
+  <data name="Embedded_data_cannot_exceed_0_MB" xml:space="preserve">
+    <value>Data embedded in a compiled worksheet cannot exceed {0} MB.</value>
+  </data>
+  <data name="A_UI_value_has_the_wrong_type" xml:space="preserve">
+    <value>A #UI value has the wrong type.</value>
+  </data>
+  <data name="Missing_path_value_0" xml:space="preserve">
+    <value>{0} requires a path.</value>
+  </data>
+  <data name="Duplicate_path_declaration_0" xml:space="preserve">
+    <value>{0} is already declared in this document.</value>
+  </data>
+  <data name="Path_root_not_declared_0_1" xml:space="preserve">
+    <value>{0} is not declared. Add {1} before this line.</value>
+  </data>
+  <data name="Path_root_folder_not_found_0_1" xml:space="preserve">
+    <value>{0} folder not found: {1}.</value>
   </data>
 </root>

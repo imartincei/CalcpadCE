@@ -1,0 +1,46 @@
+name: Run Tests
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Test version resolution
+        run: node --test tools/version.test.mjs
+
+      - name: Run tests
+        run: >
+          dotnet test Calcpad.Tests
+          -p:Version=${{ inputs.version }}
+          --logger "console;verbosity=detailed"
+          --logger "trx;LogFileName=test-results.trx"
+          --results-directory ./test-results
+
+      - name: Publish test results to summary
+        uses: dorny/test-reporter@v3
+        if: ${{ !cancelled() }}
+        with:
+          name: Unit Tests
+          path: test-results/test-results.trx
+          reporter: dotnet-trx
+          use-actions-summary: true
+

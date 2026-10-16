@@ -1,0 +1,55 @@
+' Macros: inline, multiline, string variables, parameters
+' Inline string variable
+#def greeting$ = 'Hello World'
+' Inline macro with $ params
+#def double$(n$) = n$*2
+' Inline macro with mixed params
+#def add$(a$; b$) = a$ + b$
+' Multiline string variable
+#def header$
+	'<h2>Section Title</h2>'
+	'<hr>'
+#end def
+' Multiline macro with $ params
+#def template$(title$; body$)
+	'<h3>'title$'</h3>'
+	'<p>'body$'</p>'
+#end def
+' Multiline macro with control flow
+#def checkVal$(Rn$; Ru$)
+	#if Rn$ ≥ Ru$
+		'OKAY'
+	#else
+		'N.G.'
+	#end if
+#end def
+' Multiline macro with loop
+#def sumRange$(start$; end$)
+	total_m = 0
+	#for idx = start$ : end$
+		total_m = total_m + idx
+	#loop
+#end def
+' Macro with HTML content
+#def note$(text$) = '<em>' text$ '</em>'
+#def cmt$(c$) = '<!--' c$ '--!>'
+' Macro usage
+doubled = double$(15)
+added = add$(10; 20)
+greeting$
+header$
+template$('Test'; 'Content')
+checkVal$(100; 80)
+checkVal$(50; 75)
+sumRange$(1; 5)
+note$('annotation')
+cmt$('hidden comment')
+' Macro in expression context
+a = 5
+b = double$(a)
+' Macro optional parameters and keyword arguments
+#def kwMacro$(a$; b$ = 10; c$ = 5) = a$ + b$ + c$
+kwAllDefaults = kwMacro$(1)
+kwPositional = kwMacro$(1; 2; 3)
+kwMixed = kwMacro$(1; c$ = 7)
+kwNamed = kwMacro$(a$ = 1; c$ = 7; b$ = 2)

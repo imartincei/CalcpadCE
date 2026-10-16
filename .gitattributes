@@ -1,0 +1,18 @@
+# Normalize all text files to LF in the repository and in the working tree.
+* text=auto eol=lf
+
+# Binary files: never touch line endings.
+*.avif binary
+*.docx binary
+*.gif  binary
+*.glb  binary
+*.icns binary
+*.ico  binary
+*.jpg  binary
+*.odt  binary
+*.otf  binary
+*.pdf  binary
+*.png  binary
+*.ttf  binary
+*.woff2 binary
+*.xlsx binary

@@ -30,7 +30,7 @@
             "a = random(fill(vector(n); 1))",
             $"c = {f}(a)",
             $"c_hp = {f}(hp(a))",
-            "r = abs(c - c_hp) ≤ 10^-14*abs(c)"
+            TestCalc.CompareWithTolerance("c", "c_hp", "10^-14")
         ];
 
 

@@ -1,0 +1,4 @@
+[CalcpadCE](https://calcpad-ce.org) worksheets in this section integrate the punching shear verification of flat slabs around column heads according to [Eurocode](https://en.wikipedia.org/wiki/Eurocode_2) EN 1992-1-1, with the basic control perimeter $u_1$ traced at $2d$ from the column face and the eccentricity factor $\beta$ applied to the design shear stress.
+
+Each worksheet returns the punching shear strength of the slab without shear reinforcement, the maximum strength at the column face, and the area of stirrups, studs or bent-up bars required to bridge the gap when the demand exceeds the slab capacity.
+The geometry of the perimeter changes with the column position: the [internal column](#internal-column) sees a closed perimeter, the [edge column](#edge-column) loses one side and the [corner column](#corner-column) loses two sides, with the eccentricity factor adjusted accordingly.

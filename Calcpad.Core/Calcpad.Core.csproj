@@ -5,17 +5,11 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <RootNamespace>Calcpad.Core</RootNamespace>
     <OutputType>Library</OutputType>
-    <Authors>Nedelcho Ganchovski</Authors>
-    <Company>Proektsoft EOOD</Company>
+    <Authors>CalcpadCE Contributors</Authors>
+    <Company>CalcpadCE Community</Company>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>..\Calcpad.Wpf\bin\Release\net10.0-windows\</OutputPath>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>..\Calcpad.Wpf\bin\Debug\net10.0-windows\</OutputPath>
+  <PropertyGroup>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 

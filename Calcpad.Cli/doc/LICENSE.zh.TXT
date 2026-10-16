@@ -1,4 +1,5 @@
-﻿版权所有（ c ） 2023 Proektsoft EOOD
+﻿Copyright (c) 2026 CalcpadCE Contributors
+Copyright (c) 2014-2026 Nedelcho Ganchovski
 现授予的权限，免费向任何人索取该软件和相关的文档文件（ “软件” ） ，
 以处理软件，没有任何限制，包括但不限于使用权，复制，修改，合并，出版，发行，
 授权，和/或销售软件的副本，并允许的人提供的软件是这样做，但须符合下列条件：

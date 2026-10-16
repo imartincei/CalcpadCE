@@ -1,0 +1,33 @@
+' CPD-33xx: Usage errors
+' CPD-3301: Undefined variable
+y = unknownVar * 2
+
+' CPD-3302: Wrong param count
+square(x) = x^2
+wrongCall = square(1; 2; 3)
+
+' CPD-3303: Undefined macro
+macroResult = undefined_macro$(5)
+
+' CPD-3305: Undefined function
+funcResult = undefined_func(10)
+
+' CPD-3307: Too few params
+tooFew = root(16)
+
+' CPD-3308: Too many params
+tooMany = sin(1; 2; 3)
+
+' CPD-3309: Type mismatch
+scalarVal = 1
+rowsOfScalar = n_rows(scalarVal)
+
+' CPD-3310: Undefined unit
+badUnit = 5badunit
+
+' CPD-3311: Empty parameter
+emptyParam = max(1; ; 3)
+
+' CPD-3315: Unknown keyword argument in a function call
+kwFunc(x; y = 2) = x + y
+badKeyword = kwFunc(1; q = 3)

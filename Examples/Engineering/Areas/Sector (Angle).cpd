@@ -1,0 +1,19 @@
+'<!-- Area and arc length of a circular sector from radius and central angle, valid for $\alpha \le 360°$. -->
+"Area and Arch Length of Circular Sector
+'<div style="max-width:110mm;"><img style="height:60pt;" class="side" alt="sector-angle.png" src="../../Images/math/area/sector-angle.png"></div>
+'Radius -'r = ? {1}
+'Angle -'α = ? {60}'&deg;
+'<!--
+#if α ≤ 180
+	'<-->
+	'Area
+	A = π*r^2*α/360
+	'Arch length
+	S = π*r*α/180
+	'<!--
+#else
+	'<-->
+	'Angle must be less or equal to 180 &deg;
+	'<!--
+#end if
+'<-->

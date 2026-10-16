@@ -1,0 +1,133 @@
+<div class="calcpad-output">
+ <div style="display:none">
+  <span class="eq">
+   <var>debug</var>
+   = 0
+  </span>
+ </div>
+ <strong>If clrUnits is okay to show in output</strong>
+ <p>
+  <span class="eq">
+   <var>t</var>
+   = 5
+   <i>ft</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>j</var>
+   = 6
+   <i>in</i>
+  </span>
+ </p>
+ <div style="display:none">
+  <p>
+   <span class="eq">
+    <var>t</var>
+    =
+    <var>t</var>
+    = 5
+    <i>ft</i>
+    = 60
+    <i>in</i>
+   </span>
+   ,
+   <span class="eq">
+    <var>j</var>
+    =
+    <var>j</var>
+    = 6
+    <i>in</i>
+    = 0.5
+    <i>ft</i>
+   </span>
+  </p>
+ </div>
+ <p>
+  <span class="eq">
+   <b>clrUnits</b>
+   (
+   <var>t</var>
+   )  ·
+   <b>clrUnits</b>
+   (
+   <var>j</var>
+   )  =
+   <b>clrUnits</b>
+   ( 60
+   <i>in</i>
+   )  ·
+   <b>clrUnits</b>
+   ( 0.5
+   <i>ft</i>
+   )  = 30
+  </span>
+ </p>
+ <br/>
+ <strong>If clrUnits is not okay to show in output</strong>
+ <p>
+  <span class="eq">
+   <var>t</var>
+   = 5
+   <i>ft</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>j</var>
+   = 6
+   <i>in</i>
+  </span>
+ </p>
+ <div style="display:none">
+  <p>
+   <span class="eq">
+    <var>t</var>
+    =
+    <span class="dvc">
+     <var>t</var>
+     <span class="dvl">
+     </span>
+     <i>in</i>
+    </span>
+    =
+    <span class="dvc">
+     5
+     <i>ft</i>
+     <span class="dvl">
+     </span>
+     <i>in</i>
+    </span>
+    = 60
+   </span>
+   ,
+   <span class="eq">
+    <var>j</var>
+    =
+    <span class="dvc">
+     <var>j</var>
+     <span class="dvl">
+     </span>
+     <i>ft</i>
+    </span>
+    =
+    <span class="dvc">
+     6
+     <i>in</i>
+     <span class="dvl">
+     </span>
+     <i>ft</i>
+    </span>
+    = 0.5
+   </span>
+  </p>
+ </div>
+ <p>
+  <span class="eq">
+   <var>t</var>
+   ·
+   <var>j</var>
+   = 60 · 0.5 = 30
+  </span>
+ </p>
+</div>

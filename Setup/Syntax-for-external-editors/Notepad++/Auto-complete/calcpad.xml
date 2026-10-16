@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <NotepadPlus>
-	<AutoComplete language="Calcpad">
+	<AutoComplete language="CalcpadCE">
 		<Environment ignoreCase="no" startFunc="(" stopFunc=")" paramSeparator=";" terminal="" additionalWordChar="$#μ°"/>
 		<KeyWord name="#append" />
 		<KeyWord name="#break" />
@@ -273,7 +273,7 @@
 		<KeyWord name="kHz" />
 		<KeyWord name="kip " />
 		<KeyWord name="kipf" />
-		<KeyWord name="kipm" />		
+		<KeyWord name="kipm" />
 		<KeyWord name="kip_f" />
 		<KeyWord name="kip_m" />
 		<KeyWord name="kJ" />
@@ -303,7 +303,7 @@
 		<KeyWord name="last" />
 		<KeyWord name="lb" />
 		<KeyWord name="lbf" />
-		<KeyWord name="lbm" />		
+		<KeyWord name="lbm" />
 		<KeyWord name="lb_f" />
 		<KeyWord name="lb_m" />
 		<KeyWord name="lcm" />

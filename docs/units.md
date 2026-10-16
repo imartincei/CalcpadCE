@@ -1,6 +1,6 @@
-﻿# Units
+# Units
 
-Calcpad provides comprehensive support for physical units of measurement.
+CalcpadCE provides comprehensive support for physical units of measurement.
 The current version supports metric (SI and compatible), US and Imperial units.
 There are seven basic units that correspond to the seven physical dimensions:
 
@@ -28,7 +28,9 @@ For example, the following expression will be evaluated as:
 The result is usually obtained into the first unit in the expression.
 If you want to use particular units, write a vertical bar "\|" followed by the target units at the end:
 
-`1.23 m + 35 cm + 12 mm | cm`
+```calcpad
+1.23 m + 35 cm + 12 mm | cm
+```
 
 The above expression will be evaluated to 159.2 *cm*. If you simply want to convert units, just write the source and the target units, separated by a vertical bar, like: mm \| cm or 10 m/s \| km/h.
 
@@ -50,16 +52,16 @@ In the next example, speed is calculated in m/s, but is converted and stored as 
 | `'What distance you will travel for't_2 = 5s'?` | What distance you will travel for $t_2 = 5s$?  
 | `s_2 = V*t_2\|m` | $s_2 = V*t_2 = 90 km/h*5s = 125m$
 
-## Predefined units
+## Predefined Units
 
-Calcpad includes a large collection of predefined units as follows:
+CalcpadCE includes a large collection of predefined units as follows:
 
 ### Dimensionless
 
 - Parts: %, ‰, ‱, pcm, ppm, ppb, ppt, ppq;
 - Angles: °, ′, ″, deg, rad, grad, rev;
 
-### Metric units (SI and compatible)
+### Metric Units (SI and Compatible)
 
 - Mass: g, hg, kg, t, kt, Mt, Gt, dg, cg, mg, μg, ng, pg, Da (or u);
 - Length: m, km, dm, cm, mm, μm, nm, pm, AU, ly;
@@ -98,7 +100,7 @@ Calcpad includes a large collection of predefined units as follows:
 - Equivalent dose: Sv, kSv, MSv, GSv, TSv, mSv, μSv, nSv, pSv;
 - Catalytic activity: kat;
 
-### Non-metric units (Imperial/US)
+### Non-Metric Units (Imperial/US)
 
 - Mass: gr, dr, oz, lb (or lbm, lb_m), kipm (or kip_m), st, qr,  
      cwt (or cwt_UK, cwt_US), ton (or ton_UK, ton_US), slug;
@@ -125,12 +127,12 @@ Literals that follow numbers immediately are parsed as units, e.g. "2 m". Stan
 Otherwise, it is parsed as a variable, even if a unit with the same name exists.
 If you put a dot before the literal, you will force it to be parsed as a unit, even if a variable with the same name exists, e.g. ".N\*.m".
 
-## Custom units
+## Custom Units
 
 You can define your own "custom" units and use them like any others in your code.
 Defining a unit is similar to defining a variable, but the name must be prefixed with a dot ".":
 
-```matlab
+```calcpad
 .*Name* = expression
 ```
 
@@ -138,7 +140,7 @@ Names can include some currency symbols like: €, £, ₤, ¥, ¢, ₽, ₹, �
 You can also define dimensionless units, like currency (USD, EUR, €, ₤) or information (bit, byte, KiB, etc), by specifying "= 1" for the first unit and setting the others as multiples.
 For example:
 
-```matlab
+```calcpad
 .bit = 1
 .byte = 8*bit
 .KiB = 1024*byte

@@ -196,7 +196,7 @@ b1 = 29N*m
 c1 = a > b1
 c1 = f(a; b1)
 
-"Less than or equal 
+"Less than or equal
 a = [5W; -2.1W; 0W; 7.8W; -4.6W]
 b = 0J/s
 c = a ≤ b
@@ -229,7 +229,7 @@ c1 = a ≥ b1
 c1 = f(a; b1)
 
 '<h1>Logical operators</h1>
-"Logical AND 
+"Logical AND
 a = [0Wb; 16.7Wb; 0Wb; 22.3Wb; 13.5Wb; -18Wb; 21.2Wb; 0Wb; -19.3Wb; 25Wb]
 b = 0V*s
 c = a ∧ b
@@ -310,4 +310,3 @@ f(x; y) = 4*x + 5S','c3 = f(x; y)
 
 c4 = (x > 0S)*S - y
 f(x; y) = x/2 - y','c4 = f(x; y)
-

@@ -1,4 +1,4 @@
-﻿# Reporting
+# Reporting
 
 All calculations are automatically collected into a professionally formatted calculation report.
 You can print it or open it with MS Word for editing.
@@ -8,7 +8,7 @@ Besides math expressions, you can add headings, comments, tables and images.
 
 A heading is a text, enclosed in double quotes (**"**). It is bold and larger than the main text.
 
-## Text/comments
+## Text/Comments
 
 Comments are enclosed in single quotes (**'**). You can skip the closing quote, if it is the last symbol in the line.
 Headings and comments can contain any symbols without restrictions.
@@ -16,65 +16,18 @@ Everything outside them is assumed to be math expressions.
 However, if you put any formulas inside comments, they will not be calculated or formatted.
 Since the final output is rendered to an Html document, you can use Html and CSS in comments to provide your calculation report with additional formatting.
 
-## Units in comments
-
-Alternatively, to native units, you can enter all values to be unitless and then put the units in the comments.
-In this case, you will have to include all unit conversion factors in the equations.
-Also, there is an option to generate a selection box for length units - **m**, **cm** and **mm**. You only need to insert **%u** in comments wherever you want the units to appear.
-When the program generates the input form (see further) it checks whether **%u** exists somewhere in the code.
-If so, it automatically adds a unit selection combo box, at the top-right corner.
-When you change the units from the combo, they will be filled in all occurrences of **%u** in the code.
-You can try it below:
-
-| Markdown code | Html code | Output |
-|---|---|---|
-| `### Heading 3` | `<h3>Heading 3</h3>` | Heading 3 |
-| `#### Heading 4` | `<h4>Heading 4</h4>` | Heading 4 |
-| `##### Heading 5` | `<h5>Heading 5</h5>` | Heading 5 |
-| `###### Heading 6` | `<h6>Heading 6</h6>` | Heading 6 |
-| `---` (horizontal line) | `<hr/>` | **———————** |
-| `**Bold**` | `<strong>Bold</strong>` | **Bold** |
-| `*Italic*` | `<em>Italic</em>` | *Italic* |
-| `***Bold Italic***` | `<em><strong>Bold Italic</strong></em>` | ***Bold Italic*** |
-| `++Underlined++` | `<ins>Underlined</ins>` | <u>Underlined</u> |
-| `~~Struck through~~` | `<del>Struck through</del>` | <s>Struck through</s> |
-| `==Highlighted==` | `<mark>Highlighted</mark>` | Highlighted |
-| `x^superscript^` | `x<sup>superscript</sup>` | x<sup>superscript</sup> |
-| `x~subscript~` | `x<sub>subscript</sub>` | x<sub>subscript</sub> |
-| `` `Code` `` | `<code>Code</code>` | `Code` |
-| `[Link](https://mywebsite.com)` | `<a href="https://mywebsite.com">Link</a>` | [Link](https://mywebsite.com) |
-| `![Image](image.jpg)` | `<img src="image.jpg" alt="Image" />` | |
-| `> Blockquote 1`<br/>`>> Blockquote 2` | `<blockquote>Blockquote 1`<br/>`<blockquote>Blockquote 2`<br/>`</blockquote></blockquote>` | Blockquote 1, Blockquote 2 |
-
-When you run the calculations, the "Units" combo will disappear from the output.
-Only the units will remain as filled.
-The program will also create a variable *Units*, which will contain the conversion factor from the selected units to meters.
-Its value is 1, 100 and 1000 for m, mm and cm, respectively.
-You can use it for units conversion inside the calculations.
-For example, you can create a conditional block for displaying the selected units in the report:
-
-```text
-#if *Units* ≡ 1  
-  'The selected units are meters  
-#else if *Units* ≡ 100  
-  'The selected units are centimeters  
-#else if *Units* ≡ 1000  
-  'The selected units are millimeters  
-#end if
-```
-
 ## Formatting with Html and CSS
 
-Calcpad can be used as a development platform for professional engineering programs.
+CalcpadCE can be used as a development platform for professional engineering programs.
 If you are not going to do that, you can skip this chapter.
 
 **Html** (Hyper Text Markup Language) is a markup language which is created for formatting web pages.
 You can change the font type, size and weight, the color of the text and to insert tables, images, etc.
 This is performed by adding special elements called "tags". Each tag is enclosed in angular brackets: "<tag\>". Some tags are used in pairs - opening "<tag\>" and closing "</tag\>". The contents is going in between.
-For example, if you want to make some text bold, you can use the following tags: <b\>**Bold text**</b\>. Even if you are not a professional programmer, you can easily learn some basic Html, to use with Calcpad:
+For example, if you want to make some text bold, you can use the following tags: <b\>**Bold text**</b\>. Even if you are not a professional programmer, you can easily learn some basic Html, to use with CalcpadCE:
 
 | Html code | Output |
-| --- | --- |
+| --------- | ------ |
 | `<h3>Heading 3</h3>` | <span style="font-size:2.5em;">Heading 3</span> |
 | `<h4>Heading 4</h4>` | <span style="font-size:2em;">Heading 4</span> |
 | `<h5>Heading 5</h5>` | <span style="font-size:1.5em;">Heading 5</span> |
@@ -94,7 +47,9 @@ For example, if you want to make some text bold, you can use the following tags:
 You can put Html tags only in comments, but you can also make them affect expressions.
 For example:
 
-`'<span style="color:red;"> as simple as ' 2 + 2 '</span>'`
+```calcpad
+'<span style="color:red;"> as simple as ' 2 + 2 '</span>'
+```
 
 will give the following output:
 
@@ -113,34 +68,34 @@ You can learn more about Html and CSS from the following links:
 
 You can also use some of the many free WYSIWYG Html editors available on the Internet.
 
-### Predefined classes
+### Predefined Classes
 
 Some formatting that is commonly used in engineering design worksheets is predefined as CSS classes and can be inserted by simply assigning the respective class to Html elements.
 
 **err** - adds red color to text:
 
-`'<span class="err">The check is not satisfied ✖'</span>'`  
+`'<span class="err">The check is not satisfied ✖</span>`  
 <span class="err">The check is not satisfied ✖</span>
 
 **ok** - adds green color to text:
 
-`'<span class="ok">The check is satisfied ✔'</span>'`  
+`'<span class="ok">The check is satisfied ✔</span>`  
 <span class="ok">The check is satisfied ✔</span>
 
 **ref** - (right aligned) it is used for references to design codes and equation numbering:
 
-`'<span class="ref">[EN 1992-1-1, §9.2.2]'</span>'`  
+`'<span class="ref">[EN 1992-1-1, §9.2.2]</span>`  
 <span class="ref">[EN 1992-1-1, §9.2.2]</span>
 
 **bordered** - adds border to tables:
 
-`'<table class="bordered">'...</table>'`
+`'<table class="bordered">...</table>`
 
 **data** - makes the first column left aligned and the others - right aligned:
 
-`'<table class="data">'...</table>'`
+`'<table class="data">...</table>`
 
-### Content folding
+### Content Folding
 
 If you have some long and detailed calculations, you can fold them optionally in the output.
 They will be hidden by default, except for the first line, which can be used for the section heading.
@@ -149,25 +104,28 @@ All you need to do is to enclose the folding section into a Html "**div**" eleme
 ```html
 '<div class="fold">
 '<b>Heading</b> (click to unfold)
-'Content to be folded
+'<p>Content to be folded</p>
 '</div>
 ```
 
 The result will look as follows:
 
-> **Heading** (click to unfold) … ▼
->
-> Content to be folded
+<div class="fold">
+<p><b>Heading</b> (click to unfold)</p>
+<p>Content to be folded</p>
+</div>
 
 ### Images
 
-Before inserting an image into Calcpad document, you need to have it already as a file.
+Before inserting an image into CalcpadCE document, you need to have it already as a file.
 You can create it by some image editing software and save it to a \*.png, \*.gif or \*.jpg file.
 You can use some freeware programs like Paint, Gimp, InkScape, DraftSight or others.
 Then you can insert it using Html.
 All you need to do is to put the following text at the required place, inside a comment:
 
-`'<img style="float:right" src="c:/Users/Me/Pictures/Picture1.png" alt="Picture1.png">`
+```calcpad
+'<img style="float:right" src="c:/Users/Me/Pictures/Picture1.png" alt="Picture1.png">
+```
 
 Of course, instead of "**c:/Users/Me/Pictures/Picture1.png**" you must specify the actual path to your image.
 The file can be local, network or on the Internet.
@@ -185,10 +143,10 @@ When you run the calculations, the picture will appear in the output window.
 
 [Markdown](https://www.markdownguide.org/) is a simple and lightweight markup language for text formatting.
 Unlike Html, it uses individual symbols or short sequences of symbols for tagging.
-In Calcpad, you can use Markdown in comments optionally, instead of Html.
+In CalcpadCE, you can use Markdown in comments optionally, instead of Html.
 Since it requires an additional parsing step, you can switch it on and off by using the following keywords inside your worksheet:
 
-```text
+```calcpad
 #md on - switches Markdown mode on;  
 #md off - switches Markdown mode off.
 ```
@@ -199,7 +157,7 @@ are not fully supported.
 You can use the following syntax elements:
 
 | Markdown code | Html code | Output |
-| --- | --- | --- |
+| ------------- | --------- | ------ |
 | `### Heading 3` | `<h3>Heading 3</h3>` | Heading 3 |
 | `#### Heading 4` | `<h4>Heading 4</h4>` | Heading 4 |
 | `##### Heading 5` | `<h5>Heading 5</h5>` | Heading 5 |
@@ -214,7 +172,7 @@ You can use the following syntax elements:
 | `x^superscript^` | `x<sup>superscript</sup>` | x<sup>superscript</sup> |
 | `x~subscript~` | `x<sub>subscript</sub>` | x<sub>subscript</sub> |
 | `` `Code` `` | `<code>Code</code>` | `Code` |
-| `[Link](https://example.com)` | `<a href="https://example.com">Link</a>` | [Link](https://example.com) |
+| `[Example site](https://example.com)` | `<a href="https://example.com">Example site</a>` | [Example site](https://example.com) |
 | `![Image](image.jpg)` | `<img src="image.jpg" alt="Image" />` | |
 | `> Blockquote 1`<br/>`>> Blockquote 2` | `<blockquote>Blockquote 1`<br/>`<blockquote>Blockquote 2`<br/>`</blockquote></blockquote>` | |
 
@@ -226,12 +184,12 @@ It supports both Html or Markdown, depending on your choice.
 To enable Markdown, switch the **M⭣** button on.
 Also, do not forget to add "#md on" on top of your worksheet.
 
-<img src="./media/image33.png" style="width:6.69306in;height:0.31528in" />
+<img src="./media/image33.png" style="width:6.69306in;height:0.31528in" alt="Report output toolbar" />
 
 The formatting toolbar includes the following commands:
 
 | Button | Command | Shortcut | Html | Markdown |
-| --- | --- | --- | --- | --- |
+| ------ | ------- | -------- | ---- | -------- |
 | H3 | Heading 3 | Ctrl+3 | `<h3>...</h3>` | `###...` |
 | H4 | Heading 4 | Ctrl+4 | `<h4>...</h4>` | `####...` |
 | H5 | Heading 5 | Ctrl+5 | `<h5>...</h5>` | `#####...` |
@@ -257,5 +215,5 @@ The formatting toolbar includes the following commands:
 
 To apply a formatting tag to a certain part of the text, select the part first and then press the respective button.
 If you press it once again, you will remove the existing formatting of the same type.
-Calcpad supports word autoselection.
+CalcpadCE supports word autoselection.
 If you click inside a word and press a formatting button, it is applied for the whole word.

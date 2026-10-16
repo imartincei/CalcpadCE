@@ -1,0 +1,56 @@
+name: Deploy PR preview
+
+on:
+  workflow_run:
+    workflows: ["Build PR docs"]
+    types: [completed]
+
+concurrency: preview-${{ github.event.workflow_run.head_branch }}
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  deploy-preview:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download PR number artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: pr-number
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Read PR number
+        id: pr
+        run: echo "number=$(cat pr-number.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Download site artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: site
+          path: site/
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./site/
+          preview-branch: gh-pages
+          pr-number: ${{ steps.pr.outputs.number }}
+          action: deploy
+
+      - name: Comment on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          number: ${{ steps.pr.outputs.number }}
+          header: pr-preview
+          message: >
+            Documentation preview:
+            https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-preview/pr-${{ steps.pr.outputs.number }}/

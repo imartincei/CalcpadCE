@@ -1,0 +1,12 @@
+'<!-- Volume $V = \tfrac{4}{3}\pi\, a\, b\, c$ and approximate surface area of an ellipsoid from its three semi-axes. -->
+'<div style = "max-width:110mm"><img style="height:70pt;" class="side" alt="ellipsoid.png" src = "../../Images/math/volume/ellipsoid.png"></div>
+'Dimensions
+a = ? {3}
+b = ? {2}
+c = ? {1}
+'Volume
+V = 4/3*π*a*b*c
+p = 1.6075
+'Surface area (approx.)
+S = 4*π*(((a*b)^p + (a*c)^p + (b*c)^p)/3)^(1/p)
+'

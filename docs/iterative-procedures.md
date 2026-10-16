@@ -1,11 +1,11 @@
-﻿# Iterative procedures
+# Iterative Procedures
 
 There are some other commands that allow you to calculate the result iteratively.
 Unlike numerical methods, they can work with complex numbers.
 
 ## Sum
 
-```matlab
+```calcpad
 $Sum{f(k) @ k = a : b}
 ```
 
@@ -13,7 +13,7 @@ It sums the values of f(*k*) for all integer *k* between *a* and *b*. The values
 For example, you can use series to calculate constants.
 Such is the Leibniz formula for calculation of π:
 
-```matlab
+```calcpad
 4 * $Sum{(-1)^(k+1)/(2*k - 1) @ k = 1:1000}` $= 3.1406$
 ```
 
@@ -22,7 +22,7 @@ Of course, they cannot be infinite.
 The number of iterations should be sufficient to provide the required precision of the result.
 The following pattern can be applied to approximate a function with Fourier series:
 
-```matlab
+```calcpad
 f(x) = a_0/2 + $Sum{a(k)*cos(k*x*π/l) @ k=1:n} + $Sum{b(k)*sin(k*x*π*l) @ k=1:n}
 ```
 
@@ -32,20 +32,20 @@ As an example, we can take a straight line within the interval (0; 2\**l*), with
 
 ## Product
 
-```matlab
+```calcpad
 $Product{f(k) @ k = a : b}
 ```
 
 It works like "**Sum**", but it multiplies the terms instead of adding them.
 For example, you can define your own factorial function:
 
-```matlab
+```calcpad
 F(n) = $Product{k @ k = 1 : n}
 ```
 
 You can use it further to calculate binomial coefficients by the well-known formula: C(*n*; *k*) = F(*n*)/(F (*k*)\*F(*n* - *k*)). However, it is much more efficient to define a special procedure that computes the coefficient directly without using factorials:
 
-```matlab
+```calcpad
 $Product{(i + n - k)/i @ i = 1:k}
 ```
 
@@ -53,7 +53,7 @@ Also, the latter will not overflow together with the factorials for greater valu
 
 ## Repeat
 
-```matlab
+```calcpad
 $Repeat{f(k) @ k = a : b}
 ```
 
@@ -62,26 +62,26 @@ However, there are expressions that can be calculated only by the "**Repeat**" c
 Normally, such expressions will make sense if you assign the result to a variable to be used in the next iteration.
 So, the following pattern is more likely to be applied in practice:
 
-```matlab
+```calcpad
 $Repeat{x = f(x; k) @ k = a : b}
 ```
 
 For example, you can use this command to define the Mandelbrot set in a single line:
 
-```matlab
+```calcpad
 f(z; c) = $Repeat{z = z^2 + c @ i = 1:100}
 ```
 
 You should not forget to switch to "Complex" mode.
 Then you can plot the result:
 
-```matlab
+```calcpad
 $Map{abs(f(0; x + 1i*y)) @ x = -1.5:0.5 & y = -1:1}
 ```
 
 <img src="./media/image27.png" style="width:4.81217in;height:4.37051in" alt="Mandelbrot" />
 
-## Expression blocks
+## Expression Blocks
 
 An expression block encloses a list of expressions, divided by semicolons.
 All expressions can assign to local variables.
@@ -110,7 +110,7 @@ Such is the *quadRoots* function in the example below that find the roots of a
 <tbody>
 <tr>
 <td style="text-align: left;">
-```matlab
+```calcpad
 quadRoots(a; b; c) = _
 $block{
     D = b^2 - 4*a*c;
@@ -121,7 +121,7 @@ $block{
 quadRoots(2; 3; -5)
 ```
 </td>
-<td><img src="./media/image28.png" width="400" /></td>
+<td><img src="./media/image28.png" width="400" alt="Output of the quadRoots function" /></td>
 </tr>
 </tbody>
 </table>

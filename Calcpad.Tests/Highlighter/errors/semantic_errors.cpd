@@ -1,0 +1,26 @@
+' CPD-34xx: Semantic errors
+' CPD-3401: Invalid operator
+z = 5 ++ 3
+
+' CPD-3406: Unknown directive
+#badDirective
+
+' CPD-3409: # directive in command block
+badBlock(x) = $Inline{#if x > 0; r = 1; #end if; r}
+
+' CPD-3411: Incomplete expression
+incomplete = 5 +
+
+' CPD-3412: Command variable mismatch
+sumMismatch = $Sum{j^2 @ k = 1 : 5}
+
+' CPD-3413: Reassign constant
+#const
+protected = 100
+protected = 200
+
+' CPD-3414: Outer scope assignment to undefined
+$Repeat{undefined_outer ← 5 @ k = 1 : 3}
+
+' CPD-3419: Deprecated stored input value
+L = ?{6}m

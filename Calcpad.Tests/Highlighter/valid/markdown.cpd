@@ -1,0 +1,57 @@
+' Markdown: inline formatting, headings, lists, toggling, mixed content
+#md on
+' Inline formatting
+"**Bold text**"
+"*Italic text*"
+"***Bold and italic***"
+"++Underlined text++"
+"~~Strikethrough text~~"
+"~Subscript~"
+"^Superscript^"
+' Combined inline
+"**Bold** and *italic* and ++underline++ together"
+"H~2~O is water, E = mc^2^"
+' Headings
+"### Heading 3"
+"#### Heading 4"
+"##### Heading 5"
+"###### Heading 6"
+"### **Bold Heading**"
+' Horizontal rule
+"---"
+' Lists
+"- Item 1"
+"- Item 2"
+"- Item 3"
+"1. First"
+"2. Second"
+"3. Third"
+' Markdown with expressions
+a = 42
+b = 3.14
+c = a + b
+"The value of **a** is "a
+"The sum **a + b** = "c
+' Markdown in single-quote comments
+'**Bold in single quotes**'
+'Value = 'a' (computed)'
+' Mixed markdown and HTML
+"**Bold markdown** with <span style='color:red'>red HTML</span>"
+' Markdown in macros
+#def mdNote$(text$) = '**Note:** 'text$
+#def mdSub$(label$; sub$) = label$'~'sub$'~'
+mdNote$('This is important')
+mdSub$('x'; 'i')
+' Markdown toggling
+#md off
+"**Not parsed as markdown**"
+#md on
+"**Parsed as markdown again**"
+' Markdown in control flow
+x = 100
+#if x > 50
+	"**x exceeds 50**"
+#else
+	"*x is within limits*"
+#end if
+#md off

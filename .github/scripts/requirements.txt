@@ -1,0 +1,2 @@
+# Pin versions to keep rendering output consistent between local and CI.
+beautifulsoup4==4.14.3

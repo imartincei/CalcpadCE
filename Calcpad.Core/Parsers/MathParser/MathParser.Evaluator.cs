@@ -159,21 +159,21 @@ namespace Calcpad.Core
             private IValue EvaluateToken(Token t) =>
                 t.Type switch
                 {
-                    TokenTypes.Unit => 
+                    TokenTypes.Unit =>
                         t is ValueToken vt ? vt.Value : ((VariableToken)t).Variable.ValueByRef(),
-                    TokenTypes.Variable => 
+                    TokenTypes.Variable =>
                         EvaluateVariableToken((VariableToken)t),
-                    TokenTypes.Vector => 
-                        t is VectorToken vt ? 
-                            vt.Vector : 
+                    TokenTypes.Vector =>
+                        t is VectorToken vt ?
+                            vt.Vector :
                             EvaluateVariableToken(((VariableToken)t)),
-                    TokenTypes.Matrix => 
-                        t is MatrixToken mt ? 
-                            mt.Matrix : 
+                    TokenTypes.Matrix =>
+                        t is MatrixToken mt ?
+                            mt.Matrix :
                             EvaluateVariableToken(((VariableToken)t)),
-                    TokenTypes.Input when t.Content == "?" => 
+                    TokenTypes.Input when t.Content == "?" =>
                         throw Exceptions.UndefinedInputField(),
-                    _ => 
+                    _ =>
                         ((ValueToken)t).Value
                 };
 
@@ -181,11 +181,11 @@ namespace Calcpad.Core
             private IValue EvaluateToken(Token t, in IValue a) =>
                 t.Type switch
                 {
-                    TokenTypes.Operator => 
+                    TokenTypes.Operator =>
                         -a,
-                    TokenTypes.Function => 
+                    TokenTypes.Function =>
                         IValue.EvaluateFunction(_matrixCalc, t.Index, a),
-                    TokenTypes.VectorFunction => 
+                    TokenTypes.VectorFunction =>
                         VectorCalculator.EvaluateVectorFunction(t.Index, a),
                     TokenTypes.MatrixOptionalFunction =>
                         MatrixCalculator.EvaluateMatrixIterativeFunction(t.Index, a, RealValue.Zero, _parser.Tol),
@@ -198,11 +198,11 @@ namespace Calcpad.Core
             private IValue EvaluateToken(Token t, in IValue a, in IValue b) =>
                 t.Type switch
                 {
-                    TokenTypes.Operator => 
+                    TokenTypes.Operator =>
                         IValue.EvaluateOperator(_matrixCalc, t.Index, a, b),
-                    TokenTypes.Function2 => 
+                    TokenTypes.Function2 =>
                         IValue.EvaluateFunction2(_matrixCalc, t.Index, a, b),
-                    TokenTypes.VectorFunction2 => 
+                    TokenTypes.VectorFunction2 =>
                         VectorCalculator.EvaluateVectorFunction2(t.Index, a, b),
                     TokenTypes.MatrixIterativeFunction =>
                         MatrixCalculator.EvaluateMatrixIterativeFunction(t.Index, a, b, _parser.Tol),
@@ -235,7 +235,7 @@ namespace Calcpad.Core
                 try
                 {
                     if (!_units.TryGetValue(s, out var u))
-                        u = Unit.Get(s);
+                        u = Unit.Get(s, _parser.IsUs);
 
                     t.Type = TokenTypes.Unit;
                     v.SetValue(u);
@@ -331,11 +331,11 @@ namespace Calcpad.Core
                        a = StackPop();
                 return t.Type switch
                 {
-                    TokenTypes.Function3 => 
+                    TokenTypes.Function3 =>
                         _calc.EvaluateFunction3(t.Index, a, b, c),
-                    TokenTypes.VectorFunction3 => 
+                    TokenTypes.VectorFunction3 =>
                         VectorCalculator.EvaluateVectorFunction3(t.Index, a, b, c),
-                    _ => 
+                    _ =>
                         MatrixCalculator.EvaluateMatrixFunction3(t.Index, a, b, c)
                 };
             }
@@ -424,12 +424,16 @@ namespace Calcpad.Core
             private IValue EvaluateFunctionToken(Token t, ref int tos)
             {
                 var cf = _functions[t.Index];
-                var cfParamCount = cf.ParameterCount;
+                var map = (t as FunctionToken)?.ArgumentMap;
+                var cfParamCount = map?.Length ?? cf.ParameterCount;
                 if (cf.IsRecursion)
                 {
                     tos -= cfParamCount;
                     return RealValue.NaN;
                 }
+                if (map is not null)
+                    return EvaluateFunction(cf, map, StackPopValues(cfParamCount));
+
                 switch (cf.ParameterCount)
                 {
                     case 1:
@@ -448,6 +452,37 @@ namespace Calcpad.Core
                         var cfParams = StackPopValues(cfParamCount);
                         return EvaluateFunction((CustomFunctionN)cf, cfParams);
                 }
+            }
+
+            internal IValue EvaluateFunction(CustomFunction cf, int[] map, IValue[] supplied)
+            {
+                if (cf.Function is null)
+                {
+                    cf.Function = _parser.CompileRpn(cf.Rpn);
+                    if (cf.DefaultFunctions is not null)
+                        Array.Clear(cf.DefaultFunctions);
+                }
+                var arguments = new IValue[cf.ParameterCount];
+                for (var k = 0; k < map.Length; ++k)
+                    arguments[map[k]] = supplied[k];
+
+                var parameters = cf.Parameters;
+                for (var i = 0; i < arguments.Length; ++i)
+                {
+                    if (arguments[i] is null)
+                    {
+                        var rpn = cf.Defaults?[i] ?? throw Exceptions.InvalidNumberOfArguments();
+                        arguments[i] = (cf.DefaultFunctions[i] ??= _parser.CompileRpn(rpn))();
+                    }
+                    parameters[i].SetValue(arguments[i]);
+                }
+                return cf switch
+                {
+                    CustomFunction1 cf1 => EvaluateFunction(cf1, arguments[0]),
+                    CustomFunction2 cf2 => EvaluateFunction(cf2, arguments[0], arguments[1]),
+                    CustomFunction3 cf3 => EvaluateFunction(cf3, arguments[0], arguments[1], arguments[2]),
+                    _ => EvaluateFunction((CustomFunctionN)cf, arguments)
+                };
             }
 
             internal IValue EvaluateFunction(CustomFunction1 cf, in IValue x)

@@ -1,0 +1,12 @@
+{
+  // mkdocs-material: one sentence per line, inline HTML for image sizing,
+  // and admonitions whose indented fences MD038/MD046 misread as code blocks.
+  "default": true,
+  "MD013": false,
+  "MD033": false,
+  "MD038": false,
+  "MD046": false,
+  "MD010": { "code_blocks": false },
+  "MD024": { "siblings_only": true },
+  "MD060": { "aligned_delimiter": false }
+}

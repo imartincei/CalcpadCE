@@ -1,0 +1,16 @@
+{
+    "editor.formatOnSave": false,
+    "js/ts.preferences.includePackageJsonAutoImports": "auto",
+    "js/ts.suggest.autoImports": true,
+    "js/ts.validate.enabled": true,
+    "files.associations": {
+        "*.vue": "vue"
+    },
+    "files.trimTrailingWhitespace": true,
+    "files.trimFinalNewlines": true,
+    "files.insertFinalNewline": true,
+    "[markdown]": {
+        // Two trailing spaces in Markdown signal a line break in the rendered output.
+        "files.trimTrailingWhitespace": false,
+    }
+}

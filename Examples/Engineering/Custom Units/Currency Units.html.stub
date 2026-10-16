@@ -1,0 +1,103 @@
+<div class="calcpad-output">
+ <!-- Defines USD, EUR and other currencies as custom units with cross-rates, so monetary expressions auto-convert and round consistently across the worksheet. -->
+ <p>
+  <b>Definition</b>
+ </p>
+ <p>
+  <span class="eq">
+   <i>EUR</i>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <i>USD</i>
+   = 0.92
+   <i>EUR</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <i>BGN</i>
+   = 0.511
+   <i>EUR</i>
+  </span>
+ </p>
+ <p>
+  <b>Conversion</b>
+ </p>
+ <p>
+  <span class="eq">
+   10
+   <i>BGN</i>
+   = 5.56
+   <i>USD</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   20
+   <i>EUR</i>
+   = 39.12
+   <i>BGN</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   30
+   <i>EUR</i>
+   = 32.61
+   <i>USD</i>
+  </span>
+ </p>
+ <p>
+  <b>Usage</b>
+ </p>
+ <p>
+  Unit price -
+  <span class="eq">
+   <var>p</var>
+   = 15
+   <span class="dvc">
+    <i>USD</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
+  </span>
+ </p>
+ <p>
+  Order length -
+  <span class="eq">
+   <var>L</var>
+   = 100
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  Total price in USD -
+  <span class="eq">
+   <var>P</var>
+   =
+   <var>p</var>
+   ·
+   <var>L</var>
+   = 15
+   <i>USD</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   · 100
+   <i>m</i>
+   = 1500
+   <i>USD</i>
+  </span>
+ </p>
+ <p>
+  Total price in EUR -
+  <span class="eq">
+   <var>P</var>
+   = 1380
+   <i>EUR</i>
+  </span>
+ </p>
+</div>

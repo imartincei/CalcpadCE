@@ -19,11 +19,10 @@ namespace Calcpad.Core
             private readonly Dictionary<string, Variable> _variables;
             private readonly Stack<Dictionary<string, Variable>> _localVariables = new();
             private readonly Dictionary<string, Unit> _units;
-            private static readonly char[] UnitChars = Validator.UnitChars.ToCharArray();
             static Input()
             {
                 // This array is needed to quickly check the token type of a character during parsing
-                // Letters a-z are initially assumed to be variables unless the whole literal matches a function 
+                // Letters a-z are initially assumed to be variables unless the whole literal matches a function
 
                 for (int i = 0; i < 127; ++i)
                 {
@@ -98,6 +97,7 @@ namespace Calcpad.Core
                 var isInput = false;
                 var isSubscript = false;
                 var bracketCounter = 0;
+                var parenDepth = 0;
                 var tokenLiteral = new TextSpan(expression);
                 var unitsLiteral = new TextSpan(expression);
                 var textSpan = new TextSpan(expression);
@@ -134,31 +134,29 @@ namespace Calcpad.Core
                     {
                         if (pt == TokenTypes.Unit || pt == TokenTypes.Variable)
                         {
-                            tt = tokenLiteral.StartsWithAny(UnitChars) ?
+                            tt = tokenLiteral.StartsWithAny(Validator.UnitChars) ?
                                 TokenTypes.Unit :
                                 TokenTypes.Variable;
 
                             if (c == '.' && tt == TokenTypes.Variable)
                             {
-                                var s = tokenLiteral.ToString();
-                                t = MakeVectorOrMatrixToken(s);
-                                if (t is not null)
-                                {
-                                    if (_isComplex)
-                                        throw Exceptions.ComplexVectorsAndMatricesNotSupported();
+                                if (_isComplex)
+                                    throw Exceptions.ComplexVectorsAndMatricesNotSupported();
 
-                                    tokens.Enqueue(t);
-                                    tokenLiteral.Reset(i);
-                                    tt = t.Type switch
-                                    {
-                                        TokenTypes.Vector => TokenTypes.VectorIndex,
-                                        TokenTypes.Matrix => TokenTypes.MatrixIndex,
-                                        _ => TokenTypes.ArrayIndex
-                                    };
-                                    tokens.Enqueue(new Token(s, tt));
-                                }
-                                else
-                                    tokenLiteral.Expand();
+                                var s = tokenLiteral.ToString();
+                                t = MakeVectorOrMatrixToken(s) ?? new VariableToken(s, null)
+                                {
+                                    Type = TokenTypes.Array
+                                };
+                                tokens.Enqueue(t);
+                                tokenLiteral.Reset(i);
+                                tt = t.Type switch
+                                {
+                                    TokenTypes.Vector => TokenTypes.VectorIndex,
+                                    TokenTypes.Matrix => TokenTypes.MatrixIndex,
+                                    _ => TokenTypes.ArrayIndex
+                                };
+                                tokens.Enqueue(new Token(s, tt));
                             }
                             else
                                 tokenLiteral.Expand();
@@ -264,7 +262,7 @@ namespace Calcpad.Core
                                         if (!tokenLiteral.IsEmpty)
                                             t = MakeUnitToken(s, true);
                                     }
-                                    else if (UnitChars.Contains(s[0]))
+                                    else if (Validator.UnitChars.Contains(s[0]))
                                         t = MakeUnitToken(s, true);
                                     else
                                         t = new VariableToken(s, null);
@@ -320,9 +318,15 @@ namespace Calcpad.Core
                             }
                             else
                             {
+                                if (tt == TokenTypes.BracketLeft)
+                                    ++parenDepth;
+                                else if (tt == TokenTypes.BracketRight)
+                                    --parenDepth;
+
                                 if (tt == TokenTypes.Operator)
                                 {
-                                    if (c == '=' || c == '←')
+                                    // '=' inside brackets is a parameter default, not an assignment
+                                    if ((c == '=' || c == '←') && parenDepth == 0)
                                     {
                                         if (!allowAssignment || _parser._assignmentIndex > 0)
                                             throw Exceptions.ImproperAssignment();
@@ -340,7 +344,7 @@ namespace Calcpad.Core
 
                                                 if (vt.Variable.IsReadOnly)
                                                     throw Exceptions.CannotModifyConstant(vt.Content);
-                                                
+
                                                 vt.Variable.IsReadOnly = _parser.IsConst;
                                             }
                                         }
@@ -481,7 +485,7 @@ namespace Calcpad.Core
                             _parser._targetUnits = null;
                         }
                         else
-                            _parser._targetUnits = UnitsParser.Parse(unit.Trim(), _units);
+                            _parser._targetUnits = UnitsParser.Parse(unit.Trim(), _units, _parser.IsUs);
                     }
                 }
                 else
@@ -718,11 +722,11 @@ namespace Calcpad.Core
                 }
             }
 
-            private static ValueToken MakeUnitValueToken(string units)
+            private ValueToken MakeUnitValueToken(string units)
             {
                 try
                 {
-                    var unit = Unit.Get(units);
+                    var unit = Unit.Get(units, _parser.IsUs);
                     var v = new RealValue(unit);
                     return new ValueToken(v)
                     {
@@ -778,7 +782,7 @@ namespace Calcpad.Core
                         i >= assignmentIndex &&
                         t.Type == TokenTypes.Variable &&
                         !DefinedVariables.Contains(t.Content) &&
-                        Unit.TryGet(t.Content, out var u)
+                        Unit.TryGet(t.Content, _parser.IsUs, out var u)
                     )
                     {
                         t.Type = TokenTypes.Unit;

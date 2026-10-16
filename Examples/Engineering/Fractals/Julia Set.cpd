@@ -1,0 +1,9 @@
+'<!-- Plots a [Julia set](https://en.wikipedia.org/wiki/Julia_set) for $c = -0.4 + 0.6i$ via `$Map` over a complex grid, with `$Find` locating the escape iteration of the quadratic map $z \mapsto z^2 + c$. -->
+'Function:' _
+J(z; c; n) = abs($Repeat{z = if(abs(z) < 2; z^2 + c; 4) @ i = 1 : n})
+JuliaSet(z; c) = $Find{J(z; c; x) - 2 @ x = 1 : n}
+#hide
+PlotStep = 1','PlotWidth = 600','PlotHeight = 400','Precision = 10^-4
+#show
+'Plot for'c = -0.4 + 0.6i'and'n = 100'iterations
+$Map{JuliaSet(x + 1i*y; c) @ x = -1.5 : 1.5 & y = -1 : 1}

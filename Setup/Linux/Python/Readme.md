@@ -1,12 +1,12 @@
-# How to use Calcpad with Python
+# How to use CalcpadCE with Python
 
-Since version VM 7.1.0 you can access the Calcpad math engine from Python via the new PyCalcpad.dll API library. It is wrapped on its turn by PyCalcpadWrapper.py that allows you to call all methods entirely in Python language. Because Calcpad is a .NET application, the wrapper relies on the third party library [Python.NET](https://pythonnet.github.io/) that provides the connection between Python and .NET based languages.
+Since version VM 7.1.0 you can access the CalcpadCE math engine from Python via the new PyCalcpad.dll API library. It is wrapped on its turn by PyCalcpadWrapper.py that allows you to call all methods entirely in Python language. Because CalcpadCE is a .NET application, the wrapper relies on the third party library [Python.NET](https://pythonnet.github.io/) that provides the connection between Python and .NET based languages.
 
 ## Prerequisites
-In order to use Calcpad with Python, you need to install the following prerequisites:
+In order to use CalcpadCE with Python, you need to install the following prerequisites:
 1. Python for Linux: https://www.python.org/downloads/
 2. Python.NET by typing the following command in the Command Editor: ```pip install pythonnet``` 
-3. Install the latest Calcpad: https://github.com/Proektsoftbg/Calcpad/tree/main/Setup/Linux
+3. Install the latest CalcpadCE: https://github.com/imartincei/CalcpadCE/releases
 
 ## Classes and methods
 The available classes and methods you can use in PyCalcpad.dll and PyCalcpadWrapper.py are as follows:
@@ -19,8 +19,8 @@ The available classes and methods you can use in PyCalcpad.dll and PyCalcpadWrap
 
 ```class Parser:```  
 &emsp;&emsp;```Parser()``` - creates a new Parser object with the default settings.  
-&emsp;&emsp;```Parse(code : str)``` - parses and calculates an entire Calcpad worksheet, contained in the 'code' string.  
-&emsp;&emsp;```Convert(inputFileName : str, outputFileName : str)``` - parses and calculates a Calcpad worksheet, contained in file with path 'inputFileName' and saves the result to 'outputFileName'.  
+&emsp;&emsp;```Parse(code : str)``` - parses and calculates an entire CalcpadCE worksheet, contained in the 'code' string.  
+&emsp;&emsp;```Convert(inputFileName : str, outputFileName : str)``` - parses and calculates a CalcpadCE worksheet, contained in file with path 'inputFileName' and saves the result to 'outputFileName'.  
 &emsp;&emsp;Notes:  
 &emsp;&emsp;&emsp;&emsp;1.'outputFileName' must be a file path/name with one of the following extensions: 'html', 'pdf' or 'docx'. The program will use the appropriate file format.  
 &emsp;&emsp;&emsp;&emsp;2.Alternatively, you can specify only the output format by writing either 'html', 'pdf' or 'docx', without file name. Then, the program will use the input file name by replacing the extension, accordingly.  
@@ -30,7 +30,6 @@ The available classes and methods you can use in PyCalcpad.dll and PyCalcpadWrap
 &emsp;&emsp;```Settings()``` - creates a new 'Settings' object. Default values are assigned to all fields as specified further.  
 &emsp;&emsp;```Math : MathSettings``` = MathSettings() - reads/assigns the math settings field, which is an object of class 'MathSettings'.  
 &emsp;&emsp;```Plot : PlotSettings``` = PlotSettings() - reads/assigns the plot settings field, which is an object of class 'PlotSettings'.  
-&emsp;&emsp;```Units : str``` = 'm' - units that should replace %u in comments. For example, you can specify 'm', 'cm' or 'mm'.  
 
 ```class MathSettings:```  
 &emsp;&emsp;```MathSettings()``` - creates a new 'MathSettings' object. Default values are assigned to all fields as specified further.  

@@ -236,5 +236,5 @@ x = 1.345341','hp(x)','isHp(x)
 m1
 c = sign(m1)', 'f(m1) = sign(m1)
 c = f(m1)
-c = random(m1)', 'f(m1) = random(m1)
+'c = random(m1),'f(m1) = random(m1) commented out to procude stable CI builds
 c = f(m1)

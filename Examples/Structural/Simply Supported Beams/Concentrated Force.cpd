@@ -1,0 +1,33 @@
+'<!-- Single point force $F$ at distance $a$ from the left support, with reactions $V_A = F (l - a) / l$, $V_B = -F a / l$ and the bending peak $M_{max} = F (l - a) a / l$ at the load. -->
+'<div style = "max-width:180mm;">
+'<img style="width:190pt;" alt = "simply-supported-beam-concentrated-force.png" class="side" src = "../../Images/mechanics/beams/simply-supported-beam-concentrated-force.png">
+'<p><b>Input data</b></p>
+'Beam length -'l = ? {5}'m
+'Load -'F = ? {10}'kN
+'Distance -'a = ? {2}'m
+#post
+'<p><b>Internal forces</b></p>
+'Bending
+M_max = F*(l - a)*a/l'kN·m
+'Shear
+V_A = F*(l - a)/l'kN
+V_B = -F*a/l'kN
+'<p><b>Diagrams</b></p>
+#hide
+PlotWidth = 600
+PlotHeight = 150
+#show
+'Calculate internal forces at'x_1 = ? {1}'m
+#pre
+
+#post
+'Bending
+M(x) = V_A*x - F*(x - a)*(x > a)
+$Plot{-M(x) @ x = 0 : l}
+M(x_1)'kN·m
+'Shear
+V(x) = V_A - F*(x > a)
+$Plot{V(x) @ x = 0 : l}
+V(x_1)'kN
+#show
+'</div>

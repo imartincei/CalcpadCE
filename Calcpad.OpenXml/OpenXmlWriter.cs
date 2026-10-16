@@ -38,7 +38,7 @@ namespace Calcpad.OpenXml
 
         private void WriteDocument(string html, WordprocessingDocument doc)
         {
-            // Add a main document part. 
+            // Add a main document part.
             var mainPart = doc.AddMainDocumentPart();
             // AddSettings(mainPart);
             StyleDefinitionsWriter.CreateStyleDefinitionsPart(mainPart);
@@ -485,7 +485,7 @@ namespace Calcpad.OpenXml
                             s = _expressions[id];
                     }
                 }
-                string outerXml = $@"<m:oMath 
+                string outerXml = $@"<m:oMath
                     xmlns:m=""http://schemas.openxmlformats.org/officeDocument/2006/math""
                     xmlns:w=""http://schemas.openxmlformats.org/wordprocessingml/2006/main"">
                     {s.Replace("<<", "&lt;<").Replace(">>", ">&gt;").Replace("&quot;", "\"")}

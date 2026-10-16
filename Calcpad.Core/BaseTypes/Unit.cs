@@ -22,12 +22,11 @@ namespace Calcpad.Core
         private readonly double[] _factors;
         private int Length => _powers.Length;
 
-        private static bool _isUs;
         private static readonly string CompositeUnitChars = Calculator.NegChar + "∕^";
         private static readonly string[] Names = ["g", "m", "s", "A", "°C", "mol", "cd", "rad", ""];
         private static readonly Unit[] ForceUnits = new Unit[9], ForceUnits_US = new Unit[9];
-        private static readonly FrozenSet<Unit> ElectricalUnits;
-        private static FrozenDictionary<string, Unit> Units;
+        private static readonly FrozenDictionary<Unit, Unit> ElectricalUnits;
+        private static readonly FrozenDictionary<string, Unit> Units;
         private static readonly string[] UnitNames =
         [
             "therm",
@@ -43,23 +42,18 @@ namespace Calcpad.Core
             "bu",
             "tonf"
         ];
+        // These 12 names (plus the "ton_f" alias) are the only ones that differ between the US
+        // and UK unit systems — resolved per-lookup from isUs rather than baked into Units, so
+        // the table itself can stay immutable and safe for concurrent readers.
+        private static readonly HashSet<string> AmbiguousUnitNames = new(UnitNames, StringComparer.Ordinal) { "ton_f" };
 
-        internal static bool IsUs
+        private static string ResolveKey(string text, bool isUs)
         {
-            get => _isUs;
-            set
-            {
-                _isUs = value;
-                var suffix = value ? "_US" : "_UK";
-                var units = new Dictionary<string, Unit>(Units);
-                for (var i = 0; i < UnitNames.Length; ++i)
-                {
-                    ref var s = ref UnitNames[i];
-                    units[s] = new(Units[s + suffix], s);
-                }
-                units["ton_f"] = new(Units["tonf"], "ton_f");
-                Units = units.ToFrozenDictionary();
-            }
+            if (!AmbiguousUnitNames.Contains(text))
+                return text;
+
+            var baseName = text == "ton_f" ? "tonf" : text;
+            return baseName + (isUs ? "_US" : "_UK");
         }
 
         internal Field GetField()
@@ -307,10 +301,10 @@ namespace Calcpad.Core
             _factors = u._factors;
         }
 
-        internal static Unit Get(string text) => Units[text];
+        internal static Unit Get(string text, bool isUs) => Units[ResolveKey(text, isUs)];
 
-        internal static bool TryGet(string text, out Unit u) =>
-            Units.TryGetValue(text, out u);
+        internal static bool TryGet(string text, bool isUs, out Unit u) =>
+            Units.TryGetValue(ResolveKey(text, isUs), out u);
 
         private static string TemperatureToDelta(string s)
         {
@@ -340,6 +334,7 @@ namespace Calcpad.Core
             var h = s.Scale("h", 3600d);
             var deg = new Unit("°C", 0f, 0f, 0f, 0f, 1f);
             var A = new Unit("A", 0f, 0f, 0f, 1f);
+            var Ah = new Unit(A * h, "Ah");
             var N = new Unit("N", 1f, 1f, -2f);
             var kN = N.Shift(3);
             var Nm = new Unit("Nm", 1f, 2f, -2f);
@@ -351,6 +346,7 @@ namespace Calcpad.Core
             var W = new Unit("W", 1f, 2f, -3f);
             var C = new Unit("C", 0f, 0f, 1f, 1f);
             var V = new Unit("V", 1f, 2f, -3f, -1f);
+            var kV = V.Shift(3);
             var F = new Unit("F", -1f, -2f, 4f, 2f);
             var Ohm = new Unit("Ω", 1f, 2f, -3f, -2f);
             var S = new Unit("S", -1f, -2f, 3f, 2f);
@@ -394,18 +390,22 @@ namespace Calcpad.Core
             ForceUnits_US[7] = (kipf * m.Pow(3f)).Scale("kip·ft^3", 0.028316846592);
             ForceUnits_US[8] = (kipf * m.Pow(4f)).Scale("kip·ft^4", 0.0086309748412416);
 
-            ElectricalUnits = new HashSet<Unit>()
+            // Each electrical unit maps to its canonical output. kV maps to V so
+            // kV-scaled inputs collapse to V without a post-lookup fix-up.
+            ElectricalUnits = new Dictionary<Unit, Unit>()
             {
-                S,    // -1, -2,  3,  2
-                F,    // -1, -2,  4,  2
-                C,    // 0,  0,  1,  1
-                T,    // 1,  0, -2, -1
-                Ohm,  // 1,  2, -3, -2
-                V,    // 1,  2, -3, -1
-                W,    // 1,  2, -3
-                H,    // 1,  2, -2, -2
-                Wb    // 1,  2, -2, -1
-            }.ToFrozenSet();
+                { S,   S   }, // -1, -2,  3,  2
+                { F,   F   }, // -1, -2,  4,  2
+                { C,   C   }, //  0,  0,  1,  1
+                { T,   T   }, //  1,  0, -2, -1
+                { Ohm, Ohm }, //  1,  2, -3, -2
+                { V,   V   }, //  1,  2, -3, -1
+                { kV,  V   }, //  1,  2, -3, -1
+                { W,   W   }, //  1,  2, -3
+                { H,   H   }, //  1,  2, -2, -2
+                { Ah,  Ah  }, //  0,  0,  1,  1
+                { Wb,  Wb  }, //  1,  2, -2, -1
+            }.ToFrozenDictionary();
 
             Dictionary<string, Unit> units = new(StringComparer.Ordinal)
             {
@@ -557,7 +557,7 @@ namespace Calcpad.Core
                 {"μA",  A.Shift(-6)},
                 {"nA",  A.Shift(-9)},
                 {"pA",  A.Shift(-12)},
-                {"Ah",  new(A * h, "Ah")},
+                {"Ah",  Ah},
                 {"mAh", new(A.Shift(-3) * h, "mAh")},
 
                 {"°C",  deg.Scale("°C", 1d)},
@@ -651,7 +651,15 @@ namespace Calcpad.Core
                 {"μWh", J.Scale("μWh", 3.6e-3)},
                 {"nWh", J.Scale("nWh", 3.6e-6)},
                 {"pWh", J.Scale("pWh", 3.6e-9)},
+                {"VAh",  J.Scale("VAh",  3.6e+3)},
+                {"kVAh", J.Scale("kVAh", 3.6e+6)},
+                {"MVAh", J.Scale("MVAh", 3.6e+9)},
+                {"GVAh", J.Scale("GVAh", 3.6e+12)},
 
+                {"VARh",  J.Scale("VARh",  3.6e+3)},
+                {"kVARh", J.Scale("kVARh", 3.6e+6)},
+                {"MVARh", J.Scale("MVARh", 3.6e+9)},
+                {"GVARh", J.Scale("GVARh", 3.6e+12)},
                 {"erg", J.Scale("erg", 1e-7)},
                 {"eV",  J.Scale("eV",  1.6021773300241367e-19)},
                 {"keV", J.Scale("keV", 1.6021773300241367e-16)},
@@ -714,7 +722,7 @@ namespace Calcpad.Core
                 {"pC", C.Shift(-12)},
 
                 {"V",  V},
-                {"kV", V.Shift(3)},
+                {"kV", kV},
                 {"MV", V.Shift(6)},
                 {"GV", V.Shift(9)},
                 {"TV", V.Shift(12)},
@@ -1763,7 +1771,7 @@ namespace Calcpad.Core
                 if (!s.Contains('^'))
                 {
                     var writer = new TextWriter(null, false);
-                    var ps = GetFraction(f) ?? 
+                    var ps = GetFraction(f) ??
                         (d < 0 ?
                             $"({writer.FormatNumberHelper(d, null)})" :
                             writer.FormatNumberHelper(d, null));
@@ -1780,7 +1788,7 @@ namespace Calcpad.Core
         private static string GetFraction(float f)
         {
             var uf = Math.Abs(f);
-            if (uf >= 1f) 
+            if (uf >= 1f)
                 return null;
 
             var s = f < 0 ? "-" : string.Empty;

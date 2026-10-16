@@ -1,0 +1,1014 @@
+<div class="calcpad-output">
+ <!-- Symmetric two-bar Biot truss in third-order geometric nonlinearity: the deformed length $l <span class="err">Error in "(v) = \sqrt{l^2 + v^2}$ enters the equilibrium directly and the vertical displacement is found by four different numerical methods. --&gt;" on line [<a href="#0" data-text="1">1</a>]: Invalid symbol: "{".</span>
+<p>(solved by four different numerical methods) </p>
+<h4>Input data</h4>
+<p>Strut length - <span class="eq"><var>l</var> = 2 <i>m</i></span></p>
+<p>Material - steel. Modulus of elasticity - <span class="eq"><var>E</var> = 210 <i>GPa</i></span></p>
+<p>Cross section - circular with diameter <span class="eq"><var>Φ</var> = 20 <i>mm</i></span></p>
+<p>Area - <span class="eq"><var>A</var> = <span class="dvc"><var>π</var> · <var>Φ</var><sup>2</sup><span class="dvl"></span>4</span> = <span class="dvc">3.14 ·  ( 20 <i>mm</i> ) <sup>2</sup><span class="dvl"></span>4</span> = 3.14 <i>cm</i><sup class="unit">2</sup></span></p>
+<p>Axial stiffness - <span class="eq"><var>EA</var> = <var>E</var> · <var>A</var> = 210 <i>GPa</i> · 3.14 <i>cm</i><sup class="unit">2</sup> = 65973.4 <i>kN</i></span></p>
+<p>Vertical force - <span class="eq"><var>F</var><sub>y</sub> = 20 <i>kN</i></span></p>
+<!-- SVG drawing macros (lines, points, dimension marks and rotated text) included by the nonlinear truss worksheets to render undeformed and deformed configurations side by side. -->
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:450pt; height:150pt" version="1.1" viewbox="-50 -50 300 100" xmlns="http://www.w3.org/2000/svg">
+  <line style="stroke:black; stroke-width:1.5; fill:none" x1="0" x2="100" y1="0" y2="0">
+  </line>
+  <line style="stroke:black; stroke-width:1.5; fill:none" x1="100" x2="200" y1="0" y2="0">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:3; fill:none" x1="-8" x2="8" y1="9" y2="9">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="-8" x2="0" y1="9" y2="1">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="8" x2="0" y1="9" y2="1">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:3; fill:none" x1="192" x2="208" y1="9" y2="9">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="192" x2="200" y1="9" y2="1">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="208" x2="200" y1="9" y2="1">
+  </line>
+  <polygon points="100,-32 100,-2.56 97.44,-11.2 102.56,-11.2 100,-2.56" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
+  </polygon>
+  <text text-anchor="middle" x="120" y="-25.6">Fy=20kN</text>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="0" x2="0" y1="15" y2="25">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="100" x2="100" y1="15" y2="25">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="-5" x2="105" y1="20" y2="20">
+  </line>
+  <circle cx="100" cy="20" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <circle cx="0" cy="20" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="50" y="18">2m</text>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="100" x2="100" y1="15" y2="25">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="200" x2="200" y1="15" y2="25">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="95" x2="205" y1="20" y2="20">
+  </line>
+  <circle cx="200" cy="20" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <circle cx="100" cy="20" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="150" y="18">2m</text>
+  <circle cx="0" cy="0" r="2.5" style="stroke:red; stroke-width:1; fill:white">
+  </circle>
+  <circle cx="100" cy="0" r="2.5" style="stroke:red; stroke-width:1; fill:white">
+  </circle>
+  <circle cx="200" cy="0" r="2.5" style="stroke:red; stroke-width:1; fill:white">
+  </circle>
+ </svg>
+ <h4>Solution</h4>
+ <p>
+  Because of the symmetry, the horizontal displacement in the middle is
+  <span class="eq">
+   <var>u</var>
+   = 0
+   <i>m</i>
+  </span>
+  .
+ </p>
+ <p>
+  The vertical displacement is the only unknown -
+  <var>v</var>
+  = ?
+ </p>
+ <p>Since the system is linearly unstable, we use 3-rd order geometric nonlinearity theory for the solution. The equilibrium equations are then derived for the deformed state of the structure, as follows:</p>
+ <p>Length and elongation in deformed state</p>
+ <p>
+  <span class="eq">
+   <var>l′</var>
+   (
+   <var>v</var>
+   )  =
+   <span class="o0">
+    <span class="r">√</span>
+    (
+    <var>l</var>
+    +
+    <var>u</var>
+    )
+    <sup>2</sup>
+    +
+    <var>v</var>
+    <sup>2</sup>
+   </span>
+  </span>
+  ,
+  <span class="eq">
+   <var>Δl</var>
+   (
+   <var>v</var>
+   )  =
+   <var>l′</var>
+   (
+   <var>v</var>
+   )  −
+   <var>l</var>
+  </span>
+ </p>
+ <p>
+  Horizontal reaction -
+  <span class="eq">
+   <var>F</var>
+   <sub>x</sub>
+   (
+   <var>v</var>
+   )  =
+   <var>EA</var>
+   ·
+   <span class="dvc">
+    <var>Δl</var>
+    (
+    <var>v</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <span class="dvc">
+    <var>l</var>
+    +
+    <var>u</var>
+    <span class="dvl">
+    </span>
+    <var>l′</var>
+    (
+    <var>v</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>
+  Vertical reaction -
+  <span class="eq">
+   <var>F</var>
+   <sub>y</sub>
+   (
+   <var>v</var>
+   )  =
+   <var>EA</var>
+   ·
+   <span class="dvc">
+    <var>Δl</var>
+    (
+    <var>v</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <span class="dvc">
+    <var>v</var>
+    <span class="dvl">
+    </span>
+    <var>l′</var>
+    (
+    <var>v</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>
+  Vertical reaction derivative -
+  <span class="eq">
+   <var>F′</var>
+   <sub>yv</sub>
+   (
+   <var>v</var>
+   )  =
+   <var>EA</var>
+   ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   −
+   <span class="dvc">
+    (
+    <var>l</var>
+    +
+    <var>u</var>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <var>l′</var>
+    (
+    <var>v</var>
+    )
+    <sup>3</sup>
+   </span>
+   <span class="b1">)</span>
+  </span>
+ </p>
+ <h4>1. Fixed point iteration method</h4>
+ <p>
+  Relative strain -
+  <span class="eq">
+   <var>ε</var>
+   =
+   <span class="dvc">
+    <var>F</var>
+    <sub>y</sub>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>EA</var>
+   </span>
+   =
+   <span class="dvc">
+    20
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    2 · 65973.4
+    <i>kN</i>
+   </span>
+   = 0.000152
+  </span>
+ </p>
+ <p>
+  Relative precision -
+  <span class="eq">
+   <var>δ</var>
+   <sub>max</sub>
+   = 10
+   <sup>-4</sup>
+   = 0.0001
+  </span>
+ </p>
+ <p>
+  Initial value -
+  <span class="eq">
+   <var>v</var>
+   <sub>0</sub>
+   = 200
+   <i>mm</i>
+  </span>
+ </p>
+ <p>We express the unknown vertical displacement at the middle joint as a function of the vertical force:</p>
+ <p>
+  <span class="eq">
+   <var>v</var>
+   =
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     <span class="dvc down">
+      1
+      <span class="dvl">
+      </span>
+      <span class="b1">(</span>
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       <var>l</var>
+      </span>
+      −
+      <span class="dvc">
+       <var>ε</var>
+       <span class="dvl">
+       </span>
+       <var>v</var>
+       <sub>0</sub>
+      </span>
+      <span class="b1">)</span>
+      <sup class="raised">2</sup>
+     </span>
+     −  (
+     <var>l</var>
+     +
+     <var>u</var>
+     )
+     <sup>2</sup>
+    </span>
+   </span>
+   =
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     <span class="dvc down">
+      1
+      <span class="dvl">
+      </span>
+      <span class="b1">(</span>
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       2
+       <i>m</i>
+      </span>
+      −
+      <span class="dvc">
+       0.000152
+       <span class="dvl">
+       </span>
+       200
+       <i>mm</i>
+      </span>
+      <span class="b1">)</span>
+      <sup class="raised">2</sup>
+     </span>
+     −  ( 2
+     <i>m</i>
+     + 0
+     <i>m</i>
+     )
+     <sup>2</sup>
+    </span>
+   </span>
+   = 110.24
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  After calculating the above expression iteratively
+  <span class="eq">
+   <var>n</var>
+   = 13
+  </span>
+  times, we get:
+ </p>
+ <p>
+  <span class="eq">
+   <var>v</var>
+   = 134.51
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  Relative error -
+  <span class="eq">
+   <var>δ</var>
+   =
+   <span class="dvc">
+    <b class="b0">|</b>
+    <var>v</var>
+    −
+    <var>v</var>
+    <sub>0</sub>
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <b class="b0">|</b>
+    <var>v</var>
+    <b class="b0">|</b>
+   </span>
+   =
+   <span class="dvc">
+    <b class="b0">|</b>
+    134.51
+    <i>mm</i>
+    − 134.5
+    <i>mm</i>
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <b class="b0">|</b>
+    134.51
+    <i>mm</i>
+    <b class="b0">|</b>
+   </span>
+   = 7.6×10
+   <sup>-5</sup>
+  </span>
+ </p>
+ <h4>2. Newton-Raphson′s method</h4>
+ <p>
+  Initial value -
+  <span class="eq">
+   <var>v</var>
+   <sub>0</sub>
+   = 200
+   <i>mm</i>
+  </span>
+ </p>
+ <p>We repeatedly calculate the following expression:</p>
+ <p>
+  <span class="eq">
+   <var>v</var>
+   =
+   <var>v</var>
+   <sub>0</sub>
+   −
+   <span class="dvc">
+    2 ·
+    <var>F</var>
+    <sub>y</sub>
+    (
+    <var>v</var>
+    <sub>0</sub>
+    )  −
+    <var>F</var>
+    <sub>y</sub>
+    <span class="dvl">
+    </span>
+    <var>F′</var>
+    <sub>yv</sub>
+    (
+    <var>v</var>
+    <sub>0</sub>
+    )
+   </span>
+   = 200
+   <i>mm</i>
+   −
+   <span class="dvc">
+    2 ·
+    <var>F</var>
+    <sub>y</sub>
+    ( 200
+    <i>mm</i>
+    )  − 20
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <var>F′</var>
+    <sub>yv</sub>
+    ( 200
+    <i>mm</i>
+    )
+   </span>
+   = 106.93
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  After
+  <span class="eq">
+   <var>n</var>
+   = 4
+  </span>
+  iterations we get:
+  <span class="eq">
+   <var>v</var>
+   = 134.51
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  Relative error -
+  <span class="eq">
+   <var>δ</var>
+   =
+   <span class="dvc">
+    <b class="b0">|</b>
+    <var>v</var>
+    −
+    <var>v</var>
+    <sub>0</sub>
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <b class="b0">|</b>
+    <var>v</var>
+    <b class="b0">|</b>
+   </span>
+   =
+   <span class="dvc">
+    <b class="b0">|</b>
+    134.51
+    <i>mm</i>
+    − 134.51
+    <i>mm</i>
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <b class="b0">|</b>
+    134.51
+    <i>mm</i>
+    <b class="b0">|</b>
+   </span>
+   = 9×10
+   <sup>-6</sup>
+  </span>
+ </p>
+ <h4>3. Secant method</h4>
+ <p>
+  Slope reduction factor -
+  <span class="eq">
+   <var>α</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  Initial value -
+  <span class="eq">
+   <var>v</var>
+   <sub>0</sub>
+   = 200
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  Force value -
+  <span class="eq">
+   <var>F</var>
+   <sub>y0</sub>
+   = 2 ·
+   <var>F</var>
+   <sub>y</sub>
+   (
+   <var>v</var>
+   <sub>0</sub>
+   )  = 2 ·
+   <var>F</var>
+   <sub>y</sub>
+   ( 200
+   <i>mm</i>
+   )  = 65.48
+   <i>kN</i>
+  </span>
+ </p>
+ <p>We calculate the first approximation using Newton-Raphson′s method</p>
+ <p>
+  <span class="eq">
+   <var>v</var>
+   <sub>1</sub>
+   =
+   <var>v</var>
+   <sub>0</sub>
+   −
+   <var>α</var>
+   ·
+   <span class="dvc">
+    <var>F</var>
+    <sub>y0</sub>
+    −
+    <var>F</var>
+    <sub>y</sub>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>F′</var>
+    <sub>yv</sub>
+    (
+    <var>v</var>
+    <sub>0</sub>
+    )
+   </span>
+   = 200
+   <i>mm</i>
+   − 1 ·
+   <span class="dvc">
+    65.48
+    <i>kN</i>
+    − 20
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>F′</var>
+    <sub>yv</sub>
+    ( 200
+    <i>mm</i>
+    )
+   </span>
+   = 153.46
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  Force value -
+  <span class="eq">
+   <var>F</var>
+   <sub>y1</sub>
+   = 2 ·
+   <var>F</var>
+   <sub>y</sub>
+   (
+   <var>v</var>
+   <sub>1</sub>
+   )  = 2 ·
+   <var>F</var>
+   <sub>y</sub>
+   ( 153.46
+   <i>mm</i>
+   )  = 29.67
+   <i>kN</i>
+  </span>
+ </p>
+ <p>The next approximation is evaluated by the formula:</p>
+ <p>
+  <span class="eq">
+   <var>v</var>
+   <sub>2</sub>
+   =
+   <var>v</var>
+   <sub>1</sub>
+   −
+   <var>α</var>
+   ·  (
+   <var>F</var>
+   <sub>y1</sub>
+   −
+   <var>F</var>
+   <sub>y</sub>
+   )  ·
+   <span class="dvc">
+    <var>v</var>
+    <sub>1</sub>
+    −
+    <var>v</var>
+    <sub>0</sub>
+    <span class="dvl">
+    </span>
+    <var>F</var>
+    <sub>y1</sub>
+    −
+    <var>F</var>
+    <sub>y0</sub>
+   </span>
+   = 153.46
+   <i>mm</i>
+   − 1 ·  ( 29.67
+   <i>kN</i>
+   − 20
+   <i>kN</i>
+   )  ·
+   <span class="dvc">
+    153.46
+    <i>mm</i>
+    − 200
+    <i>mm</i>
+    <span class="dvl">
+    </span>
+    29.67
+    <i>kN</i>
+    − 65.48
+    <i>kN</i>
+   </span>
+   = 140.89
+   <i>mm</i>
+  </span>
+ </p>
+ <p>We continue the calculations iteratively until we reach convergence.</p>
+ <p>
+  After
+  <span class="eq">
+   <var>n</var>
+   = 4
+  </span>
+  iterations we get:
+  <span class="eq">
+   <var>v</var>
+   <sub>2</sub>
+   = 134.51
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  Relative error -
+  <span class="eq">
+   <var>δ</var>
+   =
+   <span class="dvc">
+    <b class="b0">|</b>
+    <var>v</var>
+    <sub>2</sub>
+    −
+    <var>v</var>
+    <sub>1</sub>
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <b class="b0">|</b>
+    <var>v</var>
+    <sub>2</sub>
+    <b class="b0">|</b>
+   </span>
+   =
+   <span class="dvc">
+    <b class="b0">|</b>
+    134.51
+    <i>mm</i>
+    − 134.51
+    <i>mm</i>
+    <b class="b0">|</b>
+    <span class="dvl">
+    </span>
+    <b class="b0">|</b>
+    134.51
+    <i>mm</i>
+    <b class="b0">|</b>
+   </span>
+   = 1.57×10
+   <sup>-6</sup>
+  </span>
+ </p>
+ <h4>
+  4. Solution with Calcpad
+  <small>(modified Anderson-Bjork′s method)</small>
+ </h4>
+ <p>
+  <span class="eq">
+   <var>v</var>
+   =
+   <span class="cond">$Root</span>
+   {2 ·
+   <var>F</var>
+   <sub>y</sub>
+   (
+   <var>v</var>
+   )  =
+   <var>F</var>
+   <sub>y</sub>
+   ;
+   <var>v</var>
+   ∈ [0
+   <i>mm</i>
+   ; 200
+   <i>m</i>
+   ]} = 134.51
+   <i>mm</i>
+  </span>
+ </p>
+ <p>System behavior graph (force-displacement)</p>
+ <!-- <span class="eq"><var>v</var><sub>2</sub> = <var>v</var> = 134.51 <i>mm</i></span> , <span class="eq"><var>PlotWidth</var> = 250</span> , <span class="eq"><var>PlotHeight</var> = 150</span> -->
+ <svg class="plot" data-plot="svg" height="840px" style="width:235.19pt; height:155.56pt;" version="1.1" viewbox=" 0 0 1270 840" width="1270px" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+   .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+  </style>
+  <g class="plot">
+   <rect class="Frame" height="600" width="1000" x="180" y="120">
+   </rect>
+   <line class="Grid" x1="180" x2="1180" y1="720" y2="720">
+   </line>
+   <text class="sm end" x="161" y="738">0</text>
+   <line class="Grid" x1="180" x2="1180" y1="628.37" y2="628.37">
+   </line>
+   <text class="sm end" x="161" y="646.37">10</text>
+   <line class="Grid" x1="180" x2="1180" y1="536.75" y2="536.75">
+   </line>
+   <text class="sm end" x="161" y="554.75">20</text>
+   <line class="Grid" x1="180" x2="1180" y1="445.12" y2="445.12">
+   </line>
+   <text class="sm end" x="161" y="463.12">30</text>
+   <line class="Grid" x1="180" x2="1180" y1="353.49" y2="353.49">
+   </line>
+   <text class="sm end" x="161" y="371.49">40</text>
+   <line class="Grid" x1="180" x2="1180" y1="261.86" y2="261.86">
+   </line>
+   <text class="sm end" x="161" y="279.86">50</text>
+   <line class="Grid" x1="180" x2="1180" y1="170.24" y2="170.24">
+   </line>
+   <text class="sm end" x="161" y="188.24">60</text>
+   <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="180" y="772">0</text>
+   <line class="Grid" x1="305" x2="305" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="305" y="772">25</text>
+   <line class="Grid" x1="430" x2="430" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="430" y="772">50</text>
+   <line class="Grid" x1="555" x2="555" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="555" y="772">75</text>
+   <line class="Grid" x1="680" x2="680" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="680" y="772">100</text>
+   <line class="Grid" x1="805" x2="805" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="805" y="772">125</text>
+   <line class="Grid" x1="930" x2="930" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="930" y="772">150</text>
+   <line class="Grid" x1="1055" x2="1055" y1="120" y2="720">
+   </line>
+   <text class="sm mid" x="1055" y="772">175</text>
+   <text class="sm mid" x="1180" y="772">200</text>
+   <line class="Axis" x1="180" x2="1180" y1="720" y2="720">
+   </line>
+   <text x="1202" y="702">x</text>
+   <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+   </line>
+   <text class="mid" x="180" y="84">y</text>
+   <text x="8" y="823">[0; 0]</text>
+   <text class="end" x="1262" y="44">[200; 65.48]</text>
+   <polyline class="Series1" points="180,536.75 212.26,536.75 244.52,536.75 276.77,536.75 309.03,536.75 341.29,536.75 373.55,536.75 405.81,536.75 438.06,536.75 470.32,536.75 502.58,536.75 534.84,536.75 567.1,536.75 599.35,536.75 631.61,536.75 663.87,536.75 696.13,536.75 728.39,536.75 760.65,536.75 792.9,536.75 825.16,536.75 857.42,536.75 889.68,536.75 921.94,536.75 954.19,536.75 986.45,536.75 1018.71,536.75 1050.97,536.75 1083.23,536.75 1115.48,536.75 1147.74,536.75 1180,536.75">
+   </polyline>
+   <polygon class="Fill1" points="180,720 180,536.75 212.26,536.75 244.52,536.75 276.77,536.75 309.03,536.75 341.29,536.75 373.55,536.75 405.81,536.75 438.06,536.75 470.32,536.75 502.58,536.75 534.84,536.75 567.1,536.75 599.35,536.75 631.61,536.75 663.87,536.75 696.13,536.75 728.39,536.75 760.65,536.75 792.9,536.75 825.16,536.75 857.42,536.75 889.68,536.75 921.94,536.75 954.19,536.75 986.45,536.75 1018.71,536.75 1050.97,536.75 1083.23,536.75 1115.48,536.75 1147.74,536.75 1180,536.75 1180,720" stroke-width="0">
+   </polygon>
+   <polyline class="Series2" points="180,720 212.26,719.98 244.52,719.84 276.77,719.45 309.03,718.7 341.29,717.46 373.55,715.62 405.81,713.04 438.06,709.62 470.32,705.22 502.58,699.72 534.84,693.02 567.1,684.98 599.35,675.48 631.61,664.41 663.87,651.64 696.13,637.05 728.39,620.53 760.65,601.96 792.9,581.21 825.16,558.18 857.42,532.73 889.68,504.75 921.94,474.13 954.19,440.75 986.45,404.49 1018.71,365.23 1050.97,322.87 1083.23,277.27 1115.48,228.34 1147.74,175.95 1180,120">
+   </polyline>
+   <polygon class="Fill2" points="180,720 180,720 212.26,719.98 244.52,719.84 276.77,719.45 309.03,718.7 341.29,717.46 373.55,715.62 405.81,713.04 438.06,709.62 470.32,705.22 502.58,699.72 534.84,693.02 567.1,684.98 599.35,675.48 631.61,664.41 663.87,651.64 696.13,637.05 728.39,620.53 760.65,601.96 792.9,581.21 825.16,558.18 857.42,532.73 889.68,504.75 921.94,474.13 954.19,440.75 986.45,404.49 1018.71,365.23 1050.97,322.87 1083.23,277.27 1115.48,228.34 1147.74,175.95 1180,120 1180,720" stroke-width="0">
+   </polygon>
+   <circle class="Series3" cx="852.53" cy="536.75" r="10">
+   </circle>
+  </g>
+ </svg>
+ <h4>Results</h4>
+ <p>
+  Axial forces in bars -
+  <span class="eq">
+   <var>N</var>
+   =
+   <span class="dvc">
+    <var>Δl</var>
+    (
+    <var>v</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>l</var>
+   </span>
+   ·
+   <var>EA</var>
+   =
+   <span class="dvc">
+    <var>Δl</var>
+    ( 134.51
+    <i>mm</i>
+    )
+    <span class="dvl">
+    </span>
+    2
+    <i>m</i>
+   </span>
+   · 65973.4
+   <i>kN</i>
+   = 149.03
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  Rotation angle -
+  <span class="eq">
+   <var>α</var>
+   =
+   <b>atan2</b>
+   (
+   <var>l</var>
+   ;
+   <var>v</var>
+   )  =
+   <b>atan2</b>
+   ( 2
+   <i>m</i>
+   ; 134.51
+   <i>mm</i>
+   )  = 3.85
+  </span>
+  °
+ </p>
+ <p>Reactions in supports</p>
+ <p>
+  Horizontal -
+  <span class="eq">
+   <var>R</var>
+   <sub>x</sub>
+   =
+   <var>F</var>
+   <sub>x</sub>
+   (
+   <var>v</var>
+   )  =
+   <var>F</var>
+   <sub>x</sub>
+   ( 134.51
+   <i>mm</i>
+   )  = 148.69
+   <i>kN</i>
+  </span>
+  =
+  <span class="eq">
+   <var>N</var>
+   ·
+   <b>cos</b>
+   (
+   <var>α</var>
+   )  = 149.03
+   <i>kN</i>
+   ·
+   <b>cos</b>
+   ( 3.85 )  = 148.69
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  Vertical -
+  <span class="eq">
+   <var>R</var>
+   <sub>y</sub>
+   =
+   <var>F</var>
+   <sub>y</sub>
+   (
+   <var>v</var>
+   )  =
+   <var>F</var>
+   <sub>y</sub>
+   ( 134.51
+   <i>mm</i>
+   )  = 10
+   <i>kN</i>
+  </span>
+  =
+  <span class="eq">
+   <var>N</var>
+   ·
+   <b>sin</b>
+   (
+   <var>α</var>
+   )  = 149.03
+   <i>kN</i>
+   ·
+   <b>sin</b>
+   ( 3.85 )  = 10
+   <i>kN</i>
+  </span>
+ </p>
+ <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:450pt; height:150pt" version="1.1" viewbox="-50 -50 300 113.45" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="0,0 0,-32 -2.56,-22.4 2.56,-22.4 0,-32" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
+  </polygon>
+  <polygon points="200,0 200,-32 197.44,-22.4 202.56,-22.4 200,-32" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
+  </polygon>
+  <polygon points="-2.56,0 -32,0 -22.4,-2.56 -22.4,2.56 -32,0" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
+  </polygon>
+  <polygon points="202.56,0 232,0 222.4,-2.56 222.4,2.56 232,0" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
+  </polygon>
+  <text text-anchor="middle" x="-32" y="-8">Rx=148.69kN</text>
+  <text text-anchor="middle" x="232" y="-8">Rx=148.69kN</text>
+  <text text-anchor="middle" x="24" y="-25.6">Ry=10kN</text>
+  <text text-anchor="middle" x="176" y="-25.6">Ry=10kN</text>
+  <text text-anchor="middle" x="50" y="0">N=149.03kN</text>
+  <text text-anchor="middle" x="150" y="0">N=149.03kN</text>
+  <line style="stroke:black; stroke-width:1.5; fill:none" x1="0" x2="100" y1="0" y2="13.45">
+  </line>
+  <line style="stroke:black; stroke-width:1.5; fill:none" x1="100" x2="200" y1="13.45" y2="0">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:3; fill:none" x1="-8" x2="8" y1="9" y2="9">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="-8" x2="0" y1="9" y2="1">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="8" x2="0" y1="9" y2="1">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:3; fill:none" x1="192" x2="208" y1="9" y2="9">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="192" x2="200" y1="9" y2="1">
+  </line>
+  <line style="stroke:darkcyan; stroke-width:1; fill:none" x1="208" x2="200" y1="9" y2="1">
+  </line>
+  <polygon points="100,-18.55 100,10.89 97.44,2.25 102.56,2.25 100,10.89" style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;">
+  </polygon>
+  <text text-anchor="middle" x="120" y="-12.15">Fy=20kN</text>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="0" x2="0" y1="28.45" y2="38.45">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="100" x2="100" y1="28.45" y2="38.45">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="-5" x2="105" y1="33.45" y2="33.45">
+  </line>
+  <circle cx="100" cy="33.45" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <circle cx="0" cy="33.45" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="50" y="31.45">2m</text>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="100" x2="100" y1="28.45" y2="38.45">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="200" x2="200" y1="28.45" y2="38.45">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod" x1="95" x2="205" y1="33.45" y2="33.45">
+  </line>
+  <circle cx="200" cy="33.45" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <circle cx="100" cy="33.45" r="2" style="stroke:goldenrod; stroke-width:0.5; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="150" y="31.45">2m</text>
+  <circle cx="0" cy="0" r="2.5" style="stroke:red; stroke-width:1; fill:white">
+  </circle>
+  <circle cx="100" cy="13.45" r="2.5" style="stroke:red; stroke-width:1; fill:white">
+  </circle>
+  <circle cx="200" cy="0" r="2.5" style="stroke:red; stroke-width:1; fill:white">
+  </circle>
+ </svg>
+</div>

@@ -84,8 +84,8 @@ namespace Calcpad.Core
                 }
 
                 var type = (Types)(index + 1);
-                _keywordLength = GetKeywordLength(type);
                 _keyword = GetConditinalKeyword(type);
+                _keywordLength = _keyword.AsSpan().TrimEnd().Length;
                 IsUnchecked = type == Types.If || type == Types.ElseIf;
                 if (type > Types.If && type < Types.While && _count == 0)
                     throw Exceptions.ConditionNotInitialized();
@@ -121,6 +121,15 @@ namespace Calcpad.Core
 
             internal void Check(Complex value)
             {
+                var result = IsTrue(value);
+                if (result)
+                    IsFound = true;
+                Change(result, Type);
+                IsUnchecked = false;
+            }
+
+            internal static bool IsTrue(Complex value)
+            {
                 if (!value.IsReal)
                     throw Exceptions.ConditionComplex();
 
@@ -128,11 +137,7 @@ namespace Calcpad.Core
                 if (double.IsNaN(d) || double.IsInfinity(d))
                     throw Exceptions.ConditionResultInvalid(d.ToString());
 
-                var result = Math.Abs(d) > 1e-12;
-                if (result)
-                    IsFound = true;
-                Change(result, Type);
-                IsUnchecked = false;
+                return Math.Abs(d) > 1e-12;
             }
 
             internal void Check() => IsUnchecked = false;
@@ -144,19 +149,6 @@ namespace Calcpad.Core
                 if (string.IsNullOrEmpty(_keyword))
                     return _keyword;
                 return $"<span class=\"cond\">{_keyword}</span>";
-            }
-
-            private static int GetKeywordLength(Types type)
-            {
-                return type switch
-                {
-                    Types.If => 3,
-                    Types.Else => 5,
-                    Types.While => 6,
-                    Types.EndIf => 7,
-                    Types.ElseIf => 8,
-                    _ => 0,
-                };
             }
 
             private static string GetConditinalKeyword(Types type)

@@ -1,0 +1,9 @@
+#const h = 6
+#const g = 5
+f(x) = $Inline{ _
+h ← x + 2}
+f(5)
+g = 6
+h ← 8
+h
+kdf ← 8

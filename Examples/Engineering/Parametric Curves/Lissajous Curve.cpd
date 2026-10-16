@@ -1,0 +1,15 @@
+'<!-- Two perpendicular harmonic motions $x = A\sin(a t + \delta)$, $y = B\sin(b t)$ overlaid to recreate classic [Lissajous oscilloscope figures](https://en.wikipedia.org/wiki/Lissajous_curve). -->
+#hide
+#rad
+PlotHeight = 400
+PlotWidth = 400
+#show
+'Equation:
+x(θ) = sin(a*θ)
+y(θ) = sin(b*θ)
+'Coefficients:'a = ? {2}','b = ? {3}
+#pre
+
+'Tip: Click "<b>Calculate</b>" to see the respective plot.
+#post
+$Plot{x(θ)|y(θ) @ θ = 0 : 2*π}

@@ -1,0 +1,684 @@
+<div class="calcpad-output">
+ <!-- Required tension reinforcement $A_s$ of a T-section under a design moment $M_{Ed}$, switching between rectangular flange-only behaviour and T-section behaviour according to the position of the neutral axis. -->
+ <small>
+  According to
+  <strong>Eurocode</strong>
+  : EN 1992-1-1
+ </small>
+ <div style="max-width:180mm;">
+  <img alt="tbeam-bending.png" src="Images/structures/rc/design/tbeam-bending.png" style="width:400pt;"/>
+  <p>
+   Design bending moment -
+   <span class="eq">
+    <var>M</var>
+    <sub>Ed</sub>
+    =
+    <u class="input-5">800</u>
+   </span>
+   kN·m
+  </p>
+  <h4>Cross section dimensions</h4>
+  <p>
+   Web -
+   <span class="eq">
+    <var>b</var>
+    <sub>w</sub>
+    =
+    <u class="input-7">250</u>
+   </span>
+   mm,
+   <span class="eq">
+    <var>h</var>
+    <sub>w</sub>
+    =
+    <u class="input-7">600</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Flange -
+   <span class="eq">
+    <var>b</var>
+    <sub>f</sub>
+    =
+    <u class="input-8">1200</u>
+   </span>
+   mm,
+   <span class="eq">
+    <var>h</var>
+    <sub>f</sub>
+    =
+    <u class="input-8">120</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Concrete cover to the center of reinforcement -
+   <span class="eq">
+    <var>d</var>
+    <sub>1</sub>
+    =
+    <u class="input-9">50</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Effective cross section depth -
+   <span class="eq">
+    <var>d</var>
+    =
+    <var>h</var>
+    <sub>w</sub>
+    −
+    <var>d</var>
+    <sub>1</sub>
+    = 600 − 50 = 550
+   </span>
+   mm
+  </p>
+  <p>
+   Flange area -
+   <span class="eq">
+    <var>A</var>
+    <sub>f</sub>
+    =  (
+    <var>b</var>
+    <sub>f</sub>
+    −
+    <var>b</var>
+    <sub>w</sub>
+    )  ·
+    <var>h</var>
+    <sub>f</sub>
+    =  ( 1200 − 250 )  · 120 = 114000
+   </span>
+   mm
+   <sup>2</sup>
+  </p>
+  <p>
+   Flange first moment of area -
+   <span class="eq">
+    <var>S</var>
+    <sub>f</sub>
+    =
+    <var>A</var>
+    <sub>f</sub>
+    ·
+    <span class="b1">(</span>
+    <var>d</var>
+    −
+    <span class="dvc">
+     <var>h</var>
+     <sub>f</sub>
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    <span class="b1">)</span>
+    = 114000 ·
+    <span class="b1">(</span>
+    550 −
+    <span class="dvc">
+     120
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    <span class="b1">)</span>
+    = 55860000
+   </span>
+   mm
+   <sup>3</sup>
+  </p>
+  <h4>Material properties</h4>
+  <p class="ref" style="float:right">[EN 1992-1-1, Table 3.1]</p>
+  <p>
+   <b>Concrete</b>
+  </p>
+  <p>
+   Characteristic compressive cylinder strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ck</sub>
+    =
+    <u class="input-18">20</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Partial safety factor for concrete -
+   <span class="eq">
+    <var>γ</var>
+    <sub>c</sub>
+    = 1.5
+   </span>
+   ,
+   <span class="eq">
+    <var>α</var>
+    <sub>cc</sub>
+    =
+    <u class="input-19">0.85</u>
+   </span>
+  </p>
+  <p>
+   Design compressive cylinder strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>cd</sub>
+    =
+    <span class="dvc">
+     <var>α</var>
+     <sub>cc</sub>
+     ·
+     <var>f</var>
+     <sub>ck</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>c</sub>
+    </span>
+    =
+    <span class="dvc">
+     0.85 · 20
+     <span class="dvl">
+     </span>
+     1.5
+    </span>
+    = 11.33
+   </span>
+   MPa
+  </p>
+  <p>
+   Factor for effective compression zone depth -
+   <span class="eq">
+    <var>λ</var>
+    = 0.8
+   </span>
+  </p>
+  <p>
+   Effective compressive strength factor -
+   <span class="eq">
+    <var>η</var>
+    = 1
+   </span>
+  </p>
+  <p>
+   Ultimate compressive strain -
+   <span class="eq">
+    <var>ε</var>
+    <sub>cu3</sub>
+    = 0.0035
+   </span>
+  </p>
+  <p>
+   Mean value of axial tensile strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ctm</sub>
+    = 0.3 ·
+    <var>f</var>
+    <sub>ck</sub>
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+    = 0.3 · 20
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+    = 2.21
+   </span>
+   MPa
+  </p>
+  <p>
+   <b>Steel</b>
+  </p>
+  <p>
+   Characteristic yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>yk</sub>
+    =
+    <u class="input-28">500</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Partial safety factor for steel -
+   <span class="eq">
+    <var>γ</var>
+    <sub>s</sub>
+    = 1.15
+   </span>
+  </p>
+  <p>
+   Design yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>yd</sub>
+    =
+    <span class="dvc">
+     <var>f</var>
+     <sub>yk</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>s</sub>
+    </span>
+    =
+    <span class="dvc">
+     500
+     <span class="dvl">
+     </span>
+     1.15
+    </span>
+    = 434.78
+   </span>
+   MPa
+  </p>
+  <p>
+   Modulus of elasticity -
+   <span class="eq">
+    <var>E</var>
+    <sub>s</sub>
+    = 200000
+   </span>
+   MPa
+  </p>
+  <h4>Bending design</h4>
+  <p>Check for the location of the neutral line</p>
+  <p>Bending moment for neutral line at the bottom edge of the flange</p>
+  <p>
+   <span class="eq">
+    <var>M</var>
+    <sub>f</sub>
+    =
+    <var>b</var>
+    <sub>f</sub>
+    ·
+    <var>h</var>
+    <sub>f</sub>
+    ·
+    <var>η</var>
+    ·
+    <var>f</var>
+    <sub>cd</sub>
+    ·
+    <span class="b1">(</span>
+    <var>d</var>
+    −
+    <span class="dvc">
+     <var>h</var>
+     <sub>f</sub>
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    <span class="b1">)</span>
+    · 10
+    <sup>-6</sup>
+    = 1200 · 120 · 1 · 11.33 ·
+    <span class="b1">(</span>
+    550 −
+    <span class="dvc">
+     120
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    <span class="b1">)</span>
+    · 10
+    <sup>-6</sup>
+    = 799.68
+   </span>
+   kN·m
+  </p>
+  <p>The neutral line is below the flange - design for T-section</p>
+  <p>
+   Relative design bending moment -
+   <span class="eq">
+    <var>m</var>
+    <sub>Ed</sub>
+    =
+    <span class="dvc">
+     <var>M</var>
+     <sub>Ed</sub>
+     · 10
+     <sup>6</sup>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+     <sub>w</sub>
+     ·
+     <var>d</var>
+     <sup>2</sup>
+     ·
+     <var>η</var>
+     ·
+     <var>f</var>
+     <sub>cd</sub>
+    </span>
+    =
+    <span class="dvc">
+     800 · 10
+     <sup>6</sup>
+     <span class="dvl">
+     </span>
+     250 · 550
+     <sup>2</sup>
+     · 1 · 11.33
+    </span>
+    = 0.933
+   </span>
+  </p>
+  <p>
+   Compression zone depth -
+   <span class="eq">
+    <var>x</var>
+    =
+    <span class="dvc">
+     <var>d</var>
+     <span class="dvl">
+     </span>
+     <var>λ</var>
+    </span>
+    ·
+    <span class="b1">(</span>
+    1 −
+    <span class="o1">
+     <span class="r1">
+     </span>
+     1 − 2 ·
+     <span class="b1">(</span>
+     <var>m</var>
+     <sub>Ed</sub>
+     −
+     <span class="dvc">
+      <var>S</var>
+      <sub>f</sub>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      <sub>w</sub>
+      ·
+      <var>d</var>
+      <sup>2</sup>
+     </span>
+     <span class="b1">)</span>
+    </span>
+    <span class="b1">)</span>
+    =
+    <span class="dvc">
+     550
+     <span class="dvl">
+     </span>
+     0.8
+    </span>
+    ·
+    <span class="b1">(</span>
+    1 −
+    <span class="o1">
+     <span class="r1">
+     </span>
+     1 − 2 ·
+     <span class="b1">(</span>
+     0.933 −
+     <span class="dvc">
+      55860000
+      <span class="dvl">
+      </span>
+      250 · 550
+      <sup>2</sup>
+     </span>
+     <span class="b1">)</span>
+    </span>
+    <span class="b1">)</span>
+    = 150.33
+   </span>
+   mm
+  </p>
+  <p>
+   Relative compression zone depth -
+   <span class="eq">
+    <var>ξ</var>
+    =
+    <span class="dvc">
+     <var>x</var>
+     <span class="dvl">
+     </span>
+     <var>d</var>
+    </span>
+    =
+    <span class="dvc">
+     150.33
+     <span class="dvl">
+     </span>
+     550
+    </span>
+    = 0.273
+   </span>
+  </p>
+  <p>
+   Design yield strain of reinforcement -
+   <span class="eq">
+    <var>ε</var>
+    <sub>yd</sub>
+    =
+    <span class="dvc">
+     <var>f</var>
+     <sub>yd</sub>
+     <span class="dvl">
+     </span>
+     <var>E</var>
+     <sub>s</sub>
+    </span>
+    =
+    <span class="dvc">
+     434.78
+     <span class="dvl">
+     </span>
+     200000
+    </span>
+    = 0.00217
+   </span>
+  </p>
+  <p>Relative depth of compression zone corresponding to design yield strain</p>
+  <p>
+   <span class="eq">
+    <var>ξ</var>
+    <sub>yd</sub>
+    =
+    <span class="dvc">
+     <var>ε</var>
+     <sub>cu3</sub>
+     <span class="dvl">
+     </span>
+     <var>ε</var>
+     <sub>cu3</sub>
+     +
+     <var>ε</var>
+     <sub>yd</sub>
+    </span>
+    =
+    <span class="dvc">
+     0.0035
+     <span class="dvl">
+     </span>
+     0.0035 + 0.00217
+    </span>
+    = 0.617
+   </span>
+  </p>
+  <p>
+   Limit compression zone depth -
+   <span class="eq">
+    <var>ξ</var>
+    <sub>lim</sub>
+    =
+    <u class="input-46">0.62</u>
+   </span>
+  </p>
+  <p>
+   (enter
+   <i>ξ</i>
+   <sub>yd</sub>
+   for elastic or 0.45 for plastic analysis)
+  </p>
+  <p>
+   <span class="eq">
+    <var>ξ</var>
+    = 0.273
+   </span>
+   ≤
+   <span class="eq">
+    <var>ξ</var>
+    <sub>lim</sub>
+    = 0.62
+   </span>
+   - compressive reinforcement is NOT required.
+  </p>
+  <p>
+   Lever arm of internal forces -
+   <span class="eq">
+    <var>z</var>
+    =
+    <var>d</var>
+    − 0.5 ·
+    <var>λ</var>
+    ·
+    <var>x</var>
+    = 550 − 0.5 · 0.8 · 150.33 = 489.87
+   </span>
+   mm
+  </p>
+  <p>
+   Required tensile reinforcement area -
+   <span class="eq">
+    <var>A</var>
+    <sub>s1</sub>
+    =
+    <span class="dvc">
+     <var>M</var>
+     <sub>Ed</sub>
+     · 10
+     <sup>6</sup>
+     <span class="dvl">
+     </span>
+     <var>z</var>
+     ·
+     <var>f</var>
+     <sub>yd</sub>
+    </span>
+    =
+    <span class="dvc">
+     800 · 10
+     <sup>6</sup>
+     <span class="dvl">
+     </span>
+     489.87 · 434.78
+    </span>
+    = 3756.11
+   </span>
+   mm
+   <sup>2</sup>
+  </p>
+  <p>
+   Reinforcement ratio -
+   <span class="eq">
+    <var>ρ</var>
+    <sub>1</sub>
+    =
+    <span class="dvc">
+     <var>A</var>
+     <sub>s1</sub>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+     <sub>w</sub>
+     ·
+     <var>d</var>
+    </span>
+    =
+    <span class="dvc">
+     3756.11
+     <span class="dvl">
+     </span>
+     250 · 550
+    </span>
+    = 0.0273
+   </span>
+  </p>
+  <!-- <span class="eq"><var>ρ</var><sub>2</sub> = 0</span> -->
+  <p class="ref">
+   [EN 1992-1-1, § 9.2.1.1]
+   <p>Minimum tensile reinforcement ratio</p>
+   <p>
+    <span class="eq">
+     <var>ρ</var>
+     <sub>min</sub>
+     =
+     <b>max</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      0.26 ·
+      <var>f</var>
+      <sub>ctm</sub>
+      <span class="dvl">
+      </span>
+      <var>f</var>
+      <sub>yk</sub>
+     </span>
+     ; 0.0013
+     <span class="b1">)</span>
+     =
+     <b>max</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      0.26 · 2.21
+      <span class="dvl">
+      </span>
+      500
+     </span>
+     ; 0.0013
+     <span class="b1">)</span>
+     = 0.0013
+    </span>
+   </p>
+   <p>
+    Minimum reinforcement -
+    <span class="eq">
+     <var>A</var>
+     <sub>s_min</sub>
+     =
+     <var>ρ</var>
+     <sub>min</sub>
+     ·
+     <var>b</var>
+     <sub>w</sub>
+     ·
+     <var>d</var>
+     = 0.0013 · 250 · 550 = 178.75
+    </span>
+    mm
+    <sup>2</sup>
+   </p>
+   <p>
+    Maximum reinforcement ratio -
+    <span class="eq">
+     <var>ρ</var>
+     <sub>max</sub>
+     = 0.04
+    </span>
+   </p>
+  </p>
+ </div>
+</div>

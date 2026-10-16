@@ -1,0 +1,81 @@
+<div class="calcpad-output">
+ <!-- Area $A = \tfrac{1}{2} a\, b$ and perimeter of a right triangle from its two legs (hypotenuse via Pythagoras). -->
+ <div style="max-width:110mm;">
+  <img alt="right-triangle.png" class="side" src="Images/math/area/right-triangle.png" style="height:60pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">4</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-4">3</u>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>a</var>
+    <sup>2</sup>
+    +
+    <var>b</var>
+    <sup>2</sup>
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    4
+    <sup>2</sup>
+    + 3
+    <sup>2</sup>
+   </span>
+   = 5
+  </span>
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>a</var>
+    ·
+    <var>b</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    4 · 3
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 6
+  </span>
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   =
+   <var>a</var>
+   +
+   <var>b</var>
+   +
+   <var>c</var>
+   = 4 + 3 + 5 = 12
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

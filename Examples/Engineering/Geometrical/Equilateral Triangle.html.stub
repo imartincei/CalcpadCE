@@ -1,0 +1,354 @@
+<div class="calcpad-output">
+ <!-- Section properties of an equilateral triangle: area, centroid, $I_x$, $I_y$, section moduli and radii of gyration in closed form. -->
+ <h3>Geometrical Properties of Equilateral Triangle</h3>
+ <div style="max-width:120mm">
+  <img alt="equilateral-triangle.png" class="side" src="Images/mechanics/sections/equilateral-triangle.png" style="height:135pt;"/>
+ </div>
+ <p>Side length</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-5">1</u>
+  </span>
+  m
+ </p>
+ <p>Height</p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   =
+   <span class="dvc">
+    <span class="o0">
+     <span class="r">√</span>
+     3
+    </span>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   ·
+   <var>a</var>
+   =
+   <span class="dvc">
+    <span class="o0">
+     <span class="r">√</span>
+     3
+    </span>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   · 1 = 0.866
+  </span>
+  m
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>a</var>
+    ·
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    1 · 0.866
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 0.433
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   = 3 ·
+   <var>a</var>
+   = 3 · 1 = 3
+  </span>
+  m
+ </p>
+ <p>Centroid</p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 0.5
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   =
+   <span class="dvc">
+    0.866
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   = 0.289
+  </span>
+  m
+ </p>
+ <p>Second moments of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>y</sub>
+   =
+   <span class="dvc">
+    <var>a</var>
+    ·
+    <var>h</var>
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    36
+   </span>
+   =
+   <span class="dvc">
+    1 · 0.866
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    36
+   </span>
+   = 0.018
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>z</sub>
+   =
+   <span class="dvc">
+    <var>a</var>
+    <sup>3</sup>
+    ·
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    48
+   </span>
+   =
+   <span class="dvc">
+    1
+    <sup>3</sup>
+    · 0.866
+    <span class="dvl">
+    </span>
+    48
+   </span>
+   = 0.018
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Polar moment of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>x</sub>
+   =
+   <var>I</var>
+   <sub>y</sub>
+   +
+   <var>I</var>
+   <sub>z</sub>
+   = 0.018 + 0.018 = 0.0361
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Torsional constant</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>t</sub>
+   =
+   <span class="dvc">
+    <var>a</var>
+    <sup>4</sup>
+    ·
+    <span class="o0">
+     <span class="r">√</span>
+     3
+    </span>
+    <span class="dvl">
+    </span>
+    80
+   </span>
+   =
+   <span class="dvc">
+    1
+    <sup>4</sup>
+    ·
+    <span class="o0">
+     <span class="r">√</span>
+     3
+    </span>
+    <span class="dvl">
+    </span>
+    80
+   </span>
+   = 0.0217
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Torsional section modulus</p>
+ <p>
+  <span class="eq">
+   <var>W</var>
+   <sub>t</sub>
+   =
+   <span class="dvc">
+    <var>a</var>
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    20
+   </span>
+   =
+   <span class="dvc">
+    1
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    20
+   </span>
+   = 0.05
+  </span>
+  m
+  <sup>3</sup>
+ </p>
+ <p>Radii of gyration</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>y</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.018
+     <span class="dvl">
+     </span>
+     0.433
+    </span>
+   </span>
+   = 0.204
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>z</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>z</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.018
+     <span class="dvl">
+     </span>
+     0.433
+    </span>
+   </span>
+   = 0.204
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>x</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>x</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.0361
+     <span class="dvl">
+     </span>
+     0.433
+    </span>
+   </span>
+   = 0.289
+  </span>
+  m
+ </p>
+</div>

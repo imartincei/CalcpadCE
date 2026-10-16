@@ -1,0 +1,240 @@
+<div class="calcpad-output">
+ <!-- Volume and surface area of a rectangular frustum (obelisk) from the two parallel rectangular faces and height. -->
+ <div style="max-width:130mm">
+  <img alt="rectangular-frustum.png" class="side" src="Images/math/volume/rectangular-frustum.png" style="height:70pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <table>
+  <tr>
+   <td>Bottom base -</td>
+   <td>
+    <span class="eq">
+     <var>A</var>
+     =
+     <u class="input-5">8</u>
+    </span>
+   </td>
+   <td>
+    <span class="eq">
+     <var>B</var>
+     =
+     <u class="input-5">2</u>
+    </span>
+   </td>
+  </tr>
+  <tr>
+   <td>Top base -</td>
+   <td>
+    <span class="eq">
+     <var>a</var>
+     =
+     <u class="input-6">6</u>
+    </span>
+   </td>
+   <td>
+    <span class="eq">
+     <var>b</var>
+     =
+     <u class="input-6">4</u>
+    </span>
+   </td>
+  </tr>
+  <tr>
+   <td>
+    <p>Height -</p>
+   </td>
+   <td>
+    <span class="eq">
+     <var>h</var>
+     =
+     <u class="input-7">5</u>
+    </span>
+   </td>
+   <td>
+   </td>
+  </tr>
+ </table>
+ <p>Heights of side faces</p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   <sub>a</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <var>h</var>
+    <sup>2</sup>
+    +
+    <span class="dvc">
+     (
+     <var>B</var>
+     −
+     <var>b</var>
+     )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    5
+    <sup>2</sup>
+    +
+    <span class="dvc">
+     ( 2 − 4 )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   = 5.1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   <sub>b</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <var>h</var>
+    <sup>2</sup>
+    +
+    <span class="dvc">
+     (
+     <var>A</var>
+     −
+     <var>a</var>
+     )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    5
+    <sup>2</sup>
+    +
+    <span class="dvc">
+     ( 8 − 6 )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   = 5.1
+  </span>
+ </p>
+ <p>Volume</p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   ·  (
+   <var>A</var>
+   ·
+   <var>b</var>
+   +
+   <var>a</var>
+   ·
+   <var>B</var>
+   + 2 ·  (
+   <var>a</var>
+   ·
+   <var>b</var>
+   +
+   <var>A</var>
+   ·
+   <var>B</var>
+   )  )  =
+   <span class="dvc">
+    5
+    <span class="dvl">
+    </span>
+    6
+   </span>
+   ·  ( 8 · 4 + 6 · 2 + 2 ·  ( 6 · 4 + 8 · 2 )  )  = 103.33
+  </span>
+ </p>
+ <p>Area of side faces</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   <sub>o</sub>
+   =
+   <var>h</var>
+   <sub>a</sub>
+   ·  (
+   <var>A</var>
+   +
+   <var>a</var>
+   )  +
+   <var>h</var>
+   <sub>b</sub>
+   ·  (
+   <var>B</var>
+   +
+   <var>b</var>
+   )  = 5.1 ·  ( 8 + 6 )  + 5.1 ·  ( 2 + 4 )  = 101.98
+  </span>
+ </p>
+ <p>Base areas</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>1</sub>
+   =
+   <var>A</var>
+   ·
+   <var>B</var>
+   = 8 · 2 = 16
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>2</sub>
+   =
+   <var>a</var>
+   ·
+   <var>b</var>
+   = 6 · 4 = 24
+  </span>
+ </p>
+ <p>Total surface area</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   =
+   <var>S</var>
+   <sub>o</sub>
+   +
+   <var>A</var>
+   <sub>1</sub>
+   +
+   <var>A</var>
+   <sub>2</sub>
+   = 101.98 + 16 + 24 = 141.98
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

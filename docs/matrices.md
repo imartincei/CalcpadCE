@@ -1,8 +1,8 @@
 # Matrices
 
-## Internal implementation and types of matrices
+## Internal Implementation and Types of Matrices
 
-Calcpad includes different types of matrices: general (rectangular) and special (column, symmetric, diagonal.
+CalcpadCE includes different types of matrices: general (rectangular) and special (column, symmetric, diagonal.
 upper/lower triangular). Internally, each type is implemented in a different way that benefits from the specific structure for better efficiency.
 Externally, all of them behave in a similar way, except for a few cases.
 
@@ -11,12 +11,12 @@ Vectors normally represent matrix rows, except for diagonal and column matrices.
 
 <img src="./media/image30.png" style="width:6.71339in;height:4.4143in" alt="Картина, която съдържа текст, диаграма, линия, Паралелен Описанието е генерирано автоматично" />
 
-Calcpad uses large vectors to contain the values.
+CalcpadCE uses large vectors to contain the values.
 So, it does not store the extra zero elements for partially filled (banded) matrices.
 The indexing operator for each type is internally redefined in order to return directly zero when we try to read a value outside the matrix structure or bandwidth.
 
-| | |
-| ---- | ---- |
+| Matrix type | Indexing |
+| ----------- | -------- |
 | diagonal matrix | *M*\[*i*, *j*\] = *d*\[*i*\], if *i* = *j* and 0, if *i* ≠ *j*; |
 | column matrix | *M*\[*i*, *j*\] = *c*\[*i*\], if *j* = 1, otherwise – error; |
 | upper triangular matrix | *M*\[*i*, *j*\] = *r*i\[*j* – *i* + 1\], if *j* ≥ *i*, otherwise – 0; |
@@ -32,7 +32,9 @@ For example, you cannot assign a non-zero value to an element outside the main d
 
 Similar to vectors, you can define matrices by using the "square brackets" syntax, but the rows must be separated by vertical bars " \| ", as follows:
 
-`A_m⨯n = [a_11; a_12; …; a_1n|a_21; a_22; …;a_2n|…| a_m1; a_m2; …; a_mn]`
+```calcpad
+A_m⨯n = [a_11; a_12; …; a_1n|a_21; a_22; …;a_2n|…| a_m1; a_m2; …; a_mn]`
+```
 
 In this way, you can create only general (rectangular) types of matrices.
 For special types of matrices, you have to use the respective creational functions as described further in this manual.
@@ -93,7 +95,7 @@ In this way, you can iterate through matrix elements in a loop and include the l
 You can use both inline and block loops for that purpose.
 The code below creates a Vandermonde matrix from vector $\vec{x}$ with the specified number of columns (6):
 
-```matlab
+```calcpad
 x = [1; 2; 3; 4]
 A = matrix(len(x); 7)
 #hide
@@ -114,14 +116,16 @@ A = matrix(len(x); 7)
 
 The inline equivalent of the above loop is the following:
 
-`$Repeat{$Repeat{A.(i; j) = x.i^(j - 1) @ j = 1 : n_cols(A)} @ i = 1 : n_rows(A)}`
+```calcpad
+$Repeat{$Repeat{A.(i; j) = x.i^(j - 1) @ j = 1 : n_cols(A)} @ i = 1 : n_rows(A)}
+```
 
-## Creational functions
+## Creational Functions
 
 The "square brackets" syntax is very powerful and flexible for creating small matrices with predefined sizes.
 However, it also has a lot of limitations.
 For example, it cannot create special types of matrices and cannot specify the matrix dimensions.
-That is why, Calcpad also includes various functions for creating matrices, as follows:
+That is why, CalcpadCE also includes various functions for creating matrices, as follows:
 
 ### **matrix**(*m*; *n*)
 
@@ -430,7 +434,7 @@ $\vec{v}$
     11 & 0 & 0
     \end{bmatrix}`$
 
-## Structural functions
+## Structural Functions
 
 Structural functions are related only to the matrix structure.
 Unlike data and math functions, the result does not depend much on the values of the elements.
@@ -866,7 +870,7 @@ $j_2$
     10 & 11 & 12
     \end{bmatrix}`$
 
-## Data functions
+## Data Functions
 
 Data functions are not related to the structure of matrices but to the values of the elements.
 The following functions are available for use:
@@ -1182,7 +1186,7 @@ They replace the equality in the original functions while the rest of the behavi
 The possible suffixes are given in the table below:
 
 | suffix | mfind | hlookup | vlookup | operator |
-|--------|-------|---------|---------|---------------------|
+| ------ | ----- | ------- | ------- | -------- |
 | \_eq | **mfind_eq**(*M*; *x*) | **hlookup_eq**(*M*; *x*; $i_1$; $i_2$) | **vlookup_eq**(*M*; *x*; $i_1$; $i_2$) | = - equal |
 | \_ne | **mfind_ne**(*M*; *x*) | **hlookup_ne**(*M*; *x*; $i_1$; $i_2$) | **vlookup_ne**(*M*; *x*; $i_1$; $i_2$) | ≠ - not equal |
 | \_lt | **mfind_lt**(*M*; *x*) | **hlookup_lt**(*M*; *x*; $i_1$; $i_2$) | **vlookup_lt**(*M*; *x*; $i_1$; $i_2$) | < - less than |
@@ -1190,7 +1194,7 @@ The possible suffixes are given in the table below:
 | \_gt | **mfind_gt**(*M*; *x*) | **hlookup_gt**(*M*; *x*; $i_1$; $i_2$) | **vlookup_gt**(*M*; *x*; $i_1$; $i_2$) | > - greater than |
 | \_ge | **mfind_ge**(*M*; *x*) | **hlookup_ge**(*M*; *x*; $i_1$; $i_2$) | **vlookup_ge**(*M*; *x*; $i_1$; $i_2$) | ≥ - greater than<br />or equal |
 
-## Math functions
+## Math Functions
 
 All standard scalar math functions accept matrix arguments as well.
 The function is applied separately to all the elements in the input matrix, even if it is of a special type.
@@ -1210,7 +1214,7 @@ For example:
 1 & 1 & 0
 \end{bmatrix}`$
 
-Calcpad also includes a lot of math functions that are specific for matrices, as follows:
+CalcpadCE also includes a lot of math functions that are specific for matrices, as follows:
 
 ### **hprod**(*A*; *B*)
 
@@ -1644,7 +1648,7 @@ Calcpad also includes a lot of math functions that are specific for matrices, as
 !!! note
     The cofactor $C_{ij}$ is defined as the respective minor $M_{ij}$ is multiplied by
     $(-1)^{i + j}$. The minor $M_{ij}$ represents the determinant of the submatrix, obtained by removing the *i*-th row and the *j*-th column.
-    In Calcpad, the cofactor matrix is calculated by transposing the adjugate: $C = adj(A)^T$
+    In CalcpadCE, the cofactor matrix is calculated by transposing the adjugate: $C = adj(A)^T$
 
 !!! example
     `cofactor([1; 2|3; 4])` $`= \begin{bmatrix}
@@ -1817,7 +1821,7 @@ $n_e$
     The function returns both matrices *L* and *U*, packed in a single square matrix.
     The elements along the main diagonal belong to *U*, since it is known that those of *L* are ones.
     The solution is performed by using the Crout's algorithm with partial pivoting.
-    Instead of building the permutation matrix *P*, Calcpad internally creates a vector $\vec{ind}$ containing the indexes of the rows after reordering.
+    Instead of building the permutation matrix *P*, CalcpadCE internally creates a vector $\vec{ind}$ containing the indexes of the rows after reordering.
     If you need both matrices *L* and *U* separately, you can extract them as a Hadamard product of the combined matrix by the respective lower/upper triangular matrix.
     After that, you have to reset the diagonal of *L* to ones.
     If the type of *M* is symmetric matrix, the LDLT decomposition is returned instead of LU.
@@ -2235,7 +2239,7 @@ $\vec{b}$
     0 & 0 & 0 & 0
     \end{bmatrix}`$
 
-## Aggregate and interpolation functions
+## Aggregate and Interpolation Functions
 
 All aggregate functions can work with matrices.
 Since they are multivariate, each of them can accept a single matrix, but also a list of scalars, vectors and matrices, mixed in arbitrary order.
@@ -2328,7 +2332,9 @@ In this case you must specify exactly three arguments: the first two must be sca
 
 You can use interpolation functions to plot matrix data, as in the example below:
 
-`$Map{spline(x; y; A) @ x = 1 : n_rows(A) & y = 1 : n_cols(A)}`
+```calcpad
+$Map{spline(x; y; A) @ x = 1 : n_rows(A) & y = 1 : n_cols(A)}
+```
 
 A full list of the available aggregate and interpolation functions is provided earlier in this manual (see "Expressions/Functions" above).
 
@@ -2353,7 +2359,7 @@ For example:
 \end{bmatrix}`$
 
 The only exception is multiplication operator "\*" which represents the standard matrix multiplication.
-The elementwise (Hadamard or Schur) product is implemented in Calcpad as a function: **hprod**. Matrix multiplication *C*m×p = *A*m×n *B*n×p is defined so that each element *c*i j is obtained as the dot product of the *i*-th row of *A* and the *j*-th column of *B*:
+The elementwise (Hadamard or Schur) product is implemented in CalcpadCE as a function: **hprod**. Matrix multiplication *C*m×p = *A*m×n *B*n×p is defined so that each element *c*i j is obtained as the dot product of the *i*-th row of *A* and the *j*-th column of *B*:
 
 ``` math
 c_{ij} = \sum_{k = 1}^{n}{a_{ik}b_{kj}}

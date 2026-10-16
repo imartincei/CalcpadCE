@@ -1,0 +1,5 @@
+# makepkg working dirs and output
+/pkg/
+/src/
+*.pkg.tar.zst
+*.log

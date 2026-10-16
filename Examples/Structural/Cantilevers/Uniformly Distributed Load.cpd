@@ -1,0 +1,7 @@
+'<!-- Full-span uniform load $q$ giving the textbook support actions $M = q l^2 / 2$ and $V = q l$. -->
+'<img style="width:165pt;" alt="cantilever-beam-distributed-load-uniform.png" class="side" src="../../Images/mechanics/beams/cantilever-beam-distributed-load-uniform.png">
+'Beam Length - 'l = ?  {5}'m
+'Load- 'q = ?  {5}'kN/m
+'<p><b>Internal forces</b></p>
+'Bending - 'M = q*l^2/2'kN·m
+'Shear  - 'V = q*l'kN

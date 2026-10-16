@@ -1,0 +1,301 @@
+<div class="calcpad-output">
+ <!-- Section properties of a half circle: area, centroid offset, second moments of area and radii of gyration. -->
+ <h3>Geometrical Properties of Half Circle</h3>
+ <div style="max-width:120mm">
+  <img alt="half-circle.png" class="side" src="Images/mechanics/sections/half-circle.png" style="height:112pt;"/>
+ </div>
+ <p>Diameter</p>
+ <p>
+  <span class="eq">
+   <var>d</var>
+   =
+   <u class="input-5">1</u>
+  </span>
+  m
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>d</var>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    8
+   </span>
+   =
+   <span class="dvc">
+    3.14 · 1
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    8
+   </span>
+   = 0.393
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>d</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   +
+   <var>d</var>
+   =
+   <span class="dvc">
+    3.14 · 1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   + 1 = 2.57
+  </span>
+  m
+ </p>
+ <p>Centroid</p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    <var>d</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 0.5
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    2 ·
+    <var>d</var>
+    <span class="dvl">
+    </span>
+    3 ·
+    <var>π</var>
+   </span>
+   =
+   <span class="dvc">
+    2 · 1
+    <span class="dvl">
+    </span>
+    3 · 3.14
+   </span>
+   = 0.212
+  </span>
+  m
+ </p>
+ <p>Second moments of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>y</sub>
+   =
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>π</var>
+    <span class="dvl">
+    </span>
+    128
+   </span>
+   −
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    18 ·
+    <var>π</var>
+   </span>
+   <span class="b1">)</span>
+   ·
+   <var>d</var>
+   <sup>4</sup>
+   =
+   <span class="b1">(</span>
+   <span class="dvc">
+    3.14
+    <span class="dvl">
+    </span>
+    128
+   </span>
+   −
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    18 · 3.14
+   </span>
+   <span class="b1">)</span>
+   · 1
+   <sup>4</sup>
+   = 0.00686
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>z</sub>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>d</var>
+    <sup>4</sup>
+    <span class="dvl">
+    </span>
+    128
+   </span>
+   =
+   <span class="dvc">
+    3.14 · 1
+    <sup>4</sup>
+    <span class="dvl">
+    </span>
+    128
+   </span>
+   = 0.0245
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Polar moment of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>x</sub>
+   =
+   <var>I</var>
+   <sub>y</sub>
+   +
+   <var>I</var>
+   <sub>z</sub>
+   = 0.00686 + 0.0245 = 0.0314
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Radii of gyration</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>y</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.00686
+     <span class="dvl">
+     </span>
+     0.393
+    </span>
+   </span>
+   = 0.132
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>z</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>z</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.0245
+     <span class="dvl">
+     </span>
+     0.393
+    </span>
+   </span>
+   = 0.25
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>x</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>x</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.0314
+     <span class="dvl">
+     </span>
+     0.393
+    </span>
+   </span>
+   = 0.283
+  </span>
+  m
+ </p>
+</div>

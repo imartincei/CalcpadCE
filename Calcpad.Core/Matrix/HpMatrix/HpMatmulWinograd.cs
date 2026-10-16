@@ -104,13 +104,13 @@ namespace Calcpad.Core
                         dst[ii + j] = src.GetValue(i, j);
 
                     ii += stride;
-                }    
+                }
         }
 
         private static int NextPowerOfTwo(int n)
         {
             var power = 1;
-            while (power < n) 
+            while (power < n)
                 power *= 2;
 
             return power;
@@ -123,7 +123,7 @@ namespace Calcpad.Core
             {
                 if (Avx512F.IsSupported)
                     MultiplyAvx512Kernel_64x64(A, B, C);
-                else 
+                else
                     MultiplyFmaKernel_64x64(A, B, C);
                 return;
             }

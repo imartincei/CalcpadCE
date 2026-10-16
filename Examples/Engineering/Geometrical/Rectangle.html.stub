@@ -1,0 +1,396 @@
+<div class="calcpad-output">
+ <!-- Section properties of a rectangle: area, $I_x = b h^3 / 12$, $I_y = h b^3 / 12$, section moduli and radii of gyration. -->
+ <h3>Geometrical Properties of Rectangle</h3>
+ <div style="max-width:120mm">
+  <img alt="rectangle.png" class="side" src="Images/mechanics/sections/rectangle.png" style="height:150pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-5">2</u>
+  </span>
+  m,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-5">1</u>
+  </span>
+  m
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <var>h</var>
+   ·
+   <var>b</var>
+   = 2 · 1 = 2
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>Centroid</p>
+ <p>
+  <span class="eq">
+   <var>y</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    <var>b</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 0.5
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>z</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    2
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 1
+  </span>
+  m
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   = 2 ·  (
+   <var>h</var>
+   +
+   <var>b</var>
+   )  = 2 ·  ( 2 + 1 )  = 6
+  </span>
+  m
+ </p>
+ <p>Second moments of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>y</sub>
+   =
+   <span class="dvc">
+    <var>b</var>
+    ·
+    <var>h</var>
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   =
+   <span class="dvc">
+    1 · 2
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   = 0.667
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>z</sub>
+   =
+   <span class="dvc">
+    <var>b</var>
+    <sup>3</sup>
+    ·
+    <var>h</var>
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   =
+   <span class="dvc">
+    1
+    <sup>3</sup>
+    · 2
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   = 0.167
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Polar moment of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>x</sub>
+   =
+   <var>I</var>
+   <sub>y</sub>
+   +
+   <var>I</var>
+   <sub>z</sub>
+   = 0.667 + 0.167 = 0.833
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Radii of gyration</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>y</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.667
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </span>
+   = 0.577
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>z</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>z</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.167
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </span>
+   = 0.289
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>x</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>x</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.833
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </span>
+   = 0.645
+  </span>
+  m
+ </p>
+ <p>Torsional constant</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>t</sub>
+   =
+   <span class="dvc up">
+    <var>h</var>
+    ·
+    <var>b</var>
+    <sup>3</sup>
+    ·
+    <span class="b1">(</span>
+    1 −
+    <span class="dvc">
+     0.63 ·
+     <var>b</var>
+     <span class="dvl">
+     </span>
+     <var>h</var>
+    </span>
+    + 0.052 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>b</var>
+     <span class="dvl">
+     </span>
+     <var>h</var>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">5</sup>
+    <span class="b1">)</span>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   =
+   <span class="dvc up">
+    2 · 1
+    <sup>3</sup>
+    ·
+    <span class="b1">(</span>
+    1 −
+    <span class="dvc">
+     0.63 · 1
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    + 0.052 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">5</sup>
+    <span class="b1">)</span>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   = 0.458
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Torsional section modulus</p>
+ <p>
+  <span class="eq">
+   <var>W</var>
+   <sub>t</sub>
+   =
+   <span class="dvc up">
+    <var>h</var>
+    ·
+    <var>b</var>
+    <sup>2</sup>
+    ·
+    <span class="b1">(</span>
+    1 −
+    <span class="dvc">
+     0.63 ·
+     <var>b</var>
+     <span class="dvl">
+     </span>
+     <var>h</var>
+    </span>
+    + 0.25 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>b</var>
+     <span class="dvl">
+     </span>
+     <var>h</var>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">2</sup>
+    <span class="b1">)</span>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   =
+   <span class="dvc up">
+    2 · 1
+    <sup>2</sup>
+    ·
+    <span class="b1">(</span>
+    1 −
+    <span class="dvc">
+     0.63 · 1
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    + 0.25 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">2</sup>
+    <span class="b1">)</span>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   = 0.498
+  </span>
+  m
+  <sup>3</sup>
+ </p>
+</div>

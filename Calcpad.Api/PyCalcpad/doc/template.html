@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Created with Calcpad</title>
+    <title>Created with CalcpadCE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
@@ -37,7 +37,8 @@
         a:hover { background-color: #e9f6ff;}
 
         .eq, input[type="text"], table.matrix {
-            font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+            font-family: 'DejaVu Serif Condensed', 'Century Schoolbook', 'Times New Roman', Times, serif;
+            font-variant-numeric: lining-nums tabular-nums;
         }
 
             .eq var {
@@ -74,12 +75,12 @@
             }
 
                 .eq small var {
-                    font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+                    font-family: 'DejaVu Serif Condensed', 'Century Schoolbook', 'Times New Roman', Times, serif;
                     font-size: 8.5pt;
                 }
 
                 .eq small i {
-                    font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+                    font-family: 'DejaVu Serif Condensed', 'Century Schoolbook', 'Times New Roman', Times, serif;
                     font-size: 6pt;
                 }
 
@@ -93,7 +94,7 @@
                 border: 0.5pt solid #CCC;
                 border-radius: 0.35em;
                 box-shadow: 0.06em 0.06em 0.5em #ddd;
-                min-width: 3em; 
+                min-width: 3em;
             }
 
             input[type="text"] {
@@ -295,7 +296,7 @@
             position: relative;
             bottom: 1pt;
         }
-		
+
         .eq small.nth{
             font-size: 70%;
         }
@@ -454,7 +455,7 @@
         .nary {
             color: #C080F0;
             font-size: 240%;
-            font-family: Georgia Pro Light, serif;
+            font-family: 'DejaVu Serif Condensed', serif;
             font-weight: 200;
             line-height: 80%;
             display: block;
@@ -512,8 +513,8 @@
             max-width: 50%;
         }
 
-        .plot {
-            max-width: 100%
+        img, .plot {
+            max-width: 100%;
         }
 
         .indent {
@@ -555,17 +556,10 @@
                 }
 
         .vec {
-            font-family: 'Cambria Math', serif;
+            font-family: 'CalcpadCE Vector', 'Cambria Math', serif;
             color: #8af;
             font-style: normal;
-            display: inline-block;
-            vertical-align: 2pt;
-            margin-left: 3pt;
-            margin-right: -7pt;
-        }
-
-        small .vec {
-            margin-right: -6pt;
+            vertical-align: 0.17em;
         }
 
         #Units {
@@ -864,7 +858,7 @@
                     }
                 });
                 $(".money").each(function () { $(this).text(Number(($(this).text())).toFixed(2)); });
-				
+
 				$("input").change(function(){
 					var e = $(this);
 					var s = e.val();
@@ -880,7 +874,7 @@
                 $("a").click(function () {
                     chrome.webview.postMessage('clicked');
                 });
-				
+
 				window.addEventListener('click', () => {
 					window.chrome.webview.postMessage('focused');
 				});

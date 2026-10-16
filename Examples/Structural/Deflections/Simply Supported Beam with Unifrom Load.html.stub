@@ -1,0 +1,296 @@
+<div class="calcpad-output">
+ <!-- Simply supported beam under a full-span uniform load $q$, recovering the serviceability-relevant mid-span deflection $d_{max} = 5 q l^4 / (384 E I)$ and the support rotation $\varphi_{max} = q l^3 / (24 E I)$. -->
+ <div style="max-width: 180mm;">
+  <img alt="deflection-simply-supported-beam-distributed-load.png" class="side" src="Images/mechanics/beams/deflection-simply-supported-beam-distributed-load.png" style="width:165pt;"/>
+  <p>
+   Beam length -
+   <span class="eq">
+    <var>l</var>
+    =
+    <u class="input-4">6</u>
+   </span>
+   m
+  </p>
+  <p>
+   Load -
+   <span class="eq">
+    <var>q</var>
+    =
+    <u class="input-5">30</u>
+   </span>
+   kN/m
+  </p>
+  <p>
+   Second moment of area -
+   <span class="eq">
+    <var>I</var>
+    =
+    <u class="input-6">160000</u>
+   </span>
+   cm
+   <sup>4</sup>
+  </p>
+  <p>
+   Modulus of elasticity -
+   <span class="eq">
+    <var>E</var>
+    =
+    <u class="input-7">30</u>
+   </span>
+   GPa
+  </p>
+  <p>Functions of rotation and deflection along the beam</p>
+  <p>
+   <span class="eq">
+    <var>EI</var>
+    =
+    <var>E</var>
+    ·
+    <var>I</var>
+    · 0.01 = 30 · 160000 · 0.01 = 48000
+   </span>
+  </p>
+  <p>
+   <span class="eq">
+    <var>φ</var>
+    (
+    <var>x</var>
+    )  =
+    <span class="dvc">
+     <var>q</var>
+     <span class="dvl">
+     </span>
+     <var>EI</var>
+    </span>
+    ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>x</var>
+     <sup>3</sup>
+     <span class="dvl">
+     </span>
+     6
+    </span>
+    −
+    <span class="dvc">
+     <var>l</var>
+     ·
+     <var>x</var>
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    +
+    <span class="dvc">
+     <var>l</var>
+     <sup>3</sup>
+     <span class="dvl">
+     </span>
+     24
+    </span>
+    <span class="b1">)</span>
+   </span>
+  </p>
+  <p>
+   <span class="eq">
+    <var>d</var>
+    (
+    <var>x</var>
+    )  =
+    <span class="dvc">
+     <var>q</var>
+     <span class="dvl">
+     </span>
+     <var>EI</var>
+    </span>
+    ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>x</var>
+     <sup>4</sup>
+     <span class="dvl">
+     </span>
+     24
+    </span>
+    −
+    <span class="dvc">
+     <var>l</var>
+     ·
+     <var>x</var>
+     <sup>3</sup>
+     <span class="dvl">
+     </span>
+     12
+    </span>
+    +
+    <span class="dvc">
+     <var>l</var>
+     <sup>3</sup>
+     <span class="dvl">
+     </span>
+     24
+    </span>
+    ·
+    <var>x</var>
+    <span class="b1">)</span>
+   </span>
+  </p>
+  <svg class="plot" data-plot="svg" height="840px" style="width:494.44pt; height:155.56pt;" version="1.1" viewbox=" 0 0 2670 840" width="2670px" xmlns="http://www.w3.org/2000/svg">
+   <style type="text/css">
+    .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+   </style>
+   <g class="plot">
+    <rect class="Frame" height="600" width="2400" x="180" y="120">
+    </rect>
+    <line class="Grid" x1="180" x2="2580" y1="689.6" y2="689.6">
+    </line>
+    <text class="sm end" x="161" y="707.6">-10</text>
+    <line class="Grid" x1="180" x2="2580" y1="547.2" y2="547.2">
+    </line>
+    <text class="sm end" x="161" y="565.2">-7.5</text>
+    <line class="Grid" x1="180" x2="2580" y1="404.8" y2="404.8">
+    </line>
+    <text class="sm end" x="161" y="422.8">-5</text>
+    <line class="Grid" x1="180" x2="2580" y1="262.4" y2="262.4">
+    </line>
+    <text class="sm end" x="161" y="280.4">-2.5</text>
+    <line class="Grid" x1="180" x2="2580" y1="120" y2="120">
+    </line>
+    <text class="sm end" x="161" y="138">0</text>
+    <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="180" y="772">0</text>
+    <line class="Grid" x1="380" x2="380" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="380" y="772">0.5</text>
+    <line class="Grid" x1="580" x2="580" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="580" y="772">1</text>
+    <line class="Grid" x1="780" x2="780" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="780" y="772">1.5</text>
+    <line class="Grid" x1="980" x2="980" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="980" y="772">2</text>
+    <line class="Grid" x1="1180" x2="1180" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1180" y="772">2.5</text>
+    <line class="Grid" x1="1380" x2="1380" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1380" y="772">3</text>
+    <line class="Grid" x1="1580" x2="1580" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1580" y="772">3.5</text>
+    <line class="Grid" x1="1780" x2="1780" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1780" y="772">4</text>
+    <line class="Grid" x1="1980" x2="1980" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1980" y="772">4.5</text>
+    <line class="Grid" x1="2180" x2="2180" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2180" y="772">5</text>
+    <line class="Grid" x1="2380" x2="2380" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2380" y="772">5.5</text>
+    <text class="sm mid" x="2580" y="772">6</text>
+    <line class="Axis" x1="180" x2="2580" y1="120" y2="120">
+    </line>
+    <text x="2602" y="102">x</text>
+    <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+    </line>
+    <text class="mid" x="180" y="84">y</text>
+    <text x="8" y="823">[0; -10.53]</text>
+    <text class="end" x="2662" y="44">[6; 0]</text>
+    <polyline class="Series1" points="180,120 257.42,181.89 334.84,243.03 412.26,302.72 489.68,360.32 567.1,415.23 644.52,466.9 721.94,514.82 799.35,558.55 876.77,597.69 954.19,631.89 1031.61,660.84 1109.03,684.3 1186.45,702.08 1263.87,714.01 1341.29,720 1418.71,720 1496.13,714.01 1573.55,702.08 1650.97,684.3 1728.39,660.84 1805.81,631.89 1883.23,597.69 1960.65,558.55 2038.06,514.82 2115.48,466.9 2192.9,415.23 2270.32,360.32 2347.74,302.72 2425.16,243.03 2502.58,181.89 2580,120">
+    </polyline>
+    <polygon class="Fill1" points="180,120 180,120 257.42,181.89 334.84,243.03 412.26,302.72 489.68,360.32 567.1,415.23 644.52,466.9 721.94,514.82 799.35,558.55 876.77,597.69 954.19,631.89 1031.61,660.84 1109.03,684.3 1186.45,702.08 1263.87,714.01 1341.29,720 1418.71,720 1496.13,714.01 1573.55,702.08 1650.97,684.3 1728.39,660.84 1805.81,631.89 1883.23,597.69 1960.65,558.55 2038.06,514.82 2115.48,466.9 2192.9,415.23 2270.32,360.32 2347.74,302.72 2425.16,243.03 2502.58,181.89 2580,120 2580,120" stroke-width="0">
+    </polygon>
+   </g>
+  </svg>
+  <p>Maximum deflection</p>
+  <p>
+   <span class="eq">
+    <var>d</var>
+    <sub>max</sub>
+    =
+    <var>d</var>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>l</var>
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    <span class="b1">)</span>
+    · 10
+    <sup>3</sup>
+    =
+    <var>d</var>
+    <span class="b1">(</span>
+    <span class="dvc">
+     6
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    <span class="b1">)</span>
+    · 10
+    <sup>3</sup>
+    = 10.55
+   </span>
+   mm
+  </p>
+  <p>Maximum rotation</p>
+  <p>
+   <span class="eq">
+    <var>φ</var>
+    <sub>max</sub>
+    =
+    <var>φ</var>
+    ( 0 )  · 10
+    <sup>3</sup>
+    = 5.62
+   </span>
+   rad·10³
+  </p>
+  <p>
+   Calculate deflection at
+   <span class="eq">
+    <var>x</var>
+    =
+    <u class="input-21">3</u>
+   </span>
+   m
+  </p>
+  <p>
+   <span class="eq">
+    <var>d</var>
+    (
+    <var>x</var>
+    )  · 10
+    <sup>3</sup>
+    =
+    <var>d</var>
+    ( 3 )  · 10
+    <sup>3</sup>
+    = 10.55
+   </span>
+   mm
+  </p>
+ </div>
+</div>

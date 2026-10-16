@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.Json;
 
 namespace Calcpad.Core
 {
@@ -15,12 +16,22 @@ namespace Calcpad.Core
             Show,
             Pre,
             Post,
+            End_Hide,
+            End_Show,
+            End_Pre,
+            End_Post,
             Val,
             Equ,
             Noc,
+            End_Val,
+            End_Equ,
+            End_Noc,
             NoSub,
             NoVar,
             VarSub,
+            End_NoSub,
+            End_NoVar,
+            End_VarSub,
             Const,
             Split,
             Wrap,
@@ -49,9 +60,19 @@ namespace Calcpad.Core
             Append,
             Phasor,
             Complex,
+            Settings,
+            Ui,
+            ProjectPath,
+            LibraryPath,
+            Html,
+            Cpd,
+            Markdown,
+            End_Html,
+            End_Cpd,
+            End_Markdown,
             SkipLine
         }
-        private enum KeywordResult  
+        private enum KeywordResult
         {
             None,
             Continue,
@@ -90,7 +111,7 @@ namespace Calcpad.Core
                 return Keyword.None;
 
             var i = char.ToLowerInvariant(s[1]) - 'a';
-            if (i < 0 || i >= KeywordNames.Length)
+            if (i < 0 || i >= KeywordIndex.Length)
                 return Keyword.None;
 
             var ind = KeywordIndex[i];
@@ -108,6 +129,22 @@ namespace Calcpad.Core
             return Keyword.None;
         }
 
+        /// <summary>
+        /// The number of characters a keyword occupies in the source line, including the leading '#'.
+        /// </summary>
+        private static int KeywordLength(Keyword keyword) =>
+            KeywordNames[(int)keyword - 1].Length + 1;
+
+        /// <summary>The mode keywords that act in the current mode: any opener, but only the matching #end.</summary>
+        private bool IsActiveModeKeyword(Keyword keyword) => keyword switch
+        {
+            Keyword.Html or Keyword.Cpd or Keyword.Markdown => true,
+            Keyword.End_Html => _parseMode == ParseMode.Html,
+            Keyword.End_Markdown => _parseMode == ParseMode.Markdown,
+            Keyword.End_Cpd => _parseMode == ParseMode.Cpd,
+            _ => false
+        };
+
         KeywordResult ParseKeyword(ReadOnlySpan<char> s, ref Keyword keyword)
         {
             if (_isPausedByUser)
@@ -115,44 +152,63 @@ namespace Calcpad.Core
             else if (s[0] == '#' && keyword == Keyword.None)
                 keyword = GetKeyword(s);
 
+            var isModeKeyword = IsActiveModeKeyword(keyword);
+            // Skipped lines must not cache their keyword, or a loop would replay it
+            if (_modeSuppressed && !isModeKeyword)
+            {
+                keyword = Keyword.None;
+                return KeywordResult.Continue;
+            }
+
+            // Everything else is content in #html/#markdown, so #if, #tag and #header all pass through
+            if (IsNonCpdMode && !isModeKeyword)
+                keyword = Keyword.None;
+
             if (keyword == Keyword.None)
                 return KeywordResult.None;
 
             switch (keyword)
             {
-                case Keyword.Hide:
-                    _isVisible = false;
+                case Keyword.Html: SetParseMode(s, keyword, ParseMode.Html); break;
+                case Keyword.Cpd: SetParseMode(s, keyword, ParseMode.Cpd); break;
+                case Keyword.Markdown: SetParseMode(s, keyword, ParseMode.Markdown); break;
+                case Keyword.End_Html:
+                case Keyword.End_Cpd:
+                case Keyword.End_Markdown:
+                    FlushMarkdown();
+                    (_parseMode, _modeSuppressed) = _parseModeStack.Count > 0 ? _parseModeStack.Pop() : (ParseMode.Cpd, false);
                     break;
-                case Keyword.Show:
-                    _isVisible = true;
-                    break;
-                case Keyword.Pre:
-                    _isVisible = !_calculate;
-                    break;
-                case Keyword.Post:
-                    _isVisible = _calculate;
+                case Keyword.Hide: SetVisibility(s, keyword, Settings.Math.ShowHiddenOutput && _isVisible); break;
+                case Keyword.Show: SetVisibility(s, keyword, true); break;
+                case Keyword.Pre: SetVisibility(s, keyword, !ForPrint); break;
+                case Keyword.Post: SetVisibility(s, keyword, !EnableUi); break;
+                case Keyword.End_Hide:
+                case Keyword.End_Show:
+                case Keyword.End_Pre:
+                case Keyword.End_Post:
+                    _isVisible = _visibilityStack.Count > 0 ? _visibilityStack.Pop() : true;
                     break;
                 case Keyword.Input:
                     return ParseKeywordInput();
                 case Keyword.Pause:
                     return ParseKeywordPause();
-                case Keyword.Val:
-                    _isVal = 1;
+                case Keyword.Val: SetOutputMode(s, keyword, 1); break;
+                case Keyword.Equ: SetOutputMode(s, keyword, 0); break;
+                case Keyword.Noc: SetOutputMode(s, keyword, -1); break;
+                case Keyword.End_Val:
+                case Keyword.End_Equ:
+                case Keyword.End_Noc:
+                    _isVal = _outputModeStack.Count > 0 ? _outputModeStack.Pop() : 0;
                     break;
-                case Keyword.Equ:
-                    _isVal = 0;
-                    break;
-                case Keyword.Noc:
-                    _isVal = -1;
-                    break;
-                case Keyword.NoSub:
-                    _parser.VariableSubstitution = MathParser.VariableSubstitutionOptions.VariablesOnly;
-                    break;
-                case Keyword.NoVar:
-                    _parser.VariableSubstitution = MathParser.VariableSubstitutionOptions.SubstitutionsOnly;
-                    break;
-                case Keyword.VarSub:
-                    _parser.VariableSubstitution = MathParser.VariableSubstitutionOptions.VariablesAndSubstitutions;
+                case Keyword.NoSub: SetSubstitution(s, keyword, MathParser.VariableSubstitutionOptions.VariablesOnly); break;
+                case Keyword.NoVar: SetSubstitution(s, keyword, MathParser.VariableSubstitutionOptions.SubstitutionsOnly); break;
+                case Keyword.VarSub: SetSubstitution(s, keyword, MathParser.VariableSubstitutionOptions.VariablesAndSubstitutions); break;
+                case Keyword.End_NoSub:
+                case Keyword.End_NoVar:
+                case Keyword.End_VarSub:
+                    _parser.VariableSubstitution = _substitutionStack.Count > 0 ?
+                        _substitutionStack.Pop() :
+                        MathParser.VariableSubstitutionOptions.VariablesAndSubstitutions;
                     break;
                 case Keyword.Const:
                     _parser.IsConst = true;
@@ -213,12 +269,83 @@ namespace Calcpad.Core
                 case Keyword.Complex:
                     _parser.Phasor = false;
                     break;
+                case Keyword.Settings:
+                    ParseKeywordSettings(s);
+                    break;
+                case Keyword.Ui:
+                    return ParseKeywordUi(s);
+                case Keyword.ProjectPath:
+                case Keyword.LibraryPath:
+                    ParseKeywordPathRoot(s);
+                    break;
                 default:
                     if (keyword != Keyword.Global && keyword != Keyword.Local)
                         return KeywordResult.None;
                     break;
             }
             return KeywordResult.Continue;
+        }
+
+        private void SetVisibility(ReadOnlySpan<char> s, Keyword keyword, bool value)
+        {
+            _visibilityStack.Push(_isVisible);
+            if (IsDirectiveConditionMet(s, keyword))
+                _isVisible = value;
+        }
+
+        private void SetParseMode(ReadOnlySpan<char> s, Keyword keyword, ParseMode mode)
+        {
+            FlushMarkdown();
+            _parseModeStack.Push((_parseMode, _modeSuppressed));
+            _parseMode = mode;
+            var kwdLength = KeywordLength(keyword);
+            var hasCondition = s.Length > kwdLength && !s[kwdLength..].IsWhiteSpace();
+            // Only the inline condition suppresses; an unsatisfied #if already disables the lines
+            if (hasCondition && _calculate && _condition.IsSatisfied && !IsDirectiveConditionMet(s, keyword))
+                _modeSuppressed = true;
+        }
+
+        private void SetOutputMode(ReadOnlySpan<char> s, Keyword keyword, int value)
+        {
+            _outputModeStack.Push(_isVal);
+            if (IsDirectiveConditionMet(s, keyword))
+                _isVal = value;
+        }
+
+        private void SetSubstitution(ReadOnlySpan<char> s, Keyword keyword, MathParser.VariableSubstitutionOptions value)
+        {
+            _substitutionStack.Push(_parser.VariableSubstitution);
+            if (IsDirectiveConditionMet(s, keyword))
+                _parser.VariableSubstitution = value;
+        }
+
+        private bool IsDirectiveConditionMet(ReadOnlySpan<char> s, Keyword keyword)
+        {
+            if (!_condition.IsSatisfied)
+                return false;
+
+            var kwdLength = KeywordLength(keyword);
+            if (s.Length <= kwdLength)
+                return true;
+
+            var expr = s[kwdLength..].Trim();
+            if (expr.IsWhiteSpace())
+                return true;
+
+            if (!_calculate)
+                return false;
+
+            try
+            {
+                _parser.Parse(expr);
+                _parser.Calculate();
+                return Condition.IsTrue(_parser.Result);
+            }
+            catch (MathParserException ex)
+            {
+                AppendError(s.ToString(), ex.Message, _currentLine);
+                return false;
+            }
         }
 
         KeywordResult ParseKeywordInput()
@@ -265,9 +392,10 @@ namespace Calcpad.Core
 
         private void ParseKeywordRound(ReadOnlySpan<char> s)
         {
-            if (s.Length > 6)
+            var kwdLength = KeywordLength(Keyword.Round);
+            if (s.Length > kwdLength)
             {
-                var expr = s[6..].Trim();
+                var expr = s[kwdLength..].Trim();
                 if (expr.SequenceEqual("default"))
                     Settings.Math.Decimals = _decimals;
                 else if (int.TryParse(expr, out int n))
@@ -292,8 +420,9 @@ namespace Calcpad.Core
 
         private void ParseKeywordRepeat(ReadOnlySpan<char> s)
         {
-            ReadOnlySpan<char> expression = s.Length > 7 ? // #repeat - 7    
-                s[7..].Trim() :
+            var kwdLength = KeywordLength(Keyword.Repeat);
+            ReadOnlySpan<char> expression = s.Length > kwdLength ?
+                s[kwdLength..].Trim() :
                 [];
 
             if (_calculate)
@@ -344,8 +473,9 @@ namespace Calcpad.Core
 
         private void ParseKeywordFor(ReadOnlySpan<char> s)
         {
-            ReadOnlySpan<char> expression = s.Length > 4 ? // #for - 4
-                s[4..].Trim() :
+            var kwdLength = KeywordLength(Keyword.For);
+            ReadOnlySpan<char> expression = s.Length > kwdLength ?
+                s[kwdLength..].Trim() :
                 [];
 
             if (expression.IsWhiteSpace())
@@ -423,8 +553,9 @@ namespace Calcpad.Core
 
         private void ParseKeywordWhile(ReadOnlySpan<char> s)
         {
-            ReadOnlySpan<char> expression = s.Length > 6 ? // #while - 6
-                s[7..].Trim() :
+            var kwdLength = KeywordLength(Keyword.While);
+            ReadOnlySpan<char> expression = s.Length > kwdLength ?
+                s[kwdLength..].Trim() :
                 [];
 
             if (expression.IsWhiteSpace())
@@ -594,9 +725,10 @@ namespace Calcpad.Core
 
         private void ParseKeywordFormat(ReadOnlySpan<char> s)
         {
-            if (s.Length > 7)
+            var kwdLength = KeywordLength(Keyword.Format);
+            if (s.Length > kwdLength)
             {
-                var expr = s[7..].Trim();
+                var expr = s[kwdLength..].Trim();
                 if (expr.SequenceEqual("default"))
                     Settings.Math.FormatString = null;
                 else
@@ -611,12 +743,186 @@ namespace Calcpad.Core
             else
                 Settings.Math.FormatString = null;
         }
+        private void ParseKeywordPathRoot(ReadOnlySpan<char> s)
+        {
+            // MacroParser already declared and validated this line against the folder of the file that wrote it.
+            if (_hasInheritedPathRoots)
+                return;
+
+            PathRoots.IsDeclaration(s, out var isProject, out var start, out var length);
+            if (length == 0)
+            {
+                AppendError(s.ToString(), string.Format(Messages.Missing_path_value_0,
+                    isProject ? "#ProjectPath" : "#LibraryPath"), _currentLine);
+                return;
+            }
+
+            var rawValue = s.Slice(start, length).ToString();
+            var declaringDir = !string.IsNullOrEmpty(SourceFilePath)
+                ? System.IO.Path.GetDirectoryName(SourceFilePath) : null;
+            if (!_pathRoots.TryDeclare(isProject, rawValue, declaringDir, out var error))
+                AppendError(s.ToString(), error, _currentLine);
+        }
+
+        private const string SettingsKeyword = "#settings";
+
+        private void ParseKeywordSettings(ReadOnlySpan<char> s)
+        {
+            var json = s[SettingsKeyword.Length..].Trim();
+            if (json.IsEmpty)
+            {
+                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine);
+                return;
+            }
+            try
+            {
+                var dto = SettingsDto.Parse(json.ToString());
+                if (dto is null)
+                    return;
+
+                HashSet<SettingKey> invalid = null;
+                foreach (var error in dto.Validate())
+                {
+                    (invalid ??= []).Add(error.Key);
+                    AppendError(s.ToString(), error.Message, _currentLine);
+                }
+
+                foreach (SettingKey key in Enum.GetValues<SettingKey>())
+                    if (invalid is null || !invalid.Contains(key))
+                        ApplySetting(key, dto);
+            }
+            catch (JsonException)
+            {
+                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine);
+            }
+        }
+
+        private void ApplySetting(SettingKey key, SettingsDto dto)
+        {
+            switch (key)
+            {
+                case SettingKey.Decimals:
+                    if (dto.Decimals.HasValue)
+                        Settings.Math.Decimals = dto.Decimals.Value;
+                    break;
+                case SettingKey.Degrees:
+                    if (dto.Degrees.HasValue)
+                    {
+                        Settings.Math.Degrees = dto.Degrees.Value;
+                        _parser.Degrees = dto.Degrees.Value;
+                    }
+                    break;
+                case SettingKey.Complex:
+                    if (dto.Complex.HasValue)
+                        _parser.SetComplex(dto.Complex.Value);
+                    break;
+                case SettingKey.Substitute:
+                    if (dto.Substitute.HasValue)
+                        Settings.Math.Substitute = dto.Substitute.Value;
+                    break;
+                case SettingKey.FormatEquations:
+                    if (dto.FormatEquations.HasValue)
+                        Settings.Math.FormatEquations = dto.FormatEquations.Value;
+                    break;
+                case SettingKey.ZeroSmallMatrixElements:
+                    if (dto.ZeroSmallMatrixElements.HasValue)
+                        Settings.Math.ZeroSmallMatrixElements = dto.ZeroSmallMatrixElements.Value;
+                    break;
+                case SettingKey.ShowHiddenOutput:
+                    if (dto.ShowHiddenOutput.HasValue)
+                        Settings.Math.ShowHiddenOutput = dto.ShowHiddenOutput.Value;
+                    break;
+                case SettingKey.MaxOutputCount:
+                    if (dto.MaxOutputCount.HasValue)
+                        Settings.Math.MaxOutputCount = dto.MaxOutputCount.Value;
+                    break;
+                case SettingKey.IsUs:
+                    if (dto.IsUs.HasValue)
+                    {
+                        Settings.IsUs = dto.IsUs.Value;
+                        _parser.IsUs = dto.IsUs.Value;
+                    }
+                    break;
+                case SettingKey.VectorGraphics:
+                    if (dto.VectorGraphics.HasValue)
+                    {
+                        Settings.Plot.VectorGraphics = dto.VectorGraphics.Value;
+                        _parser.SetVariable("PlotSVG", dto.VectorGraphics.Value ? 1d : 0d);
+                    }
+                    break;
+                case SettingKey.ColorScale:
+                    if (dto.ColorScale is not null &&
+                        Enum.TryParse<PlotSettings.ColorScales>(dto.ColorScale, true, out var cs))
+                    {
+                        Settings.Plot.ColorScale = cs;
+                        _parser.SetVariable("PlotPalette", (int)cs);
+                    }
+                    break;
+                case SettingKey.SmoothScale:
+                    if (dto.SmoothScale.HasValue)
+                    {
+                        Settings.Plot.SmoothScale = dto.SmoothScale.Value;
+                        _parser.SetVariable("PlotSmooth", dto.SmoothScale.Value ? 1d : 0d);
+                    }
+                    break;
+                case SettingKey.Shadows:
+                    if (dto.Shadows.HasValue)
+                    {
+                        Settings.Plot.Shadows = dto.Shadows.Value;
+                        _parser.SetVariable("PlotShadows", dto.Shadows.Value ? 1d : 0d);
+                    }
+                    break;
+                case SettingKey.AdaptivePlot:
+                    if (dto.AdaptivePlot.HasValue)
+                    {
+                        Settings.Plot.IsAdaptive = dto.AdaptivePlot.Value;
+                        _parser.SetVariable("PlotAdaptive", dto.AdaptivePlot.Value ? 1d : 0d);
+                    }
+                    break;
+                case SettingKey.PlotWidth:
+                    if (dto.PlotWidth.HasValue)
+                    {
+                        Settings.Plot.Width = dto.PlotWidth.Value;
+                        _parser.SetVariable("PlotWidth", dto.PlotWidth.Value);
+                    }
+                    break;
+                case SettingKey.PlotHeight:
+                    if (dto.PlotHeight.HasValue)
+                    {
+                        Settings.Plot.Height = dto.PlotHeight.Value;
+                        _parser.SetVariable("PlotHeight", dto.PlotHeight.Value);
+                    }
+                    break;
+                case SettingKey.PlotStep:
+                    if (dto.PlotStep.HasValue)
+                    {
+                        Settings.Plot.Step = dto.PlotStep.Value;
+                        _parser.SetVariable("PlotStep", dto.PlotStep.Value);
+                    }
+                    break;
+                case SettingKey.Precision:
+                    if (dto.Precision.HasValue)
+                    {
+                        Settings.Math.Precision = dto.Precision.Value;
+                        _parser.SetVariable("Precision", dto.Precision.Value);
+                    }
+                    break;
+                case SettingKey.Tol:
+                    if (dto.Tol.HasValue)
+                    {
+                        Settings.Math.Tol = dto.Tol.Value;
+                        _parser.SetVariable("Tol", dto.Tol.Value);
+                    }
+                    break;
+            }
+        }
 
         private void ParseKeywordMd(ReadOnlySpan<char> s)
         {
-            if (s.Length > 3)
+            var kwdLength = KeywordLength(Keyword.Md);
+            if (s.Length > kwdLength)
             {
-                var expr = s[3..].Trim();
+                var expr = s[kwdLength..].Trim();
                 if (expr.Equals("on", StringComparison.OrdinalIgnoreCase))
                     _isMarkdownOn = true;
                 else if (expr.Equals("off", StringComparison.OrdinalIgnoreCase))
@@ -634,7 +940,9 @@ namespace Calcpad.Core
             {
                 if (_condition.IsSatisfied)
                 {
-                    var options = new ReadWriteOptions(s, 0);
+                    var sourceDir = !string.IsNullOrEmpty(SourceFilePath)
+                        ? System.IO.Path.GetDirectoryName(SourceFilePath) : null;
+                    var options = new ReadWriteOptions(s, 0, sourceDir, _pathRoots);
                     if (options.Name.IsEmpty)
                         return;
 
@@ -649,7 +957,7 @@ namespace Calcpad.Core
                 }
             }
             else if (_isVisible)
-                _sb.Append($"<p><span{HtmlId} class=\"cond\">#read</span> {s[5..]}</p>");
+                _sb.Append($"<p><span{HtmlId} class=\"cond\">#read</span> {s[KeywordLength(Keyword.Read)..]}</p>");
         }
 
         private void ParseKeywordWrite(ReadOnlySpan<char> s, Keyword keyword)
@@ -658,26 +966,46 @@ namespace Calcpad.Core
             {
                 if (_condition.IsSatisfied)
                 {
-                    var options = new ReadWriteOptions(s, keyword - Keyword.Read);
+                    var sourceDir = !string.IsNullOrEmpty(SourceFilePath)
+                        ? System.IO.Path.GetDirectoryName(SourceFilePath) : null;
+                    var options = new ReadWriteOptions(s, keyword - Keyword.Read, sourceDir, _pathRoots);
                     if (options.Name.IsEmpty)
                         return;
 
                     var m = _parser.GetMatrix(options.Name.ToString(), options.Type);
-                    DataExchange.Write(options, m);
+                    DataExchange.Write(options, m, AllowDataWrite);
+
                     if (_isVisible)
-                        ReportDataExchageResult(options, keyword == Keyword.Write ? "written to" : "appended to");
+                        ReportDataExchageResult(options, keyword == Keyword.Write ? "written to" : "appended to",
+                            AllowDataWrite);
                 }
             }
             else if (_isVisible)
-                _sb.Append($"<p><span{HtmlId} class=\"cond\">#write</span> {s[6..]}</p>");
+            {
+                var kwdLength = KeywordLength(keyword);
+                _sb.Append($"<p><span{HtmlId} class=\"cond\">{s[..kwdLength]}</span> {s[kwdLength..]}</p>");
+            }
         }
 
-        private void ReportDataExchageResult(ReadWriteOptions options, string command)
+        private void ReportDataExchageResult(ReadWriteOptions options, string command, bool done = true)
         {
-            var url = $"file:///{options.FullPath.Replace('\\', '/')}";
             _sb.Append($"<p{HtmlId}>")
                .Append($"Matrix <span class=\"eq\">{new HtmlWriter(Settings.Math, false).FormatVariable(options.Name.ToString(), string.Empty, true)}</span>")
-               .Append($" was successfully {command} <a href=\"{url}\">{options.Path}.{options.Ext}</a>");
+               .Append(done ? $" was successfully {command} " : $" will be {command} ");
+
+            // Embedded data has no file to name, and no link to it that would lead anywhere.
+            // Neither does a deferred write: the file may not exist yet.
+            if (options.Data.IsEmpty)
+            {
+                var name = $"{options.Path}.{options.Ext}";
+                if (done)
+                    _sb.Append($"<a href=\"file:///{options.FullPath.Replace('\\', '/')}\">{name}</a>");
+                else
+                    _sb.Append(name);
+            }
+            else
+                _sb.Append("embedded data");
+
             if (options.IsExcel)
             {
                 if (!options.Sheet.IsEmpty)

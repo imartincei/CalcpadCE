@@ -1,0 +1,114 @@
+<div class="calcpad-output">
+ <!-- Volume and surface area of a right triangular prism, from triangle sides and prism length. -->
+ <div style="max-width:120mm">
+  <img alt="triangular-prism.png" class="side" src="Images/math/volume/triangular-prism.png" style="height:60pt;"/>
+ </div>
+ <p>Dimensions of base</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">5</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-4">4</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>c</var>
+   =
+   <u class="input-4">3</u>
+  </span>
+ </p>
+ <p>Height</p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-6">2</u>
+  </span>
+ </p>
+ <!--
+<-->
+ <p>Base perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   =
+   <var>a</var>
+   +
+   <var>b</var>
+   +
+   <var>c</var>
+   = 5 + 4 + 3 = 12
+  </span>
+ </p>
+ <p>Semiperimeter</p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   = 0.5 ·
+   <var>P</var>
+   = 0.5 · 12 = 6
+  </span>
+ </p>
+ <p>Area of base (Heron equation)</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>p</var>
+    ·  (
+    <var>p</var>
+    −
+    <var>a</var>
+    )  ·  (
+    <var>p</var>
+    −
+    <var>b</var>
+    )  ·  (
+    <var>p</var>
+    −
+    <var>c</var>
+    )
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    6 ·  ( 6 − 5 )  ·  ( 6 − 4 )  ·  ( 6 − 3 )
+   </span>
+   = 6
+  </span>
+ </p>
+ <p>Volume</p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <var>A</var>
+   ·
+   <var>h</var>
+   = 6 · 2 = 12
+  </span>
+ </p>
+ <p>Surface area</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   = 2 ·
+   <var>A</var>
+   +
+   <var>h</var>
+   ·
+   <var>P</var>
+   = 2 · 6 + 2 · 12 = 36
+  </span>
+ </p>
+ <!--
+<-->
+</div>

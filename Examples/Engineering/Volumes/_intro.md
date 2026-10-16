@@ -1,0 +1,3 @@
+[CalcpadCE](https://calcpad-ce.org) covers every common 3D body with a one-page worksheet that returns the [volume](https://en.wikipedia.org/wiki/Volume) and surface area from a few labelled dimensions.
+
+Pick the body you need — [cube](#cube), [sphere](#sphere), [cone](#cone), [cylinder](#cylinder), [ellipsoid](#ellipsoid), [rectangular](#rectangular-pyramid) or [triangular pyramid](#triangular-pyramid), [rectangular](#rectangular-prism), [triangular](#triangular-prism) or [right polygonal prism](#right-polygonal-prism), or one of the [spherical-cap](#spherical-cap) and [frustum](#rectangular-frustum) variants — and override the inputs in the Desktop app; the result updates instantly.

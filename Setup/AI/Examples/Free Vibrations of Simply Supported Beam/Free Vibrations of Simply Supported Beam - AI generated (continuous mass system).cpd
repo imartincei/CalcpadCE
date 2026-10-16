@@ -44,7 +44,7 @@ T(k) = 1/f(k)
 	ω_k = ω(k)/1Hz
 	f_k = f(k)/1Hz
 	T_k = T(k)/1s
-	#show 
+	#show
 	'<tr><td>'k'</td><td>'ω_k'</td><td>'f_k'</td><td>'T_k'</td></tr>
 #loop
 #equ

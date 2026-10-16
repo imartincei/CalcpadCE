@@ -1,0 +1,70 @@
+<div class="calcpad-output">
+ <!-- Volume $V = \tfrac{a^3}{6\sqrt{2}}$ and surface area $S = \sqrt{3}\, a^2$ of a regular tetrahedron from its edge length. -->
+ <div style="max-width:110mm">
+  <img alt="tetrahedron.png" class="side" src="Images/math/volume/tetrahedron.png" style="height:60pt;"/>
+ </div>
+ <p>Side length</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">1</u>
+  </span>
+ </p>
+ <p>Volume</p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <span class="dvc">
+    <span class="o0">
+     <span class="r">√</span>
+     2
+    </span>
+    ·
+    <var>a</var>
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   =
+   <span class="dvc">
+    <span class="o0">
+     <span class="r">√</span>
+     2
+    </span>
+    · 1
+    <sup>3</sup>
+    <span class="dvl">
+    </span>
+    12
+   </span>
+   = 0.118
+  </span>
+ </p>
+ <p>Surface area</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    3
+   </span>
+   ·
+   <var>a</var>
+   <sup>2</sup>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    3
+   </span>
+   · 1
+   <sup>2</sup>
+   = 1.73
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

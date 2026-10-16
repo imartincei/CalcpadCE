@@ -25,7 +25,7 @@ namespace Calcpad.Core
                 var V_j = V[j];
                 SymmetricMatrixVectorProduct(Matrix, V_j, w);
                 var sw = w.AsSpan();
-                var vw = Vectorized.AsVector(sw);   
+                var vw = Vectorized.AsVector(sw);
                 // 3-term recurrence
                 Vectorized.MultiplyAdd(V[j1], -beta[j1], sw, vw);
                 alpha[j1] = Vectorized.DotProduct(w, V_j, 0, w.Length);
@@ -44,13 +44,13 @@ namespace Calcpad.Core
                 }
                 var j2 = j + 1;
                 var V_j2 = new double[n];
-                var invBeta_j = 1d / beta[j]; 
+                var invBeta_j = 1d / beta[j];
                 for (int i = 0; i < n; ++i)
                     V_j2[i] = w[i] * invBeta_j;
 
                 V[j2] = V_j2;
                 m = j;
-                // Kaniel-Paige convergence check: 
+                // Kaniel-Paige convergence check:
                 // After initialSteps, check every checkInterval steps
                 if (j >= initialSteps && (j - initialSteps) % checkInterval == 0 &&
                     CheckKanielPaigeConvergence(alpha, beta, V, j, n, eigenCount, reverse,
@@ -204,12 +204,12 @@ namespace Calcpad.Core
 
         /*
         Householder reduction of a real, symmetric matrix. On output, the orthogonal matrix Q
-        is returned effecting the transformation. d returns the diagonal elements of the tridiagonal 
+        is returned effecting the transformation. d returns the diagonal elements of the tridiagonal
         matrix, and e[0..n] the off-diagonal elements, with e[0] = 0.
 
         The algorithm was adapted from:
         Numerical Recipes 3rd Edition: The Art of Scientific Computing (3rd. ed.).
-        William H. Press, Saul A. Teukolsky, William T. Vetterling, and Brian P. Flannery. 2007. 
+        William H. Press, Saul A. Teukolsky, William T. Vetterling, and Brian P. Flannery. 2007.
         Cambridge University Press, USA.
         */
 
@@ -329,20 +329,20 @@ namespace Calcpad.Core
         }
 
         /*
-        QL algorithm with implicit shifts, to determine the eigenvalues and eigenvectors of a 
-        real, symmetric, tridiagonal matrix, or of a real, symmetric matrix previously reduced 
+        QL algorithm with implicit shifts, to determine the eigenvalues and eigenvectors of a
+        real, symmetric, tridiagonal matrix, or of a real, symmetric matrix previously reduced
         by Tridiagonalize. On input, d[0..n] contains the diagonal elements of the tridiagonal matrix.
-        On output, it returns the eigenvalues. The vector e[0..n] inputs the subdiagonal elements 
-        of the tridiagonal matrix, with e[0] arbitrary. On output e is destroyed. When finding only 
-        the eigenvalues, several lines may be omitted, as noted in the comments. 
-        If the eigenvectors of a tridiagonal matrix are desired, the matrix Q[0..n][0..n] is input 
-        as the identity matrix. If the eigenvectors of the matrix that has been reduced by Tridiagonalize 
-        are required, then Q is input as the matrix output by Tridiagonalize. In either case, the kth column 
+        On output, it returns the eigenvalues. The vector e[0..n] inputs the subdiagonal elements
+        of the tridiagonal matrix, with e[0] arbitrary. On output e is destroyed. When finding only
+        the eigenvalues, several lines may be omitted, as noted in the comments.
+        If the eigenvectors of a tridiagonal matrix are desired, the matrix Q[0..n][0..n] is input
+        as the identity matrix. If the eigenvectors of the matrix that has been reduced by Tridiagonalize
+        are required, then Q is input as the matrix output by Tridiagonalize. In either case, the kth column
         of Q returns the normalized eigenvector corresponding to d[k].
 
         The algorithm was adapted from:
         Numerical Recipes 3rd Edition: The Art of Scientific Computing (3rd. ed.).
-        William H. Press, Saul A. Teukolsky, William T. Vetterling, and Brian P. Flannery. 2007. 
+        William H. Press, Saul A. Teukolsky, William T. Vetterling, and Brian P. Flannery. 2007.
         Cambridge University Press, USA.
         */
         internal static void ImplicitQL(double[] d, double[] e, double[][] Q, bool eigenvecs)
@@ -380,7 +380,7 @@ namespace Calcpad.Core
                         var c = s;
                         var p = 0d;
                         var i = m - 1;
-                        while (i >= l)     // A plane rotation as in the original QL, 
+                        while (i >= l)     // A plane rotation as in the original QL,
                         {                  // followed by Givens rotations to restore tridiagonal form
                             var i1 = i + 1;
                             var f = s * e[i];

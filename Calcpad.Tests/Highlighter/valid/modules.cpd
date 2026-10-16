@@ -1,0 +1,15 @@
+' Modules: #include, #local, #global, module composition
+#include import.cpd
+x = IMPORTED_CONST + 1
+area = circleArea(5)
+price = 100*.EUR
+priceUSD = price/.USD
+doubled = double$(10)
+check$(100; 80)
+check$(50; 75)
+#local
+localOnly = 999
+localCalc = circleArea(10)
+#global
+reExported = 42
+#local

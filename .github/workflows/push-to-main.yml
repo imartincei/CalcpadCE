@@ -1,0 +1,41 @@
+name: Push to Main
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'Examples/**/*.html.stub'
+      - 'docs/**'
+      - '**/*.md'
+      - 'mkdocs.yml'
+  workflow_dispatch:
+
+jobs:
+  determine-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Determine version
+        id: version
+        run: node tools/version.mjs snapshot
+
+  build-all:
+    needs: determine-version
+    uses: ./.github/workflows/build-all.yml
+    with:
+      version: ${{ needs.determine-version.outputs.version }}
+
+  test:
+    needs: determine-version
+    uses: ./.github/workflows/run-tests.yml
+    with:
+      version: ${{ needs.determine-version.outputs.version }}

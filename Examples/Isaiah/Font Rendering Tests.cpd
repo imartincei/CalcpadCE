@@ -1,0 +1,176 @@
+'<!-- Exercises every text-bearing CSS class in template.html, for comparing candidate main serif fonts. -->
+'<h1>Font Rendering Tests</h1>
+'<p>Every construct below maps to a CSS class the template styles. Sections marked
+'<b>serif</b> use the main math font; the rest are here as contrast.</p>
+'<p>Symbol inventory, in the main font:
+'<span class="eq">· ∕ × ÷ ∈ ∞ √ ∑ ∏ ∫ ⋮ ⋯ ⋱ ° ‰ ± ≤ ≥ ≠ ≈ → ⃗</span></p>
+"
+'<h2>1. Symbol palette</h2>
+'<p>Every character the editor palette can insert
+'(<code>Calcpad.Highlighter/Snippets/Data/SymbolSnippets.cs</code>), first in the body
+'font, then in the equation font.</p>
+'<p>Greek lower case: α β γ δ ε ζ η θ ϑ ι κ λ μ ν ξ ο π ρ ς σ τ υ φ χ ψ ω</p>
+'<p><span class="eq">α β γ δ ε ζ η θ ϑ ι κ λ μ ν ξ ο π ρ ς σ τ υ φ χ ψ ω</span></p>
+'<p>Greek upper case: Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω</p>
+'<p><span class="eq">Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω</span></p>
+'<p>Special: ° ′ ″ ‴ ⁗ ø Ø ϕ ‰ ‱ ∡ ℓ</p>
+'<p><span class="eq">° ′ ″ ‴ ⁗ ø Ø ϕ ‰ ‱ ∡ ℓ</span></p>
+"
+'<h3>Palette characters as variables, with subscripts and units</h3>
+α_t = 12*10^-6
+β_1 = 0.85
+γ_c = 25kN/m^3
+δ_max = 12.5mm
+ε_cu = 0.0035
+θ_p = 30°
+λ_rel = 0.85
+μ_s = 0.30
+ν = 0.20
+ρ_s = 7850kg/m^3
+σ_Ed = 235MPa
+τ_Rd = 1.35MPa
+φ_ø = 16mm
+ψ_0 = 0.70
+ω_n = 377rad/s
+Δ_L = 3.2mm
+Γ_0 = 1.15
+Σ_A = 4520mm^2
+Φ_k = 0.90
+Ω_r = 2.5
+ϕ_n = 0.75
+ℓ_eff = 5.8m
+"
+'<h2>2. Variables, units and functions</h2>
+L = 6.4m
+b = 300mm
+h = 550mm
+E = 200GPa
+q = 18.5kN/m
+A_c = b*h
+I_y = b*h^3/12
+W_el = I_y/(h/2)
+M_Ed = q*L^2/8
+σ_max = M_Ed/W_el
+f(x) = sin(x)^2 + cos(x)^2
+g_1(x; y) = atan2(x; y)
+f(π/4)
+g_1(3; 4)
+"
+'<h2>3. Numerals — lining and tabular figures</h2>
+n_1 = 1234567890
+n_2 = 0.0001234
+n_3 = 1*10^-6
+n_4 = 6.022*10^23
+n_5 = -98765.4321
+n_6 = 1010101010
+T = [1111.11; 2222.22; 3333.33|4444.44; 5555.55; 6666.66|7777.77; 8888.88; 9999.99]
+"
+'<h2>4. Fractions</h2>
+a_1 = 3
+b_1 = 5
+c_1 = 7
+d_1 = 11
+r_1 = (a_1 + b_1)/(c_1 + d_1)
+r_2 = (1 + 1/(1 + 1/(1 + 1/2)))/(1 - 1/(1 - 1/3))
+r_3 = q*L^2/(8*E*I_y)*(1 + b/h)/(1 - b/(2*h))
+"
+'<h2>5. Roots</h2>
+s_1 = sqrt(2)
+s_2 = sqrt(b^2 + h^2)
+s_3 = cbrt(I_y/A_c)
+s_4 = root(σ_max/E; 4)
+s_5 = sqrt(1 + sqrt(1 + sqrt(1 + sqrt(2))))
+s_6 = sqrt((a_1 + b_1)/(c_1 + d_1))
+s_7 = root((1 + 1/(1 + 1/2))/(1 - 1/3); 5)
+s_8 = sqrt((1 + 1/(1 + 1/(1 + 1/2)))/(1 + 1/(1 + 1/(1 + 1/3))))
+"
+'<h2>6. Powers and superscripts</h2>
+p_1 = 2^10
+p_2 = E*A_c^2/(L^3)
+p_3 = 10^-6
+p_4 = (1 + β_1)^(a_1 + b_1)
+p_5 = A_c^2*I_y^3/W_el^4
+"
+'<h2>7. Brackets, absolute value and vertical growth</h2>
+k_1 = abs(-σ_max)
+k_2 = abs((a_1 + b_1)/(c_1 - d_1))
+k_3 = (1 + (a_1 + b_1)/(c_1 + d_1))*(1 - (b_1 + c_1)/(d_1 + a_1))
+k_4 = ((1 + 1/(1 + 1/(1 + 1/(1 + 1/2))))/(1 + 1/(1 + 1/(1 + 1/3))))^2
+"
+'<h2>8. N-ary operators — ∑ ∏ ∫</h2>
+S_1 = $Sum{1/i^2 @ i = 1 : 100}
+n_7 = 10
+S_2 = $Sum{i*L/n_7 @ i = 1 : 10}
+P_1 = $Product{1 + 1/i @ i = 1 : 8}
+P_2 = $Product{i^2/(i^2 - 1) @ i = 2 : 12}
+J_1 = $Integral{sin(x)^2 @ x = 0 : π}
+J_2 = $Integral{exp(-x^2)/sqrt(π) @ x = -3 : 3}
+J_3 = $Area{18.5*x*(6.4 - x)/2 @ x = 0 : 6.4}
+"
+'<h2>9. Vectors and matrices</h2>
+v = [1; 2; 3; 4; 5]
+w = [1.5; -2.5; 3.5; -4.5; 5.5]
+v*w
+A = [1; 2; 3|4; 5; 6|7; 8; 9]
+B = [2; 0; 0|0; 2; 0|0; 0; 2]
+A*B
+C = identity(5)
+D = range(1; 24; 1)
+u = [12.5; -7.25; 0.5; 108; -0.0625]
+norm(u)
+"
+'<h2>10. Conditions, loops and blocks</h2>
+#if σ_max > 100MPa
+	'<p>Over the reference stress.</p>
+	η = σ_max/(200MPa)
+#else
+	η = 0
+#end if
+#for i = 1 : 3
+	t_i = i*L/3
+#loop
+m = 0
+#while m < 3
+	m = m + 1
+#loop
+R_1 = $Root{x^2 - 2 @ x = 0 : 2}
+R_2 = $Find{sin(x) - 0.5 @ x = 0 : π/2}
+R_3 = $Slope{x^3 - 2*x @ x = 1.5}
+y = 0
+R_4 = $Repeat{y = y + 1/i^2 @ i = 1 : 6}
+"
+'<h2>11. Solver blocks</h2>
+K_1 = $Block{u = 3; w_2 = 4; sqrt(u^2 + w_2^2)}
+K_2 = $Inline{u = 5; u^2}
+"
+'<h2>12. Inline conditionals — brace ladder</h2>
+'<p>Brace height (<code>.c1</code>&hellip;<code>.c8</code>) grows with the branch count.</p>
+c_a(x) = if(x > 0; sqrt(x); 0)
+c_b(x) = switch(x < 1; 1; x < 2; 2; 0)
+c_c(x) = if(x > 0; (1 + 1/(1 + 1/2))/(1 - 1/3); 0)
+c_d(x) = switch(x < 1; 1; x < 2; 2; x < 3; 3; x < 4; 4; 0)
+c_e(x) = switch(x < 1; 1; x < 2; 2; x < 3; 3; x < 4; 4; x < 5; 5; 0)
+c_f(x) = switch(x < 1; 1; x < 2; 2; x < 3; 3; x < 4; 4; x < 5; 5; x < 6; 6; 0)
+c_g(x) = switch(x < 1; 1; x < 2; 2; x < 3; 3; x < 4; 4; x < 5; 5; x < 6; 6; x < 7; 7; 0)
+c_h(x) = switch(x < 1; 1; x < 2; 2; x < 3; 3; x < 4; 4; x < 5; 5; x < 6; 6; x < 7; 7; x < 8; 8; 0)
+c_a(2.25)
+c_g(3.5)
+"
+'<h2>13. Special values</h2>
+z_1 = 1/0
+z_2 = 0/0
+z_3 = 1*10^308*10
+"
+'<h2>14. Raw HTML classes</h2>
+'<div class="side"><p>Side note, floated right at half width, in the body sans font.</p></div>
+'<div class="indent"><p>Indented block, as emitted for unwrapped <code>#if</code> and <code>#for</code> bodies.</p></div>
+'<p class="ref">Ref: EN 1992-1-1, 6.1</p>
+'<p class="ok">Utilisation 0.72 &lt; 1.00 — OK</p>
+'<table class="bordered"><tr><th>Section</th><th>A<sub>c</sub></th><th>I<sub>y</sub></th></tr>
+'<tr><td>300×550</td><td>165000 mm²</td><td>4.16·10⁹ mm⁴</td></tr>
+'<tr><td>300×450</td><td>135000 mm²</td><td>2.28·10⁹ mm⁴</td></tr></table>
+'<ul><li>List item with <code>inline code</code> and a <kbd>Ctrl+G</kbd> key.</li>
+'<li>Second item.</li></ul>
+'<h4>Heading level 4</h4>
+'<h5>Heading level 5</h5>
+'<h6>Heading level 6</h6>

@@ -1,0 +1,41 @@
+{
+  "build": {
+    "beforeDevCommand": {
+      "script": "powershell -NoProfile -ExecutionPolicy Bypass -File dev-frontend.ps1",
+      "wait": true
+    },
+    "beforeBuildCommand": "powershell -NoProfile -ExecutionPolicy Bypass -File build-frontend.ps1"
+  },
+  "bundle": {
+    "targets": ["msi", "nsis"],
+    "licenseFile": "../../../../LICENSE",
+    "resources": {
+      "binaries/*.dll": "./",
+      "binaries/Calcpad.Server.deps.json": "./",
+      "binaries/Calcpad.Server.runtimeconfig.json": "./",
+      "binaries/Calcpad.Server.staticwebassets.endpoints.json": "./",
+      "binaries/appsettings.json": "./",
+      "binaries/THIRD-PARTY-NOTICES.txt": "./",
+      "binaries/LICENSE.txt": "./",
+      "binaries/Calcpad.Server.exe": "./",
+      "binaries/template.html": "./",
+      "binaries/Fonts/*": "./Fonts/",
+      "binaries/bg/*": "./bg/",
+      "binaries/zh/*": "./zh/"
+    },
+    "windows": {
+      "wix": {
+        "language": "en-US",
+        "fragmentPaths": ["../packaging/windows/dotnet.wxs"],
+        "featureRefs": ["DotNetPrerequisites"]
+      },
+      "nsis": {
+        "installMode": "both",
+        "installerHooks": "../packaging/windows/dotnet.nsh"
+      },
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com",
+      "tsp": true
+    }
+  }
+}

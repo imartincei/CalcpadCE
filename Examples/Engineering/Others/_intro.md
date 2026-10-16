@@ -1,0 +1,6 @@
+[CalcpadCE](https://calcpad-ce.org) is general enough to cover small algorithmic and combinatorial problems alongside its main engineering workload.
+
+This catch-all group collects eight short worksheets that exercise different parts of the language.
+[Quadratic Equation](#quadratic-equation) and [Cubic Equation](#cubic-equation) use the built-in numerical solver to recover all real roots from a coefficient list, while [Combinatorics](#combinatorics) tabulates permutations and combinations with and without repetition.
+[Bitwise Operations](#bitwise-operations) builds binary, octal and hexadecimal converters from custom multiline functions, and [Collatz Check](#collatz-check) verifies the [3n + 1 conjecture](https://en.wikipedia.org/wiki/Collatz_conjecture) over a user-chosen range using both inline and recursive loops.
+[Functions of Multiple Parameters](#functions-of-multiple-parameters) showcases the variadic `min`, `max`, `gcd` and `lcm` helpers, [Himmelblau Function](#himmelblau-function) plots the four-minimum [Himmelblau test surface](https://en.wikipedia.org/wiki/Himmelblau%27s_function) used in optimisation benchmarks, and [HTML UI](#html-ui) wires raw HTML form controls into a worksheet to drive a parametric cross-section design.

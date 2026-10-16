@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -7,21 +8,54 @@ namespace Calcpad.Core
 {
     public static class Validator
     {
-        private const string CurrencyChars = "€£₤¥¢₽₹₩₪"; // For custom currency units
-        private const string UnitSymbolChars = "°′″%‰‱";
-        private const string VarSymbolChars = ",_‾‴⁗";
-        private const string VarNonLetterChars = "℧∡";
-        private const string VarLetterChars = "ϑϕøØ";
-        private const string SuperscriptChars = "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾";
-        private const string SubscriptChars = "₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎";
-        internal const string UnitChars = UnitSymbolChars + CurrencyChars;
-        private const string VarStartingChars = UnitChars + VarNonLetterChars;
-        private const string VarChars =
-            VarStartingChars +
-            VarSymbolChars +
-            SuperscriptChars +
-            SubscriptChars +
-            VarLetterChars;
+        // For custom currency units.
+        private static readonly char[] CurrencyChars =
+        [
+            '€', '£', '₤', '¥', '¢', '₽', '₹', '₩', '₪',
+        ];
+
+        private static readonly char[] UnitSymbolChars =
+        [
+            '°', '′', '″', '%', '‰', '‱',
+        ];
+
+        // Combining marks attach to a preceding base letter, so they're allowed
+        // inside an identifier but never as a starter.
+        private static readonly char[] VarSymbolChars =
+        [
+            ',', '_', '‾', '‴', '⁗',
+            '́', // combining acute
+            '̄', // combining macron
+            '̇', // combining dot above
+            '̈', // combining diaeresis
+        ];
+
+        private static readonly char[] VarNonLetterChars = ['℧', '∡'];
+        private static readonly char[] VarLetterChars = ['ϑ', 'ϕ', 'ø', 'Ø'];
+
+        private static readonly char[] SuperscriptChars =
+        [
+            '⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹',
+            '⁺', '⁻', '⁼', '⁽', '⁾',
+        ];
+
+        private static readonly char[] SubscriptChars =
+        [
+            '₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉',
+            '₊', '₋', '₌', '₍', '₎',
+        ];
+
+        internal static readonly SearchValues<char> UnitChars =
+            SearchValues.Create([.. UnitSymbolChars, .. CurrencyChars]);
+
+        private static readonly SearchValues<char> VarStartingChars =
+            SearchValues.Create([.. UnitSymbolChars, .. CurrencyChars, .. VarNonLetterChars]);
+
+        private static readonly SearchValues<char> VarChars = SearchValues.Create(
+        [
+            .. UnitSymbolChars, .. CurrencyChars, .. VarNonLetterChars,
+            .. VarSymbolChars, .. SuperscriptChars, .. SubscriptChars, .. VarLetterChars,
+        ]);
 
         private static readonly Regex MyFormatRegex = new(@"^[FCEGND]\d{0,2}$|^[0#]+(,[0#]+)?(\.[0#]+)?([eE][+-]?0+)?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
@@ -70,7 +104,7 @@ namespace Calcpad.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsLatinLetter(char c) =>
             c >= 'a' && c <= 'z' || // a - z
-            c >= 'A' && c <= 'Z';   // A - Z 
+            c >= 'A' && c <= 'Z';   // A - Z
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsDigit(char c) =>
@@ -92,7 +126,7 @@ namespace Calcpad.Core
             VarStartingChars.Contains(c);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsVarChar(char c) => IsLetter(c) || IsDigit(c);
+        public static bool IsVarChar(char c) => IsLetter(c) || char.IsAsciiDigit(c);
 
         public static bool IsValidFormatString(string format)
         {

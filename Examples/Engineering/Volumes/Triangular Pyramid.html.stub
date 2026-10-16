@@ -1,0 +1,106 @@
+<div class="calcpad-output">
+ <!-- Volume $V = \tfrac{1}{3} A_b\, h$ of a pyramid with a general triangular base. -->
+ <div style="max-width:110mm">
+  <img alt="triangular-pyramid.png" class="side" src="Images/math/volume/triangular-pyramid.png" style="height:60pt;"/>
+ </div>
+ <p>Dimensions of base</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">5</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-4">4</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>c</var>
+   =
+   <u class="input-4">3</u>
+  </span>
+ </p>
+ <p>Height</p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-6">2</u>
+  </span>
+ </p>
+ <!--
+<-->
+ <p>Semiperimeter of base</p>
+ <p>
+  <span class="eq">
+   <var>p</var>
+   = 0.5 ·  (
+   <var>a</var>
+   +
+   <var>b</var>
+   +
+   <var>c</var>
+   )  = 0.5 ·  ( 5 + 4 + 3 )  = 6
+  </span>
+ </p>
+ <p>Area of base (Heron equation)</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>p</var>
+    ·  (
+    <var>p</var>
+    −
+    <var>a</var>
+    )  ·  (
+    <var>p</var>
+    −
+    <var>b</var>
+    )  ·  (
+    <var>p</var>
+    −
+    <var>c</var>
+    )
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    6 ·  ( 6 − 5 )  ·  ( 6 − 4 )  ·  ( 6 − 3 )
+   </span>
+   = 6
+  </span>
+ </p>
+ <p>Volume</p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   ·
+   <var>A</var>
+   ·
+   <var>h</var>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   · 6 · 2 = 4
+  </span>
+ </p>
+ <!--
+<-->
+</div>

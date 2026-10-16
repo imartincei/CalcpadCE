@@ -1,0 +1,333 @@
+<div class="calcpad-output">
+ <!-- Generate a fully parametric SVG cross-section of a prestressed double-tee panel by composing reusable `#def` shape templates from [`svg_drawing.cpd`](https://github.com/imartincei/CalcpadCE/blob/main/Examples/Engineering/3D%2C%20Plotting%2C%20Drawing/svg_drawing.cpd).
+<p>Adjust any dimension and the drawing redraws itself — ideal for standardised structural detail libraries. -->
+ <!-- A small library of reusable CalcpadCE `#def` macros that emit SVG primitives (line, rect, circle, text, dimensions).
+<p>Include this file with `#include svg_drawing.cpd` in any worksheet that needs to draw a parametric structural detail. -->
+ <h3>Prestressed TT Panel - Parametric SVG Generation</h3>
+ <p>Dimensions:</p>
+ <p>
+  Rib height -
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-7">750</u>
+  </span>
+  mm
+ </p>
+ <p>
+  Rib top width -
+  <span class="eq">
+   <var>b</var>
+   <sub>2</sub>
+   =
+   <u class="input-8">200</u>
+  </span>
+  mm
+ </p>
+ <p>
+  Slab depth -
+  <span class="eq">
+   <var>h</var>
+   <sub>f</sub>
+   =
+   <u class="input-9">100</u>
+  </span>
+  mm
+ </p>
+ <p>
+  Rib spacing c/c -
+  <span class="eq">
+   <var>B</var>
+   <sub>0</sub>
+   =
+   <u class="input-10">1500</u>
+  </span>
+  mm
+ </p>
+ <p>
+  Slab width -
+  <span class="eq">
+   <var>B</var>
+   =
+   <u class="input-11">2500</u>
+  </span>
+  mm
+ </p>
+ <p>
+  Total height -
+  <span class="eq">
+   <var>H</var>
+   =
+   <var>h</var>
+   +
+   <var>h</var>
+   <sub>f</sub>
+   = 750 + 100 = 850
+  </span>
+  mm
+ </p>
+ <p>
+  Rib bottom width -
+  <span class="eq">
+   <var>b</var>
+   <sub>1</sub>
+   =
+   <var>b</var>
+   <sub>2</sub>
+   −
+   <span class="dvc">
+    <var>h</var>
+    − 30
+    <span class="dvl">
+    </span>
+    10
+   </span>
+   = 200 −
+   <span class="dvc">
+    750 − 30
+    <span class="dvl">
+    </span>
+    10
+   </span>
+   = 128
+  </span>
+  mm
+ </p>
+ <p>
+  - mean -
+  <span class="eq">
+   <var>b</var>
+   <sub>w</sub>
+   =
+   <span class="dvc">
+    <var>b</var>
+    <sub>1</sub>
+    +
+    <var>b</var>
+    <sub>2</sub>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    128 + 200
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 164
+  </span>
+  mm
+ </p>
+ <p>
+  - at
+  <var>z</var>
+  from top -
+  <span class="eq">
+   <var>b</var>
+   (
+   <var>z</var>
+   )  =
+   <var>b</var>
+   <sub>2</sub>
+   −
+   <span class="dvc">
+    (
+    <var>b</var>
+    <sub>2</sub>
+    −
+    <var>b</var>
+    <sub>1</sub>
+    )  ·
+    <var>z</var>
+    <span class="dvl">
+    </span>
+    <var>h</var>
+   </span>
+  </span>
+  mm
+ </p>
+ <p>
+  Rib effective width -
+  <span class="eq">
+   <var>b</var>
+   <sub>f</sub>
+   =
+   <span class="dvc">
+    <var>B</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    2500
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 1250
+  </span>
+  mm
+ </p>
+ <p>
+  Distance from the center of the first row of tendons to the bottom edge -
+  <span class="eq">
+   <var>d</var>
+   <sub>p1</sub>
+   =
+   <u class="input-20">80</u>
+  </span>
+  mm
+ </p>
+ <p>
+  Number of tendons in one row -
+  <span class="eq">
+   <var>n</var>
+   <sub>ph</sub>
+   =
+   <u class="input-21">2</u>
+  </span>
+ </p>
+ <p>
+  Number of rows -
+  <span class="eq">
+   <var>n</var>
+   <sub>pv</sub>
+   =
+   <u class="input-22">3</u>
+  </span>
+ </p>
+ <svg style="font-family: Arial Nova Cond, Noto Sans Cond, Segoe UI; font-size: 54px; width:500pt; height:220pt" version="1.1" viewbox="-1450 -150 2800 1250" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="1250,0 1250,100 990,100 850,130 814,850 686,850 650,130 510,100 -510,100 -650,130 -686,850 -814,850 -850,130 -990,100 -1250,100 -1250,0" style="stroke:black; stroke-width:8; fill:lightyellow">
+  </polygon>
+  <line stroke-dasharray="60,15,10,15" style="stroke:green; stroke-width:6" x1="-750" x2="-750" y1="-100" y2="950">
+  </line>
+  <line stroke-dasharray="60,15,10,15" style="stroke:green; stroke-width:6" x1="750" x2="750" y1="-100" y2="950">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-1250" x2="-1250" y1="-100" y2="-20">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="1250" x2="1250" y1="-100" y2="-20">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-1290" x2="1290" y1="-60" y2="-60">
+  </line>
+  <circle cx="1250" cy="-60" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <circle cx="-1250" cy="-60" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="0" y="-90">B = 2500 mm</text>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-1350" x2="-1270" y1="0" y2="0">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-1350" x2="-1270" y1="850" y2="850">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-1310" x2="-1310" y1="-40" y2="890">
+  </line>
+  <circle cx="-1310" cy="0" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <circle cx="-1310" cy="850" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" transform="rotate(-90,-1340,425)" x="-1340" y="425">H = 850 mm</text>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-1210" x2="-1130" y1="0" y2="0">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-1210" x2="-1130" y1="100" y2="100">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-1170" x2="-1170" y1="-40" y2="140">
+  </line>
+  <circle cx="-1170" cy="0" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <circle cx="-1170" cy="100" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" transform="rotate(-90,-1200,50)" x="-1200" y="50">
+   h
+   <tspan dy="20">f</tspan>
+   <tspan dy="-20">=</tspan>
+   100 mm
+  </text>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-1210" x2="-1130" y1="100" y2="100">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-1210" x2="-1130" y1="850" y2="850">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-1170" x2="-1170" y1="60" y2="890">
+  </line>
+  <circle cx="-1170" cy="100" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <circle cx="-1170" cy="850" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" transform="rotate(-90,-1200,475)" x="-1200" y="475">
+   <tspan dy="100">h = 750 mm</tspan>
+  </text>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-750" x2="-750" y1="990" y2="1070">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="750" x2="750" y1="990" y2="1070">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-790" x2="790" y1="1030" y2="1030">
+  </line>
+  <circle cx="750" cy="1030" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <circle cx="-750" cy="1030" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="0" y="1000">
+   B
+   <tspan dy="5">₀</tspan>
+   <tspan dy="-5">= 1500</tspan>
+   mm
+  </text>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-850" x2="-850" y1="180" y2="260">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-650" x2="-650" y1="180" y2="260">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-890" x2="-610" y1="220" y2="220">
+  </line>
+  <circle cx="-650" cy="220" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <circle cx="-850" cy="220" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="-750" y="190">
+   b
+   <tspan dy="5">₂</tspan>
+   <tspan dy="-5">=</tspan>
+   200 mm
+  </text>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-814" x2="-814" y1="890" y2="970">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-686" x2="-686" y1="890" y2="970">
+  </line>
+  <line style="stroke:goldenrod; stroke-width:4; fill:goldenrod" x1="-854" x2="-646" y1="930" y2="930">
+  </line>
+  <circle cx="-686" cy="930" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <circle cx="-814" cy="930" r="12" style="stroke:goldenrod; stroke-width:4; fill:goldenrod">
+  </circle>
+  <text text-anchor="middle" x="-750" y="900">
+   b
+   <tspan dy="5">₁</tspan>
+   <tspan dy="-5">=</tspan>
+   128 mm
+  </text>
+  <circle cx="730" cy="770" r="10" style="stroke:red; fill:red; stroke-width:1">
+  </circle>
+  <circle cx="-730" cy="770" r="10" style="stroke:red; fill:red; stroke-width:1">
+  </circle>
+  <circle cx="770" cy="770" r="10" style="stroke:red; fill:red; stroke-width:1">
+  </circle>
+  <circle cx="-770" cy="770" r="10" style="stroke:red; fill:red; stroke-width:1">
+  </circle>
+  <circle cx="730" cy="730" r="10" style="stroke:red; fill:red; stroke-width:1">
+  </circle>
+  <circle cx="-730" cy="730" r="10" style="stroke:red; fill:red; stroke-width:1">
+  </circle>
+  <circle cx="770" cy="730" r="10" style="stroke:red; fill:red; stroke-width:1">
+  </circle>
+  <circle cx="-770" cy="730" r="10" style="stroke:red; fill:red; stroke-width:1">
+  </circle>
+  <circle cx="730" cy="690" r="10" style="stroke:red; fill:red; stroke-width:1">
+  </circle>
+  <circle cx="-730" cy="690" r="10" style="stroke:red; fill:red; stroke-width:1">
+  </circle>
+  <circle cx="770" cy="690" r="10" style="stroke:red; fill:red; stroke-width:1">
+  </circle>
+  <circle cx="-770" cy="690" r="10" style="stroke:red; fill:red; stroke-width:1">
+  </circle>
+ </svg>
+</div>

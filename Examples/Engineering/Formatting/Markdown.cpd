@@ -1,0 +1,19 @@
+'<!-- Mixes Markdown headings, lists and tables with Calcpad math by toggling `#md on`, the building block for Markdown-driven reports. -->
+#md on
+"Markdown in CalcpadCE
+'---
+'### Heading 3
+'#### Heading 4
+'##### Heading 5
+'###### Heading 6
+'A quote in comment can be escaped by entering ''another'' one
+'This text is **bold**, this is *italic* and this is ***bold-italic***.
+'You can also have ++underlined++, ~~deleted~~ and ==marked== text.
+'Adding ~sub~script and ^super^script is now easier than ever.
+'Code:
+'`c = a + b`
+'Image:
+'![CalcpadCE](https://raw.githubusercontent.com/imartincei/CalcpadCE/refs/heads/main/docs/media/logo.svg)
+'Links: <https://www.markdownguide.org>, [CalcpadCE website](https://calcpad-ce.org)
+'> Blockquote
+'>> Next level

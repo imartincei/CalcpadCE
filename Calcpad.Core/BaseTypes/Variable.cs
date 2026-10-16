@@ -8,7 +8,7 @@ namespace Calcpad.Core
         private IValue _value;
         internal ref IValue ValueByRef() => ref _value;
         internal event Action OnChange;
-        internal void Change() => OnChange?.Invoke();   
+        internal void Change() => OnChange?.Invoke();
         internal bool IsInitialized => _isIntialised;
         internal bool IsReadOnly;
         private bool _isIntialised;

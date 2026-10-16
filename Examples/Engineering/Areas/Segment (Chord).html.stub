@@ -1,0 +1,159 @@
+<div class="calcpad-output">
+ <!-- Area and arc length of a circular segment specified by chord and height, with a chord-vs-height feasibility guard. -->
+ <div style="max-width:120mm;">
+  <img alt="segment-chord.png" class="side" src="Images/math/area/segment-chord.png" style="height:60pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  Chord -
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">2</u>
+  </span>
+ </p>
+ <p>
+  Height -
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-5">1</u>
+  </span>
+ </p>
+ <!--
+<-->
+ <p>Radius</p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   =
+   <span class="dvc">
+    <var>b</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   +
+   <span class="dvc">
+    <var>a</var>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    8 ·
+    <var>b</var>
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   +
+   <span class="dvc">
+    2
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    8 · 1
+   </span>
+   = 1
+  </span>
+ </p>
+ <p>Angle</p>
+ <p>
+  <span class="eq">
+   <var>α</var>
+   = 2 ·
+   <b>asin</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>r</var>
+   </span>
+   <span class="b1">)</span>
+   = 2 ·
+   <b>asin</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    2
+    <span class="dvl">
+    </span>
+    2 · 1
+   </span>
+   <span class="b1">)</span>
+   = 180
+  </span>
+  °
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   = 0.5 ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>α</var>
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   −
+   <b>sin</b>
+   (
+   <var>α</var>
+   )
+   <span class="b1">)</span>
+   ·
+   <var>r</var>
+   <sup>2</sup>
+   = 0.5 ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    3.14 · 180
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   −
+   <b>sin</b>
+   ( 180 )
+   <span class="b1">)</span>
+   · 1
+   <sup>2</sup>
+   = 1.57
+  </span>
+ </p>
+ <p>Arc length</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>r</var>
+    ·
+    <var>α</var>
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   =
+   <span class="dvc">
+    3.14 · 1 · 180
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   = 3.14
+  </span>
+ </p>
+ <!--
+<-->
+</div>

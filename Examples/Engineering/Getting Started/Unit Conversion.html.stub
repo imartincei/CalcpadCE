@@ -1,0 +1,57 @@
+<div class="calcpad-output">
+ <!-- CalcpadCE handles unit conversion natively with SI and Imperial units. Units are checked for consistency to spot errors early. -->
+ <p>Simple unit conversion:</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   = 0.5
+   <i>m</i>
+   <sup class="unit">2</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   = 5000
+   <i>cm</i>
+   <sup class="unit">2</sup>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   = 5.38
+   <i>ft</i>
+   <sup class="unit">2</sup>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>Using different units within the same equation:</p>
+ <p>
+  <span class="eq">
+   <var>ρ</var>
+   = 3
+   <i>bar</i>
+   + 100
+   <i>psi</i>
+   = 9.89
+   <i>bar</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>ρ</var>
+   = 3
+   <i>bar</i>
+   + 100
+   <i>psi</i>
+   = 143.51
+   <i>psi</i>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>Unit validation:</p>
+ <p>x = 1 Nm + 1 m ← Rejected with: Inconsistent units: "Nm + m".</p>
+</div>

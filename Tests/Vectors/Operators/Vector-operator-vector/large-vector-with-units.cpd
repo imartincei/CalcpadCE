@@ -117,7 +117,7 @@ z
 c = y > z
 f(y; z) = y > z','c = f(y; z)
 
-"Less than or equal 
+"Less than or equal
 z
 x
 c = z ≤ x
@@ -130,7 +130,7 @@ c = z ≥ y
 f(z; y) = z ≥ y','c = f(z; y)
 
 '<h1>Logical operators</h1>
-"Logical AND 
+"Logical AND
 x
 y
 c = x ∧ y

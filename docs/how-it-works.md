@@ -1,4 +1,4 @@
-﻿# How it works
+﻿# How It Works
 
 The software is quick and easy to use.
 Just follow these simple steps:

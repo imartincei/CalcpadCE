@@ -217,7 +217,7 @@ b1 = hp([3m; 0m; -6.9m; 8.2m])
 c1 = a1 > b1
 c1 = f(a1; b1)
 
-"Less than or equal 
+"Less than or equal
 a = hp([5kg; -2.1kg; 0kg; 7.8kg; -4.6kg])
 b = hp([-7t; 1.3t; 0t; 4.5t; -9t])
 c = a ≤ b
@@ -250,7 +250,7 @@ c1 = a1 ≥ b1
 c1 = f(a1; b1)
 
 '<h1>Logical operators</h1>
-"Logical AND 
+"Logical AND
 a = hp([0dm; 16.7dm; 0dm; 22.3dm; 13.5dm])
 b = hp([-18cm; 21.2cm; 0cm; -19.3cm; 25cm])
 c = a ∧ b

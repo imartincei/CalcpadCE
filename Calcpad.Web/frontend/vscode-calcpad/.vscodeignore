@@ -1,0 +1,80 @@
+# Local linked dependencies (outside project root)
+../**
+
+# Source files
+src/**
+*.ts
+tsconfig.json
+tsconfig.vue.json
+vite.config.mts
+
+# Build and development files
+.vscode/**
+.vscode-test/**
+node_modules/**
+out/**
+!out/CalcpadVuePanel/**
+test/**
+tests/**
+.gitignore
+.git/**
+
+# Vue source files (keep compiled versions only)
+src/CalcpadVuePanel/**/*.vue
+src/CalcpadVuePanel/**/*.ts
+
+# Documentation and misc files
+*.md
+!README.md
+CLAUDE.md
+To-Do.md
+
+# Scripts and helpers
+scripts/**
+helper/**
+rollup.config.js
+
+# Development files
+*.cpd
+*.cpdz
+*.html
+!sample.html
+!templates/**/*.html
+parsed_templates_fixed.json
+test-*.cpd
+
+# Docker and shell scripts
+*.sh
+docker-compose.yml
+Dockerfile
+
+# IDE specific
+.claude/**
+
+# Bundled server binaries are shipped, so bin/ is deliberately not ignored.
+# Do NOT add a `!bin/**` re-include here: vsce applies every negation after all
+# ignores, so it would override the exclusions below and repackage them.
+
+# The server's runtime droppings and dev-only config must never ship. These are
+# regenerated locally by every debug session and leak worksheet content and
+# local source paths if packaged.
+bin/logs/**
+bin/cache/**
+bin/**/*.log
+bin/.calcpad-server.lock
+bin/appsettings.Development.json
+
+# Build-time environment config
+.env
+.env.*
+
+# Package files
+*.vsix
+package-lock.json
+*.map
+!dist/**/*.map
+
+# Temporary and cache files
+.DS_Store
+**/*.log
+npm-debug.log*

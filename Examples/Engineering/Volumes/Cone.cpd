@@ -1,0 +1,14 @@
+'<!-- Volume $V = \tfrac{1}{3}\pi r^2 h$ and lateral / total surface area of a right circular cone from radius and height. -->
+'<div style = "max-width:90mm"><img style="height:55pt;" class="side" alt="cone.png" src = "../../Images/math/volume/cone.png"></div>
+'Dimensions
+'Base radius -'r = ? {1}
+'Height -'h = ? {2}
+'Volume
+V = 1/3*π*r^2*h
+'Area of side surface
+S_o = π*r*sqr(h^2 + r^2)
+'Area of base
+A = π*r^2
+'Total surface area
+S = S_o + A
+'

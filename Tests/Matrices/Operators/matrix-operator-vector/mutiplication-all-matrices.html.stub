@@ -1,0 +1,1046 @@
+<div class="calcpad-output">
+ <h1>Multiplication with matrices</h1>
+ <p>
+ </p>
+ <h3>Full-rectangular</h3>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>rectangular</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4.5</span>
+     <span class="td">-3.2</span>
+     <span class="td">2.8</span>
+     <span class="td">-1.6</span>
+     <span class="td">0.9</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-5.7</span>
+     <span class="td">3.4</span>
+     <span class="td">-6.2</span>
+     <span class="td">1.9</span>
+     <span class="td">-4.3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7.1</span>
+     <span class="td">-2.3</span>
+     <span class="td">4.6</span>
+     <span class="td">-8.9</span>
+     <span class="td">3.2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-9.2</span>
+     <span class="td">6.5</span>
+     <span class="td">-3.8</span>
+     <span class="td">2.1</span>
+     <span class="td">-7.4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.4</span>
+     <span class="td">-1.3</span>
+     <span class="td">2.2</span>
+     <span class="td">-3.5</span>
+     <span class="td">6.8</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vector1
+   </var>
+   =
+   <b class="b0">[</b>
+   -9.2 6.3 0 7.1 3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>rectangular</sub>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    vector1
+   </var>
+   =
+   <b class="b0">[</b>
+   -70.22 74.45 -133.4 118.3 -16.32
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>matrix</var>
+   <sub>rectangular</sub>
+   ;
+   <var>vector1</var>
+   )  =
+   <var>matrix</var>
+   <sub>rectangular</sub>
+   ·
+   <var>vector1</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>rectangular</sub>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vector1
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -70.22 74.45 -133.4 118.3 -16.32
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Upper-triangular</h3>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>utriang</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4.5</span>
+     <span class="td">-3.2</span>
+     <span class="td">2.8</span>
+     <span class="td">-1.6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">3.4</span>
+     <span class="td">-6.2</span>
+     <span class="td">1.9</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">4</span>
+     <span class="td">-8.9</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">2.1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vector2
+   </var>
+   =
+   <b class="b0">[</b>
+   -3.2 -1.2 0 4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>utriang</sub>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    vector2
+   </var>
+   =
+   <b class="b0">[</b>
+   -16.96 3.52 -35.6 8.4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>matrix</var>
+   <sub>utriang</sub>
+   ;
+   <var>vector2</var>
+   )  =
+   <var>matrix</var>
+   <sub>utriang</sub>
+   ·
+   <var>vector2</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>utriang</sub>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vector2
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -16.96 3.52 -35.6 8.4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Lower-triangular</h3>
+ <p>
+  <span class="eq">
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>ltriang</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4.5</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-3.2</span>
+     <span class="td">3.4</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2.8</span>
+     <span class="td">-6.2</span>
+     <span class="td">4.6</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-1.6</span>
+     <span class="td">1.9</span>
+     <span class="td">-8.9</span>
+     <span class="td">2.1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.9</span>
+     <span class="td">-4.3</span>
+     <span class="td">3.2</span>
+     <span class="td">-7.4</span>
+     <span class="td">6.8</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vector3
+   </var>
+   =
+   <b class="b0">[</b>
+   -3.2 0 4.3 0.9 4 10
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>ltriang</sub>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    vector3
+   </var>
+   =
+   <b class="b0">[</b>
+   -14.4 10.24 10.82 -31.26 31.42 0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>matrix</var>
+   <sub>ltriang</sub>
+   ;
+   <var>vector3</var>
+   )  =
+   <var>matrix</var>
+   <sub>ltriang</sub>
+   ·
+   <var>vector3</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>ltriang</sub>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vector3
+   </var>
+   )  =
+   <b class="b0">[</b>
+   -14.4 10.24 10.82 -31.26 31.42 0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Diagonal</h3>
+ <p>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>diagonal</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4.5</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">3.4</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">2.8</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-1.6</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0.9</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">-5.7</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vector4
+   </var>
+   =
+   <b class="b0">[</b>
+   0 2.8 1.9 7 -1.6 7
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>diagonal</sub>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    vector4
+   </var>
+   =
+   <b class="b0">[</b>
+   0 9.52 5.32 -11.2 -1.44 -39.9
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>matrix</var>
+   <sub>diagonal</sub>
+   ;
+   <var>vector4</var>
+   )  =
+   <var>matrix</var>
+   <sub>diagonal</sub>
+   ·
+   <var>vector4</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>diagonal</sub>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vector4
+   </var>
+   )  =
+   <b class="b0">[</b>
+   0 9.52 5.32 -11.2 -1.44 -39.9
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <h3>Column</h3>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>column</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4.5</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-3.2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2.8</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-1.6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.9</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-5.7</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3.4</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>vector5</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4.5</span>
+     <span class="td">0.9</span>
+     <span class="td">0</span>
+     <span class="td">2</span>
+     <span class="td">4.5</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>c</var>
+   </b>
+   =
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>column</sub>
+   ·
+   <b>
+    <var>vector5</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">20.25</span>
+     <span class="td">4.05</span>
+     <span class="td">0</span>
+     <span class="td">9</span>
+     <span class="td">20.25</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-14.4</span>
+     <span class="td">-2.88</span>
+     <span class="td">0</span>
+     <span class="td">-6.4</span>
+     <span class="td">-14.4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">12.6</span>
+     <span class="td">2.52</span>
+     <span class="td">0</span>
+     <span class="td">5.6</span>
+     <span class="td">12.6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-7.2</span>
+     <span class="td">-1.44</span>
+     <span class="td">0</span>
+     <span class="td">-3.2</span>
+     <span class="td">-7.2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4.05</span>
+     <span class="td">0.81</span>
+     <span class="td">0</span>
+     <span class="td">1.8</span>
+     <span class="td">4.05</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-25.65</span>
+     <span class="td">-5.13</span>
+     <span class="td">0</span>
+     <span class="td">-11.4</span>
+     <span class="td">-25.65</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">15.3</span>
+     <span class="td">3.06</span>
+     <span class="td">0</span>
+     <span class="td">6.8</span>
+     <span class="td">15.3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>matrix</var>
+   <sub>column</sub>
+   ;
+   <var>vector5</var>
+   )  =
+   <var>matrix</var>
+   <sub>column</sub>
+   ·
+   <var>vector5</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>c</var>
+   </b>
+   =
+   <var>f</var>
+   (
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>column</sub>
+   ;
+   <b>
+    <var>vector5</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">20.25</span>
+     <span class="td">4.05</span>
+     <span class="td">0</span>
+     <span class="td">9</span>
+     <span class="td">20.25</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-14.4</span>
+     <span class="td">-2.88</span>
+     <span class="td">0</span>
+     <span class="td">-6.4</span>
+     <span class="td">-14.4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">12.6</span>
+     <span class="td">2.52</span>
+     <span class="td">0</span>
+     <span class="td">5.6</span>
+     <span class="td">12.6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-7.2</span>
+     <span class="td">-1.44</span>
+     <span class="td">0</span>
+     <span class="td">-3.2</span>
+     <span class="td">-7.2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4.05</span>
+     <span class="td">0.81</span>
+     <span class="td">0</span>
+     <span class="td">1.8</span>
+     <span class="td">4.05</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-25.65</span>
+     <span class="td">-5.13</span>
+     <span class="td">0</span>
+     <span class="td">-11.4</span>
+     <span class="td">-25.65</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">15.3</span>
+     <span class="td">3.06</span>
+     <span class="td">0</span>
+     <span class="td">6.8</span>
+     <span class="td">15.3</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+ </p>
+ <h3>Symmetric</h3>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>symmetric</sub>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4.5</span>
+     <span class="td">-3.2</span>
+     <span class="td">2.8</span>
+     <span class="td">-1.6</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-3.2</span>
+     <span class="td">3.4</span>
+     <span class="td">-6.2</span>
+     <span class="td">1.9</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2.8</span>
+     <span class="td">-6.2</span>
+     <span class="td">4.6</span>
+     <span class="td">-8.9</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-1.6</span>
+     <span class="td">1.9</span>
+     <span class="td">-8.9</span>
+     <span class="td">2.1</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vector6
+   </var>
+   =
+   <b class="b0">[</b>
+   2.8 -3 0 1.2
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>symmetric</sub>
+   ·
+   <var>
+    <span class="vec">⃗</span>
+    vector6
+   </var>
+   =
+   <b class="b0">[</b>
+   20.28 -16.88 15.76 -7.66
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>matrix</var>
+   <sub>symmetric</sub>
+   ;
+   <var>vector6</var>
+   )  =
+   <var>matrix</var>
+   <sub>symmetric</sub>
+   ·
+   <var>vector6</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <var>f</var>
+   (
+   <b>
+    <var>matrix</var>
+   </b>
+   <sub>symmetric</sub>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    vector6
+   </var>
+   )  =
+   <b class="b0">[</b>
+   20.28 -16.88 15.76 -7.66
+   <b class="b0">]</b>
+  </span>
+ </p>
+</div>

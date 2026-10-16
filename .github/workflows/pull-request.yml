@@ -1,0 +1,39 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'mkdocs.yml'
+
+jobs:
+  determine-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Determine version
+        id: version
+        run: node tools/version.mjs snapshot
+
+  build-desktop-windows:
+    needs: determine-version
+    uses: ./.github/workflows/build-desktop-windows.yml
+    with:
+      version: ${{ needs.determine-version.outputs.version }}
+
+  test:
+    needs: determine-version
+    uses: ./.github/workflows/run-tests.yml
+    with:
+      version: ${{ needs.determine-version.outputs.version }}

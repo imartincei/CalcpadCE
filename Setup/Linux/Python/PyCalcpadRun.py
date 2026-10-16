@@ -1,6 +1,7 @@
 # PyCalcpadRun.py
 
 from PyCalcpadWrapper import Calculator, MathSettings, TrigUnits
+
 # Initialize and use the Settings and Calculator classes
 settings = MathSettings()
 settings.Decimals = 15
@@ -9,8 +10,8 @@ calc = Calculator(settings)
 
 # Initialize terminal colors
 from termcolor import colored
-    
-# Caclulate expressions with Calcpad
+
+# Caclulate expressions with CalcpadCE
 print("Simple Python calculator using PyCalcpad's Run method.")
 print("Enter math expressions to evaluate. Press Enter to quit.")
 while True:
@@ -20,6 +21,6 @@ while True:
         if len(expr) == 0:
             break
         print("Out:")
-        print(colored(f"    {calc.Run(expr)}", 'green'))
+        print(colored(f"    {calc.Run(expr)}", "green"))
     except Exception as e:
-        print(colored(f"    {str(e).splitlines()[0]}", 'red'))
+        print(colored(f"    {str(e).splitlines()[0]}", "red"))

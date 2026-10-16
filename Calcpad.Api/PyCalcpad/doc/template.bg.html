@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="bg">
 <head>
-    <title>Calcpad</title>
+    <title>CalcpadCE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
@@ -271,7 +271,7 @@
 			font-family: Calibri, 'Gill Sans', 'Gill Sans MT', 'Trebuchet MS', sans-serif;
             font-size: 70%;
         }
-		
+
 		.eq small var {
 			font-family: "Times New Roman", Times, serif;
             font-size: 10pt;
@@ -286,7 +286,7 @@
             position: relative;
             bottom: 1pt;
         }
-		
+
         .eq small.nth{
             font-size: 70%;
         }
@@ -492,8 +492,8 @@
             max-width: 50%;
         }
 
-        .plot {
-            max-width: 100%
+        img, .plot {
+            max-width: 100%;
         }
 
         .indent {
@@ -535,17 +535,10 @@
                 }
 
         .vec {
-            font-family: 'Cambria Math';
+            font-family: 'CalcpadCE Vector', 'Cambria Math', serif;
             color: black;
             font-style: normal;
-            display: inline-block;
-            vertical-align: 2pt;
-            margin-left: 7pt;
-            margin-right: -7pt;
-        }
-
-        small .vec {
-            margin-right: -6pt;
+            vertical-align: 0.17em;
         }
 
         #Units {
@@ -678,7 +671,7 @@
         function delayedLoad(path) { setTimeout(function () { document.write(path); }, 1000); }
         function getVerticalPosition(line) { return document.querySelector("[data-text='" + line + "']").getBoundingClientRect().top; }
 		function isNumeric(s) {return s.match(/^-?\d+(?:\.\d+)?$/); }
-		
+
         if (window.jQuery) {
             function getHtmlWithInput() {
                 $("input[type=text]").each(function () {
@@ -829,7 +822,7 @@
                     }
                 });
                 $(".money").each(function () { $(this).text(Number(($(this).text())).toFixed(2)); });
-				
+
 				$("input").change(function(){
 					var e = $(this);
 					var s = e.val();

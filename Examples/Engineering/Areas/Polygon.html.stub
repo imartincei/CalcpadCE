@@ -1,0 +1,88 @@
+<div class="calcpad-output">
+ <!-- Area and perimeter of a regular $n$-gon from side length $a$, using $A = \tfrac{n a^2}{4}\cot(\pi/n)$. -->
+ <div style="max-width:110mm;">
+  <img alt="polygon.png" class="side" src="Images/math/area/polygon.png" style="height:70pt;"/>
+ </div>
+ <p>
+  Number of sides -
+  <span class="eq">
+   <var>n</var>
+   =
+   <u class="input-3">8</u>
+  </span>
+ </p>
+ <p>
+  Side length -
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">1</u>
+  </span>
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>α</var>
+   =
+   <span class="dvc">
+    180
+    <span class="dvl">
+    </span>
+    <var>n</var>
+   </span>
+   =
+   <span class="dvc">
+    180
+    <span class="dvl">
+    </span>
+    8
+   </span>
+   = 22.5
+  </span>
+  °
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>a</var>
+    <sup>2</sup>
+    ·
+    <var>n</var>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ·
+   <b>cot</b>
+   (
+   <var>α</var>
+   )  =
+   <span class="dvc">
+    1
+    <sup>2</sup>
+    · 8
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   ·
+   <b>cot</b>
+   ( 22.5 )  = 4.83
+  </span>
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   =
+   <var>n</var>
+   ·
+   <var>a</var>
+   = 8 · 1 = 8
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

@@ -1,4 +1,3 @@
-﻿using Calcpad.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,13 +8,15 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
+using Calcpad.Core;
 
 namespace Calcpad.Cli
 {
     class Program
-    {   
-        private static readonly string _currentCultureName = "en"; //en, bg or zh
+    {
+        private static readonly string _currentCultureName = GetCurrentCultureName();
         private static readonly char _dirSeparator = Path.DirectorySeparatorChar;
+        private const string DefaultLinuxSettingsFilePath = "/usr/share/CalcpadCE/Settings.xml";
         const string Prompt = " |> ";
         private static int _width;
 
@@ -32,21 +33,22 @@ namespace Calcpad.Cli
             }
 
             private string LatinToGreek(string input)
-            { 
-                var i = input.IndexOf('`');
+            {
+                char[] prefixes = { '`', '~' };
+                var i = input.IndexOfAny(prefixes);
                 if (i == -1)
                     return input;
 
                 _sb.Clear();
                 var n = 0;
-                while (i >= 0) 
+                while (i >= 0)
                 {
                     if (i > 0)
                         _sb.Append(input[n..i]);
 
-                    n = i + 1;                    
+                    n = i + 1;
                     _sb.Append(LatinToGreekChar(input[n]));
-                    i = input.IndexOf('`', n);
+                    i = input.IndexOfAny(prefixes, n);
                     ++n;
                 }
                 if (n < input.Length)
@@ -59,7 +61,7 @@ namespace Calcpad.Cli
                 >= 'a' and <= 'z' => GreekLetters[c - 'a'],
                 'V' => '∡',
                 'J' => 'Ø',
-                >= 'A' and <= 'Z' => (char) (GreekLetters[c - 'A'] + 'Α' - 'α'),
+                >= 'A' and <= 'Z' => (char)(GreekLetters[c - 'A'] + 'Α' - 'α'),
                 '@' => '°',
                 '\'' => '′',
                 '"' => '″',
@@ -74,27 +76,27 @@ namespace Calcpad.Cli
             {
                 _width = Math.Min(Math.Min(Console.WindowWidth, Console.BufferWidth), 85);
             }
-            catch 
-            { 
-                _width = 85; 
+            catch
+            {
+                _width = 85;
             }
             Settings settings = GetSettings();
             if (TryConvertOnStartup(settings))
                 return;
-            
+
             MathParser mp = new(settings.Math);
-            
+
             if (OperatingSystem.IsWindows())
             {
                 Console.OutputEncoding = Encoding.Unicode;
-                Console.InputEncoding = Encoding.Unicode;  
+                Console.InputEncoding = Encoding.Unicode;
             }
             else
             {
                 Console.OutputEncoding = Encoding.UTF8;
-                Console.InputEncoding = Encoding.UTF8;  
+                Console.InputEncoding = Encoding.UTF8;
             }
-            
+
             //Console.WindowWidth = 85;
             List<Line> Lines = [];
             var Title = TryOpenOnStartup(Lines);
@@ -160,7 +162,7 @@ namespace Calcpad.Cli
                         case "DEG":
                         case "RAD":
                         case "GRA":
-                            settings.Math.Degrees = sCaps == "DEG" ? 0: sCaps == "RAD" ? 1 : 2;
+                            settings.Math.Degrees = sCaps == "DEG" ? 0 : sCaps == "RAD" ? 1 : 2;
                             mp.Degrees = settings.Math.Degrees;
                             Header(Title, settings.Math.Degrees);
                             Render(mp, Lines, true);
@@ -179,10 +181,23 @@ namespace Calcpad.Cli
                             }
                             else
                             {
-                                var settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
-                                                   $"{_dirSeparator}.config{_dirSeparator}calcpad{_dirSeparator}Settings.xml";
-                                File.SetUnixFileMode(settingsPath, UnixFileMode.UserRead | UnixFileMode.UserWrite);
-                                Execute("/bin/bash", $"-c \"nano {settingsPath}\"");
+                                try
+                                {
+                                    Directory.CreateDirectory(GetSettingsDirectoryPath());
+
+                                    // Copy the default settings if it does not exist
+                                    if (OperatingSystem.IsLinux() && !File.Exists(GetSettingsFilePath()))
+                                        File.Copy(DefaultLinuxSettingsFilePath, GetSettingsFilePath());
+
+                                    File.SetUnixFileMode(GetSettingsFilePath(), UnixFileMode.UserRead | UnixFileMode.UserWrite);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error: {ex}");
+                                    Console.Write(Messages.Press_Any_Key_When_Ready);
+                                    Console.ReadKey();
+                                }
+                                Execute("/bin/bash", $"-c \"nano {GetSettingsFilePath()}\"");
                                 Console.Write(Messages.Press_Any_Key_When_Ready);
                                 Console.ReadKey();
                                 settings = GetSettings();
@@ -215,36 +230,37 @@ namespace Calcpad.Cli
                 $".{ext}" :
                 $".{_currentCultureName}.{ext}";
 
+        private static string GetSettingsDirectoryPath() => OperatingSystem.IsWindows() ?
+            AppPath :
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), ".config", "calcpad");
+
+        private static string GetSettingsFilePath() => Path.Combine(GetSettingsDirectoryPath(), "Settings.xml");
+
         static Settings GetSettings()
         {
-                Settings settings = new(); 
-                settings.Math.Decimals = 6;
-                XmlSerializer writer = new(settings.GetType());
-                var path = OperatingSystem.IsWindows() ?
-                    AppPath:
-                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + $"{_dirSeparator}.config{_dirSeparator}calcpad{_dirSeparator}";
-
-                var fileName = path + "Settings.xml";
-                FileStream fileStream = null;
-                try
+            Settings settings = new();
+            settings.Math.Decimals = 6;
+            XmlSerializer writer = new(settings.GetType());
+            FileStream fileStream = null;
+            try
+            {
+                if (Path.Exists(GetSettingsFilePath()))
                 {
-                    if (Path.Exists(fileName))
-                    {
-                        fileStream = File.OpenRead(fileName);
-                        settings = (Settings)writer.Deserialize(fileStream);
-                    }
-                    else if(Path.Exists(path))
-                    {
-                        fileStream = File.Create(fileName);
-                        writer.Serialize(fileStream, settings);
-                    }
+                    fileStream = File.OpenRead(GetSettingsFilePath());
+                    settings = (Settings)writer.Deserialize(fileStream);
                 }
+                else if (Path.Exists(GetSettingsDirectoryPath()))
+                {
+                    fileStream = File.Create(GetSettingsFilePath());
+                    writer.Serialize(fileStream, settings);
+                }
+            }
             catch (Exception ex)
             {
                 fileStream?.Close();
                 var key = WriteErrorAndWait(ex.Message, Messages.WouldYouLikeToRestoreThePreviousSettingsYN);
                 if (key.Key == ConsoleKey.Y)
-                    TryRestoreSettings(settings, writer, path);
+                    TryRestoreSettings(settings, writer, GetSettingsFilePath());
             }
             finally
             {
@@ -279,7 +295,7 @@ namespace Calcpad.Cli
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);    
+                Console.WriteLine(e.Message);
             }
             Console.WriteLine();
         }
@@ -297,7 +313,7 @@ namespace Calcpad.Cli
 
             if (OperatingSystem.IsWindows())
                 fileName = fileName.ToLower();
-            
+
             var i = fileName.IndexOf(".cpd");
             if (i < 0)
             {
@@ -315,9 +331,21 @@ namespace Calcpad.Cli
             }
             i += 4;
             var outFile = fileName[i..].Trim();
-            var isSilent = outFile.EndsWith(" -s");
-            if (isSilent)
-                outFile = outFile[..^3]; 
+            var isSilent = false;
+            var isBodyOnly = false;
+            while (true)
+            {
+                if (outFile.EndsWith(" -s", StringComparison.Ordinal))      { isSilent    = true; outFile = outFile[..^3].TrimEnd(); }
+                else if (outFile.EndsWith(" -b", StringComparison.Ordinal)) { isBodyOnly  = true; outFile = outFile[..^3].TrimEnd(); }
+                else break;
+            }
+
+            // Force decimal separator to "." for body-only in CI build
+            if (isBodyOnly)
+            {
+                CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+                Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            }
 
             fileName = fileName[..i].Trim();
             if (!File.Exists(fileName))
@@ -339,6 +367,9 @@ namespace Calcpad.Cli
             var ext = Path.GetExtension(outFile);
             try
             {
+                if (ext == ".pdf")
+                    throw new NotSupportedException(Messages.PdfExportNotAvailable);
+
                 var path = Path.GetDirectoryName(fileName);
                 if (!string.IsNullOrWhiteSpace(path))
                     Directory.SetCurrentDirectory(path);
@@ -346,11 +377,12 @@ namespace Calcpad.Cli
                 var code = CalcpadReader.Read(fileName);
                 var macroParser = new MacroParser
                 {
-                    Include = CalcpadReader.Include
+                    Include = CalcpadReader.Include,
+                    SourceFilePath = fileName
                 };
                 var hasMacroErrors = macroParser.Parse(code, out var unwrappedCode, null, 0, true);
                 string htmlResult;
-                Converter converter = new(isSilent);
+                Converter converter = new(isSilent, isBodyOnly);
                 if (hasMacroErrors)
                 {
                     htmlResult = CalcpadReader.CodeToHtml(unwrappedCode);
@@ -359,7 +391,9 @@ namespace Calcpad.Cli
                 }
                 ExpressionParser parser = new()
                 {
-                    Settings = settings
+                    Settings = settings,
+                    SourceFilePath = fileName,
+                    PathRoots = macroParser.PathRoots
                 };
                 parser.Parse(unwrappedCode, true, ext == ".docx");
                 htmlResult = parser.HtmlResult;
@@ -367,14 +401,12 @@ namespace Calcpad.Cli
                     converter.ToHtml(htmlResult, outFile);
                 else if (ext == ".docx")
                     converter.ToOpenXml(htmlResult, outFile, parser.OpenXmlExpressions);
-                else if (ext == ".pdf")
-                    converter.ToPdf(htmlResult, outFile);
                 else
                     WriteErrorAndWait(Messages.InvalidOutputExtensionMustBeHtmlDocxOrPdf);
 
                 return true;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 WriteErrorAndWait(ex.Message);
                 return true;
@@ -395,13 +427,13 @@ namespace Calcpad.Cli
             var n = args.Length;
             if (n > 1)
             {
-                var fileName = string.Join(" ", args, 1, n - 1); //.ToLower(); cannot be used in linux due to case sensitive file system
-            
+                var fileName = string.Join(" ", args, 1, n - 1);
+
                 if (OperatingSystem.IsWindows())
                 {
                     fileName = fileName.ToLower();
                 }
-                
+
                 if (File.Exists(fileName))
                 {
                     if (Path.GetExtension(fileName) == ".cpc")
@@ -421,10 +453,15 @@ namespace Calcpad.Cli
         static void Header(string Title, int drg)
         {
             Console.Clear();
-            var ver = Assembly.GetExecutingAssembly().GetName().Version;
+            var ver = Assembly.GetExecutingAssembly()
+                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "";
+            var plusIndex = ver.IndexOf('+');
+            if (plusIndex >= 0) ver = ver[..plusIndex];
             Console.WriteLine(new string('—', _width));
-            Console.WriteLine(string.Format(Messages.Welcome_To_Calcpad_Command_Line_Interpreter, ver.Major, ver.Minor, ver.Build));
-            Console.WriteLine(Messages.Copyright_2023_By_Proektsoft_EOOD);
+            Console.WriteLine(string.Format(Messages.Welcome_To_Calcpad_Command_Line_Interpreter, ver));
+            Console.WriteLine(" Copyright (c) 2026 CalcpadCE Contributors");
+            Console.WriteLine(" Copyright (c) 2014-2026 Nedelcho Ganchovski");
             Console.Write($"\r\n {Messages.Commands}: NEW OPEN SAVE LIST EXIT RESET CLS DEL ");
             switch (drg)
             {
@@ -572,7 +609,7 @@ namespace Calcpad.Cli
 
             Console.SetCursorPosition(0, Console.CursorTop - 1);
             Prompt += "SAVE" + Messages.Problem_Title;
-            if (Title.Length > 0 )
+            if (Title.Length > 0)
                 Prompt += $" ({Title}): ";
             else
                 Prompt += ": ";
@@ -616,6 +653,7 @@ namespace Calcpad.Cli
 
             Console.ResetColor();
         }
+
         private static bool Execute(string fileName, string args = "")
         {
             var proc = new Process();
@@ -639,6 +677,14 @@ namespace Calcpad.Cli
                 WriteError(Ex.Message, true);
                 return false;
             }
+        }
+
+        private static string GetCurrentCultureName()
+        {
+            string lang = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+            if (lang is "en" or "bg" or "zh")
+                return lang;
+            return "en";
         }
     }
 }

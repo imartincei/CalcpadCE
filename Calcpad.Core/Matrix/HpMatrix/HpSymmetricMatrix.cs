@@ -40,7 +40,7 @@ namespace Calcpad.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal override double GetValue(int row, int col) => 
+        internal override double GetValue(int row, int col) =>
             row <= col ?
             _hpRows[row].GetValue(col - row) :
             _hpRows[col].GetValue(row - col);
@@ -87,7 +87,7 @@ namespace Calcpad.Core
 
         internal HpUpperTriangularMatrix CholeskyDecomposition()
         {
-            var L = GetCholesky(out int[] start) ?? 
+            var L = GetCholesky(out int[] start) ??
                 throw Exceptions.MatrixNotPositiveDefinite();
 
             return GetUFromLRows(L, start);
@@ -226,7 +226,7 @@ namespace Calcpad.Core
                     if (i < start[j])
                         start[j] = i;
                 }
-            
+
             for (int j = 0; j < _colCount; ++j)
             {
                 var i0 = start[j];
@@ -244,7 +244,7 @@ namespace Calcpad.Core
         }
 
         private HpUpperTriangularMatrix GetUFromLRows(double[][] lRows, int[] start)
-        { 
+        {
             var U = new HpUpperTriangularMatrix(_rowCount, _units?.Pow(0.5f));
             var maxsize = 1;
             for (int i = 0; i < _rowCount; ++i)
@@ -689,7 +689,7 @@ namespace Calcpad.Core
             {
                 var result = new HpVector(len, len, u);
                 var values = result.Raw;
-                Parallel.For(0, len, i => 
+                Parallel.For(0, len, i =>
                 {
                     var row = _hpRows[i];
                     var p = row.Product().D;
@@ -717,7 +717,7 @@ namespace Calcpad.Core
 
         internal override HpMatrix Transpose() => RawCopy();
 
-        // L∞ (Infinity) or Chebyshev norm     
+        // L∞ (Infinity) or Chebyshev norm
         internal override RealValue InfNorm()
         {
             double norm = 0d;

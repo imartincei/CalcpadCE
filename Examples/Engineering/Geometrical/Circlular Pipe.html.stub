@@ -1,0 +1,287 @@
+<div class="calcpad-output">
+ <!-- Section properties of a circular pipe: area, $I_x = I_y = \pi (D^4 - d^4)/64$, section modulus and radii of gyration. -->
+ <h3>Geometrical Properties of Circular Pipe</h3>
+ <div style="max-width:150mm">
+  <img alt="circular-pipe.png" class="side" src="Images/mechanics/sections/circular-pipe.png" style="height:135pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  <span class="eq">
+   <var>d</var>
+   =
+   <u class="input-5">1</u>
+  </span>
+  m,
+  <span class="eq">
+   <var>t</var>
+   =
+   <u class="input-5">0.1</u>
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>d</var>
+   <sub>1</sub>
+   =
+   <var>d</var>
+   − 2 ·
+   <var>t</var>
+   = 1 − 2 · 0.1 = 0.8
+  </span>
+  m
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·  (
+    <var>d</var>
+    <sup>2</sup>
+    −
+    <var>d</var>
+    <sub>1</sub>
+    <sup>2</sup>
+    )
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   =
+   <span class="dvc">
+    3.14 ·  ( 1
+    <sup>2</sup>
+    − 0.8
+    <sup>2</sup>
+    )
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   = 0.283
+  </span>
+  m
+  <sup>2</sup>
+ </p>
+ <p>Centroid</p>
+ <p>
+  <i>z</i>
+  <sub>c</sub>
+  =
+  <span class="eq">
+   <var>y</var>
+   <sub>c</sub>
+   =
+   <span class="dvc">
+    <var>d</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 0.5
+  </span>
+  m
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   =
+   <var>π</var>
+   ·
+   <var>d</var>
+   = 3.14 · 1 = 3.14
+  </span>
+  m
+ </p>
+ <p>Second moments of area</p>
+ <p>
+  <i>I</i>
+  <sub>z</sub>
+  =
+  <span class="eq">
+   <var>I</var>
+   <sub>y</sub>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·  (
+    <var>d</var>
+    <sup>4</sup>
+    −
+    <var>d</var>
+    <sub>1</sub>
+    <sup>4</sup>
+    )
+    <span class="dvl">
+    </span>
+    64
+   </span>
+   =
+   <span class="dvc">
+    3.14 ·  ( 1
+    <sup>4</sup>
+    − 0.8
+    <sup>4</sup>
+    )
+    <span class="dvl">
+    </span>
+    64
+   </span>
+   = 0.029
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Polar moment of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>x</sub>
+   = 2 ·
+   <var>I</var>
+   <sub>y</sub>
+   = 2 · 0.029 = 0.058
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Torsional constant</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>t</sub>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·  (
+    <var>d</var>
+    <sup>4</sup>
+    −
+    <var>d</var>
+    <sub>1</sub>
+    <sup>4</sup>
+    )
+    <span class="dvl">
+    </span>
+    32
+   </span>
+   =
+   <span class="dvc">
+    3.14 ·  ( 1
+    <sup>4</sup>
+    − 0.8
+    <sup>4</sup>
+    )
+    <span class="dvl">
+    </span>
+    32
+   </span>
+   = 0.058
+  </span>
+  m
+  <sup>4</sup>
+ </p>
+ <p>Torsional section modulus</p>
+ <p>
+  <span class="eq">
+   <var>W</var>
+   <sub>t</sub>
+   =
+   <span class="dvc">
+    2 ·
+    <var>I</var>
+    <sub>t</sub>
+    <span class="dvl">
+    </span>
+    <var>d</var>
+   </span>
+   =
+   <span class="dvc">
+    2 · 0.058
+    <span class="dvl">
+    </span>
+    1
+   </span>
+   = 0.116
+  </span>
+  m
+  <sup>3</sup>
+ </p>
+ <p>Radii of gyration</p>
+ <p>
+  <i>r</i>
+  <sub>z</sub>
+  =
+  <span class="eq">
+   <var>r</var>
+   <sub>y</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.029
+     <span class="dvl">
+     </span>
+     0.283
+    </span>
+   </span>
+   = 0.32
+  </span>
+  m
+ </p>
+ <p>
+  <span class="eq">
+   <var>r</var>
+   <sub>x</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>I</var>
+     <sub>x</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     0.058
+     <span class="dvl">
+     </span>
+     0.283
+    </span>
+   </span>
+   = 0.453
+  </span>
+  m
+ </p>
+</div>

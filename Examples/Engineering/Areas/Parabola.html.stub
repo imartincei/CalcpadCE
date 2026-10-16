@@ -1,0 +1,129 @@
+<div class="calcpad-output">
+ <!-- Area of a parabolic segment $A = \tfrac{2}{3} a\, h$ from chord length and height. -->
+ <h3>Area and Arc Length of Parabolic Segment</h3>
+ <div style="max-width:120mm;">
+  <img alt="parabola.png" class="side" src="Images/math/area/parabola.png" style="height:60pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  Length -
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-5">4</u>
+  </span>
+ </p>
+ <p>
+  Height -
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-6">2</u>
+  </span>
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    2
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   ·
+   <var>a</var>
+   ·
+   <var>b</var>
+   =
+   <span class="dvc">
+    2
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   · 4 · 2 = 5.33
+  </span>
+ </p>
+ <p>Arc length</p>
+ <p>
+  Assume
+  <span class="eq">
+   <var>h</var>
+   =
+   <span class="dvc">
+    4 ·
+    <var>b</var>
+    <span class="dvl">
+    </span>
+    <var>a</var>
+   </span>
+   =
+   <span class="dvc">
+    4 · 2
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   = 2
+  </span>
+ </p>
+ <p>
+  and
+  <span class="eq">
+   <var>q</var>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    1 +
+    <var>h</var>
+    <sup>2</sup>
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    1 + 2
+    <sup>2</sup>
+   </span>
+   = 2.24
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   = 0.5 ·
+   <var>a</var>
+   ·
+   <span class="b1">(</span>
+   <var>q</var>
+   +
+   <span class="dvc">
+    <b>ln</b>
+    (
+    <var>h</var>
+    +
+    <var>q</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>h</var>
+   </span>
+   <span class="b1">)</span>
+   = 0.5 · 4 ·
+   <span class="b1">(</span>
+   2.24 +
+   <span class="dvc">
+    <b>ln</b>
+    ( 2 + 2.24 )
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   <span class="b1">)</span>
+   = 5.92
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

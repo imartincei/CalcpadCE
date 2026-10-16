@@ -1,0 +1,110 @@
+<div class="calcpad-output">
+ <!-- Area and arc length of a circular sector specified by its chord and height instead of the central angle. -->
+ <h3>Area and Arch Length of Circular Sector</h3>
+ <div style="max-width:110mm;">
+  <img alt="sector-chord.png" class="side" src="Images/math/area/sector-chord.png" style="height:60pt;"/>
+ </div>
+ <p>Dimensions</p>
+ <p>
+  Radius -
+  <span class="eq">
+   <var>r</var>
+   =
+   <u class="input-5">1</u>
+  </span>
+ </p>
+ <p>
+  Chord -
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-6">1</u>
+  </span>
+ </p>
+ <!--
+<-->
+ <p>Angle</p>
+ <p>
+  <span class="eq">
+   <var>α</var>
+   = 2 ·
+   <b>asin</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>r</var>
+   </span>
+   <span class="b1">)</span>
+   = 2 ·
+   <b>asin</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    2 · 1
+   </span>
+   <span class="b1">)</span>
+   = 60
+  </span>
+  °
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>r</var>
+    <sup>2</sup>
+    ·
+    <var>α</var>
+    <span class="dvl">
+    </span>
+    360
+   </span>
+   =
+   <span class="dvc">
+    3.14 · 1
+    <sup>2</sup>
+    · 60
+    <span class="dvl">
+    </span>
+    360
+   </span>
+   = 0.524
+  </span>
+ </p>
+ <p>Arch length</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>r</var>
+    ·
+    <var>α</var>
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   =
+   <span class="dvc">
+    3.14 · 1 · 60
+    <span class="dvl">
+    </span>
+    180
+   </span>
+   = 1.05
+  </span>
+ </p>
+ <!--
+<-->
+</div>

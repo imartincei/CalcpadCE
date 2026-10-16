@@ -1,0 +1,1709 @@
+<div class="calcpad-output">
+ <!-- Two-way slab panel with both longer edges restrained and the two shorter edges simply supported, typical of an interior panel of a one-way-spanning floor strip. -->
+ <small>
+  According to
+  <strong>Eurocode</strong>
+  : EN 1992-1-1
+ </small>
+ <div style="max-width:180mm;">
+  <img alt="fsfs-span-cl.png" class="side" src="Images/structures/rc/spans/fsfs-span-cl.png" style="height:180pt;"/>
+  <h4>Dimensions</h4>
+  <p>
+   Clear spans (
+   <i>l</i>
+   <sub>x</sub>
+   &lt;
+   <i>l</i>
+   <sub>y</sub>
+   )
+  </p>
+  <p>
+   <span class="eq">
+    <var>l</var>
+    <sub>x_cl</sub>
+    =
+    <u class="input-7">4</u>
+   </span>
+   m,
+   <span class="eq">
+    <var>l</var>
+    <sub>y_cl</sub>
+    =
+    <u class="input-7">6</u>
+   </span>
+   m
+  </p>
+  <p>
+   Beam width along
+   <i>x</i>
+   -
+   <span class="eq">
+    <var>b</var>
+    <sub>y</sub>
+    =
+    <u class="input-8">25</u>
+   </span>
+   cm
+  </p>
+  <p>
+   Beam width along
+   <i>y</i>
+   -
+   <span class="eq">
+    <var>b</var>
+    <sub>x</sub>
+    =
+    <u class="input-9">25</u>
+   </span>
+   cm
+  </p>
+  <p>
+   Slab thickness -
+   <span class="eq">
+    <var>h</var>
+    =
+    <u class="input-10">14</u>
+   </span>
+   cm
+  </p>
+  <p>
+   Concrete cover -
+   <span class="eq">
+    <var>c</var>
+    =
+    <u class="input-11">2</u>
+   </span>
+   cm
+  </p>
+  <p>Design span lengths</p>
+  <p>
+   <span class="eq">
+    <var>l</var>
+    <sub>x</sub>
+    =
+    <var>l</var>
+    <sub>x_cl</sub>
+    +
+    <b>min</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>b</var>
+     <sub>x</sub>
+     <span class="dvl">
+     </span>
+     100
+    </span>
+    ;
+    <span class="dvc">
+     <var>h</var>
+     <span class="dvl">
+     </span>
+     100
+    </span>
+    <span class="b1">)</span>
+    = 4 +
+    <b>min</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     25
+     <span class="dvl">
+     </span>
+     100
+    </span>
+    ;
+    <span class="dvc">
+     14
+     <span class="dvl">
+     </span>
+     100
+    </span>
+    <span class="b1">)</span>
+    = 4.14
+   </span>
+   m
+  </p>
+  <p>
+   <span class="eq">
+    <var>l</var>
+    <sub>y</sub>
+    =
+    <var>l</var>
+    <sub>y_cl</sub>
+    +
+    <b>min</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>b</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     100
+    </span>
+    ;
+    <span class="dvc">
+     <var>h</var>
+     <span class="dvl">
+     </span>
+     100
+    </span>
+    <span class="b1">)</span>
+    = 6 +
+    <b>min</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     25
+     <span class="dvl">
+     </span>
+     100
+    </span>
+    ;
+    <span class="dvc">
+     14
+     <span class="dvl">
+     </span>
+     100
+    </span>
+    <span class="b1">)</span>
+    = 6.14
+   </span>
+   m
+  </p>
+  <p>
+   Span ratio -
+   <span class="eq">
+    <var>k</var>
+    =
+    <span class="dvc">
+     <var>l</var>
+     <sub>y</sub>
+     <span class="dvl">
+     </span>
+     <var>l</var>
+     <sub>x</sub>
+    </span>
+    =
+    <span class="dvc">
+     6.14
+     <span class="dvl">
+     </span>
+     4.14
+    </span>
+    = 1.48
+   </span>
+  </p>
+  <p>Design spans lengths and edge moments in adjacent panels</p>
+  <img alt="fsfs-span.png" class="side" src="Images/structures/rc/spans/fsfs-span.png" style="height:140pt;"/>
+  <table>
+   <tr>
+    <td rowspan="2">
+     <p>
+      Parallel to
+      <i>x</i>
+      -
+      <br/>
+     </p>
+    </td>
+    <td>
+     <p>
+      <span class="eq">
+       <var>l</var>
+       <sub>x1</sub>
+       =
+       <u class="input-26">0</u>
+      </span>
+      m;
+     </p>
+    </td>
+    <td>
+     <p>
+      <span class="eq">
+       <var>M</var>
+       <sub>Ed_xt1_</sub>
+       =
+       <u class="input-28">0</u>
+      </span>
+      kN·m/m
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <span class="eq">
+       <var>l</var>
+       <sub>x2</sub>
+       =
+       <u class="input-30">0</u>
+      </span>
+      m;
+     </p>
+    </td>
+    <td>
+     <p>
+      <span class="eq">
+       <var>M</var>
+       <sub>Ed_xt2_</sub>
+       =
+       <u class="input-32">0</u>
+      </span>
+      kN·m/m
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   (in absence of contiguous span -
+   <i>l</i>
+   = 0)
+  </p>
+  <h4>Loads</h4>
+  <p>Characteristic uniform loads</p>
+  <p>
+   Self weight -
+   <span class="eq">
+    <var>g</var>
+    <sub>sw</sub>
+    = 0.25 ·
+    <var>h</var>
+    = 0.25 · 14 = 3.5
+   </span>
+   kN/m²
+  </p>
+  <p>
+   Permanent -
+   <span class="eq">
+    <var>g</var>
+    <sub>k</sub>
+    =
+    <u class="input-38">2.5</u>
+   </span>
+   kN/m²
+  </p>
+  <p>
+   Variable -
+   <span class="eq">
+    <var>q</var>
+    <sub>k</sub>
+    =
+    <u class="input-39">2</u>
+   </span>
+   kN/m²
+  </p>
+  <p>
+   Partial safety factor -
+   <span class="eq">
+    <var>γ</var>
+    <sub>G</sub>
+    = 1.35
+   </span>
+   ;
+   <span class="eq">
+    <var>γ</var>
+    <sub>Q</sub>
+    = 1.5
+   </span>
+  </p>
+  <p>Design uniform loads</p>
+  <p>
+   <span class="eq">
+    <var>p</var>
+    =  (
+    <var>g</var>
+    <sub>sw</sub>
+    +
+    <var>g</var>
+    <sub>k</sub>
+    )  ·
+    <var>γ</var>
+    <sub>G</sub>
+    +
+    <var>q</var>
+    <sub>k</sub>
+    ·
+    <var>γ</var>
+    <sub>Q</sub>
+    =  ( 3.5 + 2.5 )  · 1.35 + 2 · 1.5 = 11.1
+   </span>
+   kN/m²
+  </p>
+  <div class="fold">
+   <p>
+    <b>Beam loads</b>
+   </p>
+   <p>(as uniform loads)</p>
+   <table>
+    <tr>
+     <td rowspan="2">
+      <p>
+       Parallel to
+       <i>x</i>
+       -
+       <br/>
+      </p>
+     </td>
+     <td>
+      <p>
+       <span class="eq">
+        <var>g</var>
+        <sub>k_x</sub>
+        =
+        <span class="dvc">
+         (
+         <var>g</var>
+         <sub>sw</sub>
+         +
+         <var>g</var>
+         <sub>k</sub>
+         )  ·
+         <var>l</var>
+         <sub>x_cl</sub>
+         <span class="dvl">
+         </span>
+         4
+        </span>
+        =
+        <span class="dvc">
+         ( 3.5 + 2.5 )  · 4
+         <span class="dvl">
+         </span>
+         4
+        </span>
+        = 6
+       </span>
+       kN/m
+      </p>
+     </td>
+    </tr>
+    <tr>
+     <td>
+      <p>
+       <span class="eq">
+        <var>q</var>
+        <sub>k_x</sub>
+        =
+        <span class="dvc">
+         <var>q</var>
+         <sub>k</sub>
+         ·
+         <var>l</var>
+         <sub>x_cl</sub>
+         <span class="dvl">
+         </span>
+         4
+        </span>
+        =
+        <span class="dvc">
+         2 · 4
+         <span class="dvl">
+         </span>
+         4
+        </span>
+        = 2
+       </span>
+       kN/m
+      </p>
+     </td>
+    </tr>
+    <tr>
+     <td rowspan="2">
+      <p>
+       Parallel to
+       <i>y</i>
+       -
+       <br/>
+      </p>
+     </td>
+     <td>
+      <p>
+       <span class="eq">
+        <var>g</var>
+        <sub>k_y</sub>
+        =
+        <span class="dvc up">
+         (
+         <var>g</var>
+         <sub>sw</sub>
+         +
+         <var>g</var>
+         <sub>k</sub>
+         )  ·
+         <var>l</var>
+         <sub>x_cl</sub>
+         ·
+         <span class="b1">(</span>
+         <var>l</var>
+         <sub>y_cl</sub>
+         −
+         <span class="dvc">
+          <var>l</var>
+          <sub>x_cl</sub>
+          <span class="dvl">
+          </span>
+          2
+         </span>
+         <span class="b1">)</span>
+         <span class="dvl">
+         </span>
+         2 ·
+         <var>l</var>
+         <sub>y_cl</sub>
+        </span>
+        =
+        <span class="dvc up">
+         ( 3.5 + 2.5 )  · 4 ·
+         <span class="b1">(</span>
+         6 −
+         <span class="dvc">
+          4
+          <span class="dvl">
+          </span>
+          2
+         </span>
+         <span class="b1">)</span>
+         <span class="dvl">
+         </span>
+         2 · 6
+        </span>
+        = 8
+       </span>
+       kN/m
+      </p>
+     </td>
+    </tr>
+    <tr>
+     <td>
+      <p>
+       <span class="eq">
+        <var>q</var>
+        <sub>k_y</sub>
+        =
+        <span class="dvc up">
+         <var>q</var>
+         <sub>k</sub>
+         ·
+         <var>l</var>
+         <sub>x_cl</sub>
+         ·
+         <span class="b1">(</span>
+         <var>l</var>
+         <sub>y_cl</sub>
+         −
+         <span class="dvc">
+          <var>l</var>
+          <sub>x_cl</sub>
+          <span class="dvl">
+          </span>
+          2
+         </span>
+         <span class="b1">)</span>
+         <span class="dvl">
+         </span>
+         2 ·
+         <var>l</var>
+         <sub>y_cl</sub>
+        </span>
+        =
+        <span class="dvc up">
+         2 · 4 ·
+         <span class="b1">(</span>
+         6 −
+         <span class="dvc">
+          4
+          <span class="dvl">
+          </span>
+          2
+         </span>
+         <span class="b1">)</span>
+         <span class="dvl">
+         </span>
+         2 · 6
+        </span>
+        = 2.67
+       </span>
+       kN/m
+      </p>
+     </td>
+    </tr>
+   </table>
+  </div>
+  <h4>Material properties</h4>
+  <p>
+   <b>Бетон</b>
+   [EN 1992-1-1, EN 1992-1-1, Table 3.1]
+  </p>
+  <p>
+   Characteristic compressive cylinder strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ck</sub>
+    =
+    <u class="input-68">25</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Partial safety factors for concrete -
+   <span class="eq">
+    <var>γ</var>
+    <sub>c</sub>
+    = 1.5
+   </span>
+   ,
+   <span class="eq">
+    <var>α</var>
+    <sub>cc</sub>
+    =
+    <u class="input-69">0.85</u>
+   </span>
+  </p>
+  <p>
+   Design compressive cylinder strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>cd</sub>
+    =
+    <span class="dvc">
+     <var>α</var>
+     <sub>cc</sub>
+     ·
+     <var>f</var>
+     <sub>ck</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>c</sub>
+    </span>
+    =
+    <span class="dvc">
+     0.85 · 25
+     <span class="dvl">
+     </span>
+     1.5
+    </span>
+    = 14.17
+   </span>
+   MPa
+  </p>
+  <p>
+   Factor defining the effective height of the compression zone -
+   <span class="eq">
+    <var>λ</var>
+    = 0.8
+   </span>
+  </p>
+  <p>
+   Factor defining the effective strength -
+   <span class="eq">
+    <var>η</var>
+    = 1
+   </span>
+  </p>
+  <p>
+   Mean value of axial tensile strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ctm</sub>
+    = 0.3 ·
+    <var>f</var>
+    <sub>ck</sub>
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+    = 0.3 · 25
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+    = 2.56
+   </span>
+   MPa
+  </p>
+  <p>
+   <b>Steel</b>
+  </p>
+  <p>
+   Characteristic yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>yk</sub>
+    =
+    <u class="input-77">500</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Partial safety factor for steel -
+   <span class="eq">
+    <var>γ</var>
+    <sub>s</sub>
+    = 1.15
+   </span>
+  </p>
+  <p>
+   Design yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>yd</sub>
+    =
+    <span class="dvc">
+     <var>f</var>
+     <sub>yk</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>s</sub>
+    </span>
+    =
+    <span class="dvc">
+     500
+     <span class="dvl">
+     </span>
+     1.15
+    </span>
+    = 434.78
+   </span>
+   MPa
+  </p>
+  <p>
+   Limit relative compressive zone depth -
+   <span class="eq">
+    <var>ξ</var>
+    <sub>lim</sub>
+    = 0.45
+   </span>
+  </p>
+  <p>
+   <b>Bar diameters</b>
+  </p>
+  <p>
+   - Bottom parallel to
+   <i>x</i>
+   -
+   <span class="eq">
+    <var>d</var>
+    <sub>bxb</sub>
+    =
+    <u class="input-84">8</u>
+   </span>
+   mm, parallel to
+   <i>y</i>
+   -
+   <span class="eq">
+    <var>d</var>
+    <sub>byb</sub>
+    =
+    <u class="input-84">8</u>
+   </span>
+   mm
+  </p>
+  <p>
+   - Top parallel to
+   <i>x</i>
+   -
+   <span class="eq">
+    <var>d</var>
+    <sub>bxt</sub>
+    =
+    <u class="input-85">6</u>
+   </span>
+   mm
+  </p>
+  <div class="fold">
+   <h4>Static calculations</h4>
+   <p>
+    <b>Shear forces and bending moments coefficients</b>
+   </p>
+   <p>For the actual static scheme</p>
+   <p>- for shear forces</p>
+   <table class="bordered centered">
+    <tr>
+     <th rowspan="2">
+     </th>
+     <th colspan="9" style="width:100mm;">Short span coefficients</th>
+     <th rowspan="2" style="width:30mm;">Long span coefficients</th>
+    </tr>
+    <tr>
+     <th>
+      <i>k</i>
+      =
+     </th>
+     <th>1.0</th>
+     <th>1.1</th>
+     <th>1.2</th>
+     <th>1.3</th>
+     <th>1.4</th>
+     <th>1.5</th>
+     <th>1.75</th>
+     <th>2.0</th>
+    </tr>
+    <tr>
+     <th>V</th>
+     <td>
+      <i>β</i>
+      <sub>vx</sub>
+      =
+     </td>
+     <td>0.26</td>
+     <td>0.30</td>
+     <td>0.33</td>
+     <td>0.36</td>
+     <td>0.38</td>
+     <td>0.40</td>
+     <td>0.44</td>
+     <td>0.47</td>
+     <td>
+      <span class="eq">
+       <var>β</var>
+       <sub>vy</sub>
+       = 0.4
+      </span>
+     </td>
+    </tr>
+   </table>
+   <p>
+    <span class="eq">
+     <var>β</var>
+     <sub>vx</sub>
+     = 0.38 +
+     <span class="dvc">
+      ( 0.4 − 0.38 )  ·  (
+      <var>k</var>
+      − 1.4 )
+      <span class="dvl">
+      </span>
+      0.1
+     </span>
+     = 0.38 +
+     <span class="dvc">
+      ( 0.4 − 0.38 )  ·  ( 1.48 − 1.4 )
+      <span class="dvl">
+      </span>
+      0.1
+     </span>
+     = 0.397
+    </span>
+   </p>
+   <p>- for moments in mid-span</p>
+   <table class="bordered centered">
+    <tr>
+     <th rowspan="2">
+     </th>
+     <th colspan="9" style="width:100mm;">Short span coefficients</th>
+     <th rowspan="2" style="width:30mm;">Long span coefficients</th>
+    </tr>
+    <tr>
+     <th>
+      <i>k</i>
+      =
+     </th>
+     <th>1.0</th>
+     <th>1.1</th>
+     <th>1.2</th>
+     <th>1.3</th>
+     <th>1.4</th>
+     <th>1.5</th>
+     <th>1.75</th>
+     <th>2.0</th>
+    </tr>
+    <tr>
+     <th>+M</th>
+     <td>
+      <i>β</i>
+      <sub>xb1</sub>
+      =
+     </td>
+     <td>0.034</td>
+     <td>0.038</td>
+     <td>0.040</td>
+     <td>0.043</td>
+     <td>0.045</td>
+     <td>0.047</td>
+     <td>0.050</td>
+     <td>0.053</td>
+     <td>
+      <span class="eq">
+       <var>β</var>
+       <sub>yb1</sub>
+       = 0.034
+      </span>
+     </td>
+    </tr>
+    <tr>
+     <th>-M</th>
+     <td>
+      <i>β</i>
+      <sub>xt</sub>
+      =
+     </td>
+     <td>0.046</td>
+     <td>0.050</td>
+     <td>0.054</td>
+     <td>0.057</td>
+     <td>0.060</td>
+     <td>0.062</td>
+     <td>0.067</td>
+     <td>0.070</td>
+     <td>-</td>
+    </tr>
+   </table>
+   <p>
+    <span class="eq">
+     <var>β</var>
+     <sub>xb1</sub>
+     = 0.045 +
+     <span class="dvc">
+      ( 0.047 − 0.045 )  ·  (
+      <var>k</var>
+      − 1.4 )
+      <span class="dvl">
+      </span>
+      0.1
+     </span>
+     = 0.045 +
+     <span class="dvc">
+      ( 0.047 − 0.045 )  ·  ( 1.48 − 1.4 )
+      <span class="dvl">
+      </span>
+      0.1
+     </span>
+     = 0.0467
+    </span>
+   </p>
+   <p>- for moments over supports</p>
+   <p>
+    <span class="eq">
+     <var>β</var>
+     <sub>xt</sub>
+     = 0.06 +
+     <span class="dvc">
+      ( 0.062 − 0.06 )  ·  (
+      <var>k</var>
+      − 1.4 )
+      <span class="dvl">
+      </span>
+      0.1
+     </span>
+     = 0.06 +
+     <span class="dvc">
+      ( 0.062 − 0.06 )  ·  ( 1.48 − 1.4 )
+      <span class="dvl">
+      </span>
+      0.1
+     </span>
+     = 0.0617
+    </span>
+   </p>
+   <p>For simply supported slab</p>
+   <p>- for moments in mid-span</p>
+   <table class="bordered centered">
+    <tr>
+     <th colspan="9" style="width:100mm;">Short span coefficients</th>
+     <th rowspan="2" style="width:30mm;">Long span coefficients</th>
+    </tr>
+    <tr>
+     <th>
+      <i>k</i>
+      =
+     </th>
+     <th>1.0</th>
+     <th>1.1</th>
+     <th>1.2</th>
+     <th>1.3</th>
+     <th>1.4</th>
+     <th>1.5</th>
+     <th>1.75</th>
+     <th>2.0</th>
+    </tr>
+    <tr>
+     <td>
+      <i>β</i>
+      <sub>xb2</sub>
+      =
+     </td>
+     <td>0.055</td>
+     <td>0.065</td>
+     <td>0.074</td>
+     <td>0.081</td>
+     <td>0.087</td>
+     <td>0.092</td>
+     <td>0.103</td>
+     <td>0.111</td>
+     <td>
+      <span class="eq">
+       <var>β</var>
+       <sub>yb2</sub>
+       = 0.056
+      </span>
+     </td>
+    </tr>
+   </table>
+   <p>
+    <span class="eq">
+     <var>β</var>
+     <sub>xb2</sub>
+     = 0.087 +
+     <span class="dvc">
+      ( 0.092 − 0.087 )  ·  (
+      <var>k</var>
+      − 1.4 )
+      <span class="dvl">
+      </span>
+      0.1
+     </span>
+     = 0.087 +
+     <span class="dvc">
+      ( 0.092 − 0.087 )  ·  ( 1.48 − 1.4 )
+      <span class="dvl">
+      </span>
+      0.1
+     </span>
+     = 0.0912
+    </span>
+   </p>
+   <p>
+    <b>Loads for accounting alternation in adjacent spans</b>
+   </p>
+   <p>
+    <span class="eq">
+     <var>p</var>
+     <sub>1</sub>
+     =
+     <var>γ</var>
+     <sub>G</sub>
+     ·  (
+     <var>g</var>
+     <sub>sw</sub>
+     +
+     <var>g</var>
+     <sub>k</sub>
+     )  +
+     <span class="dvc">
+      <var>γ</var>
+      <sub>Q</sub>
+      ·
+      <var>q</var>
+      <sub>k</sub>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     = 1.35 ·  ( 3.5 + 2.5 )  +
+     <span class="dvc">
+      1.5 · 2
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     = 9.6
+    </span>
+    kN/m²
+   </p>
+   <p>
+    <span class="eq">
+     <var>p</var>
+     <sub>2</sub>
+     =
+     <span class="dvc">
+      <var>γ</var>
+      <sub>Q</sub>
+      ·
+      <var>q</var>
+      <sub>k</sub>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     =
+     <span class="dvc">
+      1.5 · 2
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     = 1.5
+    </span>
+    kN/m²
+   </p>
+   <p>
+    <b>Bending moments</b>
+   </p>
+   <p>Span moment (including load alternation)</p>
+   <p>
+    <span class="eq">
+     <var>M</var>
+     <sub>Ed_xb</sub>
+     =
+     <var>β</var>
+     <sub>xb1</sub>
+     ·
+     <var>p</var>
+     <sub>1</sub>
+     ·
+     <var>l</var>
+     <sub>x</sub>
+     <sup>2</sup>
+     +
+     <var>β</var>
+     <sub>xb2</sub>
+     ·
+     <var>p</var>
+     <sub>2</sub>
+     ·
+     <var>l</var>
+     <sub>x</sub>
+     <sup>2</sup>
+     = 0.0467 · 9.6 · 4.14
+     <sup>2</sup>
+     + 0.0912 · 1.5 · 4.14
+     <sup>2</sup>
+     = 10.02
+    </span>
+    kN·m/m
+   </p>
+   <p>
+    <span class="eq">
+     <var>M</var>
+     <sub>Ed_yb</sub>
+     =
+     <var>β</var>
+     <sub>yb1</sub>
+     ·
+     <var>p</var>
+     <sub>1</sub>
+     ·
+     <var>l</var>
+     <sub>x</sub>
+     <sup>2</sup>
+     +
+     <var>β</var>
+     <sub>yb2</sub>
+     ·
+     <var>p</var>
+     <sub>2</sub>
+     ·
+     <var>l</var>
+     <sub>x</sub>
+     <sup>2</sup>
+     = 0.034 · 9.6 · 4.14
+     <sup>2</sup>
+     + 0.056 · 1.5 · 4.14
+     <sup>2</sup>
+     = 7.03
+    </span>
+    kN·m/m
+   </p>
+   <p>Support moment</p>
+   <p>
+    <span class="eq">
+     <var>M</var>
+     <sub>Ed_xt</sub>
+     =
+     <var>β</var>
+     <sub>xt</sub>
+     ·
+     <var>p</var>
+     ·
+     <var>l</var>
+     <sub>x</sub>
+     <sup>2</sup>
+     = 0.0617 · 11.1 · 4.14
+     <sup>2</sup>
+     = 11.73
+    </span>
+    kN·m/m
+   </p>
+   <p>
+    <b>Average moments at supports from the adjacent spans</b>
+   </p>
+   <p>
+    <span class="eq">
+     <var>M</var>
+     <sub>Ed_xt1</sub>
+     =
+     <span class="dvc">
+      <var>M</var>
+      <sub>Ed_xt1_</sub>
+      ·
+      <var>l</var>
+      <sub>x1</sub>
+      +
+      <var>M</var>
+      <sub>Ed_xt</sub>
+      ·
+      <var>l</var>
+      <sub>x</sub>
+      <span class="dvl">
+      </span>
+      <var>l</var>
+      <sub>x1</sub>
+      +
+      <var>l</var>
+      <sub>x</sub>
+     </span>
+     =
+     <span class="dvc">
+      0 · 0 + 11.73 · 4.14
+      <span class="dvl">
+      </span>
+      0 + 4.14
+     </span>
+     = 11.73
+    </span>
+    kN·m/m
+   </p>
+   <p>
+    <span class="eq">
+     <var>M</var>
+     <sub>Ed_xt2</sub>
+     =
+     <span class="dvc">
+      <var>M</var>
+      <sub>Ed_xt2_</sub>
+      ·
+      <var>l</var>
+      <sub>x2</sub>
+      +
+      <var>M</var>
+      <sub>Ed_xt</sub>
+      ·
+      <var>l</var>
+      <sub>x</sub>
+      <span class="dvl">
+      </span>
+      <var>l</var>
+      <sub>x2</sub>
+      +
+      <var>l</var>
+      <sub>x</sub>
+     </span>
+     =
+     <span class="dvc">
+      0 · 0 + 11.73 · 4.14
+      <span class="dvl">
+      </span>
+      0 + 4.14
+     </span>
+     = 11.73
+    </span>
+    kN·m/m
+   </p>
+   <p>
+    <b>Shear forces</b>
+   </p>
+   <p>
+    <span class="eq">
+     <var>V</var>
+     <sub>Ed_x</sub>
+     =
+     <var>β</var>
+     <sub>vx</sub>
+     ·
+     <var>p</var>
+     ·
+     <var>l</var>
+     <sub>x</sub>
+     = 0.397 · 11.1 · 4.14 = 18.23
+    </span>
+    kN/m
+   </p>
+   <p>
+    <span class="eq">
+     <var>V</var>
+     <sub>Ed_y</sub>
+     =
+     <var>β</var>
+     <sub>vy</sub>
+     ·
+     <var>p</var>
+     ·
+     <var>l</var>
+     <sub>x</sub>
+     = 0.4 · 11.1 · 4.14 = 18.38
+    </span>
+    kN/m
+   </p>
+   <p>
+    <b>Edge support moments</b>
+   </p>
+   <p>
+    <span class="eq">
+     <var>M</var>
+     <sub>Ed_xte1</sub>
+     =
+     <var>M</var>
+     <sub>Ed_xt1</sub>
+     −
+     <var>V</var>
+     <sub>Ed_x</sub>
+     ·
+     <b>min</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>b</var>
+      <sub>x</sub>
+      <span class="dvl">
+      </span>
+      200
+     </span>
+     ;
+     <span class="dvc">
+      <var>h</var>
+      <span class="dvl">
+      </span>
+      200
+     </span>
+     <span class="b1">)</span>
+     = 11.73 − 18.23 ·
+     <b>min</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      25
+      <span class="dvl">
+      </span>
+      200
+     </span>
+     ;
+     <span class="dvc">
+      14
+      <span class="dvl">
+      </span>
+      200
+     </span>
+     <span class="b1">)</span>
+     = 10.46
+    </span>
+    kN·m/m
+   </p>
+   <p>
+    <span class="eq">
+     <var>M</var>
+     <sub>Ed_xte2</sub>
+     =
+     <var>M</var>
+     <sub>Ed_xt2</sub>
+     −
+     <var>V</var>
+     <sub>Ed_x</sub>
+     ·
+     <b>min</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>b</var>
+      <sub>x</sub>
+      <span class="dvl">
+      </span>
+      200
+     </span>
+     ;
+     <span class="dvc">
+      <var>h</var>
+      <span class="dvl">
+      </span>
+      200
+     </span>
+     <span class="b1">)</span>
+     = 11.73 − 18.23 ·
+     <b>min</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      25
+      <span class="dvl">
+      </span>
+      200
+     </span>
+     ;
+     <span class="dvc">
+      14
+      <span class="dvl">
+      </span>
+      200
+     </span>
+     <span class="b1">)</span>
+     = 10.46
+    </span>
+    kN·m/m
+   </p>
+  </div>
+  <div class="fold">
+   <h4>Bending design</h4>
+   <p>
+    <b>
+     Bottom reinforcement parallel to
+     <i>x</i>
+    </b>
+   </p>
+   <p>
+    Effective cross section depth -
+    <span class="eq">
+     <var>d</var>
+     <sub>xb</sub>
+     =
+     <var>h</var>
+     −
+     <var>c</var>
+     −
+     <span class="dvc">
+      <var>d</var>
+      <sub>bxb</sub>
+      <span class="dvl">
+      </span>
+      20
+     </span>
+     = 14 − 2 −
+     <span class="dvc">
+      8
+      <span class="dvl">
+      </span>
+      20
+     </span>
+     = 11.6
+    </span>
+    cm
+   </p>
+   <p>
+    Relative design bending moment -
+    <span class="eq">
+     <var>m</var>
+     <sub>Ed</sub>
+     =
+     <span class="dvc">
+      10 ·
+      <var>M</var>
+      <sub>Ed_xb</sub>
+      <span class="dvl">
+      </span>
+      <var>d</var>
+      <sub>xb</sub>
+      <sup>2</sup>
+      ·
+      <var>η</var>
+      ·
+      <var>f</var>
+      <sub>cd</sub>
+     </span>
+     =
+     <span class="dvc">
+      10 · 10.02
+      <span class="dvl">
+      </span>
+      11.6
+      <sup>2</sup>
+      · 1 · 14.17
+     </span>
+     = 0.0526
+    </span>
+   </p>
+   <p>
+    Compression zone depth -
+    <span class="eq">
+     <var>x</var>
+     =
+     <span class="dvc">
+      <var>d</var>
+      <sub>xb</sub>
+      <span class="dvl">
+      </span>
+      <var>λ</var>
+     </span>
+     ·  ( 1 −
+     <span class="o0">
+      <span class="r">√</span>
+      1 − 2 ·
+      <var>m</var>
+      <sub>Ed</sub>
+     </span>
+     )  =
+     <span class="dvc">
+      11.6
+      <span class="dvl">
+      </span>
+      0.8
+     </span>
+     ·  ( 1 −
+     <span class="o0">
+      <span class="r">√</span>
+      1 − 2 · 0.0526
+     </span>
+     )  = 0.783
+    </span>
+    cm
+   </p>
+   <p>
+    Relative compression zone depth -
+    <span class="eq">
+     <var>ξ</var>
+     =
+     <span class="dvc">
+      <var>x</var>
+      <span class="dvl">
+      </span>
+      <var>d</var>
+      <sub>xb</sub>
+     </span>
+     =
+     <span class="dvc">
+      0.783
+      <span class="dvl">
+      </span>
+      11.6
+     </span>
+     = 0.0675
+    </span>
+   </p>
+   <p>
+    Lever arm of internal forces -
+    <span class="eq">
+     <var>z</var>
+     =
+     <var>d</var>
+     <sub>xb</sub>
+     − 0.5 ·
+     <var>λ</var>
+     ·
+     <var>x</var>
+     = 11.6 − 0.5 · 0.8 · 0.783 = 11.29
+    </span>
+    cm
+   </p>
+   <p>
+    Area of required reinforcement -
+    <span class="eq">
+     <var>A</var>
+     <sub>sxb</sub>
+     =
+     <span class="dvc">
+      <var>M</var>
+      <sub>Ed_xb</sub>
+      · 10
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      <var>z</var>
+      ·
+      <var>f</var>
+      <sub>yd</sub>
+     </span>
+     =
+     <span class="dvc">
+      10.02 · 10
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      11.29 · 434.78
+     </span>
+     = 2.04
+    </span>
+    cm²/m
+   </p>
+   <p>
+    Reinforcement ratio -
+    <span class="eq">
+     <var>ρ</var>
+     <sub>xb</sub>
+     =
+     <span class="dvc">
+      <var>A</var>
+      <sub>sxb</sub>
+      <span class="dvl">
+      </span>
+      <var>d</var>
+      <sub>xb</sub>
+      · 100
+     </span>
+     =
+     <span class="dvc">
+      2.04
+      <span class="dvl">
+      </span>
+      11.6 · 100
+     </span>
+     = 0.00176
+    </span>
+   </p>
+   <p>
+    <b>The rest of the reinforcement is calculated similarly.</b>
+   </p>
+  </div>
+  <div class="fold">
+   <h4>Reinforcement detailing</h4>
+   <p>
+    <b>Bottom reinforcement</b>
+   </p>
+   <p class="ref">[EN 1992-1-1, § 9.2.1.1 (1)]</p>
+   <p>Minimum reinforcement ratio</p>
+   <p>
+    <span class="eq">
+     <var>ρ</var>
+     <sub>min</sub>
+     =
+     <b>max</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      0.26 ·
+      <var>f</var>
+      <sub>ctm</sub>
+      <span class="dvl">
+      </span>
+      <var>f</var>
+      <sub>yk</sub>
+     </span>
+     ; 0.0013
+     <span class="b1">)</span>
+     =
+     <b>max</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      0.26 · 2.56
+      <span class="dvl">
+      </span>
+      500
+     </span>
+     ; 0.0013
+     <span class="b1">)</span>
+     = 0.00133
+    </span>
+   </p>
+   <p class="ref">[EN 1992-1-1, § 9.2.1.1 (3)]</p>
+   <p>
+    Maximum reinforcement ratio -
+    <span class="eq">
+     <var>ρ</var>
+     <sub>max</sub>
+     = 0.04
+    </span>
+   </p>
+   <!--
+<-->
+   <p>Required bar spacing</p>
+   <p>
+    <span class="eq">
+     <var>s</var>
+     <sub>xb</sub>
+     =
+     <b>floor</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>π</var>
+      ·
+      <var>d</var>
+      <sub>bxb</sub>
+      <sup>2</sup>
+      <span class="dvl">
+      </span>
+      4 ·
+      <var>A</var>
+      <sub>sxb</sub>
+     </span>
+     <span class="b1">)</span>
+     =
+     <b>floor</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      3.14 · 8
+      <sup>2</sup>
+      <span class="dvl">
+      </span>
+      4 · 2.04
+     </span>
+     <span class="b1">)</span>
+     = 24
+    </span>
+    cm
+   </p>
+   <!-- <span class="eq"><var>s</var><sub>yb</sub> = <b>floor</b><span class="b1">(</span><span class="dvc"><var>π</var> · <var>d</var><sub>byb</sub><sup>2</sup><span class="dvl"></span>4 · <var>A</var><sub>syb</sub></span><span class="b1">)</span> = <b>floor</b><span class="b1">(</span><span class="dvc">3.14 · 8<sup>2</sup><span class="dvl"></span>4 · 1.53</span><span class="b1">)</span> = 32</span> cm-->
+   <p class="ref">[EN 1992-1-1, § 9.3.1.1 (3)]</p>
+   <p>Maximum bar spacing</p>
+   <p>
+    <span class="eq">
+     <var>s</var>
+     <sub>max</sub>
+     =
+     <b>min</b>
+     ( 2 ·
+     <var>h</var>
+     ; 25 )  =
+     <b>min</b>
+     ( 2 · 14; 25 )  = 25
+    </span>
+    cm
+   </p>
+   <!--<p><i>s</i><sub>yb</sub> &gt; <i>s</i><sub>max</sub>. Assume <span class="eq"><var>s</var><sub>yb</sub> = <var>s</var><sub>max</sub> = 25</span> cm</p>-->
+   <p>
+    <b>The rest of the reinforcement is detailed similarly</b>
+   </p>
+  </div>
+  <h4>Results</h4>
+  <table class="bordered centered">
+   <tr>
+    <th>Reinforcement</th>
+    <th>
+     M
+     <sub>Ed</sub>
+     <br/>
+     kN·m/m
+    </th>
+    <th>
+     A
+     <sub>s</sub>
+     <br/>
+     cm
+     <sup>2</sup>
+     /m
+    </th>
+    <th>ρ, %</th>
+    <th>Selected</th>
+   </tr>
+   <tr>
+    <td>
+     Bottom parallel to
+     <i>x</i>
+    </td>
+    <td>10.02</td>
+    <td>2.04</td>
+    <td>0.18%</td>
+    <td>Ø8/24</td>
+   </tr>
+   <tr>
+    <td>
+     Bottom parallel to
+     <i>y</i>
+    </td>
+    <td>7.03</td>
+    <td>1.53</td>
+    <td>0.14%</td>
+    <td>Ø8/25</td>
+   </tr>
+   <tr>
+    <td>
+     Top parallel to
+     <i>x</i>
+     - left side
+    </td>
+    <td>10.46</td>
+    <td>2.11</td>
+    <td>0.18%</td>
+    <td>Ø6/13</td>
+   </tr>
+   <tr>
+    <td>
+     Top parallel to
+     <i>x</i>
+     - right side
+    </td>
+    <td>10.46</td>
+    <td>2.11</td>
+    <td>0.18%</td>
+    <td>Ø6/13</td>
+   </tr>
+  </table>
+ </div>
+</div>

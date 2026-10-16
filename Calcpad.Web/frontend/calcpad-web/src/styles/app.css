@@ -1,0 +1,1107 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body, #app {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Tell the browser which color scheme to use so native widgets (the <select>
+ * popup, scrollbars, form controls) render with the matching OS theme instead
+ * of the default. CSS alone cannot style the popup of a <select>. Follows
+ * <html data-theme="…">, which is set by the app-theme applier. */
+html {
+    color-scheme: dark;
+}
+html[data-theme="light"] {
+    color-scheme: light;
+}
+
+body {
+    font-family: var(--vscode-font-family);
+}
+
+/* Style every <select> consistently, not just the output channel one.
+ * `option` styling is honored by Chromium/WebKit on Linux when color-scheme
+ * is set above. */
+select {
+    background: var(--vscode-dropdown-background, #3c3c3c);
+    color: var(--vscode-dropdown-foreground, #cccccc);
+    border: 1px solid var(--vscode-dropdown-border, #3c3c3c);
+    border-radius: 2px;
+    padding: 2px 6px;
+    font-size: var(--calcpad-font-size-md);
+    cursor: pointer;
+}
+select:focus {
+    outline: 1px solid var(--vscode-focusBorder, #007acc);
+}
+select option {
+    background: var(--vscode-dropdown-listBackground, #252526);
+    color: var(--vscode-dropdown-foreground, #cccccc);
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.app-layout {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    background: var(--vscode-editor-background);
+    color: var(--vscode-foreground);
+}
+
+/* While any divider is being dragged, iframes must not swallow the drag's mousemove/
+   mouseup — those are bound to the outer window, and an iframe routes mouse events to
+   its own document instead of bubbling them out, which would strand the drag mid-resize
+   the moment the cursor crosses into one. */
+.app-layout.resizing iframe {
+    pointer-events: none;
+}
+
+/* Wrappers around the editor and preview panes. Normally they contribute nothing:
+   `display: contents` dissolves them so their children are direct flex items of
+   `.app-layout` and sit side by side. In #UI input mode `.work-area` becomes a column
+   instead, which stacks the surviving tab strip above the form. */
+.work-area,
+.preview-area {
+    display: contents;
+}
+
+.work-area.ui-mode {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Just the tab strip is left, so the editor side hugs its content and the panes
+   below it take the rest of the height. */
+.work-area.ui-mode .editor-pane,
+.work-area.ui-mode .editor-groups {
+    flex: 0 0 auto;
+}
+
+.work-area.ui-mode .preview-area {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+}
+
+.editor-pane {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.spacer {
+    flex: 1;
+}
+
+.status-bar .status-server {
+    padding: 1px 8px;
+    font-size: var(--calcpad-font-size-md);
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 2px;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.status-bar .status-server.connected {
+    color: #6bd66b;
+}
+
+.status-bar .status-server.connecting {
+    color: #ffcc66;
+}
+
+.status-bar .status-server.disconnected {
+    color: #ffb3b3;
+}
+
+.toolbar-btn {
+    background: var(--vscode-button-secondaryBackground, #3a3d41);
+    color: var(--vscode-button-secondaryForeground, #ccc);
+    border: none;
+    padding: 2px 8px;
+    font-size: var(--calcpad-font-size-sm);
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+.toolbar-btn:hover {
+    background: var(--vscode-button-secondaryHoverBackground, #4a4d51);
+}
+
+.toolbar-btn.active {
+    background: var(--vscode-button-background, #0e639c);
+    color: var(--vscode-button-foreground, #fff);
+}
+
+.preview-mode-group {
+    display: inline-flex;
+    gap: 2px;
+    margin-left: 8px;
+}
+
+.editor-area {
+    position: relative;
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* min-width: 0 is load-bearing: Monaco's pixel width would otherwise floor the
+   container, so the editor never shrinks back and runs under the results pane. */
+.editor-container {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* Floats over the code rather than sitting in the status bar, where it was too easy
+ * to miss. Translucent until hover so it reads as an overlay and the line it covers
+ * stays legible. */
+.editor-sidebar-reveal {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: var(--vscode-editorWidget-background, #252526);
+    color: var(--vscode-tab-inactiveForeground, #969696);
+    border: 1px solid var(--vscode-widget-border, #454545);
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0.75;
+}
+
+.editor-sidebar-reveal svg {
+    width: 14px;
+    height: 14px;
+}
+
+.editor-sidebar-reveal:hover {
+    opacity: 1;
+    color: var(--vscode-tab-activeForeground, #ffffff);
+    background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1));
+}
+
+.editor-sidebar-reveal:focus-visible {
+    opacity: 1;
+    outline: 1px solid var(--vscode-focusBorder, #007acc);
+    outline-offset: 1px;
+}
+
+/* ---- Editor groups (split layout) ---- */
+.editor-groups {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.editor-group {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Subtle top accent on the focused group's tab strip when split, mirroring
+ * VS Code's active-group highlight. */
+.editor-group.active-group .tab-strip {
+    box-shadow: inset 0 2px 0 var(--vscode-focusBorder, #007acc);
+}
+
+.group-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    flex-shrink: 0;
+    background: transparent;
+    color: var(--vscode-tab-inactiveForeground, #969696);
+    border: none;
+    border-left: 1px solid var(--vscode-tab-border, #252526);
+    cursor: pointer;
+    font-size: var(--calcpad-font-size-sm);
+}
+.group-close:hover {
+    background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1));
+    color: var(--vscode-tab-hoverForeground, #ffffff);
+}
+
+/* Draggable horizontal divider between the two stacked groups (editor + preview). */
+.group-divider {
+    height: 4px;
+    flex-shrink: 0;
+    cursor: row-resize;
+    background: var(--vscode-widget-border, #1e1e1e);
+    transition: background 0.15s;
+}
+.group-divider:hover,
+.group-divider.dragging {
+    background: var(--vscode-focusBorder, #007acc);
+}
+
+/* Preview frames stack (mirrors the editor split). */
+.preview-frames {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* "Calculating…" overlay shown over the preview during long server renders. It washes
+   the document underneath, so it follows the preview theme rather than the app's. */
+.preview-loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.7);
+    color: #333;
+    font-size: var(--calcpad-font-size-lg);
+    pointer-events: none;
+}
+.preview-loading-overlay.preview-dark {
+    background: rgba(30, 30, 30, 0.7);
+    color: #d4d4d4;
+}
+.preview-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(0, 0, 0, 0.15);
+    border-top-color: var(--vscode-progressBar-background, #0078d4);
+    border-radius: 50%;
+    animation: preview-spin 0.8s linear infinite;
+}
+.preview-loading-overlay.preview-dark .preview-spinner {
+    border-color: rgba(255, 255, 255, 0.18);
+    border-top-color: var(--vscode-progressBar-background, #0078d4);
+}
+@keyframes preview-spin {
+    to { transform: rotate(360deg); }
+}
+
+.panel-scope {
+    font-size: var(--calcpad-font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--vscode-descriptionForeground, #888);
+    margin-left: 8px;
+    padding: 1px 6px;
+    border: 1px solid var(--vscode-widget-border, #454545);
+    border-radius: 8px;
+}
+
+/* ---- Tab strip (VS Code-style) ---- */
+.tab-strip {
+    display: flex;
+    align-items: stretch;
+    background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
+    border-bottom: 1px solid var(--vscode-editorGroupHeader-tabsBorder, #1e1e1e);
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-shrink: 0;
+    height: 30px;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Only once its tabs overflow (see setTabStripRef's ResizeObserver in App.vue) does the
+ * strip grow enough to give the scrollbar room below a full-height tab row, instead of
+ * the scrollbar sitting over the tabs' close buttons. Non-overflowing strips stay compact. */
+.tab-strip.tab-strip-overflowing {
+    height: 48px;
+}
+
+/* Thinner than the app-wide scrollbar so it eats less of the tab strip's height.
+ * Chromium fattens custom scrollbars on hover by default, so pin the hover
+ * state to the same height explicitly. On the Linux desktop app (WebKitGTK) this
+ * doesn't apply -- scrollbars there come from GTK's native overlay-scrolling theme,
+ * not page CSS, and grow on hover regardless of this rule. */
+.tab-strip::-webkit-scrollbar,
+.tab-strip::-webkit-scrollbar:hover {
+    height: 5px;
+}
+
+.tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 8px 0 12px;
+    height: 100%;
+    background: var(--vscode-tab-inactiveBackground, #2d2d2d);
+    color: var(--vscode-tab-inactiveForeground, #969696);
+    border-right: 1px solid var(--vscode-tab-border, #252526);
+    cursor: pointer;
+    font-size: var(--calcpad-font-size-lg);
+    white-space: nowrap;
+    max-width: 240px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    border-top: 1px solid transparent;
+}
+
+.tab:hover {
+    background: var(--vscode-tab-hoverBackground, #2a2d2e);
+    color: var(--vscode-tab-hoverForeground, #ffffff);
+}
+
+.tab.active {
+    background: var(--vscode-tab-activeBackground, #1e1e1e);
+    color: var(--vscode-tab-activeForeground, #ffffff);
+    border-top-color: var(--vscode-tab-activeBorderTop, #007acc);
+}
+
+.tab-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tab-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    margin-left: 2px;
+    background: transparent;
+    color: inherit;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: var(--calcpad-font-size-sm);
+    line-height: 1;
+}
+
+.tab-close:hover {
+    background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1));
+}
+
+.tab-dirty-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 10px;
+    height: 18px;
+    margin-right: 4px;
+    color: var(--vscode-tab-activeForeground, #ffffff);
+    font-size: var(--calcpad-font-size-xs);
+    line-height: 1;
+    pointer-events: none;
+}
+
+.tab-new {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    flex-shrink: 0;
+    height: 100%;
+    background: transparent;
+    color: var(--vscode-tab-inactiveForeground, #969696);
+    border: none;
+    cursor: pointer;
+    font-size: var(--calcpad-font-size-xl);
+}
+
+.tab-new:hover {
+    background: var(--vscode-tab-hoverBackground, #2a2d2e);
+    color: var(--vscode-tab-hoverForeground, #ffffff);
+}
+
+/* Run / Split / Preview at the tab strip's right edge. Sticky rather than merely
+ * right-aligned: the strip is a horizontal scroller, so an ordinary flex item
+ * scrolls out of reach as soon as the tabs overflow. */
+.tab-actions {
+    position: sticky;
+    right: 0;
+    display: inline-flex;
+    align-items: stretch;
+    flex-shrink: 0;
+    background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
+    border-left: 1px solid var(--vscode-widget-border, #454545);
+}
+
+.tab-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    padding: 0;
+    background: transparent;
+    color: var(--vscode-tab-inactiveForeground, #969696);
+    border: none;
+    cursor: pointer;
+}
+
+.tab-action svg {
+    width: 14px;
+    height: 14px;
+}
+
+.tab-action:hover {
+    background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1));
+    color: var(--vscode-tab-hoverForeground, #ffffff);
+}
+
+/* Icon-only, so the ring is the only focus cue. */
+.tab-action:focus-visible {
+    outline: 1px solid var(--vscode-focusBorder, #007acc);
+    outline-offset: -2px;
+}
+
+.tab-action.active {
+    color: var(--vscode-tab-activeForeground, #ffffff);
+}
+
+.tab-context-menu {
+    position: fixed;
+    z-index: 1000;
+    min-width: 200px;
+    padding: 4px 0;
+    background: var(--vscode-menu-background, var(--vscode-editor-background, #252526));
+    color: var(--vscode-menu-foreground, var(--vscode-foreground, #cccccc));
+    border: 1px solid var(--vscode-menu-border, var(--vscode-widget-border, #454545));
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tab-context-item {
+    display: block;
+    width: 100%;
+    padding: 5px 14px;
+    text-align: left;
+    background: transparent;
+    color: inherit;
+    border: none;
+    cursor: pointer;
+    font-size: var(--calcpad-font-size-md);
+    font-family: inherit;
+}
+
+.tab-context-item:hover:not(:disabled) {
+    background: var(--vscode-menu-selectionBackground, var(--vscode-list-hoverBackground, #04395e));
+    color: var(--vscode-menu-selectionForeground, inherit);
+}
+
+.tab-context-item:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.tab-context-sep {
+    height: 1px;
+    margin: 4px 0;
+    background: var(--vscode-menu-separatorBackground, var(--vscode-widget-border, #454545));
+}
+
+.sidebar-pane {
+    /* Width is set inline from sidebarWidth in App.vue. Min/max enforced
+     * here as a guard rail against bad inline values. */
+    min-width: 180px;
+    max-width: 600px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--vscode-widget-border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* The Vue sidebar app mounts here. Fill the pane height and let the panel
+ * scroll vertically when wrapped tabs + content exceed the visible area. */
+#vue-sidebar {
+    flex: 1;
+    min-height: 0;
+    /* The panel scrolls internally; a scroller here would run the thumb up
+       over the tab and activity bars. */
+    overflow: hidden;
+}
+
+.sidebar-toggle {
+    display: none;
+}
+
+/* Legacy rail (replaced by .resize-handle as combined resizer + collapse
+ * button). Hidden in case any markup still references it. */
+.sidebar-rail {
+    width: 16px;
+    background: var(--vscode-activityBar-background, #333333);
+    color: var(--vscode-activityBar-foreground, #cccccc);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    border-right: 1px solid var(--vscode-widget-border, #1e1e1e);
+    transition: background 0.15s;
+}
+.sidebar-rail:hover {
+    background: var(--vscode-toolbar-hoverBackground, #2a2d2e);
+}
+.sidebar-rail-icon {
+    font-size: var(--calcpad-font-size-lg);
+    line-height: 1;
+}
+.sidebar-rail.collapsed {
+    /* Slightly wider when collapsed so it's easier to grab. */
+    width: 20px;
+}
+
+/* Combined resizer + collapse / expand control.
+ *  - Drag horizontally to resize the sidebar.
+ *  - Double-click while open to collapse.
+ *  - Single click while collapsed to re-expand. */
+.resize-handle {
+    width: 4px;
+    flex-shrink: 0;
+    cursor: col-resize;
+    background: transparent;
+    transition: background 0.15s;
+}
+.resize-handle:hover,
+.resize-handle.dragging {
+    background: var(--vscode-focusBorder, #007acc);
+}
+/* When the sidebar is collapsed, widen the strip so it's easy to grab and
+ * give it a subtle activity-bar tint so the user can see where to click. */
+.resize-handle.collapsed {
+    width: 8px;
+    cursor: pointer;
+    background: var(--vscode-activityBar-background, #333333);
+    border-right: 1px solid var(--vscode-widget-border, #1e1e1e);
+}
+.resize-handle.collapsed:hover {
+    background: var(--vscode-toolbar-hoverBackground, #2a2d2e);
+}
+
+/* Widen the grab area without changing the visible divider. */
+.resize-handle,
+.pane-divider {
+    position: relative;
+    z-index: 5;
+}
+
+.resize-handle::after,
+.pane-divider::after {
+    content: "";
+    position: absolute;
+    inset: 0 -4px;
+}
+
+/* Draggable vertical divider between side-by-side panes: the editor and the
+ * results pane, and the input form and its report companion in UI mode.
+ * Replaces the border those panes used to draw for the same visual split. */
+.pane-divider {
+    width: 4px;
+    flex-shrink: 0;
+    cursor: col-resize;
+    background: var(--vscode-widget-border, #1e1e1e);
+    transition: background 0.15s;
+}
+.pane-divider:hover,
+.pane-divider.dragging {
+    background: var(--vscode-focusBorder, #007acc);
+}
+
+/* Preview pane */
+.preview-pane {
+    width: 45%;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* #UI input mode hides the editor body, so the form gets the whole window below
+   the tab strip. */
+.preview-pane.fullscreen {
+    width: auto;
+    flex: 1;
+}
+
+/* Report pane beside the input form. Splits the window with it via the
+   `.pane-divider` between them; flex:1 here is just the fallback when that
+   divider (and the report pane itself) isn't rendered. */
+.ui-print-pane {
+    width: auto;
+    flex: 1;
+}
+
+/* Find-in-preview widget (VS Code editor-find analog), floated top-right. */
+.preview-find {
+    position: absolute;
+    top: 36px;
+    right: 18px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px;
+    background: var(--vscode-editorWidget-background, #252526);
+    color: var(--vscode-editorWidget-foreground, #cccccc);
+    border: 1px solid var(--vscode-widget-border, #454545);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.preview-find-input {
+    width: 180px;
+    padding: 3px 6px;
+    font-size: var(--calcpad-font-size-md);
+    font-family: inherit;
+    background: var(--vscode-input-background, #3c3c3c);
+    color: var(--vscode-input-foreground, #cccccc);
+    border: 1px solid var(--vscode-input-border, transparent);
+    border-radius: 2px;
+    outline: none;
+}
+
+.preview-find-input:focus {
+    border-color: var(--vscode-focusBorder, #007fd4);
+}
+
+.preview-find-count {
+    min-width: 34px;
+    text-align: center;
+    font-size: var(--calcpad-font-size-sm);
+    opacity: 0.8;
+}
+
+.preview-find-btn {
+    padding: 2px 6px;
+    background: transparent;
+    color: inherit;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: var(--calcpad-font-size-md);
+    line-height: 1;
+}
+
+.preview-find-btn:hover:not(:disabled) {
+    background: var(--vscode-toolbar-hoverBackground, rgba(90, 93, 94, 0.31));
+}
+
+.preview-find-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.preview-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    background: var(--vscode-titleBar-activeBackground, #3c3c3c);
+    border-bottom: 1px solid var(--vscode-widget-border);
+    font-size: var(--calcpad-font-size-md);
+    min-height: 32px;
+}
+
+/* Double-buffered preview: both frames stay visible and painted, one occluding the
+   other, so bringing a finished render forward is a z-index flip with nothing left to
+   rasterize. That relies on the front frame being opaque across its whole box, which
+   is what the background below is for. */
+.preview-buffers {
+    position: relative;
+    min-height: 0;
+}
+.preview-buffers.active-group {
+    outline: 1px solid var(--vscode-focusBorder, #007acc);
+    outline-offset: -1px;
+}
+.preview-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: var(--vscode-editor-background, #1e1e1e);
+    z-index: 1;
+}
+.preview-frame.preview-frame-back {
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Bottom panel (Problems / Output) */
+.bottom-panel {
+    height: 200px;
+    min-height: 100px;
+    border-top: 1px solid var(--vscode-widget-border);
+    display: flex;
+    flex-direction: column;
+    background: var(--vscode-panel-background, #1e1e1e);
+}
+
+.bottom-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 8px;
+    background: var(--vscode-panel-background, #1e1e1e);
+    border-bottom: 1px solid var(--vscode-widget-border);
+    min-height: 32px;
+}
+
+.panel-tab {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--vscode-panelTitle-inactiveForeground, #888);
+    font-size: var(--calcpad-font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 6px 8px;
+    cursor: pointer;
+}
+
+.panel-tab:hover {
+    color: var(--vscode-panelTitle-activeForeground, #e7e7e7);
+}
+
+.panel-tab.active {
+    color: var(--vscode-panelTitle-activeForeground, #e7e7e7);
+    border-bottom-color: var(--vscode-panelTitle-activeBorder, #e7e7e7);
+}
+
+.output-channel-select {
+    background: var(--vscode-dropdown-background, #3c3c3c);
+    color: var(--vscode-dropdown-foreground, #cccccc);
+    border: 1px solid var(--vscode-dropdown-border, #3c3c3c);
+    font-size: var(--calcpad-font-size-sm);
+    padding: 2px 6px;
+    margin-left: 8px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.output-channel-select:focus {
+    outline: 1px solid var(--vscode-focusBorder, #007acc);
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+.modal-card {
+    min-width: 360px;
+    max-width: 520px;
+    background: var(--vscode-editorWidget-background, #252526);
+    color: var(--vscode-editorWidget-foreground, #cccccc);
+    border: 1px solid var(--vscode-editorWidget-border, #454545);
+    border-radius: 4px;
+    padding: 16px 18px 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    font-size: var(--calcpad-font-size-lg);
+}
+.modal-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.modal-message {
+    white-space: pre-wrap;
+    margin-bottom: 14px;
+}
+/* The URL is worksheet-controlled and may be long: wrap it rather than let it
+   stretch the dialog, and keep it visually separate from our own wording. */
+.modal-url {
+    font-family: var(--vscode-editor-font-family, monospace);
+    font-size: var(--calcpad-font-size-md);
+    background: var(--vscode-editor-background, #1e1e1e);
+    border: 1px solid var(--vscode-widget-border, #474747);
+    border-radius: 3px;
+    padding: 8px 10px;
+    margin-bottom: 14px;
+    max-height: 6em;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+    user-select: text;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+.modal-btn {
+    background: var(--vscode-button-secondaryBackground, #3a3d41);
+    color: var(--vscode-button-secondaryForeground, #cccccc);
+    border: none;
+    padding: 4px 12px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: var(--calcpad-font-size-md);
+}
+.modal-btn:hover {
+    background: var(--vscode-button-secondaryHoverBackground, #45494e);
+}
+.modal-btn.primary {
+    background: var(--vscode-button-background, #0e639c);
+    color: var(--vscode-button-foreground, #ffffff);
+}
+.modal-btn.primary:hover {
+    background: var(--vscode-button-hoverBackground, #1177bb);
+}
+
+.quick-pick-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 14px;
+}
+.quick-pick-option {
+    text-align: left;
+    background: var(--vscode-editor-background, #1e1e1e);
+    color: var(--vscode-editor-foreground, #d4d4d4);
+    border: 1px solid var(--vscode-widget-border, #474747);
+    border-radius: 3px;
+    padding: 8px 10px;
+    cursor: pointer;
+}
+.quick-pick-option:hover {
+    background: var(--vscode-list-hoverBackground, #2a2d2e);
+    border-color: var(--vscode-focusBorder, #007fd4);
+}
+.quick-pick-option-label {
+    font-size: var(--calcpad-font-size-md);
+}
+.quick-pick-option-detail {
+    font-size: var(--calcpad-font-size-sm);
+    color: var(--vscode-descriptionForeground, #858585);
+    margin-top: 2px;
+}
+
+.problems-badge {
+    font-size: var(--calcpad-font-size-xs);
+    padding: 0 5px;
+    border-radius: 8px;
+    min-width: 18px;
+    text-align: center;
+    line-height: 16px;
+}
+
+.problems-badge.error {
+    background: var(--vscode-errorForeground, #f14c4c);
+    color: #fff;
+}
+
+.problems-badge.warning {
+    background: var(--vscode-editorWarning-foreground, #cca700);
+    color: #000;
+}
+
+.problems-badge.info {
+    background: var(--vscode-editorInfo-foreground, #3794ff);
+    color: #fff;
+}
+
+.problems-list {
+    flex: 1;
+    overflow-y: auto;
+    font-family: var(--vscode-editor-font-family, 'Cascadia Code', Consolas, monospace);
+    font-size: var(--calcpad-font-size-md);
+}
+
+.problem-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.problem-row:hover {
+    background: var(--vscode-list-hoverBackground, #2a2d2e);
+}
+
+.problem-icon {
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+    font-size: var(--calcpad-font-size-md);
+}
+
+.problem-icon.lintError {
+    color: var(--vscode-errorForeground, #f14c4c);
+}
+
+.problem-icon.warning {
+    color: var(--vscode-editorWarning-foreground, #cca700);
+}
+
+.problem-icon.info {
+    color: var(--vscode-editorInfo-foreground, #3794ff);
+}
+
+.problem-message {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--vscode-foreground, #ccc);
+}
+
+.problem-code {
+    flex-shrink: 0;
+    color: var(--vscode-descriptionForeground, #888);
+    font-size: var(--calcpad-font-size-sm);
+}
+
+.problem-location {
+    flex-shrink: 0;
+    color: var(--vscode-descriptionForeground, #888);
+    font-size: var(--calcpad-font-size-sm);
+}
+
+.problems-empty {
+    padding: 12px;
+    color: var(--vscode-descriptionForeground, #888);
+    font-style: italic;
+    text-align: center;
+}
+
+/* Output panel */
+.output-list {
+    flex: 1;
+    overflow-y: auto;
+    font-family: var(--vscode-editor-font-family, 'Cascadia Code', Consolas, monospace);
+    font-size: var(--calcpad-font-size-md);
+}
+
+.output-row {
+    display: flex;
+    gap: 8px;
+    padding: 1px 12px;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.output-row:hover {
+    background: var(--vscode-list-hoverBackground, #2a2d2e);
+}
+
+.output-timestamp {
+    flex-shrink: 0;
+    color: var(--vscode-descriptionForeground, #888);
+}
+
+.output-level {
+    flex-shrink: 0;
+    width: 40px;
+    font-weight: 600;
+}
+
+.output-row.info .output-level {
+    color: var(--vscode-editorInfo-foreground, #3794ff);
+}
+
+.output-row.warn .output-level {
+    color: var(--vscode-editorWarning-foreground, #cca700);
+}
+
+.output-row.error .output-level {
+    color: var(--vscode-errorForeground, #f14c4c);
+}
+
+.output-row.debug .output-level {
+    color: var(--vscode-descriptionForeground, #888);
+}
+
+.output-message {
+    flex: 1;
+    color: var(--vscode-foreground, #ccc);
+}
+
+/* Status bar */
+.status-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+    height: 22px;
+    background: var(--vscode-statusBar-background, #007acc);
+    color: var(--vscode-statusBar-foreground, #fff);
+    font-size: var(--calcpad-font-size-md);
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.status-bar:hover {
+    background: var(--vscode-statusBar-hoverBackground, #1f8ad2);
+}
+
+.status-problems,
+.status-output {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 0 4px;
+    border-radius: 2px;
+}
+
+.status-problems:hover,
+.status-output:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.status-icon {
+    width: 12px;
+    height: 12px;
+    vertical-align: -2px;
+    fill: currentColor;
+}
+
+.status-icon.lintError {
+    color: #ffc9c9;
+}
+
+.status-icon.warning {
+    color: #ffd980;
+}
+
+.status-icon.info {
+    color: #cfe8ff;
+}
+
+.status-text {
+    font-size: var(--calcpad-font-size-sm);
+    opacity: 0.8;
+}

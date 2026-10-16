@@ -1,0 +1,1080 @@
+<div class="calcpad-output">
+ <!-- Punching shear verification of a flat slab around an edge column: open control perimeter on three sides, eccentricity factor for an edge support and design of the punching reinforcement. -->
+ <small>
+  According to
+  <strong>Eurocode</strong>
+  : EN 1992-1-1
+ </small>
+ <div style="max-width:180mm">
+  <img alt="punching-edge-column.png" class="side" src="Images/structures/rc/design/punching-edge-column.png" style="width:225pt;"/>
+  <h4>Input data</h4>
+  <p>
+   <b>Column</b>
+  </p>
+  <p>
+   Dimensions -
+   <span class="eq">
+    <var>c</var>
+    <sub>1</sub>
+    =
+    <u class="input-7">600</u>
+   </span>
+   mm,
+   <span class="eq">
+    <var>c</var>
+    <sub>2</sub>
+    =
+    <u class="input-7">300</u>
+   </span>
+   mm
+  </p>
+  <p>
+   <b>Design loads</b>
+  </p>
+  <p>
+   Support reaction -
+   <span class="eq">
+    <var>V</var>
+    <sub>Ed</sub>
+    =
+    <u class="input-9">200</u>
+   </span>
+   kN
+  </p>
+  <p>
+   <b>Slab</b>
+  </p>
+  <p>
+   Depth -
+   <span class="eq">
+    <var>h</var>
+    =
+    <u class="input-11">200</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Concrete cover -
+   <span class="eq">
+    <var>c</var>
+    =
+    <u class="input-12">20</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Longitudinal bars diameter -
+   <span class="eq">
+    <var>d</var>
+    <sub>bL</sub>
+    =
+    <u class="input-13">10</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Links diameter -
+   <span class="eq">
+    <var>d</var>
+    <sub>w</sub>
+    =
+    <u class="input-14">6</u>
+   </span>
+   mm
+  </p>
+  <p>Effective slab depth</p>
+  <p>
+   <span class="eq">
+    <var>d</var>
+    =
+    <var>h</var>
+    −
+    <var>c</var>
+    −
+    <var>d</var>
+    <sub>bL</sub>
+    = 200 − 20 − 10 = 170
+   </span>
+   mm
+  </p>
+  <p>Longitudinal reinforcement area</p>
+  <p>
+   <span class="eq">
+    <var>A</var>
+    <sub>sx</sub>
+    =
+    <u class="input-20">1200</u>
+   </span>
+   mm²/m,
+   <span class="eq">
+    <var>A</var>
+    <sub>sy</sub>
+    =
+    <u class="input-20">600</u>
+   </span>
+   mm²/m
+  </p>
+  <p>Reinforcement ratio</p>
+  <p>
+   <span class="eq">
+    <var>ρ</var>
+    <sub>lx</sub>
+    =
+    <span class="dvc">
+     <var>A</var>
+     <sub>sx</sub>
+     <span class="dvl">
+     </span>
+     1000 ·
+     <var>d</var>
+    </span>
+    =
+    <span class="dvc">
+     1200
+     <span class="dvl">
+     </span>
+     1000 · 170
+    </span>
+    = 0.00706
+   </span>
+  </p>
+  <p>
+   <span class="eq">
+    <var>ρ</var>
+    <sub>ly</sub>
+    =
+    <span class="dvc">
+     <var>A</var>
+     <sub>sy</sub>
+     <span class="dvl">
+     </span>
+     1000 ·
+     <var>d</var>
+    </span>
+    =
+    <span class="dvc">
+     600
+     <span class="dvl">
+     </span>
+     1000 · 170
+    </span>
+    = 0.00353
+   </span>
+  </p>
+  <p>
+   <span class="eq">
+    <var>ρ</var>
+    <sub>l</sub>
+    =
+    <span class="o0">
+     <span class="r">√</span>
+     <var>ρ</var>
+     <sub>lx</sub>
+     ·
+     <var>ρ</var>
+     <sub>ly</sub>
+    </span>
+    =
+    <span class="o0">
+     <span class="r">√</span>
+     0.00706 · 0.00353
+    </span>
+    = 0.00499
+   </span>
+  </p>
+  <p>
+   <b>Material properties</b>
+  </p>
+  <p>
+   <b>Concrete</b>
+   [EN 1992-1-1, Table 3.1]
+  </p>
+  <p>
+   Characteristic compressive cylinder strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ck</sub>
+    =
+    <u class="input-29">25</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Partial safety factor for concrete -
+   <span class="eq">
+    <var>γ</var>
+    <sub>c</sub>
+    = 1.5
+   </span>
+   ,
+   <span class="eq">
+    <var>α</var>
+    <sub>cc</sub>
+    =
+    <u class="input-30">1</u>
+   </span>
+  </p>
+  <p>
+   Design compressive cylinder strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>cd</sub>
+    =
+    <span class="dvc">
+     <var>α</var>
+     <sub>cc</sub>
+     ·
+     <var>f</var>
+     <sub>ck</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>c</sub>
+    </span>
+    =
+    <span class="dvc">
+     1 · 25
+     <span class="dvl">
+     </span>
+     1.5
+    </span>
+    = 16.67
+   </span>
+   MPa
+  </p>
+  <p>
+   <b>Steel</b>
+  </p>
+  <p>
+   Characteristic yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>yk</sub>
+    =
+    <u class="input-35">500</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Partial safety factor for steel -
+   <span class="eq">
+    <var>γ</var>
+    <sub>s</sub>
+    = 1.15
+   </span>
+  </p>
+  <p>
+   Design yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ywd</sub>
+    =
+    <span class="dvc">
+     <var>f</var>
+     <sub>yk</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>s</sub>
+    </span>
+    =
+    <span class="dvc">
+     500
+     <span class="dvl">
+     </span>
+     1.15
+    </span>
+    = 434.78
+   </span>
+   MPa
+  </p>
+  <p>Basic control perimeter length</p>
+  <p>
+   <span class="eq">
+    <var>u</var>
+    <sub>1</sub>
+    =
+    <var>c</var>
+    <sub>2</sub>
+    + 2 ·
+    <var>c</var>
+    <sub>1</sub>
+    + 2 ·
+    <var>π</var>
+    ·
+    <var>d</var>
+    = 300 + 2 · 600 + 2 · 3.14 · 170 = 2568.14
+   </span>
+   mm
+  </p>
+  <p class="ref">[EN 1992-1-1, Figure 6.21N]</p>
+  <p>
+   <b>β factor</b>
+   -
+   <span class="eq">
+    <var>β</var>
+    = 1.4
+   </span>
+  </p>
+  <div class="fold">
+   <h4>Punching shear resistance without reinforcement</h4>
+   <p>
+    <span class="eq">
+     <var>k</var>
+     =
+     <b>min</b>
+     <span class="b1">(</span>
+     1 +
+     <span class="o1">
+      <span class="r1">
+      </span>
+      <span class="dvc">
+       200
+       <span class="dvl">
+       </span>
+       <var>d</var>
+      </span>
+     </span>
+     ; 2
+     <span class="b1">)</span>
+     =
+     <b>min</b>
+     <span class="b1">(</span>
+     1 +
+     <span class="o1">
+      <span class="r1">
+      </span>
+      <span class="dvc">
+       200
+       <span class="dvl">
+       </span>
+       170
+      </span>
+     </span>
+     ; 2
+     <span class="b1">)</span>
+     = 2
+    </span>
+   </p>
+   <p>
+    <span class="eq">
+     <var>C</var>
+     <sub>Rd_c</sub>
+     =
+     <span class="dvc">
+      0.18
+      <span class="dvl">
+      </span>
+      <var>γ</var>
+      <sub>c</sub>
+     </span>
+     =
+     <span class="dvc">
+      0.18
+      <span class="dvl">
+      </span>
+      1.5
+     </span>
+     = 0.12
+    </span>
+   </p>
+   <p class="ref">[EN 1992-1-1 (6.47)]</p>
+   <p>Punching shear resistance</p>
+   <p>
+    <span class="eq">
+     <var>v</var>
+     <sub>Rd_c_</sub>
+     =
+     <var>C</var>
+     <sub>Rd_c</sub>
+     ·
+     <var>k</var>
+     ·  ( 100 ·
+     <var>ρ</var>
+     <sub>l</sub>
+     ·
+     <var>f</var>
+     <sub>ck</sub>
+     )
+     <sup>
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       3
+      </span>
+     </sup>
+     = 0.12 · 2 ·  ( 100 · 0.00499 · 25 )
+     <sup>
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       3
+      </span>
+     </sup>
+     = 0.557
+    </span>
+    MPa
+   </p>
+   <p class="ref">[EN 1992-1-1 (6.2b)]</p>
+   <p>Minimum shear resistance</p>
+   <p>
+    <span class="eq">
+     <var>v</var>
+     <sub>min</sub>
+     = 0.035 ·
+     <var>k</var>
+     <sup>
+      <span class="dvc">
+       3
+       <span class="dvl">
+       </span>
+       2
+      </span>
+     </sup>
+     ·
+     <span class="o0">
+      <span class="r">√</span>
+      <var>f</var>
+      <sub>ck</sub>
+     </span>
+     = 0.035 · 2
+     <sup>
+      <span class="dvc">
+       3
+       <span class="dvl">
+       </span>
+       2
+      </span>
+     </sup>
+     ·
+     <span class="o0">
+      <span class="r">√</span>
+      25
+     </span>
+     = 0.495
+    </span>
+    MPa
+   </p>
+   <p>
+    <span class="eq">
+     <var>v</var>
+     <sub>Rd_c</sub>
+     =
+     <b>max</b>
+     (
+     <var>v</var>
+     <sub>min</sub>
+     ;
+     <var>v</var>
+     <sub>Rd_c_</sub>
+     )  =
+     <b>max</b>
+     ( 0.495; 0.557 )  = 0.557
+    </span>
+    MPa
+   </p>
+   <p class="ref">[EN 1992-1-1 (6.38)]</p>
+   <p>Design shear stress</p>
+   <p>
+    <span class="eq">
+     <var>v</var>
+     <sub>Ed</sub>
+     =
+     <span class="dvc">
+      <var>β</var>
+      ·
+      <var>V</var>
+      <sub>Ed</sub>
+      · 10
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      <var>u</var>
+      <sub>1</sub>
+      ·
+      <var>d</var>
+     </span>
+     =
+     <span class="dvc">
+      1.4 · 200 · 10
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      2568.14 · 170
+     </span>
+     = 0.641
+    </span>
+    MPa
+   </p>
+  </div>
+  <p class="ref">[EN 1992-1-1, §6.4.3 (2,b)]</p>
+  <p>
+   <span class="eq">
+    <var>v</var>
+    <sub>Ed</sub>
+    = 0.641
+   </span>
+   MPa &gt;
+   <span class="eq">
+    <var>v</var>
+    <sub>Rd_c</sub>
+    = 0.557
+   </span>
+   MPa. Shear reinforcement is required.
+  </p>
+  <div class="fold">
+   <h4>Check at column edge</h4>
+   <p>Column perimeter</p>
+   <p>
+    <span class="eq">
+     <var>u</var>
+     <sub>0</sub>
+     =
+     <b>min</b>
+     ( 2 ·
+     <var>c</var>
+     <sub>1</sub>
+     +
+     <var>c</var>
+     <sub>2</sub>
+     ; 3 ·
+     <var>d</var>
+     +
+     <var>c</var>
+     <sub>2</sub>
+     )  =
+     <b>min</b>
+     ( 2 · 600 + 300; 3 · 170 + 300 )  = 810
+    </span>
+    mm
+   </p>
+   <p class="ref">[EN 1992-1-1 (6.53)]</p>
+   <p>Punching shear resistance at column edge</p>
+   <p>
+    <span class="eq">
+     <var>v</var>
+     <sub>Ed_max</sub>
+     =
+     <span class="dvc">
+      <var>β</var>
+      ·
+      <var>V</var>
+      <sub>Ed</sub>
+      · 10
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      <var>u</var>
+      <sub>0</sub>
+      ·
+      <var>d</var>
+     </span>
+     =
+     <span class="dvc">
+      1.4 · 200 · 10
+      <sup>3</sup>
+      <span class="dvl">
+      </span>
+      810 · 170
+     </span>
+     = 2.03
+    </span>
+    MPa
+   </p>
+   <p>Maximum punching shear stress</p>
+   <p>
+    <span class="eq">
+     <var>ν</var>
+     = 0.6 ·
+     <span class="b1">(</span>
+     1 −
+     <span class="dvc">
+      <var>f</var>
+      <sub>ck</sub>
+      <span class="dvl">
+      </span>
+      250
+     </span>
+     <span class="b1">)</span>
+     = 0.6 ·
+     <span class="b1">(</span>
+     1 −
+     <span class="dvc">
+      25
+      <span class="dvl">
+      </span>
+      250
+     </span>
+     <span class="b1">)</span>
+     = 0.54
+    </span>
+   </p>
+   <p class="ref">[BS EN 1992-1-1, Table NA.1, §6.4.5 (3)]</p>
+   <p>
+    <span class="eq">
+     <var>v</var>
+     <sub>Rd_max</sub>
+     = 0.5 ·
+     <var>ν</var>
+     ·
+     <var>f</var>
+     <sub>cd</sub>
+     = 0.5 · 0.54 · 16.67 = 4.5
+    </span>
+    MPa
+   </p>
+  </div>
+  <p class="ref">[EN 1992-1-1, §6.4.3 (2,a)]</p>
+  <p>
+   <span class="eq">
+    <var>v</var>
+    <sub>Ed_max</sub>
+    = 2.03
+   </span>
+   MPa ≤
+   <span class="eq">
+    <var>v</var>
+    <sub>Rd_max</sub>
+    = 4.5
+   </span>
+   MPa. Design check is satisfied.
+  </p>
+  <p class="ref">[BS EN 1992-1-1, Table NA.1, §6.4.5 (3)]</p>
+  <p>Limitation of punching stress at basic control perimeter</p>
+  <p>
+   <span class="eq">
+    <var>v</var>
+    <sub>Ed</sub>
+    = 0.641
+   </span>
+   MPa ≤
+   <span class="eq">
+    2 ·
+    <var>v</var>
+    <sub>Rd_c</sub>
+    = 2 · 0.557 = 1.11
+   </span>
+   MPa. Design check is satisfied.
+  </p>
+  <div class="fold">
+   <h4>Punching resistance with shear reinforcement</h4>
+   <p>Effective yield strength of shear reinforcement</p>
+   <p>
+    <span class="eq">
+     <var>f</var>
+     <sub>ywd_ef</sub>
+     =
+     <b>min</b>
+     ( 250 + 0.25 ·
+     <var>d</var>
+     ;
+     <var>f</var>
+     <sub>ywd</sub>
+     )  =
+     <b>min</b>
+     ( 250 + 0.25 · 170; 434.78 )  = 292.5
+    </span>
+    MPa
+   </p>
+   <p>Area of one shear link</p>
+   <p>
+    <span class="eq">
+     <var>A</var>
+     <sub>sw_1</sub>
+     =
+     <span class="dvc">
+      <var>π</var>
+      ·
+      <var>d</var>
+      <sub>w</sub>
+      <sup>2</sup>
+      <span class="dvl">
+      </span>
+      4
+     </span>
+     =
+     <span class="dvc">
+      3.14 · 6
+      <sup>2</sup>
+      <span class="dvl">
+      </span>
+      4
+     </span>
+     = 28.27
+    </span>
+    mm²
+   </p>
+   <p class="ref">[EN 1992-1-1, §9.4.3 (1)]</p>
+   <p>
+    Radial link spacing -
+    <span class="eq">
+     <var>s</var>
+     <sub>r</sub>
+     = 0.75 ·
+     <var>d</var>
+     = 0.75 · 170 = 127.5
+    </span>
+    mm
+   </p>
+   <p>Required shear reinforcement</p>
+   <p>
+    <span class="eq">
+     <var>A</var>
+     <sub>sw_req</sub>
+     =
+     <span class="dvc">
+      (
+      <var>v</var>
+      <sub>Ed</sub>
+      − 0.75 ·
+      <var>v</var>
+      <sub>Rd_c</sub>
+      )  ·
+      <var>u</var>
+      <sub>1</sub>
+      ·
+      <var>s</var>
+      <sub>r</sub>
+      <span class="dvl">
+      </span>
+      1.5 ·
+      <var>f</var>
+      <sub>ywd_ef</sub>
+     </span>
+     =
+     <span class="dvc">
+      ( 0.641 − 0.75 · 0.557 )  · 2568.14 · 127.5
+      <span class="dvl">
+      </span>
+      1.5 · 292.5
+     </span>
+     = 167.05
+    </span>
+    mm²
+   </p>
+   <p>
+    Tangential link spacing -
+    <span class="eq">
+     <var>s</var>
+     <sub>t</sub>
+     =
+     <b>floor</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>u</var>
+      <sub>1</sub>
+      ·
+      <var>A</var>
+      <sub>sw_1</sub>
+      <span class="dvl">
+      </span>
+      <var>A</var>
+      <sub>sw_req</sub>
+     </span>
+     <span class="b1">)</span>
+     =
+     <b>floor</b>
+     <span class="b1">(</span>
+     <span class="dvc">
+      2568.14 · 28.27
+      <span class="dvl">
+      </span>
+      167.05
+     </span>
+     <span class="b1">)</span>
+     = 434
+    </span>
+    mm
+   </p>
+   <p class="ref">[EN 1992-1-1, §9.4.3 (1)]</p>
+   <p>
+    Check:
+    <span class="eq">
+     <var>s</var>
+     <sub>t</sub>
+     = 434
+    </span>
+    mm &gt;
+    <span class="eq">
+     1.5 ·
+     <var>d</var>
+     = 1.5 · 170 = 255
+    </span>
+    mm.
+   </p>
+   <p class="err">Distance exceeds the maximum value.</p>
+   <p>
+    Accepted value:
+    <span class="eq">
+     <var>s</var>
+     <sub>t</sub>
+     = 1.5 ·
+     <var>d</var>
+     = 1.5 · 170 = 255
+    </span>
+    mm
+   </p>
+   <p class="ref">[EN 1992-1-1, §9.4.3 (2)]</p>
+   <p>Minimum shear reinforcement</p>
+   <p>
+    <span class="eq">
+     <var>A</var>
+     <sub>sw_min</sub>
+     =
+     <span class="dvc up">
+      <span class="dvc">
+       0.08 ·
+       <span class="o0">
+        <span class="r">√</span>
+        <var>f</var>
+        <sub>ck</sub>
+       </span>
+       <span class="dvl">
+       </span>
+       <var>f</var>
+       <sub>yk</sub>
+      </span>
+      ·
+      <var>s</var>
+      <sub>r</sub>
+      ·
+      <var>s</var>
+      <sub>t</sub>
+      <span class="dvl">
+      </span>
+      1.5
+     </span>
+     =
+     <span class="dvc up">
+      <span class="dvc">
+       0.08 ·
+       <span class="o0">
+        <span class="r">√</span>
+        25
+       </span>
+       <span class="dvl">
+       </span>
+       500
+      </span>
+      · 127.5 · 255
+      <span class="dvl">
+      </span>
+      1.5
+     </span>
+     = 17.34
+    </span>
+    mm²
+   </p>
+   <p>
+    <span class="eq">
+     <var>A</var>
+     <sub>sw_1</sub>
+     = 28.27
+    </span>
+    mm² ≥
+    <span class="eq">
+     <var>A</var>
+     <sub>sw_min</sub>
+     = 17.34
+    </span>
+    mm². The calculated reinforcement is greater than the minimum.
+   </p>
+  </div>
+  <p>Total shear reinforcement for each perimeter</p>
+  <p>
+   <span class="eq">
+    <var>A</var>
+    <sub>sw</sub>
+    =
+    <span class="dvc">
+     <var>A</var>
+     <sub>sw_1</sub>
+     ·
+     <var>u</var>
+     <sub>1</sub>
+     <span class="dvl">
+     </span>
+     <var>s</var>
+     <sub>t</sub>
+    </span>
+    =
+    <span class="dvc">
+     28.27 · 2568.14
+     <span class="dvl">
+     </span>
+     255
+    </span>
+    = 284.75
+   </span>
+   mm²
+  </p>
+  <p class="ref">[EN 1992-1-1 (6.52)]</p>
+  <p>Punching resistance with shear reinforcement</p>
+  <p>
+   <span class="eq">
+    <var>v</var>
+    <sub>Rd_cs</sub>
+    = 0.75 ·
+    <var>v</var>
+    <sub>Rd_c</sub>
+    +
+    <span class="dvc up">
+     <span class="dvc">
+      1.5 ·
+      <var>d</var>
+      <span class="dvl">
+      </span>
+      <var>s</var>
+      <sub>r</sub>
+     </span>
+     ·
+     <var>A</var>
+     <sub>sw</sub>
+     ·
+     <var>f</var>
+     <sub>ywd_ef</sub>
+     <span class="dvl">
+     </span>
+     <var>u</var>
+     <sub>1</sub>
+     ·
+     <var>d</var>
+    </span>
+    = 0.75 · 0.557 +
+    <span class="dvc up">
+     <span class="dvc">
+      1.5 · 170
+      <span class="dvl">
+      </span>
+      127.5
+     </span>
+     · 284.75 · 292.5
+     <span class="dvl">
+     </span>
+     2568.14 · 170
+    </span>
+    = 0.799
+   </span>
+  </p>
+  <p>
+   <span class="eq">
+    <var>v</var>
+    <sub>Ed</sub>
+    = 0.641
+   </span>
+   MPa ≤
+   <span class="eq">
+    <var>v</var>
+    <sub>Rd_cs</sub>
+    = 0.799
+   </span>
+   MPa. Check is satisfied!
+  </p>
+  <p class="ref">[EN 1992-1-1 (6.54)]</p>
+  <p>Outer control perimeter at which shear reinforcement is not required</p>
+  <p>
+   <span class="eq">
+    <var>u</var>
+    <sub>out</sub>
+    =
+    <span class="dvc">
+     <var>β</var>
+     ·
+     <var>V</var>
+     <sub>Ed</sub>
+     · 10
+     <sup>3</sup>
+     <span class="dvl">
+     </span>
+     <var>v</var>
+     <sub>Rd_c</sub>
+     ·
+     <var>d</var>
+    </span>
+    =
+    <span class="dvc">
+     1.4 · 200 · 10
+     <sup>3</sup>
+     <span class="dvl">
+     </span>
+     0.557 · 170
+    </span>
+    = 2958.78
+   </span>
+   mm
+  </p>
+  <p>Distance to outer control perimeter</p>
+  <p>
+   <span class="eq">
+    <var>a</var>
+    <sub>out</sub>
+    =
+    <span class="dvc">
+     <var>u</var>
+     <sub>out</sub>
+     − 2 ·
+     <var>c</var>
+     <sub>1</sub>
+     −
+     <var>c</var>
+     <sub>2</sub>
+     <span class="dvl">
+     </span>
+     <var>π</var>
+    </span>
+    =
+    <span class="dvc">
+     2958.78 − 2 · 600 − 300
+     <span class="dvl">
+     </span>
+     3.14
+    </span>
+    = 464.34
+   </span>
+   mm
+  </p>
+  <p>Required number of perimeters</p>
+  <p>
+   <span class="eq">
+    <var>n</var>
+    =
+    <b>ceiling</b>
+    <span class="b1">(</span>
+    <b>max</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>a</var>
+     <sub>out</sub>
+     − 2 ·
+     <var>d</var>
+     <span class="dvl">
+     </span>
+     0.75 ·
+     <var>d</var>
+    </span>
+    + 1; 2
+    <span class="b1">)</span>
+    <span class="b1">)</span>
+    =
+    <b>ceiling</b>
+    <span class="b1">(</span>
+    <b>max</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     464.34 − 2 · 170
+     <span class="dvl">
+     </span>
+     0.75 · 170
+    </span>
+    + 1; 2
+    <span class="b1">)</span>
+    <span class="b1">)</span>
+    = 2
+   </span>
+  </p>
+  <img alt="punching-edge-column-reinf-plan.png" src="Images/structures/rc/design/punching-edge-column-reinf-plan.png" style="display:inline;"/>
+  <img alt="punching-edge-column-reinf-section.png" src="Images/structures/rc/design/punching-edge-column-reinf-section.png" style="width:195pt;"/>
+ </div>
+</div>

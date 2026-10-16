@@ -12,7 +12,7 @@ namespace PyCalcpad
         {
             _parser.Parse(code);
             _parser.Calculate();
-            _parser.SetVariable("ans", _parser.Real); 
+            _parser.SetVariable("ans", _parser.Real);
             return _parser.ResultAsString;
         }
 

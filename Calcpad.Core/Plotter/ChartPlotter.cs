@@ -17,8 +17,10 @@ namespace Calcpad.Core
         {
             Left = (int)(1.5 * Margin);
             Right = (int)(0.75 * Margin);
-            Width = (int)(Parser.PlotWidth * ScreenScaleFactor) + Left + Right;
-            Height = (int)(Parser.PlotHeight * ScreenScaleFactor) + 2 * Margin;
+            var w = (int)Parser.GetSettingsVariable("PlotWidth", Settings.Width);
+            var h = (int)Parser.GetSettingsVariable("PlotHeight", Settings.Height);
+            Width = (int)(w * ScreenScaleFactor) + Left + Right;
+            Height = (int)(h * ScreenScaleFactor) + 2 * Margin;
         }
 
         internal string Plot(Func<IValue>[] fx, Func<IValue>[] fy, Variable var, double start, double end, Unit u)
@@ -349,7 +351,7 @@ namespace Calcpad.Core
                     penNo = 1;
             }
             if (string.IsNullOrEmpty(fileName))
-                return $"<svg class=\"plot\" {svgDrawing.ToString()[4..]}";
+                return $"<svg class=\"plot\" data-plot=\"svg\" {svgDrawing.ToString()[4..]}";
 
             SvgToFile(svgDrawing, Settings.ImagePath, fileName);
             return HtmlImg(Settings.ImageUri + fileName);

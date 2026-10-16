@@ -1,0 +1,21 @@
+' Data exchange: #read, #write, #append
+' CSV read - basic
+#read M from data.csv
+' CSV read with range
+#read M2 from data.csv@R1C1:R3C3
+' CSV read with TYPE and SEP
+#read M3 from data.csv TYPE=R SEP=','
+' CSV read with all options
+#read M4 from data.csv@R2C1:R5C3 TYPE=D SEP=','
+' Excel read with sheet and range
+' #read M5 from workbook.xlsx@Sheet1!A1:C5 TYPE=R
+' Write to CSV
+#write M to output.csv
+' Write with range and options
+#write M to output.csv@R1C1:R5C3 TYPE=N SEP=','
+' Append to CSV
+#append M to output.csv
+' Append with options
+#append M to output.csv TYPE=N SEP=','
+' Read TYPE variants: R=raw, D=decimal, C=column, S=skip, U=units, L=labels, V=vector
+#read M6 from data.csv TYPE=V

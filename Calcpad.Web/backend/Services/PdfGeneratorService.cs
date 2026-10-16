@@ -1,0 +1,753 @@
+using System.Reflection;
+using Calcpad.Highlighter.HtmlComment;
+using PuppeteerSharp;
+using PuppeteerSharp.Media;
+using PdfSharp.Drawing;
+using PdfSharp.Fonts;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.IO;
+
+namespace Calcpad.Server.Services
+{
+    /// <summary>
+    /// Font resolver that maps any font request to embedded Segoe WP fonts from PdfSharp.WPFonts.
+    /// Required for PDFsharp on Linux where system fonts aren't auto-discovered.
+    /// </summary>
+    internal class EmbeddedFontResolver : IFontResolver
+    {
+        private const string Regular = "SegoeWP";
+        private const string Bold = "SegoeWP-Bold";
+
+        private static readonly Assembly _wpFontsAssembly =
+            Assembly.Load("PdfSharp.WPFonts");
+
+        public FontResolverInfo? ResolveTypeface(string familyName, bool isBold, bool isItalic)
+        {
+            return new FontResolverInfo(isBold ? Bold : Regular);
+        }
+
+        public byte[]? GetFont(string faceName)
+        {
+            var resourceName = $"PdfSharp.WPFonts.Fonts.{faceName}.ttf";
+            using var stream = _wpFontsAssembly.GetManifestResourceStream(resourceName);
+            if (stream == null) return null;
+            using var ms = new MemoryStream();
+            stream.CopyTo(ms);
+            return ms.ToArray();
+        }
+    }
+
+    /// <summary>
+    /// No Chromium-family browser could be used for rendering. Carries the
+    /// <c>BROWSER_NOT_FOUND</c> contract to the controller so clients can offer the
+    /// bundled-Chromium download instead of failing with a generic 500.
+    /// </summary>
+    public class BrowserUnavailableException : Exception
+    {
+        public BrowserUnavailableException(string message, Exception? innerException = null)
+            : base(message, innerException) { }
+    }
+
+    /// <summary>
+    /// A browser was found but would not start, even after a retry. Maps to
+    /// <c>BROWSER_LAUNCH_FAILED</c> so clients offer a retry rather than a download.
+    /// </summary>
+    public class BrowserLaunchFailedException : Exception
+    {
+        public string BrowserPath { get; }
+
+        public BrowserLaunchFailedException(string browserPath, string message, Exception? innerException = null)
+            : base(message, innerException)
+        {
+            BrowserPath = browserPath;
+        }
+    }
+
+    /// <summary>Which browser the PDF pipeline would use right now, and whether a download is possible.</summary>
+    public record BrowserStatus(bool Available, string Source, string? Path, bool DownloadAllowed, int DownloadSizeMb);
+
+    public class PdfGeneratorService : IAsyncDisposable
+    {
+        // ChromeHeadlessShell unpacked; used only to size the confirmation prompt clients show.
+        private const int ChromiumDownloadSizeMb = 180;
+
+        private IBrowser? _browser;
+        private readonly SemaphoreSlim _browserLock = new(1, 1);
+        private readonly SemaphoreSlim _downloadLock = new(1, 1);
+        // Caps concurrent Chromium pages against the one shared browser, independent of
+        // _browserLock (which only guards lazy browser creation) — a burst of PDF/DOCX
+        // requests would otherwise open one page per request with no upper bound.
+        private readonly SemaphoreSlim _pageLock = new(4, 4);
+        private readonly IConfiguration _config;
+        private static string? _cachedChromiumPath;
+
+        static PdfGeneratorService()
+        {
+            if (GlobalFontSettings.FontResolver == null)
+                GlobalFontSettings.FontResolver = new EmbeddedFontResolver();
+        }
+
+        public PdfGeneratorService(IConfiguration config)
+        {
+            _config = config;
+        }
+
+        public async Task<byte[]> GeneratePdfAsync(string html, PdfSettingsDto? options = null)
+        {
+            options ??= new PdfSettingsDto();
+
+            // Step 1: Generate basic PDF with PuppeteerSharp
+            var basicPdf = await GenerateBasicPdfAsync(html, options).ConfigureAwait(false);
+
+            // Step 2: Enhance with PDFsharp (headers, footers, backgrounds)
+            return EnhancePdf(basicPdf, options);
+        }
+
+        private async Task<byte[]> GenerateBasicPdfAsync(string html, PdfSettingsDto options)
+        {
+            var browser = await GetOrCreateBrowserAsync().ConfigureAwait(false);
+
+            await _pageLock.WaitAsync().ConfigureAwait(false);
+            IPage page;
+            try
+            {
+                page = await browser.NewPageAsync().ConfigureAwait(false);
+            }
+            catch
+            {
+                _pageLock.Release();
+                throw;
+            }
+
+            try
+            {
+                // PuppeteerSharp doesn't reliably switch to print media before
+                // PdfStreamAsync, so do it explicitly — otherwise @media print
+                // rules in the page CSS won't apply (e.g. the body max-width
+                // override that lets content fill the print area).
+                await page.EmulateMediaTypeAsync(MediaType.Print).ConfigureAwait(false);
+
+                // Bumped from the 30 s default because large documents (multi-MB
+                // HTML with many script tags) can need more time to reach
+                // networkidle0.
+                await page.SetContentAsync(html, new NavigationOptions
+                {
+                    WaitUntil = [WaitUntilNavigation.Networkidle0],
+                    Timeout = 120_000
+                }).ConfigureAwait(false);
+
+                // Inject PDF-specific styles
+                await page.AddStyleTagAsync(new AddTagOptions
+                {
+                    Content = @"
+                        body {
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                        }
+                        .calcpad-ui-datagrid td {
+                            background-color: LightYellow !important;
+                        }
+                    "
+                }).ConfigureAwait(false);
+
+                // Replace <input> elements with underlined text (matches WPF PDF output),
+                // then fit datagrid tables to page width with text wrapping
+                await page.EvaluateFunctionAsync(@"() => {
+                    // 1. Replace inputs with static underlined text
+                    document.querySelectorAll('input[type=""text""]').forEach(input => {
+                        const u = document.createElement('u');
+                        u.textContent = input.value || '\u00A0\u00A0\u00A0';
+                        u.style.backgroundColor = 'LightYellow';
+                        input.parentNode.replaceChild(u, input);
+                    });
+
+                    // 2. Fit datagrid tables to page width
+                    document.querySelectorAll('.calcpad-ui-datagrid').forEach(container => {
+                        // Remove jspreadsheet overflow constraints so full table is visible
+                        var content = container.querySelector('.jss_content');
+                        if (content) {
+                            content.style.overflow = 'visible';
+                            content.style.maxWidth = 'none';
+                            content.style.maxHeight = 'none';
+                            // Set by the preview script only when the grid overflowed the page.
+                            content.style.width = '';
+                        }
+                        var wrapper = container.querySelector('.jss');
+                        if (wrapper) {
+                            wrapper.style.overflow = 'visible';
+                            wrapper.style.maxWidth = 'none';
+                        }
+
+                        var table = container.querySelector('table');
+                        if (!table) return;
+
+                        // Widen the table to the page. The per-column widths live in the
+                        // <colgroup>, so the surplus is shared out across them and the grid
+                        // keeps the proportions the #UI directive asked for.
+                        var pageWidth = document.body.clientWidth || 700;
+                        table.style.tableLayout = 'fixed';
+                        table.style.width = pageWidth + 'px';
+
+                        // Allow text wrapping within cells
+                        var cells = table.querySelectorAll('td, th');
+                        cells.forEach(function(cell) {
+                            cell.style.width = '';
+                            cell.style.minWidth = '0';
+                            cell.style.padding = '2px 6px';
+                            cell.style.whiteSpace = 'normal';
+                            cell.style.wordWrap = 'break-word';
+                            cell.style.overflowWrap = 'break-word';
+                            cell.style.fontSize = '10pt';
+                        });
+                    });
+                }").ConfigureAwait(false);
+
+                await WaitForAsyncContentAsync(page).ConfigureAwait(false);
+
+                var pdfOptions = new PuppeteerSharp.PdfOptions
+                {
+                    Format = ParsePaperFormat(options.Format),
+                    Landscape = options.Orientation == "landscape",
+                    PrintBackground = true,
+                    MarginOptions = new MarginOptions
+                    {
+                        Top = options.MarginTop ?? PdfSettingsDefaults.MarginTop,
+                        Right = options.MarginRight ?? PdfSettingsDefaults.MarginRight,
+                        Bottom = options.MarginBottom ?? PdfSettingsDefaults.MarginBottom,
+                        Left = options.MarginLeft ?? PdfSettingsDefaults.MarginLeft
+                    },
+                    DisplayHeaderFooter = false
+                };
+
+                // Stream the PDF in chunks instead of returning the whole blob in
+                // one CDP message. The single-message path hits a buffer cap in the
+                // DevTools transport (see puppeteer/puppeteer#11720) which produces
+                // a silent blank PDF on large documents.
+                var pdfStream = await page.PdfStreamAsync(pdfOptions).ConfigureAwait(false);
+                try
+                {
+                    using var ms = new MemoryStream();
+                    await pdfStream.CopyToAsync(ms).ConfigureAwait(false);
+                    return ms.ToArray();
+                }
+                finally
+                {
+                    await pdfStream.DisposeAsync().ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                try
+                {
+                    await page.CloseAsync().ConfigureAwait(false);
+                }
+                finally
+                {
+                    _pageLock.Release();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Waits for all client-side rendered images (DXF plots, charts, anything async that
+        /// ends up as an <c>&lt;img&gt;</c>) to finish before capturing the PDF, since
+        /// <c>Networkidle0</c> misses work that happens after the last network request returns.
+        /// Every <c>&lt;img&gt;</c> with a <c>src</c> must report <c>complete</c> with a
+        /// non-zero <c>naturalWidth</c>, followed by a double <c>requestAnimationFrame</c>
+        /// flush and bounded by a 30 s timeout.
+        /// </summary>
+        private static async Task WaitForAsyncContentAsync(IPage page)
+        {
+            try
+            {
+                await page.WaitForFunctionAsync(@"() => {
+                    const imgs = document.querySelectorAll('img');
+                    return Array.from(imgs).every(img => {
+                        if (!img.src && !img.currentSrc) return false;
+                        return img.complete && img.naturalWidth > 0;
+                    });
+                }", new WaitForFunctionOptions { Timeout = 30000, PollingInterval = 100 }).ConfigureAwait(false);
+            }
+            catch (WaitTaskTimeoutException)
+            {
+                // One stuck render shouldn't block the whole PDF — log and proceed
+                // with whatever did finish.
+                FileLogger.LogWarning("PDF render-wait timed out; proceeding with partial result", null);
+            }
+
+            try
+            {
+                await page.EvaluateFunctionAsync(@"() => new Promise(resolve =>
+                    requestAnimationFrame(() => requestAnimationFrame(resolve)))").ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogWarning("PDF paint-frame flush failed before capture", ex.Message);
+            }
+        }
+
+        private async Task<IBrowser> GetOrCreateBrowserAsync()
+        {
+            if (_browser is { IsClosed: false })
+                return _browser;
+
+            await _browserLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                if (_browser is { IsClosed: false })
+                    return _browser;
+
+                // Clean up stale browser
+                if (_browser != null)
+                {
+                    try { await _browser.CloseAsync().ConfigureAwait(false); } catch { }
+                    _browser = null;
+                }
+
+                var executablePath = await ResolveBrowserPathAsync().ConfigureAwait(false);
+                FileLogger.LogVerbose("Launching browser", executablePath);
+
+                try
+                {
+                    _browser = await LaunchBrowserAsync(executablePath).ConfigureAwait(false);
+                }
+                catch (Exception first)
+                {
+                    // Launches can fail transiently, e.g. while the browser is mid-update.
+                    FileLogger.LogWarning("Browser launch failed; retrying once", DescribeLaunchFailure(executablePath, first));
+                    await Task.Delay(1000).ConfigureAwait(false);
+                    try
+                    {
+                        _browser = await LaunchBrowserAsync(executablePath).ConfigureAwait(false);
+                        FileLogger.LogWarning("Browser launch succeeded on retry", executablePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        FileLogger.LogWarning("Browser launch failed again", DescribeLaunchFailure(executablePath, ex));
+
+                        // Only fall back to a ChromeHeadlessShell that is already on disk, or
+                        // download one when the host has pre-approved it. An unattended download
+                        // here is what the desktop/VS Code clients now prompt for instead.
+                        var fallbackPath = FindDownloadedChromium();
+                        if (fallbackPath == null && IsDownloadAllowed())
+                            fallbackPath = await DownloadChromiumAsync().ConfigureAwait(false);
+
+                        if (fallbackPath == null || string.Equals(fallbackPath, executablePath, StringComparison.OrdinalIgnoreCase))
+                            throw new BrowserLaunchFailedException(executablePath, LaunchFailedMessage(executablePath, ex), ex);
+
+                        FileLogger.LogWarning("Falling back to downloaded ChromeHeadlessShell", fallbackPath);
+                        _browser = await LaunchBrowserAsync(fallbackPath).ConfigureAwait(false);
+                    }
+                }
+
+                return _browser;
+            }
+            finally
+            {
+                _browserLock.Release();
+            }
+        }
+
+        // Two attempts plus the retry delay must finish inside the clients' 60 s PDF fetch timeout.
+        private const int BrowserLaunchTimeoutMs = 20_000;
+
+        private static Task<IBrowser> LaunchBrowserAsync(string executablePath) =>
+            Puppeteer.LaunchAsync(new LaunchOptions
+            {
+                Headless = true,
+                ExecutablePath = executablePath,
+                Timeout = BrowserLaunchTimeoutMs,
+                Args = ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu", "--disable-dev-shm-usage"]
+            });
+
+        private static string DescribeLaunchFailure(string executablePath, Exception ex) =>
+            $"Path: {executablePath}\nExists: {File.Exists(executablePath)}\n{ex}";
+
+        private static string LaunchFailedMessage(string executablePath, Exception ex)
+        {
+            var reason = System.Text.RegularExpressions.Regex
+                .Replace(ex.Message.Replace("Failed to launch browser!", ""), @"\s+", " ").Trim();
+            if (reason.Length == 0) reason = "it exited without an error message";
+            return $"The browser at '{executablePath}' was found but failed to start ({reason}). "
+                + "This is often temporary, for example while the browser is updating. "
+                + "Try again, or set BrowserPath in appsettings.json to a different Chromium-family browser.";
+        }
+
+        /// <summary>
+        /// Resolves a Chromium-based browser executable. Checks (in order):
+        /// 1. Host-configured path (<c>BrowserPath</c> in appsettings, or the
+        ///    <c>BROWSER_PATH</c> environment variable). Never request-supplied — an
+        ///    executable path off the wire is an arbitrary-process-launch primitive.
+        /// 2. Well-known system browser locations (Edge, Chrome)
+        /// 3. A ChromeHeadlessShell already downloaded by <see cref="InstallBrowserAsync"/>
+        /// 4. A fresh download, but only when <c>AllowChromiumDownload</c> is set
+        /// </summary>
+        /// <exception cref="BrowserUnavailableException">
+        /// Nothing usable was found and downloading was not pre-approved. Clients turn this into
+        /// a prompt offering the download rather than performing one silently.
+        /// </exception>
+        private async Task<string> ResolveBrowserPathAsync()
+        {
+            // 1. Try the host-configured browser path
+            var path = NullIfEmpty(_config["BrowserPath"])
+                ?? Environment.GetEnvironmentVariable("BROWSER_PATH");
+
+            if (!string.IsNullOrEmpty(path))
+            {
+                if (File.Exists(path))
+                    return path;
+
+                // A stale BrowserPath (a Linux path in a config used on Windows, an
+                // uninstalled browser) shouldn't strand the user — auto-detection below
+                // usually finds a working browser.
+                FileLogger.LogWarning("Configured browser path does not exist; falling back to auto-detection", path);
+            }
+
+            // 2. Try well-known system browser locations
+            var systemBrowser = FindSystemBrowser();
+            if (systemBrowser != null)
+            {
+                FileLogger.LogVerbose("Auto-detected system browser", systemBrowser);
+                return systemBrowser;
+            }
+
+            // 3. A ChromeHeadlessShell downloaded earlier — the user already consented once
+            var downloaded = FindDownloadedChromium();
+            if (downloaded != null)
+            {
+                FileLogger.LogVerbose("Using downloaded ChromeHeadlessShell", downloaded);
+                return downloaded;
+            }
+
+            // 4. Only download unattended when the host opted in
+            if (IsDownloadAllowed())
+                return await DownloadChromiumAsync().ConfigureAwait(false);
+
+            FileLogger.LogWarning("No Chromium-family browser found for PDF export", null);
+            throw new BrowserUnavailableException(
+                "No Chromium-family browser was found. Install Chrome, Edge or Chromium, set BrowserPath, or download the bundled Chromium.");
+        }
+
+        /// <summary>Current browser resolution, without launching or downloading anything.</summary>
+        public BrowserStatus GetBrowserStatus()
+        {
+            var configured = NullIfEmpty(_config["BrowserPath"])
+                ?? Environment.GetEnvironmentVariable("BROWSER_PATH");
+            if (!string.IsNullOrEmpty(configured) && File.Exists(configured))
+                return new BrowserStatus(true, "configured", configured, IsDownloadAllowed(), ChromiumDownloadSizeMb);
+
+            var systemBrowser = FindSystemBrowser();
+            if (systemBrowser != null)
+                return new BrowserStatus(true, "system", systemBrowser, IsDownloadAllowed(), ChromiumDownloadSizeMb);
+
+            var downloaded = FindDownloadedChromium();
+            if (downloaded != null)
+                return new BrowserStatus(true, "downloaded", downloaded, IsDownloadAllowed(), ChromiumDownloadSizeMb);
+
+            return new BrowserStatus(false, "none", null, IsDownloadAllowed(), ChromiumDownloadSizeMb);
+        }
+
+        /// <summary>
+        /// Downloads ChromeHeadlessShell on explicit request — the only path that downloads
+        /// without the <c>AllowChromiumDownload</c> opt-in, because the caller is relaying a
+        /// user's confirmation. Drops any stale browser so the next render picks up the new
+        /// executable.
+        /// </summary>
+        public async Task<string> InstallBrowserAsync()
+        {
+            await _downloadLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                var existing = FindDownloadedChromium();
+                if (existing != null)
+                    return existing;
+
+                var path = await DownloadChromiumAsync().ConfigureAwait(false);
+
+                await _browserLock.WaitAsync().ConfigureAwait(false);
+                try
+                {
+                    if (_browser != null)
+                    {
+                        try { await _browser.CloseAsync().ConfigureAwait(false); } catch { }
+                        _browser = null;
+                    }
+                }
+                finally
+                {
+                    _browserLock.Release();
+                }
+
+                return path;
+            }
+            finally
+            {
+                _downloadLock.Release();
+            }
+        }
+
+        private bool IsDownloadAllowed()
+        {
+            if (bool.TryParse(Environment.GetEnvironmentVariable("ALLOW_CHROMIUM_DOWNLOAD"), out var fromEnv))
+                return fromEnv;
+            return _config.GetValue("AllowChromiumDownload", false);
+        }
+
+        private static string? FindDownloadedChromium()
+        {
+            if (_cachedChromiumPath != null && File.Exists(_cachedChromiumPath))
+                return _cachedChromiumPath;
+
+            try
+            {
+                var fetcher = new BrowserFetcher(new BrowserFetcherOptions
+                {
+                    Path = Path.Combine(AppContext.BaseDirectory, "chromium"),
+                    Browser = SupportedBrowser.ChromeHeadlessShell
+                });
+
+                foreach (var installed in fetcher.GetInstalledBrowsers())
+                {
+                    var executable = installed.GetExecutablePath();
+                    if (File.Exists(executable))
+                    {
+                        _cachedChromiumPath = executable;
+                        return executable;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogWarning("Could not enumerate downloaded browsers", ex.Message);
+            }
+
+            return null;
+        }
+
+        private static string? FindSystemBrowser()
+        {
+            string[] candidates;
+
+            if (OperatingSystem.IsWindows())
+            {
+                var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+                var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+                var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+                candidates =
+                [
+                    Path.Combine(programFiles, "Microsoft", "Edge", "Application", "msedge.exe"),
+                    Path.Combine(programFilesX86, "Microsoft", "Edge", "Application", "msedge.exe"),
+                    Path.Combine(localAppData, "Microsoft", "Edge", "Application", "msedge.exe"),
+                    Path.Combine(programFiles, "Google", "Chrome", "Application", "chrome.exe"),
+                    Path.Combine(programFilesX86, "Google", "Chrome", "Application", "chrome.exe"),
+                    Path.Combine(localAppData, "Google", "Chrome", "Application", "chrome.exe"),
+                ];
+            }
+            else if (OperatingSystem.IsLinux())
+            {
+                candidates =
+                [
+                    "/usr/bin/chromium",
+                    "/usr/bin/chromium-browser",
+                    "/usr/bin/google-chrome",
+                    "/usr/bin/google-chrome-stable",
+                    "/snap/bin/chromium",
+                ];
+            }
+            else if (OperatingSystem.IsMacOS())
+            {
+                candidates =
+                [
+                    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+                    "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+                    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+                ];
+            }
+            else
+            {
+                return null;
+            }
+
+            foreach (var candidate in candidates)
+            {
+                if (File.Exists(candidate))
+                    return candidate;
+            }
+
+            return null;
+        }
+
+        private static async Task<string> DownloadChromiumAsync()
+        {
+            var existing = FindDownloadedChromium();
+            if (existing != null)
+                return existing;
+
+            var downloadDir = Path.Combine(AppContext.BaseDirectory, "chromium");
+
+            FileLogger.LogInfo("Downloading ChromeHeadlessShell", downloadDir);
+
+            var fetcher = new BrowserFetcher(new BrowserFetcherOptions
+            {
+                Path = downloadDir,
+                Browser = SupportedBrowser.ChromeHeadlessShell
+            });
+
+            var installed = await fetcher.DownloadAsync().ConfigureAwait(false);
+            _cachedChromiumPath = installed.GetExecutablePath();
+            FileLogger.LogInfo("ChromeHeadlessShell download complete", _cachedChromiumPath);
+            return _cachedChromiumPath;
+        }
+
+        private static string? NullIfEmpty(string? value) =>
+            string.IsNullOrEmpty(value) ? null : value;
+
+        /// <summary>Recognized names mirror <see cref="PdfPaperFormat"/> in Calcpad.Highlighter,
+        /// which is what validates a document's <c>pdf</c> metadata comment.</summary>
+        private static PaperFormat ParsePaperFormat(string? format) =>
+            Enum.TryParse<PdfPaperFormat>(format, true, out var parsed)
+                ? MapPaperFormat(parsed)
+                : MapPaperFormat(Enum.Parse<PdfPaperFormat>(PdfSettingsDefaults.Format, true));
+
+        private static PaperFormat MapPaperFormat(PdfPaperFormat format) => format switch
+        {
+            PdfPaperFormat.Letter => PaperFormat.Letter,
+            PdfPaperFormat.Legal => PaperFormat.Legal,
+            PdfPaperFormat.Tabloid => PaperFormat.Tabloid,
+            PdfPaperFormat.Ledger => PaperFormat.Ledger,
+            PdfPaperFormat.A0 => PaperFormat.A0,
+            PdfPaperFormat.A1 => PaperFormat.A1,
+            PdfPaperFormat.A2 => PaperFormat.A2,
+            PdfPaperFormat.A3 => PaperFormat.A3,
+            PdfPaperFormat.A4 => PaperFormat.A4,
+            PdfPaperFormat.A5 => PaperFormat.A5,
+            PdfPaperFormat.A6 => PaperFormat.A6,
+            _ => PaperFormat.Letter,
+        };
+
+        #region PDFsharp Enhancement
+
+        private byte[] EnhancePdf(byte[] pdfBytes, PdfSettingsDto options)
+        {
+            var lines = (options.HeaderFooterLines ?? PdfSettingsDefaults.HeaderFooterLines).ToLowerInvariant();
+            bool headerLine = lines is "both" or "header";
+            bool footerLine = lines is "both" or "footer";
+
+            using var inputStream = new MemoryStream(pdfBytes);
+            var document = PdfReader.Open(inputStream, PdfDocumentOpenMode.Modify);
+
+            var ctx = SetupHeaderFooterContext(options.LineColor);
+            for (int i = 0; i < document.PageCount; i++)
+            {
+                var page = document.Pages[i];
+                using var gfx = XGraphics.FromPdfPage(page, XGraphicsPdfPageOptions.Append);
+
+                double width = page.Width.Point;
+                double height = page.Height.Point;
+
+                DrawHeader(gfx, width, ctx, headerLine, options);
+                DrawFooter(gfx, width, height, i + 1, document.PageCount, ctx, footerLine, options);
+            }
+
+            using var outputStream = new MemoryStream();
+            document.Save(outputStream, false);
+            return outputStream.ToArray();
+        }
+
+        private readonly record struct HeaderFooterContext(double Margin, XPen LinePen, XSolidBrush GrayBrush);
+
+        private static HeaderFooterContext SetupHeaderFooterContext(string? lineColor) => new(
+            Margin: 20,
+            LinePen: new XPen(ParseLineColor(lineColor), 0.5),
+            GrayBrush: new XSolidBrush(XColor.FromArgb(77, 77, 77)));
+
+        private static XColor ParseLineColor(string? hex)
+        {
+            if (hex is null || !PdfSettingsDto.HexColor.IsMatch(hex))
+                hex = PdfSettingsDefaults.LineColor;
+            var rgb = Convert.ToInt32(hex[1..], 16);
+            return XColor.FromArgb((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
+        }
+
+        private void DrawHeader(XGraphics gfx, double width, HeaderFooterContext ctx, bool drawLine, PdfSettingsDto options)
+        {
+            var font = new XFont("Helvetica", 10);
+            var boldFont = new XFont("Helvetica", 12, XFontStyleEx.Bold);
+            var smallFont = new XFont("Helvetica", 8);
+            var darkBrush = XBrushes.Black;
+            var lightGrayBrush = new XSolidBrush(XColor.FromArgb(128, 128, 128));
+
+            double margin = ctx.Margin;
+            double headerY = margin;
+
+            // Separator line below header text
+            double lineY = headerY + 25;
+            if (drawLine)
+                gfx.DrawLine(ctx.LinePen, margin, lineY, width - margin, lineY);
+
+            // Document title (top-left, bold)
+            if (!string.IsNullOrEmpty(options.DocumentTitle))
+            {
+                gfx.DrawString(options.DocumentTitle, boldFont, darkBrush,
+                    new XPoint(margin, headerY + 12));
+            }
+
+            // Timestamp (top-right)
+            if (options.ShowDate ?? PdfSettingsDefaults.ShowDate)
+            {
+                var timestampFormat = string.IsNullOrEmpty(options.DateTimeFormat) ? "g" : options.DateTimeFormat;
+                var timestamp = DateTime.Now.ToString(timestampFormat);
+                var timestampSize = gfx.MeasureString(timestamp, smallFont);
+                gfx.DrawString(timestamp, smallFont, lightGrayBrush,
+                    new XPoint(width - margin - timestampSize.Width, headerY + 12));
+            }
+        }
+
+        private void DrawFooter(XGraphics gfx, double width, double height,
+            int pageNumber, int totalPages, HeaderFooterContext ctx, bool drawLine, PdfSettingsDto options)
+        {
+            var font = new XFont("Helvetica", 8);
+            var centerFont = new XFont("Helvetica", 10);
+
+            double margin = ctx.Margin;
+            double footerY = height - margin - 20;
+
+            // Separator line above footer
+            double lineY = footerY - 5;
+            if (drawLine)
+                gfx.DrawLine(ctx.LinePen, margin, lineY, width - margin, lineY);
+
+            // Right side: Page numbers
+            if (options.ShowPageNumbers ?? PdfSettingsDefaults.ShowPageNumbers)
+            {
+                var pageText = $"Page {pageNumber} of {totalPages}";
+                var pageSize = gfx.MeasureString(pageText, font);
+                gfx.DrawString(pageText, font, ctx.GrayBrush,
+                    new XPoint(width - margin - pageSize.Width, footerY + 8));
+            }
+        }
+
+        #endregion
+
+        public async ValueTask DisposeAsync()
+        {
+            if (_browser != null)
+            {
+                try
+                {
+                    var process = _browser.Process;
+                    await _browser.CloseAsync().ConfigureAwait(false);
+                    // Ensure the browser process is fully terminated so it doesn't hold file locks
+                    if (process is { HasExited: false })
+                    {
+                        process.Kill(entireProcessTree: true);
+                        process.WaitForExit(3000);
+                    }
+                }
+                catch { }
+                _browser = null;
+            }
+        }
+    }
+}

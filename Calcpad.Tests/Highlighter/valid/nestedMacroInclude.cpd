@@ -1,0 +1,43 @@
+#local
+#include nestedMacroInclude2.cpd
+#global
+#def getMn$(M_n$; A_s$; d$)
+	ρ_smn = A_s$/(d$*12in)
+	k_mn = sqrt(2*ρ_smn*n + (ρ_smn*n)^2) - ρ_smn*n
+	j_mn = 1 - k_mn/3
+	M_m = 0.5*F_b*k_mn*j_mn*12in*d$^2
+	M_s = A_s$*F_s*j_mn*d$
+	M_n$ = min(M_m; M_s)
+#end def
+'
+#def getVn$(V_n$; M_a$; V_a$; P_a$; d$; A_n$; y_g$)
+    ratio_vn = min(M_a$/(V_a$*d$); 1)
+	#if ratio_vn ≤ 0.25
+		F_v = 3*sqrt(f′_m)*sqrt(1psi)note$('M/(V*d) ≤ 0.25')
+	#else if ratio_vn ≥ 1
+		F_v = 2*sqrt(f′_m)*sqrt(1psi)note$('M/(V*d) ≥ 1')
+	#else
+		F_v = (3*sqrt(f′_m) - ((ratio_vn - 0.25)/0.75)*sqrt(f′_m))*sqrt(1psi)|psinote$('0.25 < M/(V*d) < 1')
+	#end if
+	F_vm = 0.5*((4 - 1.75*ratio_vn)*sqrt(f′_m)*sqrt(1psi)) + 0.25*P_a$/A_n$|psi
+	V_n$ = min(F_v; F_vm)*A_n$*y_g$
+#end def
+'
+#def getCom$(f_ab$; M_aLC$; P_aLC$; A_s$; A_n$; d$; I_N$)
+	hide$
+	f_a,bLC = vector(len(P_aLC$))
+	unhide$
+	ρ_smn = A_s$/(d$*12in)
+	k_mn = sqrt(2*ρ_smn*n + (ρ_smn*n)^2) - ρ_smn*n
+	hide$
+	#for itr = 1 : len(P_aLC$)
+		f_a = P_aLC$.itr/A_n$
+		x = k_mn*d$
+		f_b = M_aLC$.itr*x/I_N$
+		f_a,bLC.itr = abs(f_a) + abs(f_b)
+	#loop
+	unhide$
+	'Sum of compression stresses from axial and compression loads for each load combo
+	f_a,bLC
+	f_ab$ = max(f_a,bLC)|psi
+#end def

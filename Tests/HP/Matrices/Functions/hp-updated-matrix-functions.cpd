@@ -160,10 +160,10 @@ L = ltriang_hp(3)
 	#for j = 1 : i
 		#if i ≡ j
 			L.(i; i) = sqrt(m_definitive.(i; i) - $Sum{L.(i; k)^2 @ k = 1 : i})
-			
+
 		#else
 			L.(i; j) = (m_definitive.(i; j) - $Sum{L.(i; k)*L.(j; k) @ k = 1 : i})/L.(j; j)
-			
+
 		#end if
 	#loop
 #loop

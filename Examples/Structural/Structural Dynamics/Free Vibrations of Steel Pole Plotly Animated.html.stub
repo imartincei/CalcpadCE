@@ -1,0 +1,2967 @@
+<div class="calcpad-output">
+ <!-- Tapered steel pole free-vibration analysis with the mode shapes animated in the browser by Plotly, smoothly interpolating between the positive and negative amplitude of each mode. -->
+ <h3>Static scheme</h3>
+ <p>
+  Cantilever with length -
+  <span class="eq">
+   <var>L</var>
+   = 110
+   <i>m</i>
+  </span>
+ </p>
+ <h3>Material</h3>
+ <h4>Steel</h4>
+ <p>
+  Elastic modulus -
+  <span class="eq">
+   <var>E</var>
+   = 206
+   <i>GPa</i>
+  </span>
+ </p>
+ <p>
+  Poisson′s ratio -
+  <span class="eq">
+   <var>ν</var>
+   = 0.3
+  </span>
+ </p>
+ <p>
+  Shear modulus -
+  <span class="eq">
+   <var>G</var>
+   =
+   <span class="dvc">
+    <var>E</var>
+    <span class="dvl">
+    </span>
+    2 ·  ( 1 +
+    <var>ν</var>
+    )
+   </span>
+   =
+   <span class="dvc">
+    206
+    <i>GPa</i>
+    <span class="dvl">
+    </span>
+    2 ·  ( 1 + 0.3 )
+   </span>
+   = 79.23
+   <i>GPa</i>
+  </span>
+ </p>
+ <p>
+  Mass density -
+  <span class="eq">
+   <var>γ</var>
+   <sub>s</sub>
+   = 7.85
+   <span class="dvc">
+    <i>t</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+    <sup class="unit">3</sup>
+   </span>
+  </span>
+ </p>
+ <!--Section shape  <span class="eq"><var>shape</var> = 3</span> ,  <span class="eq"><var>Precision</var> = 10<sup>-4</sup> = 0.0001</span> -->
+ <h3>Cross-section</h3>
+ <p>Section height:</p>
+ <p>
+  - at bottom -
+  <span class="eq">
+   <var>h</var>
+   <sub>b</sub>
+   = 3000
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  - at top -
+  <span class="eq">
+   <var>h</var>
+   <sub>t</sub>
+   = 750
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  - difference -
+  <span class="eq">
+   <var>Δh</var>
+   =
+   <var>h</var>
+   <sub>t</sub>
+   −
+   <var>h</var>
+   <sub>b</sub>
+   = 750
+   <i>mm</i>
+   − 3000
+   <i>mm</i>
+   = -2250
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  - as a function of distance to base -
+  <span class="eq">
+   <var>h</var>
+   (
+   <var>x</var>
+   )  =
+   <var>h</var>
+   <sub>b</sub>
+   +
+   <span class="dvc">
+    <var>Δh</var>
+    ·
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    <var>L</var>
+   </span>
+  </span>
+ </p>
+ <p>Section width:</p>
+ <p>
+  - at bottom -
+  <span class="eq">
+   <var>w</var>
+   <sub>b</sub>
+   = 3000
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  - at top -
+  <span class="eq">
+   <var>w</var>
+   <sub>t</sub>
+   = 750
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  - difference -
+  <span class="eq">
+   <var>Δw</var>
+   =
+   <var>w</var>
+   <sub>t</sub>
+   −
+   <var>w</var>
+   <sub>b</sub>
+   = 750
+   <i>mm</i>
+   − 3000
+   <i>mm</i>
+   = -2250
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  - as a function of distance to base -
+  <span class="eq">
+   <var>w</var>
+   (
+   <var>x</var>
+   )  =
+   <var>w</var>
+   <sub>b</sub>
+   +
+   <span class="dvc">
+    <var>Δw</var>
+    ·
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    <var>L</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  Cross-section shape -
+  <b>Elliptical tube</b>
+ </p>
+ <p>
+  Thickness -
+  <span class="eq">
+   <var>t</var>
+   <sub>b</sub>
+   = 20
+   <i>mm</i>
+  </span>
+  ,
+  <span class="eq">
+   <var>t</var>
+   <sub>t</sub>
+   = 9
+   <i>mm</i>
+  </span>
+ </p>
+ <p>Function of cross-section outline</p>
+ <p>
+  <span class="eq">
+   <var>t</var>
+   (
+   <var>x</var>
+   )  =
+   <var>t</var>
+   <sub>b</sub>
+   +
+   <span class="dvc">
+    (
+    <var>t</var>
+    <sub>t</sub>
+    −
+    <var>t</var>
+    <sub>b</sub>
+    )  ·
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    <var>L</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   <sub>i</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  =
+   <var>w</var>
+   (
+   <var>x</var>
+   )  − 2 ·
+   <var>t</var>
+   (
+   <var>x</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   <sub>i</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  =
+   <var>h</var>
+   (
+   <var>x</var>
+   )  − 2 ·
+   <var>t</var>
+   (
+   <var>x</var>
+   )
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   <sub>1</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  =
+   <span class="dvc">
+    2 ·
+    <var>w</var>
+    (
+    <var>x</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>h</var>
+    (
+    <var>x</var>
+    )
+   </span>
+   ·
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>h</var>
+     (
+     <var>x</var>
+     )
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">2</sup>
+    −
+    <span class="b1">(</span>
+    <var>z</var>
+    −
+    <span class="dvc">
+     <var>h</var>
+     (
+     <var>x</var>
+     )
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">2</sup>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   <sub>2</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  =
+   <span class="dvcs">
+    <span class="c2">{</span>
+    <span class="dvs">
+     if  (
+     <var>z</var>
+     &gt;
+     <var>t</var>
+     (
+     <var>x</var>
+     )  )  ·  (
+     <var>z</var>
+     &lt;
+     <var>h</var>
+     (
+     <var>x</var>
+     )  −
+     <var>t</var>
+     (
+     <var>x</var>
+     )  ) :
+     <span class="dvc">
+      2 ·
+      <var>b</var>
+      <sub>i</sub>
+      (
+      <var>x</var>
+      ;
+      <var>z</var>
+      )
+      <span class="dvl">
+      </span>
+      <var>h</var>
+      <sub>i</sub>
+      (
+      <var>x</var>
+      ;
+      <var>z</var>
+      )
+     </span>
+     ·
+     <span class="o1">
+      <span class="r1">
+      </span>
+      <span class="b1">(</span>
+      <span class="dvc">
+       <var>h</var>
+       <sub>i</sub>
+       (
+       <var>x</var>
+       ;
+       <var>z</var>
+       )
+       <span class="dvl">
+       </span>
+       2
+      </span>
+      <span class="b1">)</span>
+      <sup class="raised">2</sup>
+      −
+      <span class="b1">(</span>
+      <var>z</var>
+      −
+      <span class="dvc">
+       <var>h</var>
+       (
+       <var>x</var>
+       )
+       <span class="dvl">
+       </span>
+       2
+      </span>
+      <span class="b1">)</span>
+      <sup class="raised">2</sup>
+     </span>
+     <br/>
+     else: 0
+     <i>m</i>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  =
+   <var>b</var>
+   <sub>1</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  −
+   <var>b</var>
+   <sub>2</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )
+  </span>
+ </p>
+ <h4>Cross section properties</h4>
+ <p>
+  <span class="eq">
+   <var>δ</var>
+   = 0.01
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  Area -
+  <span class="eq">
+   <var>A</var>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>h</var>
+     (
+     <var>x</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>mm</i>
+    </small>
+   </span>
+   <var>b</var>
+   <sub>1</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  d
+   <var>z</var>
+   −
+   <span class="dvr">
+    <small>
+     <var>h</var>
+     (
+     <var>x</var>
+     )  −
+     <var>t</var>
+     (
+     <var>x</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     <var>t</var>
+     (
+     <var>x</var>
+     )
+    </small>
+   </span>
+   <var>b</var>
+   <sub>2</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  d
+   <var>z</var>
+  </span>
+ </p>
+ <p>
+  First moment of area -
+  <span class="eq">
+   <var>S</var>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>h</var>
+     (
+     <var>x</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>mm</i>
+    </small>
+   </span>
+   <var>b</var>
+   <sub>1</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  ·
+   <var>z</var>
+   d
+   <var>z</var>
+   −
+   <span class="dvr">
+    <small>
+     <var>h</var>
+     (
+     <var>x</var>
+     )  −
+     <var>t</var>
+     (
+     <var>x</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     <var>t</var>
+     (
+     <var>x</var>
+     )
+    </small>
+   </span>
+   <var>b</var>
+   <sub>2</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  ·
+   <var>z</var>
+   d
+   <var>z</var>
+  </span>
+ </p>
+ <p>
+  Geometrical center-
+  <span class="eq">
+   <var>z</var>
+   <sub>c</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvc">
+    <var>S</var>
+    (
+    <var>x</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>A</var>
+    (
+    <var>x</var>
+    )
+   </span>
+  </span>
+ </p>
+ <p>Second moment of area</p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>1</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>h</var>
+     (
+     <var>x</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>mm</i>
+    </small>
+   </span>
+   <var>b</var>
+   <sub>1</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  ·  (
+   <var>z</var>
+   −
+   <var>z</var>
+   <sub>c</sub>
+   (
+   <var>x</var>
+   )  )
+   <sup>2</sup>
+   d
+   <var>z</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   <sub>2</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>h</var>
+     (
+     <var>x</var>
+     )  −
+     <var>t</var>
+     (
+     <var>x</var>
+     )
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     <var>t</var>
+     (
+     <var>x</var>
+     )
+    </small>
+   </span>
+   <var>b</var>
+   <sub>2</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  ·  (
+   <var>z</var>
+   −
+   <var>z</var>
+   <sub>c</sub>
+   (
+   <var>x</var>
+   )  )
+   <sup>2</sup>
+   d
+   <var>z</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>I</var>
+   (
+   <var>x</var>
+   )  =
+   <var>I</var>
+   <sub>1</sub>
+   (
+   <var>x</var>
+   )  −
+   <var>I</var>
+   <sub>2</sub>
+   (
+   <var>x</var>
+   )
+  </span>
+ </p>
+ <p>First moment of area under z</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   <sub>1</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>z</var>
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     <var>δ</var>
+    </small>
+   </span>
+   <var>b</var>
+   <sub>1</sub>
+   (
+   <var>x</var>
+   ;
+   <var>ζ</var>
+   )  ·  (
+   <var>z</var>
+   <sub>c</sub>
+   (
+   <var>x</var>
+   )  −
+   <var>ζ</var>
+   )  d
+   <var>ζ</var>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   <sub>2</sub>
+   (
+   <var>x</var>
+   ;
+   <var>z</var>
+   )  =
+   <span class="dvr">
+    <small>
+     <var>z</var>
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     <var>t</var>
+     (
+     <var>x</var>
+     )  +
+     <var>δ</var>
+    </small>
+   </span>
+   <var>b</var>
+   <sub>2</sub>
+   (
+   <var>x</var>
+   ;
+   <var>ζ</var>
+   )  ·  (
+   <var>z</var>
+   <sub>c</sub>
+   (
+   <var>x</var>
+   )  −
+   <var>ζ</var>
+   )  d
+   <var>ζ</var>
+  </span>
+ </p>
+ <p>Shear area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>Q1</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvc">
+    <var>I</var>
+    <sub>1</sub>
+    (
+    <var>x</var>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <span class="dvr">
+     <small>
+      <var>h</var>
+      (
+      <var>x</var>
+      )  −
+      <var>δ</var>
+     </small>
+     <span class="nary">
+      <em>∫</em>
+     </span>
+     <small>
+      <var>δ</var>
+     </small>
+    </span>
+    <span class="dvc">
+     <var>S</var>
+     <sub>1</sub>
+     (
+     <var>x</var>
+     ;
+     <var>z</var>
+     )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+     <sub>1</sub>
+     (
+     <var>x</var>
+     ;
+     <var>z</var>
+     )
+    </span>
+    d
+    <var>z</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>Q2</sub>
+   (
+   <var>x</var>
+   )  =
+   <span class="dvc">
+    <var>I</var>
+    <sub>2</sub>
+    (
+    <var>x</var>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <span class="dvr">
+     <small>
+      <var>h</var>
+      (
+      <var>x</var>
+      )  −
+      <var>t</var>
+      (
+      <var>x</var>
+      )  −
+      <var>δ</var>
+     </small>
+     <span class="nary">
+      <em>∫</em>
+     </span>
+     <small>
+      <var>t</var>
+      (
+      <var>x</var>
+      )  +
+      <var>δ</var>
+     </small>
+    </span>
+    <span class="dvc">
+     <var>S</var>
+     <sub>2</sub>
+     (
+     <var>x</var>
+     ;
+     <var>z</var>
+     )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+     <sub>2</sub>
+     (
+     <var>x</var>
+     ;
+     <var>z</var>
+     )
+    </span>
+    d
+    <var>z</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>Q</sub>
+   (
+   <var>x</var>
+   )  =
+   <var>A</var>
+   <sub>Q1</sub>
+   (
+   <var>x</var>
+   )  −
+   <var>A</var>
+   <sub>Q2</sub>
+   (
+   <var>x</var>
+   )
+  </span>
+ </p>
+ <!-- <span class="eq"><var>PlotWidth</var> = 200</span> , <span class="eq"><var>PlotHeight</var> = 200</span> -->
+ <svg class="plot" data-plot="svg" height="1040px" style="width:198.15pt; height:192.59pt;" version="1.1" viewbox=" 0 0 1070 1040" width="1070px" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+   .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+.Series4 {stroke:#f0d000;}
+circle.Series4 {fill:#f0d000;}
+.Fill4 {fill:#f0d000; fill-opacity:0.035;}
+.Series5 {stroke:MediumVioletRed;}
+circle.Series5 {fill:MediumVioletRed;}
+.Fill5 {fill:MediumVioletRed; fill-opacity:0.030;}
+.Series6 {stroke:MediumSpringGreen;}
+circle.Series6 {fill:MediumSpringGreen;}
+.Fill6 {fill:MediumSpringGreen; fill-opacity:0.025;}
+  </style>
+  <g class="plot">
+   <rect class="Frame" height="800" width="800" x="180" y="120">
+   </rect>
+   <line class="Grid" x1="180" x2="980" y1="920" y2="920">
+   </line>
+   <text class="sm end" x="161" y="938">0</text>
+   <line class="Grid" x1="180" x2="980" y1="853.33" y2="853.33">
+   </line>
+   <text class="sm end" x="161" y="871.33">250</text>
+   <line class="Grid" x1="180" x2="980" y1="786.67" y2="786.67">
+   </line>
+   <text class="sm end" x="161" y="804.67">500</text>
+   <line class="Grid" x1="180" x2="980" y1="720" y2="720">
+   </line>
+   <text class="sm end" x="161" y="738">750</text>
+   <line class="Grid" x1="180" x2="980" y1="653.33" y2="653.33">
+   </line>
+   <text class="sm end" x="161" y="671.33">1000</text>
+   <line class="Grid" x1="180" x2="980" y1="586.67" y2="586.67">
+   </line>
+   <text class="sm end" x="161" y="604.67">1250</text>
+   <line class="Grid" x1="180" x2="980" y1="520" y2="520">
+   </line>
+   <text class="sm end" x="161" y="538">1500</text>
+   <line class="Grid" x1="180" x2="980" y1="453.33" y2="453.33">
+   </line>
+   <text class="sm end" x="161" y="471.33">1750</text>
+   <line class="Grid" x1="180" x2="980" y1="386.67" y2="386.67">
+   </line>
+   <text class="sm end" x="161" y="404.67">2000</text>
+   <line class="Grid" x1="180" x2="980" y1="320" y2="320">
+   </line>
+   <text class="sm end" x="161" y="338">2250</text>
+   <line class="Grid" x1="180" x2="980" y1="253.33" y2="253.33">
+   </line>
+   <text class="sm end" x="161" y="271.33">2500</text>
+   <line class="Grid" x1="180" x2="980" y1="186.67" y2="186.67">
+   </line>
+   <text class="sm end" x="161" y="204.67">2750</text>
+   <line class="Grid" x1="180" x2="980" y1="120" y2="120">
+   </line>
+   <text class="sm end" x="161" y="138">3000</text>
+   <line class="Grid" x1="180" x2="180" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="180" y="972">-1500</text>
+   <line class="Grid" x1="280" x2="280" y1="120" y2="920">
+   </line>
+   <line class="Grid" x1="380" x2="380" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="380" y="972">-750</text>
+   <line class="Grid" x1="480" x2="480" y1="120" y2="920">
+   </line>
+   <line class="Grid" x1="580" x2="580" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="580" y="972">0</text>
+   <line class="Grid" x1="680" x2="680" y1="120" y2="920">
+   </line>
+   <line class="Grid" x1="780" x2="780" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="780" y="972">750</text>
+   <line class="Grid" x1="880" x2="880" y1="120" y2="920">
+   </line>
+   <line class="Grid" x1="980" x2="980" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="980" y="972">1500</text>
+   <line class="Axis" x1="180" x2="980" y1="920" y2="920">
+   </line>
+   <text x="1002" y="902">x</text>
+   <line class="Axis" x1="580" x2="580" y1="120" y2="920">
+   </line>
+   <text class="mid" x="580" y="84">y</text>
+   <text x="8" y="1023">[-1500; 0]</text>
+   <text class="end" x="1062" y="44">[1500; 3000]</text>
+   <circle class="Series1" cx="580" cy="520" r="10">
+   </circle>
+   <polyline class="Series2" points="580,920 615.88,918.39 630.7,916.77 642.03,915.16 651.55,913.55 667.45,910.32 680.78,907.1 702.92,900.65 721.35,894.19 737.37,887.74 751.67,881.29 776.54,868.39 797.83,855.48 816.52,842.58 833.18,829.68 848.19,816.77 861.81,803.87 874.24,790.97 896.06,765.16 914.49,739.35 930.06,713.55 943.13,687.74 953.97,661.94 962.77,636.13 969.67,610.32 974.76,584.52 978.12,558.71 979.79,532.9 979.79,507.1 978.12,481.29 974.76,455.48 969.67,429.68 962.77,403.87 953.97,378.06 943.13,352.26 930.06,326.45 914.49,300.65 896.06,274.84 874.24,249.03 861.81,236.13 848.19,223.23 833.18,210.32 816.52,197.42 797.83,184.52 776.54,171.61 751.67,158.71 721.35,145.81">
+   </polyline>
+   <polyline class="Series3" points="580,920 544.12,918.39 529.3,916.77 517.97,915.16 508.45,913.55 492.55,910.32 479.22,907.1 457.08,900.65 438.65,894.19 422.63,887.74 408.33,881.29 383.46,868.39 362.17,855.48 343.48,842.58 326.82,829.68 311.81,816.77 298.19,803.87 285.76,790.97 263.94,765.16 245.51,739.35 229.94,713.55 216.87,687.74 206.03,661.94 197.23,636.13 190.33,610.32 185.24,584.52 181.88,558.71 180.21,532.9 180.21,507.1 181.88,481.29 185.24,455.48 190.33,429.68 197.23,403.87 206.03,378.06 216.87,352.26 229.94,326.45 245.51,300.65 263.94,274.84 285.76,249.03 298.19,236.13 311.81,223.23 326.82,210.32 343.48,197.42 362.17,184.52 383.46,171.61 408.33,158.71 438.65,145.81">
+   </polyline>
+   <polyline class="Series4" points="580,920 580,918.39 580,916.77 580,915.16 609.69,913.55 626.35,911.94 638.4,910.32 656.93,907.1 671.68,903.87 684.26,900.65 705.46,894.19 723.27,887.74 738.84,881.29 765.44,868.39 787.88,855.48 807.38,842.58 824.67,829.68 840.17,816.77 854.19,803.87 866.95,790.97 878.6,778.06 889.29,765.16 908.09,739.35 923.95,713.55 937.25,687.74 948.26,661.94 957.19,636.13 964.19,610.32 969.36,584.52 972.76,558.71 974.46,532.9 974.46,507.1 972.76,481.29 969.36,455.48 964.19,429.68 957.19,403.87 948.26,378.06 937.25,352.26 923.95,326.45 908.09,300.65 889.29,274.84 878.6,261.94 866.95,249.03 854.19,236.13 840.17,223.23 824.67,210.32 807.38,197.42 787.88,184.52 765.44,171.61 738.84,158.71 723.27,152.26 705.46,145.81 684.26,139.35 671.68,136.13 656.93,132.9 638.4,129.68 626.35,128.06 609.69,126.45 580,124.84 580,123.23 580,121.61 580,120">
+   </polyline>
+   <polyline class="Series5" points="580,920 580,918.39 580,916.77 580,915.16 550.31,913.55 533.65,911.94 521.6,910.32 503.07,907.1 488.32,903.87 475.74,900.65 454.54,894.19 436.73,887.74 421.16,881.29 394.56,868.39 372.12,855.48 352.62,842.58 335.33,829.68 319.83,816.77 305.81,803.87 293.05,790.97 281.4,778.06 270.71,765.16 251.91,739.35 236.05,713.55 222.75,687.74 211.74,661.94 202.81,636.13 195.81,610.32 190.64,584.52 187.24,558.71 185.54,532.9 185.54,507.1 187.24,481.29 190.64,455.48 195.81,429.68 202.81,403.87 211.74,378.06 222.75,352.26 236.05,326.45 251.91,300.65 270.71,274.84 281.4,261.94 293.05,249.03 305.81,236.13 319.83,223.23 335.33,210.32 352.62,197.42 372.12,184.52 394.56,171.61 421.16,158.71 436.73,152.26 454.54,145.81 475.74,139.35 488.32,136.13 503.07,132.9 521.6,129.68 533.65,128.06 550.31,126.45 580,124.84 580,123.23 580,121.61 580,120">
+   </polyline>
+   <polyline class="Series6" points="980,520 954.19,520 928.39,520 902.58,520 876.77,520 850.97,520 825.16,520 799.35,520 773.55,520 747.74,520 721.94,520 696.13,520 670.32,520 644.52,520 618.71,520 592.9,520 567.1,520 541.29,520 515.48,520 489.68,520 463.87,520 438.06,520 412.26,520 386.45,520 360.65,520 334.84,520 309.03,520 283.23,520 257.42,520 231.61,520 205.81,520 180,520">
+   </polyline>
+  </g>
+ </svg>
+ <svg class="plot" data-plot="svg" height="1040px" style="width:198.15pt; height:192.59pt;" version="1.1" viewbox=" 0 0 1070 1040" width="1070px" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+   .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+.Series4 {stroke:#f0d000;}
+circle.Series4 {fill:#f0d000;}
+.Fill4 {fill:#f0d000; fill-opacity:0.035;}
+.Series5 {stroke:MediumVioletRed;}
+circle.Series5 {fill:MediumVioletRed;}
+.Fill5 {fill:MediumVioletRed; fill-opacity:0.030;}
+.Series6 {stroke:MediumSpringGreen;}
+circle.Series6 {fill:MediumSpringGreen;}
+.Fill6 {fill:MediumSpringGreen; fill-opacity:0.025;}
+  </style>
+  <g class="plot">
+   <rect class="Frame" height="800" width="800" x="180" y="120">
+   </rect>
+   <line class="Grid" x1="180" x2="980" y1="920" y2="920">
+   </line>
+   <text class="sm end" x="161" y="938">0</text>
+   <line class="Grid" x1="180" x2="980" y1="813.33" y2="813.33">
+   </line>
+   <text class="sm end" x="161" y="831.33">100</text>
+   <line class="Grid" x1="180" x2="980" y1="706.67" y2="706.67">
+   </line>
+   <text class="sm end" x="161" y="724.67">200</text>
+   <line class="Grid" x1="180" x2="980" y1="600" y2="600">
+   </line>
+   <text class="sm end" x="161" y="618">300</text>
+   <line class="Grid" x1="180" x2="980" y1="493.33" y2="493.33">
+   </line>
+   <text class="sm end" x="161" y="511.33">400</text>
+   <line class="Grid" x1="180" x2="980" y1="386.67" y2="386.67">
+   </line>
+   <text class="sm end" x="161" y="404.67">500</text>
+   <line class="Grid" x1="180" x2="980" y1="280" y2="280">
+   </line>
+   <text class="sm end" x="161" y="298">600</text>
+   <line class="Grid" x1="180" x2="980" y1="173.33" y2="173.33">
+   </line>
+   <text class="sm end" x="161" y="191.33">700</text>
+   <line class="Grid" x1="260" x2="260" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="260" y="972">-300</text>
+   <line class="Grid" x1="366.67" x2="366.67" y1="120" y2="920">
+   </line>
+   <line class="Grid" x1="473.33" x2="473.33" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="473.33" y="972">-100</text>
+   <line class="Grid" x1="580" x2="580" y1="120" y2="920">
+   </line>
+   <line class="Grid" x1="686.67" x2="686.67" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="686.67" y="972">100</text>
+   <line class="Grid" x1="793.33" x2="793.33" y1="120" y2="920">
+   </line>
+   <line class="Grid" x1="900" x2="900" y1="120" y2="920">
+   </line>
+   <text class="sm mid" x="900" y="972">300</text>
+   <line class="Axis" x1="180" x2="980" y1="920" y2="920">
+   </line>
+   <text x="1002" y="902">x</text>
+   <line class="Axis" x1="580" x2="580" y1="120" y2="920">
+   </line>
+   <text class="mid" x="580" y="84">y</text>
+   <text x="8" y="1023">[-375; 0]</text>
+   <text class="end" x="1062" y="44">[375; 750]</text>
+   <circle class="Series1" cx="580" cy="520" r="10">
+   </circle>
+   <polyline class="Series2" points="580,920 615.88,918.39 630.7,916.77 642.03,915.16 651.55,913.55 667.45,910.32 680.78,907.1 702.92,900.65 721.35,894.19 737.37,887.74 751.67,881.29 776.54,868.39 797.83,855.48 816.52,842.58 833.18,829.68 848.19,816.77 861.81,803.87 874.24,790.97 896.06,765.16 914.49,739.35 930.06,713.55 943.13,687.74 953.97,661.94 962.77,636.13 969.67,610.32 974.76,584.52 978.12,558.71 979.79,532.9 979.79,507.1 978.12,481.29 974.76,455.48 969.67,429.68 962.77,403.87 953.97,378.06 943.13,352.26 930.06,326.45 914.49,300.65 896.06,274.84 874.24,249.03 861.81,236.13 848.19,223.23 833.18,210.32 816.52,197.42 797.83,184.52 776.54,171.61 751.67,158.71 721.35,145.81">
+   </polyline>
+   <polyline class="Series3" points="580,920 544.12,918.39 529.3,916.77 517.97,915.16 508.45,913.55 492.55,910.32 479.22,907.1 457.08,900.65 438.65,894.19 422.63,887.74 408.33,881.29 383.46,868.39 362.17,855.48 343.48,842.58 326.82,829.68 311.81,816.77 298.19,803.87 285.76,790.97 263.94,765.16 245.51,739.35 229.94,713.55 216.87,687.74 206.03,661.94 197.23,636.13 190.33,610.32 185.24,584.52 181.88,558.71 180.21,532.9 180.21,507.1 181.88,481.29 185.24,455.48 190.33,429.68 197.23,403.87 206.03,378.06 216.87,352.26 229.94,326.45 245.51,300.65 263.94,274.84 285.76,249.03 298.19,236.13 311.81,223.23 326.82,210.32 343.48,197.42 362.17,184.52 383.46,171.61 408.33,158.71 438.65,145.81">
+   </polyline>
+   <polyline class="Series4" points="580,920 630.68,907.1 666.73,900.65 691.32,894.19 711.06,887.74 727.92,881.29 742.79,874.84 756.18,868.39 779.66,855.48 799.9,842.58 817.72,829.68 833.65,816.77 848.01,803.87 861.05,790.97 872.94,778.06 883.82,765.16 902.95,739.35 919.04,713.55 932.53,687.74 943.68,661.94 952.73,636.13 959.81,610.32 965.03,584.52 968.48,558.71 970.19,532.9 970.19,507.1 968.48,481.29 965.03,455.48 959.81,429.68 952.73,403.87 943.68,378.06 932.53,352.26 919.04,326.45 902.95,300.65 883.82,274.84 872.94,261.94 861.05,249.03 848.01,236.13 833.65,223.23 817.72,210.32 799.9,197.42 779.66,184.52 756.18,171.61 742.79,165.16 727.92,158.71 711.06,152.26 691.32,145.81 666.73,139.35 630.68,132.9 580,120">
+   </polyline>
+   <polyline class="Series5" points="580,920 529.32,907.1 493.27,900.65 468.68,894.19 448.94,887.74 432.08,881.29 417.21,874.84 403.82,868.39 380.34,855.48 360.1,842.58 342.28,829.68 326.35,816.77 311.99,803.87 298.95,790.97 287.06,778.06 276.18,765.16 257.05,739.35 240.96,713.55 227.47,687.74 216.32,661.94 207.27,636.13 200.19,610.32 194.97,584.52 191.52,558.71 189.81,532.9 189.81,507.1 191.52,481.29 194.97,455.48 200.19,429.68 207.27,403.87 216.32,378.06 227.47,352.26 240.96,326.45 257.05,300.65 276.18,274.84 287.06,261.94 298.95,249.03 311.99,236.13 326.35,223.23 342.28,210.32 360.1,197.42 380.34,184.52 403.82,171.61 417.21,165.16 432.08,158.71 448.94,152.26 468.68,145.81 493.27,139.35 529.32,132.9 580,120">
+   </polyline>
+   <polyline class="Series6" points="980,520 954.19,520 928.39,520 902.58,520 876.77,520 850.97,520 825.16,520 799.35,520 773.55,520 747.74,520 721.94,520 696.13,520 670.32,520 644.52,520 618.71,520 592.9,520 567.1,520 541.29,520 515.48,520 489.68,520 463.87,520 438.06,520 412.26,520 386.45,520 360.65,520 334.84,520 309.03,520 283.23,520 257.42,520 231.61,520 205.81,520 180,520">
+   </polyline>
+  </g>
+ </svg>
+ <h3>Mass</h3>
+ <p>
+  Distributed mass along height -
+  <span class="eq">
+   <var>m</var>
+   (
+   <var>x</var>
+   )  =
+   <var>A</var>
+   (
+   <var>x</var>
+   )  ·
+   <var>γ</var>
+   <sub>s</sub>
+  </span>
+ </p>
+ <h3>Solution</h3>
+ <p>
+  Number of nodes -
+  <span class="eq">
+   <var>n</var>
+   <sub>J</sub>
+   = 11
+  </span>
+ </p>
+ <p>
+  Length of one segment -
+  <span class="eq">
+   <var>Δx</var>
+   =
+   <span class="dvc">
+    <var>L</var>
+    <span class="dvl">
+    </span>
+    <var>n</var>
+    <sub>J</sub>
+   </span>
+   =
+   <span class="dvc">
+    110
+    <i>m</i>
+    <span class="dvl">
+    </span>
+    11
+   </span>
+   = 10
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  Elevation of node
+  <var>j</var>
+  -
+  <span class="eq">
+   <var>x</var>
+   (
+   <var>j</var>
+   )  =
+   <var>Δx</var>
+   ·
+   <var>j</var>
+  </span>
+ </p>
+ <p>
+  Bending due to horizontal force
+  <var>F</var>
+  <sub>j</sub>
+  = 1 at node
+  <var>j</var>
+ </p>
+ <p>
+  <span class="eq">
+   <var>M</var>
+   (
+   <var>j</var>
+   ;
+   <var>x</var>
+   )  =
+   <b>max</b>
+   (
+   <var>x</var>
+   (
+   <var>j</var>
+   )  −
+   <var>x</var>
+   ; 0
+   <i>m</i>
+   )
+  </span>
+ </p>
+ <p>Flexibility matrix</p>
+ <p>
+  <span class="eq">
+   <var>D</var>
+   (
+   <var>i</var>
+   ;
+   <var>j</var>
+   )  =
+   <span class="b2">(</span>
+   <span class="dvr">
+    <small>
+     <var>L</var>
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    <var>M</var>
+    (
+    <var>i</var>
+    ;
+    <var>x</var>
+    )  ·
+    <var>M</var>
+    (
+    <var>j</var>
+    ;
+    <var>x</var>
+    )
+    <span class="dvl">
+    </span>
+    <var>I</var>
+    (
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+   <span class="b2">)</span>
+   ·
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>E</var>
+   </span>
+   +
+   <span class="b2">(</span>
+   <span class="dvr">
+    <small>
+     <var>L</var>
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     0
+     <i>m</i>
+    </small>
+   </span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>A</var>
+    <sub>Q</sub>
+    (
+    <var>x</var>
+    )
+   </span>
+   d
+   <var>x</var>
+   <span class="b2">)</span>
+   ·
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>G</var>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>D</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.00911</span>
+     <span class="td">0.0219</span>
+     <span class="td">0.0346</span>
+     <span class="td">0.0474</span>
+     <span class="td">0.0601</span>
+     <span class="td">0.0729</span>
+     <span class="td">0.0856</span>
+     <span class="td">0.0984</span>
+     <span class="td">0.111</span>
+     <span class="td">0.124</span>
+     <span class="td">0.137</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0219</span>
+     <span class="td">0.0731</span>
+     <span class="td">0.129</span>
+     <span class="td">0.185</span>
+     <span class="td">0.242</span>
+     <span class="td">0.298</span>
+     <span class="td">0.354</span>
+     <span class="td">0.41</span>
+     <span class="td">0.466</span>
+     <span class="td">0.522</span>
+     <span class="td">0.578</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0346</span>
+     <span class="td">0.129</span>
+     <span class="td">0.263</span>
+     <span class="td">0.403</span>
+     <span class="td">0.543</span>
+     <span class="td">0.683</span>
+     <span class="td">0.824</span>
+     <span class="td">0.964</span>
+     <span class="td">1.1</span>
+     <span class="td">1.24</span>
+     <span class="td">1.38</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0474</span>
+     <span class="td">0.185</span>
+     <span class="td">0.403</span>
+     <span class="td">0.673</span>
+     <span class="td">0.952</span>
+     <span class="td">1.23</span>
+     <span class="td">1.51</span>
+     <span class="td">1.79</span>
+     <span class="td">2.07</span>
+     <span class="td">2.35</span>
+     <span class="td">2.63</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0601</span>
+     <span class="td">0.242</span>
+     <span class="td">0.543</span>
+     <span class="td">0.952</span>
+     <span class="td">1.43</span>
+     <span class="td">1.93</span>
+     <span class="td">2.43</span>
+     <span class="td">2.92</span>
+     <span class="td">3.42</span>
+     <span class="td">3.91</span>
+     <span class="td">4.41</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0729</span>
+     <span class="td">0.298</span>
+     <span class="td">0.683</span>
+     <span class="td">1.23</span>
+     <span class="td">1.93</span>
+     <span class="td">2.73</span>
+     <span class="td">3.56</span>
+     <span class="td">4.38</span>
+     <span class="td">5.2</span>
+     <span class="td">6.02</span>
+     <span class="td">6.85</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0856</span>
+     <span class="td">0.354</span>
+     <span class="td">0.824</span>
+     <span class="td">1.51</span>
+     <span class="td">2.43</span>
+     <span class="td">3.56</span>
+     <span class="td">4.84</span>
+     <span class="td">6.15</span>
+     <span class="td">7.47</span>
+     <span class="td">8.78</span>
+     <span class="td">10.1</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0984</span>
+     <span class="td">0.41</span>
+     <span class="td">0.964</span>
+     <span class="td">1.79</span>
+     <span class="td">2.92</span>
+     <span class="td">4.38</span>
+     <span class="td">6.15</span>
+     <span class="td">8.17</span>
+     <span class="td">10.24</span>
+     <span class="td">12.3</span>
+     <span class="td">14.37</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.111</span>
+     <span class="td">0.466</span>
+     <span class="td">1.1</span>
+     <span class="td">2.07</span>
+     <span class="td">3.42</span>
+     <span class="td">5.2</span>
+     <span class="td">7.47</span>
+     <span class="td">10.24</span>
+     <span class="td">13.39</span>
+     <span class="td">16.64</span>
+     <span class="td">19.89</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.124</span>
+     <span class="td">0.522</span>
+     <span class="td">1.24</span>
+     <span class="td">2.35</span>
+     <span class="td">3.91</span>
+     <span class="td">6.02</span>
+     <span class="td">8.78</span>
+     <span class="td">12.3</span>
+     <span class="td">16.64</span>
+     <span class="td">21.67</span>
+     <span class="td">26.88</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.137</span>
+     <span class="td">0.578</span>
+     <span class="td">1.38</span>
+     <span class="td">2.63</span>
+     <span class="td">4.41</span>
+     <span class="td">6.85</span>
+     <span class="td">10.1</span>
+     <span class="td">14.37</span>
+     <span class="td">19.89</span>
+     <span class="td">26.88</span>
+     <span class="td">35.23</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+  mm/kN
+ </p>
+ <p>Mass matrix</p>
+ <p>
+  <span class="eq">
+   <var>d</var>
+   <sub>M,j</sub>
+   =
+   <span class="dvr">
+    <small>
+     <var>x</var>
+     (
+     <var>j</var>
+     )  +
+     <span class="dvc">
+      <var>Δx</var>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     <var>x</var>
+     (
+     <var>j</var>
+     )  −
+     <span class="dvc">
+      <var>Δx</var>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </small>
+   </span>
+   <var>m</var>
+   (
+   <var>x</var>
+   )  d
+   <var>x</var>
+   = 1.06
+   <i>t</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">13.01</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">11.43</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">9.94</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">8.55</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">7.26</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">6.08</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">4.99</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">4</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">3.12</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">2.33</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0.904</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  Total mass of structure -
+  <span class="eq">
+   <var>M</var>
+   <sub>tot</sub>
+   =
+   <b>sum</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    d
+   </var>
+   <sub>M</sub>
+   )  = 71.62
+  </span>
+  t
+ </p>
+ <p>Eigenvalues</p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   <sub>sq</sub>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    <b>
+     <var>M</var>
+    </b>
+   </span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3.61</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">3.38</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">3.15</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">2.92</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">2.7</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">2.47</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">2.23</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">2</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1.77</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">1.53</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0.951</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>C</var>
+   </b>
+   =
+   <b>copy</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   <sub>sq</sub>
+   ·
+   <b>
+    <var>D</var>
+   </b>
+   ·
+   <b>
+    <var>M</var>
+   </b>
+   <sub>sq</sub>
+   ;
+   <b>symmetric</b>
+   (
+   <var>n</var>
+   <sub>J</sub>
+   ) ; 1; 1 )  =
+   <b>copy</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   <sub>sq</sub>
+   ·
+   <b>
+    <var>D</var>
+   </b>
+   ·
+   <b>
+    <var>M</var>
+   </b>
+   <sub>sq</sub>
+   ;
+   <b>symmetric</b>
+   ( 11 ) ; 1; 1 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.119</span>
+     <span class="td">0.267</span>
+     <span class="td">0.394</span>
+     <span class="td">0.5</span>
+     <span class="td">0.585</span>
+     <span class="td">0.648</span>
+     <span class="td">0.69</span>
+     <span class="td">0.71</span>
+     <span class="td">0.708</span>
+     <span class="td">0.683</span>
+     <span class="td">0.469</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.267</span>
+     <span class="td">0.835</span>
+     <span class="td">1.38</span>
+     <span class="td">1.83</span>
+     <span class="td">2.2</span>
+     <span class="td">2.48</span>
+     <span class="td">2.67</span>
+     <span class="td">2.77</span>
+     <span class="td">2.78</span>
+     <span class="td">2.7</span>
+     <span class="td">1.86</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.394</span>
+     <span class="td">1.38</span>
+     <span class="td">2.61</span>
+     <span class="td">3.71</span>
+     <span class="td">4.61</span>
+     <span class="td">5.31</span>
+     <span class="td">5.8</span>
+     <span class="td">6.08</span>
+     <span class="td">6.15</span>
+     <span class="td">5.99</span>
+     <span class="td">4.15</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.5</span>
+     <span class="td">1.83</span>
+     <span class="td">3.71</span>
+     <span class="td">5.75</span>
+     <span class="td">7.51</span>
+     <span class="td">8.88</span>
+     <span class="td">9.87</span>
+     <span class="td">10.48</span>
+     <span class="td">10.69</span>
+     <span class="td">10.5</span>
+     <span class="td">7.31</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.585</span>
+     <span class="td">2.2</span>
+     <span class="td">4.61</span>
+     <span class="td">7.51</span>
+     <span class="td">10.42</span>
+     <span class="td">12.82</span>
+     <span class="td">14.61</span>
+     <span class="td">15.76</span>
+     <span class="td">16.27</span>
+     <span class="td">16.11</span>
+     <span class="td">11.3</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.648</span>
+     <span class="td">2.48</span>
+     <span class="td">5.31</span>
+     <span class="td">8.88</span>
+     <span class="td">12.82</span>
+     <span class="td">16.6</span>
+     <span class="td">19.58</span>
+     <span class="td">21.6</span>
+     <span class="td">22.64</span>
+     <span class="td">22.68</span>
+     <span class="td">16.05</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.69</span>
+     <span class="td">2.67</span>
+     <span class="td">5.8</span>
+     <span class="td">9.87</span>
+     <span class="td">14.61</span>
+     <span class="td">19.58</span>
+     <span class="td">24.15</span>
+     <span class="td">27.51</span>
+     <span class="td">29.47</span>
+     <span class="td">29.98</span>
+     <span class="td">21.45</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.71</span>
+     <span class="td">2.77</span>
+     <span class="td">6.08</span>
+     <span class="td">10.48</span>
+     <span class="td">15.76</span>
+     <span class="td">21.6</span>
+     <span class="td">27.51</span>
+     <span class="td">32.71</span>
+     <span class="td">36.17</span>
+     <span class="td">37.6</span>
+     <span class="td">27.33</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.708</span>
+     <span class="td">2.78</span>
+     <span class="td">6.15</span>
+     <span class="td">10.69</span>
+     <span class="td">16.27</span>
+     <span class="td">22.64</span>
+     <span class="td">29.47</span>
+     <span class="td">36.17</span>
+     <span class="td">41.77</span>
+     <span class="td">44.89</span>
+     <span class="td">33.39</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.683</span>
+     <span class="td">2.7</span>
+     <span class="td">5.99</span>
+     <span class="td">10.5</span>
+     <span class="td">16.11</span>
+     <span class="td">22.68</span>
+     <span class="td">29.98</span>
+     <span class="td">37.6</span>
+     <span class="td">44.89</span>
+     <span class="td">50.58</span>
+     <span class="td">39.03</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.469</span>
+     <span class="td">1.86</span>
+     <span class="td">4.15</span>
+     <span class="td">7.31</span>
+     <span class="td">11.3</span>
+     <span class="td">16.05</span>
+     <span class="td">21.45</span>
+     <span class="td">27.33</span>
+     <span class="td">33.39</span>
+     <span class="td">39.03</span>
+     <span class="td">31.84</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    λ
+   </var>
+   =
+   <b>eigenvals</b>
+   (
+   <b>
+    <var>C</var>
+   </b>
+   · 10
+   <sup>-3</sup>
+   ; -3 )  =
+   <b class="b0">[</b>
+   0.195 0.0173 0.00341
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Natural frequencies</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    ω
+   </var>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     <var>
+      <span class="vec">⃗</span>
+      λ
+     </var>
+    </span>
+   </span>
+   =
+   <b class="b0">[</b>
+   2.27 7.6 17.13
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Vibration frequencies</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    f
+   </var>
+   =
+   <span class="dvc">
+    <var>
+     <span class="vec">⃗</span>
+     ω
+    </var>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>π</var>
+   </span>
+   ·
+   <i>Hz</i>
+   =
+   <span class="dvc">
+    <var>
+     <span class="vec">⃗</span>
+     ω
+    </var>
+    <span class="dvl">
+    </span>
+    2 · 3.14
+   </span>
+   ·
+   <i>Hz</i>
+   =
+   <b class="b0">[</b>
+   0.361
+   <i>Hz</i>
+   1.21
+   <i>Hz</i>
+   2.73
+   <i>Hz</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Vibration periods</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    T
+   </var>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>
+     <span class="vec">⃗</span>
+     f
+    </var>
+   </span>
+   =
+   <b class="b0">[</b>
+   2.77
+   <i>s</i>
+   0.826
+   <i>s</i>
+   0.367
+   <i>s</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>Mode shapes</p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>V</var>
+   </b>
+   =
+   <b>transp</b>
+   (
+   <b>eigenvecs</b>
+   (
+   <b>
+    <var>C</var>
+   </b>
+   · 10
+   <sup>-3</sup>
+   ; -3 )  )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.00896</span>
+     <span class="td">0.0316</span>
+     <span class="td">0.0687</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0348</span>
+     <span class="td">0.112</span>
+     <span class="td">0.217</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0758</span>
+     <span class="td">0.219</span>
+     <span class="td">0.357</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.13</span>
+     <span class="td">0.324</span>
+     <span class="td">0.402</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.194</span>
+     <span class="td">0.396</span>
+     <span class="td">0.298</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.264</span>
+     <span class="td">0.404</span>
+     <span class="td">0.0531</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.336</span>
+     <span class="td">0.326</span>
+     <span class="td">-0.239</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.403</span>
+     <span class="td">0.151</span>
+     <span class="td">-0.414</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.459</span>
+     <span class="td">-0.104</span>
+     <span class="td">-0.312</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.495</span>
+     <span class="td">-0.391</span>
+     <span class="td">0.105</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.372</span>
+     <span class="td">-0.47</span>
+     <span class="td">0.48</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>Φ</var>
+   </b>
+   =
+   <b>inverse</b>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   <sub>sq</sub>
+   )  ·
+   <b>
+    <var>V</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.00248</span>
+     <span class="td">0.00875</span>
+     <span class="td">0.019</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0103</span>
+     <span class="td">0.0332</span>
+     <span class="td">0.0643</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.024</span>
+     <span class="td">0.0695</span>
+     <span class="td">0.113</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0443</span>
+     <span class="td">0.111</span>
+     <span class="td">0.138</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0718</span>
+     <span class="td">0.147</span>
+     <span class="td">0.111</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.107</span>
+     <span class="td">0.164</span>
+     <span class="td">0.0216</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.15</span>
+     <span class="td">0.146</span>
+     <span class="td">-0.107</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.201</span>
+     <span class="td">0.0754</span>
+     <span class="td">-0.207</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.26</span>
+     <span class="td">-0.0589</span>
+     <span class="td">-0.176</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.324</span>
+     <span class="td">-0.256</span>
+     <span class="td">0.069</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.391</span>
+     <span class="td">-0.494</span>
+     <span class="td">0.505</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>X</var>
+   </b>
+   =
+   <b>stack</b>
+   (
+   <b>matrix</b>
+   ( 1; 3 ) ;
+   <b>
+    <var>Φ</var>
+   </b>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.00248</span>
+     <span class="td">0.00875</span>
+     <span class="td">0.019</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0103</span>
+     <span class="td">0.0332</span>
+     <span class="td">0.0643</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.024</span>
+     <span class="td">0.0695</span>
+     <span class="td">0.113</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0443</span>
+     <span class="td">0.111</span>
+     <span class="td">0.138</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0718</span>
+     <span class="td">0.147</span>
+     <span class="td">0.111</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.107</span>
+     <span class="td">0.164</span>
+     <span class="td">0.0216</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.15</span>
+     <span class="td">0.146</span>
+     <span class="td">-0.107</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.201</span>
+     <span class="td">0.0754</span>
+     <span class="td">-0.207</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.26</span>
+     <span class="td">-0.0589</span>
+     <span class="td">-0.176</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.324</span>
+     <span class="td">-0.256</span>
+     <span class="td">0.069</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.391</span>
+     <span class="td">-0.494</span>
+     <span class="td">0.505</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <svg class="plot" data-plot="svg" height="1840px" style="width:138.89pt; height:340.74pt;" version="1.1" viewbox=" 0 0 750 1840" width="750px" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+   .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+.Series2 {stroke:YellowGreen;}
+circle.Series2 {fill:YellowGreen;}
+.Fill2 {fill:YellowGreen; fill-opacity:0.045;}
+.Series3 {stroke:CornflowerBlue;}
+circle.Series3 {fill:CornflowerBlue;}
+.Fill3 {fill:CornflowerBlue; fill-opacity:0.040;}
+  </style>
+  <g class="plot">
+   <rect class="Frame" height="1600" width="480" x="180" y="120">
+   </rect>
+   <line class="Grid" x1="180" x2="660" y1="1720" y2="1720">
+   </line>
+   <text class="sm end" x="161" y="1738">0</text>
+   <line class="Grid" x1="180" x2="660" y1="1574.55" y2="1574.55">
+   </line>
+   <text class="sm end" x="161" y="1592.55">10</text>
+   <line class="Grid" x1="180" x2="660" y1="1429.09" y2="1429.09">
+   </line>
+   <text class="sm end" x="161" y="1447.09">20</text>
+   <line class="Grid" x1="180" x2="660" y1="1283.64" y2="1283.64">
+   </line>
+   <text class="sm end" x="161" y="1301.64">30</text>
+   <line class="Grid" x1="180" x2="660" y1="1138.18" y2="1138.18">
+   </line>
+   <text class="sm end" x="161" y="1156.18">40</text>
+   <line class="Grid" x1="180" x2="660" y1="992.73" y2="992.73">
+   </line>
+   <text class="sm end" x="161" y="1010.73">50</text>
+   <line class="Grid" x1="180" x2="660" y1="847.27" y2="847.27">
+   </line>
+   <text class="sm end" x="161" y="865.27">60</text>
+   <line class="Grid" x1="180" x2="660" y1="701.82" y2="701.82">
+   </line>
+   <text class="sm end" x="161" y="719.82">70</text>
+   <line class="Grid" x1="180" x2="660" y1="556.36" y2="556.36">
+   </line>
+   <text class="sm end" x="161" y="574.36">80</text>
+   <line class="Grid" x1="180" x2="660" y1="410.91" y2="410.91">
+   </line>
+   <text class="sm end" x="161" y="428.91">90</text>
+   <line class="Grid" x1="180" x2="660" y1="265.45" y2="265.45">
+   </line>
+   <text class="sm end" x="161" y="283.45">100</text>
+   <line class="Grid" x1="180" x2="660" y1="120" y2="120">
+   </line>
+   <text class="sm end" x="161" y="138">110</text>
+   <text class="sm mid" x="176.79" y="1772">-0.5</text>
+   <line class="Grid" x1="296.89" x2="296.89" y1="120" y2="1720">
+   </line>
+   <line class="Grid" x1="417" x2="417" y1="120" y2="1720">
+   </line>
+   <text class="sm mid" x="417" y="1772">0</text>
+   <line class="Grid" x1="537.11" x2="537.11" y1="120" y2="1720">
+   </line>
+   <line class="Grid" x1="657.21" x2="657.21" y1="120" y2="1720">
+   </line>
+   <text class="sm mid" x="657.21" y="1772">0.5</text>
+   <line class="Axis" x1="180" x2="660" y1="1720" y2="1720">
+   </line>
+   <text x="682" y="1702">x</text>
+   <line class="Axis" x1="417" x2="417" y1="120" y2="1720">
+   </line>
+   <text class="mid" x="417" y="84">y</text>
+   <text x="8" y="1823">[-0.494; 0]</text>
+   <text class="end" x="742" y="44">[0.505; 110]</text>
+   <polyline class="Series1" points="417,1720 417.23,1668.39 417.62,1616.77 418.36,1565.16 419.44,1513.55 420.85,1461.94 422.63,1410.32 424.76,1358.71 427.27,1307.1 430.18,1255.48 433.49,1203.87 437.21,1152.26 441.38,1100.65 445.97,1049.03 451.03,997.42 456.56,945.81 462.55,894.19 469.03,842.58 476,790.97 483.45,739.35 491.38,687.74 499.81,636.13 508.71,584.52 518.05,532.9 527.86,481.29 538.05,429.68 548.59,378.06 559.5,326.45 570.65,274.84 581.94,223.23 593.44,171.61 605.04,120">
+   </polyline>
+   <polyline class="Series2" points="417,1720 417.91,1668.39 419.32,1616.77 421.74,1565.16 425.31,1513.55 429.77,1461.94 434.9,1410.32 440.87,1358.71 447.36,1307.1 454.1,1255.48 461.28,1203.87 468.38,1152.26 475.09,1100.65 481.62,1049.03 487.14,997.42 491.48,945.81 494.71,894.19 495.8,842.58 494.82,790.97 491.51,739.35 484.89,687.74 475.19,636.13 462.09,584.52 444.9,532.9 423.73,481.29 398.73,429.68 369.74,378.06 336.64,326.45 300.71,274.84 262.5,223.23 221.69,171.61 179.55,120">
+   </polyline>
+   <polyline class="Series3" points="417,1720 419.27,1668.39 422.38,1616.77 427.19,1565.16 434.27,1513.55 442.59,1461.94 450.91,1410.32 459.87,1358.71 468.29,1307.1 474.81,1255.48 480.14,1203.87 482.99,1152.26 482.3,1100.65 478.49,1049.03 471.01,997.42 459.2,945.81 443.6,894.19 425.64,842.58 404.23,790.97 381.1,739.35 360.15,687.74 338.59,636.13 329.01,610.32 324.99,597.42 321.69,584.52 319.22,571.61 317.74,558.71 316.96,545.81 316.21,532.9 315.23,507.1 315.23,494.19 315.72,481.29 316.82,468.39 318.65,455.48 321.33,442.58 324.98,429.68 329.71,416.77 335.6,403.87 342.41,390.97 350.08,378.06 358.6,365.16 367.94,352.26 388.97,326.45 412.97,300.65 439.75,274.84 469.46,249.03 502.88,223.23 578.15,171.61 659.55,120">
+   </polyline>
+  </g>
+ </svg>
+ <p>
+  Comparison with ASCE SEI 7/22
+  <span class="ref">(C26.11-13)</span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>λ</var>
+   <sub>1</sub>
+   = 1.9 ·
+   <b>exp</b>
+   <span class="b1">(</span>
+   -4 ·
+   <span class="dvc">
+    <var>h</var>
+    <sub>t</sub>
+    <span class="dvl">
+    </span>
+    <var>h</var>
+    <sub>b</sub>
+   </span>
+   <span class="b1">)</span>
+   +
+   <span class="dvc down">
+    6.65
+    <span class="dvl">
+    </span>
+    0.9 +
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>t</var>
+     <sub>t</sub>
+     <span class="dvl">
+     </span>
+     <var>t</var>
+     <sub>b</sub>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">0.666</sup>
+   </span>
+   = 1.9 ·
+   <b>exp</b>
+   <span class="b1">(</span>
+   -4 ·
+   <span class="dvc">
+    750
+    <i>mm</i>
+    <span class="dvl">
+    </span>
+    3000
+    <i>mm</i>
+   </span>
+   <span class="b1">)</span>
+   +
+   <span class="dvc down">
+    6.65
+    <span class="dvl">
+    </span>
+    0.9 +
+    <span class="b1">(</span>
+    <span class="dvc">
+     9
+     <i>mm</i>
+     <span class="dvl">
+     </span>
+     20
+     <i>mm</i>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">0.666</sup>
+   </span>
+   = 5.17
+  </span>
+ </p>
+ <p class="ref">(C26.11-12)</p>
+ <p>Fundamental natural frequency</p>
+ <p>
+  <span class="eq">
+   <var>n</var>
+   <sub>1</sub>
+   =
+   <span class="dvc">
+    <var>λ</var>
+    <sub>1</sub>
+    <span class="dvl">
+    </span>
+    2 ·
+    <var>π</var>
+    ·
+    <var>L</var>
+    <sup>2</sup>
+   </span>
+   ·
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>E</var>
+     ·
+     <var>I</var>
+     ( 0
+     <i>m</i>
+     )
+     <span class="dvl">
+     </span>
+     <var>m</var>
+     ( 0
+     <i>m</i>
+     )
+    </span>
+   </span>
+   =
+   <span class="dvc">
+    5.17
+    <span class="dvl">
+    </span>
+    2 · 3.14 ·  ( 110
+    <i>m</i>
+    )
+    <sup>2</sup>
+   </span>
+   ·
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     206
+     <i>GPa</i>
+     ·
+     <var>I</var>
+     ( 0
+     <i>m</i>
+     )
+     <span class="dvl">
+     </span>
+     <var>m</var>
+     ( 0
+     <i>m</i>
+     )
+    </span>
+   </span>
+   = 0.367
+   <i>Hz</i>
+  </span>
+ </p>
+ <p>Fundamental period of vibrations</p>
+ <p>
+  <span class="eq">
+   <var>T</var>
+   <sub>1</sub>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>n</var>
+    <sub>1</sub>
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    0.367
+    <i>Hz</i>
+   </span>
+   = 2.72
+   <i>s</i>
+  </span>
+ </p>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js">
+ </script>
+ <script charset="utf-8" src="https://cdn.plot.ly/plotly-2.26.0.min.js">
+ </script>
+ <h4>Animation of mode 1 - T = 2.77s</h4>
+ <div id="Mode1">
+ </div>
+ <script>
+  const y1 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110];var x1 = [0, 0, 0.01, 0.02, 0.04, 0.07, 0.11, 0.15, 0.2, 0.26, 0.32, 0.39];var t1 = 1386.3;var layout = {autosize:false,width:300,height:600,xaxis:{range:[-0.4,0.4],tick0:-0.4,dtick: 0.1,ticklen:0.8},yaxis:{dtick:10},margin:{l:25,r:10,b:50,t:10,pad:2},};var data = [{x:x1,y:y1,line:{shape:"spline"},}];Plotly.newPlot("Mode1",data,layout);function animateMode1(){for (let i = 0; i < x1.length; i++) {x1[i] = -x1[i];}Plotly.animate("Mode1",{data:[{x:x1,y:y1,line:{shape:"spline"},}],traces:[0],layout:layout},{transition:{duration:t1,easing:"cos"},frame:{duration:t1, redraw: false},mode: "next"}).then(()=>requestAnimationFrame(animateMode1)).catch(()=>{});}requestAnimationFrame(animateMode1);
+ </script>
+</div>

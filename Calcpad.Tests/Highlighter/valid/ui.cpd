@@ -1,0 +1,92 @@
+' #UI keyword - interactive input controls
+' Covers entry, datagrid, dropdown, radio and checkbox, plus the reportStyle
+' property that only takes effect when rendering a report.
+
+' CSS classes the "style" and "reportStyle" properties bind to
+#val
+'<style>
+'  .calcpad-ui-input.highlight { background-color: #eeeeee; border: 1px solid #aaaaaa; }
+'  .calcpad-ui-dropdown.primary { font-weight: 600; }
+'  .calcpad-ui-radio.compact .calcpad-ui-radio-label { margin-right: 4px; }
+'  .calcpad-ui-checkbox.switch { accent-color: #2a8f3f; }
+'  .calcpad-ui-datagrid.bordered { border: 2px solid #444444; }
+'  p.boxed { border: 1px solid #cccccc; padding: 2px 4px; }
+'</style>
+#end val
+
+' Scalar entries, type auto-detected
+#UI L = 10m
+#UI W = 5m
+A = L*W
+
+' Explicit type and a UI-mode style
+#UI {"type": "entry", "style": "highlight"} depth = 2m
+depth
+
+' A class applied only when the report is rendered
+#UI {"reportStyle": "boxed"} P = 25kN
+P
+
+' Both modes styled independently
+#UI {"style": "highlight", "reportStyle": "boxed"} q = 3kN/m
+q
+
+' Datagrids from literals, shape auto-detected
+#UI v = [1; 2; 3]
+v
+#UI M = [1; 2; 3 | 4; 5; 6]
+M
+
+' Datagrids from constructors
+#UI Z = vector(5)
+Z
+#UI G = matrix(3; 4)
+G
+
+' Explicit shape and headers - the right hand side is reshaped to fit
+#UI {"type": "datagrid", "style": "bordered", "rows": 2, "columns": 3, "columnHeaders": ["a", "b", "c"], "rowHeaders": ["r1", "r2"]} T = [0; 0; 0 | 0; 0; 0]
+T
+
+' Dropdown and radio - keys are the labels, values are substituted
+#UI {"type": "dropdown", "style": "primary", "keys": ["Low", "Med", "High"], "values": ["1", "2", "3"]} grade = 1
+grade
+#UI {"type": "radio", "style": "compact", "keys": ["Steel", "Concrete"], "values": ["200GPa", "25GPa"]} E = 200GPa
+E
+
+' Checkbox toggles between 1 and 0
+#UI {"type": "checkbox", "style": "switch"} flag = 1
+flag
+
+' Explicit number mode is accepted
+#UI {"mode": "number"} n = 4
+n
+
+' Conditional controls - only the taken branch renders
+#UI {"type": "checkbox"} useSteel = 1
+#if useSteel ≡ 1
+    #UI E2 = 200GPa
+#else
+    #UI E2 = 25GPa
+#end if
+E2
+
+' Redefinition - each declaration is a separate control
+#UI x = 1
+x = x + 1
+#UI x = 5
+x
+
+' Controls inside a loop - one instance per pass
+#repeat 3
+    #UI y = 2
+    y
+#loop
+
+' Input form and report are mutually exclusive
+#pre
+    #UI thickness = 12mm
+    thickness
+#end pre
+#post
+    'Report only
+#end post

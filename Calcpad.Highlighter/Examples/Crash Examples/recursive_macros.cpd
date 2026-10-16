@@ -1,0 +1,25 @@
+' Regression: recursive #def macros must not blow the stack.
+' Pre-fix, ContentResolver.ExpandMacros recursed forever on cycles,
+' crashing Calcpad.Server with a StackOverflowException via GetHighlightTokens.
+
+' Direct self-reference
+#def selfref$ = selfref$
+selfref$
+
+' Mutual recursion
+#def alpha$ = beta$
+#def beta$ = alpha$
+alpha$
+beta$
+
+' Three-way cycle
+#def a$ = b$
+#def b$ = c$
+#def c$ = a$
+a$
+
+' Non-cyclic deep nesting must still expand correctly
+#def one$ = 1
+#def two$ = one$ + one$
+#def three$ = two$ + one$
+three$

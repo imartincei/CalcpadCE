@@ -100,7 +100,7 @@ namespace Calcpad.Core
                 Fact,     // 42
                 (in ComplexValue a) => -a,   // 43
                 Not,      // 44
-                Timer     // 45  
+                Timer     // 45
             ];
 
             Functions2 =
@@ -163,7 +163,7 @@ namespace Calcpad.Core
         {
             CheckTrigFunctionUnits("phasor", b.Units);
             var u = b.Units;
-            var d = u is null ? 1d : u.ConvertTo(Unit.Get("rad"));
+            var d = u is null ? 1d : u.ConvertTo(Unit.Get("rad", false));
             var phi = b.A * d;
             var c = a.A * (Math.Cos(phi) + Complex.ImaginaryOne * Math.Sin(phi));
             return new ComplexValue(c, a.Units, a.IsUnit);
@@ -530,7 +530,7 @@ namespace Calcpad.Core
             new(value * FromRad[_degrees], AngleUnits[_degrees]) :
             new(value * FromRad[_degrees]);
 
-        protected static ComplexValue Timer(in ComplexValue _) => new(Timer(), Unit.Get("s"));
+        protected static ComplexValue Timer(in ComplexValue _) => new(Timer(), Unit.Get("s", false));
 
     }
 }

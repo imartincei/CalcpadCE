@@ -1,0 +1,40 @@
+<div class="calcpad-output">
+ <!-- Volume $V = a^3$ and surface area $S = 6 a^2$ of a cube from a single edge length. -->
+ <div style="max-width:90mm">
+  <img alt="cube.png" class="side" src="Images/math/volume/cube.png" style="height:65pt;"/>
+ </div>
+ <p>Side length</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">1</u>
+  </span>
+ </p>
+ <p>Volume</p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <var>a</var>
+   <sup>3</sup>
+   = 1
+   <sup>3</sup>
+   = 1
+  </span>
+ </p>
+ <p>Surface area</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   = 6 ·
+   <var>a</var>
+   <sup>2</sup>
+   = 6 · 1
+   <sup>2</sup>
+   = 6
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

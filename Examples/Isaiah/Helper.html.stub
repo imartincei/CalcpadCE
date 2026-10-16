@@ -1,0 +1,782 @@
+<div class="calcpad-output">
+ <h3>Examples</h3>
+ <p>
+  <span class="eq">
+   <var>debug</var>
+   = 1
+  </span>
+ </p>
+ <p>text</p>
+ <p style="page-break-before: always;">
+ </p>
+ <p>' text</p>
+ <p>
+  calc'
+  <span class="ref" style="color: blue; background: #EFEFFF; font-size: 12pt; font-style: italic">[  REFERENCE  ]</span>
+ </p>
+ <!--  will not print  -->
+ <!--
+<p>Multiline comment </p>
+<p>-->
+ <div style="display:none">'this will not print'</div>
+ <div style="display:none">
+  <p>this will not print</p>
+ </div>
+ <p>
+  <span class="eq">
+   <var>value</var>
+   = 1
+  </span>
+ </p>
+ <div style="display:none">
+  <p>this is only hidden when value ≡ 1</p>
+ </div>
+ <p>this shows when value ≡ 1</p>
+ <p>
+  <span class="eq">
+   <var>hi</var>
+   = 1
+   <i>in</i>
+  </span>
+  <em>this is a note</em>
+ </p>
+ <span class="err">ERROR:   Something went wrong</span>
+ <br/>
+ <span style="color: red; font-weight: bold;">Pay attention to this</span>
+ <br/>
+ <!--  aside seems broken  -->
+ <p style="width:10; float:left">
+  <span class="eq">1 = 1</span>
+ </p>
+ <aside style="width:10; padding-left:2%; border-radius:8px;margin-left:0%; float:right ;font-style:italic; background:lightblue;">
+  <p>
+   <span class="eq">1 = 1</span>
+  </p>
+ </aside>
+ <p>
+  <span class="eq">
+   <var>eq</var>
+   <sub>tolerance</sub>
+   ( 9; 10; 2 )  = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>eq</var>
+   <sub>tolerance</sub>
+   ( 10; 7; 2 )  = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   =
+   <span class="b0">[</span>
+   4; 3; 4; 1; 2; 2; 3; 4; 5; 5; 6
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   4 3 4 1 2 2 3 4 5 5 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vf
+   </var>
+   =
+   <span class="b0">[</span>
+   1; 2; 3; 4; 5; 6
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 3 4 5 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v1
+   </var>
+   =
+   <span class="b0">[</span>
+   1; 1; 1; 2; 2; 2
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 1 1 2 2 2
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v2
+   </var>
+   =
+   <span class="b0">[</span>
+   3; 4; 3; 4; 3; 4
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   3 4 3 4 3 4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    filteredV
+   </var>
+   =
+   <var>filterVecAnd</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vf
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    v1
+   </var>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    v2
+   </var>
+   ; 1; 3 )  =
+   <b class="b0">[</b>
+   1 3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    uniqueV
+   </var>
+   =
+   <var>uniqueV</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   )  =
+   <b class="b0">[</b>
+   4 3 1 2 5 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   1; 3; 2
+   <span class="b0">|</span>
+   5; 4; 2
+   <span class="b0">|</span>
+   3; 5; 6
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">3</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">4</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>msetRow</var>
+   ( 2;
+   <b>
+    <var>M</var>
+   </b>
+   ;
+   <span class="b0">[</span>
+   7; 8; 9
+   <span class="b0">]</span>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">3</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">5</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>msetCol</var>
+   ( 2;
+   <b>
+    <var>M</var>
+   </b>
+   ;
+   <span class="b0">[</span>
+   7; 8; 9
+   <span class="b0">]</span>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">7</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">9</span>
+     <span class="td">6</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   <sub>flat</sub>
+   =
+   <var>flatM</var>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   )  =
+   <b class="b0">[</b>
+   1 7 2 7 8 9 3 9 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    uniqueM
+   </var>
+   =
+   <var>uniqueM</var>
+   (
+   <b>
+    <var>M</var>
+   </b>
+   )  =
+   <b class="b0">[</b>
+   1 7 2 8 9 3 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    removedV
+   </var>
+   =
+   <var>removeV</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   <sub>flat</sub>
+   ; 4 )  =
+   <b class="b0">[</b>
+   1 7 2 7 8 9 3 9 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vUnits
+   </var>
+   =
+   <span class="b1">[</span>
+   1
+   <i>in</i>
+   ; 4
+   <i>in</i>
+   ; 6
+   <i>lbf</i>
+   ; 6
+   <i>ft</i>
+   <sup class="unit">2</sup>
+   ;
+   <span class="dvc">
+    0
+    <span class="dvl">
+    </span>
+    0
+   </span>
+   <span class="b1">]</span>
+   =
+   <b class="b0">[</b>
+   1
+   <i>in</i>
+   4
+   <i>in</i>
+   6
+   <i>lbf</i>
+   6
+   <i>ft</i>
+   <sup class="unit">2</sup>
+   <span class="err">Undefined</span>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="err">
+   Error in "vUnits = removeVIgnoreUnits(vUnits; 0/0)" on line [
+   <a data-text="191" href="#0">191</a>
+   ]: Inconsistent units: "unitless . in".
+  </span>
+ </p>
+ <p>
+  <span class="err">
+   Error in "vUnits = removeVIgnoreUnits(vUnits; 6)" on line [
+   <a data-text="192" href="#0">192</a>
+   ]: Inconsistent units: "unitless . in".
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vector
+   </var>
+   =
+   <b>find</b>
+   (
+   <b>vector</b>
+   ( 1 ) ; 1; 1 )  =
+   <b class="b0">[</b>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>appendV</var>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    vector
+   </var>
+   ; 4 )  =
+   <b class="b0">[</b>
+   4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    l
+   </var>
+   <sub>jagged</sub>
+   =
+   <span class="b0">[</span>
+   1; 2; 0; 4
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 0 4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>jaggedM</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   1
+   <span class="b0">|</span>
+   2; 3
+   <span class="b0">|</span>
+   0
+   <span class="b0">|</span>
+   4; 7; 8; 9
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>jaggedM</var>
+   </b>
+   =
+   <var>fillUndefM</var>
+   (
+   <b>
+    <var>jaggedM</var>
+   </b>
+   ;
+   <var>
+    <span class="vec">⃗</span>
+    l
+   </var>
+   <sub>jagged</sub>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>getNullMap</var>
+   (
+   <b>
+    <var>jaggedM</var>
+   </b>
+   )  =
+   <b class="b0">[</b>
+   1 2 0 4
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>jaggedM</var>
+   </b>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">2</span>
+     <span class="td">3</span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+      <span class="err">Undefined</span>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">7</span>
+     <span class="td">8</span>
+     <span class="td">9</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    vector
+   </var>
+   =
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>set</var>
+   ( 2;
+   <var>
+    <span class="vec">⃗</span>
+    vector
+   </var>
+   ; 5 )  =
+   <b class="b0">[</b>
+   1 5 3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>matrix</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   1; 2
+   <span class="b0">|</span>
+   3; 4
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>mset</var>
+   ( 2; 1;
+   <b>
+    <var>matrix</var>
+   </b>
+   ; 6 )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">6</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <h4 style="text-align: center;">TEST HEADER</h4>
+</div>

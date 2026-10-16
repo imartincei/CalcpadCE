@@ -1,0 +1,565 @@
+<div class="calcpad-output">
+ <!-- HP variant of the structural toolkit: $len$, $size$, $resize$, $slice$, $join$ and $reverse$, operating in-place on packed storage where possible. -->
+ <style>em {font-family:"Times New Roman";}</style>
+ <p>
+  <b>Len</b>
+  (
+  <em>vector</em>
+  ) and
+  <b>Size</b>
+  (
+  <em>vector</em>
+  )
+ </p>
+ <hr/>
+ <p>Explicitly initialized short vectors:</p>
+ <p>
+  <span class="eq">
+   <b>len</b>
+   (
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3; 0; 0
+   <span class="b0">]</span>
+   )  )  = 5
+  </span>
+  - vector length
+ </p>
+ <p>
+  <span class="eq">
+   <b>size</b>
+   (
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3; 0; 0
+   <span class="b0">]</span>
+   )  )  = 5
+  </span>
+  - the actual size in memory
+ </p>
+ <p>Size is equal to length even if last elements are zero</p>
+ <p>Implicitly initialized large vectors:</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>vector</b>
+   <sub>hp</sub>
+   ( 200 )  =
+   <b class="b0">[</b>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   <span title="179 elements skipped.">...</span>
+   0
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   <sub>35</sub>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>len</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   )  = 200
+  </span>
+  - the lenght is equal to the count of all elements
+ </p>
+ <p>
+  <span class="eq">
+   <b>size</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   )  = 35
+  </span>
+  - the size is equal to the index of the last element intitalized with a non-zero value
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Resize</b>
+  (
+  <em>vector</em>
+  ;
+  <em>new length</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3; 4; 5
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   1 2 3 4 5
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>resize</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 3 )  =
+   <b class="b0">[</b>
+   1 2 3
+   <b class="b0">]</b>
+  </span>
+  - set a new size and return a reference to
+  <var>a</var>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b class="b0">[</b>
+   1 2 3
+   <b class="b0">]</b>
+  </span>
+  - the original vector was modified
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   <sub>1</sub>
+   = 0
+  </span>
+  - changing a value in the referece...
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b class="b0">[</b>
+   0 2 3
+   <b class="b0">]</b>
+  </span>
+  - also changes the original vector.
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Join</b>
+  (
+  <em>mixed list of arguments</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2
+   <span class="b0">|</span>
+   3; 4
+   <span class="b0">]</span>
+   )  =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   7; 8; 9
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   7 8 9
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>hp</b>
+   (
+   <b>join</b>
+   ( 0;
+   <b>
+    <var>A</var>
+   </b>
+   ; 5; 6;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  )  =
+   <b class="b0">[</b>
+   0 1 2 3 4 5 6 7 8 9
+   <b class="b0">]</b>
+  </span>
+  - by function...
+  <span class="eq">
+   <b>isHp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   )  = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   0;
+   <b>
+    <var>A</var>
+   </b>
+   ; 5; 6;
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   0 1 2 3 4 5 6 7 8 9
+   <b class="b0">]</b>
+  </span>
+  - or by square brackets initializer.
+ </p>
+ <p>
+  <span class="eq">
+   <b>isHp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   )  = 1
+  </span>
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Slice</b>
+  (
+  <em>vector</em>
+  ;
+  <em>start index</em>
+  ;
+  <em>end index</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3; 4; 5; 6; 7; 8
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   1 2 3 4 5 6 7 8
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>slice</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 3; 7 )  =
+   <b class="b0">[</b>
+   3 4 5 6 7
+   <b class="b0">]</b>
+  </span>
+  - segment between the 3-rd and 7-th elements of vector
+  <em>a</em>
+  , incl.
+ </p>
+ <p>
+  <span class="eq">
+   <b>slice</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 6; 10 )  =
+   <b class="b0">[</b>
+   6 7 8
+   <b class="b0">]</b>
+  </span>
+  - if the index is &gt; of the vector length, returns the elements up to the end
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>First</b>
+  (
+  <em>vector</em>
+  ;
+  <em>count</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   0; 1; 2; 3; 4; 5; 6
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   0 1 2 3 4 5 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>first</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 3 )  =
+   <b class="b0">[</b>
+   0 1 2
+   <b class="b0">]</b>
+  </span>
+  - the first 3 elements of the vector
+  <em>a</em>
+ </p>
+ <p>
+  <span class="eq">
+   <b>first</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 10 )  =
+   <b class="b0">[</b>
+   0 1 2 3 4 5 6
+   <b class="b0">]</b>
+  </span>
+  - if the number of elements is &gt; the vector  length, returns all elements
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Last</b>
+  (
+  <em>vector</em>
+  ;
+  <em>count</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   0; 1; 2; 3; 4; 5; 6
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   0 1 2 3 4 5 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>last</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 3 )  =
+   <b class="b0">[</b>
+   4 5 6
+   <b class="b0">]</b>
+  </span>
+  - the last 3 elements of the vector
+  <em>a</em>
+ </p>
+ <p>
+  <span class="eq">
+   <b>last</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ; 10 )  =
+   <b class="b0">[</b>
+   0 1 2 3 4 5 6
+   <b class="b0">]</b>
+  </span>
+  - if the number of elements is &gt; the length of the vector, returns all elements
+ </p>
+ <p>
+ </p>
+ <p>
+  <b>Extract</b>
+  (
+  <em>vector</em>
+  ;
+  <em>indexes</em>
+  )
+ </p>
+ <hr/>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   0; 1; 2; 3; 4; 5; 6
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   0 1 2 3 4 5 6
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <b>extract</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   ;
+   <span class="b0">[</span>
+   2; 4; 6
+   <span class="b0">]</span>
+   )  =
+   <b class="b0">[</b>
+   1 3 5
+   <b class="b0">]</b>
+  </span>
+  - the elements of
+  <em>a</em>
+  , with indexes 3, 4, and 6
+ </p>
+ <p>
+  <span class="eq">
+   <b>isHp</b>
+   (
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   )  = 1
+  </span>
+ </p>
+</div>

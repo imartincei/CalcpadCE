@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Math>
-    <Decimals>6</Decimals>
+    <Decimals>2</Decimals>
     <Degrees>0</Degrees>
     <IsComplex>false</IsComplex>
     <Substitute>true</Substitute>
     <FormatEquations>true</FormatEquations>
+    <Precision>1E-14</Precision>
+    <Tol>1E-06</Tol>
   </Math>
   <Plot>
     <IsAdaptive>true</IsAdaptive>
+    <Width>500</Width>
+    <Height>300</Height>
+    <Step>0</Step>
     <ScreenScaleFactor>2</ScreenScaleFactor>
     <ImagePath />
     <ImageUri />
@@ -19,4 +24,5 @@
     <LightDirection>NorthWest</LightDirection>
   </Plot>
   <Units>m</Units>
+  <IsUs>false</IsUs>
 </Settings>

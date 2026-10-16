@@ -1,0 +1,20 @@
+' CPD-31xx: Balance errors
+' CPD-3101: Unmatched opening paren
+x = (1 + 2
+
+' CPD-3102: Unmatched closing paren
+y = 1 + 2)
+
+' CPD-3103: Unmatched opening bracket
+arr1 = [1; 2; 3
+
+' CPD-3104: Unmatched closing bracket
+arr2 = 1; 2; 3]
+
+' CPD-3105: Unmatched brace / control block
+f(x) = $Block{y = x*2
+#if x > 0
+	z = 1
+
+' CPD-3106: Unmatched closing brace
+g(x) = x*2}

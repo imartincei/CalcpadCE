@@ -1,0 +1,62 @@
+<div class="calcpad-output">
+ <!-- Volume $V = a\, b\, c$ and surface area $S = 2(a b + b c + c a)$ of a rectangular prism (box). -->
+ <div style="max-width:130mm">
+  <img alt="rectangular-prism.png" class="side" src="Images/math/volume/rectangular-prism.png" style="height:65pt;"/>
+ </div>
+ <p>Dimensions of base</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">3</u>
+  </span>
+  ,
+  <span class="eq">
+   <var>b</var>
+   =
+   <u class="input-4">2</u>
+  </span>
+ </p>
+ <p>Height</p>
+ <p>
+  <span class="eq">
+   <var>h</var>
+   =
+   <u class="input-6">1</u>
+  </span>
+ </p>
+ <p>Volume</p>
+ <p>
+  <span class="eq">
+   <var>V</var>
+   =
+   <var>a</var>
+   ·
+   <var>b</var>
+   ·
+   <var>h</var>
+   = 3 · 2 · 1 = 6
+  </span>
+ </p>
+ <p>Surface area</p>
+ <p>
+  <span class="eq">
+   <var>S</var>
+   = 2 ·  (
+   <var>a</var>
+   ·
+   <var>b</var>
+   +
+   <var>b</var>
+   ·
+   <var>h</var>
+   +
+   <var>a</var>
+   ·
+   <var>h</var>
+   )  = 2 ·  ( 3 · 2 + 2 · 1 + 3 · 1 )  = 22
+  </span>
+ </p>
+ <p>
+ </p>
+</div>

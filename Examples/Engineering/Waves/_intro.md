@@ -1,0 +1,6 @@
+[CalcpadCE](https://calcpad-ce.org) treats classical [wave interference](https://en.wikipedia.org/wiki/Wave_interference) and [diffraction](https://en.wikipedia.org/wiki/Diffraction) as plain superposition problems: each emitter contributes a sinusoidal field, and the worksheet sums them on a 2D grid via `$Map`, with the result shown as a heat-map straight inside the page.
+
+Two complementary viewpoints recur throughout the category — a *general view* that maps the full $\Psi(x,\, y)$ field over the whole region, and a *screen view* that collapses the same physics onto an intensity profile $I(x)$ along a distant detector.
+The [water-wave examples](#waves-2d-on-water-interference_1) introduce the simplest two-source case and add an [animated variant](#waves-2d-on-water-interference) where time is swept frame-by-frame; the [single-slit diffraction](#diffraction-of-light-on-single-slit-general-view) sheets approximate the slit by 7 line sources; and the multi-slit interference sheets scale the same formulation to [2](#interference-of-light-2-slits-general-view), [4](#interference-of-light-4-slits-general-view) and [6](#interference-of-light-6-slits-general-view) coherent emitters.
+
+Wavelength, slit spacing and observation distance are exposed at the top of every sheet, so each worksheet doubles as a sandbox for fringe-spacing and angular-resolution studies.

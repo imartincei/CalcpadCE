@@ -1,0 +1,104 @@
+import * as vscode from 'vscode';
+import type { ILogger } from 'calcpad-frontend';
+import { CalcpadApiClient, SymbolAtPositionResponse, parseDirectiveLine } from 'calcpad-frontend';
+import { VSCodeFileSystem } from './adapters';
+import { resolveSymbolLocation, resolveIncludeDirectiveLocation, resolveDocumentPathRoots } from './calcpadLocationResolver';
+import type { CalcpadDefinitionsService } from './calcpadDefinitionsService';
+
+/**
+ * Provides "Go to Definition" (Ctrl+click / F12) for CalcPad functions, macros, variables, and
+ * `#include` directives. Clicking an `#include FILEPATH` path jumps straight to that file;
+ * otherwise the server is asked which symbol is at the cursor and the first assignment wins.
+ */
+export class CalcpadDefinitionProvider implements vscode.DefinitionProvider {
+    private apiClient: CalcpadApiClient;
+    private definitionsService: CalcpadDefinitionsService;
+    private outputChannel: ILogger;
+    private logger: ILogger;
+    private fileSystem: VSCodeFileSystem;
+
+    constructor(apiClient: CalcpadApiClient, definitionsService: CalcpadDefinitionsService, outputChannel: ILogger) {
+        this.apiClient = apiClient;
+        this.definitionsService = definitionsService;
+        this.outputChannel = outputChannel;
+        this.logger = outputChannel;
+        this.fileSystem = new VSCodeFileSystem();
+    }
+
+    async provideDefinition(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken
+    ): Promise<vscode.Definition | null> {
+        const includeTarget = this.includePathAt(document, position);
+        if (includeTarget !== undefined) {
+            if (!includeTarget) return null;
+            const roots = resolveDocumentPathRoots(
+                document, this.definitionsService.getCachedPathRoots(document.uri.toString()),
+            );
+            return resolveIncludeDirectiveLocation(document, includeTarget, this.fileSystem, this.outputChannel, '[Definition]', roots);
+        }
+
+        const sym = await this.fetchSymbol(document, position);
+        if (!sym) {
+            this.outputChannel.appendLine('[Definition] No symbol at cursor position', 'verbose');
+            return null;
+        }
+
+        this.outputChannel.appendLine('[Definition] Looking for definition of: ' + sym.symbolName, 'verbose');
+
+        const definition = sym.locations.find(loc => loc.isAssignment);
+        if (!definition) {
+            this.outputChannel.appendLine('[Definition] No definition (assignment) found for: ' + sym.symbolName, 'verbose');
+            return null;
+        }
+
+        this.outputChannel.appendLine(
+            `[Definition] Found definition at line ${definition.line}, col ${definition.column}` +
+            (definition.sourceFile ? ` in ${definition.sourceFile}` : '')
+        , 'verbose');
+
+        return resolveSymbolLocation(document, definition, this.fileSystem, this.outputChannel, '[Definition]');
+    }
+
+    /**
+     * Returns the raw path text when `position` is on an `#include FILEPATH`
+     * line at or past where the path starts, `undefined` when the line isn't
+     * an include directive (fall through to symbol lookup).
+     */
+    private includePathAt(document: vscode.TextDocument, position: vscode.Position): string | undefined {
+        const line = document.lineAt(position.line).text;
+        const parsed = parseDirectiveLine(line);
+        if (!parsed || parsed.directive !== 'include') return undefined;
+        if (position.character < parsed.pathStartCol) return undefined;
+        return parsed.partialPath.trim();
+    }
+
+    private async fetchSymbol(document: vscode.TextDocument, position: vscode.Position): Promise<SymbolAtPositionResponse | null> {
+        try {
+            return await this.apiClient.symbolAtPosition(
+                document.getText(),
+                position.line,
+                position.character,
+                document.uri.fsPath,
+            );
+        } catch (error) {
+            this.outputChannel.appendLine(
+                '[Definition] Error resolving symbol: ' + (error instanceof Error ? error.message : 'Unknown error')
+            , 'verbose');
+            return null;
+        }
+    }
+
+    static register(
+        apiClient: CalcpadApiClient,
+        definitionsService: CalcpadDefinitionsService,
+        outputChannel: ILogger
+    ): vscode.Disposable {
+        const provider = new CalcpadDefinitionProvider(apiClient, definitionsService, outputChannel);
+        return vscode.languages.registerDefinitionProvider(
+            { language: 'calcpad' },
+            provider
+        );
+    }
+}

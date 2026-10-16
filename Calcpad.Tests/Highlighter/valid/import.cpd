@@ -1,0 +1,17 @@
+'Module target for #include tests
+#global
+IMPORTED_CONST = 42
+circleArea(r) = π*r^2
+.EUR = 1
+.USD = 0.92
+#def double$(n$) = n$*2
+#def test$(text$) = text$
+#def check$(Rn$; Ru$)
+	#if Rn$ ≥ Ru$
+		'OKAY'
+	#else
+		'N.G.'
+	#end if
+#end def
+#local
+localVar = circleArea(5)

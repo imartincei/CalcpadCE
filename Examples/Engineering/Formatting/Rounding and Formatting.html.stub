@@ -1,0 +1,151 @@
+<div class="calcpad-output">
+ <!-- Reference for the $round$, $format$ and $scale$ directives, covering decimal rounding, significant figures, scientific notation and unit-aware display. -->
+ <h3>Rounding and formatting numbers in CalcpadCE</h3>
+ <p>
+  Custom rounding -
+  <span class="eq">
+   <var>a</var>
+   = 100 ·
+   <span class="o0">
+    <span class="r">√</span>
+    2
+   </span>
+   = 141.421356
+  </span>
+  (to 6 digits)
+ </p>
+ <p>
+  Default rounding -
+  <span class="eq">
+   <var>a</var>
+   = 141.42
+  </span>
+ </p>
+ <p>
+  Custom worksheet level formatting -
+  <span class="eq">
+   <var>a</var>
+   = 1.4142×10
+   <sup>+02</sup>
+  </span>
+  - custom(0.00##E+00)
+ </p>
+ <p>
+  Default formatting -
+  <span class="eq">
+   <var>a</var>
+   = 141.42
+  </span>
+ </p>
+ <p>Custom inline formatting</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   = 100 ·
+   <span class="o0">
+    <span class="r">√</span>
+    2
+   </span>
+   = 141.4214
+  </span>
+  - decimal (F4)
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 100 ·
+   <span class="o0">
+    <span class="r">√</span>
+    3
+   </span>
+   = 1.732×10
+   <sup>+002</sup>
+  </span>
+  - engineering (E3)
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   = 1.732e+002
+  </span>
+  - engineering (e3 - with small letter 'e')
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   =
+   <var>a</var>
+   +
+   <var>b</var>
+   = 141.4214 + 1.732×10
+   <sup>+002</sup>
+   = 314.626
+  </span>
+  - general (G6)
+ </p>
+ <p>
+  <span class="eq">
+   10000 ·
+   <var>c</var>
+   = 10000 · 314.626 = 3,146,264.37
+  </span>
+  - numeric (N3 - with thousands separator)
+ </p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   = 300 = ¤300.00
+  </span>
+  - currency (C)
+ </p>
+ <p>Inline formatting overrides worksheet level formatting and both override rounding</p>
+ <p>Formatting with units</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    2
+    <i>m</i>
+    <sup class="unit">2</sup>
+   </span>
+   = 1.4142×10
+   <sup>2</sup>
+   <i>cm</i>
+  </span>
+  - custom (0.0000E0)
+ </p>
+ <p>
+  <span class="eq">
+   <var>b</var>
+   =
+   <i>m</i>
+   ·
+   <span class="o0">
+    <span class="r">√</span>
+    3
+   </span>
+   = 1.73205
+   <i>m</i>
+  </span>
+  - custom (0.00000)
+ </p>
+ <p>
+  <span class="eq">
+   <var>c</var>
+   =
+   <var>b</var>
+   −
+   <var>a</var>
+   = 1.73205
+   <i>m</i>
+   − 1.4142×10
+   <sup>2</sup>
+   <i>cm</i>
+   = 317,837.2
+   <i>μm</i>
+  </span>
+  - numeric (N1)
+ </p>
+</div>

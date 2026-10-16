@@ -108,9 +108,9 @@ namespace Calcpad.Core
 
         private void GetImageSize()
         {
-            var w = (int)(Parser.PlotWidth * ScreenScaleFactor);
-            var h = (int)(Parser.PlotHeight * ScreenScaleFactor);
-            _size = (int)(Parser.PlotStep * ScreenScaleFactor);
+            var w = (int)((int)Parser.GetSettingsVariable("PlotWidth", Settings.Width) * ScreenScaleFactor);
+            var h = (int)((int)Parser.GetSettingsVariable("PlotHeight", Settings.Height) * ScreenScaleFactor);
+            _size = (int)((int)Parser.GetSettingsVariable("PlotStep", Settings.Step) * ScreenScaleFactor);
             var d = (int)Math.Sqrt(w * w + h * h);
             if (_size == 0)
             {
@@ -616,7 +616,8 @@ namespace Calcpad.Core
                 double d = 0.75 / ScreenScaleFactor;
                 double dw = Math.Round(d * Width);
                 double dh = Math.Round(d * Height);
-                return $"<div class=\"plot\" style=\"width:{dw}pt; height:{dh}pt;\">{g}</div>";
+                var svgText = "<svg data-plot=\"svg\" " + g.ToString()[4..];
+                return $"<div class=\"plot\" style=\"width:{dw}pt; height:{dh}pt;\">{svgText}</div>";
             }
             SvgToFile(g, Settings.ImagePath, fileName);
             return HtmlImg(Settings.ImageUri + fileName);

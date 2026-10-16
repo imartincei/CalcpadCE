@@ -1,0 +1,1872 @@
+<div class="calcpad-output">
+ <!-- Eurocode 8 detailing of a primary seismic column for medium ductility class: cross-section dimensions, longitudinal ratio, confinement of the boundary regions and minimum mechanical volumetric ratio of the hoops. -->
+ <small>
+  According to
+  <strong>Eurocode</strong>
+  : EN 1998-1
+ </small>
+ <div style="max-width:180mm">
+  <img alt="column-section.png" class="side" src="Images/structures/rc/detailing/column-section.png" style="width:220pt;"/>
+  <p>
+   <b>Column dimensions</b>
+  </p>
+  <p>
+   Cross section -
+   <span class="eq">
+    <var>b</var>
+    <sub>c</sub>
+    =
+    <u class="input-6">500</u>
+   </span>
+   mm,
+   <span class="eq">
+    <var>h</var>
+    <sub>c</sub>
+    =
+    <u class="input-6">500</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Clear storey height -
+   <span class="eq">
+    <var>l</var>
+    <sub>cl</sub>
+    =
+    <u class="input-7">2850</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Cross section area -
+   <span class="eq">
+    <var>A</var>
+    <sub>c</sub>
+    =
+    <var>b</var>
+    <sub>c</sub>
+    ·
+    <var>h</var>
+    <sub>c</sub>
+    = 500 · 500 = 250000
+   </span>
+   mm²
+  </p>
+  <p>
+   Maximum seismic axial load -
+   <span class="eq">
+    <var>N</var>
+    <sub>Ed</sub>
+    =
+    <u class="input-9">983.8</u>
+   </span>
+   kN
+  </p>
+  <p>
+  </p>
+  <p class="ref">[EN 1992-1-1, Table 3.1]</p>
+  <p>
+   <b>Concrete</b>
+  </p>
+  <p>
+   Characteristic compressive cylinder strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ck</sub>
+    =
+    <u class="input-13">25</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Partial safety factor -
+   <span class="eq">
+    <var>γ</var>
+    <sub>c</sub>
+    = 1.5
+   </span>
+   ,
+   <span class="eq">
+    <var>α</var>
+    <sub>ct</sub>
+    = 1
+   </span>
+   ,
+   <span class="eq">
+    <var>α</var>
+    <sub>cc</sub>
+    =
+    <u class="input-14">1</u>
+   </span>
+  </p>
+  <img alt="column-view.png" class="side" src="Images/structures/rc/detailing/column-view.png" style="width:130pt;"/>
+  <p>Mean value of axial tensile strength</p>
+  <p>
+   <span class="eq">
+    <var>f</var>
+    <sub>ctm</sub>
+    = 0.3 ·
+    <var>f</var>
+    <sub>ck</sub>
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+    = 0.3 · 25
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+    = 2.56
+   </span>
+   MPa
+  </p>
+  <p>Characteristic axial tensile strength</p>
+  <p>
+   <span class="eq">
+    <var>f</var>
+    <sub>ctk,005</sub>
+    = 0.7 ·
+    <var>f</var>
+    <sub>ctm</sub>
+    = 0.7 · 2.56 = 1.8
+   </span>
+   MPa
+  </p>
+  <p>Design compressive cylinder strength</p>
+  <p>
+   <span class="eq">
+    <var>f</var>
+    <sub>cd</sub>
+    =
+    <span class="dvc">
+     <var>α</var>
+     <sub>cc</sub>
+     ·
+     <var>f</var>
+     <sub>ck</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>c</sub>
+    </span>
+    =
+    <span class="dvc">
+     1 · 25
+     <span class="dvl">
+     </span>
+     1.5
+    </span>
+    = 16.67
+   </span>
+   MPa
+  </p>
+  <p>
+  </p>
+  <p>
+   <b>Longitudinal reinforcement</b>
+  </p>
+  <p id="C" style="display:none;">
+   <span class="eq">
+    <var>C</var>
+    =
+    <u class="input-26">0</u>
+   </span>
+  </p>
+  <p>
+   Characteristic yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>yk</sub>
+    =
+    <u class="input-27">500</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Steel class -
+   <select data-target="C">
+    <option value="0">Class B</option>
+    <option value="1">Class C</option>
+   </select>
+  </p>
+  Selected steel class
+  <b>B500B</b>
+  <p>
+   Partial safety factor for steel -
+   <span class="eq">
+    <var>γ</var>
+    <sub>s</sub>
+    = 1.15
+   </span>
+  </p>
+  <p>
+   Design yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>yd</sub>
+    =
+    <span class="dvc">
+     <var>f</var>
+     <sub>yk</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>s</sub>
+    </span>
+    =
+    <span class="dvc">
+     500
+     <span class="dvl">
+     </span>
+     1.15
+    </span>
+    = 434.78
+   </span>
+   MPa
+  </p>
+  <p>
+   Modulus of elasticity -
+   <span class="eq">
+    <var>E</var>
+    <sub>s</sub>
+    = 200000
+   </span>
+   MPa
+  </p>
+  <p>
+   Bar diameter -
+   <span class="eq">
+    <var>d</var>
+    <sub>bL</sub>
+    =
+    <u class="input-47">28</u>
+   </span>
+   mm
+  </p>
+  <p class="ref">[BS EN 1992-1-1, § 9.5.2 (1)/NA.1]</p>
+  <p>
+   Minimum bar diameter -
+   <span class="eq">
+    <var>d</var>
+    <sub>bL,min</sub>
+    = 12
+   </span>
+   mm
+  </p>
+  <p>
+   Bar count -
+   <span class="eq">
+    <var>n</var>
+    <sub>b</sub>
+    =
+    <u class="input-55">12</u>
+   </span>
+  </p>
+  <p>
+   Bar count along "
+   <var>h</var>
+   <sub>c</sub>
+   " -
+   <span class="eq">
+    <var>n</var>
+    <sub>b1</sub>
+    =
+    <u class="input-56">4</u>
+   </span>
+  </p>
+  <p>
+   Bar count along "
+   <var>b</var>
+   <sub>c</sub>
+   " -
+   <span class="eq">
+    <var>n</var>
+    <sub>b2</sub>
+    =
+    <span class="dvc">
+     <var>n</var>
+     <sub>b</sub>
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    −
+    <var>n</var>
+    <sub>b1</sub>
+    + 2 =
+    <span class="dvc">
+     12
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    − 4 + 2 = 4
+   </span>
+  </p>
+  <p>Reinforcement area</p>
+  <p>
+   <span class="eq">
+    <var>A</var>
+    <sub>s1</sub>
+    =
+    <span class="dvc">
+     <var>π</var>
+     ·
+     <var>d</var>
+     <sub>bL</sub>
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    =
+    <span class="dvc">
+     3.14 · 28
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    = 615.75
+   </span>
+   mm²
+  </p>
+  <p>
+   <span class="eq">
+    <var>A</var>
+    <sub>s</sub>
+    =
+    <var>n</var>
+    <sub>b</sub>
+    ·
+    <var>A</var>
+    <sub>s1</sub>
+    = 12 · 615.75 = 7389.03
+   </span>
+   mm²
+  </p>
+  <p>Reinforcement ratio</p>
+  <p>
+   <span class="eq">
+    <var>ρ</var>
+    <sub>L</sub>
+    =
+    <span class="dvc">
+     <var>A</var>
+     <sub>s</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+     <sub>c</sub>
+    </span>
+    =
+    <span class="dvc">
+     7389.03
+     <span class="dvl">
+     </span>
+     250000
+    </span>
+    = 0.0296
+   </span>
+  </p>
+  <p class="ref">[§ 5.4.3.2.2 (1)]</p>
+  <p>
+   Design check: 0.01 ≤
+   <span class="eq">
+    <var>ρ</var>
+    <sub>L</sub>
+    = 0.0296
+   </span>
+   ≤ 0.04. The check is satisfied! ✓
+  </p>
+  <p>
+  </p>
+  <p class="ref">[EN 1992-1-1, § 9.5.1 (1)]</p>
+  <p>
+   <b>Column dimensions check</b>
+  </p>
+  <p>
+   <span class="eq">
+    <span class="dvc">
+     <var>h</var>
+     <sub>c</sub>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+     <sub>c</sub>
+    </span>
+    =
+    <span class="dvc">
+     500
+     <span class="dvl">
+     </span>
+     500
+    </span>
+    = 1
+   </span>
+   ≤ 4. The check is satisfied! ✓
+  </p>
+  <p class="ref">[§ 5.4.3.2.1 (3)]</p>
+  <p>Check for normalized axial load</p>
+  <p>
+   <span class="eq">
+    <var>ν</var>
+    <sub>d</sub>
+    =
+    <span class="dvc">
+     <var>N</var>
+     <sub>Ed</sub>
+     <span class="dvl">
+     </span>
+     <var>A</var>
+     <sub>c</sub>
+     ·
+     <var>f</var>
+     <sub>cd</sub>
+    </span>
+    · 1000 =
+    <span class="dvc">
+     983.8
+     <span class="dvl">
+     </span>
+     250000 · 16.67
+    </span>
+    · 1000 = 0.236
+   </span>
+  </p>
+  <p>
+   <span class="eq">
+    <var>ν</var>
+    <sub>d</sub>
+    = 0.236
+   </span>
+   ≤ 0.65. The check is satisfied! ✓
+  </p>
+  <p>
+  </p>
+  <p class="ref">[§ 5.4.3.2.2 (4)]</p>
+  <p>
+   <b>Critical region length</b>
+  </p>
+  <p>
+   <span class="eq">
+    <var>l</var>
+    <sub>cr</sub>
+    =
+    <b>max</b>
+    <span class="b1">(</span>
+    <var>h</var>
+    <sub>c</sub>
+    ;
+    <span class="dvc">
+     <var>l</var>
+     <sub>cl</sub>
+     <span class="dvl">
+     </span>
+     6
+    </span>
+    ; 450
+    <span class="b1">)</span>
+    =
+    <b>max</b>
+    <span class="b1">(</span>
+    500;
+    <span class="dvc">
+     2850
+     <span class="dvl">
+     </span>
+     6
+    </span>
+    ; 450
+    <span class="b1">)</span>
+    = 500
+   </span>
+   mm
+  </p>
+  <p>Design anchorage length</p>
+  <p>
+   <span class="eq">
+    <var>η</var>
+    <sub>1</sub>
+    = 1
+   </span>
+   - when good conditions are provided
+  </p>
+  <p>
+   <span class="eq">
+    <var>η</var>
+    <sub>2</sub>
+    = 1
+   </span>
+   - for
+   <span class="eq">
+    <var>d</var>
+    <sub>bL</sub>
+    = 28
+   </span>
+   ≤ 32 mm
+  </p>
+  <p>
+   <span class="eq">
+    <var>f</var>
+    <sub>ctd</sub>
+    =
+    <span class="dvc">
+     <var>α</var>
+     <sub>ct</sub>
+     ·
+     <var>f</var>
+     <sub>ctk,005</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>c</sub>
+    </span>
+    =
+    <span class="dvc">
+     1 · 1.8
+     <span class="dvl">
+     </span>
+     1.5
+    </span>
+    = 1.2
+   </span>
+   MPa
+  </p>
+  <p class="ref">[EN 1992-1-1, § 8.4.2 (2)]</p>
+  <p>
+   <span class="eq">
+    <var>f</var>
+    <sub>bd</sub>
+    = 2.25 ·
+    <var>η</var>
+    <sub>1</sub>
+    ·
+    <var>η</var>
+    <sub>2</sub>
+    ·
+    <var>f</var>
+    <sub>ctd</sub>
+    = 2.25 · 1 · 1 · 1.2 = 2.69
+   </span>
+   MPa
+  </p>
+  <p>
+   <span class="eq">
+    <var>σ</var>
+    <sub>sd</sub>
+    =
+    <var>f</var>
+    <sub>yd</sub>
+    = 434.78
+   </span>
+   MPa
+  </p>
+  <p class="ref">[EN 1992-1-1, § 8.4.3 (2)]</p>
+  <p>
+   <span class="eq">
+    <var>l</var>
+    <sub>b,rqd</sub>
+    =
+    <span class="dvc">
+     <var>d</var>
+     <sub>bL</sub>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    ·
+    <span class="dvc">
+     <var>σ</var>
+     <sub>sd</sub>
+     <span class="dvl">
+     </span>
+     <var>f</var>
+     <sub>bd</sub>
+    </span>
+    =
+    <span class="dvc">
+     28
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    ·
+    <span class="dvc">
+     434.78
+     <span class="dvl">
+     </span>
+     2.69
+    </span>
+    = 1130.06
+   </span>
+   mm
+  </p>
+  <p class="ref">[EN 1992-1-1, Table 8.2]</p>
+  <p>
+   <span class="eq">
+    <var>α</var>
+    <sub>1</sub>
+    = 1
+   </span>
+   ,
+   <span class="eq">
+    <var>α</var>
+    <sub>2</sub>
+    = 1
+   </span>
+   ,
+   <span class="eq">
+    <var>α</var>
+    <sub>3</sub>
+    = 1
+   </span>
+   ,
+   <span class="eq">
+    <var>α</var>
+    <sub>5</sub>
+    = 1
+   </span>
+   ,
+   <span class="eq">
+    <var>α</var>
+    <sub>6</sub>
+    = 1.5
+   </span>
+  </p>
+  <p class="ref">[EN 1992-1-1, § 8.7.3 (1)]</p>
+  <p>
+   <span class="eq">
+    <var>l</var>
+    <sub>0_</sub>
+    =
+    <var>α</var>
+    <sub>1</sub>
+    ·
+    <var>α</var>
+    <sub>2</sub>
+    ·
+    <var>α</var>
+    <sub>3</sub>
+    ·
+    <var>α</var>
+    <sub>5</sub>
+    ·
+    <var>α</var>
+    <sub>6</sub>
+    ·
+    <var>l</var>
+    <sub>b,rqd</sub>
+    = 1 · 1 · 1 · 1 · 1.5 · 1130.06 = 1695.08
+   </span>
+   mm
+  </p>
+  <p>
+   <span class="eq">
+    <var>l</var>
+    <sub>0,min</sub>
+    =
+    <b>max</b>
+    ( 0.3 ·
+    <var>α</var>
+    <sub>6</sub>
+    ·
+    <var>l</var>
+    <sub>b,rqd</sub>
+    ; 15 ·
+    <var>d</var>
+    <sub>bL</sub>
+    ; 200 )  =
+    <b>max</b>
+    ( 0.3 · 1.5 · 1130.06; 15 · 28; 200 )  = 508.52
+   </span>
+   mm
+  </p>
+  <p>
+   <span class="eq">
+    <var>l</var>
+    <sub>0</sub>
+    =
+    <b>round</b>
+    (
+    <b>max</b>
+    (
+    <var>l</var>
+    <sub>0_</sub>
+    ;
+    <var>l</var>
+    <sub>0,min</sub>
+    )  )  =
+    <b>round</b>
+    (
+    <b>max</b>
+    ( 1695.08; 508.52 )  )  = 1695
+   </span>
+   mm
+  </p>
+  <p>Mid zone length</p>
+  <p>
+   <span class="eq">
+    <var>l</var>
+    <sub>1</sub>
+    =
+    <b>max</b>
+    ( 0;
+    <var>l</var>
+    <sub>cl</sub>
+    −
+    <var>l</var>
+    <sub>cr</sub>
+    −
+    <var>l</var>
+    <sub>0</sub>
+    )  =
+    <b>max</b>
+    ( 0; 2850 − 500 − 1695 )  = 655
+   </span>
+   mm
+  </p>
+  <p>
+  </p>
+  <p>
+   <b>Transverse reinforcement</b>
+  </p>
+  <p>
+   Hoop diameter -
+   <span class="eq">
+    <var>d</var>
+    <sub>bw</sub>
+    =
+    <u class="input-128">10</u>
+   </span>
+   mm
+  </p>
+  <p>
+   Characteristic yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ywk</sub>
+    =
+    <u class="input-129">500</u>
+   </span>
+   MPa
+  </p>
+  <p>
+   Design yield strength -
+   <span class="eq">
+    <var>f</var>
+    <sub>ywd</sub>
+    =
+    <span class="dvc">
+     <var>f</var>
+     <sub>ywk</sub>
+     <span class="dvl">
+     </span>
+     <var>γ</var>
+     <sub>s</sub>
+    </span>
+    =
+    <span class="dvc">
+     500
+     <span class="dvl">
+     </span>
+     1.15
+    </span>
+    = 434.78
+   </span>
+   MPa
+  </p>
+  <p>
+   Concrete cover to hoops -
+   <span class="eq">
+    <var>c</var>
+    = 40
+   </span>
+   mm
+  </p>
+  <p class="ref">[EN 1992-1-1, § 9.5.3 (1)]</p>
+  <p>
+   Minimum diameter -
+   <span class="eq">
+    <var>d</var>
+    <sub>bw,min</sub>
+    =
+    <b>max</b>
+    ( 6; 0.25 ·
+    <var>d</var>
+    <sub>bL</sub>
+    )  =
+    <b>max</b>
+    ( 6; 0.25 · 28 )  = 7
+   </span>
+   mm
+  </p>
+  <p>Hoop diameter check:</p>
+  <p>
+   <span class="eq">
+    <var>d</var>
+    <sub>bw</sub>
+    = 10
+   </span>
+   ≥
+   <span class="eq">
+    <var>d</var>
+    <sub>bw,min</sub>
+    = 7
+   </span>
+   mm. The check is satisfied! ✓
+  </p>
+  <p>
+  </p>
+  <p>Confined core dimensions (between centerlines of links)</p>
+  <p>
+   <span class="eq">
+    <var>b</var>
+    <sub>0</sub>
+    =
+    <var>b</var>
+    <sub>c</sub>
+    −  (
+    <var>d</var>
+    <sub>bw</sub>
+    + 2 ·
+    <var>c</var>
+    )  = 500 −  ( 10 + 2 · 40 )  = 410
+   </span>
+   mm
+  </p>
+  <p>
+   <span class="eq">
+    <var>h</var>
+    <sub>0</sub>
+    =
+    <var>h</var>
+    <sub>c</sub>
+    −  (
+    <var>d</var>
+    <sub>bw</sub>
+    + 2 ·
+    <var>c</var>
+    )  = 500 −  ( 10 + 2 · 40 )  = 410
+   </span>
+   mm
+  </p>
+  <p>Maximum bar spacing</p>
+  <p>
+   <span class="eq">
+    <var>d</var>
+    <sub>b1</sub>
+    =
+    <span class="dvc">
+     <var>h</var>
+     <sub>c</sub>
+     − 2 ·  (
+     <var>d</var>
+     <sub>bw</sub>
+     +
+     <var>c</var>
+     )  −
+     <var>d</var>
+     <sub>bL</sub>
+     <span class="dvl">
+     </span>
+     <var>n</var>
+     <sub>b1</sub>
+     − 1
+    </span>
+    =
+    <span class="dvc">
+     500 − 2 ·  ( 10 + 40 )  − 28
+     <span class="dvl">
+     </span>
+     4 − 1
+    </span>
+    = 124
+   </span>
+   mm
+  </p>
+  <p>
+   <span class="eq">
+    <var>d</var>
+    <sub>b2</sub>
+    =
+    <span class="dvc">
+     <var>b</var>
+     <sub>c</sub>
+     − 2 ·  (
+     <var>d</var>
+     <sub>bw</sub>
+     +
+     <var>c</var>
+     )  −
+     <var>d</var>
+     <sub>bL</sub>
+     <span class="dvl">
+     </span>
+     <var>n</var>
+     <sub>b2</sub>
+     − 1
+    </span>
+    =
+    <span class="dvc">
+     500 − 2 ·  ( 10 + 40 )  − 28
+     <span class="dvl">
+     </span>
+     4 − 1
+    </span>
+    = 124
+   </span>
+   mm
+  </p>
+  <p>Maximum distance between consecutive longitudinal bars engaged by hoops</p>
+  <p class="ref">[§ 5.4.3.2.2 (11), b)]</p>
+  <p>
+   <span class="eq">
+    <var>d</var>
+    <sub>h,max</sub>
+    = 200
+   </span>
+   mm
+  </p>
+  <p>Distance between bars engaged by links</p>
+  <p>
+   <span class="eq">
+    <var>n</var>
+    <sub>h1</sub>
+    =
+    <b>max</b>
+    <span class="b1">(</span>
+    <b>floor</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>d</var>
+     <sub>h,max</sub>
+     <span class="dvl">
+     </span>
+     <var>d</var>
+     <sub>b1</sub>
+    </span>
+    <span class="b1">)</span>
+    ; 1
+    <span class="b1">)</span>
+    =
+    <b>max</b>
+    <span class="b1">(</span>
+    <b>floor</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     200
+     <span class="dvl">
+     </span>
+     124
+    </span>
+    <span class="b1">)</span>
+    ; 1
+    <span class="b1">)</span>
+    = 1
+   </span>
+  </p>
+  <p>
+   <span class="eq">
+    <var>n</var>
+    <sub>h2</sub>
+    =
+    <b>max</b>
+    <span class="b1">(</span>
+    <b>floor</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>d</var>
+     <sub>h,max</sub>
+     <span class="dvl">
+     </span>
+     <var>d</var>
+     <sub>b2</sub>
+    </span>
+    <span class="b1">)</span>
+    ; 1
+    <span class="b1">)</span>
+    =
+    <b>max</b>
+    <span class="b1">(</span>
+    <b>floor</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     200
+     <span class="dvl">
+     </span>
+     124
+    </span>
+    <span class="b1">)</span>
+    ; 1
+    <span class="b1">)</span>
+    = 1
+   </span>
+  </p>
+  <p>Distance between bars engaged by links</p>
+  <p>
+   <span class="eq">
+    <var>d</var>
+    <sub>h1</sub>
+    =
+    <var>n</var>
+    <sub>h1</sub>
+    ·
+    <var>d</var>
+    <sub>b1</sub>
+    = 1 · 124 = 124
+   </span>
+  </p>
+  <p>
+   <span class="eq">
+    <var>d</var>
+    <sub>h2</sub>
+    =
+    <var>n</var>
+    <sub>h2</sub>
+    ·
+    <var>d</var>
+    <sub>b2</sub>
+    = 1 · 124 = 124
+   </span>
+  </p>
+  <p>Distance between bars engaged by links</p>
+  <p>
+   <span class="eq">
+    <var>n</var>
+    <sub>h1</sub>
+    =
+    <b>round</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     (
+     <var>n</var>
+     <sub>b1</sub>
+     − 1 )  ·
+     <var>d</var>
+     <sub>b1</sub>
+     <span class="dvl">
+     </span>
+     <var>d</var>
+     <sub>h1</sub>
+    </span>
+    <span class="b1">)</span>
+    =
+    <b>round</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     ( 4 − 1 )  · 124
+     <span class="dvl">
+     </span>
+     124
+    </span>
+    <span class="b1">)</span>
+    = 3
+   </span>
+  </p>
+  <p>
+   <span class="eq">
+    <var>n</var>
+    <sub>h2</sub>
+    =
+    <b>round</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     (
+     <var>n</var>
+     <sub>b2</sub>
+     − 1 )  ·
+     <var>d</var>
+     <sub>b2</sub>
+     <span class="dvl">
+     </span>
+     <var>d</var>
+     <sub>h2</sub>
+    </span>
+    <span class="b1">)</span>
+    =
+    <b>round</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     ( 4 − 1 )  · 124
+     <span class="dvl">
+     </span>
+     124
+    </span>
+    <span class="b1">)</span>
+    = 3
+   </span>
+  </p>
+  <p>
+  </p>
+  <p>Hoop spacing in critical regions</p>
+  <p class="ref">[§ 5.4.3.2.2 (11), a)]</p>
+  <p>
+   <span class="eq">
+    <var>s</var>
+    <sub>cr</sub>
+    =
+    <b>min</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>b</var>
+     <sub>0</sub>
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    ; 8 ·
+    <var>d</var>
+    <sub>bL</sub>
+    ; 175
+    <span class="b1">)</span>
+    =
+    <b>min</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     410
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    ; 8 · 28; 175
+    <span class="b1">)</span>
+    = 175
+   </span>
+   mm
+  </p>
+  <p>Hoop spacing in mid zone</p>
+  <p class="ref">[EN 1992-1-1, § 9.5.3 (3)]</p>
+  <p>
+   <span class="eq">
+    <var>s</var>
+    =
+    <b>min</b>
+    (
+    <var>b</var>
+    <sub>c</sub>
+    ; 20 ·
+    <var>d</var>
+    <sub>bL</sub>
+    ; 400 )  =
+    <b>min</b>
+    ( 500; 20 · 28; 400 )  = 400
+   </span>
+   mm
+  </p>
+  <p>Hoop spacing in lap zone</p>
+  <p class="ref">[§ 5.6.3 (3), c)]</p>
+  <p>
+   <span class="eq">
+    <var>s</var>
+    <sub>l</sub>
+    =
+    <b>min</b>
+    <span class="b1">(</span>
+    100;
+    <span class="dvc">
+     <var>b</var>
+     <sub>c</sub>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    <span class="b1">)</span>
+    =
+    <b>min</b>
+    <span class="b1">(</span>
+    100;
+    <span class="dvc">
+     500
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    <span class="b1">)</span>
+    = 100
+   </span>
+   mm
+  </p>
+  <p>
+  </p>
+  <b>Transverse reinforcement in lap zones</b>
+  <p>Required area of one leg</p>
+  <p class="ref">[§ 5.6.3 (4)]</p>
+  <p>
+   <span class="eq">
+    <var>A</var>
+    <sub>st</sub>
+    =
+    <var>s</var>
+    <sub>l</sub>
+    ·
+    <span class="dvc">
+     <var>d</var>
+     <sub>bL</sub>
+     <span class="dvl">
+     </span>
+     50
+    </span>
+    ·
+    <span class="dvc">
+     <var>f</var>
+     <sub>yd</sub>
+     <span class="dvl">
+     </span>
+     <var>f</var>
+     <sub>ywd</sub>
+    </span>
+    = 100 ·
+    <span class="dvc">
+     28
+     <span class="dvl">
+     </span>
+     50
+    </span>
+    ·
+    <span class="dvc">
+     434.78
+     <span class="dvl">
+     </span>
+     434.78
+    </span>
+    = 56
+   </span>
+   mm²
+  </p>
+  <p>Provided area of one leg</p>
+  <p>
+   <span class="eq">
+    <var>A</var>
+    <sub>sw1</sub>
+    =
+    <span class="dvc">
+     <var>π</var>
+     ·
+     <var>d</var>
+     <sub>bw</sub>
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    =
+    <span class="dvc">
+     3.14 · 10
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    = 78.54
+   </span>
+   mm²
+  </p>
+  <p>
+   Design check:
+   <span class="eq">
+    <var>A</var>
+    <sub>sw1</sub>
+    = 78.54
+   </span>
+   mm² ≥
+   <span class="eq">
+    <var>A</var>
+    <sub>st</sub>
+    = 56
+   </span>
+   mm². The check is satisfied! ✓
+  </p>
+  <p>Check for bar diameters &gt; 20 mm:</p>
+  <p>Number of legs in the outer 1/3 of lap zone</p>
+  <p>
+   <span class="eq">
+    <var>n</var>
+    <sub>w</sub>
+    =
+    <b>round</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     2 ·
+     <var>l</var>
+     <sub>0</sub>
+     <span class="dvl">
+     </span>
+     3 ·
+     <var>s</var>
+     <sub>l</sub>
+    </span>
+    <span class="b1">)</span>
+    =
+    <b>round</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     2 · 1695
+     <span class="dvl">
+     </span>
+     3 · 100
+    </span>
+    <span class="b1">)</span>
+    = 11
+   </span>
+  </p>
+  <p>Total area of legs in the outer 1/3 of lap zone</p>
+  <p>
+   <span class="eq">
+    <var>ΣA</var>
+    <sub>sw</sub>
+    =
+    <var>A</var>
+    <sub>sw1</sub>
+    ·
+    <var>n</var>
+    <sub>w</sub>
+    = 78.54 · 11 = 863.94
+   </span>
+  </p>
+  <p class="ref">[EN 1992-1-1, § 8.7.4.1 (3)]</p>
+  <p>
+   Design check:
+   <span class="eq">
+    <var>ΣA</var>
+    <sub>sw</sub>
+    = 863.94
+   </span>
+   mm² ≥
+   <span class="eq">
+    <var>A</var>
+    <sub>s1</sub>
+    = 615.75
+   </span>
+   mm²
+  </p>
+  <p>Additional hoop is required for compressed bars</p>
+  <p class="ref">[EN 1992-1-1, § 8.7.4.2 (1)]</p>
+  <p>
+   at
+   <span class="eq">
+    4 ·
+    <var>d</var>
+    <sub>bL</sub>
+    = 4 · 28 = 112
+   </span>
+   mm from the end of the lap zone
+  </p>
+  <p>
+  </p>
+  <b>Calculation of hoop count</b>
+  <p>
+   In the lap zone -
+   <span class="eq">
+    <var>n</var>
+    <sub>w,l</sub>
+    =
+    <b>round</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>l</var>
+     <sub>0</sub>
+     <span class="dvl">
+     </span>
+     <var>s</var>
+     <sub>l</sub>
+    </span>
+    <span class="b1">)</span>
+    =
+    <b>round</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     1695
+     <span class="dvl">
+     </span>
+     100
+    </span>
+    <span class="b1">)</span>
+    = 17
+   </span>
+  </p>
+  <p>
+   In the middle zone -
+   <span class="eq">
+    <var>n</var>
+    <sub>w,1</sub>
+    =
+    <b>round</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>l</var>
+     <sub>1</sub>
+     <span class="dvl">
+     </span>
+     <var>s</var>
+    </span>
+    <span class="b1">)</span>
+    =
+    <b>round</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     655
+     <span class="dvl">
+     </span>
+     400
+    </span>
+    <span class="b1">)</span>
+    = 2
+   </span>
+  </p>
+  <p>
+   In critical region -
+   <span class="eq">
+    <var>n</var>
+    <sub>w,cr</sub>
+    =
+    <b>round</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>l</var>
+     <sub>cr</sub>
+     <span class="dvl">
+     </span>
+     <var>s</var>
+     <sub>cr</sub>
+    </span>
+    <span class="b1">)</span>
+    =
+    <b>round</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     500
+     <span class="dvl">
+     </span>
+     175
+    </span>
+    <span class="b1">)</span>
+    = 3
+   </span>
+  </p>
+  <p>
+   Total number of hoops -
+   <span class="eq">
+    <var>n</var>
+    <sub>w</sub>
+    =
+    <var>n</var>
+    <sub>w,l</sub>
+    +
+    <var>n</var>
+    <sub>w,1</sub>
+    +
+    <var>n</var>
+    <sub>w,cr</sub>
+    = 17 + 2 + 3 = 22
+   </span>
+  </p>
+  <p>
+  </p>
+  <p>
+   <b>Detailing for local ductility in the critical region at column base</b>
+  </p>
+  <p>Total length of confining hoops</p>
+  <p>
+   <span class="eq">
+    <var>Σl</var>
+    <sub>i</sub>
+    =  (
+    <var>n</var>
+    <sub>h1</sub>
+    + 1 )  ·
+    <var>b</var>
+    <sub>0</sub>
+    +  (
+    <var>n</var>
+    <sub>h2</sub>
+    + 1 )  ·
+    <var>h</var>
+    <sub>0</sub>
+    =  ( 3 + 1 )  · 410 +  ( 3 + 1 )  · 410 = 3280
+   </span>
+  </p>
+  <p>Mechanical volumetric ratio of confining hoops within the critical region</p>
+  <p>
+   <span class="eq">
+    <var>ω</var>
+    <sub>d</sub>
+    =
+    <span class="dvc">
+     <var>A</var>
+     <sub>sw1</sub>
+     ·
+     <var>Σl</var>
+     <sub>i</sub>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+     <sub>0</sub>
+     ·
+     <var>h</var>
+     <sub>0</sub>
+     ·
+     <b>min</b>
+     (
+     <var>s</var>
+     <sub>cr</sub>
+     ;
+     <var>s</var>
+     <sub>l</sub>
+     )
+    </span>
+    ·
+    <span class="dvc">
+     <var>f</var>
+     <sub>ywd</sub>
+     <span class="dvl">
+     </span>
+     <var>f</var>
+     <sub>cd</sub>
+    </span>
+    =
+    <span class="dvc">
+     78.54 · 3280
+     <span class="dvl">
+     </span>
+     410 · 410 ·
+     <b>min</b>
+     ( 175; 100 )
+    </span>
+    ·
+    <span class="dvc">
+     434.78
+     <span class="dvl">
+     </span>
+     16.67
+    </span>
+    = 0.4
+   </span>
+  </p>
+  <p class="ref">[§ 5.4.3.2.2 (8)]</p>
+  <p>The minimum value is 0.08.</p>
+  <p>
+   Design check:
+   <span class="eq">
+    <var>ω</var>
+    <sub>d</sub>
+    = 0.4
+   </span>
+   ≥
+   <span class="eq">0.08 = 0.08</span>
+   . The condition is satisfied!
+  </p>
+  <p>Sum of the squares of the spacing between consecutive engaged bars</p>
+  <p>
+   <span class="eq">
+    <var>Σb2</var>
+    <sub>i</sub>
+    = 2 ·  (
+    <var>n</var>
+    <sub>h1</sub>
+    ·
+    <var>d</var>
+    <sub>h1</sub>
+    <sup>2</sup>
+    +
+    <var>n</var>
+    <sub>h2</sub>
+    ·
+    <var>d</var>
+    <sub>h2</sub>
+    <sup>2</sup>
+    )  = 2 ·  ( 3 · 124
+    <sup>2</sup>
+    + 3 · 124
+    <sup>2</sup>
+    )  = 184512
+   </span>
+  </p>
+  <p>Confinement effectiveness factors for bars and hoops</p>
+  <p>
+   <span class="eq">
+    <var>α</var>
+    <sub>n</sub>
+    = 1 −
+    <span class="dvc">
+     <var>Σb2</var>
+     <sub>i</sub>
+     <span class="dvl">
+     </span>
+     6 ·
+     <var>b</var>
+     <sub>0</sub>
+     ·
+     <var>h</var>
+     <sub>0</sub>
+    </span>
+    = 1 −
+    <span class="dvc">
+     184512
+     <span class="dvl">
+     </span>
+     6 · 410 · 410
+    </span>
+    = 0.817
+   </span>
+  </p>
+  <p>
+   <span class="eq">
+    <var>α</var>
+    <sub>s</sub>
+    =
+    <span class="b1">(</span>
+    1 −
+    <span class="dvc">
+     <var>s</var>
+     <sub>cr</sub>
+     <span class="dvl">
+     </span>
+     2 ·
+     <var>b</var>
+     <sub>0</sub>
+    </span>
+    <span class="b1">)</span>
+    ·
+    <span class="b1">(</span>
+    1 −
+    <span class="dvc">
+     <var>s</var>
+     <sub>cr</sub>
+     <span class="dvl">
+     </span>
+     2 ·
+     <var>h</var>
+     <sub>0</sub>
+    </span>
+    <span class="b1">)</span>
+    =
+    <span class="b1">(</span>
+    1 −
+    <span class="dvc">
+     175
+     <span class="dvl">
+     </span>
+     2 · 410
+    </span>
+    <span class="b1">)</span>
+    ·
+    <span class="b1">(</span>
+    1 −
+    <span class="dvc">
+     175
+     <span class="dvl">
+     </span>
+     2 · 410
+    </span>
+    <span class="b1">)</span>
+    = 0.619
+   </span>
+  </p>
+  <p>
+   <span class="eq">
+    <var>α</var>
+    =
+    <var>α</var>
+    <sub>n</sub>
+    ·
+    <var>α</var>
+    <sub>s</sub>
+    = 0.817 · 0.619 = 0.506
+   </span>
+  </p>
+  <p>
+   <b>Analysis results</b>
+  </p>
+  <p>
+   Fundamental period of first vibration mode -
+   <span class="eq">
+    <var>T</var>
+    <sub>1</sub>
+    =
+    <u class="input-236">0.55</u>
+   </span>
+   s
+  </p>
+  <p>
+   Upper limit period of constant spectral acceleration -
+   <span class="eq">
+    <var>T</var>
+    <sub>C</sub>
+    =
+    <u class="input-237">0.6</u>
+   </span>
+   s
+  </p>
+  <p>
+   Basic behavior factor value -
+   <span class="eq">
+    <var>q</var>
+    <sub>0</sub>
+    =
+    <u class="input-238">3.9</u>
+   </span>
+  </p>
+  <p>
+   <b>Curvature ductility factor</b>
+  </p>
+  <p class="ref">[§ 5.2.3.4 (3)]</p>
+  <p>
+   <span class="eq">
+    <var>μ</var>
+    <sub>Φ</sub>
+    = 1 + 2 ·  (
+    <var>q</var>
+    <sub>0</sub>
+    − 1 )  ·
+    <span class="dvc">
+     <var>T</var>
+     <sub>C</sub>
+     <span class="dvl">
+     </span>
+     <var>T</var>
+     <sub>1</sub>
+    </span>
+    = 1 + 2 ·  ( 3.9 − 1 )  ·
+    <span class="dvc">
+     0.6
+     <span class="dvl">
+     </span>
+     0.55
+    </span>
+    = 7.33
+   </span>
+   - for T
+   <sub>1</sub>
+   &lt; T
+   <sub>C</sub>
+  </p>
+  <!-- <span class="eq"><var>μ</var><sub>Φ</sub> = 1.5 · <var>μ</var><sub>Φ</sub> = 1.5 · 7.33 = 10.99</span> -->
+  <p class="ref">[§ 5.2.3.4 (4)]</p>
+  <p>
+   For steel class B, ductility factor is increased by 05% -
+   <span class="eq">
+    <var>μ</var>
+    <sub>Φ</sub>
+    = 10.99
+   </span>
+  </p>
+  <p>
+   Design value of steel yield strain -
+   <span class="eq">
+    <var>ε</var>
+    <sub>sy_d</sub>
+    =
+    <span class="dvc">
+     <var>f</var>
+     <sub>yd</sub>
+     <span class="dvl">
+     </span>
+     <var>E</var>
+     <sub>s</sub>
+    </span>
+    =
+    <span class="dvc">
+     434.78
+     <span class="dvl">
+     </span>
+     200000
+    </span>
+    = 0.00217
+   </span>
+  </p>
+  <p class="ref">[§ 5.4.3.2.2 (8)]</p>
+  <p>
+   Design check:
+   <var>αω</var>
+   <sub>d</sub>
+   ≥
+   <var>αω</var>
+   <sub>d,min</sub>
+   = 30·
+   <var>μ</var>
+   <sub>Φ</sub>
+   ·
+   <var>ν</var>
+   <sub>d</sub>
+   ·
+   <var>ε</var>
+   <sub>sy_d</sub>
+   ·
+   <var>b</var>
+   <sub>c</sub>
+   /
+   <var>b</var>
+   <sub>0</sub>
+   – 0.035
+  </p>
+  <p>
+   <span class="eq">
+    <var>αω</var>
+    <sub>d</sub>
+    =
+    <var>α</var>
+    ·
+    <var>ω</var>
+    <sub>d</sub>
+    = 0.506 · 0.4 = 0.202
+   </span>
+  </p>
+  <p>
+   <span class="eq">
+    <var>αω</var>
+    <sub>d,min</sub>
+    = 30 ·
+    <var>μ</var>
+    <sub>Φ</sub>
+    ·
+    <var>ν</var>
+    <sub>d</sub>
+    ·
+    <var>ε</var>
+    <sub>sy_d</sub>
+    ·
+    <span class="dvc">
+     <var>b</var>
+     <sub>c</sub>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+     <sub>0</sub>
+    </span>
+    − 0.035 = 30 · 10.99 · 0.236 · 0.00217 ·
+    <span class="dvc">
+     500
+     <span class="dvl">
+     </span>
+     410
+    </span>
+    − 0.035 = 0.171
+   </span>
+  </p>
+  <p>
+   The required curvature ductility is provided:
+   <span class="eq">
+    <var>αω</var>
+    <sub>d</sub>
+    = 0.202
+   </span>
+   ≥
+   <span class="eq">
+    <var>αω</var>
+    <sub>d,min</sub>
+    = 0.171
+   </span>
+  </p>
+  <p>NOTE: All references are according to EN 1998-1, unless noted otherwise.</p>
+ </div>
+</div>

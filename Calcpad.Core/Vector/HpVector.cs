@@ -49,7 +49,7 @@ namespace Calcpad.Core
             {
                 var values = new RealValue[_length];
                 for (int i = 0; i < _size; ++i)
-                    values[i] = new(_values[i], Units); 
+                    values[i] = new(_values[i], Units);
 
                 if (Units is not null)
                 {
@@ -62,7 +62,7 @@ namespace Calcpad.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal double GetValue(int index) => 
+        internal double GetValue(int index) =>
             index >= _size ? 0d : _values[index];
 
 
@@ -124,7 +124,7 @@ namespace Calcpad.Core
             if (values.Length > MaxLength)
                 throw Exceptions.VectorSizeLimit();
 
-            Units = units;  
+            Units = units;
             _values = values;
             _length = _values.Length;
             for (int i = _length - 1; i >= 0; --i)
@@ -184,7 +184,7 @@ namespace Calcpad.Core
 
         public override bool Equals(object obj) => obj is HpVector v && Equals(v);
 
-        public bool Equals(HpVector other) => 
+        public bool Equals(HpVector other) =>
             Length == other.Length && _size != other._size &&
             _values.AsSpan(0, _size).SequenceEqual(other._values.AsSpan(0, other._size));
 
@@ -206,7 +206,7 @@ namespace Calcpad.Core
         }
 
         private static HpVector Clone(HpVector a) => new(a._length, a._size, a.Units);
-        private static HpVector Clone(HpVector a, HpVector b) => 
+        private static HpVector Clone(HpVector a, HpVector b) =>
             new(Math.Max(a._length, b._length), Math.Max(a._size, b._size), a.Units);
 
         public static HpVector operator -(HpVector a)
@@ -307,7 +307,7 @@ namespace Calcpad.Core
         public static HpVector operator -(RealValue a, HpVector b)
         {
             var c = Clone(b);
-            c.Units = a.Units;  
+            c.Units = a.Units;
             var da = a.D;
             var k = Unit.Convert(a.Units, b.Units, '-');
             var nb = b._size;
@@ -453,7 +453,7 @@ namespace Calcpad.Core
             if (na == 0)
                 return c;
 
-            db *= b.D; 
+            db *= b.D;
             ReadOnlySpan<double> sa = a._values.AsSpan(0, na);
             Span<double> sc = c._values.AsSpan();
             var nv = 0;
@@ -627,7 +627,7 @@ namespace Calcpad.Core
         {
             if (b.Units is not null)
                 throw Exceptions.CannotEvaluateRemainder(Unit.GetText(a.Units), Unit.GetText(b.Units));
-            
+
             var c = Clone(a, b);
             var na = a._size;
             var nb = b._size;
@@ -786,7 +786,7 @@ namespace Calcpad.Core
             var nb = b._size;
             (var n1, var n2) = MinMax(na, nb);
             ReadOnlySpan<double> sa = a._values.AsSpan(0, na);
-            ReadOnlySpan<double> sb = b._values.AsSpan(0, nb);  
+            ReadOnlySpan<double> sb = b._values.AsSpan(0, nb);
             Span<double> sc = c._values.AsSpan();
             for (int i = n1 - 1; i >= 0; --i)
                 sc[i] = sa[i].IsNotEqual(sb[i] * d);
@@ -1093,7 +1093,7 @@ namespace Calcpad.Core
             return c;
         }
 
-        private const double logicalZero = RealValue.LogicalZero;   
+        private const double logicalZero = RealValue.LogicalZero;
         public static HpVector operator &(HpVector a, HpVector b)
         {
             var c = Clone(a, b);
@@ -1491,7 +1491,7 @@ namespace Calcpad.Core
 
                 ++start;
             }
-            var span = vector._values.AsSpan(); 
+            var span = vector._values.AsSpan();
             for (int i = start; i < _size; ++i)
                 span[_length - i - 1] = _values[i];
 
@@ -1558,7 +1558,7 @@ namespace Calcpad.Core
 
         internal override int[] GetOrderIndexes(bool reverse, int len = -1)
         {
-            if (len < 0) 
+            if (len < 0)
                 len = _length;
 
             var values = new double[len];
@@ -1842,7 +1842,7 @@ namespace Calcpad.Core
             return new(count);
         }
 
-        // L1 or Manhattan norm  
+        // L1 or Manhattan norm
         internal override RealValue L1Norm()
         {
             if (_size == 0)
@@ -1870,7 +1870,7 @@ namespace Calcpad.Core
             return new(norm, Units);
         }
 
-        // L2 or Euclidean norm  
+        // L2 or Euclidean norm
         internal override RealValue Norm()
         {
             if (_size == 0)
@@ -1894,11 +1894,11 @@ namespace Calcpad.Core
             {
                 var d = sa[i];
                 norm += d * d;
-            }    
+            }
             return new(Math.Sqrt(norm), Units);
         }
 
-        // Lp norm   
+        // Lp norm
         internal override RealValue LpNorm(int p)
         {
             if (p < 1)
@@ -2134,7 +2134,7 @@ namespace Calcpad.Core
             }
             for (int i = nv; i < _size; ++i)
                 product *= sa[i];
-            
+
             return new(product, Units?.Pow(_length));
         }
 

@@ -1,0 +1,37 @@
+<div class="calcpad-output">
+ <!-- Area $A = a^2$ and perimeter $P = 4a$ of a square from a single side length. -->
+ <div style="max-width:80mm;">
+  <img alt="square.png" class="side" src="Images/math/area/square.png" style="height:60pt;"/>
+ </div>
+ <p>Side length</p>
+ <p>
+  <span class="eq">
+   <var>a</var>
+   =
+   <u class="input-4">1</u>
+  </span>
+ </p>
+ <p>Area</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   =
+   <var>a</var>
+   <sup>2</sup>
+   = 1
+   <sup>2</sup>
+   = 1
+  </span>
+ </p>
+ <p>Perimeter</p>
+ <p>
+  <span class="eq">
+   <var>P</var>
+   = 4 ·
+   <var>a</var>
+   = 4 · 1 = 4
+  </span>
+ </p>
+ <p>
+ </p>
+</div>
