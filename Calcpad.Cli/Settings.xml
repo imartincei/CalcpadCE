@@ -6,6 +6,7 @@
     <IsComplex>false</IsComplex>
     <Substitute>true</Substitute>
     <FormatEquations>true</FormatEquations>
+    <InlineMatrices>true</InlineMatrices>
     <Precision>1E-14</Precision>
     <Tol>1E-06</Tol>
   </Math>

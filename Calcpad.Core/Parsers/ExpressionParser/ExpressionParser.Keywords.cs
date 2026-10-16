@@ -828,6 +828,10 @@ namespace Calcpad.Core
                     if (dto.ZeroSmallMatrixElements.HasValue)
                         Settings.Math.ZeroSmallMatrixElements = dto.ZeroSmallMatrixElements.Value;
                     break;
+                case SettingKey.InlineMatrices:
+                    if (dto.InlineMatrices.HasValue)
+                        Settings.Math.InlineMatrices = dto.InlineMatrices.Value;
+                    break;
                 case SettingKey.ShowHiddenOutput:
                     if (dto.ShowHiddenOutput.HasValue)
                         Settings.Math.ShowHiddenOutput = dto.ShowHiddenOutput.Value;

@@ -471,6 +471,8 @@ Results will appear in the "**Output**" box on the right as a professionally for
     - `#round default` - restores rounding to the default settings
     - `#format *FFFF*` - specifies custom format string
     - `#format default` - restores the default formatting
+    - `#split` - split long equations after the `=` symbol onto a new indented line
+    - `#wrap` - wrap long equations at the end of the line (default)
     - `#md on` - enables markdown in comments
     - `#md off` - disables markdown in comments
     - `#phasor` - sets output format of complex numbers to polar phasor: A∠φ

@@ -10,6 +10,7 @@ export interface CalcpadSettings {
         substitute: boolean;
         formatEquations: boolean;
         zeroSmallMatrixElements: boolean;
+        inlineMatrices: boolean;
         showHiddenOutput: boolean;
         maxOutputCount: number;
         formatString: string;
@@ -142,6 +143,7 @@ export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
     { key: 'substitute', label: 'Substitute variables', detail: 'Substitute variable values into expressions', type: 'boolean', def: true },
     { key: 'formatEquations', label: 'Format equations', detail: 'Professional (checked) renders equations in stacked math form; Inline (unchecked) renders them on a single line.', type: 'boolean', def: true },
     { key: 'zeroSmallMatrixElements', label: 'Zero small matrix elements', detail: 'Display very small matrix/vector values as 0 instead of using scientific notation.', type: 'boolean', def: true },
+    { key: 'inlineMatrices', label: 'Substitute vectors and matrices inline', detail: 'On (default) renders substituted matrix/vector literals on a single line. Off renders substituted matrix/vector literals in a grid (the same way as the numerical output).', type: 'boolean', def: true },
     { key: 'showHiddenOutput', label: 'Show hidden output', detail: 'Ignore #hide so suppressed content is rendered anyway. For debugging.', type: 'boolean', def: false },
     { key: 'maxOutputCount', label: 'Max output count', detail: 'Maximum number of rows/columns shown for large matrices and vectors (5–100).', type: 'number', def: 20, min: 5, max: 100 },
     { key: 'isUs', label: 'Non-metric units', detail: 'Selects US or UK definitions for bare unit names that differ between the two systems (gal, ton, cwt, pt, qt, bbl, tonf, therm, etc.).', type: 'boolean', def: true },
@@ -177,7 +179,8 @@ export function validateSettingValue(key: string, value: string | number | boole
 export const SETTINGS_PATH: Partial<Record<string, string>> = {
     decimals: 'math.decimals', degrees: 'math.degrees', complex: 'math.isComplex',
     substitute: 'math.substitute', formatEquations: 'math.formatEquations',
-    zeroSmallMatrixElements: 'math.zeroSmallMatrixElements', showHiddenOutput: 'math.showHiddenOutput',
+    zeroSmallMatrixElements: 'math.zeroSmallMatrixElements', inlineMatrices: 'math.inlineMatrices',
+    showHiddenOutput: 'math.showHiddenOutput',
     maxOutputCount: 'math.maxOutputCount', precision: 'math.precision', tol: 'math.tol',
     isUs: 'isUs', vectorGraphics: 'plot.vectorGraphics', colorScale: 'plot.colorScale',
     smoothScale: 'plot.smoothScale', shadows: 'plot.shadows', adaptivePlot: 'plot.isAdaptive',

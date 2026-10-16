@@ -196,7 +196,7 @@ namespace Calcpad.Core
                             else if (tt == TokenTypes.Vector)
                                 RenderVectorToken(t, b);
                             else if (tt == TokenTypes.RowDivisor)
-                                t.Content = RenderParameters(t, b, t.ParameterCount);
+                                RenderRowDivisorToken(t, b);
                             else if (tt == TokenTypes.Matrix)
                                 RenderMatrixToken(t, b);
                             else if (st == "!")
@@ -681,38 +681,66 @@ namespace Calcpad.Core
 
                 void RenderMatrixToken(RenderToken t, RenderToken b)
                 {
-                    var s = RenderParameters(t, b, t.ParameterCount, true);
-                    t.Content = AddBrackets(s, t.Level, t.MinOffset, t.MaxOffset, '[', ']');
+                    var rows = new string[t.ParameterCount + 1][];
+                    CollectRow(b, rows, t.ParameterCount);
+                    for (var j = t.ParameterCount - 1; j >= 0; --j)
+                        CollectRow(stackBuffer.Pop(), rows, j);
+
+                    t.Content = substitute || !writer.InlineMatrices ?
+                        writer.FormatBracketedMatrix(rows, t.Level, t.MinOffset, t.MaxOffset) :
+                        AddBrackets(writer.JoinCells(rows), t.Level, t.MinOffset, t.MaxOffset, '[', ']');
                     t.MinOffset = 0;
                     t.MaxOffset = 0;
+                    return;
+
+                    void CollectRow(RenderToken row, string[][] rows, int index)
+                    {
+                        rows[index] = row.Cells ?? [row.Content];
+                        if (row.Level > t.Level)
+                            t.Level = row.Level;
+
+                        t.MinOffset = Math.Min(row.MinOffset, t.MinOffset);
+                        t.MaxOffset = Math.Max(row.MaxOffset, t.MaxOffset);
+                    }
                 }
 
                 void RenderVectorToken(RenderToken t, RenderToken b)
                 {
-                    var s = RenderParameters(t, b, t.ParameterCount);
-                    t.Content = AddBrackets(s, t.Level, t.MinOffset, t.MaxOffset, '[', ']');
+                    var cells = RenderElements(t, b, t.ParameterCount);
+                    t.Content = substitute || !writer.InlineMatrices ?
+                        writer.FormatBracketedVector(cells, t.Level, t.MinOffset, t.MaxOffset) :
+                        AddBrackets(string.Join(div, cells), t.Level, t.MinOffset, t.MaxOffset, '[', ']');
                     t.MinOffset = 0;
                     t.MaxOffset = 0;
                 }
 
-                string RenderParameters(RenderToken t, RenderToken b, int count, bool matrix = false)
+                void RenderRowDivisorToken(RenderToken t, RenderToken b)
                 {
-                    var s = b.Content;
+                    t.Cells = RenderElements(t, b, t.ParameterCount);
+                    t.Content = string.Join(div, t.Cells);
+                }
+
+                string RenderParameters(RenderToken t, RenderToken b, int count) =>
+                    string.Join(div, RenderElements(t, b, count));
+
+                string[] RenderElements(RenderToken t, RenderToken b, int count)
+                {
+                    var items = new string[count + 1];
+                    items[^1] = b.Content;
                     t.Level = b.Level;
                     t.MinOffset = b.MinOffset;
                     t.MaxOffset = b.MaxOffset;
-                    var d = matrix ? writer.FormatOperator('|') : div;
-                    for (int j = 0; j < count; ++j)
+                    for (int j = count - 1; j >= 0; --j)
                     {
                         var a = stackBuffer.Pop();
-                        s = string.Concat(a.Content, d, s);
+                        items[j] = a.Content;
                         if (a.Level > t.Level)
                             t.Level = a.Level;
 
                         t.MinOffset = Math.Min(a.MinOffset, t.MinOffset);
                         t.MaxOffset = Math.Max(a.MaxOffset, t.MaxOffset);
                     }
-                    return s;
+                    return items;
                 }
 
                 void RenderFactorialToken(RenderToken t, RenderToken b)
@@ -728,7 +756,7 @@ namespace Calcpad.Core
                 {
                     var offset = b.MaxOffset + b.MinOffset;
                     b.Level += (b.MaxOffset - b.MinOffset) / 2;
-                    var sb = offset == 0 ? b.Content : FixOffset(b.Content, offset);
+                    var sb = offset == 0 ? b.Content : OutputWriter.FixOffset(b.Content, offset);
                     t.Content = writer.FormatRoot(sb, b.Level, s);
                     t.Level = b.Level;
                 }
@@ -800,22 +828,8 @@ namespace Calcpad.Core
                     }
                 }
 
-                string AddBrackets(string s, int level, int minOffset, int maxOffset, char left, char right)
-                {
-                    var offset = minOffset + maxOffset;
-                    level += (maxOffset - minOffset) / 2;
-                    if (offset == 0)
-                        return writer.AddBrackets(s, level, left, right);
-
-                    return writer.AddBrackets(FixOffset(s, offset), level, left, right);
-                }
-
-                string FixOffset(string s, int offset) => offset switch
-                {
-                    < 0 => $"<span class=\"dvc up\">{s}</span>",
-                    > 0 => $"<span class=\"dvc down\">{s}</span>",
-                    _ => s
-                };
+                string AddBrackets(string s, int level, int minOffset, int maxOffset, char left, char right) =>
+                    writer.AddOffsetBrackets(s, level, minOffset, maxOffset, left, right);
             }
 
             private static string RenderMatrix(Matrix matrix, OutputWriter writer) =>
