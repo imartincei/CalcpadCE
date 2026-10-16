@@ -1609,17 +1609,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#linter-diagnostics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Linter diagnostics
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#editor-support" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3092,17 +3081,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#linter-diagnostics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Linter diagnostics
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#editor-support" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3145,33 +3123,33 @@
 <p>Functions and macros can declare <strong>optional parameters</strong> with default values, and can be called with <strong>keyword arguments</strong> of the form <code>name = value</code>.</p>
 <h2 id="optional-parameters-in-functions">Optional parameters in functions<a class="headerlink" href="#optional-parameters-in-functions" title="Permanent link">&para;</a></h2>
 <p>Give a parameter a default with <code>=</code> in the parameter list:</p>
-<div class="language-text highlight"><pre><span></span><code>f(x; y = 0; z = 1kg) = x*y + z
+<div class="language-calcpad highlight"><pre><span></span><code><span class="nv">f</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="na">kg</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">x</span><span class="o">*</span><span class="nv">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">z</span>
 </code></pre></div>
-<p>Required parameters must come before optional ones. 
-A default is stored as source text and evaluated at <strong>call time</strong> in the global scope, so <code>y = a</code> picks up whatever <code>a</code> holds when the call runs.</p>
+<p>Required parameters must come before optional ones.</p>
 <h2 id="calling-a-function-with-keyword-arguments">Calling a function with keyword arguments<a class="headerlink" href="#calling-a-function-with-keyword-arguments" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code>f(x; y = 0; z = 1) = x*y + z
+<div class="language-calcpad highlight"><pre><span></span><code><span class="nv">f</span><span class="p">(</span><span class="nv">x</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="nv">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">x</span><span class="o">*</span><span class="nv">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">z</span>
 
-f(5; 3; 2)              'positional only
-f(x = 5; z = 2; y = 3)  'all keyword, any order
-f(5; z = 2)             'x = 5 positional, y = 0 default, z = 2 keyword
-f(5)                    'y and z both take their defaults
+<span class="nv">f</span><span class="p">(</span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w">              </span><span class="c1">'positional only</span>
+<span class="nv">f</span><span class="p">(</span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="nv">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="w">  </span><span class="c1">'all keyword, any order</span>
+<span class="nv">f</span><span class="p">(</span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="nv">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w">             </span><span class="c1">'x = 5 positional, y = 0 default, z = 2 keyword</span>
+<span class="nv">f</span><span class="p">(</span><span class="m">5</span><span class="p">)</span><span class="w">                    </span><span class="c1">'y and z both take their defaults</span>
 </code></pre></div>
-<p>The call is rewritten to a plain positional call before it is evaluated, so <code>f(5; z = 2)</code> becomes <code>f(5; 0; 2)</code>.</p>
+<p>Keyword arguments work with any custom function, including one without defaults.</p>
 <h2 id="optional-parameters-in-macros">Optional parameters in macros<a class="headerlink" href="#optional-parameters-in-macros" title="Permanent link">&para;</a></h2>
 <p>Macros use the <code>$</code> suffix on names and parameters.
 A macro default is raw text that is substituted into the macro body:</p>
-<div class="language-text highlight"><pre><span></span><code>#def calc$(a$; b$ = 10; c$ = 5)
-    result = a$ + b$ + c$
-#end def
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#def</span><span class="w"> </span><span class="nv">calc</span>$<span class="p">(</span><span class="nv">a</span>$<span class="p">;</span><span class="w"> </span><span class="nv">b</span>$<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="nv">c</span>$<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">a</span>$<span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">b</span>$<span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">c</span>$
+<span class="k">#end def</span>
 </code></pre></div>
 <h2 id="calling-a-macro-with-keyword-arguments">Calling a macro with keyword arguments<a class="headerlink" href="#calling-a-macro-with-keyword-arguments" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code>calc$(1; 2; 3)                'positional
-calc$(a$ = 1; c$ = 7; b$ = 2) 'keyword, any order
-calc$(1; c$ = 7)              'positional then keyword
-calc$()                       'all defaults
+<div class="language-calcpad highlight"><pre><span></span><code><span class="nv">calc</span>$<span class="p">(</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="w">                </span><span class="c1">'positional</span>
+<span class="nv">calc</span>$<span class="p">(</span><span class="nv">a</span>$<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="nv">c</span>$<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="nv">b</span>$<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w"> </span><span class="c1">'keyword, any order</span>
+<span class="nv">calc</span>$<span class="p">(</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="nv">c</span>$<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">7</span><span class="p">)</span><span class="w">              </span><span class="c1">'positional then keyword</span>
+<span class="nv">calc</span>$<span class="p">()</span><span class="w">                       </span><span class="c1">'all defaults</span>
 </code></pre></div>
-<p><code>m$()</code> means "use every default" only when the macro has at least one optional parameter.
+<p>Keyword arguments work with any macro, including one without defaults.</p>
+<p><code>calc$()</code> means "use every default" only when the macro has at least one optional parameter.
 For a macro whose parameters are all required, an empty argument list still passes empty strings, as before.</p>
 <h2 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h2>
 <ol>
@@ -3181,49 +3159,15 @@ For a macro whose parameters are all required, an empty argument list still pass
 <li>A missing required argument is an error.</li>
 <li>A missing optional argument takes its default.</li>
 </ol>
-<h2 id="linter-diagnostics">Linter diagnostics<a class="headerlink" href="#linter-diagnostics" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Code</th>
-<th>Applies to</th>
-<th>Condition</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>CPD-2213</code></td>
-<td>Macro definition</td>
-<td>Required parameter after an optional parameter</td>
-</tr>
-<tr>
-<td><code>CPD-3207</code></td>
-<td>Function definition</td>
-<td>Required parameter after an optional parameter</td>
-</tr>
-<tr>
-<td><code>CPD-3314</code></td>
-<td>Macro call</td>
-<td>Unknown keyword argument name</td>
-</tr>
-<tr>
-<td><code>CPD-3315</code></td>
-<td>Function call</td>
-<td>Unknown keyword argument name</td>
-</tr>
-</tbody>
-</table>
 <h2 id="editor-support">Editor support<a class="headerlink" href="#editor-support" title="Permanent link">&para;</a></h2>
 <p>Autocomplete inserts calls with parameter-name placeholders, and hover documentation shows each default:</p>
 <div class="language-text highlight"><pre><span></span><code>y (default: 0)
 z (default: 1kg)
 </code></pre></div>
-<p>A parameter without a default is marked <code>(required)</code> when the function or macro also has optional
-ones.</p>
+<p>A parameter without a default is marked <code>(required)</code> when the function or macro also has optional ones.</p>
 <h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Built-in functions (<code>sin</code>, <code>cos</code>, <code>sqrt</code>, …) take neither keyword arguments nor defaults.</li>
-<li>A default cannot reference another parameter.</li>
 </ul>
 
 
