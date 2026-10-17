@@ -31,6 +31,7 @@ This is a fork of the now [closed-source](#️-project-status--history) Calcpad 
 * **Programmability:** Full control over your calculations using custom functions, macros, conditional logic, loops, and file I/O (CSV / Excel <img src="docs/media/excel.svg" alt="" height="20">).
 * **Rich Documentation:** Seamlessly embed Markdown, HTML, CSS, and parametric SVG drawings directly alongside your code.
 * **Professional Reporting:** Automatically generate interactive HTML input forms and export polished, heavily formatted reports to native Word <img src="docs/media/image11.png" alt="" height="20"> formulas or PDF <img src="docs/media/image10.png" alt="" height="20">.
+* **Worksheet Automation:** Run worksheets from scripts and compare results as inputs change, with values and units returned as JSON. Available by building the CLI from source; [see the CLI automation guide](docs/agent-cli.md).
 
 ![CalcpadCE Screenshot](docs/media/Sample.avif)
 
@@ -123,7 +124,7 @@ npm run dev
 To produce installers for your platform, run `./build-desktop.sh` (or `.\build-desktop.ps1`) from the same directory.
 
 The command line interpreter builds on its own with `dotnet build Calcpad.Cli` from the repository root.
-It is a development tool used to render the documentation's examples and is not part of a release.
+It supports worksheet automation and renders the documentation's examples; it is not currently included in release packages.
 
 ### VS Code Tasks
 

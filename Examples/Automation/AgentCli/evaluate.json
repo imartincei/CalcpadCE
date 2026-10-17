@@ -1,0 +1,5 @@
+{
+  "file": "divider.cpd",
+  "inputs": { "Vin": "12", "R1": "1", "R2": "2" },
+  "outputs": ["Vout"]
+}

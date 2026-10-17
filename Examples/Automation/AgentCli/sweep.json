@@ -1,0 +1,6 @@
+{
+  "file": "divider.cpd",
+  "inputs": { "Vin": "12", "R1": "1" },
+  "outputs": ["Vout"],
+  "sweep": { "variable": "R2", "values": ["1", "2", "3"] }
+}
