@@ -1,13 +1,15 @@
 ﻿# Installation
 
+## CLI automation
+
+The current desktop release packages do not include a standalone CLI build with the `agent evaluate` and `agent sweep` commands. Build the CLI from the repository source to use worksheet automation with JSON requests and typed scalar results. See [CLI automation](agent-cli.md) for build instructions, a runnable example, and the command contract.
+
 ## Windows
 
 Installation is performed by the automated [setup program](https://github.com/imartincei/CalcpadCE/releases). Follow the instruction of the setup wizard.
 The software requires a 64-bit computer with Windows 10/11 and [Microsoft .NET Desktop Runtime 10.0](https://dotnet.microsoft.com/en-us/download/dotnet/10.0).
 
-The installer also includes the command-line interface (CLI).
-After installation it can be found at:
-`%LOCALAPPDATA%\Programs\CalcpadCE\cli\Cli.exe`
+For the standalone command-line interface (CLI), including worksheet automation, use the source-build instructions linked above.
 
 ## Linux
 
@@ -49,7 +51,7 @@ After installation it can be found at:
     If you get a message like the one below, please ignore it: N: Download is performed unsandboxed as root as file '.../Calcpad.7.5.9.deb' couldn't be accessed by user '\_apt'. - pkgAcquire::Run (13: Permission denied)
 
 And that's it.
-You can start the CalcpadCE command line interpreter (CLI) by simply typing:
+If you have a standalone CLI installed from an older package, start it by typing:
 
 ```bash
 calcpad

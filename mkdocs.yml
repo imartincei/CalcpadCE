@@ -36,6 +36,7 @@ nav:
     - index.md
     - Fields of Application: fields-of-application.md
     - Installation: installation.md
+    - CLI Automation: agent-cli.md
     - Licensing: licensing-and-terms-of-use.md
     - How It Works: how-it-works.md
     - Theoretical Background: theoretical-background.md
