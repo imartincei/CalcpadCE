@@ -1,0 +1,6 @@
+"Resistor divider — CLI automation example"
+'<p>Ideal source, no output load, nominal resistors. Input overrides use magnitudes in the declared units.</p>
+#UI Vin = 12V
+#UI R1 = 1kΩ
+#UI R2 = 2kΩ
+Vout = Vin*R2/(R1 + R2)

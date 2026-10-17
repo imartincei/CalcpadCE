@@ -412,7 +412,10 @@ namespace Calcpad.Core
                 }
                 var overridden = ApplyUiOverride(ui, expression, value);
                 if (overridden is not null)
+                {
                     expression = overridden;
+                    _appliedUiOverrides.Add(ui.VariableName);
+                }
             }
 
             if (isDatagrid)

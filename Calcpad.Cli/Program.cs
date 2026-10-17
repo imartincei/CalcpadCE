@@ -69,8 +69,14 @@ namespace Calcpad.Cli
             };
         }
 
-        static void Main()
+        static void Main(string[] args)
         {
+            if (args.Length > 0 && string.Equals(args[0], "agent", StringComparison.OrdinalIgnoreCase))
+            {
+                Environment.ExitCode = AgentCommand.Run(args);
+                return;
+            }
+
             Thread.CurrentThread.CurrentUICulture = new CultureInfo(_currentCultureName);
             try
             {

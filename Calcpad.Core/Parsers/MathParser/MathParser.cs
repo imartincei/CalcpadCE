@@ -108,6 +108,22 @@ namespace Calcpad.Core
         public double Imaginary => Result.Im;
         public System.Numerics.Complex Complex => Result;
 
+#nullable enable
+        internal (string Name, ScalarResult? Result)? GetScalarAssignmentResult()
+        {
+            if (!_isCalculated || _rpn is not { Length: > 2 } ||
+                _rpn[0] is not VariableToken variable || !IsAssignment(_rpn[^1].Content))
+                return null;
+
+            // For indexed vector or matrix writes, the expression result is the
+            // assigned element, while the variable still holds a composite value.
+            var result = variable.Variable.Value is IScalarValue scalar
+                ? new ScalarResult(scalar.Re, scalar.Im, scalar.Im != 0d, scalar.Units?.Text)
+                : null;
+            return (variable.Content, result);
+        }
+#nullable restore
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool IsAssignment(in string s) => s == "=" || s == "←";

@@ -34,6 +34,9 @@ namespace Calcpad.Core
         private List<CalcpadError> _errorList;
         private LineInfo[] _lineCache;
         private static bool[] IsLineExtension = new bool[128];
+        private readonly Dictionary<string, ScalarResult> _scalarResults = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, ScalarResult> _uiInputResults = new(StringComparer.Ordinal);
+        private readonly HashSet<string> _appliedUiOverrides = new(StringComparer.Ordinal);
 
         public Settings Settings { get; set; } = new();
         public string SourceFilePath { get; set; }
@@ -51,6 +54,14 @@ namespace Calcpad.Core
         }
         public string HtmlResult { get; private set; }
         public IReadOnlyList<CalcpadError> Errors => _errorList;
+        /// <summary>Whether to capture machine-readable scalar assignment values.</summary>
+        public bool CaptureScalarResults { get; set; }
+        /// <summary>The latest scalar assignment values captured during this parse.</summary>
+        public IReadOnlyDictionary<string, ScalarResult> ScalarResults => _scalarResults;
+        /// <summary>The scalar values assigned by #UI controls during this parse.</summary>
+        public IReadOnlyDictionary<string, ScalarResult> UiInputResults => _uiInputResults;
+        /// <summary>Variable names whose #UI controls accepted an override during this parse.</summary>
+        public IReadOnlySet<string> AppliedUiOverrides => _appliedUiOverrides;
         public bool IsPaused => _startLine > 0;
         public bool Debug { get; set; }
         public bool ForPrint { get; set; }
@@ -517,6 +528,9 @@ namespace Calcpad.Core
             _errIndex = 0;
             _firstErrIndexByLine = new();
             _errorList = new();
+            _scalarResults.Clear();
+            _uiInputResults.Clear();
+            _appliedUiOverrides.Clear();
             if (!_calculate)
                 _startLine = 0;
 
@@ -642,7 +656,24 @@ namespace Calcpad.Core
                             _parser.ReadEquationFromCache(cacheID);
 
                         if (_calculate && _isVal > -1)
+                        {
                             _parser.Calculate(isOutput, cacheID);
+                            if (CaptureScalarResults && _parser.GetScalarAssignmentResult() is { } assignment)
+                            {
+                                if (assignment.Result is { } result)
+                                {
+                                    _scalarResults[assignment.Name] = result;
+                                    if (ui is not null)
+                                        _uiInputResults[assignment.Name] = result;
+                                }
+                                else
+                                {
+                                    _scalarResults.Remove(assignment.Name);
+                                    if (ui is not null)
+                                        _uiInputResults.Remove(assignment.Name);
+                                }
+                            }
+                        }
                         else
                             _parser.DefineCustomUnits();
 
