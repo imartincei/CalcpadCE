@@ -171,6 +171,7 @@ namespace Calcpad.Core
             var fileLine = -1;
             var traceSource = -1;
             var defTraceSource = -1;
+            var defLine = -1;
             string traceText = null;
             try
             {
@@ -234,8 +235,17 @@ namespace Calcpad.Core
 
                 if (macroDefCount > 0)
                 {
-                    sb.Append(Messages.Macro_definition_block_not_closed_Missing_end_def);
+                    var message = Messages.Macro_definition_block_not_closed_Missing_end_def;
+                    sb.Append(message);
                     hasErrors = true;
+                    Trace?.Errors.Add(new(defTraceSource, message));
+                    _errorList.Add(new CalcpadError
+                    {
+                        SourceLine = defLine,
+                        OutputLine = _parsedLineNumber + 1,
+                        Message = message,
+                        Source = CalcpadErrorSource.Macro,
+                    });
                 }
             }
             catch (Exception ex)
@@ -447,6 +457,7 @@ namespace Calcpad.Core
                             textSpan.Reset(i);
                         }
                         defTraceSource = traceSource;
+                        defLine = lineNumber;
                         ++macroDefCount;
                     }
                 }

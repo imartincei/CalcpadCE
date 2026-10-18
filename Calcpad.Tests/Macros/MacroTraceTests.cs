@@ -99,6 +99,16 @@ namespace Calcpad.Tests
         }
 
         [Fact]
+        public void UnclosedDef_IsReportedOnDefLine()
+        {
+            var trace = new MacroTrace();
+            var parser = new MacroParser { Trace = trace };
+            Assert.True(parser.Parse("x = 1\n#def blk$\ny = 2", out _, null, 0, false));
+            Assert.Equal("#def blk$", trace.SourceLines[trace.Errors.Single().SourceIndex].Text);
+            Assert.Equal(2, parser.Errors.Single().SourceLine);
+        }
+
+        [Fact]
         public void Abort_IsNotComplete()
         {
             var trace = Trace("#def m$(a; a) = a\nx = 1");
