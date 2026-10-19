@@ -1,15 +1,18 @@
 ' CPD-32xx: Naming errors
-' CPD-3205: Variable conflicts with keyword
+' CPD-3204: Variable conflicts with keyword
 if = 1
 for = 2
 
-' CPD-3206: Variable shadows unit
+' Variable shadows unit (allowed, no error)
 m = 5
 kg = 10
 s = 2
 
-' CPD-3207: Variable conflicts with constant
+' CPD-3205: Variable conflicts with constant
 e = 2.71
 
-' CPD-3208: Function with no params
+' CPD-3206: Function with no params
 calc() = 43
+
+' CPD-3207: Required parameter after optional parameter
+reqAfterOpt(x = 1; y) = x + y

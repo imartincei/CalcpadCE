@@ -95,8 +95,10 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     if (callParams == null)
                         continue;
 
-                    // Check parameter count matches
-                    if (blockInfo.Parameters.Count != callParams.Count)
+                    var required = stage3.DefinedFunctions.TryGetValue(funcName, out var funcInfo)
+                        ? funcInfo.RequiredParamCount
+                        : blockInfo.Parameters.Count;
+                    if (callParams.Count < required || callParams.Count > blockInfo.Parameters.Count)
                         continue;
 
                     // Validate each statement using tokenizer-based parsing

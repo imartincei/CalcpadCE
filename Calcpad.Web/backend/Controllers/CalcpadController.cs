@@ -27,6 +27,8 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>Error code clients match on to offer the bundled-Chromium download.</summary>
         private const string BrowserNotFoundCode = "BROWSER_NOT_FOUND";
+        /// <summary>A browser exists but would not start; clients offer a retry.</summary>
+        private const string BrowserLaunchFailedCode = "BROWSER_LAUNCH_FAILED";
 
         public CalcpadController(CalcpadService calcpadService, PdfGeneratorService pdfService, ContentResolutionCache contentResolutionCache, RuntimeTraceCache runtimeTraceCache, IWebHostEnvironment environment)
         {
@@ -345,6 +347,17 @@ namespace Calcpad.Server.Controllers
 
                 return File(pdfBytes, "application/pdf", "document.pdf");
             }
+            catch (BrowserLaunchFailedException ex)
+            {
+                FileLogger.LogWarning("PDF generation blocked: browser failed to start", ex.Message);
+                return StatusCode(503, new
+                {
+                    error = "Browser failed to start",
+                    code = BrowserLaunchFailedCode,
+                    message = ex.Message,
+                    path = ex.BrowserPath
+                });
+            }
             catch (BrowserUnavailableException ex)
             {
                 FileLogger.LogWarning("PDF generation blocked: no usable browser", ex.Message);
@@ -584,7 +597,8 @@ namespace Calcpad.Server.Controllers
                         SourceFile = m.SourceFile,
                         Description = m.Description,
                         ParamTypes = m.ParamTypes,
-                        ParamDescriptions = m.ParamDescriptions
+                        ParamDescriptions = m.ParamDescriptions,
+                        Defaults = m.Defaults
                     }).ToList(),
 
                     Functions = staged.Stage3.FunctionsWithParams.Select(f =>
@@ -605,7 +619,8 @@ namespace Calcpad.Server.Controllers
                             SourceFile = f.SourceFile,
                             Description = f.Description,
                             ParamTypes = f.ParamTypes,
-                            ParamDescriptions = f.ParamDescriptions
+                            ParamDescriptions = f.ParamDescriptions,
+                            Defaults = f.Defaults
                         };
                     }).ToList(),
 
@@ -1208,6 +1223,9 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>User-provided descriptions per parameter</summary>
         public List<string>? ParamDescriptions { get; set; }
+
+        /// <summary>Default value per parameter; a null entry marks a required parameter</summary>
+        public List<string?>? Defaults { get; set; }
     }
 
     public class FunctionDefinitionDto
@@ -1259,6 +1277,9 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>User-provided descriptions per parameter</summary>
         public List<string>? ParamDescriptions { get; set; }
+
+        /// <summary>Default value per parameter; a null entry marks a required parameter</summary>
+        public List<string?>? Defaults { get; set; }
     }
 
     public class VariableDefinitionDto

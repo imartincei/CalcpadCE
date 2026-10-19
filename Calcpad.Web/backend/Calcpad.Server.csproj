@@ -21,6 +21,12 @@
     <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
 
+  <!-- Framework-dependent apphosts skip their own folder when looking for the runtime, so a
+       hostfxr left over from a self-contained install can't make them run as self-contained. -->
+  <PropertyGroup Condition="'$(SelfContained)' != 'true'">
+    <AppHostDotNetSearch>EnvironmentVariable;Global</AppHostDotNetSearch>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
@@ -29,6 +35,8 @@
     <PackageReference Include="Microsoft.OpenApi" Version="2.9.0" />
     <PackageReference Include="PuppeteerSharp" Version="21.1.1" />
     <PackageReference Include="PDFsharp" Version="6.2.0" />
+    <!-- Pin to resolve GHSA-846f-f764-76mx and GHSA-2fmv-rv2c-59x7 in transitive 8.0.1. -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
   </ItemGroup>
 
   <ItemGroup>

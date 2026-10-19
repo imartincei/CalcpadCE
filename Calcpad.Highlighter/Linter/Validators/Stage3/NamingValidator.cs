@@ -87,6 +87,17 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                             "Function '" + funcName + "' must have at least one parameter");
                     }
 
+                    else
+                    {
+                        var (paramNames, defaults) = ParsingHelpers.ParseParamList(paramsStr);
+                        foreach (var name in ParsingHelpers.RequiredAfterOptional(paramNames, defaults))
+                        {
+                            var startPos = line.IndexOf(funcName, StringComparison.Ordinal);
+                            result.AddError(i, startPos >= 0 ? startPos : 0, line.Length, "CPD-3207",
+                                "Required parameter '" + name + "' cannot follow an optional parameter");
+                        }
+                    }
+
                     // Pass Stage3 line index - diagnostic extensions handle mapping
                     ValidateIdentifierName(funcName, line, i, false, result);
                 }

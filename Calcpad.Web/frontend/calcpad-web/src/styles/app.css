@@ -601,6 +601,20 @@ select option {
     background: var(--vscode-toolbar-hoverBackground, #2a2d2e);
 }
 
+/* Widen the grab area without changing the visible divider. */
+.resize-handle,
+.pane-divider {
+    position: relative;
+    z-index: 5;
+}
+
+.resize-handle::after,
+.pane-divider::after {
+    content: "";
+    position: absolute;
+    inset: 0 -4px;
+}
+
 /* Draggable vertical divider between side-by-side panes: the editor and the
  * results pane, and the input form and its report companion in UI mode.
  * Replaces the border those panes used to draw for the same visual split. */

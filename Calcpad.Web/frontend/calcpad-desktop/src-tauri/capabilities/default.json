@@ -19,9 +19,9 @@
     "core:path:default",
     "core:app:default",
     {
-      "comment": "Worksheet file: links reach this and open with the OS default, so the confirm dialog is the control.",
+      "comment": "Worksheet file: links reach this and open with the OS default, so the confirm dialog is the control. $APPDATA is listed because ** skips dot-dirs like ~/.local.",
       "identifier": "opener:allow-open-path",
-      "allow": [{ "path": "**" }],
+      "allow": [{ "path": "**" }, { "path": "$APPDATA/**" }],
       "deny": [{ "path": "$RESOURCE/**" }]
     },
     "opener:allow-reveal-item-in-dir",

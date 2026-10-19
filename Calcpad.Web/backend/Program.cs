@@ -156,6 +156,19 @@ try
         Environment.SetEnvironmentVariable("CALCPAD_PORT", Environment.GetEnvironmentVariable("CALCPAD_PORT") ?? "9420");
     }
 
+    // A malformed appsettings.json would otherwise surface as an opaque host-builder crash.
+    if (CalcpadApiService.IgnoreSettingsFiles)
+    {
+        FileLogger.LogWarning("Ignoring appsettings files", $"{CalcpadApiService.IgnoreSettingsEnvVar}=1; using built-in defaults");
+    }
+    else if (Program.FindInvalidSettingsFile() is string settingsError)
+    {
+        FileLogger.LogError("Invalid configuration file", new InvalidDataException(settingsError));
+        Console.Error.WriteLine($"{Program.ConfigErrorPrefix}{settingsError}");
+        FileLogger.Flush();
+        Environment.Exit(Program.ConfigErrorExitCode);
+    }
+
     // Create and configure web application using shared service
     var (app, serverUrl) = CalcpadApiService.CreateConfiguredApp(forwardedArgs);
 
@@ -297,6 +310,58 @@ catch (Exception ex)
 
 internal static partial class Program
 {
+    /// <summary>EX_CONFIG from sysexits.h. Hosts match on it to skip auto-restart.</summary>
+    internal const int ConfigErrorExitCode = 78;
+    internal const string ConfigErrorPrefix = "CONFIG ERROR: ";
+
+    /// <summary>
+    /// Loads the appsettings files the host builder will load, through the same JSON
+    /// configuration provider. Returns a user-facing message for the first bad one.
+    /// </summary>
+    internal static string? FindInvalidSettingsFile()
+    {
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+            ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+            ?? "Production";
+
+        foreach (var name in new[] { "appsettings.json", $"appsettings.{environment}.json" })
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, name);
+            if (!File.Exists(path)) continue;
+            try
+            {
+                new Microsoft.Extensions.Configuration.ConfigurationBuilder()
+                    .AddJsonFile(path, optional: false, reloadOnChange: false)
+                    .Build();
+            }
+            catch (InvalidDataException ex)
+            {
+                Exception cause = ex;
+                while (cause.InnerException != null && cause is not System.Text.Json.JsonException)
+                    cause = cause.InnerException;
+
+                // Reader messages end with a 0-based "LineNumber: n | BytePositionInLine: n."
+                var reason = System.Text.RegularExpressions.Regex
+                    .Replace(cause.Message.Split(" LineNumber:")[0], @"\s+", " ").Trim();
+                if (cause is not System.Text.Json.JsonException json)
+                    return $"{path} is not a valid settings file: {reason}";
+
+                var where = json.LineNumber is long line
+                    ? $" (line {line + 1}, column {(json.BytePositionInLine ?? 0) + 1})"
+                    : "";
+                var hint = reason.Contains("escapable character")
+                    ? " In Windows paths use forward slashes (C:/Program Files/...) or doubled backslashes."
+                    : "";
+                return $"{path} is not valid JSON{where}: {reason}{hint}";
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                return $"{path} could not be read: {ex.Message}";
+            }
+        }
+        return null;
+    }
+
     /// <summary>
     /// True if the URL's host is loopback. Gates server-mode bindings for now.
     /// </summary>

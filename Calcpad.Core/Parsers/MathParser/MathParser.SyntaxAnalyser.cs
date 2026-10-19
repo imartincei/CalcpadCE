@@ -145,7 +145,7 @@ namespace Calcpad.Core
                                     multiFunctionStack.Push(new MultiFunctionStackItem(t, countOfBrackets, countOfDivisors));
                             }
                             else
-                                countOfDivisors += 1 - _functions[t.Index].ParameterCount;
+                                countOfDivisors += 1 - ((t as FunctionToken)?.ParameterCount ?? _functions[t.Index].ParameterCount);
                             break;
                         case TokenTypes.BracketLeft:
                             if (indexNum != 0)

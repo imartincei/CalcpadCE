@@ -135,8 +135,8 @@ export function writesAllowed(mode: WriteMode, forPrint: boolean, enableUi = fal
 export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
     { key: 'decimals', label: 'Decimals', detail: 'Decimal places in output (0 to 15)', type: 'number', def: 2, min: 0, max: 15 },
     {
-        key: 'degrees', label: 'Angle units', detail: 'Angle unit: 0=radians, 1=degrees, 2=gradians', type: 'enum', def: 0,
-        options: [{ value: '0', label: 'Radians' }, { value: '1', label: 'Degrees' }, { value: '2', label: 'Gradians' }],
+        key: 'degrees', label: 'Angle units', detail: 'Angle unit: 0=degrees, 1=radians, 2=gradians', type: 'enum', def: 0,
+        options: [{ value: '0', label: 'Degrees' }, { value: '1', label: 'Radians' },{ value: '2', label: 'Gradians' }],
     },
     { key: 'complex', label: 'Complex numbers', detail: 'Enable complex number mode', type: 'boolean', def: false },
     { key: 'substitute', label: 'Substitute variables', detail: 'Substitute variable values into expressions', type: 'boolean', def: true },

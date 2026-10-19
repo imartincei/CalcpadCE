@@ -47,6 +47,7 @@ export default defineConfig({
     __VUE_OPTIONS_API__: true,
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
     // Define process.env for webview compatibility
+    'process.env.NODE_ENV': JSON.stringify('production'),
     'process.env': JSON.stringify({
       NODE_ENV: 'production'
     })

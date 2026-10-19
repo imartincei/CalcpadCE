@@ -144,8 +144,9 @@ namespace Calcpad.Core
                                 throw Exceptions.InvalidFunction(t.Content);
 
                             var cf = _functions[t.Index];
-                            var cfValues = PopValues(stackBuffer, cf.ParameterCount);
-                            stackBuffer.Push(ParseFunction(cf, cfValues));
+                            var map = (t as FunctionToken)?.ArgumentMap;
+                            var cfValues = PopValues(stackBuffer, map?.Length ?? cf.ParameterCount);
+                            stackBuffer.Push(ParseFunction(cf, cfValues, map));
                             continue;
                         case TokenTypes.Vector:
                         case TokenTypes.RowDivisor:
@@ -470,10 +471,18 @@ namespace Calcpad.Core
             private static MethodCallExpression AsMatrix(Expression a) =>
                  Expression.Call(AsMatrixMethod, a, Expression.Constant(Exceptions.Items.Argument));
 
-            private Expression ParseFunction(CustomFunction cf, Expression[] arguments)
+            private Expression ParseFunction(CustomFunction cf, Expression[] arguments, int[] map)
             {
                 if (cf.IsRecursion)
                     return Expression.Constant(RealValue.NaN, typeof(IValue));
+
+                if (map is not null)
+                    return Expression.Call(
+                        _evaluatorInstance,
+                        EvaluateCustomFunctionDefaultsMethod,
+                        Expression.Constant(cf, typeof(CustomFunction)),
+                        Expression.Constant(map),
+                        Expression.NewArrayInit(typeof(IValue), arguments));
 
                 return arguments.Length switch
                 {

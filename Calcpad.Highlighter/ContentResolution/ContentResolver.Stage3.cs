@@ -80,11 +80,13 @@ namespace Calcpad.Highlighter.ContentResolution
             var functions = new Dictionary<string, FunctionInfo>(StringComparer.Ordinal);
             foreach (var f in functionsWithParams)
             {
+                var funcParams = f.Params ?? new List<string>();
                 functions[f.Name] = new FunctionInfo
                 {
                     LineNumber = f.LineNumber,
-                    ParamCount = f.Params?.Count ?? 0,
-                    ParamNames = f.Params ?? new List<string>()
+                    ParamCount = funcParams.Count,
+                    RequiredParamCount = ParsingHelpers.CountRequiredParams(funcParams.Count, f.Defaults),
+                    ParamNames = funcParams
                 };
             }
 

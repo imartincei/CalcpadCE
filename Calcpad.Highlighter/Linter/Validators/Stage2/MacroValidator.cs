@@ -158,17 +158,13 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage2
             // Validate parameters
             if (!string.IsNullOrWhiteSpace(paramsStr))
             {
-                var parameters = ParameterParser.ParseParameters(paramsStr); // splits by ';'
+                var (paramNames, defaults) = ParsingHelpers.ParseParamList(paramsStr);
+                foreach (var name in ParsingHelpers.RequiredAfterOptional(paramNames, defaults))
+                    result.AddError(stage2Line, 0, line.Length, "CPD-2213", "'" + name + "'", LineStage.Stage2);
+
                 var seenParams = new HashSet<string>(StringComparer.Ordinal); // params are case sensitive
-
-                foreach (var param in parameters)
+                foreach (var paramName in paramNames)
                 {
-                    // Skip empty params (will be caught elsewhere)
-                    if (string.IsNullOrWhiteSpace(param))
-                        continue;
-
-                    var paramName = param;
-
                     // Check for duplicate parameter names
                     if (!seenParams.Add(paramName))
                     {

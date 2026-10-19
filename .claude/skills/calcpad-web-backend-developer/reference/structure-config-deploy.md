@@ -58,6 +58,7 @@ A non-loopback bind is rejected twice: once on the URL string before startup, on
 | `CALCPAD_ENABLE_HTTPS` | (unset) | Serves `https`. Only applies on the `CALCPAD_PORT` path |
 | `CALCPAD_API_TOKEN` | *(unset — unauthenticated)* | Required in `X-Calcpad-Token` on every `/api` request when set |
 | `CALCPAD_DETACHED` | (unset) | `1` disables the stdin-EOF watchdog and the default port file |
+| `CALCPAD_IGNORE_APPSETTINGS` | (unset) | `1` skips `appsettings*.json` and runs with built-in defaults. The desktop app sets this when the user ignores a malformed settings file |
 | `CALCPAD_CONTENT_CACHE_SIZE_LIMIT` | `100` | Entries in the resolved-content cache |
 | `BROWSER_PATH` | *(auto-detect)* | Chromium-family executable for PDF export |
 | `ALLOW_CHROMIUM_DOWNLOAD` | `false` | Lets the render path download Chromium on its own |

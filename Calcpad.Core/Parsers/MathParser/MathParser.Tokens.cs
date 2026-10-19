@@ -76,6 +76,9 @@
         private sealed class FunctionToken : Token
         {
             internal int ParameterCount;
+            // Keyword/omitted-argument calls: parameter index per supplied argument
+            internal int[] ArgumentMap;
+            internal int PositionalCount;
             internal FunctionToken(string content) : base(content, TokenTypes.MultiFunction) { }
         }
 
@@ -130,6 +133,8 @@
             internal int MinOffset;
             internal int MaxOffset;
             internal readonly int ParameterCount;
+            internal readonly int[] ArgumentMap;
+            internal readonly int PositionalCount;
             internal bool IsCompositeValue;
 
             internal RenderToken(string content, TokenTypes type, int level) : base(content, type)
@@ -144,7 +149,11 @@
                 Order = t.Order;
                 ParameterCount = -1;
                 if (t is FunctionToken ft)
+                {
                     ParameterCount = ft.ParameterCount;
+                    ArgumentMap = ft.ArgumentMap;
+                    PositionalCount = ft.PositionalCount;
+                }
                 else if (t is VectorToken)
                 {
                     ParameterCount = (int)Index - 1;

@@ -720,6 +720,14 @@ namespace Calcpad.Highlighter.Tokenizer
                         argTokens.Add(new Token(_state.Line, originalCol, clipLen, token.Type, clipText));
                     }
 
+                    // A keyword argument names a parameter of the called macro.
+                    if (argTokens.Count > 1 && argTokens[1].Text == "=" &&
+                        paramOrder.Contains(argTokens[0].Text))
+                    {
+                        var kw = argTokens[0];
+                        argTokens[0] = new Token(kw.Line, kw.Column, kw.Length, TokenType.MacroParameter, kw.Text);
+                    }
+
                     // Fix up tokens: if inside a macro definition, reclassify any tokens
                     // matching outer macro parameters from Macro to MacroParameter
                     if (_inMacroDefinition && _macroParameters.Count > 0)
@@ -816,7 +824,8 @@ namespace Calcpad.Highlighter.Tokenizer
 
         private bool ParseMacroContent(char c, int i, int len)
         {
-            if (c == '=' && _state.HasMacro && !_state.IsInFunctionParams)
+            // Inside the parameter list '=' introduces a default, not the macro body.
+            if (c == '=' && _state.HasMacro && !_state.IsInFunctionParams && _state.BracketCount == 0)
             {
                 var afterEquals = i + 1 < len ? _state.Text.Span[(i + 1)..].TrimStart().ToString() : string.Empty;
 
@@ -826,7 +835,8 @@ namespace Calcpad.Highlighter.Tokenizer
                     _macroBodies[_pendingMacroDefName] = afterEquals;
                     if (!_macroParameterOrder.ContainsKey(_pendingMacroDefName))
                     {
-                        _macroParameterOrder[_pendingMacroDefName] = new List<string>(_macroParameters);
+                        // Declared order
+                        _macroParameterOrder[_pendingMacroDefName] = ExtractMacroParams(_state.Text.Span);
                     }
                     _pendingMacroDefName = null;
                 }
@@ -838,55 +848,29 @@ namespace Calcpad.Highlighter.Tokenizer
             return false;
         }
 
-        /// <summary>
-        /// Extracts macro parameter names from a #def line.
-        /// Handles both inline (#def macro$(x$; y$) = ...) and multiline forms.
-        /// </summary>
-        private static List<string> ExtractMacroParams(ReadOnlySpan<char> lineSpan)
-        {
-            var names = new List<string>();
+        private static List<string> ExtractMacroParams(ReadOnlySpan<char> lineSpan) =>
+            ExtractMacroParamsWithDefaults(lineSpan).Names;
 
+        /// <summary>
+        /// Extracts macro parameter names and defaults from a #def line (inline or multiline form).
+        /// </summary>
+        private static (List<string> Names, List<string> Defaults) ExtractMacroParamsWithDefaults(ReadOnlySpan<char> lineSpan)
+        {
             var dollarIndex = lineSpan.IndexOf('$');
-            if (dollarIndex < 0) return names;
+            if (dollarIndex < 0) return ([], null);
 
             // Check that '(' immediately follows '$' (with optional whitespace).
             // If '=' appears before '(', the '(' is part of the body, not params.
             // e.g., #def emptyV$ = find(vector(1); 1; 1) — no params
             var afterDollar = lineSpan[(dollarIndex + 1)..].TrimStart();
             if (afterDollar.IsEmpty || afterDollar[0] != '(')
-                return names;
+                return ([], null);
 
             var openParen = lineSpan.Length - afterDollar.Length;  // absolute index of '('
             var closeParen = ParsingHelpers.FindMatchingClose(lineSpan, openParen, '(', ')');
-            if (closeParen < 0) return names;
+            if (closeParen < 0) return ([], null);
 
-            var paramsSpan = lineSpan.Slice(openParen + 1, closeParen - openParen - 1);
-
-            // Split by ';' at paren depth 0
-            int segStart = 0;
-            int parenDepth = 0;
-
-            void ProcessSegment(ReadOnlySpan<char> seg)
-            {
-                seg = seg.Trim();
-                if (seg.IsEmpty) return;
-                names.Add(seg.ToString());
-            }
-
-            for (int i = 0; i < paramsSpan.Length; i++)
-            {
-                var c = paramsSpan[i];
-                if (c == '(') parenDepth++;
-                else if (c == ')') parenDepth--;
-                else if (c == ';' && parenDepth == 0)
-                {
-                    ProcessSegment(paramsSpan[segStart..i]);
-                    segStart = i + 1;
-                }
-            }
-            ProcessSegment(paramsSpan[segStart..]);
-
-            return names;
+            return ParsingHelpers.ParseParamList(lineSpan[(openParen + 1)..closeParen].ToString());
         }
 
         /// <summary>

@@ -52,6 +52,10 @@ namespace Calcpad.Core
     {
         public string Name { get; init; }
         public IReadOnlyList<string> Parameters { get; init; }
+
+        /// <summary>Default values parallel to <see cref="Parameters"/>; null marks a required parameter.</summary>
+        public IReadOnlyList<string> Defaults { get; init; }
+
         public IReadOnlyList<string> Content { get; init; }
         public int SourceIndex { get; init; }
 

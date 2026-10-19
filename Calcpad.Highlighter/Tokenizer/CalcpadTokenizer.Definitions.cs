@@ -266,6 +266,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 {
                     Name = _lintDefName,
                     Params = funcParams,
+                    Defaults = ExtractFunctionParamDefaults(_lintDefLineText.Span),
                     LineNumber = _lintDefNameLine,
                     Source = sourceInfo.Source,
                     SourceFile = sourceInfo.SourceFile,
@@ -332,6 +333,13 @@ namespace Calcpad.Highlighter.Tokenizer
             }
 
             return result.ToString().Trim();
+        }
+
+        private static List<string> ExtractFunctionParamDefaults(ReadOnlySpan<char> line)
+        {
+            var open = line.IndexOf('(');
+            var close = open < 0 ? -1 : ParsingHelpers.FindMatchingClose(line, open, '(', ')');
+            return close < 0 ? null : ParsingHelpers.ParseParamList(line[(open + 1)..close].ToString()).Defaults;
         }
 
         /// <summary>

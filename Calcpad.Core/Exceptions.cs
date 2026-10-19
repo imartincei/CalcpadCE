@@ -268,6 +268,15 @@ namespace Calcpad.Core
         internal static MathParserException UndefinedMacro(string s) =>
             new(string.Format(Messages.Macro_not_defined_0, s));
 
+        internal static MathParserException RequiredParameterAfterOptional(string name) =>
+            new(string.Format(Messages.Required_parameter_after_optional_0, name));
+
+        internal static MathParserException UnknownKeywordArgument(string name) =>
+            new(string.Format(Messages.Unknown_keyword_argument_0, name));
+
+        internal static MathParserException DuplicateArgument(string name) =>
+            new(string.Format(Messages.Duplicate_argument_0, name));
+
         internal static MathParserException MissingMapItem(string s) =>
             new(string.Format(Messages.Missing_0_in_surface_map_command, s));
 

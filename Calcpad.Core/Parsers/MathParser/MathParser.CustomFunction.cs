@@ -17,6 +17,19 @@ namespace Calcpad.Core
             internal Func<IValue> Function;
             internal bool IsReadOnly;
 
+            // Null entry = required; null array = no defaults
+            internal Token[][] Defaults;
+            internal Func<IValue>[] DefaultFunctions;
+
+            internal int IndexOfParameter(ReadOnlySpan<char> name)
+            {
+                for (var i = 0; i < ParameterCount; ++i)
+                    if (name.SequenceEqual(ParameterName(i)))
+                        return i;
+
+                return -1;
+            }
+
             internal abstract void AddParameters(List<string> parameters);
             internal abstract void ClearCache();
             internal abstract void PurgeCache();
@@ -29,9 +42,22 @@ namespace Calcpad.Core
                     return true;
 
                 f ??= this;
-                for (int i = 0, len = Rpn.Length; i < len; ++i)
+                if (CheckRecursion(Rpn, f, functions))
+                    return true;
+
+                if (Defaults is not null)
+                    foreach (var rpn in Defaults)
+                        if (rpn is not null && CheckRecursion(rpn, f, functions))
+                            return true;
+
+                return false;
+            }
+
+            private static bool CheckRecursion(Token[] rpn, CustomFunction f, Container<CustomFunction> functions)
+            {
+                for (int i = 0, len = rpn.Length; i < len; ++i)
                 {
-                    var t = Rpn[i];
+                    var t = rpn[i];
                     if (t.Type == TokenTypes.CustomFunction)
                     {
                         var cf = functions[t.Index];

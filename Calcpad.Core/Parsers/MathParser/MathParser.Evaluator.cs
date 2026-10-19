@@ -427,12 +427,16 @@ namespace Calcpad.Core
             private IValue EvaluateFunctionToken(Token t, ref int tos)
             {
                 var cf = _functions[t.Index];
-                var cfParamCount = cf.ParameterCount;
+                var map = (t as FunctionToken)?.ArgumentMap;
+                var cfParamCount = map?.Length ?? cf.ParameterCount;
                 if (cf.IsRecursion)
                 {
                     tos -= cfParamCount;
                     return RealValue.NaN;
                 }
+                if (map is not null)
+                    return EvaluateFunction(cf, map, StackPopValues(cfParamCount));
+
                 switch (cf.ParameterCount)
                 {
                     case 1:
@@ -451,6 +455,37 @@ namespace Calcpad.Core
                         var cfParams = StackPopValues(cfParamCount);
                         return EvaluateFunction((CustomFunctionN)cf, cfParams);
                 }
+            }
+
+            internal IValue EvaluateFunction(CustomFunction cf, int[] map, IValue[] supplied)
+            {
+                if (cf.Function is null)
+                {
+                    cf.Function = _parser.CompileRpn(cf.Rpn);
+                    if (cf.DefaultFunctions is not null)
+                        Array.Clear(cf.DefaultFunctions);
+                }
+                var arguments = new IValue[cf.ParameterCount];
+                for (var k = 0; k < map.Length; ++k)
+                    arguments[map[k]] = supplied[k];
+
+                var parameters = cf.Parameters;
+                for (var i = 0; i < arguments.Length; ++i)
+                {
+                    if (arguments[i] is null)
+                    {
+                        var rpn = cf.Defaults?[i] ?? throw Exceptions.InvalidNumberOfArguments();
+                        arguments[i] = (cf.DefaultFunctions[i] ??= _parser.CompileRpn(rpn))();
+                    }
+                    parameters[i].SetValue(arguments[i]);
+                }
+                return cf switch
+                {
+                    CustomFunction1 cf1 => EvaluateFunction(cf1, arguments[0]),
+                    CustomFunction2 cf2 => EvaluateFunction(cf2, arguments[0], arguments[1]),
+                    CustomFunction3 cf3 => EvaluateFunction(cf3, arguments[0], arguments[1], arguments[2]),
+                    _ => EvaluateFunction((CustomFunctionN)cf, arguments)
+                };
             }
 
             internal IValue EvaluateFunction(CustomFunction1 cf, in IValue x)

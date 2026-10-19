@@ -142,6 +142,7 @@ namespace Calcpad.Highlighter.ContentResolution
                 var line = macro.SourceIndex;
                 var info = includeMap.GetValueOrDefault(line);
                 var parameters = new List<string>(macro.Parameters);
+                var defaults = new List<string>(macro.Defaults);
                 // Body lines are taken from the source so blank lines stay in place.
                 var content = macro.IsInline
                     ? new List<string>(macro.Content)
@@ -151,6 +152,7 @@ namespace Calcpad.Highlighter.ContentResolution
                 {
                     Name = macro.Name,
                     Params = parameters,
+                    Defaults = defaults,
                     Content = content,
                     LineNumber = line,
                     Source = info?.Source ?? "local",
@@ -172,6 +174,7 @@ namespace Calcpad.Highlighter.ContentResolution
                     {
                         LineNumber = line,
                         ParamCount = parameters.Count,
+                        RequiredParamCount = ParsingHelpers.CountRequiredParams(parameters.Count, defaults),
                         ParamNames = parameters
                     };
             }

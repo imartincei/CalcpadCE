@@ -8,7 +8,7 @@ In VS Code, do not use VS Code's own settings editor.
 | Setting | Values | Meaning |
 | ------- | ------ | ------- |
 | **Decimals** | 0–15 | Decimal places shown in results. |
-| **Angle Units** | Radians / Degrees / Gradians | Trigonometric angle setting. |
+| **Angle Units** | Degrees / Radians / Gradians | Trigonometric angle setting. |
 | **Complex Numbers** | on/off | Enable complex-number arithmetic. |
 | **Substitute Variables** | on/off | Substitute variable values into the output. |
 | **Format Equations** | on/off | *Professional* (on) renders equations in stacked math form; *Inline* (off) renders them on a single line. |

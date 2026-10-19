@@ -433,7 +433,7 @@
       },
       {
         "command": "calcpad.refreshDocumentConnecting",
-        "title": "CalcpadCE: Restart Server (server starting\u2026)",
+        "title": "CalcpadCE: Restart Server (server starting…)",
         "icon": {
           "light": "media/restart-connecting-light.svg",
           "dark": "media/restart-connecting-dark.svg"
@@ -883,13 +883,13 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/node": "^20.19.16",
     "@types/vscode": "^1.82.0",
-    "@vitejs/plugin-vue": "^6.0.4",
-    "@vscode/vsce": "^3.7.1",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vscode/vsce": "^4.0.0",
     "@vue/compiler-sfc": "^3.5.21",
     "concurrently": "^9.2.1",
     "rollup": "^4.53.3",
     "typescript": "^5.9.2",
-    "vite": "^7.3.1",
+    "vite": "^8.3.4",
     "vue-tsc": "^3.2.4"
   },
   "dependencies": {
