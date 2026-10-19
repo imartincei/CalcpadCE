@@ -771,7 +771,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 var (line, column, length) = kvp.Value;
 
                 if (!usedAfterLastAssignment.Contains(varName) &&
-                    !CalcpadBuiltIns.SettingsVariables.Contains(varName))
+                    !CalcpadBuiltIns.SettingsVariables.Contains(varName) &&
+                    !stage3.CustomUnits.Contains(varName))
                 {
                     result.AddInformation(line, column, column + length, "CPD-3312",
                         "Variable '" + varName + "' is defined but never used");

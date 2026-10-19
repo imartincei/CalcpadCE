@@ -124,17 +124,30 @@ namespace Calcpad.Highlighter.ContentResolution
             // definitions API and the metadata panel — need original lines, so remap
             // them here, after the Stage3-internal indexes (which rely on Stage3 lines)
             // have been built.
-            int MapDefLineToOriginal(int stage3Line)
+            int MapToRootLine(int stage3Line)
             {
-                if (filteredIncludeMap.TryGetValue(stage3Line, out var info) &&
-                    info.Source == "include" && info.OriginalLine >= 0)
-                    return info.OriginalLine;
                 var stage2Line = sourceMap.TryGetValue(stage3Line, out var s2) ? s2 : stage3Line;
                 var stage1Line = stage2.SourceMap.TryGetValue(stage2Line, out var s1) ? s1 : stage2Line;
                 var (originalLine, _) = MapColumnThroughContinuation(
                     stage1Line, 0, stage1.LineContinuationSegments, stage1.SourceMap);
                 return originalLine;
             }
+
+            int MapDefLineToOriginal(int stage3Line) =>
+                filteredIncludeMap.TryGetValue(stage3Line, out var info) &&
+                info.Source == "include" && info.OriginalLine >= 0
+                    ? info.OriginalLine
+                    : MapToRootLine(stage3Line);
+
+            var variableFirstLines = new Dictionary<string, int>(StringComparer.Ordinal);
+            void AddFirstLine(string name, int stage3Line)
+            {
+                var line = MapToRootLine(stage3Line);
+                if (!variableFirstLines.TryGetValue(name, out var first) || line < first)
+                    variableFirstLines[name] = line;
+            }
+            foreach (var v in variablesWithDefs) AddFirstLine(v.Name, v.LineNumber);
+            foreach (var (name, line) in tokenizerResult.DefinedVariables) AddFirstLine(name, line);
 
             foreach (var f in functionsWithParams) f.LineNumber = MapDefLineToOriginal(f.LineNumber);
             foreach (var v in variablesWithDefs) v.LineNumber = MapDefLineToOriginal(v.LineNumber);
@@ -150,6 +163,7 @@ namespace Calcpad.Highlighter.ContentResolution
                 FunctionsWithParams = functionsWithParams,
                 UserDefinedMacros = userDefinedMacros,
                 DefinedVariables = variables,
+                VariableFirstLines = variableFirstLines,
                 VariablesWithDefinitions = variablesWithDefs,
                 CustomUnits = customUnits,
                 TypeTracker = typeTracker,

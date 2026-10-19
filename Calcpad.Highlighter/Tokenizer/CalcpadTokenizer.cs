@@ -60,6 +60,7 @@ namespace Calcpad.Highlighter.Tokenizer
             public TokenType CurrentType;
             public TokenType PreviousType;
             public bool AllowUnaryMinus;
+            public bool IsUnitsAfterNumber;         // Core always reads a name after a number as units
 
             // Local variable tracking
             public bool IsFunctionDefinition;       // True when parsing f(x;y) = ... before the =
@@ -613,6 +614,7 @@ namespace Calcpad.Highlighter.Tokenizer
 
             // Resolve types based on context (no error detection - that's the linter's job)
             type = ResolveType(type, text);
+            _state.IsUnitsAfterNumber = false;
 
             // Check for macro parameters in comment content when inside a macro definition
             if (_inMacroDefinition && _macroParameters.Count > 0 &&

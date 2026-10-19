@@ -484,17 +484,8 @@ namespace Calcpad.Server.Controllers
                 FileLogger.LogVerbose("Highlight request received", $"Length: {request.Content.Length}");
 
                 var tokenizer = new CalcpadTokenizer();
-
-                // Run content resolution to collect macro info from includes (resolver reads
-                // referenced files from disk via SourceFilePath when no in-memory cache is supplied).
-                if (!string.IsNullOrEmpty(request.SourceFilePath))
-                {
-                    var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
-                    tokenizer.SetMacroCommentParameters(
-                        staged.Stage2.MacroCommentParameters,
-                        staged.Stage2.MacroParameterOrder,
-                        staged.Stage2.MacroBodies);
-                }
+                tokenizer.SetResolvedContent(
+                    _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath));
 
                 var result = tokenizer.Tokenize(request.Content);
                 return Ok(MapTokensToResponse(result.Tokens, request.IncludeText));

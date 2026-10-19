@@ -325,6 +325,13 @@ namespace Calcpad.Highlighter.ContentResolution
         public List<FunctionDefinition> FunctionsWithParams { get; set; }
         public Dictionary<string, MacroInfo> UserDefinedMacros { get; set; }
         public HashSet<string> DefinedVariables { get; set; }
+
+        /// <summary>
+        /// Case-sensitive variable name → first original source line (0-based) that defines it.
+        /// Included and macro-generated definitions map to their #include or call line.
+        /// </summary>
+        public Dictionary<string, int> VariableFirstLines { get; set; } = new(System.StringComparer.Ordinal);
+
         public List<VariableDefinition> VariablesWithDefinitions { get; set; }
         public List<CustomUnitDefinition> CustomUnits { get; set; }
 
