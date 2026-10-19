@@ -2,6 +2,7 @@ import * as monaco from 'monaco-editor';
 import { CalcpadApiClient } from 'calcpad-frontend/api/client';
 import { CalcpadLintService } from 'calcpad-frontend/services/linter';
 import type { LintDiagnostic } from 'calcpad-frontend/types/api';
+import { documentIdFor } from './document-id';
 
 export type LintSeverity = 'error' | 'warning' | 'information';
 
@@ -57,7 +58,7 @@ async function lintAndMark(
 
     const content = model.getValue();
     const ctx = getFileContext ? await getFileContext(content) : {};
-    const response = await apiClient.lint(content, ctx.sourceFilePath, { key });
+    const response = await apiClient.lint(content, ctx.sourceFilePath, { key, documentId: documentIdFor(model) });
 
     if (!response?.diagnostics) {
         monaco.editor.setModelMarkers(model, 'calcpad', []);

@@ -1,8 +1,8 @@
-# Desktop app testing on a hidden desktop (Windows)
+# Desktop app testing on a hidden desktop
 
 Runs an isolated copy of the CalcpadCE desktop app (Tauri) where nothing shows on the developer's screen, and drives it from scripts. The developer can keep working while an agent exercises menus, native dialogs and server failures.
 
-## How it works
+## How it works (Windows)
 
 - **Hidden desktop.** `deskrun` creates a second Win32 desktop (`WinSta0\CalcpadTest`) and starts processes on it. Windows on that desktop are never shown and can't take focus. Every process it starts, including the server sidecar and WebView2, inherits it.
 - **Isolated app copy.** `build.ps1` builds the app with identifier `com.calcpadce.desktop.test` (via `TAURI_CONFIG`) and assembles it with the server in `.work\app`. That gives the copy its own app data folder (`%APPDATA%\com.calcpadce.desktop.test`) and its own single-instance lock. Without this it would share open tabs, drafts and settings with the developer's CalcpadCE, and launching theirs could be forwarded into the hidden one.
@@ -10,7 +10,7 @@ Runs an isolated copy of the CalcpadCE desktop app (Tauri) where nothing shows o
 - **Native dialogs.** Tauri's dialogs are Win32 TaskDialogs and file pickers, which JS can't reach. `ui.ps1` reads and clicks them with UI Automation. UI Automation only sees its own desktop, so `ui.ps1` re-runs itself on the hidden desktop through `deskrun`.
 - **Configuration.** `-Settings <file>` gives the server a different `appsettings.json`. `-Env @{...}` sets environment variables for the app and its server, for example `BROWSER_PATH` to pick the PDF browser.
 
-## Usage
+## Usage (Windows)
 
 ```powershell
 cd tools\desktop-test
@@ -38,4 +38,25 @@ Rust-side `eprintln!` output goes to `.work\app-out.txt`. Crash reports go to `%
 - **CDP while a dialog is open.** CDP evaluation can stall while a native modal is open. Dismiss the dialog first. `cdp.mjs` gives up after 20 s.
 - **Empty documents.** Export and preview fail early on an empty document, so set some content first.
 - **Stopping processes.** `launch.ps1 -Stop` only stops processes running from `.work\`, plus the PDF browser the test server started. It never touches the developer's own CalcpadCE or its PDF browser.
-- **Platform.** Windows only.
+- **Platform.** The scripts above are Windows only. See Linux below.
+
+## Linux
+
+The same idea with Linux pieces. Needs `kwin_wayland` (KDE) and `dbus-run-session`; no X server or WebDriver.
+
+- **Hidden desktop.** `launch.sh` runs a private D-Bus session with an off-screen KWin (`kwin_wayland --virtual`) and starts the app on its Wayland socket. The session gets none of the developer's displays or session bus, so nothing reaches their desktop.
+- **Isolated app copy.** `build.sh` builds with identifier `com.calcpadce.desktop.test` and lays it out like the .deb install: `.work/app/bin/calcpad-desktop` with the server in `.work/app/lib/CalcpadCE Test`, where Tauri looks for it outside a cargo `target` folder. App data goes to `~/.local/share/com.calcpadce.desktop.test`.
+- **Webview control.** `launch.sh` sets `WEBKIT_INSPECTOR_HTTP_SERVER`, WebKitGTK's remote inspector. `cdp.mjs` speaks that protocol on Linux, so its commands work unchanged.
+
+```bash
+cd tools/desktop-test
+./build.sh --stage --frontend     # first time, or after backend (--stage) / TS (--frontend) changes
+./launch.sh [--settings path/to/appsettings.json] [--env NAME=value]...
+./launch.sh --stop
+```
+
+Output from the app, its server and KWin goes to `.work/app-out.txt`.
+
+- **No native dialogs.** There is no `ui.ps1` counterpart yet, so GTK dialogs can't be read or clicked.
+- **DMA-BUF.** `launch.sh` sets `WEBKIT_DISABLE_DMABUF_RENDERER=1`; without it WebKit trips a Wayland protocol error on KWin's virtual backend and the window dies.
+- **Stopping processes.** `launch.sh --stop` only stops processes running from `.work/app` and the KWin on the harness's own socket.

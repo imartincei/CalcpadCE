@@ -235,7 +235,7 @@ let extensionContext: vscode.ExtensionContext;
 let vueUiProvider: CalcpadVueUIProvider | undefined;
 // Set in activate(); the module-level export commands need it outside that scope.
 let sharedApiClient: CalcpadApiClient | undefined;
-// Set in activate(); reruns lint and definitions once a preview has recorded a runtime trace.
+// Set in activate(); reruns lint, definitions and highlighting once a preview has recorded a runtime trace.
 let refreshDocumentAnalysis: ((document: vscode.TextDocument) => void) | undefined;
 
 const NO_SERVER_MESSAGE = 'No CalcpadCE server available — the bundled server did not start '
@@ -2068,7 +2068,10 @@ export async function activate(context: vscode.ExtensionContext) {
         pendingDocument = undefined;
         if (next) await processDocument(next);
     }
-    refreshDocumentAnalysis = document => void processDocument(document);
+    refreshDocumentAnalysis = document => {
+        void processDocument(document);
+        semanticTokensProvider.refresh();
+    };
 
     async function _doProcessDocument(document: vscode.TextDocument) {
         outputChannel.appendLine('[processDocument] Processing document: ' + document.uri.fsPath, 'verbose');

@@ -47,6 +47,15 @@ namespace Calcpad.Tests
         }
 
         [Fact]
+        public void UnitFallback_IsNotAVariable()
+        {
+            var trace = Run("x = 1\n#if x > 5\na = 5\n#end if\nc = a\nb = 2*a\nd = a");
+            Assert.False(trace.Variables.ContainsKey("a"));
+            Assert.True(trace.Variables.ContainsKey("c"));
+            Assert.True(Run("c = a\na = 5\nd = a").Variables.ContainsKey("a"));
+        }
+
+        [Fact]
         public void NoCalculation_RecordsNoAssignment()
         {
             var trace = Run("#noc\ny = 5\n#equ");

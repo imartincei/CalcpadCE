@@ -61,6 +61,7 @@ export class CalcpadDefinitionsService {
         documentKey: string,
         sourceFilePath?: string,
         requestKey?: string,
+        documentId?: string,
     ): Promise<DefinitionsResponse | null> {
         const reqId = ++this.requestId;
         const startTime = Date.now();
@@ -73,7 +74,7 @@ export class CalcpadDefinitionsService {
             return null;
         }
 
-        const definitions = await this.apiClient.definitions(content, sourceFilePath, { key: requestKey ?? documentKey });
+        const definitions = await this.apiClient.definitions(content, sourceFilePath, { key: requestKey ?? documentKey, documentId });
 
         if (definitions) {
             this.cache.set(documentKey, definitions);

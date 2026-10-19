@@ -86,6 +86,7 @@ interface CalcpadRequest {
   forceUnwrappedCode?: boolean; // If true, return code without calculation (default: false)
   theme?: string;               // "light" or "dark" (default: "light")
   sourceFilePath?: string;      // Full path of source file on client (used to resolve relative #include against the parent file's directory)
+  documentId?: string;          // Identifies a document with no sourceFilePath (an untitled tab); see /highlight
 
   // Render mode. #pre is hidden when forPrint is true; #post is hidden when enableUi is true.
   forPrint?: boolean;           // Report layout (default: false)
@@ -137,7 +138,9 @@ Array<{
 
 The header is listed in the CORS policy's exposed headers, so a browser client can read it.
 
-A render with line anchors (`includeLineAnchors`, on by default for anything but print) also records what the calculation executed and sets `X-Calcpad-Trace: 1`. `/lint`, `/definitions`, `/highlight` and `/symbol-at-position` requests for the same `content` and `sourceFilePath` then use it: variable types come from the run, and lines the run never reached (an untaken `#if` branch) skip type checks. A client should refetch lint and definitions when it sees the header. Until then, or for any other content, those endpoints use static inference.
+A render with line anchors (`includeLineAnchors`, on by default for anything but print) also records what the calculation executed and sets `X-Calcpad-Trace: 1`. `/lint`, `/definitions`, `/highlight` and `/symbol-at-position` requests for the same `content` and `sourceFilePath` then use it: variable types come from the run, and lines the run never reached (an untaken `#if` branch) skip type checks. A client should refetch lint, definitions and highlighting when it sees the header. Until then, or for any other content, those endpoints use static inference.
+
+`/highlight` also keeps the variable names of a document's last run, per `sourceFilePath`, after its content changes. A unit-named identifier such as `a` (are) is then a variable only where Core would read one: a definition in a branch the run skipped leaves the unit, while a definition added since the run counts at once. A document with no `sourceFilePath` gets this only when `/convert` and `/highlight` both send the same `documentId`, which should be unique to that document.
 
 Every local `<img src>` comes back with its `{project}`/`{library}`/`{user}` token and any environment variable already expanded to an absolute forward-slash path, resolved against the roots declared anywhere in the `#include` chain. A source with no token is returned as authored, so a relative one still needs joining against `sourceFilePath`'s folder — the only path work left to a client that has to read the file off disk (to base64-inline it for a sandboxed preview, say). An undeclared root is reported as a normal render error and the source is left as written.
 
@@ -365,6 +368,7 @@ interface HighlightRequest {
   content: string;          // The Calcpad source code to tokenize
   includeText?: boolean;    // Whether to include token text in response (default: false)
   sourceFilePath?: string;  // Full path of source file on client (for resolving relative #include)
+  documentId?: string;      // Identifies a document with no sourceFilePath (an untitled tab)
 }
 ```
 

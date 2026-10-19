@@ -29,7 +29,8 @@ import {
 } from 'calcpad-frontend';
 import { registerCalcpadLanguage, registerCalcpadTheme, remeasureEditorFontsWhenReady, resolveEditorFontFamily } from './editor/setup';
 import { setAppTheme, coerceAppTheme, getResolvedAppTheme, onAppThemeChanged } from './editor/app-theme';
-import { registerSemanticTokensProvider } from './editor/semantic-tokens';
+import { registerSemanticTokensProvider, type SemanticTokensHandle } from './editor/semantic-tokens';
+import { documentIdFor } from './editor/document-id';
 import { setupDiagnostics } from './editor/diagnostics';
 import { registerCompletionProvider } from './editor/completions';
 import { registerIncludeCompletionProvider } from './editor/include-completions';
@@ -332,6 +333,7 @@ async function bootstrap(): Promise<void> {
     const getFileContext = 'buildFileContext' in activeBridge
         ? (content: string) => (activeBridge as any).buildFileContext(content)
         : undefined;
+    let semanticTokens: SemanticTokensHandle | undefined;
 
     function docKeyFor(group: EditorGroup): string {
         return `tab:${group.tabs.activeId ?? 'none'}`;
@@ -390,7 +392,8 @@ async function bootstrap(): Promise<void> {
     async function refreshDefinitionsFor(group: EditorGroup): Promise<void> {
         const content = group.editor.getValue();
         const ctx = getFileContext ? await getFileContext(content) : {};
-        editorBridge.definitions.refreshDefinitions(content, docKeyFor(group), ctx.sourceFilePath, `defs:${group.id}`);
+        editorBridge.definitions.refreshDefinitions(
+            content, docKeyFor(group), ctx.sourceFilePath, `defs:${group.id}`, documentIdFor(group.editor.getModel()));
     }
 
     // Also hands the result to App.vue, which themes the loading overlay with it.
@@ -690,6 +693,7 @@ async function bootstrap(): Promise<void> {
         }
 
         const fileContext = getFileContext ? await getFileContext(content) : {};
+        const documentId = documentIdFor(group.editor.getModel());
 
         const hideLoading = showPreviewLoading(group);
         let result;
@@ -707,12 +711,12 @@ async function bootstrap(): Promise<void> {
                 : undefined;
             const write = activeBridge.mayWrite(mode === 'report', mode === 'ui');
             result = mode === 'unwrapped'
-                ? await activeBridge.api.convertUnwrapped(content, apiSettings, fileContext.sourceFilePath, theme, { key: `preview:${group.id}`, write })
+                ? await activeBridge.api.convertUnwrapped(content, apiSettings, fileContext.sourceFilePath, theme, { key: `preview:${group.id}`, write, documentId })
                 // The report is a print layout, but on screen, so it keeps the line
                 // anchors that forPrint would otherwise suppress.
                 : await activeBridge.api.convert(
                     content, apiSettings, 'html', mode === 'report', fileContext.sourceFilePath, theme, ui,
-                    mode === 'report' ? true : undefined, { key: `preview:${group.id}`, write });
+                    mode === 'report' ? true : undefined, { key: `preview:${group.id}`, write, documentId });
         } catch (err) {
             void hideLoading();
             throw err;
@@ -729,6 +733,7 @@ async function bootstrap(): Promise<void> {
             if (result.traceUpdated) {
                 void refreshDefinitionsFor(group);
                 void group.diagnostics?.refresh();
+                semanticTokens?.refresh();
             }
             // Before the image inlining and the injection passes each copy it. Showing a
             // render costs several times its own size, so the check that can hold the line
@@ -1241,7 +1246,7 @@ async function bootstrap(): Promise<void> {
     }
 
     // ---- Global (per-language) Monaco providers ----
-    registerSemanticTokensProvider(activeBridge.api, getFileContext);
+    semanticTokens = registerSemanticTokensProvider(activeBridge.api, getFileContext);
     registerCompletionProvider(editorBridge);
     if (tauriBridge) {
         registerIncludeCompletionProvider({

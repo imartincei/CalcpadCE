@@ -76,7 +76,9 @@ namespace Calcpad.Server.Controllers
                 // Tells the client lint and definitions can now use what this run executed.
                 if (trace != null)
                 {
-                    _runtimeTraceCache.Store(request.SourceFilePath, request.Content, trace);
+                    _runtimeTraceCache.Store(request.SourceFilePath, request.DocumentId, request.Content, trace);
+                    _runtimeTraceCache.StoreNames(request.SourceFilePath, request.DocumentId, RuntimeVariableNames.From(
+                        trace, _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, request.DocumentId)));
                     Response.Headers["X-Calcpad-Trace"] = "1";
                 }
                 return Content(htmlResult, "text/html");
@@ -485,7 +487,8 @@ namespace Calcpad.Server.Controllers
 
                 var tokenizer = new CalcpadTokenizer();
                 tokenizer.SetResolvedContent(
-                    _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath));
+                    _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, request.DocumentId),
+                    _runtimeTraceCache.GetNames(request.SourceFilePath, request.DocumentId));
 
                 var result = tokenizer.Tokenize(request.Content);
                 return Ok(MapTokensToResponse(result.Tokens, request.IncludeText));
@@ -518,7 +521,7 @@ namespace Calcpad.Server.Controllers
 
                 var linter = new CalcpadLinter();
 
-                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
+                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, request.DocumentId);
 
                 // Extract LintIgnore regions from raw source, then lint with suppression
                 var ignoreRegions = _lintIgnoreRegionParser.ExtractRegions(request.Content);
@@ -571,7 +574,7 @@ namespace Calcpad.Server.Controllers
 
                 FileLogger.LogVerbose("Definitions request received", "Length: " + request.Content.Length);
 
-                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
+                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, request.DocumentId);
 
                 var typeTracker = staged.Stage3.TypeTracker;
 
@@ -689,7 +692,7 @@ namespace Calcpad.Server.Controllers
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
+                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, request.DocumentId);
                 var hit = SymbolResolver.ResolveSymbolAt(staged.Stage3, request.Line, request.Column);
                 if (hit == null) return Ok(null);
 
@@ -928,6 +931,9 @@ namespace Calcpad.Server.Controllers
         /// </summary>
         public string? SourceFilePath { get; set; }
 
+        /// <summary>Identifies a document with no <see cref="SourceFilePath"/>, e.g. an untitled tab.</summary>
+        public string? DocumentId { get; set; }
+
         /// <summary>
         /// When true, <c>#UI</c> lines render as interactive controls and <c>#post</c>
         /// content is hidden. When false the document renders as a report, exactly as
@@ -1047,6 +1053,9 @@ namespace Calcpad.Server.Controllers
         /// Full path of the source file on disk.
         /// </summary>
         public string? SourceFilePath { get; set; }
+
+        /// <summary>Identifies a document with no <see cref="SourceFilePath"/>, e.g. an untitled tab.</summary>
+        public string? DocumentId { get; set; }
     }
 
     public class HighlightResponse
@@ -1090,6 +1099,9 @@ namespace Calcpad.Server.Controllers
         /// Full path of the source file on disk.
         /// </summary>
         public string? SourceFilePath { get; set; }
+
+        /// <summary>Identifies a document with no <see cref="SourceFilePath"/>, e.g. an untitled tab.</summary>
+        public string? DocumentId { get; set; }
     }
 
     public class LintResponse
@@ -1138,6 +1150,9 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>Full path of the source file on disk.</summary>
         public string? SourceFilePath { get; set; }
+
+        /// <summary>Identifies a document with no <see cref="SourceFilePath"/>, e.g. an untitled tab.</summary>
+        public string? DocumentId { get; set; }
     }
 
     public class DefinitionsResponse
@@ -1355,6 +1370,9 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>Full path of the source file on disk (used to resolve #include).</summary>
         public string? SourceFilePath { get; set; }
+
+        /// <summary>Identifies a document with no <see cref="SourceFilePath"/>, e.g. an untitled tab.</summary>
+        public string? DocumentId { get; set; }
     }
 
     public class SymbolAtPositionResponse

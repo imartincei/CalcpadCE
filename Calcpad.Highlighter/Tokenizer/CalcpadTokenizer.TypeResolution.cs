@@ -21,6 +21,7 @@ namespace Calcpad.Highlighter.Tokenizer
 
         // Variables the expanded content defines (includes, macros), by first source line.
         private IReadOnlyDictionary<string, int> _resolvedVariableLines;
+        private RuntimeVariableNames _runtimeNames;
 
         // Tracks #read keyword in all modes (not just Lint) so the next variable can be
         // recorded as a definition.
@@ -110,18 +111,15 @@ namespace Calcpad.Highlighter.Tokenizer
                     // Check if it's a known local variable (defined earlier in this line)
                     if (_localVariables.Contains(text))
                         return TokenType.LocalVariable;
-                    // Check if it's a known defined variable
-                    if (IsKnownVariable(text))
-                        return TokenType.Variable;
-                    // If not a known variable, fall back to unit when it is a valid unit name,
-                    // which is what makes "ft" in "x = 5*ft" a unit. The exception is the first
-                    // identifier position on a line, which is a variable definition ("a = 42",
-                    // "#const h = 6", "#UI L = 10m"): falling back to Units there would keep it
-                    // out of _definedVariables and cascade every later use to Units as well.
+                    // A unit name that isn't a variable is the unit, which is what makes "ft" in
+                    // "x = 5*ft" a unit. The exception is the first identifier position on a line,
+                    // which is a variable definition ("a = 42", "#const h = 6", "#UI L = 10m"):
+                    // falling back to Units there would keep it out of _definedVariables and
+                    // cascade every later use to Units as well.
                     if (IsKnownUnit(text) &&
                         !_beforeFirstCodeToken &&
                         !_state.IsDataExchangeKeyword)
-                        return TokenType.Units;
+                        return IsVariableNotUnit(text) ? TokenType.Variable : TokenType.Units;
                     // Otherwise keep as variable - linter will detect if undefined
                     break;
 
@@ -169,8 +167,7 @@ namespace Calcpad.Highlighter.Tokenizer
                     // operator might be initially classified as Units due to PreviousType tracking.
                     if (_localVariables.Contains(text))
                         return TokenType.LocalVariable;
-                    // If it's a known defined variable, treat as variable
-                    if (IsKnownVariable(text))
+                    if (IsVariableNotUnit(text))
                         return TokenType.Variable;
                     // Keep as units - linter will validate if it's a valid unit
                     break;
@@ -468,13 +465,23 @@ namespace Calcpad.Highlighter.Tokenizer
         /// Uses the macros and variables that only exist once includes and macros expand. A
         /// resolved variable counts as known on lines after its first definition.
         /// </summary>
-        public void SetResolvedContent(StagedResolvedContent staged)
+        /// <param name="runtimeNames">The document's last run, which decides unit names it covers.</param>
+        public void SetResolvedContent(StagedResolvedContent staged, RuntimeVariableNames runtimeNames = null)
         {
             SetMacroCommentParameters(
                 staged.Stage2.MacroCommentParameters,
                 staged.Stage2.MacroParameterOrder,
                 staged.Stage2.MacroBodies);
             _resolvedVariableLines = staged.Stage3.VariableFirstLines;
+            _runtimeNames = runtimeNames;
+        }
+
+        private bool IsVariableNotUnit(string name)
+        {
+            var definedBefore = IsKnownVariable(name);
+            return _runtimeNames != null && IsKnownUnit(name)
+                ? _runtimeNames.IsVariable(name, definedBefore)
+                : definedBefore;
         }
 
         private bool IsKnownVariable(string name)

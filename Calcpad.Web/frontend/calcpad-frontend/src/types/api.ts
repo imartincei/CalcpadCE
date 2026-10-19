@@ -8,6 +8,8 @@
 export interface LintRequest {
     content: string;
     sourceFilePath?: string;
+    /** Identifies a document with no sourceFilePath, so its last run applies to it alone. */
+    documentId?: string;
 }
 
 export interface LintResponse {
@@ -51,6 +53,8 @@ export interface HighlightRequest {
     content: string;
     includeText?: boolean;
     sourceFilePath?: string;
+    /** Identifies a document with no sourceFilePath, so its last run applies to it alone. */
+    documentId?: string;
 }
 
 export interface HighlightResponse {
@@ -182,6 +186,8 @@ export enum CalcpadTokenType {
 export interface DefinitionsRequest {
     content: string;
     sourceFilePath?: string;
+    /** Identifies a document with no sourceFilePath, so its last run applies to it alone. */
+    documentId?: string;
 }
 
 export interface DefinitionsResponse {
@@ -280,6 +286,8 @@ export interface SymbolAtPositionRequest {
     line: number;       // 0-based, in original source
     column: number;     // 0-based
     sourceFilePath?: string;
+    /** Identifies a document with no sourceFilePath, so its last run applies to it alone. */
+    documentId?: string;
 }
 
 export interface SymbolAtPositionResponse {

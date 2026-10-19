@@ -161,19 +161,19 @@ export class CalcpadApiClient {
         })();
     }
 
-    public async lint(content: string, sourceFilePath?: string, opts?: { key?: string }): Promise<LintResponse | null> {
-        const request: LintRequest = { content, sourceFilePath };
+    public async lint(content: string, sourceFilePath?: string, opts?: { key?: string; documentId?: string }): Promise<LintResponse | null> {
+        const request: LintRequest = { content, sourceFilePath, documentId: opts?.documentId };
         return this.post<LintResponse>('/api/calcpad/lint', request, 'Lint', opts?.key);
     }
 
-    public async highlight(content: string, includeText: boolean = false, sourceFilePath?: string, opts?: { key?: string }): Promise<HighlightToken[] | null> {
-        const request: HighlightRequest = { content, includeText, sourceFilePath };
+    public async highlight(content: string, includeText: boolean = false, sourceFilePath?: string, opts?: { key?: string; documentId?: string }): Promise<HighlightToken[] | null> {
+        const request: HighlightRequest = { content, includeText, sourceFilePath, documentId: opts?.documentId };
         const response = await this.post<HighlightResponse>('/api/calcpad/highlight', request, 'Highlight', opts?.key);
         return response?.tokens ?? null;
     }
 
-    public async definitions(content: string, sourceFilePath?: string, opts?: { key?: string }): Promise<DefinitionsResponse | null> {
-        const request: DefinitionsRequest = { content, sourceFilePath };
+    public async definitions(content: string, sourceFilePath?: string, opts?: { key?: string; documentId?: string }): Promise<DefinitionsResponse | null> {
+        const request: DefinitionsRequest = { content, sourceFilePath, documentId: opts?.documentId };
         return this.post<DefinitionsResponse>('/api/calcpad/definitions', request, 'Definitions', opts?.key);
     }
 
@@ -188,9 +188,9 @@ export class CalcpadApiClient {
         line: number,
         column: number,
         sourceFilePath?: string,
-        opts?: { key?: string },
+        opts?: { key?: string; documentId?: string },
     ): Promise<SymbolAtPositionResponse | null> {
-        const request: SymbolAtPositionRequest = { content, line, column, sourceFilePath };
+        const request: SymbolAtPositionRequest = { content, line, column, sourceFilePath, documentId: opts?.documentId };
         return this.post<SymbolAtPositionResponse>('/api/calcpad/symbol-at-position', request, 'SymbolAtPosition', opts?.key);
     }
 
@@ -341,7 +341,7 @@ export class CalcpadApiClient {
         theme?: 'light' | 'dark',
         ui?: UiConvertOptions,
         includeLineAnchors?: boolean,
-        opts?: { key?: string; write?: boolean },
+        opts?: { key?: string; write?: boolean; documentId?: string },
     ): Promise<ArrayBuffer | ConvertResult | null> {
         return this.withSupersession(opts?.key, async (signal) => {
             const url = await this.resolveUrl('/api/calcpad/convert', 'Convert');
@@ -357,6 +357,7 @@ export class CalcpadApiClient {
                         includeLineAnchors,
                         hideErrorLines: ui?.hideErrorLines,
                         write: opts?.write ?? false,
+                        documentId: opts?.documentId,
                     }),
                     signal: combineSignals(AbortSignal.timeout(60000), signal),
                 });
@@ -422,7 +423,7 @@ export class CalcpadApiClient {
         settings: unknown,
         sourceFilePath?: string,
         theme?: 'light' | 'dark',
-        opts?: { key?: string; write?: boolean },
+        opts?: { key?: string; write?: boolean; documentId?: string },
     ): Promise<ConvertResult | null> {
         return this.withSupersession(opts?.key, async (signal) => {
             const url = await this.resolveUrl('/api/calcpad/convert?unwrap=true', 'ConvertUnwrapped');
@@ -431,7 +432,7 @@ export class CalcpadApiClient {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: this.jsonHeaders(),
-                    body: JSON.stringify({ content, settings, sourceFilePath, theme, write: opts?.write ?? false }),
+                    body: JSON.stringify({ content, settings, sourceFilePath, theme, write: opts?.write ?? false, documentId: opts?.documentId }),
                     signal: combineSignals(AbortSignal.timeout(60000), signal),
                 });
                 if (!response.ok) return null;

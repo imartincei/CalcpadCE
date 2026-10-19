@@ -3,21 +3,29 @@ import { CalcpadApiClient } from 'calcpad-frontend/api/client';
 import { SEMANTIC_TOKEN_TYPES, mapTokenTypeToIndex } from 'calcpad-frontend/services/highlight';
 import { truncateBase64Content } from 'calcpad-frontend/services/base64-truncate';
 import type { FileContextProvider } from './diagnostics';
+import { documentIdFor } from './document-id';
+
+export interface SemanticTokensHandle extends monaco.IDisposable {
+    /** Re-requests tokens for every open model, e.g. after a run changed what names mean. */
+    refresh(): void;
+}
 
 /**
  * Register a DocumentSemanticTokensProvider that fetches tokens from the CalcPad server.
- * Returns a disposable to unregister the provider.
  */
 export function registerSemanticTokensProvider(
     apiClient: CalcpadApiClient,
     getFileContext?: FileContextProvider,
-): monaco.IDisposable {
+): SemanticTokensHandle {
     const legend = {
         tokenTypes: SEMANTIC_TOKEN_TYPES,
         tokenModifiers: [] as string[],
     };
+    const changed = new monaco.Emitter<void>();
 
     const provider: monaco.languages.DocumentSemanticTokensProvider = {
+        onDidChange: changed.event,
+
         getLegend() {
             return legend;
         },
@@ -28,6 +36,7 @@ export function registerSemanticTokensProvider(
             const ctx = getFileContext ? await getFileContext(content) : {};
             const tokens = await apiClient.highlight(truncatedContent, false, ctx.sourceFilePath, {
                 key: `highlight:${model.uri.toString()}`,
+                documentId: documentIdFor(model),
             });
 
             if (token.isCancellationRequested || !tokens || tokens.length === 0) {
@@ -67,5 +76,12 @@ export function registerSemanticTokensProvider(
         },
     };
 
-    return monaco.languages.registerDocumentSemanticTokensProvider('calcpad', provider);
+    const registration = monaco.languages.registerDocumentSemanticTokensProvider('calcpad', provider);
+    return {
+        refresh: () => changed.fire(),
+        dispose: () => {
+            registration.dispose();
+            changed.dispose();
+        },
+    };
 }

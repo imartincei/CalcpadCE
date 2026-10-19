@@ -22,7 +22,7 @@ namespace Calcpad.Server.Services
 
         private readonly IMemoryCache _cache;
         private readonly RuntimeTraceCache _traces;
-        private readonly ConcurrentDictionary<string, string> _activeKeyBySourceFile = new();
+        private readonly ConcurrentDictionary<string, string> _activeKeyByDocument = new();
 
         /// <summary>
         /// Resolutions currently running. Without this the four endpoints one keystroke triggers
@@ -68,21 +68,21 @@ namespace Calcpad.Server.Services
             };
         }
 
-        public StagedResolvedContent GetOrResolve(string content, string? sourceFilePath)
+        public StagedResolvedContent GetOrResolve(string content, string? sourceFilePath, string? documentId = null)
         {
-            var fileKey = sourceFilePath ?? string.Empty;
+            var documentKey = ContentKey.Document(sourceFilePath, documentId);
             var key = ContentKey.For(sourceFilePath, content);
 
             if (_cache.TryGetValue(key, out CacheEntry? cached) && cached != null && IsIncludesFresh(cached))
-                return ApplyTrace(cached, sourceFilePath, key);
+                return ApplyTrace(cached, sourceFilePath, documentId, key);
 
             // Concurrent callers for the same key share one resolution instead of racing.
             var lazy = _inFlight.GetOrAdd(key, _ => new Lazy<CacheEntry>(
-                () => Resolve(content, sourceFilePath, fileKey, key),
+                () => Resolve(content, sourceFilePath, documentKey, key),
                 LazyThreadSafetyMode.ExecutionAndPublication));
             try
             {
-                return ApplyTrace(lazy.Value, sourceFilePath, key);
+                return ApplyTrace(lazy.Value, sourceFilePath, documentId, key);
             }
             finally
             {
@@ -94,9 +94,9 @@ namespace Calcpad.Server.Services
         /// Overlays the latest /convert trace for this exact content. A trace recorded before an
         /// include last changed describes stale include content, so it is ignored.
         /// </summary>
-        private StagedResolvedContent ApplyTrace(CacheEntry entry, string? sourceFilePath, string key)
+        private StagedResolvedContent ApplyTrace(CacheEntry entry, string? sourceFilePath, string? documentId, string key)
         {
-            var trace = _traces.Get(sourceFilePath, key);
+            var trace = _traces.Get(sourceFilePath, documentId, key);
             if (trace is null || entry.IncludeWriteTimes.Values.Any(t => t > trace.StoredUtc))
                 return entry.Staged;
 
@@ -108,10 +108,10 @@ namespace Calcpad.Server.Services
             return staged;
         }
 
-        private CacheEntry Resolve(string content, string? sourceFilePath, string fileKey, string key)
+        private CacheEntry Resolve(string content, string? sourceFilePath, string documentKey, string key)
         {
-            // New content for this file — drop its old entry now instead of waiting on the TTL.
-            if (_activeKeyBySourceFile.TryGetValue(fileKey, out var oldKey) && oldKey != key)
+            // New content for this document — drop its old entry now instead of waiting on the TTL.
+            if (_activeKeyByDocument.TryGetValue(documentKey, out var oldKey) && oldKey != key)
                 _cache.Remove(oldKey);
 
             var staged = new ContentResolver().GetStagedContent(content, sourceFilePath: sourceFilePath);
@@ -132,12 +132,12 @@ namespace Calcpad.Server.Services
                 SlidingExpiration = _baseOptions.SlidingExpiration,
                 Size = Math.Clamp(staged.Stage3.Lines?.Count ?? 1, 1, _sizeLimit),
             };
-            // Without this the map keeps one entry per file path ever seen, outliving by far
+            // Without this the map keeps one entry per document ever seen, outliving by far
             // the cache entries it points at.
             options.RegisterPostEvictionCallback((_, _, _, _) =>
-                _activeKeyBySourceFile.TryRemove(new KeyValuePair<string, string>(fileKey, key)));
+                _activeKeyByDocument.TryRemove(new KeyValuePair<string, string>(documentKey, key)));
             _cache.Set(key, entry, options);
-            _activeKeyBySourceFile[fileKey] = key;
+            _activeKeyByDocument[documentKey] = key;
             return entry;
         }
 

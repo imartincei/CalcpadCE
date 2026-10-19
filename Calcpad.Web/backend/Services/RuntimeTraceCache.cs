@@ -1,4 +1,6 @@
+using System.Collections.Concurrent;
 using Calcpad.Core;
+using Calcpad.Highlighter.ContentResolution;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Calcpad.Server.Services
@@ -12,6 +14,7 @@ namespace Calcpad.Server.Services
         public sealed record Entry(string Key, RuntimeTrace Trace, DateTime StoredUtc, long Version);
 
         private readonly IMemoryCache _cache;
+        private readonly ConcurrentDictionary<string, RuntimeVariableNames> _names = new();
         private readonly TimeSpan _expiration;
         private readonly int _sizeLimit;
         private long _version;
@@ -25,11 +28,11 @@ namespace Calcpad.Server.Services
                 ? seconds : 120);
         }
 
-        public void Store(string? sourceFilePath, string content, RuntimeTrace trace)
+        public void Store(string? sourceFilePath, string? documentId, string content, RuntimeTrace trace)
         {
             var entry = new Entry(ContentKey.For(sourceFilePath, content), trace, DateTime.UtcNow,
                 Interlocked.Increment(ref _version));
-            _cache.Set(CacheKey(sourceFilePath), entry, new MemoryCacheEntryOptions
+            _cache.Set("trace|" + ContentKey.Document(sourceFilePath, documentId), entry, new MemoryCacheEntryOptions
             {
                 SlidingExpiration = _expiration,
                 Size = Math.Clamp(trace.Lines.Count, 1, _sizeLimit),
@@ -37,9 +40,23 @@ namespace Calcpad.Server.Services
         }
 
         /// <summary>The trace for exactly this content, or null.</summary>
-        public Entry? Get(string? sourceFilePath, string key) =>
-            _cache.TryGetValue(CacheKey(sourceFilePath), out Entry? entry) && entry?.Key == key ? entry : null;
+        public Entry? Get(string? sourceFilePath, string? documentId, string key) =>
+            _cache.TryGetValue("trace|" + ContentKey.Document(sourceFilePath, documentId), out Entry? entry) &&
+            entry?.Key == key ? entry : null;
 
-        private static string CacheKey(string? sourceFilePath) => "trace|" + (sourceFilePath ?? string.Empty);
+        /// <summary>
+        /// Keeps the run's variable names for the document whatever its content becomes, for as
+        /// long as the server runs, so highlighting doesn't fall back to static between runs. A
+        /// document with neither a path nor an id gets none.
+        /// </summary>
+        public void StoreNames(string? sourceFilePath, string? documentId, RuntimeVariableNames names)
+        {
+            var document = ContentKey.Document(sourceFilePath, documentId);
+            if (document.Length > 0)
+                _names[document] = names;
+        }
+
+        public RuntimeVariableNames? GetNames(string? sourceFilePath, string? documentId) =>
+            _names.GetValueOrDefault(ContentKey.Document(sourceFilePath, documentId));
     }
 }

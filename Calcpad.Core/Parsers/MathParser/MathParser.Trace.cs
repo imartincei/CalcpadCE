@@ -50,6 +50,10 @@ namespace Calcpad.Core
 
             void Record()
             {
+                // A name that fell back to its unit holds the unit but stays uninitialized.
+                if (!variable.IsInitialized)
+                    return;
+
                 var kind = RuntimeTrace.KindOf(variable.Value);
                 if (kind is null || kind == lastKind && Line == lastLine)
                     return;

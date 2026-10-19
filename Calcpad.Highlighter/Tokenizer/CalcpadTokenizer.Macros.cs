@@ -685,6 +685,7 @@ namespace Calcpad.Highlighter.Tokenizer
                         tokenizer.SetMacroCommentParameters(_macroCommentParameters, _macroParameterOrder, _macroBodies);
                     tokenizer.SetResolvingMacros(_resolvingMacros);
                     tokenizer._resolvedVariableLines = _resolvedVariableLines;
+                    tokenizer._runtimeNames = _runtimeNames;
                     var result = tokenizer.TokenizeSingleLine(expanded, _state.Line);
 
                     // Extract tokens overlapping with the argument region in the expanded string

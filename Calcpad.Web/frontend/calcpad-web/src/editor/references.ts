@@ -3,6 +3,7 @@ import type { SymbolAtPositionResponse, SymbolLocation } from 'calcpad-frontend/
 import type { EditorBridge } from './bridge';
 import type { FileContextProvider } from './diagnostics';
 import { parseDirectiveLine } from 'calcpad-frontend';
+import { documentIdFor } from './document-id';
 
 /**
  * Resolves a `SymbolLocation` whose `source !== 'local'` to a Monaco model URI by opening the
@@ -36,6 +37,7 @@ async function resolveSymbol(
         position.lineNumber - 1,
         position.column - 1,
         ctx.sourceFilePath,
+        { documentId: documentIdFor(model) },
     );
 }
 
