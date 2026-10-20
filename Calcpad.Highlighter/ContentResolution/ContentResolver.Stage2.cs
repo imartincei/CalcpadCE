@@ -20,7 +20,8 @@ namespace Calcpad.Highlighter.ContentResolution
             OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
         /// <summary>A line MacroParser emitted, for Stage 3.</summary>
-        private readonly record struct OutputLine(string Text, int Stage2Line, IReadOnlyList<string> ExpandedMacros, int ContentIndex, int ContentCount);
+        /// <param name="Origins">Stage 2 line and column each character was read from, or -1; null without expansion.</param>
+        private readonly record struct OutputLine(string Text, int Stage2Line, IReadOnlyList<string> ExpandedMacros, int ContentIndex, int ContentCount, (int Line, int Column)[] Origins);
 
         private Stage2Result ProcessStage2(Stage1Result stage1, string sourceFilePath, out List<OutputLine> outputs)
         {
@@ -31,6 +32,7 @@ namespace Calcpad.Highlighter.ContentResolution
             {
                 SourceFilePath = sourceFilePath,
                 Trace = trace,
+                Debug = true,
                 Include = (path, _) =>
                 {
                     string raw;
@@ -85,7 +87,7 @@ namespace Calcpad.Highlighter.ContentResolution
                     lines[output.SourceIndex] = text;
                     includeMap[output.SourceIndex] = new SourceInfo { Source = "include", SourceFile = output.FailedInclude };
                 }
-                outputs.Add(new(text, output.SourceIndex, output.ExpandedMacros, output.ContentIndex, output.ContentCount));
+                outputs.Add(new(text, output.SourceIndex, output.ExpandedMacros, output.ContentIndex, output.ContentCount, Locate(trace, output.SourceOffsets)));
             }
 
             // MacroParser stops at an unrecoverable error, so the rest is passed through unexpanded.
@@ -101,19 +103,14 @@ namespace Calcpad.Highlighter.ContentResolution
                     lines.Add(stage1.Lines[j]);
                     sourceMap[i] = j;
                     includeMap[i] = local;
-                    outputs.Add(new(stage1.Lines[j], i, null, 0, 1));
+                    outputs.Add(new(stage1.Lines[j], i, null, 0, 1, null));
                 }
             }
 
             var (macroDefinitions, duplicateMacros, userDefinedMacros) = CollectMacros(trace, lines, includeMap);
-            var (macroCommentParams, macroParamOrder) = ComputeMacroCommentParameters(macroDefinitions);
-
-            var macroBodies = new Dictionary<string, string>(StringComparer.Ordinal);
+            var macroParamOrder = new Dictionary<string, List<string>>(StringComparer.Ordinal);
             foreach (var macro in macroDefinitions)
-            {
-                if (macro.Content.Count > 0)
-                    macroBodies.TryAdd(macro.Name, JoinLines(macro.Content));
-            }
+                macroParamOrder.TryAdd(macro.Name, macro.Params);
 
             return new Stage2Result
             {
@@ -122,13 +119,23 @@ namespace Calcpad.Highlighter.ContentResolution
                 IncludeMap = includeMap,
                 MacroDefinitions = macroDefinitions,
                 DuplicateMacros = duplicateMacros,
-                MacroCommentParameters = macroCommentParams,
                 MacroParameterOrder = macroParamOrder,
-                MacroBodies = macroBodies,
                 UserDefinedMacros = userDefinedMacros,
                 PathRoots = parser.PathRoots,
                 IncludedFileHashes = includedFileHashes
             };
+        }
+
+        private static (int, int)[] Locate(MacroTrace trace, IReadOnlyList<int> offsets)
+        {
+            if (offsets is null)
+                return null;
+
+            var origins = new (int, int)[offsets.Count];
+            for (var i = 0; i < origins.Length; i++)
+                origins[i] = trace.TryLocate(offsets[i], out var line, out var column) ? (line, column) : (-1, -1);
+
+            return origins;
         }
 
         private static (List<MacroDefinition>, List<DuplicateMacro>, Dictionary<string, MacroInfo>) CollectMacros(
@@ -202,185 +209,6 @@ namespace Calcpad.Highlighter.ContentResolution
                 lines.Add(line.ToString());
 
             return lines;
-        }
-
-        /// <summary>
-        /// Computes which parameters are "comment parameters" for each macro — those appearing
-        /// directly in a comment section of the macro content, or passed to another macro's
-        /// comment parameter position. Uses fixed-point iteration to handle transitive
-        /// dependencies.
-        /// </summary>
-        private static (Dictionary<string, HashSet<string>> CommentParams, Dictionary<string, List<string>> ParamOrder)
-            ComputeMacroCommentParameters(List<MacroDefinition> macroDefinitions)
-        {
-            var commentParams = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
-            var paramOrder = new Dictionary<string, List<string>>(StringComparer.Ordinal);
-
-            // Build macro lookup and initialize structures
-            var macrosByName = new Dictionary<string, MacroDefinition>(StringComparer.Ordinal);
-            foreach (var macro in macroDefinitions)
-            {
-                if (!macrosByName.ContainsKey(macro.Name))
-                {
-                    macrosByName[macro.Name] = macro;
-                    paramOrder[macro.Name] = macro.Params ?? new List<string>();
-                    commentParams[macro.Name] = new HashSet<string>(StringComparer.Ordinal);
-                }
-            }
-
-            // First pass: find direct comment parameters (params that appear in comment text)
-            foreach (var macro in macroDefinitions)
-            {
-                if (macro.Params == null || macro.Params.Count == 0 || macro.Content == null)
-                    continue;
-
-                foreach (var contentLine in macro.Content)
-                {
-                    var lineCommentParams = CalcpadTokenizer.FindCommentParamsInLine(contentLine, macro.Params);
-                    foreach (var param in lineCommentParams)
-                    {
-                        commentParams[macro.Name].Add(param);
-                    }
-                }
-
-                // Also update the MacroDefinition's CommentParameters
-                macro.CommentParameters = new HashSet<string>(commentParams[macro.Name], StringComparer.Ordinal);
-            }
-
-            // Second pass: transitive closure - if a param is passed to another macro's comment param position
-            // Repeat until no changes (fixed point)
-            bool changed = true;
-            int maxIterations = 100; // Safety limit
-            int iteration = 0;
-
-            while (changed && iteration < maxIterations)
-            {
-                changed = false;
-                iteration++;
-
-                foreach (var macro in macroDefinitions)
-                {
-                    if (macro.Params == null || macro.Params.Count == 0 || macro.Content == null)
-                        continue;
-
-                    // Scan macro content for calls to other macros
-                    foreach (var contentLine in macro.Content)
-                    {
-                        // Find macro calls in this line (pattern: macroName$(args))
-                        var calls = FindMacroCallsInLine(contentLine, macrosByName);
-
-                        foreach (var (calledMacro, args) in calls)
-                        {
-                            if (!macrosByName.TryGetValue(calledMacro, out var calledMacroDef))
-                                continue;
-
-                            var calledParams = calledMacroDef.Params;
-                            if (calledParams == null)
-                                continue;
-
-                            // Check each argument position
-                            for (int argIdx = 0; argIdx < args.Count && argIdx < calledParams.Count; argIdx++)
-                            {
-                                var calledParamName = calledParams[argIdx];
-
-                                // If this position in the called macro is a comment parameter
-                                if (commentParams.TryGetValue(calledMacro, out var calledCommentParams) &&
-                                    calledCommentParams.Contains(calledParamName))
-                                {
-                                    // Check if the argument contains any of our parameters
-                                    var argText = args[argIdx];
-                                    foreach (var ourParam in macro.Params)
-                                    {
-                                        if (argText.Contains(ourParam) && !commentParams[macro.Name].Contains(ourParam))
-                                        {
-                                            commentParams[macro.Name].Add(ourParam);
-                                            changed = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Update MacroDefinition.CommentParameters with final results
-            foreach (var macro in macroDefinitions)
-            {
-                if (commentParams.TryGetValue(macro.Name, out var cp))
-                {
-                    macro.CommentParameters = new HashSet<string>(cp, StringComparer.Ordinal);
-                }
-            }
-
-            return (commentParams, paramOrder);
-        }
-
-        /// <summary>
-        /// Finds macro calls in a line and returns the called macro name and arguments.
-        /// </summary>
-        private static List<(string MacroName, List<string> Args)> FindMacroCallsInLine(
-            string line, Dictionary<string, MacroDefinition> knownMacros)
-        {
-            var results = new List<(string, List<string>)>();
-            if (string.IsNullOrEmpty(line))
-                return results;
-
-            var lineSpan = line.AsSpan();
-
-            // Look for pattern: macroName$(args) where macroName$ is a known macro
-            int i = 0;
-            while (i < lineSpan.Length)
-            {
-                // Find next $
-                int dollarIdx = lineSpan[i..].IndexOf('$');
-                if (dollarIdx < 0)
-                    break;
-                dollarIdx += i;
-
-                // Try to extract macro name ending at this $
-                // Work backwards to find the start of the identifier
-                int nameStart = dollarIdx;
-                while (nameStart > 0 && CalcpadCharacterHelpers.IsMacroLetter(lineSpan[nameStart - 1], dollarIdx - nameStart))
-                {
-                    nameStart--;
-                }
-
-                if (nameStart < dollarIdx)
-                {
-                    var macroName = lineSpan.Slice(nameStart, dollarIdx - nameStart + 1).ToString();
-
-                    // Check if this is a known macro
-                    if (knownMacros.ContainsKey(macroName))
-                    {
-                        // Look for opening parenthesis
-                        int afterDollar = dollarIdx + 1;
-
-                        // Skip whitespace
-                        ParsingHelpers.SkipWhitespace(lineSpan, ref afterDollar);
-
-                        if (afterDollar < lineSpan.Length && lineSpan[afterDollar] == '(')
-                        {
-                            // Find matching close paren and extract args
-                            int parenStart = afterDollar;
-                            var closePos = ParsingHelpers.FindMatchingClose(lineSpan, parenStart, '(', ')');
-
-                            if (closePos >= 0)
-                            {
-                                var argsStr = lineSpan.Slice(parenStart + 1, closePos - parenStart - 1).ToString();
-                                var args = ParameterParser.ParseMacroParameters(argsStr);
-                                results.Add((macroName, args));
-                                i = closePos + 1;
-                                continue;
-                            }
-                        }
-                    }
-                }
-
-                i = dollarIdx + 1;
-            }
-
-            return results;
         }
     }
 }

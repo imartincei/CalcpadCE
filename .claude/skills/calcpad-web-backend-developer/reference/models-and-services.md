@@ -114,10 +114,9 @@ var staged = _contentResolutionCache.GetOrResolve(request.Content, request.Sourc
 var ignoreRegions = _lintIgnoreRegionParser.ExtractRegions(request.Content);
 var lintResult = new CalcpadLinter().Lint(staged, ignoreRegions);
 
-// Tokenization — feed it macro info from includes when a source path is known
+// Tokenization — resolved content supplies macros, expanded definitions and macro argument tokens
 var tokenizer = new CalcpadTokenizer();
-tokenizer.SetMacroCommentParameters(staged.Stage2.MacroCommentParameters,
-    staged.Stage2.MacroParameterOrder, staged.Stage2.MacroBodies);
+tokenizer.SetResolvedContent(staged, _runtimeTraceCache.GetNames(request.SourceFilePath, request.DocumentId));
 var tokens = tokenizer.Tokenize(request.Content).Tokens;
 
 // Definitions come off the staged pipeline, types off its TypeTracker

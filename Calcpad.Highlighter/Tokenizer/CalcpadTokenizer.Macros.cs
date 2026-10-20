@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Calcpad.Highlighter.ContentResolution;
 using Calcpad.Highlighter.Linter.Constants;
 using Calcpad.Highlighter.Linter.Helpers;
 using Calcpad.Highlighter.Tokenizer.Models;
@@ -13,19 +14,10 @@ namespace Calcpad.Highlighter.Tokenizer
         private bool _inMacroDefinition;  // True when inside #def...#end def or after = in inline #def
         private readonly HashSet<string> _macroParameters = new(StringComparer.Ordinal);
 
-        // Tracks which parameters for each macro are "comment parameters" (used in comment text)
-        // Key: macro name (case-insensitive), Value: set of parameter names that appear in comments
-        private readonly Dictionary<string, HashSet<string>> _macroCommentParameters = new(StringComparer.Ordinal);
-
-        // Tracks ordered parameter lists per macro (for call-site argument matching)
+        // Ordered parameter names per macro, for keyword arguments at call sites
         private readonly Dictionary<string, List<string>> _macroParameterOrder = new(StringComparer.Ordinal);
 
-        // Stores inline macro bodies for argument type resolution via substitution + tokenization
-        // Key: macro name (case-insensitive), Value: body text (everything after = in #def)
-        private readonly Dictionary<string, string> _macroBodies = new(StringComparer.Ordinal);
-
-        // Pre-tokenized argument tokens for the current macro call (populated by look-ahead)
-        // Each entry is a list of tokens for one argument, with call-site-adjusted columns
+        // Pre-tokenized argument tokens for the current macro call, with call-site columns
         private List<List<Token>> _macroCallPreTokenized;
 
         // Whether the current macro argument's pre-computed tokens have been emitted
@@ -37,47 +29,24 @@ namespace Calcpad.Highlighter.Tokenizer
         // Tracks the last macro name seen at a call site (before ( clears the builder)
         private string _lastMacroCallName;
 
-        // True if macro comment parameters were set externally via SetMacroCommentParameters
-        // When true, CollectDefinitions will not overwrite the external info
-        private bool _hasExternalMacroCommentInfo;
+        // True when macro parameters were set externally, so tokenizing keeps them
+        private bool _hasExternalMacroInfo;
 
-        // Macros currently being resolved on the arg-tokenization recursion stack.
-        // Shared across nested tokenizer instances created in ResolveMacroCallArgTokens so that
-        // a parameterized self-reference (#def grow$(x$) = grow$(x$)) does not recurse forever.
-        private HashSet<string> _resolvingMacros;
+        // MacroParser's expansion of each call line, keyed by original line
+        private IReadOnlyDictionary<int, List<CallSiteExpansion>> _callSiteExpansions;
 
-        /// <summary>
-        /// Shares the "currently-resolving macros" set with a nested tokenizer.
-        /// Used by ResolveMacroCallArgTokens to propagate cycle state into the fresh
-        /// tokenizer that re-tokenizes the substituted macro body.
-        /// </summary>
-        internal void SetResolvingMacros(HashSet<string> resolvingMacros)
-        {
-            _resolvingMacros = resolvingMacros;
-        }
+        // Argument tokens for the line in _argTokensLine: projected from its expansion, and literal
+        private int _argTokensLine = -1;
+        private List<Token> _projectedTokens;
+        private List<Token> _literalTokens;
 
         /// <summary>
-        /// Sets macro comment parameter information from ContentResolver Stage2, which enables
-        /// correct tokenization of macro call arguments as Comment vs expression. Call this before
-        /// Tokenize() when you have pre-computed comment parameter info.
+        /// Sets the macros' parameter names, as Stage 2 collected them including macros from
+        /// includes. Call this before Tokenize().
         /// </summary>
-        public void SetMacroCommentParameters(
-            Dictionary<string, HashSet<string>> commentParams,
-            Dictionary<string, List<string>> paramOrder,
-            Dictionary<string, string> macroBodies = null)
+        public void SetMacroParameters(Dictionary<string, List<string>> paramOrder)
         {
-            _macroCommentParameters.Clear();
             _macroParameterOrder.Clear();
-            _macroBodies.Clear();
-
-            if (commentParams != null)
-            {
-                foreach (var kvp in commentParams)
-                {
-                    _macroCommentParameters[kvp.Key] = new HashSet<string>(kvp.Value, StringComparer.Ordinal);
-                }
-            }
-
             if (paramOrder != null)
             {
                 foreach (var kvp in paramOrder)
@@ -86,16 +55,7 @@ namespace Calcpad.Highlighter.Tokenizer
                     _definedMacros.Add(kvp.Key);
                 }
             }
-
-            if (macroBodies != null)
-            {
-                foreach (var kvp in macroBodies)
-                {
-                    _macroBodies[kvp.Key] = kvp.Value;
-                }
-            }
-
-            _hasExternalMacroCommentInfo = true;
+            _hasExternalMacroInfo = true;
         }
 
         /// <summary>
@@ -104,12 +64,9 @@ namespace Calcpad.Highlighter.Tokenizer
         /// </summary>
         private void ResetMacroState()
         {
-            // Only clear macro comment info if not set externally
-            if (!_hasExternalMacroCommentInfo)
+            if (!_hasExternalMacroInfo)
             {
-                _macroCommentParameters.Clear();
                 _macroParameterOrder.Clear();
-                _macroBodies.Clear();
             }
             else
             {
@@ -123,6 +80,7 @@ namespace Calcpad.Highlighter.Tokenizer
             _macroArgPreEmitted = false;
             _pendingMacroDefName = null;
             _lastMacroCallName = null;
+            _argTokensLine = -1;
         }
 
         /// <summary>
@@ -387,20 +345,14 @@ namespace Calcpad.Highlighter.Tokenizer
 
         private void ParseMacroArgs(char c, int position)
         {
-            // If we have pre-tokenized data from body substitution, use that instead
             if (_macroCallPreTokenized != null)
             {
                 ParseMacroArgsPreTokenized(c, position);
                 return;
             }
 
-            // Determine if current argument is a "comment parameter"
-            var isCommentArg = IsCurrentMacroArgComment();
-
-            // Handle comment delimiters within expression arguments (fallback path)
-            if (!isCommentArg && _state.TextComment == '\0' && (c == '\'' || c == '"'))
+            if (_state.TextComment == '\0' && (c == '\'' || c == '"'))
             {
-                // Start comment within macro argument
                 Append(_state.CurrentTypeOrPrevious);
                 _state.TextComment = c;
                 _builder.Append(c);
@@ -409,12 +361,10 @@ namespace Calcpad.Highlighter.Tokenizer
                 return;
             }
 
-            // Inside a comment within macro args - accumulate as Comment
-            if (!isCommentArg && _state.TextComment != '\0')
+            if (_state.TextComment != '\0')
             {
                 if (c == _state.TextComment)
                 {
-                    // End of comment
                     _builder.Append(c);
                     Append(TokenType.Comment);
                     _state.TextComment = '\0';
@@ -436,7 +386,10 @@ namespace Calcpad.Highlighter.Tokenizer
             if (c == '$' && _builder.Length > 0)
             {
                 _builder.Append('$');
-                ParseMacroInComment(isCommentArg ? TokenType.Comment : _state.CurrentType);
+                if (IsMacroKeywordArgumentName(position))
+                    Append(TokenType.MacroParameter);
+                else
+                    ParseMacroInComment(_state.CurrentType);
             }
             else if (c == '(' || c == ')')
             {
@@ -447,26 +400,15 @@ namespace Calcpad.Highlighter.Tokenizer
                     if (_state.BracketCount <= _state.MacroArgs)
                     {
                         _state.MacroArgs = 0;
-                        // Clear macro call tracking when we exit the macro args
                         _state.CurrentMacroCall = null;
                         _state.CurrentMacroArgIndex = 0;
-                        _state.TextComment = '\0'; // Clear any unclosed quote from macro args
+                        _state.TextComment = '\0';
                     }
 
                     _state.BracketCount--;
                 }
 
-                // Flush buffer before bracket
-                if (isCommentArg)
-                {
-                    Append(TokenType.Comment);
-                }
-                else
-                {
-                    // For expression arguments, flush as current type
-                    Append(_state.CurrentTypeOrPrevious);
-                }
-
+                Append(_state.CurrentTypeOrPrevious);
                 _builder.Append(c);
                 _state.CurrentType = TokenType.Bracket;
                 Append(_state.CurrentType);
@@ -475,88 +417,51 @@ namespace Calcpad.Highlighter.Tokenizer
             }
             else if (c == ';')
             {
-                // Flush buffer before semicolon
-                if (isCommentArg)
-                {
-                    Append(TokenType.Comment);
-                }
-                else
-                {
-                    Append(_state.CurrentTypeOrPrevious);
-                }
-
+                Append(_state.CurrentTypeOrPrevious);
                 _builder.Append(c);
                 _state.CurrentType = TokenType.Operator;
                 Append(_state.CurrentType);
-
-                // Move to next argument
                 _state.CurrentMacroArgIndex++;
             }
-            else if (isCommentArg)
+            else if (CalcpadBuiltIns.Operators.Contains(c))
             {
-                // Comment argument - just accumulate everything
+                Append(_state.CurrentTypeOrPrevious);
                 _builder.Append(c);
-                _state.CurrentType = TokenType.Comment;
+                _state.CurrentType = TokenType.Operator;
+                Append(_state.CurrentType);
+            }
+            else if (char.IsWhiteSpace(c))
+            {
+                Append(_state.CurrentTypeOrPrevious);
+                _builder.Append(c);
+                Append(TokenType.None);
+                _state.CurrentType = TokenType.None;
+            }
+            else if (_builder.Length == 0)
+            {
+                _state.CurrentType = InitType(c, _state.CurrentType);
+                _builder.Append(c);
             }
             else
             {
-                // Expression argument - tokenize normally
-                // Handle operators
-                if (CalcpadBuiltIns.Operators.Contains(c))
-                {
-                    Append(_state.CurrentTypeOrPrevious);
-                    _builder.Append(c);
-                    _state.CurrentType = TokenType.Operator;
-                    Append(_state.CurrentType);
-                }
-                else if (char.IsWhiteSpace(c))
-                {
-                    // Flush buffer on whitespace
-                    Append(_state.CurrentTypeOrPrevious);
-                    _builder.Append(c);
-                    Append(TokenType.None);
-                    _state.CurrentType = TokenType.None;
-                }
-                else if (_builder.Length == 0)
-                {
-                    // Start new token
-                    _state.CurrentType = InitType(c, _state.CurrentType);
-                    _builder.Append(c);
-                }
-                else
-                {
-                    _builder.Append(c);
-                }
+                _builder.Append(c);
             }
 
             _state.PreviousType = _state.CurrentType;
         }
 
-        /// <summary>
-        /// Checks if the current macro argument position corresponds to a "comment parameter".
-        /// </summary>
-        private bool IsCurrentMacroArgComment()
+        /// <summary>True for "name$" followed by '=' that names a parameter of the macro being called.</summary>
+        private bool IsMacroKeywordArgumentName(int dollar)
         {
-            if (string.IsNullOrEmpty(_state.CurrentMacroCall))
+            if (_state.CurrentMacroCall is null ||
+                !_macroParameterOrder.TryGetValue(_state.CurrentMacroCall, out var parameters) ||
+                !parameters.Contains(_builder.ToString()))
                 return false;
 
-            // Check if we have parameter order info for this macro
-            if (!_macroParameterOrder.TryGetValue(_state.CurrentMacroCall, out var paramOrder))
-                return false;
-
-            // Check if current argument index is valid
-            if (_state.CurrentMacroArgIndex >= paramOrder.Count)
-                return false;
-
-            var paramName = paramOrder[_state.CurrentMacroArgIndex];
-
-            // Check if this parameter is a "comment parameter"
-            if (_macroCommentParameters.TryGetValue(_state.CurrentMacroCall, out var commentParams))
-            {
-                return commentParams.Contains(paramName);
-            }
-
-            return false;
+            var span = _state.Text.Span;
+            var i = dollar + 1;
+            ParsingHelpers.SkipWhitespace(span, ref i);
+            return i < span.Length && span[i] == '=' && (i + 1 >= span.Length || span[i + 1] != '=');
         }
 
         /// <summary>
@@ -594,164 +499,146 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// Resolves macro call argument tokens by substituting each argument into the macro body,
-        /// tokenizing the expanded body, and extracting tokens that correspond to the argument region.
-        /// Token columns are adjusted to map back to the original call-site positions.
+        /// Takes argument tokens from MacroParser's expansion of the line, projected back to it;
+        /// text the expansion doesn't carry (nested calls, keyword names, parameters in a #def
+        /// body) keeps its literal tokens. Without an expansion the arguments are tokenized literally.
         /// </summary>
-        private void ResolveMacroCallArgTokens(string macroName, int openParenCol)
+        private void ResolveMacroCallArgTokens(int openParenCol)
         {
             _macroCallPreTokenized = null;
             _macroArgPreEmitted = false;
-
-            if (!_macroBodies.TryGetValue(macroName, out var body))
-                return;
-            if (!_macroParameterOrder.TryGetValue(macroName, out var paramOrder))
-                return;
-            if (paramOrder.Count == 0)
+            if (_callSiteExpansions is null || !_callSiteExpansions.TryGetValue(_state.Line, out var expansions))
                 return;
 
-            // Cycle guard: a macro whose body re-invokes itself (directly or transitively)
-            // would otherwise drive ResolveMacroCallArgTokens -> TokenizeSingleLine -> ParseBrackets
-            // back into ResolveMacroCallArgTokens forever and overflow the stack.
-            // Falling through with _macroCallPreTokenized = null routes ParseMacroArgs through
-            // the non-pre-tokenized path, which tokenizes the call literally without re-expanding.
-            if (_resolvingMacros != null && _resolvingMacros.Contains(macroName))
-                return;
-
-            // Look ahead to extract arguments from the current line
-            var args = ExtractMacroCallArgsWithPositions(_state.Text.Span, openParenCol + 1);
-            if (args.Count == 0)
-                return;
-
-            _resolvingMacros ??= new HashSet<string>(StringComparer.Ordinal);
-            _resolvingMacros.Add(macroName);
-            try
+            if (_argTokensLine != _state.Line)
             {
-                _macroCallPreTokenized = new List<List<Token>>();
+                _argTokensLine = _state.Line;
+                _projectedTokens = ProjectExpansions(expansions);
+                var literal = CreateArgumentTokenizer();
+                literal._inMacroDefinition = _inMacroDefinition;
+                literal._macroParameters.UnionWith(_macroParameters);
+                _literalTokens = literal.TokenizeSingleLine(_state.Text.ToString(), _state.Line).Tokens;
+            }
 
-                for (int i = 0; i < args.Count && i < paramOrder.Count; i++)
+            _macroCallPreTokenized = [];
+            foreach (var (text, start) in ExtractMacroCallArgsWithPositions(_state.Text.Span, openParenCol + 1))
+                _macroCallPreTokenized.Add(MergeArgumentTokens(start, start + text.Length));
+        }
+
+        /// <summary>A tokenizer that resolves names as this one does at the current line, without expansions.</summary>
+        private CalcpadTokenizer CreateArgumentTokenizer()
+        {
+            var tokenizer = new CalcpadTokenizer
+            {
+                _parent = this,
+                _resolvedVariableLines = _resolvedVariableLines,
+                _runtimeNames = _runtimeNames,
+                _hasExternalMacroInfo = true
+            };
+            tokenizer._definedMacros.UnionWith(_definedMacros);
+            foreach (var (name, parameters) in _macroParameterOrder)
+                tokenizer._macroParameterOrder[name] = parameters;
+
+            return tokenizer;
+        }
+
+        /// <summary>Tokens of the expanded lines, cut to the runs of characters that came from the call site.</summary>
+        private List<Token> ProjectExpansions(List<CallSiteExpansion> expansions)
+        {
+            var tokenizer = CreateArgumentTokenizer();
+            var result = new List<Token>();
+            foreach (var expansion in expansions)
+            {
+                var columns = expansion.Columns;
+                foreach (var token in tokenizer.TokenizeSingleLine(expansion.Text, expansion.CallLine).Tokens)
                 {
-                    var (argText, argStartCol) = args[i];
-                    var paramName = paramOrder[i];
-
-                    // Find parameter position in body, searching line-by-line to avoid
-                    // cross-line state leakage (PreviousType carrying over from prior lines
-                    // would cause identifiers after Const tokens to be misclassified as Units)
-                    string targetLine = null;
-                    int posInLine = -1;
-                    if (body.IndexOf('\n') >= 0)
-                    {
-                        // Multi-line body: find the specific line containing the parameter
-                        int lineStart = 0;
-                        while (lineStart < body.Length)
-                        {
-                            int lineEnd = body.IndexOf('\n', lineStart);
-                            if (lineEnd < 0) lineEnd = body.Length;
-                            var lineSpan = body.AsSpan(lineStart, lineEnd - lineStart);
-                            int idx = lineSpan.IndexOf(paramName.AsSpan(), StringComparison.Ordinal);
-                            if (idx >= 0)
-                            {
-                                targetLine = lineSpan.ToString();
-                                posInLine = idx;
-                                break;
-                            }
-                            lineStart = lineEnd + 1;
-                        }
-                    }
-                    else
-                    {
-                        // Single-line body: use as-is
-                        var idx = body.AsSpan().IndexOf(paramName.AsSpan(), StringComparison.Ordinal);
-                        if (idx >= 0)
-                        {
-                            targetLine = body;
-                            posInLine = idx;
-                        }
-                    }
-
-                    if (targetLine == null || posInLine < 0)
-                    {
-                        _macroCallPreTokenized.Add(new List<Token>());
+                    if (token.Type == TokenType.None)
                         continue;
-                    }
 
-                    // Substitute parameter with argument in the target line only
-                    var expanded = targetLine.Substring(0, posInLine) + argText + targetLine.Substring(posInLine + paramName.Length);
-
-                    // Tokenize the expanded line using a fresh tokenizer with macro context
-                    // so nested macro calls (e.g., outer$(inner$(x))) are properly resolved
-                    var tokenizer = new CalcpadTokenizer();
-                    if (_hasExternalMacroCommentInfo)
-                        tokenizer.SetMacroCommentParameters(_macroCommentParameters, _macroParameterOrder, _macroBodies);
-                    tokenizer.SetResolvingMacros(_resolvingMacros);
-                    tokenizer._resolvedVariableLines = _resolvedVariableLines;
-                    tokenizer._runtimeNames = _runtimeNames;
-                    var result = tokenizer.TokenizeSingleLine(expanded, _state.Line);
-
-                    // Extract tokens overlapping with the argument region in the expanded string
-                    int argStartInExpanded = posInLine;
-                    int argEndInExpanded = posInLine + argText.Length;
-                    var argTokens = new List<Token>();
-
-                    foreach (var token in result.Tokens)
+                    var end = Math.Min(token.Column + token.Length, columns.Length);
+                    for (var i = token.Column; i < end;)
                     {
-                        int tokStart = token.Column;
-                        int tokEnd = token.Column + token.Length;
-
-                        // Skip tokens entirely outside the arg range
-                        if (tokEnd <= argStartInExpanded || tokStart >= argEndInExpanded)
-                            continue;
-
-                        // Clip to arg range
-                        int clipStart = Math.Max(tokStart, argStartInExpanded);
-                        int clipEnd = Math.Min(tokEnd, argEndInExpanded);
-                        int clipLen = clipEnd - clipStart;
-
-                        if (clipLen <= 0)
-                            continue;
-
-                        // Adjust column to original call-site line
-                        int originalCol = clipStart - argStartInExpanded + argStartCol;
-
-                        // Extract clipped text
-                        int textOffset = clipStart - tokStart;
-                        string clipText = (textOffset == 0 && clipLen == token.Length)
-                            ? token.Text
-                            : token.Text.Substring(textOffset, clipLen);
-
-                        argTokens.Add(new Token(_state.Line, originalCol, clipLen, token.Type, clipText));
-                    }
-
-                    // A keyword argument names a parameter of the called macro.
-                    if (argTokens.Count > 1 && argTokens[1].Text == "=" &&
-                        paramOrder.Contains(argTokens[0].Text))
-                    {
-                        var kw = argTokens[0];
-                        argTokens[0] = new Token(kw.Line, kw.Column, kw.Length, TokenType.MacroParameter, kw.Text);
-                    }
-
-                    // Fix up tokens: if inside a macro definition, reclassify any tokens
-                    // matching outer macro parameters from Macro to MacroParameter
-                    if (_inMacroDefinition && _macroParameters.Count > 0)
-                    {
-                        for (int j = 0; j < argTokens.Count; j++)
+                        var column = columns[i];
+                        var j = i + 1;
+                        if (column >= 0)
                         {
-                            var t = argTokens[j];
-                            if (t.Type == TokenType.Macro && _macroParameters.Contains(t.Text))
-                            {
-                                argTokens[j] = new Token(t.Line, t.Column, t.Length, TokenType.MacroParameter, t.Text);
-                            }
-                        }
-                    }
+                            while (j < end && columns[j] == column + j - i)
+                                ++j;
 
-                    _macroCallPreTokenized.Add(argTokens);
+                            result.Add(Slice(token, i - token.Column, j - token.Column, column));
+                        }
+                        i = j;
+                    }
                 }
             }
-            finally
+            return result;
+        }
+
+        /// <summary>
+        /// Projected tokens within [start, end), expression types winning over comment text where
+        /// an argument appears more than once, with literal tokens filling the rest.
+        /// </summary>
+        private List<Token> MergeArgumentTokens(int start, int end)
+        {
+            var tokens = new List<Token>();
+            foreach (var token in _projectedTokens)
+                if (!IsText(token.Type))
+                    AddProjected(token);
+            foreach (var token in _projectedTokens)
+                if (IsText(token.Type))
+                    AddProjected(token);
+
+            tokens.Sort((a, b) => a.Column.CompareTo(b.Column));
+            var projected = tokens.ToArray();
+            foreach (var token in _literalTokens)
             {
-                _resolvingMacros.Remove(macroName);
+                var from = Math.Max(token.Column, start);
+                var to = Math.Min(token.Column + token.Length, end);
+                foreach (var covered in projected)
+                {
+                    if (from >= to || covered.Column >= to)
+                        break;
+
+                    if (covered.Column > from)
+                        AddLiteral(token, from, covered.Column);
+
+                    from = Math.Max(from, covered.Column + covered.Length);
+                }
+                if (from < to)
+                    AddLiteral(token, from, to);
+            }
+            tokens.Sort((a, b) => a.Column.CompareTo(b.Column));
+            return tokens;
+
+            void AddLiteral(Token token, int from, int to)
+            {
+                var piece = Slice(token, from - token.Column, to - token.Column, from);
+                if (!string.IsNullOrWhiteSpace(piece.Text))
+                    tokens.Add(piece);
+            }
+
+            void AddProjected(Token token)
+            {
+                var from = Math.Max(token.Column, start);
+                var to = Math.Min(token.Column + token.Length, end);
+                if (from >= to)
+                    return;
+
+                foreach (var t in tokens)
+                    if (t.Column < to && from < t.Column + t.Length)
+                        return;
+
+                tokens.Add(Slice(token, from - token.Column, to - token.Column, from));
             }
         }
+
+        private static bool IsText(TokenType type) =>
+            type is >= TokenType.Comment and <= TokenType.Svg;
+
+        /// <summary>Characters [from, to) of a token, placed at a column on the current line.</summary>
+        private Token Slice(Token token, int from, int to, int column) =>
+            new(_state.Line, column, to - from, token.Type,
+                from == 0 && to == token.Length ? token.Text : token.Text.Substring(from, to - from));
 
         /// <summary>
         /// Handles macro argument characters when pre-tokenized data is available, emitting the
@@ -829,12 +716,8 @@ namespace Calcpad.Highlighter.Tokenizer
             // Inside the parameter list '=' introduces a default, not the macro body.
             if (c == '=' && _state.HasMacro && !_state.IsInFunctionParams && _state.BracketCount == 0)
             {
-                var afterEquals = i + 1 < len ? _state.Text.Span[(i + 1)..].TrimStart().ToString() : string.Empty;
-
-                // Store macro body and param order for argument type resolution (all modes)
                 if (_pendingMacroDefName != null)
                 {
-                    _macroBodies[_pendingMacroDefName] = afterEquals;
                     if (!_macroParameterOrder.ContainsKey(_pendingMacroDefName))
                     {
                         // Declared order
@@ -873,66 +756,6 @@ namespace Calcpad.Highlighter.Tokenizer
             if (closeParen < 0) return ([], null);
 
             return ParsingHelpers.ParseParamList(lineSpan[(openParen + 1)..closeParen].ToString());
-        }
-
-        /// <summary>
-        /// Finds which parameters appear in comment sections of a line.
-        /// Comments start with ' or " and end with the same character.
-        /// </summary>
-        public static HashSet<string> FindCommentParamsInLine(string line, List<string> parameters)
-        {
-            var result = new HashSet<string>(StringComparer.Ordinal);
-            if (parameters.Count == 0)
-                return result;
-
-            var lineSpan = line.AsSpan();
-
-            // Find all comment sections in the line
-            var inComment = false;
-            char commentChar = '\0';
-            var commentStart = -1;
-
-            for (int i = 0; i < lineSpan.Length; i++)
-            {
-                var c = lineSpan[i];
-
-                if (!inComment && (c == '\'' || c == '"'))
-                {
-                    inComment = true;
-                    commentChar = c;
-                    commentStart = i;
-                }
-                else if (inComment && c == commentChar)
-                {
-                    // End of comment - check for parameters in this section
-                    var commentSpan = lineSpan.Slice(commentStart, i - commentStart + 1);
-                    foreach (var param in parameters)
-                    {
-                        if (commentSpan.IndexOf(param.AsSpan(), StringComparison.Ordinal) >= 0)
-                        {
-                            result.Add(param);
-                        }
-                    }
-                    inComment = false;
-                    commentChar = '\0';
-                    commentStart = -1;
-                }
-            }
-
-            // Handle unclosed comment (continues to end of line)
-            if (inComment && commentStart >= 0)
-            {
-                var commentSpan = lineSpan[commentStart..];
-                foreach (var param in parameters)
-                {
-                    if (commentSpan.IndexOf(param.AsSpan(), StringComparison.Ordinal) >= 0)
-                    {
-                        result.Add(param);
-                    }
-                }
-            }
-
-            return result;
         }
     }
 }

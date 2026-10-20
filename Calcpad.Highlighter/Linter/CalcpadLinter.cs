@@ -57,12 +57,7 @@ namespace Calcpad.Highlighter.Linter
             // Create tokenizer for stage 3 content
             var tokenProvider = new TokenizedLineProvider();
 
-            // Pass macro comment parameters from Stage2 so that macro call arguments
-            // are correctly tokenized as Comment vs expression
-            tokenProvider.SetMacroCommentParameters(
-                staged.Stage2.MacroCommentParameters,
-                staged.Stage2.MacroParameterOrder,
-                staged.Stage2.MacroBodies);
+            tokenProvider.SetMacroParameters(staged.Stage2.MacroParameterOrder);
 
             tokenProvider.Tokenize(stage3Context.Lines);
 

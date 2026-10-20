@@ -43,7 +43,10 @@ namespace Calcpad.Highlighter.ContentResolution
                     CallSiteLine = stage2.Lines[output.Stage2Line],
                     CallSiteStage2Line = output.Stage2Line,
                     ContentLineIndex = output.ContentIndex,
-                    TotalContentLines = output.ContentCount
+                    TotalContentLines = output.ContentCount,
+                    SourceColumns = output.Origins is { } origins
+                        ? Array.ConvertAll(origins, o => o.Line == output.Stage2Line ? o.Column : -1)
+                        : null
                 };
             }
 
@@ -174,8 +177,65 @@ namespace Calcpad.Highlighter.ContentResolution
                 VariableUsages = variableUsages,
                 VariableIndex = variableIndex,
                 FunctionIndex = functionIndex,
-                MacroIndex = macroIndex
+                MacroIndex = macroIndex,
+                CallSiteExpansions = BuildCallSiteExpansions(outputs, stage2, stage1)
             };
+        }
+
+        /// <summary>
+        /// The expanded lines that carry text from each root-document line: its own macro calls,
+        /// and for a #def body line, its first expansion.
+        /// </summary>
+        private static Dictionary<int, List<CallSiteExpansion>> BuildCallSiteExpansions(
+            List<OutputLine> outputs, Stage2Result stage2, Stage1Result stage1)
+        {
+            var result = new Dictionary<int, List<CallSiteExpansion>>();
+            var firstCall = new Dictionary<int, int>();
+            var byLine = new Dictionary<int, int[]>();
+            foreach (var output in outputs)
+            {
+                if (output.Origins is not { } origins)
+                    continue;
+
+                byLine.Clear();
+                for (var i = 0; i < origins.Length; i++)
+                {
+                    var (stage2Line, stage2Column) = origins[i];
+                    if (stage2Line < 0 || stage2.IncludeMap.GetValueOrDefault(stage2Line)?.Source != "local")
+                        continue;
+
+                    var (line, column) = MapColumnThroughContinuation(
+                        stage2.SourceMap.GetValueOrDefault(stage2Line, stage2Line), stage2Column,
+                        stage1.LineContinuationSegments, stage1.SourceMap);
+                    if (!byLine.TryGetValue(line, out var columns))
+                    {
+                        if (firstCall.TryAdd(line, output.Stage2Line) || firstCall[line] == output.Stage2Line)
+                        {
+                            byLine[line] = columns = new int[origins.Length];
+                            Array.Fill(columns, -1);
+                        }
+                        else
+                            byLine[line] = columns = null;
+                    }
+                    if (columns != null)
+                        columns[i] = column;
+                }
+
+                var callLine = MapColumnThroughContinuation(
+                    stage2.SourceMap.GetValueOrDefault(output.Stage2Line, output.Stage2Line), 0,
+                    stage1.LineContinuationSegments, stage1.SourceMap).OriginalLine;
+                foreach (var (line, columns) in byLine)
+                {
+                    if (columns == null)
+                        continue;
+
+                    if (!result.TryGetValue(line, out var list))
+                        result[line] = list = [];
+
+                    list.Add(new CallSiteExpansion(output.Text, columns, callLine));
+                }
+            }
+            return result;
         }
 
         /// <summary>

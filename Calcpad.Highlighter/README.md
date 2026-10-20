@@ -43,17 +43,17 @@ The Stage 1 lines run through `MacroParser` with a `MacroTrace` attached. The tr
 
 Included files are read from disk, filtered with `MacroParser.FilterIncludedContent` (the same `#local`/`#global` rule the server's include delegate uses, but blanking lines so include line numbers stay exact), and put through Stage 1. A file that can't be found becomes an error comment and processing continues.
 
-Macro metadata comments and *comment parameters* are computed here. Comment parameters are parameters used inside comments, with transitive closure through nested macro calls, so the tokenizer highlights the matching call-site arguments as comments rather than expressions.
+Macro metadata comments are read here. `MacroParser` runs in Debug mode, so each output line carries the source line and column of every character it was built from (`MacroTraceOutputLine.SourceOffsets`).
 
-`Stage2Result` carries `Lines`, `SourceMap`, `IncludeMap`, `PathRoots`, `MacroDefinitions`, `MacroCommentParameters`, `MacroParameterOrder`, `MacroBodies`, `UserDefinedMacros`, and `DuplicateMacros`.
+`Stage2Result` carries `Lines`, `SourceMap`, `IncludeMap`, `PathRoots`, `MacroDefinitions`, `MacroParameterOrder`, `UserDefinedMacros`, and `DuplicateMacros`.
 
 ### Stage 3 — Macro expansion and definition collection
 
-**Phase 1** takes the lines `MacroParser` emitted, with `#def` blocks removed and macros expanded. Expansion metadata maps errors inside expanded content back to the call site. A line whose expansion failed is kept as written.
+**Phase 1** takes the lines `MacroParser` emitted, with `#def` blocks removed and macros expanded. Expansion metadata maps errors back to the call site: to the argument a range came from, or to the whole call line for macro body text. A line whose expansion failed is kept as written.
 
 **Phase 2** tokenizes the expanded content in **Lint** mode to extract variables, functions, custom units (`.unitName`), and command-block functions (`$Inline{}`, `$Block{}`, `$While{}`); builds the `TypeTracker`; and builds symbol indices mapping every name to all its occurrences with source-file info.
 
-`Stage3Result` carries the fully expanded `Lines` plus `MacroExpansions`, `UserDefinedFunctions`/`FunctionsWithParams`, `VariablesWithDefinitions`, `CustomUnits`, `CommandBlockFunctions`, `TypeTracker`, `VariableAssignments`/`VariableUsages`/`VariableReassignments`, and `VariableIndex`/`FunctionIndex`/`MacroIndex`.
+`Stage3Result` carries the fully expanded `Lines` plus `MacroExpansions`, `CallSiteExpansions` (the expanded lines carrying text from each root line, which the tokenizer projects onto macro call arguments), `UserDefinedFunctions`/`FunctionsWithParams`, `VariablesWithDefinitions`, `CustomUnits`, `CommandBlockFunctions`, `TypeTracker`, `VariableAssignments`/`VariableUsages`/`VariableReassignments`, and `VariableIndex`/`FunctionIndex`/`MacroIndex`.
 
 ### Runtime overlay
 

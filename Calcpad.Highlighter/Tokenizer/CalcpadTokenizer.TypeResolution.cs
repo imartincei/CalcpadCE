@@ -23,6 +23,9 @@ namespace Calcpad.Highlighter.Tokenizer
         private IReadOnlyDictionary<string, int> _resolvedVariableLines;
         private RuntimeVariableNames _runtimeNames;
 
+        // The tokenizer whose definitions this one also sees
+        private CalcpadTokenizer _parent;
+
         // Tracks #read keyword in all modes (not just Lint) so the next variable can be
         // recorded as a definition.
         private bool _expectingReadVariable;
@@ -458,20 +461,23 @@ namespace Calcpad.Highlighter.Tokenizer
 
         private bool IsKnownFunction(string name)
         {
-            return CalcpadBuiltIns.Functions.Contains(name) || _definedFunctions.Contains(name);
+            return CalcpadBuiltIns.Functions.Contains(name) || _definedFunctions.Contains(name) ||
+                   _parent?._definedFunctions.Contains(name) == true;
         }
+
+        private bool HasDefaults(string name) =>
+            _functionsWithDefaults.Contains(name) || _parent?._functionsWithDefaults.Contains(name) == true;
 
         /// <summary>
         /// Uses the macros and variables that only exist once includes and macros expand. A
-        /// resolved variable counts as known on lines after its first definition.
+        /// resolved variable counts as known on lines after its first definition, and macro
+        /// call arguments take their tokens from MacroParser's expansion.
         /// </summary>
         /// <param name="runtimeNames">The document's last run, which decides unit names it covers.</param>
         public void SetResolvedContent(StagedResolvedContent staged, RuntimeVariableNames runtimeNames = null)
         {
-            SetMacroCommentParameters(
-                staged.Stage2.MacroCommentParameters,
-                staged.Stage2.MacroParameterOrder,
-                staged.Stage2.MacroBodies);
+            SetMacroParameters(staged.Stage2.MacroParameterOrder);
+            _callSiteExpansions = staged.Stage3.CallSiteExpansions;
             _resolvedVariableLines = staged.Stage3.VariableFirstLines;
             _runtimeNames = runtimeNames;
         }
@@ -488,6 +494,7 @@ namespace Calcpad.Highlighter.Tokenizer
         {
             return _localVariables.Contains(name) ||
                    _definedVariables.Contains(name) ||
+                   _parent?._definedVariables.Contains(name) == true ||
                    CalcpadBuiltIns.CommonConstants.Contains(name) ||
                    _resolvedVariableLines != null &&
                    _resolvedVariableLines.TryGetValue(name, out var line) && line < _state.Line;
@@ -495,7 +502,7 @@ namespace Calcpad.Highlighter.Tokenizer
 
         private bool IsKnownUnit(string name)
         {
-            return _definedUnits.Contains(name) || IsBuiltInUnit(name);
+            return _definedUnits.Contains(name) || _parent?._definedUnits.Contains(name) == true || IsBuiltInUnit(name);
         }
 
         private static bool IsBuiltInUnit(string name)
