@@ -1753,6 +1753,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#pause-in-ui-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        #pause in UI mode
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#diagnostics" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3582,6 +3593,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#pause-in-ui-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        #pause in UI mode
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#diagnostics" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4057,6 +4079,36 @@ Beam$(6m)
     y
 #loop
 </code></pre></div>
+<h2 id="pause-in-ui-mode"><code>#pause</code> in UI mode<a class="headerlink" href="#pause-in-ui-mode" title="Permanent link">&para;</a></h2>
+<p>The input form recalculates the whole document every time a value changes. 
+Put <code>#pause</code> after inputs that come before something slow such as a long loop, a large matrix solve, heavy JavaScript, etc. 
+The form stops there, so editing values stays responsive, and the slow part runs only once the user presses Next.</p>
+<p><code>#pause</code> splits the input form into steps.
+The form calculates down to the first <code>#pause</code> and stops there.
+<strong>Next</strong> continues to the following one, adding the next section below the ones already shown, and <strong>Previous</strong> steps back.
+Earlier inputs stay on screen and can still be changed.</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#</span><span class="nv">UI</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span>
+<span class="k">#</span><span class="nv">UI</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000000</span>
+<span class="k">#pause</span>
+<span class="k">#hide</span>
+<span class="nv">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
+<span class="k">#for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">n</span>
+<span class="w">    </span><span class="nv">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">x</span><span class="o">/</span><span class="nv">i</span><span class="o">^</span><span class="m">2</span>
+<span class="k">#loop</span>
+<span class="k">#</span><span class="nv">end</span><span class="w"> </span><span class="nv">hide</span>
+<span class="nv">s</span>
+</code></pre></div>
+<p>The <strong>Next</strong> and <strong>Previous</strong> buttons appear only when the document has at least one <code>#pause</code>.
+In the desktop and web app they sit in the toolbar beside <strong>Save values</strong>.
+In VS Code, they are arrows in the input form's title bar (beside the save button).</p>
+<p>Outside the input form, <code>#pause</code> is ignored and the whole document is calculated.</p>
+<p>Each step is tied to the <code>#pause</code> it stops at, so the form stays where it is while inputs change:</p>
+<ul>
+<li><strong>Loops:</strong> a <code>#pause</code> inside a loop stops once per pass. If an input lowers the loop count below the pass you are on, the form stops at the first <code>#pause</code> after the loop.</li>
+<li><strong>Conditions:</strong> a <code>#pause</code> in a branch that is not taken is skipped. If flipping an input moves the branch you are on, the form stops at the next <code>#pause</code> that is reached.</li>
+<li><strong>Edits:</strong> editing the source while the form is open keeps the current step, unless a <code>#pause</code> or a loop is added, removed or moved.</li>
+</ul>
+<p>The step is not saved with the values, so the form starts again from the first step when it is reopened.</p>
 <h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
 <p><code>#UI</code> problems are reported under <code>CPD-3415</code> by the linter and also appear at the offending line by the calculation engine when you run the document:</p>
 <table>
