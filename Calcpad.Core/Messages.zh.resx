@@ -298,7 +298,7 @@
   <data name="Inconsistent_units_0_1_2" xml:space="preserve">
     <value>单位不一致： "{0} {1} {2}".</value>
   </data>
-  <data name="Units_cannon_be_raised_to_complex_power" xml:space="preserve">
+  <data name="Units_cannot_be_raised_to_complex_power" xml:space="preserve">
     <value>单位无法计算复数次幂.</value>
   </data>
   <data name="if_block_not_closed_Missing_end_if" xml:space="preserve">
@@ -362,19 +362,16 @@
     <value>宏名称 "{0}" 必须以 "$" 结尾。</value>
   </data>
   <data name="Missing_delimiter_0_in_plot_command" xml:space="preserve">
-    <value>&lt;span class = "err"&gt;绘图命令 "{1}" 中缺少分隔符"{0}".&lt;/span&gt;</value>
+    <value>绘图命令 "{1}" 中缺少分隔符"{0}".</value>
   </data>
   <data name="Missing_0_in_plot_command_1" xml:space="preserve">
-    <value>&lt;span class = "err"&gt;绘图命令 "{1}" 中缺少 {0}.&lt;/span&gt;.</value>
+    <value>绘图命令 "{1}" 中缺少 {0}.</value>
   </data>
   <data name="More_than_one_delimiter_in_plot_command" xml:space="preserve">
-    <value>&lt;span class = "err"&gt;绘图命令 {0} 中有多个分隔符"|".&lt;/span&gt;</value>
+    <value>绘图命令 {0} 中有多个分隔符"|".</value>
   </data>
   <data name="Missing_delimiter_0_in_surface_map_command_1" xml:space="preserve">
-    <value>&lt;span class = "err"&gt;曲面投影命令 "{1}" 中缺少分隔符 "{0}"&lt;/span&gt;</value>
-  </data>
-  <data name="Function_redefined" xml:space="preserve">
-    <value> 警告！函数已重新定义.</value>
+    <value>曲面投影命令 "{1}" 中缺少分隔符 "{0}"</value>
   </data>
   <data name="Raise_to_square" xml:space="preserve">
     <value>求平方</value>

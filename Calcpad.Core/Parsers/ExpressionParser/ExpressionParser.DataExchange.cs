@@ -34,9 +34,9 @@ namespace Calcpad.Core
                     }
                     return ReadCSV(options);
                 }
-                catch (Exception e)
+                catch (Exception e) when (e is not MathParserException)
                 {
-                    throw new MathParserException(e.Message);
+                    throw new MathParserException(e.Message, "CPD-5707", CalcpadErrorKind.Values);
                 }
             }
 
@@ -58,9 +58,9 @@ namespace Calcpad.Core
 
                     return ReadCSVFromString(options, Encoding.UTF8.GetString(bytes, 0, length));
                 }
-                catch (Exception e)
+                catch (Exception e) when (e is not MathParserException)
                 {
-                    throw new MathParserException(e.Message);
+                    throw new MathParserException(e.Message, "CPD-5707", CalcpadErrorKind.Values);
                 }
             }
 
@@ -212,9 +212,9 @@ namespace Calcpad.Core
                     else
                         WriteCSV(options, data);
                 }
-                catch (Exception e)
+                catch (Exception e) when (e is not MathParserException)
                 {
-                    throw new MathParserException(e.Message);
+                    throw new MathParserException(e.Message, "CPD-5707", CalcpadErrorKind.Values);
                 }
             }
 

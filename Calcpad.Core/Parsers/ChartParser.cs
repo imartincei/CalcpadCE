@@ -41,11 +41,11 @@ namespace Calcpad.Core
                     --bracketCount;
             }
             if (index <= 4)
-                return string.Format(Messages.Missing_delimiter_0_in_plot_command, delimiters[index].ToString(), script.ToString());
+                throw Exceptions.MissingPlotDelimiter(delimiters[index], script.ToString());
 
             for (int j = 0; j < n; ++j)
                 if (string.IsNullOrWhiteSpace(input[j]))
-                    return string.Format(Messages.Missing_0_in_plot_command_1, Parts[j], script.ToString());
+                    throw Exceptions.MissingPlotItem(Parts[j], script.ToString());
 
             string result;
             if (calculate)
@@ -60,7 +60,7 @@ namespace Calcpad.Core
                 {
                     var xy = charts[i].Split('|');
                     if (xy.Length > 2)
-                        return string.Format(Messages.More_than_one_delimiter_in_plot_command, script.ToString());
+                        throw Exceptions.MultiplePlotDelimiters(script.ToString());
                     else if (xy.Length > 0)
                     {
                         if (xy.Length == 1)
@@ -110,7 +110,7 @@ namespace Calcpad.Core
             {
                 var xy = s.Split('|');
                 if (xy.Length > 2)
-                    return string.Format(Messages.More_than_one_delimiter_in_plot_command, input[0]);
+                    throw Exceptions.MultiplePlotDelimiters(input[0]);
                 else if (xy.Length > 0)
                 {
                     string sx, sy;

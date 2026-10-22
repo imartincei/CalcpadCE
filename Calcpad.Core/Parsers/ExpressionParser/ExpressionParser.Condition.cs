@@ -21,10 +21,15 @@ namespace Calcpad.Core
             {
                 internal bool Value { get; }
                 internal Types Type { get; }
-                internal Item(bool value, Types type)
+                // Output and source line of the #if or #while that opened the block.
+                internal int Line { get; }
+                internal int SourceLine { get; }
+                internal Item(bool value, Types type, int line = -1, int sourceLine = 0)
                 {
                     Type = type;
                     Value = value;
+                    Line = line;
+                    SourceLine = sourceLine;
                 }
             }
 
@@ -40,15 +45,28 @@ namespace Calcpad.Core
             internal int KeywordLength => _keywordLength;
             internal bool IsLoop => _conditions[_count].Type == Types.While;
 
+            /// <summary>Where the innermost unclosed #if started, if any.</summary>
+            internal (int Line, int SourceLine)? OpenIf
+            {
+                get
+                {
+                    for (var i = Id; i > 0; --i)
+                        if (_conditions[i].Type != Types.While)
+                            return (_conditions[i].Line, _conditions[i].SourceLine);
+
+                    return null;
+                }
+            }
+
             internal Condition()
             {
                 _conditions[0] = new Item(true, Types.None);
                 _keyword = string.Empty;
             }
-            private void Add(bool value)
+            private void Add(bool value, int line, int sourceLine)
             {
                 ++Id;
-                _conditions[Id] = new Item(value, Types.If);
+                _conditions[Id] = new Item(value, Types.If, line, sourceLine);
                 if (IsSatisfied)
                 {
                     ++_count;
@@ -68,10 +86,10 @@ namespace Calcpad.Core
 
             private void Change(bool value, Types type)
             {
-                _conditions[Id] = new Item(value, type);
+                _conditions[Id] = new Item(value, type, _conditions[Id].Line, _conditions[Id].SourceLine);
             }
 
-            internal void SetCondition(int index)
+            internal void SetCondition(int index, int line = -1, int sourceLine = 0)
             {
                 if (index < 0 || index >= (int)Types.While)
                 {
@@ -101,10 +119,10 @@ namespace Calcpad.Core
                 switch (type)
                 {
                     case Types.If:
-                        Add(true);
+                        Add(true, line, sourceLine);
                         break;
                     case Types.While:
-                        _conditions[++Id] = new Item(true, type);
+                        _conditions[++Id] = new Item(true, type, line, sourceLine);
                         ++_count;
                         break;
                     case Types.ElseIf:

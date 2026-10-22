@@ -313,8 +313,8 @@
   <data name="Inconsistent_units_0_1_2" xml:space="preserve">
         <value>Inconsistent units: "{0} {1} {2}".</value>
     </data>
-  <data name="Units_cannon_be_raised_to_complex_power" xml:space="preserve">
-        <value>Units cannon be raised to complex power.</value>
+  <data name="Units_cannot_be_raised_to_complex_power" xml:space="preserve">
+        <value>Units cannot be raised to complex power.</value>
     </data>
   <data name="Cannot_evaluate_remainder_0_1_The_denominator_must_be_unitless" xml:space="preserve">
         <value>Cannot evaluate remainder: "{0}  ⦼  {1}". The denominator must be unitless.</value>
@@ -386,19 +386,16 @@
         <value>Macro name "{0}" must end with "$".</value>
     </data>
   <data name="Missing_delimiter_0_in_plot_command" xml:space="preserve">
-        <value>&lt;span class = "err"&gt;Missing delimiter "{0}" in plot command "{1}".&lt;/span&gt;</value>
+        <value>Missing delimiter "{0}" in plot command "{1}".</value>
     </data>
   <data name="Missing_0_in_plot_command_1" xml:space="preserve">
-        <value>&lt;span class = "err"&gt;Missing {0} in plot command "{1}".&lt;/span&gt;.</value>
+        <value>Missing {0} in plot command "{1}".</value>
     </data>
   <data name="More_than_one_delimiter_in_plot_command" xml:space="preserve">
-        <value>&lt;span class = "err"&gt;More than one delimiter "|" in plot command {0}.&lt;/span&gt;</value>
+        <value>More than one delimiter "|" in plot command {0}.</value>
     </data>
   <data name="Missing_delimiter_0_in_surface_map_command_1" xml:space="preserve">
-        <value>&lt;span class = "err"&gt;Missing delimiter "{0}" in surface map command "{1}".&lt;/span&gt;</value>
-    </data>
-  <data name="Function_redefined" xml:space="preserve">
-        <value> Warning! Function redefined.</value>
+        <value>Missing delimiter "{0}" in surface map command "{1}".</value>
     </data>
   <data name="Raise_to_square" xml:space="preserve">
     <value>Raise to square</value>

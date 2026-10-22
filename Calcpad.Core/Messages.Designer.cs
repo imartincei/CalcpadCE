@@ -547,15 +547,6 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to  Warning! Function redefined..
-        // / </summary>
-        public static string Function_redefined {
-            get {
-                return ResourceManager.GetString("Function_redefined", resourceCulture);
-            }
-        }
-
-        // / <summary>
         // /   Looks up a localized string similar to Error: &quot;#if&quot; block not closed. Missing &quot;#end if&quot;..
         // / </summary>
         public static string if_block_not_closed_Missing_end_if {
@@ -1042,7 +1033,7 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to &lt;span class = &quot;err&quot;&gt;Missing {0} in plot command &quot;{1}&quot;.&lt;/span&gt;..
+        // /   Looks up a localized string similar to Missing {0} in plot command &quot;{1}&quot;..
         // / </summary>
         public static string Missing_0_in_plot_command_1 {
             get {
@@ -1060,7 +1051,7 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to &lt;span class = &quot;err&quot;&gt;Missing delimiter &quot;{0}&quot; in plot command &quot;{1}&quot;.&lt;/span&gt;.
+        // /   Looks up a localized string similar to Missing delimiter &quot;{0}&quot; in plot command &quot;{1}&quot;..
         // / </summary>
         public static string Missing_delimiter_0_in_plot_command {
             get {
@@ -1078,7 +1069,7 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to &lt;span class = &quot;err&quot;&gt;Missing delimiter &quot;{0}&quot; in surface map command &quot;{1}&quot;.&lt;/span&gt;.
+        // /   Looks up a localized string similar to Missing delimiter &quot;{0}&quot; in surface map command &quot;{1}&quot;..
         // / </summary>
         public static string Missing_delimiter_0_in_surface_map_command_1 {
             get {
@@ -1195,7 +1186,7 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to &lt;span class = &quot;err&quot;&gt;More than one delimiter &quot;|&quot; in plot command {0}.&lt;/span&gt;.
+        // /   Looks up a localized string similar to More than one delimiter &quot;|&quot; in plot command {0}..
         // / </summary>
         public static string More_than_one_delimiter_in_plot_command {
             get {
@@ -1636,11 +1627,11 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to Units cannon be raised to complex power..
+        // /   Looks up a localized string similar to Units cannot be raised to complex power..
         // / </summary>
-        public static string Units_cannon_be_raised_to_complex_power {
+        public static string Units_cannot_be_raised_to_complex_power {
             get {
-                return ResourceManager.GetString("Units_cannon_be_raised_to_complex_power", resourceCulture);
+                return ResourceManager.GetString("Units_cannot_be_raised_to_complex_power", resourceCulture);
             }
         }
 

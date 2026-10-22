@@ -38,7 +38,7 @@ namespace Calcpad.Core
             if (++_htmlLines == MaxHtmlLines)
             {
                 FlushMarkdown();
-                AppendError(line.ToString(), string.Format(Messages.The_output_is_longer_than_0_lines_The_rest_will_be_skipped, MaxHtmlLines), _currentLine);
+                AppendError(line.ToString(), string.Format(Messages.The_output_is_longer_than_0_lines_The_rest_will_be_skipped, MaxHtmlLines), _currentLine, "CPD-5906", CalcpadErrorKind.Values);
                 return;
             }
 
@@ -48,7 +48,7 @@ namespace Calcpad.Core
                 {
                     _htmlLines = MaxHtmlLines;
                     FlushMarkdown();
-                    AppendError(line.ToString(), string.Format(Messages.The_output_is_longer_than_0_lines_The_rest_will_be_skipped, MaxHtmlLines), _currentLine);
+                    AppendError(line.ToString(), string.Format(Messages.The_output_is_longer_than_0_lines_The_rest_will_be_skipped, MaxHtmlLines), _currentLine, "CPD-5906", CalcpadErrorKind.Values);
                     return;
                 }
 

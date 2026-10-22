@@ -315,11 +315,17 @@ export enum CalcpadTypeId {
 
 export type CalcpadErrorSource = 'Macro' | 'Expression';
 
+/** What an error depends on: Syntax, Structure, Names (order and branches) or Values. */
+export type CalcpadErrorKind = 'Syntax' | 'Structure' | 'Names' | 'Values';
+
 export interface CalcpadError {
     sourceLine: number;
     outputLine: number;
     message: string;
     source: CalcpadErrorSource;
+    /** CPD-xxxx code, shared with the linter where both report the same problem. */
+    code?: string;
+    kind?: CalcpadErrorKind;
 }
 
 export interface ConvertResult {

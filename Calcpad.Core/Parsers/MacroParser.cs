@@ -404,6 +404,8 @@ namespace Calcpad.Core
                         OutputLine = _parsedLineNumber + 1,
                         Message = message,
                         Source = CalcpadErrorSource.Macro,
+                        Code = "CPD-2206",
+                        Kind = CalcpadErrorKind.Structure
                     });
                 }
             }
@@ -783,6 +785,8 @@ namespace Calcpad.Core
                     OutputLine = _parsedLineNumber,
                     Message = errorMessage,
                     Source = CalcpadErrorSource.Macro,
+                    Code = code,
+                    Kind = CalcpadErrorKind.Structure
                 });
             }
 

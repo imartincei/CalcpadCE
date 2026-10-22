@@ -535,16 +535,19 @@ namespace Calcpad.Core
                     if (e.Message.Contains("%F"))
                     {
                         var s = e.Message.Replace("%F", _items[0].Input).Replace("%V", _items[1].Input);
-                        throw new MathParserException(s);
+                        throw new MathParserException(s, e.Code, e.Kind);
                     }
                     throw;
+                }
+                finally
+                {
+                    --_parser._isSolver;
                 }
                 if (_type == SolverTypes.Sup || _type == SolverTypes.Inf)
                 {
                     var s = _items[1].Input + (_type == SolverTypes.Sup ? "_sup" : "_inf");
                     _parser.SetVariable(s, (RealValue)_var.Value);
                 }
-                --_parser._isSolver;
 
                 if (double.IsNaN(d) && !_parser.IsPlotting)
                     throw Exceptions.NoSolution(ToString());

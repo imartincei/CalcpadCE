@@ -43,7 +43,7 @@ namespace Calcpad.Core
                     --bracketCount;
             }
             if (index <= n)
-                return string.Format(Messages.Missing_delimiter_0_in_surface_map_command_1, delimiters[index].ToString(), script.ToString());
+                throw Exceptions.MissingMapDelimiter(delimiters[index], script.ToString());
 
             for (int i = 0; i < n; ++i)
             {

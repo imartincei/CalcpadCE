@@ -181,7 +181,7 @@ namespace Calcpad.Core
                 {
                     var rawPath = $"{Path}.{Ext}";
                     if (pathRoots != null && !pathRoots.TryExpand(rawPath, out rawPath, out var tokenError))
-                        throw new MathParserException(tokenError);
+                        throw new MathParserException(tokenError, "CPD-1106", CalcpadErrorKind.Syntax);
 
                     var path = Environment.ExpandEnvironmentVariables(rawPath);
                     FullPath = sourceDir != null

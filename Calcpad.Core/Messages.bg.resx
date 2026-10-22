@@ -301,7 +301,7 @@
   <data name="Inconsistent_units_0_1_2" xml:space="preserve">
         <value>Несъвместими мерни единици: "{0} {1} {2}".</value>
     </data>
-  <data name="Units_cannon_be_raised_to_complex_power" xml:space="preserve">
+  <data name="Units_cannot_be_raised_to_complex_power" xml:space="preserve">
         <value>Не мога да повдигна мерни единици на комплексна степен.</value>
     </data>
   <data name="if_block_not_closed_Missing_end_if" xml:space="preserve">
@@ -365,19 +365,16 @@
         <value>Името на макрос "{0}" трябва да завършва с "$".</value>
     </data>
   <data name="Missing_delimiter_0_in_plot_command" xml:space="preserve">
-        <value>&lt;span class = "err"&gt;Липсва разделител "{0}" в команда за графика "{1}".&lt;/span&gt;</value>
+        <value>Липсва разделител "{0}" в команда за графика "{1}".</value>
     </data>
   <data name="Missing_0_in_plot_command_1" xml:space="preserve">
-        <value>&lt;span class = "err"&gt;Липсва {0} в команда за графика "{1}".&lt;/span&gt;.</value>
+        <value>Липсва {0} в команда за графика "{1}".</value>
     </data>
   <data name="More_than_one_delimiter_in_plot_command" xml:space="preserve">
-        <value>&lt;span class = "err"&gt;Разделителите "|" са повече от един в команда за графика {0}.&lt;/span&gt;</value>
+        <value>Разделителите "|" са повече от един в команда за графика {0}.</value>
     </data>
   <data name="Missing_delimiter_0_in_surface_map_command_1" xml:space="preserve">
-        <value>&lt;span class = "err"&gt;Липсва разделител "{0}" в команда за 2D графика "{1}".&lt;/span&gt;</value>
-    </data>
-  <data name="Function_redefined" xml:space="preserve">
-        <value> Внимание! Функцията е предефинирана.</value>
+        <value>Липсва разделител "{0}" в команда за 2D графика "{1}".</value>
     </data>
   <data name="Raise_to_square" xml:space="preserve">
     <value>Степенуване</value>

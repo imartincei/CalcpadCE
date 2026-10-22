@@ -219,7 +219,7 @@ namespace Calcpad.Core
                         break;
                     }
                     if (iter == 30)
-                        throw new MathParserException("no convergence in 30 SVD iterations.");
+                        throw new MathParserException("no convergence in 30 SVD iterations.", "CPD-5536", CalcpadErrorKind.Values);
 
                     var x = sig[l];
                     nm = k - 1;

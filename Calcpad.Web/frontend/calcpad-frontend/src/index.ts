@@ -26,6 +26,7 @@ export type {
     PrettifyResponse,
     CalcpadError,
     CalcpadErrorSource,
+    CalcpadErrorKind,
     ConvertResult,
     UiConvertOptions,
     ExportVariant,

@@ -111,7 +111,7 @@ namespace Calcpad.Core
                 SymmetricMatrixVectorProduct(p, Ap);
                 var pAp = Vectorized.DotProduct(p, Ap, 0, n);
                 if (Math.Abs(pAp) < 1e-15) // Check for numerical stability
-                    throw new MathParserException(Messages.TheMatrixIsIllConditioned);
+                    throw new MathParserException(Messages.TheMatrixIsIllConditioned, "CPD-5534", CalcpadErrorKind.Values);
 
                 var alpha = rz_old / pAp;
                 Vectorized.MultiplyAdd(p, alpha, x);    // x = x + alpha * p
@@ -124,7 +124,7 @@ namespace Calcpad.Core
                 rz_old = rznew;
             }
             if (iter == maxIterations)
-                throw new MathParserException(string.Format(Messages.ThePCGSolverFailedToConvergeIn_0_Iterations, maxIterations));
+                throw new MathParserException(string.Format(Messages.ThePCGSolverFailedToConvergeIn_0_Iterations, maxIterations), "CPD-5535", CalcpadErrorKind.Values);
         }
 
         private void SymmetricMatrixVectorProduct(double[] x, double[] y)

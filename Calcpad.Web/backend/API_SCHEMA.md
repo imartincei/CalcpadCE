@@ -133,12 +133,14 @@ Array<{
   outputLine: number;
   message: string;
   source: "Macro" | "Expression";
+  code: string;                 // CPD-xxxx, shared with /lint where both report the same problem
+  kind: "Syntax" | "Structure" | "Names" | "Values";
 }>
 ```
 
 The header is listed in the CORS policy's exposed headers, so a browser client can read it.
 
-A render with line anchors (`includeLineAnchors`, on by default for anything but print) also records what the calculation executed and sets `X-Calcpad-Trace: 1`. `/lint`, `/definitions`, `/highlight` and `/symbol-at-position` requests for the same `content` and `sourceFilePath` then use it: variable types come from the run, and lines the run never reached (an untaken `#if` branch) skip type checks. A client should refetch lint, definitions and highlighting when it sees the header. Until then, or for any other content, those endpoints use static inference.
+A render with line anchors (`includeLineAnchors`, on by default for anything but print) also records what the calculation executed and sets `X-Calcpad-Trace: 1`. `/lint`, `/definitions`, `/highlight` and `/symbol-at-position` requests for the same `content` and `sourceFilePath` then use it: variable types come from the run. A client should refetch lint, definitions and highlighting when it sees the header. Until then, or for any other content, those endpoints use static inference.
 
 `/highlight` also keeps the variable names of a document's last run, per `sourceFilePath`, after its content changes. A unit-named identifier such as `a` (are) is then a variable only where Core would read one: a definition in a branch the run skipped leaves the unit, while a definition added since the run counts at once. A document with no `sourceFilePath` gets this only when `/convert` and `/highlight` both send the same `documentId`, which should be unique to that document.
 
@@ -561,6 +563,114 @@ interface LintDiagnostic {
 | CPD-3419 | Semantic | Deprecated stored input value |
 | **Stage 3: Format (CPD-36xx)** |||
 | CPD-3601 | Format | Invalid format specifier |
+| **Core runtime and check pass (CPD-5xxx)** |||
+| CPD-5101 | Syntax | Cannot evaluate literal |
+| CPD-5102 | Syntax | Expression is empty |
+| CPD-5103 | Syntax | Missing operand |
+| CPD-5104 | Syntax | Cannot evaluate as type |
+| CPD-5105 | Syntax | Invalid expression (stack leak) |
+| CPD-5106 | Syntax | Invalid expression (empty stack) |
+| CPD-5107 | Syntax | Undefined input field |
+| CPD-5108 | Syntax | Cannot parse number |
+| CPD-5109 | Syntax | More than one assignment |
+| CPD-5110 | Syntax | Unexpected delimiter |
+| CPD-5111 | Syntax | Missing delimiter in function definition |
+| CPD-5112 | Syntax | Duplicate keyword argument in a function call |
+| CPD-5113 | Syntax | Missing item in a $Plot or $Map command |
+| CPD-5120 | Syntax | More than one delimiter in a plot command |
+| CPD-5114 | Syntax | Bracket mismatch |
+| CPD-5115 | Syntax | Function definition inside a solver block |
+| CPD-5116 | Syntax | Missing file name |
+| CPD-5117 | Syntax | Invalid data type |
+| CPD-5118 | Syntax | Missing matrix index |
+| CPD-5119 | Syntax | Invalid number of indexes |
+| CPD-5201 | Structure | Condition cannot be empty |
+| CPD-5202 | Structure | Duplicate #else |
+| CPD-5203 | Structure | #else if after #else |
+| CPD-5301 | Names | Cannot evaluate as a function |
+| CPD-5302 | Names | Cannot evaluate as a function or operator |
+| CPD-5303 | Names | Cannot redefine existing units |
+| CPD-5304 | Names | Right side must be constant |
+| CPD-5305 | Names | Recursion not allowed in function definition |
+| CPD-5306 | Names | Circular function reference |
+| CPD-5401 | Values | Power must be unitless |
+| CPD-5402 | Values | Right side does not evaluate to units |
+| CPD-5403 | Values | Inconsistent units |
+| CPD-5404 | Values | Invalid units for function |
+| CPD-5405 | Values | Root index must be unitless |
+| CPD-5406 | Values | Root index cannot be complex |
+| CPD-5407 | Values | Root index must be an integer greater than 1 |
+| CPD-5408 | Values | Factorial argument out of range |
+| CPD-5409 | Values | Factorial argument must be unitless |
+| CPD-5410 | Values | Factorial argument must be a positive integer |
+| CPD-5411 | Values | Factorial argument cannot be complex |
+| CPD-5412 | Values | Remainder denominator must be unitless |
+| CPD-5413 | Values | Both values must be integers |
+| CPD-5414 | Values | Calculated units inconsistent with target units |
+| CPD-5415 | Values | Inconsistent units for assigned value |
+| CPD-5416 | Values | Inconsistent units for assigned value |
+| CPD-5417 | Values | Result is not a real number |
+| CPD-5418 | Values | Argument out of range |
+| CPD-5419 | Values | Condition cannot be complex |
+| CPD-5420 | Values | Condition result is invalid |
+| CPD-5421 | Values | Plot limits are identical |
+| CPD-5422 | Values | Inconsistent units in operation |
+| CPD-5423 | Values | Units raised to a complex power |
+| CPD-5424 | Values | Cannot evaluate remainder |
+| CPD-5501 | Values | Index out of range |
+| CPD-5502 | Values | Cannot assign vector to scalar |
+| CPD-5503 | Values | Value must be scalar |
+| CPD-5504 | Values | Value must be real |
+| CPD-5505 | Values | Value must be a positive integer |
+| CPD-5506 | Values | Value must be a matrix |
+| CPD-5507 | Values | Value must be a vector |
+| CPD-5508 | Values | Step cannot be zero |
+| CPD-5509 | Values | Vector size limit exceeded |
+| CPD-5510 | Values | Cross product needs 2 or 3 element vectors |
+| CPD-5511 | Values | Function not defined in complex mode |
+| CPD-5512 | Values | Matrix dimensions do not match |
+| CPD-5513 | Values | Matrix must be square |
+| CPD-5514 | Values | Lp norm needs p >= 1 |
+| CPD-5515 | Values | Matrix must be symmetric |
+| CPD-5516 | Values | Matrix is not positive definite |
+| CPD-5517 | Values | Matrix is singular |
+| CPD-5518 | Values | Matrix is singular or close to singular |
+| CPD-5519 | Values | Vectors and matrices not supported in complex mode |
+| CPD-5520 | Values | Cannot interpolate with a non-scalar value |
+| CPD-5521 | Values | Jacobi iteration failed |
+| CPD-5522 | Values | Invalid operand |
+| CPD-5523 | Values | Invalid argument |
+| CPD-5524 | Values | Argument is not an eigenvalue |
+| CPD-5525 | Values | QL algorithm failed to converge |
+| CPD-5526 | Values | Matrix size limit exceeded |
+| CPD-5527 | Values | Embedded data size limit exceeded |
+| CPD-5528 | Values | Datagrid size limit exceeded |
+| CPD-5529 | Values | Matrix needs at least as many rows as columns |
+| CPD-5530 | Values | Variable is not a matrix |
+| CPD-5531 | Values | Value must be a high-performance matrix |
+| CPD-5532 | Values | Value must be a high-performance vector |
+| CPD-5533 | Values | FFT input needs one or two rows |
+| CPD-5534 | Values | Matrix is ill-conditioned |
+| CPD-5535 | Values | PCG solver failed to converge |
+| CPD-5536 | Values | SVD failed to converge |
+| CPD-5601 | Values | Cannot evaluate the function for the solver variable |
+| CPD-5602 | Values | Function not defined for the solver variable |
+| CPD-5603 | Values | Solver limits out of range |
+| CPD-5604 | Values | No solution |
+| CPD-5701 | Values | Cannot write PNG file |
+| CPD-5702 | Values | Cannot write SVG file |
+| CPD-5703 | Values | Cannot convert PNG to Base64 |
+| CPD-5704 | Values | File not found |
+| CPD-5705 | Values | Path not found |
+| CPD-5706 | Values | File format not supported |
+| CPD-5707 | Values | Cannot read or write data file |
+| CPD-5900 | Values | Unexpected error |
+| CPD-5901 | Values | Interrupted by user |
+| CPD-5902 | Values | Calculations not active |
+| CPD-5903 | Values | Possibly infinite loop |
+| CPD-5904 | Values | Too many errors |
+| CPD-5905 | Values | Iteration limit exceeded |
+| CPD-5906 | Values | Output too long |
 
 **Example Request:**
 ```json

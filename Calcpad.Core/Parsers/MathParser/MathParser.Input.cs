@@ -960,8 +960,8 @@ namespace Calcpad.Core
             private int AddSolver(string script, SolverBlock.SolverTypes st)
             {
                 ++_parser._isSolver;
-                _solveBlocks.Add(new SolverBlock(script, st, _parser));
-                --_parser._isSolver;
+                try { _solveBlocks.Add(new SolverBlock(script, st, _parser)); }
+                finally { --_parser._isSolver; }
                 return _solveBlocks.Count - 1;
             }
 

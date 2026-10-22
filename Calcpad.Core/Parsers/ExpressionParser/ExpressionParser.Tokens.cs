@@ -102,7 +102,7 @@ namespace Calcpad.Core
         private string ExpandImages(string html, int line) =>
             html.Contains("<img", StringComparison.OrdinalIgnoreCase)
                 ? ImageReferences.ExpandSources(html, _pathRoots, SourceDirectory,
-                    error => AppendError(html, error, line))
+                    error => AppendError(html, error, line, "CPD-1106", CalcpadErrorKind.Syntax))
                 : html;
 
         private void ExpandImageSources(List<Token> tokens)

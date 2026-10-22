@@ -142,7 +142,10 @@ CPD-32xx: Stage 3 - Naming (variable/function names)
 CPD-33xx: Stage 3 - Usage (undefined identifiers)
 CPD-34xx: Stage 3 - Semantic (operators, commands)
 CPD-35xx: Stage 3 - Function type checking
+CPD-5xxx: Core errors (51 syntax, 52 structure, 53 names, 54 values, 55 matrices, 56 solvers, 57 files, 59 other)
 ```
+
+Core errors that match a lint check reuse its code (`MathParserException.Code`), so one LintIgnore covers both.
 
 Most CPD-11xx/22xx codes and the macro-call codes (CPD-3303, 3304, 3314, 3316, 3317) are set by Core's
 `MacroParser` (`MacroTraceError.Code`), not by a Highlighter validator. `MacroValidator` only reports them.

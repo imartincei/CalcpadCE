@@ -14,7 +14,7 @@
           @contextmenu.prevent.stop="openContextMenu($event, err)"
         >
           <span class="error-icon">✕</span>
-          <span class="error-source">{{ err.source }}</span>
+          <span class="error-source">{{ err.code ?? err.source }}</span>
           <span class="error-message">{{ err.message }}</span>
           <span class="error-location">Ln {{ err.sourceLine }}</span>
         </div>
@@ -64,7 +64,7 @@ const contextMenu = ref<ErrorContextMenu | null>(null)
 
 /** Matches the Problems panel's format. */
 const formatError = (err: CalcpadError): string =>
-  `[Ln ${err.sourceLine}] ${err.source}: ${err.message}`
+  `[Ln ${err.sourceLine}] ${err.code ?? err.source}: ${err.message}`
 
 const openContextMenu = (e: MouseEvent, error: CalcpadError | null) => {
   contextMenu.value = { x: e.clientX, y: e.clientY, error }

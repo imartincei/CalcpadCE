@@ -64,7 +64,7 @@ namespace Calcpad.Core
                 var braceEnd = s.IndexOf('}');
                 if (braceEnd < 0)
                 {
-                    AppendError(s.ToString(), Messages.Improper_format_for_UI_keyword_Missing_closing_brace, _currentLine);
+                    AppendError(s.ToString(), Messages.Improper_format_for_UI_keyword_Missing_closing_brace, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
                     _uiSkipChars = s.Length;
                     return KeywordResult.None;
                 }
@@ -74,7 +74,7 @@ namespace Calcpad.Core
                 }
                 catch (JsonException)
                 {
-                    AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, UiKeyword), _currentLine);
+                    AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, UiKeyword), _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
                     _uiSkipChars = SkipSpaces(s, UiKeyword.Length);
                     return KeywordResult.None;
                 }
@@ -87,7 +87,7 @@ namespace Calcpad.Core
             if (errors.Count > 0)
             {
                 foreach (var error in errors)
-                    AppendError(s.ToString(), error.Message, _currentLine);
+                    AppendError(s.ToString(), error.Message, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
 
                 return KeywordResult.None;
             }
@@ -99,25 +99,25 @@ namespace Calcpad.Core
             {
                 if (assignment.Name.EndsWith('$'))
                 {
-                    AppendError(s.ToString(), Messages.Only_numbers_are_supported_by_the_UI_keyword, _currentLine);
+                    AppendError(s.ToString(), Messages.Only_numbers_are_supported_by_the_UI_keyword, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
                     return KeywordResult.None;
                 }
                 var type = UiSyntax.ResolveType(properties.Type, assignment.Rhs);
                 if (!UiSyntax.IsValue(assignment.Rhs, type, properties.AllowsExpression))
                 {
-                    AppendError(s.ToString(), Messages.UI_expressions_require_allowExpression, _currentLine);
+                    AppendError(s.ToString(), Messages.UI_expressions_require_allowExpression, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
                     return KeywordResult.None;
                 }
                 if (UiSyntax.TypeMismatch(properties.Type, assignment.Rhs, properties.AllowsExpression) is { } mismatch)
                 {
-                    AppendError(s.ToString(), mismatch, _currentLine);
+                    AppendError(s.ToString(), mismatch, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
                     return KeywordResult.None;
                 }
                 var typeErrors = properties.ValidateResolvedType(type);
                 if (typeErrors.Count > 0)
                 {
                     foreach (var error in typeErrors)
-                        AppendError(s.ToString(), error.Message, _currentLine);
+                        AppendError(s.ToString(), error.Message, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
 
                     return KeywordResult.None;
                 }
@@ -160,7 +160,7 @@ namespace Calcpad.Core
             if (_lineUiControls.Count == 0)
             {
                 _lineUiControls = null;
-                AppendError(s.ToString(), Messages.The_UI_keyword_requires_a_variable_assignment, _currentLine);
+                AppendError(s.ToString(), Messages.The_UI_keyword_requires_a_variable_assignment, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
             }
             return KeywordResult.None;
         }
