@@ -13,86 +13,10 @@ namespace Calcpad.Highlighter.Linter.Helpers
     {
         /// <summary>
         /// Parses a semicolon-separated parameter string, ignoring semicolons inside parentheses,
-        /// braces and brackets and preserving empty parameters. When <paramref name="lineTokens"/>
-        /// and <paramref name="tokenGroups"/> are both provided, also partitions the line's tokens
-        /// into per-parameter groups on the same boundaries, with <paramref name="paramStartCol"/>
-        /// the column just inside the opening paren.
+        /// braces and brackets and preserving empty parameters.
         /// </summary>
-        public static List<string> ParseParameters(string paramsStr,
-            List<Token> lineTokens = null, int paramStartCol = 0,
-            List<List<Token>> tokenGroups = null)
-        {
-            if (string.IsNullOrWhiteSpace(paramsStr))
-                return new List<string>();
-
-            if (lineTokens == null || tokenGroups == null)
-                return SplitByDelimiter(paramsStr, ';');
-
-            // Split the string and record column boundaries for each segment
-            var parameters = new List<string>();
-            var boundaries = new List<(int startCol, int endCol)>();
-            var span = paramsStr.AsSpan();
-            int segStart = 0;
-            int parenDepth = 0, braceDepth = 0, bracketDepth = 0;
-
-            for (int i = 0; i < span.Length; i++)
-            {
-                var c = span[i];
-                if (c == '(') parenDepth++;
-                else if (c == ')') parenDepth--;
-                else if (c == '{') braceDepth++;
-                else if (c == '}') braceDepth--;
-                else if (c == '[') bracketDepth++;
-                else if (c == ']') bracketDepth--;
-
-                if (c == ';' && parenDepth == 0 && braceDepth == 0 && bracketDepth == 0)
-                {
-                    parameters.Add(span[segStart..i].Trim().ToString());
-                    boundaries.Add((paramStartCol + segStart, paramStartCol + i));
-                    segStart = i + 1;
-                }
-            }
-
-            if (segStart < span.Length || parameters.Count > 0)
-            {
-                parameters.Add(span[segStart..].Trim().ToString());
-                boundaries.Add((paramStartCol + segStart, paramStartCol + span.Length));
-            }
-
-            // Partition tokens into groups using the column boundaries.
-            // Both tokens and boundaries are sorted by column, so merge in one pass.
-            int bIdx = 0;
-            var group = new List<Token>();
-
-            foreach (var token in lineTokens)
-            {
-                if (bIdx >= boundaries.Count)
-                    break;
-
-                if (token.Column < boundaries[bIdx].startCol)
-                    continue;
-
-                while (bIdx < boundaries.Count && token.Column >= boundaries[bIdx].endCol)
-                {
-                    tokenGroups.Add(group);
-                    group = new List<Token>();
-                    bIdx++;
-                }
-
-                if (bIdx < boundaries.Count && token.Column >= boundaries[bIdx].startCol &&
-                    token.Column < boundaries[bIdx].endCol)
-                {
-                    group.Add(token);
-                }
-            }
-
-            if (bIdx < boundaries.Count)
-                tokenGroups.Add(group);
-            while (tokenGroups.Count < parameters.Count)
-                tokenGroups.Add(new List<Token>());
-
-            return parameters;
-        }
+        public static List<string> ParseParameters(string paramsStr) =>
+            string.IsNullOrWhiteSpace(paramsStr) ? new List<string>() : SplitByDelimiter(paramsStr, ';');
 
         /// <summary>
         /// Counts the parameters in a semicolon-separated string, ignoring semicolons inside
@@ -123,43 +47,6 @@ namespace Calcpad.Highlighter.Linter.Helpers
                     count++;
             }
             return count;
-        }
-
-        /// <summary>
-        /// Parses macro call arguments using span-based index tracking.
-        /// For macros, only parentheses are considered for nesting.
-        /// </summary>
-        public static List<string> ParseMacroParameters(string paramsStr)
-        {
-            if (string.IsNullOrWhiteSpace(paramsStr))
-                return new List<string> { string.Empty };
-
-            var result = new List<string>();
-            var span = paramsStr.AsSpan();
-            int segStart = 0;
-            int parenDepth = 0;
-
-            for (int i = 0; i < span.Length; i++)
-            {
-                var c = span[i];
-
-                if (c == '(') parenDepth++;
-                else if (c == ')') parenDepth--;
-
-                if (c == ';' && parenDepth == 0)
-                {
-                    result.Add(span[segStart..i].Trim().ToString());
-                    segStart = i + 1;
-                }
-            }
-
-            // Add the last parameter
-            if (segStart < span.Length || result.Count > 0)
-            {
-                result.Add(span[segStart..].Trim().ToString());
-            }
-
-            return result;
         }
 
         /// <summary>

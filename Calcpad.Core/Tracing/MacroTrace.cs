@@ -94,5 +94,8 @@ namespace Calcpad.Core
     /// <param name="Name">The path as written, with path tokens expanded.</param>
     public readonly record struct MacroTraceInclude(string Path, string Name, int RootLine);
 
-    public readonly record struct MacroTraceError(int SourceIndex, string Message);
+    /// <param name="Code">Linter code (CPD-xxxx) for the error.</param>
+    /// <param name="Start">Offset of the error's first character for <see cref="MacroTrace.TryLocate"/>, or -1.</param>
+    /// <param name="End">Offset past the error's last character, or -1.</param>
+    public readonly record struct MacroTraceError(int SourceIndex, string Message, string Code, int Start = -1, int End = -1);
 }

@@ -125,12 +125,8 @@ namespace Calcpad.Highlighter.ContentResolution
         public string Description { get; set; }
     }
 
-    public class DuplicateMacro
-    {
-        public string Name { get; set; }
-        public int DuplicateLineNumber { get; set; }
-        public int OriginalLineNumber { get; set; }
-    }
+    /// <summary>An error MacroParser reported, on a Stage 2 line.</summary>
+    public readonly record struct MacroError(int Line, int Column, int EndColumn, string Code, string Message);
 
     public class MacroInfo
     {
@@ -234,7 +230,6 @@ namespace Calcpad.Highlighter.ContentResolution
         public List<VariableDefinition> VariablesWithDefinitions { get; set; }
         public List<CustomUnitDefinition> CustomUnits { get; set; }
         public List<MacroDefinition> AllMacros { get; set; }
-        public List<DuplicateMacro> DuplicateMacros { get; set; }
     }
 
     /// <summary>
@@ -274,7 +269,7 @@ namespace Calcpad.Highlighter.ContentResolution
         public Dictionary<int, int> SourceMap { get; set; }
         public Dictionary<int, SourceInfo> IncludeMap { get; set; }
         public List<MacroDefinition> MacroDefinitions { get; set; }
-        public List<DuplicateMacro> DuplicateMacros { get; set; }
+        public List<MacroError> Errors { get; set; }
 
         /// <summary>
         /// The `#ProjectPath`/`#LibraryPath` roots declared anywhere in the root file or its

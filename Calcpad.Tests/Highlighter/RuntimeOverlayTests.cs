@@ -23,31 +23,6 @@ namespace Calcpad.Tests.Highlighter
             return withTrace ? ContentResolver.ApplyRuntimeTrace(staged, RunCore(source)) : staged;
         }
 
-        private static LinterDiagnostic[] TypeWarnings(string source, bool withTrace) =>
-            new CalcpadLinter().Lint(Resolve(source, withTrace)).Diagnostics
-                .Where(d => d.Code == "CPD-3309").ToArray();
-
-        [Fact]
-        public void OnlyTheTakenBranch_IsTypeChecked()
-        {
-            const string source = "a = 5\n#if a > 10\nn = len(a)\n#else\nm = len(a)\n#end if";
-            // Static inference can't type a literal, so it has nothing to check.
-            Assert.Empty(TypeWarnings(source, withTrace: false));
-
-            var warning = Assert.Single(TypeWarnings(source, withTrace: true));
-            Assert.Equal(4, warning.Line);
-        }
-
-        [Fact]
-        public void Redefinition_IsTypedPerLine()
-        {
-            const string source = "x = 5\nn = len(x)\nx = [1; 2; 3]\nm = len(x)";
-            Assert.Empty(TypeWarnings(source, withTrace: false));
-
-            var warning = Assert.Single(TypeWarnings(source, withTrace: true));
-            Assert.Equal(1, warning.Line);
-        }
-
         [Fact]
         public void TypeChanges_StartOnTheirAssignmentLines()
         {

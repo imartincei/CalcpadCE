@@ -235,9 +235,6 @@ namespace Calcpad.Core
         internal static MathParserException CircularReference(string name) =>
             new(string.Format(Messages.Circular_reference_detected_for_function_0, name));
 
-        internal static MathParserException CircularMacroReference(string name) =>
-            new(string.Format(Messages.Circular_reference_detected_for_macro_0, name));
-
         internal static MathParserException InvalidFunctionDefinition() =>
             new(Messages.Invalid_function_definition_exception);
 
@@ -261,12 +258,6 @@ namespace Calcpad.Core
 
         internal static MathParserException ConditionResultInvalid(string s) =>
             new(string.Format(Messages.Condition_result_is_invalid_0, s));
-
-        internal static MathParserException DuplicateMacroParameters(string s) =>
-            new(string.Format(Messages.Duplicate_macro_parameter_names_0_and_1, s, s));
-
-        internal static MathParserException UndefinedMacro(string s) =>
-            new(string.Format(Messages.Macro_not_defined_0, s));
 
         internal static MathParserException RequiredParameterAfterOptional(string name) =>
             new(string.Format(Messages.Required_parameter_after_optional_0, name));

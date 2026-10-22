@@ -374,13 +374,16 @@
         <value>Invalid inside macro definition.</value>
     </data>
   <data name="There_is_no_matching_def" xml:space="preserve">
-        <value>"There is no matching "#def".</value>
+        <value>There is no matching "#def".</value>
     </data>
   <data name="Invalid_symbol_0_in_macro_name" xml:space="preserve">
         <value>Invalid symbol "{0}" in macro name.</value>
     </data>
   <data name="Duplicate_macro_name_0" xml:space="preserve">
         <value>Duplicate macro name: "{0}".</value>
+    </data>
+  <data name="Macro_name_0_must_end_with_dollar" xml:space="preserve">
+        <value>Macro name "{0}" must end with "$".</value>
     </data>
   <data name="Missing_delimiter_0_in_plot_command" xml:space="preserve">
         <value>&lt;span class = "err"&gt;Missing delimiter "{0}" in plot command "{1}".&lt;/span&gt;</value>

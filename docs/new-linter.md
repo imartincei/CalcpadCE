@@ -17,11 +17,15 @@ The tables below group them by the kind of problem.
 | CPD-1101 | Error | Malformed `#include` statement |
 | CPD-1102 | Error | Missing `#include` filename |
 | CPD-1103 | Warning | Deprecated `#include` input values |
+| CPD-1104 | Error | Include file not found |
+| CPD-1105 | Error | Circular `#include` |
+| CPD-1106 | Error | Invalid `#ProjectPath` or `#LibraryPath` |
 
 ### Macro definitions
 
 | Code | Severity | Meaning |
 | ---- | -------- | ------- |
+| CPD-2200 | Error | Macro or include error |
 | CPD-2201 | Error | Duplicate macro definition |
 | CPD-2202 | Error | Macro name must end with `$` |
 | CPD-2203 | Error | Macro parameter must end with `$` |
@@ -68,16 +72,16 @@ The tables below group them by the kind of problem.
 | CPD-3303 | Error | Undefined macro |
 | CPD-3304 | Error | Macro called with the wrong number of parameters |
 | CPD-3305 | Error | Undefined function |
-| CPD-3306 | Warning | Invalid element access |
 | CPD-3307 | Error | Too few parameters |
 | CPD-3308 | Error | Too many parameters |
-| CPD-3309 | Warning | Parameter type mismatch |
 | CPD-3310 | Error | Undefined unit |
 | CPD-3311 | Error | Empty parameter in a function call |
 | CPD-3312 | Information | Unused variable |
 | CPD-3313 | Error | Redefinition of existing function |
 | CPD-3314 | Error | Unknown keyword argument in a macro call |
 | CPD-3315 | Error | Unknown keyword argument in a function call |
+| CPD-3316 | Error | Duplicate keyword argument in a macro call |
+| CPD-3317 | Error | Circular macro reference |
 
 ### Semantics
 

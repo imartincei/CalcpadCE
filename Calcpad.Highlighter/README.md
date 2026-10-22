@@ -45,7 +45,7 @@ Included files are read from disk, filtered with `MacroParser.FilterIncludedCont
 
 Macro metadata comments are read here. `MacroParser` runs in Debug mode, so each output line carries the source line and column of every character it was built from (`MacroTraceOutputLine.SourceOffsets`).
 
-`Stage2Result` carries `Lines`, `SourceMap`, `IncludeMap`, `PathRoots`, `MacroDefinitions`, `MacroParameterOrder`, `UserDefinedMacros`, and `DuplicateMacros`.
+`Stage2Result` carries `Lines`, `SourceMap`, `IncludeMap`, `PathRoots`, `MacroDefinitions`, `MacroParameterOrder`, `UserDefinedMacros`, and `Errors` (MacroParser's own errors, with codes and source columns).
 
 ### Stage 3 — Macro expansion and definition collection
 
@@ -104,8 +104,8 @@ Twelve validators run in stage order:
 
 | Stage | Validators |
 |-------|-----------|
-| 1 | `IncludeValidator` — `#include` syntax and file resolution |
-| 2 | `MacroValidator` — duplicates, parameter syntax, naming, nesting |
+| 1 | `IncludeValidator` — deprecated `#include` input values |
+| 2 | `MacroValidator` — MacroParser's include and macro errors, plus parameters without `$` and `#def` inside control blocks |
 | 3 | `BalanceValidator`, `NamingValidator`, `UsageValidator`, `SemanticValidator`, `FunctionTypeValidator`, `CommandBlockValidator`, `FormatValidator`, `HtmlCommentValidator`, `SettingsValidator`, `UiValidator` |
 
 Every diagnostic code, its severity, and the `LintIgnore`/`EndLintIgnore` markers that `LintIgnoreRegionParser` reads are documented in [docs/new-linter.md](../docs/new-linter.md). Codes are defined in [Linter/Constants/ErrorCodes.cs](Linter/Constants/ErrorCodes.cs) — keep the two in sync when adding one.
@@ -122,7 +122,7 @@ It serves three consumers:
 
 1. **Autocomplete** — `GetAllSnippetsArray()` / `GetSnippetsByCategory(prefix)` back `GET /snippets` ([schema](../Calcpad.Web/backend/API_SCHEMA.md)).
 2. **Built-in name sets** — `GetFunctionNames()`, `GetKeywordNames()`, `GetCommandNames()`, `GetUnitNames()`, `GetConstantNames()`, `GetSettingNames()`, `GetControlBlockKeywordNames()`, `GetEndKeywordNames()`, `GetOperators()` return `FrozenSet`s used by `NamingValidator` to catch conflicts (a variable named `sin`) and by the tokenizer to classify identifiers.
-3. **Signature checking** — `GetFunctionSnippetsByName()`, `GetFunctionOverloads()`, `GetVectorReturningFunctions()`, `GetMatrixReturningFunctions()` give `FunctionTypeValidator` argument counts, types, and return types.
+3. **Signature checking** — `GetFunctionSnippetsByName()`, `GetFunctionOverloads()`, `GetVectorReturningFunctions()`, `GetMatrixReturningFunctions()` give `FunctionTypeValidator` argument counts and the type tracker return types.
 
 Adding a built-in function anywhere means adding its snippet here; nothing else knows the name exists.
 

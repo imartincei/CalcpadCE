@@ -107,7 +107,18 @@ namespace Calcpad.Highlighter.ContentResolution
                 }
             }
 
-            var (macroDefinitions, duplicateMacros, userDefinedMacros) = CollectMacros(trace, lines, includeMap);
+            var errors = new List<MacroError>(trace.Errors.Count);
+            foreach (var error in trace.Errors)
+            {
+                var i = error.SourceIndex;
+                if (trace.SourceLines[i].File is null && trace.TryLocate(error.Start, out var startLine, out var start) &&
+                    trace.TryLocate(error.End, out var endLine, out var end) && startLine == i && endLine == i)
+                    errors.Add(new(i, start, end + 1, error.Code, error.Message));
+                else
+                    errors.Add(new(i, 0, stage1.Lines[sourceMap[i]].Length, error.Code, error.Message));
+            }
+
+            var (macroDefinitions, userDefinedMacros) = CollectMacros(trace, lines, includeMap);
             var macroParamOrder = new Dictionary<string, List<string>>(StringComparer.Ordinal);
             foreach (var macro in macroDefinitions)
                 macroParamOrder.TryAdd(macro.Name, macro.Params);
@@ -118,7 +129,7 @@ namespace Calcpad.Highlighter.ContentResolution
                 SourceMap = sourceMap,
                 IncludeMap = includeMap,
                 MacroDefinitions = macroDefinitions,
-                DuplicateMacros = duplicateMacros,
+                Errors = errors,
                 MacroParameterOrder = macroParamOrder,
                 UserDefinedMacros = userDefinedMacros,
                 PathRoots = parser.PathRoots,
@@ -138,11 +149,10 @@ namespace Calcpad.Highlighter.ContentResolution
             return origins;
         }
 
-        private static (List<MacroDefinition>, List<DuplicateMacro>, Dictionary<string, MacroInfo>) CollectMacros(
+        private static (List<MacroDefinition>, Dictionary<string, MacroInfo>) CollectMacros(
             MacroTrace trace, List<string> lines, Dictionary<int, SourceInfo> includeMap)
         {
             var definitions = new List<MacroDefinition>(trace.Macros.Count);
-            var duplicates = new List<DuplicateMacro>();
             var userDefined = new Dictionary<string, MacroInfo>(StringComparer.Ordinal);
             foreach (var macro in trace.Macros)
             {
@@ -169,23 +179,15 @@ namespace Calcpad.Highlighter.ContentResolution
                     ParamDescriptions = metadata?.ParamDescriptions
                 });
 
-                if (userDefined.TryGetValue(macro.Name, out var first))
-                    duplicates.Add(new DuplicateMacro
-                    {
-                        Name = macro.Name,
-                        DuplicateLineNumber = line,
-                        OriginalLineNumber = first.LineNumber
-                    });
-                else
-                    userDefined[macro.Name] = new MacroInfo
-                    {
-                        LineNumber = line,
-                        ParamCount = parameters.Count,
-                        RequiredParamCount = ParsingHelpers.CountRequiredParams(parameters.Count, defaults),
-                        ParamNames = parameters
-                    };
+                userDefined.TryAdd(macro.Name, new MacroInfo
+                {
+                    LineNumber = line,
+                    ParamCount = parameters.Count,
+                    RequiredParamCount = ParsingHelpers.CountRequiredParams(parameters.Count, defaults),
+                    ParamNames = parameters
+                });
             }
-            return (definitions, duplicates, userDefined);
+            return (definitions, userDefined);
         }
 
         // A metadata comment applies across blank lines but not past any other line.

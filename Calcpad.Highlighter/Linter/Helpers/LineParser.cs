@@ -251,38 +251,5 @@ namespace Calcpad.Highlighter.Linter.Helpers
             }
             return -1;
         }
-
-        /// <summary>
-        /// Checks if the trimmed line is a #def statement.
-        /// </summary>
-        public static bool IsDefStatement(string trimmedLine)
-        {
-            return IsDefStatement(trimmedLine.AsSpan());
-        }
-
-        /// <summary>
-        /// Checks if the trimmed line is a #def statement. Span overload.
-        /// </summary>
-        public static bool IsDefStatement(ReadOnlySpan<char> trimmedLine)
-        {
-            return trimmedLine.StartsWith("#def ", StringComparison.OrdinalIgnoreCase) ||
-                   trimmedLine.Equals("#def", StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Checks if the trimmed line is a #end def statement.
-        /// </summary>
-        public static bool IsEndDefStatement(string trimmedLine)
-        {
-            return IsEndDefStatement(trimmedLine.AsSpan());
-        }
-
-        /// <summary>
-        /// Checks if the trimmed line is a #end def statement. Span overload.
-        /// </summary>
-        public static bool IsEndDefStatement(ReadOnlySpan<char> trimmedLine)
-        {
-            return trimmedLine.Equals("#end def", StringComparison.OrdinalIgnoreCase);
-        }
     }
 }

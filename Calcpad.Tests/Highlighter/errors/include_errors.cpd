@@ -1,9 +1,9 @@
-' CPD-11xx: Include validation errors
-' CPD-1101: Malformed #include (regex doesn't match)
-#include !!!invalid!!!
+' CPD-11xx: Include errors
+' CPD-1101: Unclosed input field list (also CPD-1103: deprecated input values)
+#include ../valid/import.cpd #{2; 3
 
 ' CPD-1102: Missing filename
 #include
 
-' CPD-1103: Deprecated #include input values
-#include ../valid/import.cpd #{2; 3}
+' CPD-1104: Include file not found
+#include no_such_file.cpd

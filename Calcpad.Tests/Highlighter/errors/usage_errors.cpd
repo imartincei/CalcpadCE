@@ -18,10 +18,6 @@ tooFew = root(16)
 ' CPD-3308: Too many params
 tooMany = sin(1; 2; 3)
 
-' CPD-3309: Type mismatch
-scalarVal = 1
-rowsOfScalar = n_rows(scalarVal)
-
 ' CPD-3310: Undefined unit
 badUnit = 5badunit
 

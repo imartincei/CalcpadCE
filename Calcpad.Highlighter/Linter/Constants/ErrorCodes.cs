@@ -11,8 +11,12 @@ namespace Calcpad.Highlighter.Linter.Constants
             ["CPD-1101"] = "Malformed #include statement",
             ["CPD-1102"] = "Missing #include filename",
             ["CPD-1103"] = "Deprecated #include input values",
+            ["CPD-1104"] = "Include file not found",
+            ["CPD-1105"] = "Circular #include",
+            ["CPD-1106"] = "Invalid #ProjectPath or #LibraryPath",
 
             // Stage 2: Macro definitions (CPD-22xx)
+            ["CPD-2200"] = "Macro or include error",
             ["CPD-2201"] = "Duplicate macro definition",
             ["CPD-2202"] = "Macro name must end with '$'",
             ["CPD-2203"] = "Macro parameter must end with '$'",
@@ -50,16 +54,16 @@ namespace Calcpad.Highlighter.Linter.Constants
             ["CPD-3303"] = "Undefined macro",
             ["CPD-3304"] = "Macro called with the wrong number of parameters",
             ["CPD-3305"] = "Undefined function",
-            ["CPD-3306"] = "Invalid element access",
             ["CPD-3307"] = "Too few parameters",
             ["CPD-3308"] = "Too many parameters",
-            ["CPD-3309"] = "Parameter type mismatch",
             ["CPD-3310"] = "Undefined unit",
             ["CPD-3311"] = "Empty parameter in a function call",
             ["CPD-3312"] = "Unused variable",
             ["CPD-3313"] = "Redefinition of existing function",
             ["CPD-3314"] = "Unknown keyword argument",
             ["CPD-3315"] = "Unknown keyword argument in function call",
+            ["CPD-3316"] = "Duplicate keyword argument in a macro call",
+            ["CPD-3317"] = "Circular macro reference",
 
             // Stage 3: Semantic (CPD-34xx)
             ["CPD-3401"] = "Invalid operator usage",

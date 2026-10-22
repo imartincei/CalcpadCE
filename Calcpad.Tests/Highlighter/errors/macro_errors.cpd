@@ -7,11 +7,37 @@
 #def kwMacro$(a$; b$ = 1) = a$ + b$
 badKeyword = kwMacro$(1; z$ = 2)
 
+' CPD-3304: Wrong number of arguments
+badCount = kwMacro$(1; 2; 3)
+
+' CPD-3316: Duplicate keyword argument
+dupKeyword = kwMacro$(1; b$ = 2; b$ = 3)
+
+' CPD-3317: Circular macro reference
+#def loopA$ = loopB$
+#def loopB$ = loopA$
+circular = loopA$
+
 ' CPD-2202: Macro name without $
 #def badMacro = 5
 
+' CPD-2203: Macro parameter without $
+#def noDollar$(p) = p
+
 ' CPD-2204: Invalid macro name
 #def 123bad$ = 1
+
+' CPD-2205: Malformed #def
+#def = 1
+
+' CPD-2208: Macro parameter starting with a digit
+#def digitParam$(1p$) = 1
+
+' CPD-2210: Invalid character in macro name
+#def bad!name$ = 1
+
+' CPD-2211: Invalid character in macro parameter
+#def badParam$(p!$) = 1
 
 ' CPD-2207: Nested macro def
 #def outer$
@@ -23,11 +49,14 @@ badKeyword = kwMacro$(1; z$ = 2)
 	#def badPlace$ = 1
 #end if
 
-' CPD-2206: Unmatched #end def
-#def unmatched$
-
 ' CPD-2212: Duplicate macro parameter
 #def dupParam$(x$; x$) = x$
 
 ' CPD-2213: Required parameter after optional parameter
 #def reqAfterOpt$(a$ = 1; b$) = a$ + b$
+
+' CPD-3303: Undefined macro
+undefinedCall = noSuchMacro$(1)
+
+' CPD-2206: Unmatched #end def
+#end def

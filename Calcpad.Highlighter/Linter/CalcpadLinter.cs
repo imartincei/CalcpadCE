@@ -140,21 +140,11 @@ namespace Calcpad.Highlighter.Linter
                 context.MacroDefinitions.Add(new Models.MacroDefinition
                 {
                     Name = macro.Name,
-                    ParameterCount = macro.Params?.Count ?? 0,
+                    Parameters = macro.Params,
                     LineNumber = macro.LineNumber
                 });
             }
-
-            // Convert duplicate macros
-            foreach (var dup in stage2Result.DuplicateMacros)
-            {
-                context.DuplicateMacros.Add(new DuplicateMacroInfo
-                {
-                    Name = dup.Name,
-                    OriginalLineNumber = dup.OriginalLineNumber,
-                    DuplicateLineNumber = dup.DuplicateLineNumber
-                });
-            }
+            context.Errors = stage2Result.Errors;
 
             return context;
         }

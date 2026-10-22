@@ -31,10 +31,6 @@ namespace Calcpad.Highlighter.Linter.Models
         /// <summary>Runtime facts from Core; null when no trace matched the content.</summary>
         public RuntimeOverlay Runtime { get; set; }
 
-        /// <summary>True when a matching Core run never reached the line, e.g. an untaken #if branch.</summary>
-        public bool IsNotExecuted(int stage3Line) =>
-            Runtime?.GetExecution(stage3Line) == LineExecution.NotExecuted;
-
         /// <summary>
         /// Functions that use command blocks ($Inline, $Block, $While).
         /// Key is function name, value is the command block info.

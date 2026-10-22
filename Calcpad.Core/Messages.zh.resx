@@ -350,13 +350,16 @@
     <value>无效的内部宏定义.</value>
   </data>
   <data name="There_is_no_matching_def" xml:space="preserve">
-    <value>"没有匹配的 "#def".</value>
+    <value>没有匹配的 "#def".</value>
   </data>
   <data name="Invalid_symbol_0_in_macro_name" xml:space="preserve">
     <value>宏名称中的符号 "{0}" 无效.</value>
   </data>
   <data name="Duplicate_macro_name_0" xml:space="preserve">
     <value>宏名称重复： "{0}".</value>
+  </data>
+  <data name="Macro_name_0_must_end_with_dollar" xml:space="preserve">
+    <value>宏名称 "{0}" 必须以 "$" 结尾。</value>
   </data>
   <data name="Missing_delimiter_0_in_plot_command" xml:space="preserve">
     <value>&lt;span class = "err"&gt;绘图命令 "{1}" 中缺少分隔符"{0}".&lt;/span&gt;</value>

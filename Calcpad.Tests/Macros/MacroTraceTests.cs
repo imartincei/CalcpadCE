@@ -169,10 +169,67 @@ namespace Calcpad.Tests
         }
 
         [Fact]
+        public void DefinitionErrors_DoNotAbort()
+        {
+            var trace = Trace("#def m$(a$; a$) = a$\n#def n$(a$ = 1; b$) = b$\n#def k$(x$\n#end def\nx = 1");
+            Assert.True(trace.IsComplete);
+            Assert.Equal(["CPD-2212", "CPD-2213", "CPD-2205"], trace.Errors.Select(e => e.Code));
+            Assert.Equal("x = 1", trace.OutputLines[^1].Text);
+        }
+
+        [Fact]
         public void Abort_IsNotComplete()
         {
-            var trace = Trace("#def m$(a; a) = a\nx = 1");
-            Assert.False(trace.IsComplete);
+            var path = Path.GetTempFileName();
+            try
+            {
+                var trace = new MacroTrace();
+                var parser = new MacroParser { Trace = trace, Include = (_, _) => throw new IOException() };
+                parser.Parse($"#include {path}\nx = 1", out _, null, 0, false);
+                Assert.False(trace.IsComplete);
+                Assert.Equal("CPD-2200", Assert.Single(trace.Errors).Code);
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+        [Fact]
+        public void CallErrors_LocateTheCall()
+        {
+            var trace = Trace("#def m$(a$) = a$\nx = 1 + m$(1; 2) + n$");
+            Assert.Equal(["CPD-3304"], trace.Errors.Select(e => e.Code));
+            var error = trace.Errors[0];
+            Assert.True(trace.TryLocate(error.Start, out var line, out var start));
+            Assert.True(trace.TryLocate(error.End, out _, out var end));
+            Assert.Equal((1, 8, 15), (line, start, end));
+        }
+
+        [Fact]
+        public void ErrorsFromMacroBodies_LocateTheBody()
+        {
+            var trace = Trace("#def m$ = n$\nx = m$");
+            var error = Assert.Single(trace.Errors);
+            Assert.Equal("CPD-3303", error.Code);
+            Assert.Equal(1, error.SourceIndex);
+            Assert.True(trace.TryLocate(error.Start, out var line, out _));
+            Assert.Equal(0, line);
+        }
+
+        [Fact]
+        public void UnclosedParameterList_DoesNotHang()
+        {
+            var trace = Trace("#def m$(a$ \nx = 1");
+            Assert.Contains(trace.Errors, e => e.Code == "CPD-2205");
+        }
+
+        [Fact]
+        public void StrayEndDef_DoesNotBreakLaterDefinitions()
+        {
+            var trace = Trace("#end def\n#def m$ = 1\nx = m$");
+            Assert.Equal(["CPD-2206"], trace.Errors.Select(e => e.Code));
+            Assert.Equal("x = 1", trace.OutputLines[^1].Text);
         }
     }
 }

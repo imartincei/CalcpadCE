@@ -943,6 +943,15 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
+        // /   Looks up a localized string similar to Macro name &quot;{0}&quot; must end with &quot;$&quot;..
+        // / </summary>
+        public static string Macro_name_0_must_end_with_dollar {
+            get {
+                return ResourceManager.GetString("Macro_name_0_must_end_with_dollar", resourceCulture);
+            }
+        }
+
+        // / <summary>
         // /   Looks up a localized string similar to Macro not defined: {0}..
         // / </summary>
         public static string Macro_not_defined_0 {
@@ -1555,7 +1564,7 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to &quot;There is no matching &quot;#def&quot;..
+        // /   Looks up a localized string similar to There is no matching &quot;#def&quot;..
         // / </summary>
         public static string There_is_no_matching_def {
             get {

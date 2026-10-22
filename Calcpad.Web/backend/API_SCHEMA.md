@@ -490,7 +490,11 @@ interface LintDiagnostic {
 | CPD-1101 | Include | Malformed #include statement |
 | CPD-1102 | Include | Missing #include filename |
 | CPD-1103 | Include | Deprecated #include input values |
+| CPD-1104 | Include | Include file not found |
+| CPD-1105 | Include | Circular #include |
+| CPD-1106 | Include | Invalid #ProjectPath or #LibraryPath |
 | **Stage 2: Macro definitions (CPD-22xx)** |||
+| CPD-2200 | Macro | Macro or include error |
 | CPD-2201 | Macro | Duplicate macro definition |
 | CPD-2202 | Macro | Macro name must end with '$' |
 | CPD-2203 | Macro | Macro parameter must end with '$' |
@@ -503,6 +507,7 @@ interface LintDiagnostic {
 | CPD-2210 | Macro | Invalid character in macro name |
 | CPD-2211 | Macro | Invalid character in macro parameter |
 | CPD-2212 | Macro | Duplicate macro parameter |
+| CPD-2213 | Macro | Required parameter after optional parameter |
 | **Stage 3: Balance (CPD-31xx)** |||
 | CPD-3101 | Balance | Unmatched opening parenthesis |
 | CPD-3102 | Balance | Unmatched closing parenthesis |
@@ -517,20 +522,23 @@ interface LintDiagnostic {
 | CPD-3204 | Naming | Variable name conflicts with a keyword |
 | CPD-3205 | Naming | Variable name conflicts with a built-in constant |
 | CPD-3206 | Naming | Function must have at least one parameter |
+| CPD-3207 | Naming | Required parameter after optional parameter in function definition |
 | **Stage 3: Usage (CPD-33xx)** |||
 | CPD-3301 | Usage | Undefined variable |
 | CPD-3302 | Usage | Function called with the wrong number of parameters |
 | CPD-3303 | Usage | Undefined macro |
 | CPD-3304 | Usage | Macro called with the wrong number of parameters |
 | CPD-3305 | Usage | Undefined function |
-| CPD-3306 | Usage | Invalid element access |
 | CPD-3307 | Usage | Too few parameters |
 | CPD-3308 | Usage | Too many parameters |
-| CPD-3309 | Usage | Parameter type mismatch |
 | CPD-3310 | Usage | Undefined unit |
 | CPD-3311 | Usage | Empty parameter in a function call |
 | CPD-3312 | Usage | Unused variable |
 | CPD-3313 | Usage | Redefinition of existing function |
+| CPD-3314 | Usage | Unknown keyword argument |
+| CPD-3315 | Usage | Unknown keyword argument in function call |
+| CPD-3316 | Usage | Duplicate keyword argument in a macro call |
+| CPD-3317 | Usage | Circular macro reference |
 | **Stage 3: Semantic (CPD-34xx)** |||
 | CPD-3401 | Semantic | Invalid operator usage |
 | CPD-3402 | Semantic | Unknown command name |

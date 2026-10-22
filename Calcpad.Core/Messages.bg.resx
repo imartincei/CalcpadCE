@@ -353,13 +353,16 @@
         <value>Невалидно в дефиниция на макрос.</value>
     </data>
   <data name="There_is_no_matching_def" xml:space="preserve">
-        <value>"Няма съответен "#def".</value>
+        <value>Няма съответен "#def".</value>
     </data>
   <data name="Invalid_symbol_0_in_macro_name" xml:space="preserve">
         <value>Невалиден символ "{0}" в име на макрос.</value>
     </data>
   <data name="Duplicate_macro_name_0" xml:space="preserve">
         <value>Повтарящо се име на макрос: "{0}".</value>
+    </data>
+  <data name="Macro_name_0_must_end_with_dollar" xml:space="preserve">
+        <value>Името на макрос "{0}" трябва да завършва с "$".</value>
     </data>
   <data name="Missing_delimiter_0_in_plot_command" xml:space="preserve">
         <value>&lt;span class = "err"&gt;Липсва разделител "{0}" в команда за графика "{1}".&lt;/span&gt;</value>

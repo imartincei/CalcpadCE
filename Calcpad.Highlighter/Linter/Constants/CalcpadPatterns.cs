@@ -37,23 +37,6 @@ namespace Calcpad.Highlighter.Linter.Constants
             $@"\b([{MacroNameStartChars}][{MacroNameChars}]*\$)(?:\(([^)]*)\))?",
             RegexOptions.Compiled);
 
-        // Inline macro definition: #def macroName$(params) = expression
-        // Macro names only allow ASCII letters, digits, underscore - not Greek or special chars
-        public static readonly Regex InlineMacroDef = new(
-            $@"#def\s+([{MacroNameStartChars}][{MacroNameChars}]*\$?)(?:\(([^)]*)\))?\s*=\s*(.+)",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-        // Multiline macro definition: #def macroName$(params)
-        // Macro names only allow ASCII letters, digits, underscore - not Greek or special chars
-        public static readonly Regex MultilineMacroDef = new(
-            $@"#def\s+([{MacroNameStartChars}][{MacroNameChars}]*\$?)(?:\(([^)]*)\))?\s*$",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-        // #include pattern
-        public static readonly Regex IncludeStatement = new(
-            @"^\s*#include\s+(.+)$",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         // #read pattern
         public static readonly Regex ReadStatement = new(
             @"^\s*#read\s+(.+)$",
@@ -102,23 +85,6 @@ namespace Calcpad.Highlighter.Linter.Constants
         // Parameters have OPTIONAL $ suffix (e.g., "param" or "param$")
         public static readonly Regex MacroParamInComment = new(
             $@"(?<![{MacroNameChars}\$])([{MacroNameStartChars}][{MacroNameChars}]*\$?)(?![{MacroNameChars}])",
-            RegexOptions.Compiled);
-
-        // Loose pattern to extract macro name (allows any characters before ( or =)
-        // Used for error reporting when strict patterns don't match
-        public static readonly Regex LooseMacroNameExtract = new(
-            @"#def\s+([^\s(=]+)",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-        // Pattern for valid macro name (from Calcpad.Core.Validator.IsMacroLetter)
-        // Must start with letter or underscore, then letters/digits/underscores, optional $ at end
-        public static readonly Regex ValidMacroName = new(
-            $@"^[{MacroNameStartChars}][{MacroNameChars}]*\$?$",
-            RegexOptions.Compiled);
-
-        // Pattern for valid macro parameter (same as name but $ is optional)
-        public static readonly Regex ValidMacroParam = new(
-            $@"^[{MacroNameStartChars}][{MacroNameChars}]*\$?$",
             RegexOptions.Compiled);
     }
 }

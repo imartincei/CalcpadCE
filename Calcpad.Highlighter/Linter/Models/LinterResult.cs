@@ -91,7 +91,12 @@ namespace Calcpad.Highlighter.Linter.Models
                 case LineStage.Stage2:
                     if (Stage2Context != null)
                     {
-                        diagnostic.Line = SourceMapper.MapStage2ToOriginal(diagnostic.StageLine, Stage2Context, Stage1Context);
+                        Apply(diagnostic, SourceMapper.MapStage2PositionToOriginal(
+                            diagnostic.StageLine,
+                            diagnostic.Column,
+                            diagnostic.EndColumn,
+                            Stage2Context,
+                            Stage1Context));
                     }
                     break;
 
@@ -99,34 +104,37 @@ namespace Calcpad.Highlighter.Linter.Models
                     if (Stage2Context != null && Stage3Context != null)
                     {
                         // Use full mapping with line continuation support
-                        var mapped = SourceMapper.MapPositionToOriginal(
+                        Apply(diagnostic, SourceMapper.MapPositionToOriginal(
                             diagnostic.StageLine,
                             diagnostic.Column,
                             diagnostic.EndColumn,
                             Stage3Context,
                             Stage2Context,
-                            Stage1Context);
-
-                        diagnostic.Line = mapped.Line;
-                        diagnostic.Column = mapped.Column;
-                        diagnostic.EndColumn = mapped.EndColumn;
-
-                        // Add additional ranges if the diagnostic spans multiple lines
-                        if (mapped.AdditionalRanges != null && mapped.AdditionalRanges.Count > 0)
-                        {
-                            diagnostic.AdditionalRanges = new List<DiagnosticRange>();
-                            foreach (var range in mapped.AdditionalRanges)
-                            {
-                                diagnostic.AdditionalRanges.Add(new DiagnosticRange
-                                {
-                                    Line = range.Line,
-                                    Column = range.Column,
-                                    EndColumn = range.EndColumn
-                                });
-                            }
-                        }
+                            Stage1Context));
                     }
                     break;
+            }
+        }
+
+        private static void Apply(LinterDiagnostic diagnostic, MappedPosition mapped)
+        {
+            diagnostic.Line = mapped.Line;
+            diagnostic.Column = mapped.Column;
+            diagnostic.EndColumn = mapped.EndColumn;
+
+            // Add additional ranges if the diagnostic spans multiple lines
+            if (mapped.AdditionalRanges != null && mapped.AdditionalRanges.Count > 0)
+            {
+                diagnostic.AdditionalRanges = new List<DiagnosticRange>();
+                foreach (var range in mapped.AdditionalRanges)
+                {
+                    diagnostic.AdditionalRanges.Add(new DiagnosticRange
+                    {
+                        Line = range.Line,
+                        Column = range.Column,
+                        EndColumn = range.EndColumn
+                    });
+                }
             }
         }
     }

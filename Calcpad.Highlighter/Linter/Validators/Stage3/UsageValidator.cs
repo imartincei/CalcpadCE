@@ -18,7 +18,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             ValidateUndefinedIdentifiers(stage3, result, tokenProvider);
             ValidateUndefinedUnits(stage3, result, tokenProvider);
             ValidateFunctionCalls(stage3, result, tokenProvider);
-            ValidateMacroCalls(stage3, result, tokenProvider);
+            ValidateUndefinedMacros(stage3, result, tokenProvider);
             ValidateUnusedDefinitions(stage3, result, tokenProvider);
         }
 
@@ -325,18 +325,6 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                         // Line continuation mapping is handled automatically by LinterResult
                         result.AddError(i, token.Column, token.Column + token.Length, "CPD-3301",
                             "'" + baseName + "'");
-                        continue;
-                    }
-
-                    // If using element access, validate that the variable supports it
-                    if (isElementAccess && stage3.TypeTracker != null && !stage3.IsNotExecuted(i))
-                    {
-                        var varInfo = stage3.TypeTracker.GetVariableInfoAt(baseName, i);
-                        if (varInfo != null && !varInfo.SupportsElementAccess)
-                        {
-                            result.AddWarning(i, token.Column, token.Column + token.Length, "CPD-3306",
-                                "'" + baseName + "' is a " + varInfo.Type.ToString().ToLower() + ", element access .() is only valid for vectors and matrices");
-                        }
                     }
                 }
             }
@@ -595,67 +583,21 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             return counts;
         }
 
-        private void ValidateMacroCalls(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
+        // MacroParser only expands once a macro exists; before that, Core fails only at run time.
+        private static void ValidateUndefinedMacros(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
+            if (stage3.DefinedMacros.Count > 0)
+                return;
+
             for (int i = 0; i < stage3.Lines.Count; i++)
             {
-                if (!tokenProvider.IsCpdMode(i)) continue;
-
-                var line = stage3.Lines[i];
-
-                if (LineParser.ShouldSkipLine(line))
+                if (!tokenProvider.IsCpdMode(i) || LineParser.ShouldSkipLine(stage3.Lines[i]))
                     continue;
 
-                var trimmed = line.Trim();
-
-                // Skip #def lines (macro definitions)
-                if (LineParser.IsDefStatement(trimmed))
-                    continue;
-
-                var tokens = tokenProvider.GetTokensForLine(i);
-                var keywordArgNames = new HashSet<string>(StringComparer.Ordinal);
-
-                foreach (var token in tokens)
+                foreach (var token in tokenProvider.GetTokensForLine(i))
                 {
-                    // Only check Macro tokens
-                    if (token.Type != TokenType.Macro)
-                        continue;
-
-                    var macroName = token.Text;
-
-                    // Check if macro is defined
-                    if (!stage3.DefinedMacros.ContainsKey(macroName))
-                    {
-                        // Already reported as an unknown keyword argument of an enclosing call
-                        if (keywordArgNames.Contains(macroName))
-                            continue;
-
-                        // Pass Stage3 line index - diagnostic extensions handle mapping
-                        result.AddError(i, token.Column, token.Column + token.Length, "CPD-3303",
-                            "'" + macroName + "'");
-                        continue;
-                    }
-
-                    // Check parameter count
-                    if (stage3.DefinedMacros.TryGetValue(macroName, out MacroInfo macroInfo))
-                    {
-                        var rawArgs = ParseMacroCallArgStrings(line, token.Column + token.Length);
-                        if (rawArgs == null) rawArgs = new List<string>();
-
-                        var endCol = CallEndColumn(line, token);
-                        foreach (var arg in rawArgs)
-                        {
-                            if (IsUnknownKeywordArg(arg, macroInfo.ParamNames, out var kwName) &&
-                                !stage3.DefinedMacros.ContainsKey(kwName))
-                            {
-                                keywordArgNames.Add(kwName);
-                                result.AddError(i, token.Column, endCol, "CPD-3314",
-                                    "'" + kwName + "' is not a parameter of '" + macroName + "'");
-                            }
-                        }
-                        if (ArgCountMessage(macroName, rawArgs.Count, macroInfo.RequiredParamCount, macroInfo.ParamCount) is { } message)
-                            result.AddError(i, token.Column, endCol, "CPD-3304", message);
-                    }
+                    if (token.Type == TokenType.Macro)
+                        result.AddError(i, token.Column, token.Column + token.Length, "CPD-3303", "'" + token.Text + "'");
                 }
             }
         }
@@ -705,16 +647,6 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 return -1;
 
             return ParameterParser.CountParameters(paramsStr);
-        }
-
-        /// <summary>
-        /// Returns the raw argument strings for a macro call, or null if no opening paren found.
-        /// </summary>
-        private static List<string> ParseMacroCallArgStrings(string line, int afterMacroName)
-        {
-            var (found, paramsStr) = ParsingHelpers.ExtractParamsString(line, afterMacroName);
-            if (!found) return null;
-            return ParameterParser.ParseMacroParameters(paramsStr);
         }
 
         /// <summary>

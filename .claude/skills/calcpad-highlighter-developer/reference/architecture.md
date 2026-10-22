@@ -50,7 +50,7 @@ Calcpad.Highlighter/
 │           ├── NamingValidator.cs       - Variable names
 │           ├── UsageValidator.cs        - Undefined checks
 │           ├── SemanticValidator.cs     - Operators/commands
-│           ├── FunctionTypeValidator.cs - Parameter types
+│           ├── FunctionTypeValidator.cs - Built-in argument counts
 │           ├── CommandBlockValidator.cs - $Inline/$Block/$While contents
 │           ├── FormatValidator.cs       - Format specifiers
 │           ├── HtmlCommentValidator.cs  - Metadata comment directives
@@ -143,6 +143,9 @@ CPD-33xx: Stage 3 - Usage (undefined identifiers)
 CPD-34xx: Stage 3 - Semantic (operators, commands)
 CPD-35xx: Stage 3 - Function type checking
 ```
+
+Most CPD-11xx/22xx codes and the macro-call codes (CPD-3303, 3304, 3314, 3316, 3317) are set by Core's
+`MacroParser` (`MacroTraceError.Code`), not by a Highlighter validator. `MacroValidator` only reports them.
 
 ## TokenType Enum
 

@@ -40,6 +40,20 @@ namespace Calcpad.Highlighter.Linter.Helpers
             return stage1.SourceMap.TryGetValue(stage1Line, out var original) ? original : stage1Line;
         }
 
+        public static MappedPosition MapStage2PositionToOriginal(int stage2Line, int column, int endColumn, Stage2Context stage2, Stage1Context stage1)
+        {
+            var stage1Line = stage2.Stage2ToStage1Map.TryGetValue(stage2Line, out var s1) ? s1 : stage2Line;
+            if (stage1.LineContinuationSegments.TryGetValue(stage1Line, out var segments) && segments.Count > 1)
+                return MapPositionWithContinuations(column, endColumn, segments);
+
+            return new MappedPosition
+            {
+                Line = stage1.SourceMap.TryGetValue(stage1Line, out var original) ? original : stage1Line,
+                Column = column,
+                EndColumn = endColumn
+            };
+        }
+
         public static int MapStage3ToOriginal(int stage3Line, Stage3Context stage3, Stage2Context stage2, Stage1Context stage1)
         {
             var stage2Line = stage3.Stage3ToStage2Map.TryGetValue(stage3Line, out var s2) ? s2 : stage3Line;

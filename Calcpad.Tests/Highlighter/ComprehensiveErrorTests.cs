@@ -49,19 +49,30 @@ namespace Calcpad.Tests.Highlighter
                 { "balance_errors.cpd", "CPD-3106" },
 
                 // Include errors (CPD-11xx)
+                { "include_errors.cpd", "CPD-1101" },
                 { "include_errors.cpd", "CPD-1102" },
                 { "include_errors.cpd", "CPD-1103" }, // Warning: deprecated #include input values
+                { "include_errors.cpd", "CPD-1104" },
 
                 // Macro errors (CPD-22xx)
                 { "macro_errors.cpd", "CPD-2201" },
                 { "macro_errors.cpd", "CPD-2202" },
+                { "macro_errors.cpd", "CPD-2203" },
+                { "macro_errors.cpd", "CPD-2204" },
+                { "macro_errors.cpd", "CPD-2205" },
                 { "macro_errors.cpd", "CPD-2206" },
                 { "macro_errors.cpd", "CPD-2207" },
+                { "macro_errors.cpd", "CPD-2208" },
                 { "macro_errors.cpd", "CPD-2209" },
                 { "macro_errors.cpd", "CPD-2210" },
+                { "macro_errors.cpd", "CPD-2211" },
                 { "macro_errors.cpd", "CPD-2212" },
                 { "macro_errors.cpd", "CPD-2213" },
+                { "macro_errors.cpd", "CPD-3303" },
+                { "macro_errors.cpd", "CPD-3304" },
                 { "macro_errors.cpd", "CPD-3314" },
+                { "macro_errors.cpd", "CPD-3316" },
+                { "macro_errors.cpd", "CPD-3317" },
 
                 // Naming errors (CPD-32xx)
                 { "naming_errors.cpd", "CPD-3204" },
