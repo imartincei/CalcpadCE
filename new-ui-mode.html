@@ -3860,7 +3860,7 @@ They share the line's JSON properties but are saved and overridden separately.</
 </table>
 <p><code>keys</code> and <code>values</code> are both required for a drop-down or radio group, and must be the same length.
 The datagrid properties throw an error on any other control.
-<code>forceUnits</code> and <code>allowExpression</code> will error on a drop-down, radio group or checkbox, which always substitute the whole value from their own <code>values</code> anyway.</p>
+<code>forceUnits</code> and <code>allowExpression</code> will error on a drop-down, radio group or checkbox, which substitute their own <code>values</code> anyway.</p>
 <p>You don't have to write JSON by hand — the <a href="new-calcpad-panel.html#properties">Properties tab</a> has a form for it that fills in the fields that apply to the control type it detects.</p>
 <h2 id="the-control-types">The control types<a class="headerlink" href="#the-control-types" title="Permanent link">&para;</a></h2>
 <h3 id="entry-an-input-box"><code>entry</code>: an input box<a class="headerlink" href="#entry-an-input-box" title="Permanent link">&para;</a></h3>
@@ -3881,7 +3881,8 @@ It implies <code>forceUnits: false</code> — a formula cannot carry an appended
 </code></pre></div>
 <h3 id="dropdown-a-list"><code>dropdown</code>: a list<a class="headerlink" href="#dropdown-a-list" title="Permanent link">&para;</a></h3>
 <p><code>keys</code> are shown, <code>values</code> are substituted.
-A value may carry its own unit, so a drop-down can switch units as well as magnitudes.</p>
+A value may carry its own unit, so a drop-down can switch units as well as magnitudes.
+A value without one keeps the unit written in the document, so <code>"235"</code> on <code>f_y = 355MPa</code> gives <code>f_y = 235MPa</code>.</p>
 <div class="language-text highlight"><pre><span></span><code>#UI {"type": "dropdown", "keys": ["Low", "Medium", "High"], "values": ["1", "2", "3"]} grade = 1
 </code></pre></div>
 <h3 id="radio-a-button-group"><code>radio</code>: a button group<a class="headerlink" href="#radio-a-button-group" title="Permanent link">&para;</a></h3>
