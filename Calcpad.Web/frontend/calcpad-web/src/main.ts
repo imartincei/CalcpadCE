@@ -14,6 +14,7 @@ import {
     serializeMetadataComment,
     buildSourceDefinitionResolver,
     UiOverrideStore,
+    UiPauseStore,
     writeUiOverrides,
     extractUiControls,
     isCompiledPath,
@@ -102,7 +103,7 @@ function getEmptyPreviewHtml(theme: 'light' | 'dark'): string {
 </head>
 <body>
     <h3>Empty Document</h3>
-    <p>Start typing CalcpadCE code to see the preview.</p>
+    <p>Start typing to see the preview.</p>
     <h4>Formatting Hotkeys</h4>
     <table>
         <tr><th>Bold</th><td>Ctrl+B</td></tr>
@@ -415,6 +416,8 @@ async function bootstrap(): Promise<void> {
     const uiOverrides = new UiOverrideStore();
     // Documents whose in-memory values have not been written back yet.
     const uiOverridesDirty = new Set<string>();
+    // The #pause step each input form is on.
+    const uiPause = new UiPauseStore();
     // Documents with an unapplied Properties form, reported by the panel.
     const metadataDirty = new Set<string>();
     // Controls each document's last input-form render produced, which is what tells the
@@ -707,7 +710,12 @@ async function bootstrap(): Promise<void> {
             if (overrideMode) syncUiOverrides(group, content);
             // Unwrapped always shows the document as written.
             const ui = overrideMode
-                ? { enableUi: mode === 'ui', uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)) }
+                ? {
+                    enableUi: mode === 'ui',
+                    uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)),
+                    stepPauses: mode === 'ui',
+                    pauseAfter: uiPause.pauseAfter(uiDocKeyFor(group)),
+                }
                 : undefined;
             const write = activeBridge.mayWrite(mode === 'report', mode === 'ui');
             result = mode === 'unwrapped'
@@ -749,7 +757,11 @@ async function bootstrap(): Promise<void> {
                 ? await tauriBridge.inlineDocumentImages(result.html, previewImageBudget(group))
                 : result.html;
             const committed = appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine, uiDocKeyFor(group));
-            if (mode === 'ui') uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
+            if (mode === 'ui') {
+                uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
+                uiPause.update(uiDocKeyFor(group), result.pause);
+                appInstance.setUiPauseState(uiPause.state(uiDocKeyFor(group)) ?? null);
+            }
             window.dispatchEvent(new MessageEvent('message', {
                 data: { type: 'updateConvertErrors', errors: result.errors },
             }));
@@ -849,7 +861,7 @@ async function bootstrap(): Promise<void> {
         // the taskbar; the main window, and the single-window case, stay unmarked.
         const suffix = isPrimaryWindow ? '' : ` (${windowLabel.slice('main-'.length)})`;
         const title = active?.title
-            ? `${active.title} - CalcpadCE ${appVersion}${suffix}`
+            ? `${active.title} – CalcpadCE ${appVersion}${suffix}`
             : `CalcpadCE ${appVersion}${suffix}`;
         document.title = title;
         setNativeTitle?.(title);
@@ -1431,6 +1443,13 @@ async function bootstrap(): Promise<void> {
             return;
         }
 
+        // F5 pressed inside a preview frame (desktop only).
+        if (data.type === 'previewRefresh') {
+            if (!fromPreview) return;
+            void runRefresh();
+            return;
+        }
+
         // Results -> editor navigation. An 'output' line only makes sense in the unwrapped
         // view when the document has macros/includes, so the pane flips there scrolled to it
         // (the two-step); a 'source' line navigates Monaco directly, and the message's
@@ -1629,6 +1648,13 @@ async function bootstrap(): Promise<void> {
         switchView?: (id: string) => void;
     };
 
+    // Settings lives in the CalcpadCE view, which the Files view or a collapsed sidebar hides.
+    function openSettings(): void {
+        appInstance.showSidebar();
+        sidebarInstance.switchView?.('calcpad');
+        sidebarInstance.switchTab?.('settings');
+    }
+
     // ---- Result mode and pane layout: restore, then keep persisted ----
     // Installs from before the workspace store kept the mode in the settings extras, under
     // `previewMode` with `wrapped` for what is now `preview`; carry that over once.
@@ -1738,6 +1764,10 @@ async function bootstrap(): Promise<void> {
 
     appInstance.onSaveUiOverridesRequest = () => { void saveUiOverrides(); };
 
+    appInstance.onUiPauseStepRequest = (direction: 'next' | 'previous') => {
+        if (uiPause.step(activeUiDocKey(), direction)) void refreshPreviewFor(activeGroup);
+    };
+
     /**
      * Leaving the input form discards the entered values — they only live in memory
      * until written into the document — so prompt for unwritten ones first. Returns
@@ -1758,6 +1788,8 @@ async function bootstrap(): Promise<void> {
         uiOverrides.clear(docKey);
         uiOverridesDirty.delete(docKey);
         refreshUiDirtyIndicator();
+        uiPause.clear(docKey);
+        appInstance.setUiPauseState(null);
         return true;
     }
 
@@ -2174,7 +2206,7 @@ async function bootstrap(): Promise<void> {
                 void splitEditor();
             });
             ed.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Comma, () => {
-                sidebarInstance.switchTab?.('settings');
+                openSettings();
             });
             ed.addCommand(monaco.KeyCode.F5, () => { void runRefresh(); });
             // Clipboard via Tauri's native clipboard API (WebKitGTK workaround).
@@ -2540,6 +2572,10 @@ async function bootstrap(): Promise<void> {
                     appInstance.toggleSidebar();
                     break;
 
+                case 'go-to-settings':
+                    openSettings();
+                    break;
+
                 case 'toggle-preview':
                     appInstance.togglePreview();
                     break;
@@ -2678,6 +2714,12 @@ async function bootstrap(): Promise<void> {
                 void runRefresh();
                 return;
             }
+            // F5 — run/refresh instead of reloading the webview.
+            if (e.key === 'F5' && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
+                e.preventDefault();
+                void runRefresh();
+                return;
+            }
             if (!e.ctrlKey || e.metaKey) return;
             if ((e.key === 'w' || e.key === 'W') && e.altKey && !e.shiftKey) {
                 e.preventDefault();
@@ -2720,7 +2762,7 @@ async function bootstrap(): Promise<void> {
             // Ctrl+, — open Settings tab in sidebar (VS Code convention).
             if (e.key === ',' && !e.shiftKey && !e.altKey) {
                 e.preventDefault();
-                sidebarInstance.switchTab?.('settings');
+                openSettings();
                 return;
             }
             // Ctrl+Shift+B → toggle sidebar (Ctrl+B is reserved for Bold formatting).

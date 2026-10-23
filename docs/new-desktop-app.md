@@ -147,13 +147,14 @@ The menu bar drives the whole app:
 
 - **File** — New Tab · Open… · Save · Save As… · Save As Compiled Worksheet… · Export Portable Package… · Close Tab · Export ▸ · Quit — see [Exports](new-exports.md) for what each export command produces
 - **Edit** — Undo · Redo · Cut · Copy · Paste · Select All · Find · Replace
-- **View** — Toggle Sidebar · Toggle Preview · Toggle Word Wrap · Split Editor · Result Mode: Preview / Unwrapped / Input / Report
+- **View** — Toggle Sidebar · Go to Settings · Toggle Preview · Toggle Word Wrap · Split Editor · Result Mode: Preview / Unwrapped / Input / Report
 - **Server** — Refresh (**Ctrl+Alt+X**) · Show Server Log · Stop Server · Restart Server
 - **Help** — Documentation (opens the docs site in your default browser)
 
 ## Settings and configurations
 
-All calculation, plot, unit, theme, editor, and linter settings live in the **Settings** tab of the sidebar.
+All calculation, plot, unit, theme, editor, and linter settings live in the **Settings** tab of the sidebar. 
+Open it with **View → Go to Settings** (Ctrl+,).
 The desktop app also supports **named configurations** — save different sets of settings (e.g. one for metric with 3 decimals, one for imperial with degrees) and switch the active configuration from the Settings tab; configurations persist between sessions.
 
 See **[The CalcpadCE Panel & Settings → Settings](new-calcpad-panel.md#settings)** for the full list, and **[→ Formatting](new-calcpad-panel.md#formatting-prettify)** for the Prettify options.

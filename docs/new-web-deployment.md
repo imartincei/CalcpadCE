@@ -85,6 +85,7 @@ The full request/response schema lives at [Calcpad.Web/backend/API_SCHEMA.md](ht
 - `uiOverrides` — values entered into `#UI` controls, keyed by the control identity the preview reports in `data-ui-var`
 - `includeLineAnchors` — emits the per-line anchors and error boxes the preview navigates by. Defaults to the opposite of `forPrint`
 - `hideErrorLines` — drops the "on line [N]" reference from error messages. Defaults to `enableUi`
+- `stepPauses` / `pauseAfter` — splits the input form at each `#pause`, stopping at the first one after the `pauseAfter` key. Requires `enableUi`; every other render runs past `#pause`
 - `write` — whether this request may run `#write`/`#append`. `false` by default, so a preview refresh doesn't rewrite output on every keystroke
 
 The analysis endpoints (`/highlight`, `/lint`, `/definitions`, `/symbol-at-position`) take `content` and `sourceFilePath` only.
@@ -99,6 +100,8 @@ Calculation errors come back alongside it in an `X-Calcpad-Errors` response head
 ```typescript
 Array<{ sourceLine, outputLine, message, source: "Macro" | "Expression" }>
 ```
+
+A stepped input form also returns an `X-Calcpad-Pause` header, URL-encoded JSON of `{ next, previous }`. Send `next` or `previous` back as `pauseAfter` to move a step; either is null when there is no step that way.
 
 ### Definitions
 

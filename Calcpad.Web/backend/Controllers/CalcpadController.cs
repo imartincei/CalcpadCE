@@ -57,11 +57,12 @@ namespace Calcpad.Server.Controllers
                 }
 
                 var forceUnwrapped = unwrap || request.ForceUnwrappedCode;
-                var (htmlResult, _, errors, trace) = _calcpadService.Convert(
+                var (htmlResult, _, errors, trace, pause) = _calcpadService.Convert(
                     request.Content, request.Settings, forceUnwrapped, request.Theme, request.SourceFilePath,
                     request.ForPrint, captureOpenXml: false, request.EnableUi, request.UiOverrides,
                     debug: request.IncludeLineAnchors, hideErrorLines: request.HideErrorLines,
-                    write: request.Write, cancellationToken: cancellationToken);
+                    write: request.Write, stepPauses: request.StepPauses, pauseAfter: request.PauseAfter,
+                    cancellationToken: cancellationToken);
                 if (unwrap)
                 {
                     htmlResult = ProcessDataTextLinks(htmlResult);
@@ -80,6 +81,14 @@ namespace Calcpad.Server.Controllers
                     _runtimeTraceCache.StoreNames(request.SourceFilePath, request.DocumentId, RuntimeVariableNames.From(
                         trace, _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, request.DocumentId)));
                     Response.Headers["X-Calcpad-Trace"] = "1";
+                }
+                if (pause is not null)
+                {
+                    var pauseJson = System.Text.Json.JsonSerializer.Serialize(pause, new System.Text.Json.JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+                    });
+                    Response.Headers["X-Calcpad-Pause"] = Uri.EscapeDataString(pauseJson);
                 }
                 return Content(htmlResult, "text/html");
             }
@@ -441,7 +450,7 @@ namespace Calcpad.Server.Controllers
                 // never a navigable preview, so line anchors are always off - but ForPrint
                 // and UiOverrides come from the request, so the caller chooses between a
                 // report (#pre hidden, entered #UI values applied) and the preview layout.
-                var (html, openXmlExpressions, _, _) = _calcpadService.Convert(
+                var (html, openXmlExpressions, _, _, _) = _calcpadService.Convert(
                     request.Content, request.Settings, request.ForceUnwrappedCode, request.Theme, request.SourceFilePath,
                     forPrint: request.ForPrint, captureOpenXml: true, enableUi: false, uiOverrides: request.UiOverrides,
                     debug: false, write: request.Write, cancellationToken: cancellationToken);
@@ -947,6 +956,19 @@ namespace Calcpad.Server.Controllers
         /// modes, so a report shows the values that were actually entered.
         /// </summary>
         public Dictionary<string, string>? UiOverrides { get; set; }
+
+        /// <summary>
+        /// Splits the <c>#UI</c> form at each <c>#pause</c>, stopping at the first one after
+        /// <see cref="PauseAfter"/>. Requires <see cref="EnableUi"/>; every other render runs
+        /// past <c>#pause</c>. The response carries <c>X-Calcpad-Pause</c>.
+        /// </summary>
+        public bool StepPauses { get; set; }
+
+        /// <summary>
+        /// Key of the last <c>#pause</c> the user moved past, as returned in <c>X-Calcpad-Pause</c>.
+        /// Null or <c>"start"</c> stops at the first one.
+        /// </summary>
+        public string? PauseAfter { get; set; }
 
         /// <summary>
         /// Emits per-line anchors and the error-summary boxes the preview uses for line links,

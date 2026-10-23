@@ -357,7 +357,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         {
             return CalcpadBuiltIns.Keywords.Contains(keyword) ||
                    CalcpadBuiltIns.ControlBlockKeywords.Contains(keyword) ||
-                   CalcpadBuiltIns.EndKeywords.Contains(keyword);
+                   CalcpadBuiltIns.EndKeywords.Contains(keyword) ||
+                   CalcpadBuiltIns.DeprecatedKeywords.Contains(keyword);
         }
     }
 }

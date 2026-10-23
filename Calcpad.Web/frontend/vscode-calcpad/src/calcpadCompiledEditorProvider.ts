@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import type { ILogger } from 'calcpad-frontend';
 import * as path from 'path';
 import { writeUiOverrides } from 'calcpad-frontend';
-import type { CalcpadApiClient, UiOverrideStore } from 'calcpad-frontend';
+import type { CalcpadApiClient, UiOverrideStore, UiPauseStore } from 'calcpad-frontend';
 import { handleFrameStateMessage } from './previewFrame';
 
 /**
@@ -59,6 +59,7 @@ export class CalcpadCompiledEditorProvider
     constructor(
         private readonly _apiClient: CalcpadApiClient,
         private readonly _uiOverrides: UiOverrideStore,
+        private readonly _uiPause: UiPauseStore,
         private readonly _renderPanel: RenderPanel,
         private readonly _log: ILogger,
     ) {}
@@ -66,10 +67,11 @@ export class CalcpadCompiledEditorProvider
     public static register(
         apiClient: CalcpadApiClient,
         uiOverrides: UiOverrideStore,
+        uiPause: UiPauseStore,
         renderPanel: RenderPanel,
         log: ILogger,
     ): CalcpadCompiledEditorProvider {
-        const provider = new CalcpadCompiledEditorProvider(apiClient, uiOverrides, renderPanel, log);
+        const provider = new CalcpadCompiledEditorProvider(apiClient, uiOverrides, uiPause, renderPanel, log);
         provider._registration = vscode.window.registerCustomEditorProvider(
             CalcpadCompiledEditorProvider.viewType,
             provider,
@@ -90,6 +92,12 @@ export class CalcpadCompiledEditorProvider
      */
     public sourceFor(uri: vscode.Uri): string | undefined {
         return this._docs.get(uri.toString())?.text;
+    }
+
+    /** Re-renders an open compiled worksheet's form and report. */
+    public async refresh(uri: vscode.Uri): Promise<void> {
+        const document = this._docs.get(uri.toString());
+        if (document) await this._refresh(document);
     }
 
     /**
@@ -183,6 +191,7 @@ export class CalcpadCompiledEditorProvider
         document.originalBytes = bytes;
         // Drop the entered values so the form comes back as the file has it.
         this._uiOverrides.clear(document.uri.toString());
+        this._uiPause.clear(document.uri.toString());
         await this._refresh(document);
     }
 
@@ -238,6 +247,7 @@ export class CalcpadCompiledEditorProvider
             // Entered values only live in memory; with no view left on the document
             // there is nothing to keep them for.
             this._uiOverrides.clear(key);
+            this._uiPause.clear(key);
         });
     }
 

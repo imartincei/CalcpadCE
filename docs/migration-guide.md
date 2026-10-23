@@ -6,6 +6,23 @@ These sections also note how to migrate to supported syntax.
 
 ## Migrate from 7.x.x
 
+### `#input` is deprecated
+
+`#input` rendered an input form at a breakpoint and waited for the user to resume.
+[UI mode](new-ui-mode.md) replaces it.
+
+#### What breaks
+
+`#input` still parses without errors but has no effect.
+The [linter](new-linter.md) flags it as a warning under `CPD-3420`.
+It will be removed in a future update.
+
+#### How to update
+
+Declare the inputs with `#UI` and replace `#input` with `#pause` where needed.
+In the UI mode input form, `#pause` ends a step that the user moves past with **Next**.
+See [`#pause` in UI mode](new-ui-mode.md#pause-in-ui-mode).
+
 ### `?{}` Input syntax is deprecated
 
 [UI mode](new-ui-mode.md) replaces the two places a document used to keep its own input values — a `?{6}` field, and the `#{2; 3}` list that fed those fields into an `#include`:

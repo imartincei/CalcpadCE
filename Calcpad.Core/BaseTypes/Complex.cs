@@ -9,7 +9,7 @@ namespace Calcpad.Core
         private const double TrigMin = -1e8;
         private const double TrigMax = 1e8;
         private const double Eps = 1e-12;
-        private static readonly Random Rand = new();
+        private static readonly Random Rand = System.Random.Shared;
 
         private readonly double _a;
         private readonly double _b;

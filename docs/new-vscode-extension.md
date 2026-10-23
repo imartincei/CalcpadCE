@@ -74,6 +74,7 @@ See [Exports → Export variants](new-exports.md#export-variants) for a breakdow
 
 The Report preview opens on its own beside the editor, or alongside the `#UI` input form when that is open, and it keeps its line links so a result traces back to the line that produced it.
 With it (or the input form) focused, **CalcpadCE: Print Report to PDF** appears as a button in the panel's title bar.
+When the document has a `#pause`, the input form's title bar also shows **Previous** and **Next** arrows that move between its steps.
 See **[UI Mode](new-ui-mode.md)**.
 
 All panels:

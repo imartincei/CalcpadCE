@@ -42,8 +42,8 @@ export const calcpadDarkTheme: monaco.editor.IStandaloneThemeData = {
     colors: {
         'editor.background': '#1e1e1e',
         'editor.foreground': '#d4d4d4',
-        'editorLineNumber.foreground': '#858585',
-        'editorLineNumber.activeForeground': '#c6c6c6',
+        'editorLineNumber.foreground': '#6e7681',
+        'editorLineNumber.activeForeground': '#cccccc',
         'editor.selectionBackground': '#264f78',
         'editor.inactiveSelectionBackground': '#3a3d41',
         'editorBracketMatch.background': '#0064001a',
@@ -106,8 +106,8 @@ export const calcpadLightTheme: monaco.editor.IStandaloneThemeData = {
     colors: {
         'editor.background': '#ffffff',
         'editor.foreground': '#000000',
-        'editorLineNumber.foreground': '#237893',
-        'editorLineNumber.activeForeground': '#0b216f',
+        'editorLineNumber.foreground': '#6e7681',
+        'editorLineNumber.activeForeground': '#171184',
         'editor.selectionBackground': '#add6ff',
         'editor.inactiveSelectionBackground': '#e5ebf1',
         'editorBracketMatch.background': '#0064001a',

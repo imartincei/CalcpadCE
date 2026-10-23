@@ -105,6 +105,11 @@ interface CalcpadRequest {
                                 //   input mode has no source editor for it to point at. Defaults
                                 //   to enableUi; the report pane shown beside the form overrides
                                 //   it to true even though enableUi is false there.
+  stepPauses?: boolean;         // Stop the input form at the first #pause after pauseAfter and
+                                //   return X-Calcpad-Pause (default: false). Requires enableUi;
+                                //   every other render runs past #pause.
+  pauseAfter?: string | null;   // Key of the last #pause the user moved past, as returned in
+                                //   X-Calcpad-Pause. null or "start" stops at the first one.
 
   // Whether this request may run #write/#append. False by default, so a preview refresh does
   // not rewrite the document's output on every keystroke. The front ends resolve their
@@ -121,6 +126,8 @@ The four renderings the front ends expose map onto these as:
 | Preview | `false` | `false` | — | on screen: default; export: `false` | default (`false`) |
 | Report | `true` | `false` | yes | on screen: `true`; export: `false` | default, unless shown beside input form: `true` |
 | Input form | `false` | `true` | yes | export: `false` | default (`true`) |
+
+The on-screen input form also sets `stepPauses: true`; its export does not, so the exported form is complete.
 | Unwrapped | — | — | — | n/a (`?unwrap=true`) | n/a |
 
 **Response:** HTML content (`text/html`)
@@ -138,7 +145,17 @@ Array<{
 }>
 ```
 
-The header is listed in the CORS policy's exposed headers, so a browser client can read it.
+When `stepPauses` is in effect, an `X-Calcpad-Pause` header reports where the form stopped, URL-encoded JSON of:
+
+```typescript
+{
+  next: string | null;      // pauseAfter for the next step; null when the form reached the end
+  previous: string | null;  // pauseAfter for the previous step: "start" goes back to the first
+                            //   step; null when already on it
+}
+```
+
+Both headers are listed in the CORS policy's exposed headers, so a browser client can read them.
 
 A render with line anchors (`includeLineAnchors`, on by default for anything but print) also records what the calculation executed and sets `X-Calcpad-Trace: 1`. `/lint`, `/definitions`, `/highlight` and `/symbol-at-position` requests for the same `content` and `sourceFilePath` then use it: variable types come from the run. A client should refetch lint, definitions and highlighting when it sees the header. Until then, or for any other content, those endpoints use static inference.
 

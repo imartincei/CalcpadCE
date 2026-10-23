@@ -283,7 +283,7 @@ namespace Calcpad.Tests
             Assert.Equal(0, result);
         }
 
-        [Fact(Skip = "Flaky: intermittent Expected: 0, Actual: 1, even when setting the tolerance to 10^-3")]
+        [Fact]
         [Trait("Category", "HPScalarSymmetricMatrixOperators")]
         public void HPScalarSymmetricMatrixModulo()
         {

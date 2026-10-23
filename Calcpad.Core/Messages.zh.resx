@@ -310,8 +310,8 @@
   <data name="Unexpected_error_0_Please_check_the_expression_consistency" xml:space="preserve">
     <value>意外错误： {0} 请检查表达式的一致性.</value>
   </data>
-  <data name="Paused_Press_F5_to_continue" xml:space="preserve">
-    <value>&lt;p&gt;&lt;span class="err"&gt;已暂停！&lt;/span&gt;按&lt;b&gt;F5&lt;/b&gt; &lt;a href="#0" data-text="continue"&gt;继续&lt;/a&gt;或&lt;b&gt;按Esc&lt;/b&gt; &lt;a href="#0" data-text="cancel"&gt;取消&lt;/a&gt;.&lt;/p&gt;</value>
+  <data name="Paused_Click_Next_to_continue" xml:space="preserve">
+    <value>&lt;p class="paused"&gt;已暂停：点击 Next 继续&lt;/p&gt;</value>
   </data>
   <data name="Error_found_on_line" xml:space="preserve">
     <value>&lt;div class="errorHeader"&gt;在以下行发现&lt;b&gt;1&lt;/b&gt;个错误：</value>

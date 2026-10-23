@@ -673,14 +673,7 @@ namespace Calcpad.Highlighter.Snippets.Data
             new SnippetItem
             {
                 Insert = "#pause",
-                Description = "Pause calculation and wait for user to resume. Not supported in Calcpad.Web.",
-                Category = "Breakpoints",
-                KeywordType = "Keyword"
-            },
-            new SnippetItem
-            {
-                Insert = "#input",
-                Description = "Render input form and wait for user input. Not supported in Calcpad.Web.",
+                Description = "In #UI mode, splits the form into steps navigated with Next/Previous. Ignored in reports.",
                 Category = "Breakpoints",
                 KeywordType = "Keyword"
             },

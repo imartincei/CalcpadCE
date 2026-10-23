@@ -26,6 +26,7 @@ namespace Calcpad.Highlighter.Linter
         private readonly SettingsValidator _settingsValidator = new();
         private readonly UiValidator _uiValidator = new();
         private readonly LegacyInputValidator _legacyInputValidator = new();
+        private readonly DeprecatedInputKeywordValidator _deprecatedInputKeywordValidator = new();
 
         /// <summary>
         /// Lint code using pre-processed staged content from ContentResolver.
@@ -230,6 +231,7 @@ namespace Calcpad.Highlighter.Linter
             _settingsValidator.Validate(stage3, result, tokenProvider);
             _uiValidator.Validate(stage3, result, tokenProvider);
             _legacyInputValidator.Validate(stage3, result, tokenProvider);
+            _deprecatedInputKeywordValidator.Validate(stage3, result, tokenProvider);
         }
     }
 }

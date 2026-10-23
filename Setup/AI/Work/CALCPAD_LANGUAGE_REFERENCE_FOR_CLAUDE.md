@@ -556,8 +556,7 @@ You can add or omit as many "#else if's" as needed. Only one "#else" is allowed.
 	
 ### Breakpoints for step-by-step execution:  
 
-  `#pause` - calculates to the current line and waits until resumed manually  
-  `#input` - renders an input form to the current line and waits for user input.  
+  `#pause` - in the #UI input form, ends a step; Next / Previous move between steps. Ignored everywhere else.  
 	
 ### Switches for trigonometric units:
 

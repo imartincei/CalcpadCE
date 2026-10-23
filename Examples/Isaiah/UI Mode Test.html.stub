@@ -716,20 +716,120 @@
  </p>
  <p>
  </p>
- <h3>4. #UI around an expression without assignment - errors in UI mode</h3>
+ <h3>4. #pause - a stepped input form</h3>
+ <p>In UI mode the form stops at each #pause and Next / Previous move between steps. Everywhere else #pause is ignored.</p>
+ <p>
+ </p>
+ <p>
+  <span class="eq">
+   <var>span</var>
+   = 6
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>span</var>
+   = 6
+   <i>m</i>
+  </span>
+ </p>
+ <p>The checkbox decides how many pauses the branch adds.</p>
+ <p>
+  <span class="eq">
+   <var>detailed</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>d1</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>d1</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>d2</var>
+   = 2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>d2</var>
+   = 2
+  </span>
+ </p>
+ <p>One pause per pass. Lowering the count below the current pass moves the form to the first #pause after the loop.</p>
+ <p>
+  <span class="eq">
+   <var>passes</var>
+   = 3
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>zp</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>zp</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>zp</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>zp</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>zp</var>
+   = 1
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>zp</var>
+   = 1
+  </span>
+ </p>
+ <p>End of the stepped section.</p>
+ <p>
+ </p>
+ <h3>5. #input - deprecated, has no effect, warned as CPD-3420</h3>
+ <p>
+ </p>
+ <p>
+ </p>
+ <h3>6. #UI around an expression without assignment - errors in UI mode</h3>
  <p>Expected error: "The #UI keyword requires a variable assignment."</p>
  <p>
  </p>
  <p class="err">
   Error in "#UI {"type": "entry"}" on line [
-  <a data-text="108" href="#0">108</a>
+  <a data-text="141" href="#0">141</a>
   ]: The #UI keyword requires a variable assignment.
  </p>
  <p>
  </p>
  <p>
  </p>
- <h3>5. #UI assigned an expression rather than a value - errors in both modes</h3>
+ <h3>7. #UI assigned an expression rather than a value - errors in both modes</h3>
  <p>
   Expected error: "#UI directives do not support expressions." A control overwrites the
   <p>right hand side with whatever was entered, so only a value, a vector or a matrix can be</p>
@@ -739,7 +839,7 @@
  </p>
  <p class="err">
   Error in "#UI {"type": "entry"} k = max(E2)" on line [
-  <a data-text="115" href="#0">115</a>
+  <a data-text="148" href="#0">148</a>
   ]: #UI does not support expressions unless 'allowExpression' is true.
  </p>
  <p>
@@ -759,7 +859,7 @@
  </p>
  <p class="err">
   Error in "#UI {"type": "entry"} k2 = 2*E2" on line [
-  <a data-text="116" href="#0">116</a>
+  <a data-text="149" href="#0">149</a>
   ]: #UI does not support expressions unless 'allowExpression' is true.
  </p>
  <p>

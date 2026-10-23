@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import type { ILogger } from 'calcpad-frontend';
 import {
     buildInsertSnippet,
+    completionRangeStart,
     hasSnippetPlaceholders,
     formatInsertLabel,
     formatMacroCompletion,
@@ -82,9 +83,13 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
 
         const completionItems: vscode.CompletionItem[] = [];
 
-        // Get the word being typed
+        // Get the word being typed, including a leading '#' the word pattern excludes
         const wordRange = document.getWordRangeAtPosition(position);
-        const word = wordRange ? document.getText(wordRange) : '';
+        const wordStart = wordRange ? wordRange.start.character : position.character;
+        const range = new vscode.Range(
+            position.line, completionRangeStart(lineText, wordStart),
+            position.line, wordRange ? wordRange.end.character : position.character);
+        const word = document.getText(range);
 
         this.outputChannel.appendLine('[COMPLETION] Word: "' + word + '" at position ' + position.line + ':' + position.character, 'verbose');
 
@@ -140,6 +145,8 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
                 }
             }
         }
+
+        for (const item of completionItems) item.range = range;
 
         this.outputChannel.appendLine(`[COMPLETION] Returning ${completionItems.length} items`, 'verbose');
         return completionItems;
@@ -473,7 +480,7 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
         return vscode.languages.registerCompletionItemProvider(
             ['calcpad', 'plaintext'], // Language selector
             provider,
-            '.', '(', '$', '{' // Trigger characters ('{' for '<!--{' metadata comments)
+            '.', '(', '$', '{', '#' // Trigger characters ('{' for '<!--{' metadata comments)
         );
     }
 }

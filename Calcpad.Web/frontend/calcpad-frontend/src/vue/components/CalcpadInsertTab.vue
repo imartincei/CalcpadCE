@@ -444,7 +444,7 @@ watch(
 
 <style scoped>
 .insert-tab {
-  padding: 12px;
+  padding: 12px 12px 0;
   height: 100%;
   display: flex;
   flex-direction: column;

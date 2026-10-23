@@ -3039,21 +3039,22 @@ namespace Calcpad.Core
         private static void SvdDiagonalize(Matrix U, Vector sig, Matrix V, Vector rv1, int m, int n, RealValue anorm)
         {
             RealValue g;
+            var tol = anorm * HpSvdSolver.MachineEpsilon;
             for (int k = n; k >= 0; --k)
             {
-                for (int iter = 1; iter <= 30; ++iter)
+                for (int iter = 1; iter <= HpSvdSolver.MaxIterations; ++iter)
                 {
                     var flag = 1;
-                    var nm = 0;
-                    int l;
+                    int nm, l;
                     for (l = k; l >= 0; --l)
                     {
-                        if (rv1[l].D == 0 || (RealValue.Abs(rv1[l]) + anorm).CompareTo(anorm) == 0)
+                        nm = l - 1;
+                        if (rv1[l].D == 0 || RealValue.Abs(rv1[l]).CompareTo(tol) <= 0)
                         {
                             flag = 0;
                             break;
                         }
-                        if ((RealValue.Abs(sig[nm]) + anorm).CompareTo(anorm) == 0)
+                        if (RealValue.Abs(sig[nm]).CompareTo(tol) <= 0)
                             break;
                     }
                     nm = l - 1;
@@ -3066,7 +3067,7 @@ namespace Calcpad.Core
                         {
                             f = s * rv1[i];
                             rv1[i] = c * rv1[i];
-                            if ((RealValue.Abs(f) + anorm).CompareTo(anorm) == 0)
+                            if (RealValue.Abs(f).CompareTo(tol) <= 0)
                                 break;
 
                             g = sig[i];
@@ -3097,8 +3098,8 @@ namespace Calcpad.Core
                         }
                         break;
                     }
-                    if (iter == 30)
-                        throw new MathParserException("no convergence in 30 svdcmp iterations", "CPD-5536", CalcpadErrorKind.Values);
+                    if (iter == HpSvdSolver.MaxIterations)
+                        throw new MathParserException($"no convergence in {HpSvdSolver.MaxIterations} svdcmp iterations", "CPD-5536", CalcpadErrorKind.Values);
 
                     var x = sig[l];
                     nm = k - 1;

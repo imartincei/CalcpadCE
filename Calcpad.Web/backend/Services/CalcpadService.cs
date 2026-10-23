@@ -5,6 +5,9 @@ using Calcpad.Server.Controllers;
 
 namespace Calcpad.Server.Services
 {
+    /// <summary>Where a stepped <c>#UI</c> form stopped, returned in <c>X-Calcpad-Pause</c>.</summary>
+    public sealed record PauseInfo(string? Next, string? Previous);
+
     public class CalcpadService
     {
         private readonly string _tempDirectory;
@@ -40,7 +43,7 @@ namespace Calcpad.Server.Services
         }
 
         /// <returns>Trace is what Core executed, recorded only when the run was in debug mode.</returns>
-        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors, RuntimeTrace? Trace) Convert(
+        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors, RuntimeTrace? Trace, PauseInfo? Pause) Convert(
             string calcpadContent,
             Settings? settings = null,
             bool forceUnwrappedCode = false,
@@ -53,6 +56,8 @@ namespace Calcpad.Server.Services
             bool? debug = null,
             bool? hideErrorLines = null,
             bool write = false,
+            bool stepPauses = false,
+            string? pauseAfter = null,
             CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(calcpadContent))
@@ -74,6 +79,8 @@ namespace Calcpad.Server.Services
                 // Printed output is a report by definition, so it never carries controls.
                 // Overrides still apply - the report shows the values that were entered.
                 enableUi &= !forPrint;
+                // Only the interactive form stops at #pause; everything else runs past it.
+                stepPauses &= enableUi;
 
                 // Input mode hides the source editor, so its "on line [N]" links point at
                 // nothing reachable. Defaults to following enableUi; the report pane beside
@@ -93,6 +100,7 @@ namespace Calcpad.Server.Services
                 cancellationToken.ThrowIfCancellationRequested();
 
                 string htmlResult;
+                PauseInfo? pause = null;
                 IReadOnlyList<string> openXmlExpressions = Array.Empty<string>();
                 var errors = new List<CalcpadError>(macroParser.Errors);
                 RuntimeTrace? trace = null;
@@ -140,10 +148,14 @@ namespace Calcpad.Server.Services
                             EnableUi = enableUi,
                             UiOverrides = uiOverrides,
                             ShowErrorLines = showErrorLines,
-                            AllowDataWrite = write
+                            AllowDataWrite = write,
+                            PauseMode = stepPauses ? PauseBehavior.Step : PauseBehavior.Ignore,
+                            PauseAfter = pauseAfter
                         };
                         parser.Parse(outputText, true, captureOpenXml);
                         htmlResult = parser.HtmlResult;
+                        if (stepPauses)
+                            pause = new PauseInfo(parser.NextPauseKey, parser.PreviousPauseKey);
                         errors.AddRange(parser.Errors);
                         trace = parser.Trace;
                         if (captureOpenXml)
@@ -160,7 +172,7 @@ namespace Calcpad.Server.Services
                 var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);
                 FileLogger.LogVerbose("Conversion completed successfully", $"Output length: {finalHtml.Length}");
 
-                return (finalHtml, openXmlExpressions, errors, trace);
+                return (finalHtml, openXmlExpressions, errors, trace, pause);
             }
             catch (OperationCanceledException)
             {

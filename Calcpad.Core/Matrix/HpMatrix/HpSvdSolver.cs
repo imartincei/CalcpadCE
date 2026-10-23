@@ -5,6 +5,9 @@ namespace Calcpad.Core
 {
     internal static class HpSvdSolver
     {
+        internal const int MaxIterations = 75;
+        internal const double MachineEpsilon = 2.220446049250313e-16;
+
         internal static void Bidiagonalize(double[][] U, double[] sig, double[] rv1, Span<double> U_col_i, int m, int n, out double anorm)
         {
             const double eps = 1d / double.MaxValue;
@@ -160,21 +163,22 @@ namespace Calcpad.Core
         internal static void Diagonalize(double[][] U, double[] sig, double[][] V, double[] rv1, int m, int n, double anorm)
         {
             double g;
+            var tol = MachineEpsilon * anorm;
             for (int k = n; k >= 0; --k)
             {
-                for (int iter = 1; iter <= 30; ++iter)
+                for (int iter = 1; iter <= MaxIterations; ++iter)
                 {
                     var flag = 1;
-                    var nm = 0;
-                    int l;
+                    int nm, l;
                     for (l = k; l >= 0; --l)
                     {
-                        if (rv1[l] == 0 || (Math.Abs(rv1[l]) + anorm) == anorm)
+                        nm = l - 1;
+                        if (rv1[l] == 0 || Math.Abs(rv1[l]) <= tol)
                         {
                             flag = 0;
                             break;
                         }
-                        if ((Math.Abs(sig[nm]) + anorm) == anorm)
+                        if (Math.Abs(sig[nm]) <= tol)
                             break;
                     }
                     nm = l - 1;
@@ -187,7 +191,7 @@ namespace Calcpad.Core
                         {
                             f = s * rv1[i];
                             rv1[i] = c * rv1[i];
-                            if ((Math.Abs(f) + anorm) == anorm)
+                            if (Math.Abs(f) <= tol)
                                 break;
 
                             g = sig[i];
@@ -218,8 +222,8 @@ namespace Calcpad.Core
                         }
                         break;
                     }
-                    if (iter == 30)
-                        throw new MathParserException("no convergence in 30 SVD iterations.", "CPD-5536", CalcpadErrorKind.Values);
+                    if (iter == MaxIterations)
+                        throw new MathParserException($"no convergence in {MaxIterations} SVD iterations.", "CPD-5536", CalcpadErrorKind.Values);
 
                     var x = sig[l];
                     nm = k - 1;

@@ -34,6 +34,11 @@ export interface CompletionData {
 const SORT_USER = '0_';
 const SORT_BUILTIN = '1_';
 
+/** Pulls a 0-indexed word start back over a preceding `#`, which the word pattern excludes. */
+export function completionRangeStart(lineText: string, wordStart: number): number {
+    return lineText[wordStart - 1] === '#' ? wordStart - 1 : wordStart;
+}
+
 function escapeSnippetText(text: string): string {
     return text.replace(/[\\$}]/g, '\\$&');
 }

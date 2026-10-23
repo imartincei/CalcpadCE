@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, hasConvertTrace, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt} from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, hasConvertTrace, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt} from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -45,6 +45,8 @@ let uiPanel: vscode.WebviewPanel | undefined = undefined;
 let uiReportPanel: vscode.WebviewPanel | undefined = undefined;
 const uiOverrides = new UiOverrideStore();
 const uiOverridesDirty = new Set<string>();
+// The #pause step each input form is on, shared with the compiled-worksheet editor.
+const uiPause = new UiPauseStore();
 // Controls each document's last input-form render produced, keyed like the store above.
 const uiControls = new Map<string, UiControl[]>();
 // Document the input form is currently showing, so its values can be prompted
@@ -95,6 +97,33 @@ function syncInputMode(): void {
         && input.viewType.endsWith(CalcpadCompiledEditorProvider.reportViewType);
     const sourceless = !!compiled || compiledReport;
     vueUiProvider?.setInputMode(!!uiPanel || sourceless, sourceless);
+    syncUiPauseContext();
+}
+
+/** The document whose #pause steps the Previous/Next buttons act on. */
+function activeUiPauseDocKey(): string | undefined {
+    return activeCompiledUri()?.toString() ?? (uiPanel ? uiPanelDocKey : undefined);
+}
+
+function syncUiPauseContext(): void {
+    const docKey = activeUiPauseDocKey();
+    const state = docKey ? uiPause.state(docKey) : undefined;
+    void vscode.commands.executeCommand('setContext', 'calcpad.uiPauseActive', hasPauseSteps(state));
+    void vscode.commands.executeCommand('setContext', 'calcpad.uiPauseHasPrevious', !!state && state.previous !== null);
+    void vscode.commands.executeCommand('setContext', 'calcpad.uiPauseHasNext', !!state && state.next !== null);
+}
+
+async function stepUiPause(direction: 'next' | 'previous'): Promise<void> {
+    const compiled = activeCompiledUri();
+    const docKey = activeUiPauseDocKey();
+    if (!docKey || !uiPause.step(docKey, direction)) return;
+    if (compiled) {
+        await compiledEditor?.refresh(compiled);
+        return;
+    }
+    const document = vscode.workspace.textDocuments.find(d => d.uri.toString() === docKey);
+    if (uiPanel && document)
+        await updatePreviewContent(uiPanel, document.getText(), document.uri, false, undefined, true);
 }
 
 /** The content and identity of a document the preview and export paths work from. */
@@ -183,6 +212,8 @@ async function discardUiValues(docKey: string | undefined, allowCancel = false):
     }
     uiOverrides.clear(docKey);
     uiOverridesDirty.delete(docKey);
+    uiPause.clear(docKey);
+    syncUiPauseContext();
     return true;
 }
 
@@ -856,7 +887,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             </head>
             <body>
                 <h3>Empty Document</h3>
-                <p>Start typing CalcpadCE code to see the preview.</p>
+                <p>Start typing to see the preview.</p>
                 <h4>Formatting Hotkeys</h4>
                 <table>
                     <tr><th>Bold</th><td>Ctrl+B</td></tr>
@@ -911,6 +942,8 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             // The input form has no source editor for "on line [N]" to point at, and
             // neither does the report while it's shown behind that form.
             hideErrorLines: forPrint && uiPanel !== undefined ? true : undefined,
+            stepPauses: enableUi,
+            pauseAfter: enableUi ? uiPause.pauseAfter(docKey) : undefined,
             write: settingsManager.mayWrite(forPrint, enableUi)
         });
         // Routed through the shared client (rather than a bare fetch) so a newer preview
@@ -947,6 +980,10 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         if (hasConvertTrace(response)) {
             const document = vscode.workspace.textDocuments.find(d => d.uri.toString() === sourceFileUri.toString());
             if (document) refreshDocumentAnalysis?.(document);
+        }
+        if (enableUi) {
+            uiPause.update(docKey, parseConvertPauseHeader(response));
+            syncUiPauseContext();
         }
 
         // Use the entire API response as the webview HTML
@@ -1764,11 +1801,11 @@ function schedulePreviewUpdate() {
 
 export async function activate(context: vscode.ExtensionContext) {
     console.log('VS Code CalcPad extension is now active!');
-    
+
     try {
         // Store extension context for global access
         extensionContext = context;
-        
+
         // Create output channel for debugging
         outputChannel = new VSCodeLogger(vscode.window.createOutputChannel('CalcpadCE Extension'));
 
@@ -2040,6 +2077,7 @@ export async function activate(context: vscode.ExtensionContext) {
         compiledEditor = CalcpadCompiledEditorProvider.register(
             apiClient,
             uiOverrides,
+            uiPause,
             (panel, text, uri, kind) => updatePreviewContent(
                 panel, text, uri, false, undefined, kind === 'form', kind === 'report', true),
             outputChannel,
@@ -2291,6 +2329,9 @@ export async function activate(context: vscode.ExtensionContext) {
         }
         vscode.window.showInformationMessage(`Saved ${count} #UI value(s) to the document.`);
     });
+
+    const uiPausePreviousCommand = vscode.commands.registerCommand('vscode-calcpad.uiPausePrevious', () => stepUiPause('previous'));
+    const uiPauseNextCommand = vscode.commands.registerCommand('vscode-calcpad.uiPauseNext', () => stepUiPause('next'));
 
     // `targetLine` lets a caller name the line (the sidebar's TOC does); from the palette or
     // a keybinding it arrives undefined and the cursor's line is used. Only that second form
@@ -2704,6 +2745,8 @@ export async function activate(context: vscode.ExtensionContext) {
             toggleUiModeCommand,
             toggleUiReportCommand,
             saveUiValuesCommand,
+            uiPausePreviousCommand,
+            uiPauseNextCommand,
             focusPreviewToLineCommand,
             onDidChangeTextEditorSelection,
             showInsertCommand,
@@ -2755,9 +2798,9 @@ export async function activate(context: vscode.ExtensionContext) {
             webviewSourceRegistration,
             installJuliaMonoDisposable
         );
-        
+
         outputChannel.appendLine('CalcPad extension activation completed successfully', 'information');
-        
+
     } catch (error) {
         console.error('CalcPad extension activation failed:', error);
         if (outputChannel) {

@@ -79,7 +79,6 @@ namespace Calcpad.Core
             Break
         }
 
-        private Keyword _previousKeyword = Keyword.None;
         private static string[] KeywordNames;
         private static Keyword[] KeywordValues;
         private static List<int>[] KeywordIndex;
@@ -147,9 +146,7 @@ namespace Calcpad.Core
 
         KeywordResult ParseKeyword(ReadOnlySpan<char> s, ref Keyword keyword)
         {
-            if (_isPausedByUser)
-                keyword = Keyword.Pause;
-            else if (s[0] == '#' && keyword == Keyword.None)
+            if (s[0] == '#' && keyword == Keyword.None)
                 keyword = GetKeyword(s);
 
             var isModeKeyword = IsActiveModeKeyword(keyword);
@@ -188,8 +185,7 @@ namespace Calcpad.Core
                 case Keyword.End_Post:
                     _isVisible = _visibilityStack.Count > 0 ? _visibilityStack.Pop() : true;
                     break;
-                case Keyword.Input:
-                    return ParseKeywordInput();
+                case Keyword.Input: break; // Deprecated, kept so old documents still parse
                 case Keyword.Pause:
                     return ParseKeywordPause();
                 case Keyword.Val: SetOutputMode(s, keyword, 1); break;
@@ -348,42 +344,12 @@ namespace Calcpad.Core
             }
         }
 
-        KeywordResult ParseKeywordInput()
-        {
-            if (_condition.IsSatisfied)
-            {
-                _previousKeyword = Keyword.Input;
-                if (_calculate)
-                {
-                    _startLine = _currentLine + 1;
-                    _pauseCharCount = _sb.Length;
-                    _calculate = false;
-                    return KeywordResult.Continue;
-                }
-                return KeywordResult.Break;
-            }
-            return _calculate ? KeywordResult.Continue : KeywordResult.Break;
-        }
-
         KeywordResult ParseKeywordPause()
         {
-            if (_condition.IsSatisfied && (_calculate || _startLine > 0))
-            {
-                if (_calculate)
-                {
-                    if (_isPausedByUser)
-                        _startLine = _currentLine;
-                    else
-                        _startLine = _currentLine + 1;
-                }
+            if (PauseMode == PauseBehavior.Step && _calculate && _condition.IsSatisfied &&
+                (_loops.Count == 0 || !_loops.Peek().IsBroken))
+                return StepPause();
 
-                if (_previousKeyword != Keyword.Input)
-                    _pauseCharCount = _sb.Length;
-
-                _previousKeyword = Keyword.Pause;
-                _isPausedByUser = false;
-                return KeywordResult.Break;
-            }
             if (_isVisible && !_calculate)
                 _sb.Append($"<p{HtmlId} class=\"cond\">#pause</p>");
 

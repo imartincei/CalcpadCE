@@ -139,8 +139,13 @@ select option {
     border-radius: 2px;
 }
 
-.toolbar-btn:hover {
+.toolbar-btn:hover:not(:disabled) {
     background: var(--vscode-button-secondaryHoverBackground, #4a4d51);
+}
+
+.toolbar-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
 }
 
 .toolbar-btn.active {
@@ -319,33 +324,41 @@ select option {
 
 /* ---- Tab strip (VS Code-style) ---- */
 .tab-strip {
+    --tab-strip-height: 30px;
     display: flex;
     align-items: stretch;
     background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
     border-bottom: 1px solid var(--vscode-editorGroupHeader-tabsBorder, #1e1e1e);
-    overflow-x: auto;
-    overflow-y: hidden;
     flex-shrink: 0;
-    height: 30px;
+    height: var(--tab-strip-height);
     -webkit-user-select: none;
     user-select: none;
 }
 
-/* Only once its tabs overflow (see setTabStripRef's ResizeObserver in App.vue) does the
- * strip grow enough to give the scrollbar room below a full-height tab row, instead of
- * the scrollbar sitting over the tabs' close buttons. Non-overflowing strips stay compact. */
-.tab-strip.tab-strip-overflowing {
-    height: 48px;
+.tab-list {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    align-items: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
-/* Thinner than the app-wide scrollbar so it eats less of the tab strip's height.
- * Chromium fattens custom scrollbars on hover by default, so pin the hover
- * state to the same height explicitly. On the Linux desktop app (WebKitGTK) this
- * doesn't apply -- scrollbars there come from GTK's native overlay-scrolling theme,
- * not page CSS, and grow on hover regardless of this rule. */
-.tab-strip::-webkit-scrollbar,
-.tab-strip::-webkit-scrollbar:hover {
+@supports selector(::-webkit-scrollbar) {
+    .tab-list {
+        scrollbar-width: auto;
+        scrollbar-color: auto;
+    }
+}
+
+.tab-list::-webkit-scrollbar,
+.tab-list::-webkit-scrollbar:hover {
     height: 5px;
+}
+
+.tab-list > .tab,
+.tab-list > .tab-new {
+    height: calc(var(--tab-strip-height) - 1px);
 }
 
 .tab {
@@ -353,7 +366,6 @@ select option {
     align-items: center;
     gap: 6px;
     padding: 0 8px 0 12px;
-    height: 100%;
     background: var(--vscode-tab-inactiveBackground, #2d2d2d);
     color: var(--vscode-tab-inactiveForeground, #969696);
     border-right: 1px solid var(--vscode-tab-border, #252526);
@@ -422,7 +434,6 @@ select option {
     justify-content: center;
     width: 28px;
     flex-shrink: 0;
-    height: 100%;
     background: transparent;
     color: var(--vscode-tab-inactiveForeground, #969696);
     border: none;
@@ -435,12 +446,7 @@ select option {
     color: var(--vscode-tab-hoverForeground, #ffffff);
 }
 
-/* Run / Split / Preview at the tab strip's right edge. Sticky rather than merely
- * right-aligned: the strip is a horizontal scroller, so an ordinary flex item
- * scrolls out of reach as soon as the tabs overflow. */
 .tab-actions {
-    position: sticky;
-    right: 0;
     display: inline-flex;
     align-items: stretch;
     flex-shrink: 0;
@@ -463,6 +469,11 @@ select option {
 .tab-action svg {
     width: 14px;
     height: 14px;
+}
+
+.results-sidebar-toggle {
+    flex-shrink: 0;
+    align-self: stretch;
 }
 
 .tab-action:hover {
@@ -580,6 +591,7 @@ select option {
  *  - Single click while collapsed to re-expand. */
 .resize-handle {
     width: 4px;
+    margin-inline-end: -4px;
     flex-shrink: 0;
     cursor: col-resize;
     background: transparent;
@@ -593,6 +605,7 @@ select option {
  * give it a subtle activity-bar tint so the user can see where to click. */
 .resize-handle.collapsed {
     width: 8px;
+    margin-inline-end: 0;
     cursor: pointer;
     background: var(--vscode-activityBar-background, #333333);
     border-right: 1px solid var(--vscode-widget-border, #1e1e1e);
@@ -718,11 +731,11 @@ select option {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 4px 12px;
+    padding-inline-start: 12px;
     background: var(--vscode-titleBar-activeBackground, #3c3c3c);
     border-bottom: 1px solid var(--vscode-widget-border);
     font-size: var(--calcpad-font-size-md);
-    min-height: 32px;
+    min-height: 30px;
 }
 
 /* Double-buffered preview: both frames stay visible and painted, one occluding the

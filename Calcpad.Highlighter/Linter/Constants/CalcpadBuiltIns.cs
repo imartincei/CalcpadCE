@@ -212,6 +212,14 @@ namespace Calcpad.Highlighter.Linter.Constants
         }.ToFrozenSet();
 
         /// <summary>
+        /// Keywords still recognized but left out of completions. Each has its own deprecation warning.
+        /// </summary>
+        public static readonly FrozenSet<string> DeprecatedKeywords = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)
+        {
+            "#input"
+        }.ToFrozenSet(System.StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
         /// Keywords that are standalone (no content required after).
         /// </summary>
         public static readonly FrozenSet<string> StandaloneKeywords = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)

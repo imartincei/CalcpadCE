@@ -220,7 +220,7 @@
         .dvcs:has(.block):not(.block *) {
             display: inline-block;
             border-left: solid 1pt #80b0e8;
-            padding-left: 0;
+            padding-left: 3pt;
             margin-left: 3pt;
         }
 
@@ -230,6 +230,10 @@
                 color: #90c4f0;
                 margin-left: -4.5pt;
             }
+
+        .dvcs:has(.block) > :first-child {
+            display: none;
+        }
 
         .arr {
             color: #90c4f0;
@@ -496,6 +500,11 @@
         .ok {
             color: Green;
             background-color: #F0FFF0;
+        }
+
+        .paused {
+            color: #8A6D00;
+            background-color: #FFF8D6;
         }
 
         .ref {
@@ -892,6 +901,11 @@
             background-color: #2d3f2d; /* Dark green background */
         }
 
+        .dark-theme .paused {
+            color: #e8dca8;
+            background-color: #3f3a26;
+        }
+
         .dark-theme .ref {
             color: #b5cea8; /* Light green */
             background-color: #2d3f2d; /* Dark green background */
@@ -1099,13 +1113,6 @@
         .lineLink { left: -3em !important; top: 0 !important; bottom: 0 !important; width: 3em !important; height: auto !important; font-size: 16pt !important; padding-right: 4pt !important; box-sizing: border-box !important; display: flex !important; align-items: center !important; justify-content: flex-end !important; opacity: 0 !important; transition: opacity 0.15s !important; }
         .lineLink:hover { opacity: 1 !important; }
     </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll(".dvcs:has(.block) > :first-child").forEach(function (el) {
-                el.innerHTML = "&hairsp;";
-            });
-        });
-    </script>
 </head>
 <body>
     {{CONTENT}}

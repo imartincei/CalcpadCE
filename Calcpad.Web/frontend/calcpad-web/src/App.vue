@@ -33,40 +33,37 @@
             :style="editorGroupStyle(gi)"
             @mousedown="onGroupFocus(group.id)"
           >
-            <!-- Grows taller only once the tabs overflow, to clear the scrollbar. -->
             <div
               v-if="group.tabs.length > 0"
               class="tab-strip"
-              :class="{ 'tab-strip-overflowing': tabStripOverflowIds.has(group.id) }"
-              role="tablist"
-              :ref="el => setTabStripRef(group.id, el)"
               @contextmenu.prevent
             >
-              <div
-                v-for="tab in group.tabs"
-                :key="tab.id"
-                class="tab"
-                :class="{ active: tab.isActive, dirty: tab.dirty }"
-                role="tab"
-                :aria-selected="tab.isActive"
-                :title="tab.filePath || tab.title"
-                @mousedown.left="onTabClick(group.id, tab.id)"
-                @mousedown.middle.prevent="onTabClose(group.id, tab.id)"
-                @contextmenu.prevent="onTabContextMenu($event, group.id, tab.id)"
-              >
-                <span class="tab-title">{{ tab.title }}</span>
-                <span v-if="tab.dirty" class="tab-dirty-dot" :title="'Unsaved changes'">●</span>
-                <button
-                  class="tab-close"
-                  :title="tab.dirty ? 'Close (unsaved changes)' : 'Close'"
-                  @mousedown.stop
-                  @click.stop="onTabClose(group.id, tab.id)"
+              <div class="tab-list" role="tablist" @wheel="onTabListWheel">
+                <div
+                  v-for="tab in group.tabs"
+                  :key="tab.id"
+                  class="tab"
+                  :class="{ active: tab.isActive, dirty: tab.dirty }"
+                  role="tab"
+                  :aria-selected="tab.isActive"
+                  :title="tab.filePath || tab.title"
+                  @mousedown.left="onTabClick(group.id, tab.id)"
+                  @mousedown.middle.prevent="onTabClose(group.id, tab.id)"
+                  @contextmenu.prevent="onTabContextMenu($event, group.id, tab.id)"
                 >
-                  ✕
-                </button>
+                  <span class="tab-title">{{ tab.title }}</span>
+                  <span v-if="tab.dirty" class="tab-dirty-dot" :title="'Unsaved changes'">●</span>
+                  <button
+                    class="tab-close"
+                    :title="tab.dirty ? 'Close (unsaved changes)' : 'Close'"
+                    @mousedown.stop
+                    @click.stop="onTabClose(group.id, tab.id)"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <button class="tab-new" title="New tab (Ctrl+T)" @click="onNewTab(group.id)">+</button>
               </div>
-              <button class="tab-new" title="New tab (Ctrl+T)" @click="onNewTab(group.id)">+</button>
-              <span class="spacer"></span>
               <!-- First group only; the strip is inside the v-for over groups. -->
               <div v-if="gi === 0 && !uiModeFullscreen" class="tab-actions">
                 <button
@@ -88,14 +85,13 @@
                   <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2.5" y="2.5" width="11" height="11" rx="1"/><line x1="2.5" y1="8" x2="13.5" y2="8"/></svg>
                 </button>
                 <button
-                  class="tab-action"
-                  :class="{ active: previewVisible }"
+                  v-if="!previewVisible"
+                  class="tab-action results-sidebar-toggle"
                   @click="togglePreview"
-                  :title="previewVisible ? 'Hide the results pane' : 'Show the results pane (Ctrl+P)'"
-                  :aria-label="previewVisible ? 'Hide the results pane' : 'Show the results pane'"
-                  :aria-pressed="previewVisible"
+                  title="Show the results pane (Ctrl+P)"
+                  aria-label="Show the results pane"
                 >
-                  <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2.5" y="2.5" width="11" height="11" rx="1"/><line x1="9" y1="2.5" x2="9" y2="13.5"/><path d="M9.5 3h4v10h-4z" fill="currentColor" stroke="none" opacity="0.5"/></svg>
+                  <SidebarIcon side="right" collapsed />
                 </button>
               </div>
               <button
@@ -115,11 +111,7 @@
                 title="Show the sidebar (Ctrl+Shift+B)"
                 aria-label="Show the sidebar"
               >
-                <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2">
-                  <rect x="2.5" y="2.5" width="11" height="11" rx="1"/>
-                  <line x1="6.5" y1="2.5" x2="6.5" y2="13.5"/>
-                  <polyline points="9.5,5.5 12,8 9.5,10.5"/>
-                </svg>
+                <SidebarIcon collapsed />
               </button>
             </div>
           </div>
@@ -332,6 +324,20 @@
           >Report</button>
         </div>
         <span class="spacer"></span>
+        <span v-if="resultMode === 'ui' && hasPauseSteps(uiPause)" class="preview-mode-group">
+          <button
+            class="toolbar-btn"
+            :disabled="uiPause?.previous == null"
+            @click="onUiPauseStep('previous')"
+            title="Back to the previous #pause"
+          >◀ Previous</button>
+          <button
+            class="toolbar-btn"
+            :disabled="uiPause?.next == null"
+            @click="onUiPauseStep('next')"
+            title="Continue past the next #pause"
+          >Next ▶</button>
+        </span>
         <button
           v-if="uiModeFullscreen"
           class="toolbar-btn"
@@ -358,7 +364,15 @@
             @click="exitUiMode"
             title="Return to the editor"
           >Exit input mode</button>
-          <button v-else class="toolbar-btn" @click="togglePreview">✕</button>
+          <button
+            v-else
+            class="tab-action results-sidebar-toggle"
+            @click="togglePreview"
+            title="Hide the results pane (Ctrl+P)"
+            aria-label="Hide the results pane"
+          >
+            <SidebarIcon side="right" />
+          </button>
         </template>
       </div>
       <!-- One preview iframe per editor group. allow-same-origin is deliberately
@@ -564,6 +578,7 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
+import SidebarIcon from 'calcpad-frontend/vue/components/SidebarIcon.vue'
 import {
   extractBodyHtml,
   isCompiledPath,
@@ -578,6 +593,8 @@ import {
   MAX_HTML_MIRROR_CHARS,
   DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT,
   MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
+  hasPauseSteps,
+  type UiPauseState,
   type PreviewScrollState,
   type ServerStatus,
   type DisplayLogLevel,
@@ -611,6 +628,9 @@ const onSaveUiOverridesRequest = ref<(() => void) | null>(null)
 const onExitUiModeRequest = ref<(() => Promise<boolean>) | null>(null)
 // "Print PDF" — the host runs the export.
 const onPrintReportRequest = ref<(() => void) | null>(null)
+// #pause steps of the input form; null when it has none.
+const uiPause = ref<UiPauseState | null>(null)
+const onUiPauseStepRequest = ref<((direction: 'next' | 'previous') => void) | null>(null)
 
 /** UI mode hands the whole window to the input form; only the tab strip stays. */
 const uiModeFullscreen = computed(() => previewVisible.value && resultMode.value === 'ui')
@@ -694,43 +714,6 @@ function setEditorRef(id: string, el: unknown): void {
   else editorEls.delete(id)
 }
 
-// Which tab strips overflow, so only those grow taller for the scrollbar. A
-// ResizeObserver catches both causes: window resizes and tabs coming and going.
-const tabStripEls = new Map<string, HTMLElement>()
-const tabStripElIds = new WeakMap<Element, string>()
-const tabStripOverflowIds = ref<Set<string>>(new Set())
-let tabStripResizeObserver: ResizeObserver | null = null
-
-function setTabStripOverflow(id: string, overflowing: boolean): void {
-  if (tabStripOverflowIds.value.has(id) === overflowing) return
-  const next = new Set(tabStripOverflowIds.value)
-  if (overflowing) next.add(id)
-  else next.delete(id)
-  tabStripOverflowIds.value = next
-}
-
-function checkTabStripOverflow(id: string): void {
-  const el = tabStripEls.get(id)
-  if (!el) return
-  setTabStripOverflow(id, el.scrollWidth > el.clientWidth + 1)
-}
-
-function setTabStripRef(id: string, el: unknown): void {
-  const prev = tabStripEls.get(id)
-  if (prev && prev !== el) {
-    tabStripResizeObserver?.unobserve(prev)
-    tabStripElIds.delete(prev)
-  }
-  if (el instanceof HTMLElement) {
-    tabStripEls.set(id, el)
-    tabStripElIds.set(el, id)
-    tabStripResizeObserver?.observe(el)
-    checkTabStripOverflow(id)
-  } else {
-    tabStripEls.delete(id)
-    setTabStripOverflow(id, false)
-  }
-}
 function setFrameRef(map: Map<string, FramePair>, id: string, slot: number, el: unknown): void {
   const pair = map.get(id) ?? [null, null] as FramePair
   pair[slot === 0 ? 0 : 1] = el instanceof HTMLIFrameElement ? el : null
@@ -971,6 +954,16 @@ const tabContextMenu = ref<TabContextMenuState | null>(null)
 function setTabs(groupId: string, next: TabUiState[]): void {
   const g = groups.value.find(g => g.id === groupId)
   if (g) g.tabs = next
+}
+
+function onTabListWheel(event: WheelEvent): void {
+  if (event.ctrlKey || event.deltaX !== 0 || event.deltaY === 0) return
+  const tabList = event.currentTarget as HTMLElement
+  if (tabList.scrollWidth <= tabList.clientWidth) return
+  const step = event.deltaMode === WheelEvent.DOM_DELTA_LINE ? tabList.clientHeight
+    : event.deltaMode === WheelEvent.DOM_DELTA_PAGE ? tabList.clientWidth : 1
+  event.preventDefault()
+  tabList.scrollLeft += event.deltaY * step * 0.3
 }
 
 function onTabClick(groupId: string, id: string): void {
@@ -1357,6 +1350,20 @@ function onPreviewWindowMessage(e: MessageEvent): void {
     }
     return
   }
+  // Replayed on the host window, where main.ts binds app shortcuts. Only a focused
+  // frame may send one, so worksheet script can't fire them unprompted.
+  if (data.type === 'previewShortcut') {
+    const focused = document.activeElement
+    if (!(focused instanceof HTMLIFrameElement) || focused.contentWindow !== e.source) return
+    window.dispatchEvent(new KeyboardEvent('keydown', {
+      key: String(data.key ?? ''),
+      ctrlKey: data.ctrlKey === true,
+      shiftKey: data.shiftKey === true,
+      altKey: data.altKey === true,
+      cancelable: true,
+    }))
+    return
+  }
   if (data.type === 'previewClipboardAction') {
     const action = data.action as PreviewClipboardAction
     if (!isRepeatedPreviewClipboard(action)) void runPreviewClipboardAction(frameId, action)
@@ -1539,6 +1546,10 @@ function toggleSidebar(): void {
   sidebarVisible.value = !sidebarVisible.value
 }
 
+function showSidebar(): void {
+  sidebarVisible.value = true
+}
+
 const onLayoutChanged = ref<((layout: WorkspaceLayout) => void) | null>(null)
 
 // Watched, not reported per toggle: several controls flip these directly.
@@ -1641,6 +1652,14 @@ function onSaveUiOverrides(): void {
 
 function onPrintReport(): void {
   onPrintReportRequest.value?.()
+}
+
+function setUiPauseState(state: UiPauseState | null): void {
+  uiPause.value = state
+}
+
+function onUiPauseStep(direction: 'next' | 'previous'): void {
+  onUiPauseStepRequest.value?.(direction)
 }
 
 /** Leaves the fullscreen input form for the report view, bringing the editor back. */
@@ -1811,6 +1830,13 @@ function injectLineLinks(
     "      e.preventDefault();",
     "      try { window.parent.postMessage({ type: 'previewFindOpen', groupId: FRAME_ID }, '*'); } catch (_e) {}",
     "    }",
+    // Unhandled, F5 here reloads the whole desktop webview.
+    ...(props.isDesktop ? [
+    "    if (e.key === 'F5' && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {",
+    "      e.preventDefault();",
+    "      try { window.parent.postMessage({ type: 'previewRefresh', groupId: FRAME_ID }, '*'); } catch (_e) {}",
+    "    }",
+    ] : []),
     "  });",
     "  var isCodeView = !!document.querySelector('.line-num');",
     "  document.querySelectorAll('a[data-text]').forEach(function(link) {",
@@ -1951,13 +1977,13 @@ function insertHeadScript(html: string, body: string): string {
 
 /**
  * The frame's half of find-in-preview and the clipboard bridge. Done in the frame so it can
- * keep an opaque origin; from the host it would need `allow-same-origin`. `interceptClipboard`
- * takes Ctrl+C/X/V in the capture phase, ahead of the datagrid library.
+ * keep an opaque origin; from the host it would need `allow-same-origin`. `desktopHost`
+ * takes Ctrl+C/X/V and the app shortcuts in the capture phase, ahead of the datagrid library.
  */
 function injectPreviewAgent(
   html: string,
   frameId: string,
-  interceptClipboard: boolean,
+  desktopHost: boolean,
   scroll: PreviewScrollState | undefined,
 ): string {
   const id = JSON.stringify(frameId)
@@ -2032,7 +2058,7 @@ function injectPreviewAgent(
     "    try { selection = String(window.getSelection() || ''); } catch (_e) {}",
     "    if (selection) send({ type: 'previewClipboardText', text: selection });",
     '  }',
-    ...(interceptClipboard ? [
+    ...(desktopHost ? [
     "  var ACTIONS = { c: 'copy', x: 'cut', v: 'paste' };",
     "  document.addEventListener('keydown', function(e) {",
     '    if ((!e.ctrlKey && !e.metaKey) || e.altKey || e.shiftKey) return;',
@@ -2042,6 +2068,19 @@ function injectPreviewAgent(
     '    e.stopImmediatePropagation();',
     // The host resolves paste text and echoes the action back as cpdClipboardExec.
     "    send({ type: 'previewClipboardAction', action: action });",
+    '  }, true);',
+    '',
+    // ---- app shortcuts ----
+    // Ctrl+keys go to main.ts's window handler, which a frame's keys never reach; it acts
+    // only on app shortcuts. Kept here: select all, find, clipboard, undo/redo.
+    // AltGr reports as Ctrl+Alt, so it is skipped to keep those characters typeable.
+    "  var FRAME_KEYS = 'acfvxyz';",
+    "  document.addEventListener('keydown', function(e) {",
+    "    if (!e.ctrlKey || e.metaKey || e.getModifierState('AltGraph')) return;",
+    "    var k = (e.key || '').toLowerCase();",
+    "    if (k !== 'tab' && (k.length !== 1 || FRAME_KEYS.indexOf(k) !== -1)) return;",
+    '    e.preventDefault();',
+    "    send({ type: 'previewShortcut', key: e.key, ctrlKey: e.ctrlKey, shiftKey: e.shiftKey, altKey: e.altKey });",
     '  }, true);',
     ] : []),
     '',
@@ -2214,22 +2253,12 @@ onMounted(async () => {
   document.addEventListener('mousedown', onDocumentInteractionForTabMenu)
   document.addEventListener('keydown', onDocumentInteractionForTabMenu)
   window.addEventListener('message', onPreviewWindowMessage)
-
-  tabStripResizeObserver = new ResizeObserver(entries => {
-    for (const entry of entries) {
-      const id = tabStripElIds.get(entry.target)
-      if (id) checkTabStripOverflow(id)
-    }
-  })
-  for (const el of tabStripEls.values()) tabStripResizeObserver.observe(el)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('mousedown', onDocumentInteractionForTabMenu)
   document.removeEventListener('keydown', onDocumentInteractionForTabMenu)
   window.removeEventListener('message', onPreviewWindowMessage)
-  tabStripResizeObserver?.disconnect()
-  tabStripResizeObserver = null
 })
 
 // ---- In-app confirm dialog ----
@@ -2347,6 +2376,7 @@ defineExpose({
   onRunRequest,
   // panels / preview
   toggleSidebar,
+  showSidebar,
   togglePreview,
   onLayoutChanged,
   setLayout,
@@ -2368,6 +2398,8 @@ defineExpose({
   onSaveUiOverridesRequest,
   onExitUiModeRequest,
   onPrintReportRequest,
+  setUiPauseState,
+  onUiPauseStepRequest,
   setUiPrintHtml,
   isUiPrintVisible,
   onUiPrintToggled,

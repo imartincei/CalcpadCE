@@ -1,5 +1,6 @@
 import * as monaco from 'monaco-editor';
 import {
+    completionRangeStart,
     formatBuiltinSnippetCompletion,
     formatCustomUnitCompletion,
     formatFunctionCompletion,
@@ -26,13 +27,13 @@ export function registerCompletionProvider(bridge: EditorBridge): monaco.IDispos
             // Inside a #include/#read/#write/#append/#ProjectPath/#LibraryPath
             // path, only registerIncludeCompletionProvider's file suggestions
             // should show.
-            const lineToCursor = model.getLineContent(position.lineNumber).substring(0, position.column - 1);
-            if (parseDirectiveLine(lineToCursor)) return { suggestions: [] };
+            const line = model.getLineContent(position.lineNumber);
+            if (parseDirectiveLine(line.substring(0, position.column - 1))) return { suggestions: [] };
 
             const word = model.getWordUntilPosition(position);
             const range: monaco.IRange = {
                 startLineNumber: position.lineNumber,
-                startColumn: word.startColumn,
+                startColumn: completionRangeStart(line, word.startColumn - 1) + 1,
                 endLineNumber: position.lineNumber,
                 endColumn: word.endColumn,
             };

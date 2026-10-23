@@ -1267,11 +1267,11 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to &lt;p&gt;&lt;span class=&quot;err&quot;&gt;Paused!&lt;/span&gt; Press &lt;b&gt;F5&lt;/b&gt; to &lt;a href=&quot;#0&quot; data-text=&quot;continue&quot;&gt;continue&lt;/a&gt; or &lt;b&gt;Esc&lt;/b&gt; to &lt;a href=&quot;#0&quot; data-text=&quot;cancel&quot;&gt;cancel&lt;/a&gt;.&lt;/p&gt;.
+        // /   Looks up a localized string similar to &lt;p class=&quot;paused&quot;&gt;Paused: Click Next to Continue&lt;/p&gt;.
         // / </summary>
-        public static string Paused_Press_F5_to_continue {
+        public static string Paused_Click_Next_to_continue {
             get {
-                return ResourceManager.GetString("Paused_Press_F5_to_continue", resourceCulture);
+                return ResourceManager.GetString("Paused_Click_Next_to_continue", resourceCulture);
             }
         }
 
