@@ -740,7 +740,7 @@ const localSettings = ref<Settings>({ ...props.settings })
 // field order unchanged.
 const MATH_KEYS = [
   'decimals', 'degrees', 'complex', 'substitute', 'formatEquations',
-  'zeroSmallMatrixElements', 'showHiddenOutput', 'maxOutputCount', 'precision', 'tol',
+  'zeroSmallMatrixElements', 'inlineMatrices', 'showHiddenOutput', 'maxOutputCount', 'precision', 'tol',
 ].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
 const PLOT_KEYS_A = ['adaptivePlot'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
 const PLOT_KEYS_B = ['vectorGraphics', 'colorScale', 'smoothScale', 'shadows'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
@@ -829,6 +829,7 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       substitute: 'substitute variables',
       formatEquations: 'format equations professional inline',
       zeroSmallMatrixElements: 'zero small matrix elements scientific notation',
+      inlineMatrices: 'inline matrices vectors grid bracket single line rendering layout cells aligned',
       showHiddenOutput: 'show hidden output hide debug debugging suppressed',
       maxOutputCount: 'max output count rows columns matrices vectors',
       precision: 'numerical precision integration root finding tolerance',

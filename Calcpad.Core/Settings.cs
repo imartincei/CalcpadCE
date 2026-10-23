@@ -23,7 +23,8 @@ namespace Calcpad.Core
         PlotHeight,
         PlotStep,
         Precision,
-        Tol
+        Tol,
+        InlineMatrices
     }
 
     /// <summary>
@@ -50,6 +51,7 @@ namespace Calcpad.Core
         public int? PlotStep { get; set; }
         public double? Precision { get; set; }
         public double? Tol { get; set; }
+        public bool? InlineMatrices { get; set; }
 
         /// <summary>
         /// Bounds mirror how <c>Calcpad.Core</c> constrains each value: <c>decimals</c> and
@@ -103,6 +105,14 @@ namespace Calcpad.Core
         public bool Substitute { get; set; }
         public bool FormatEquations { get; set; }
         public bool ZeroSmallMatrixElements { get; set; }
+
+        /// <summary>
+        /// Renders matrix/vector literals and vector results on a single bracketed line
+        /// (true, the default). When false they are typeset as aligned grids inside
+        /// full-height brackets vertically centered on the equation line, including
+        /// matrix/vector literals on the equation line.
+        /// </summary>
+        public bool InlineMatrices { get; set; }
         public bool ShowHiddenOutput { get; set; }
         public int MaxOutputCount
         {
@@ -129,6 +139,7 @@ namespace Calcpad.Core
             Substitute = true;
             FormatEquations = true;
             ZeroSmallMatrixElements = true;
+            InlineMatrices = true;
             ShowHiddenOutput = false;
             MaxOutputCount = 20;
             Precision = 1e-14;

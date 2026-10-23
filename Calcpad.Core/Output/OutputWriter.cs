@@ -22,6 +22,10 @@ namespace Calcpad.Core
         protected readonly string formatString = null;
         protected readonly bool formatEquations;
         protected readonly bool zeroSmallElements;
+
+        /// <summary>Renders substituted matrix/vector literals and vector results on a single bracketed line.</summary>
+        protected readonly bool inlineMatrices;
+        internal bool InlineMatrices => inlineMatrices;
         protected readonly int maxCount = 20;
         protected readonly bool phasor = false;
         protected readonly int degrees = 0;
@@ -35,6 +39,7 @@ namespace Calcpad.Core
             formatString = settings.FormatString;
             formatEquations = settings.FormatEquations;
             zeroSmallElements = settings.ZeroSmallMatrixElements;
+            inlineMatrices = settings.InlineMatrices;
             maxCount = settings.MaxOutputCount;
             degrees = settings.Degrees;
             this.phasor = phasor;
@@ -72,6 +77,125 @@ namespace Calcpad.Core
         internal abstract string FormatMatrixValue(RealValue value, double zeroThreshold);
         internal abstract string FormatBlock(string[] sa);
         internal abstract string CloseCurlyBrackets(string sa, int level);
+
+        internal string FormatBracketedVector(string[] cells, int level, int minOffset, int maxOffset)
+        {
+            if (inlineMatrices)
+                return AddOffsetBrackets(string.Join(FormatOperator(';'), cells), level, minOffset, maxOffset, '[', ']');
+
+            var grid = TruncateColumns([cells]);
+            return WrapMatrix(grid, grid[0].Length);
+        }
+
+        /// <summary>A bracketed matrix literal. Rows are already split into cells by the row divisors.</summary>
+        internal string FormatBracketedMatrix(string[][] rows, int level, int minOffset, int maxOffset)
+        {
+            if (inlineMatrices)
+                return AddOffsetBrackets(JoinCells(rows), level, minOffset, maxOffset, '[', ']');
+
+            var grid = TruncateRows(rows, out var columns);
+            return WrapMatrix(grid, columns);
+        }
+
+        internal string AddOffsetBrackets(string s, int level, int minOffset, int maxOffset, char left, char right)
+        {
+            var offset = minOffset + maxOffset;
+            level += (maxOffset - minOffset) / 2;
+            return AddBrackets(offset == 0 ? s : FixOffset(s, offset), level, left, right);
+        }
+
+        internal static string FixOffset(string s, int offset) => offset switch
+        {
+            < 0 => $"<span class=\"dvc up\">{s}</span>",
+            > 0 => $"<span class=\"dvc down\">{s}</span>",
+            _ => s
+        };
+
+        /// <summary>Renders pre-formatted cells as an aligned grid inside full-height brackets.</summary>
+        protected abstract string WrapMatrix(string[][] rows, int columns);
+
+        internal string JoinCells(string[][] rows)
+        {
+            var sb = new StringBuilder();
+            foreach (var row in rows)
+            {
+                if (sb.Length > 0)
+                    sb.Append(FormatOperator('|'));
+
+                sb.Append(string.Join(FormatOperator(';'), row));
+            }
+            return sb.ToString();
+        }
+
+        // Truncates head/tail rows and columns like FormatMatrix, so wide grids never run past the page width.
+        private string[][] TruncateRows(string[][] rows, out int columns)
+        {
+            columns = 0;
+            foreach (var row in rows)
+                if (row.Length > columns)
+                    columns = row.Length;
+
+            if (columns > maxCount)
+                columns = maxCount + 2;
+
+            if (rows.Length <= maxCount)
+                return FitRows(rows, columns);
+
+            var grid = new string[maxCount + 2][];
+            for (var i = 0; i < maxCount; ++i)
+                grid[i] = rows[i];
+
+            var dots = new string[columns];
+            for (var j = 0; j < columns; ++j)
+                dots[j] = columns > maxCount && j == maxCount ? "⋱" : "⋮";
+
+            grid[maxCount] = dots;
+            grid[^1] = rows[^1];
+            return FitRows(grid, columns);
+        }
+
+        private string[][] TruncateColumns(string[][] rows)
+        {
+            var columns = 0;
+            foreach (var row in rows)
+                if (row.Length > columns)
+                    columns = row.Length;
+
+            if (columns > maxCount)
+                columns = maxCount + 2;
+
+            return FitRows(rows, columns);
+        }
+
+        private string[][] FitRows(string[][] rows, int columns)
+        {
+            var grid = new string[rows.Length][];
+            for (var i = 0; i < rows.Length; ++i)
+                grid[i] = FitRow(rows[i], columns);
+
+            return grid;
+        }
+
+        // Pads ragged rows to the widest row, so the brackets stay square.
+        private string[] FitRow(string[] row, int columns)
+        {
+            if (row.Length == columns)
+                return row;
+
+            var cells = new string[columns];
+            var head = Math.Min(row.Length, columns > maxCount ? maxCount : columns);
+            for (var j = 0; j < head; ++j)
+                cells[j] = row[j];
+
+            if (columns > maxCount)
+            {
+                cells[maxCount] = "⋯";
+                if (row.Length > maxCount)
+                    cells[^1] = row[^1];
+            }
+            return cells;
+        }
+
         internal string FormatUnitsText(string text)
         {
             _stringBuilder.Clear();

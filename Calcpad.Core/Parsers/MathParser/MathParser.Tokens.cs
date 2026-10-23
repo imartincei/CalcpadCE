@@ -136,6 +136,7 @@
             internal readonly int[] ArgumentMap;
             internal readonly int PositionalCount;
             internal bool IsCompositeValue;
+            internal string[] Cells;      // Row cells of a bracketed literal, for grid rendering.
 
             internal RenderToken(string content, TokenTypes type, int level) : base(content, type)
             {
