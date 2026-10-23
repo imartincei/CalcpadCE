@@ -3424,6 +3424,7 @@ A bare <code>dotnet run</code> leaves the variable unset, and the API is then op
 <li><code>uiOverrides</code> — values entered into <code>#UI</code> controls, keyed by the control identity the preview reports in <code>data-ui-var</code></li>
 <li><code>includeLineAnchors</code> — emits the per-line anchors and error boxes the preview navigates by. Defaults to the opposite of <code>forPrint</code></li>
 <li><code>hideErrorLines</code> — drops the "on line [N]" reference from error messages. Defaults to <code>enableUi</code></li>
+<li><code>stepPauses</code> / <code>pauseAfter</code> — splits the input form at each <code>#pause</code>, stopping at the first one after the <code>pauseAfter</code> key. Requires <code>enableUi</code>; every other render runs past <code>#pause</code></li>
 <li><code>write</code> — whether this request may run <code>#write</code>/<code>#append</code>. <code>false</code> by default, so a preview refresh doesn't rewrite output on every keystroke</li>
 </ul>
 <p>The analysis endpoints (<code>/highlight</code>, <code>/lint</code>, <code>/definitions</code>, <code>/symbol-at-position</code>) take <code>content</code> and <code>sourceFilePath</code> only.</p>
@@ -3433,6 +3434,7 @@ A bare <code>dotnet run</code> leaves the variable unset, and the API is then op
 Calculation errors come back alongside it in an <code>X-Calcpad-Errors</code> response header, URL-encoded JSON of:</p>
 <div class="language-typescript highlight"><pre><span></span><code><span class="nb">Array</span><span class="o">&lt;</span><span class="p">{</span><span class="w"> </span><span class="nx">sourceLine</span><span class="p">,</span><span class="w"> </span><span class="nx">outputLine</span><span class="p">,</span><span class="w"> </span><span class="nx">message</span><span class="p">,</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="s2">"Macro"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"Expression"</span><span class="w"> </span><span class="p">}</span><span class="o">&gt;</span>
 </code></pre></div>
+<p>A stepped input form also returns an <code>X-Calcpad-Pause</code> header, URL-encoded JSON of <code>{ next, previous }</code>. Send <code>next</code> or <code>previous</code> back as <code>pauseAfter</code> to move a step; either is null when there is no step that way.</p>
 <h3 id="definitions">Definitions<a class="headerlink" href="#definitions" title="Permanent link">&para;</a></h3>
 <p>Four parallel arrays, plus the resolved <code>projectPath</code> and <code>libraryPath</code> when the document's <code>#include</code> chain declares them:</p>
 <ul>

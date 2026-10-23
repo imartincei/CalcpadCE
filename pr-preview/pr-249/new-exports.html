@@ -3410,6 +3410,8 @@ y = x + 1
 </tbody>
 </table>
 <p>The input form and unwrapped never write, and which <code>#UI</code> values (default or overrides) reach the file depends on the preview mode and settings.</p>
+<p>Numbers in CSV are always written with a <code>.</code> decimal separator, so a file reads back the same on any machine.
+To read a CSV saved by Excel with a decimal comma, use sep=';'. To write that spreadsheet, use .xlsx.</p>
 <h2 id="portable-exports">Portable exports<a class="headerlink" href="#portable-exports" title="Permanent link">&para;</a></h2>
 <p>Beyond saving a document as <code>.cpd</code>, CalcpadCE can produce two self-contained outputs meant to be handed to someone else: a compiled worksheet, which runs anywhere but keeps its source locked, and a portable package, which stays readable and editable.</p>
 <h3 id="save-as-compiled-worksheet">Save As Compiled Worksheet<a class="headerlink" href="#save-as-compiled-worksheet" title="Permanent link">&para;</a></h3>

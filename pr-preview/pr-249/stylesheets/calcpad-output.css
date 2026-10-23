@@ -332,7 +332,7 @@
     .dvcs:has(.block):not(.block *) {
         display: inline-block;
         border-left: solid 1pt #80b0e8;
-        padding-left: 0;
+        padding-left: 3pt;
         margin-left: 3pt;
     }
 
@@ -341,6 +341,10 @@
         font-size: 9pt;
         color: #90c4f0;
         margin-left: -4.5pt;
+    }
+
+    .dvcs:has(.block) > :first-child {
+        display: none;
     }
 
     .arr {
