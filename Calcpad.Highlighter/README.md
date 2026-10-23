@@ -100,13 +100,15 @@ var result = new CalcpadLinter().Lint(staged, ignoreRegions);
 // result.ErrorCount, result.WarningCount, result.Diagnostics
 ```
 
-Twelve validators run in stage order:
+Validators run in stage order:
 
 | Stage | Validators |
 |-------|-----------|
 | 1 | `IncludeValidator` — deprecated `#include` input values |
 | 2 | `MacroValidator` — MacroParser's include and macro errors, plus parameters without `$` and `#def` inside control blocks |
-| 3 | `BalanceValidator`, `NamingValidator`, `UsageValidator`, `SemanticValidator`, `FunctionTypeValidator`, `CommandBlockValidator`, `FormatValidator`, `HtmlCommentValidator`, `SettingsValidator`, `UiValidator` |
+| 3 | `NamingValidator`, `UsageValidator`, `FunctionTypeValidator`, `CommandBlockValidator`, `HtmlCommentValidator`, `SettingsValidator`, `UiValidator`, `LegacyInputValidator`, `DeprecatedInputKeywordValidator`, then `CoreCheckValidator` and `RunErrorValidator` |
+
+`CoreCheckValidator` reports Core's check pass (`ExpressionParser.Check`), run once per resolved content and cached in `StagedResolvedContent.CoreCheck`. It parses every line, untaken branches included, so syntax, brackets, block structure, argument counts and unknown functions come from Core. Errors that depend on names are shown only on lines the last run didn't execute. `RunErrorValidator` reports the errors of the last run that `Lint` was given (see `RunErrors`). Duplicates are collapsed by line and code, keeping the static check. Neither runs when MacroParser reported errors.
 
 Every diagnostic code, its severity, and the `LintIgnore`/`EndLintIgnore` markers that `LintIgnoreRegionParser` reads are documented in [docs/new-linter.md](../docs/new-linter.md). Codes are defined in [Linter/Constants/ErrorCodes.cs](Linter/Constants/ErrorCodes.cs) — keep the two in sync when adding one.
 

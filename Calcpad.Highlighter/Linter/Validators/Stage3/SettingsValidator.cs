@@ -42,7 +42,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 return;
 
             var reporter = new DirectiveJsonReporter(
-                result, lineIndex, token.Column, token.Column + token.Length, Code, "#settings");
+                result, lineIndex, token.Column, token.Column + token.Length, Code, "#settings", coreRejects: true);
 
             using (var doc = reporter.TryParse(json))
             {
@@ -62,12 +62,12 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             }
             catch (JsonException)
             {
-                reporter.Warn("a #settings value has the wrong type");
+                reporter.Report("a #settings value has the wrong type");
                 return;
             }
 
             foreach (var error in dto.Validate())
-                reporter.Warn(error.Message);
+                reporter.Report(error.Message);
         }
     }
 }

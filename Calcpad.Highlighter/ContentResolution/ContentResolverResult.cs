@@ -315,6 +315,9 @@ namespace Calcpad.Highlighter.ContentResolution
         /// </summary>
         public Dictionary<string, int> VariableFirstLines { get; set; } = new(System.StringComparer.Ordinal);
 
+        /// <summary>The Stage 3 line of each variable's first definition, case-sensitive.</summary>
+        public Dictionary<string, int> VariableFirstStage3Lines { get; set; } = new(System.StringComparer.Ordinal);
+
         public List<VariableDefinition> VariablesWithDefinitions { get; set; }
         public List<CustomUnitDefinition> CustomUnits { get; set; }
 
@@ -388,5 +391,8 @@ namespace Calcpad.Highlighter.ContentResolution
 
         /// <summary>What Core executed for this content; null when no trace matched.</summary>
         public RuntimeOverlay Runtime { get; set; }
+
+        /// <summary>Core's check pass over the Stage 3 lines, run once on first use.</summary>
+        public Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>> CoreCheck { get; set; }
     }
 }

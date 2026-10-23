@@ -976,7 +976,6 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         }
         outputChannel.appendLine('API call successful', 'verbose');
 
-        vueUiProvider?.updateConvertErrors(parseConvertErrorHeader(response));
         if (hasConvertTrace(response)) {
             const document = vscode.workspace.textDocuments.find(d => d.uri.toString() === sourceFileUri.toString());
             if (document) refreshDocumentAnalysis?.(document);
@@ -1366,7 +1365,8 @@ async function writeDataFiles() {
             ? 'Ran the document; #write and #append are up to date.'
             : `Ran with ${errors.length} error${errors.length === 1 ? '' : 's'} — some output may be missing.`;
         vueUiProvider?.writeFilesResult(ok, message);
-        vueUiProvider?.updateConvertErrors(errors);
+        const document = vscode.workspace.textDocuments.find(d => d.uri.toString() === source.uri.toString());
+        if (document) refreshDocumentAnalysis?.(document);
         if (ok)
             vscode.window.showInformationMessage(message);
         else

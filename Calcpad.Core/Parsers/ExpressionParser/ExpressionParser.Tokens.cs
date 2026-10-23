@@ -10,6 +10,7 @@ namespace Calcpad.Core
             internal string Value { get; set; }
             internal TokenTypes Type;
             internal int CacheID = -1;
+            internal int Start = -1;
             internal Token(string value, TokenTypes type)
             {
                 Value = value;
@@ -51,7 +52,7 @@ namespace Calcpad.Core
                             }
                         }
                         if (!ts.IsEmpty)
-                            AddToken(tokens, ts.Cut(), currentSeparator);
+                            AddToken(tokens, ts.Cut(), currentSeparator, ts.Start);
 
                         ts.Reset(i + 1);
                         currentSeparator = currentSeparator == c ? ' ' : c;
@@ -63,12 +64,12 @@ namespace Calcpad.Core
                     ts.Expand();
             }
             if (!ts.IsEmpty)
-                AddToken(tokens, ts.Cut(), currentSeparator);
+                AddToken(tokens, ts.Cut(), currentSeparator, ts.Start);
 
             return tokens;
         }
 
-        private void AddToken(List<Token> tokens, ReadOnlySpan<char> value, char separator)
+        private void AddToken(List<Token> tokens, ReadOnlySpan<char> value, char separator, int start)
         {
             var tokenValue = value.ToString().Replace("\"\"", "&quot;").Replace("''", "&apos;");
             var tokenType = GetTokenType(separator);
@@ -85,7 +86,7 @@ namespace Calcpad.Core
                     tokenValue = string.Concat(" ", tokenValue," ");
             }
 
-            var token = new Token(tokenValue, tokenType);
+            var token = new Token(tokenValue, tokenType) { Start = start };
             if (token.Type == TokenTypes.Text)
             {
                 tokenValue = tokenValue.TrimStart();

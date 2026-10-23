@@ -162,7 +162,17 @@ namespace Calcpad.Core
                 keyword = Keyword.None;
 
             if (keyword == Keyword.None)
-                return KeywordResult.None;
+            {
+                if (s[0] != '#' || IsNonCpdMode)
+                    return KeywordResult.None;
+
+                if (_condition.IsSatisfied || !_calculate)
+                {
+                    var end = s.IndexOfAny(' ', '\t');
+                    AppendError(s.ToString(), string.Format(Messages.Invalid_keyword_0, (end < 0 ? s : s[..end]).ToString()), _currentLine, "CPD-3403", CalcpadErrorKind.Syntax);
+                }
+                return KeywordResult.Continue;
+            }
 
             switch (keyword)
             {
@@ -231,23 +241,32 @@ namespace Calcpad.Core
                     ParseKeywordFormat(s);
                     break;
                 case Keyword.Repeat:
+                    CheckLoopStart();
                     ParseKeywordRepeat(s);
                     break;
                 case Keyword.For:
+                    CheckLoopStart();
                     ParseKeywordFor(s);
                     break;
                 case Keyword.While:
+                    CheckLoopStart();
                     ParseKeywordWhile(s);
                     break;
                 case Keyword.Loop:
-                    ParseKeywordLoop(s);
+                    if (_isCheck)
+                        CheckLoopEnd(s);
+                    else
+                        ParseKeywordLoop(s);
                     break;
                 case Keyword.Break:
                     if (ParseKeywordBreak())
                         return KeywordResult.Break;
                     break;
                 case Keyword.Continue:
-                    ParseKeywordContinue();
+                    if (_isCheck && _checkLoops.Count == 0)
+                        AppendError("#continue", Messages.continue_without_a_corresponding_repeat, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
+                    else
+                        ParseKeywordContinue();
                     break;
                 case Keyword.Md:
                     ParseKeywordMd(s);
@@ -285,8 +304,26 @@ namespace Calcpad.Core
         private void SetVisibility(ReadOnlySpan<char> s, Keyword keyword, bool value)
         {
             _visibilityStack.Push(_isVisible);
+            // The check pass validates hidden keyword lines too
             if (IsDirectiveConditionMet(s, keyword))
-                _isVisible = value;
+                _isVisible = value || _isCheck;
+        }
+
+        // The check pass doesn't run loops, so it tracks only their structure
+        private readonly Stack<(int Id, int Line, int SourceLine)> _checkLoops = new();
+
+        private void CheckLoopStart()
+        {
+            if (_isCheck)
+                _checkLoops.Push((_condition.Id, _currentLine, _parser.Line));
+        }
+
+        private void CheckLoopEnd(ReadOnlySpan<char> s)
+        {
+            if (_checkLoops.Count == 0)
+                AppendError(s.ToString(), Messages.loop_without_a_corresponding_repeat, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
+            else if (_checkLoops.Pop().Id != _condition.Id)
+                AppendError(s.ToString(), Messages.Entangled_if__end_if__and_repeat__loop_blocks, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
         }
 
         private void SetParseMode(ReadOnlySpan<char> s, Keyword keyword, ParseMode mode)
@@ -445,74 +482,77 @@ namespace Calcpad.Core
                 [];
 
             if (expression.IsWhiteSpace())
-                throw Exceptions.ExpressionEmpty();
+            {
+                if (!_calculate || _condition.IsSatisfied)
+                    throw Exceptions.ExpressionEmpty();
+                return;
+            }
 
             (int loopStart, int loopEnd) = GetForLoopLimits(expression);
-            if (loopStart > -1 &&
-                loopEnd > loopStart)
+            var varName = loopStart > -1 ? expression[..loopStart].Trim().ToString() : null;
+            if (loopEnd <= loopStart || !Validator.IsVariable(varName))
             {
-                var varName = expression[..loopStart].Trim().ToString();
-                var startExpr = expression[(loopStart + 1)..loopEnd].Trim();
-                var endExpr = expression[(loopEnd + 1)..].Trim();
-                if (Validator.IsVariable(varName))
+                if (!_calculate || _condition.IsSatisfied)
+                    throw Exceptions.InvalidForHeader();
+                return;
+            }
+            var startExpr = expression[(loopStart + 1)..loopEnd].Trim();
+            var endExpr = expression[(loopEnd + 1)..].Trim();
+            if (_calculate)
+            {
+                if (_condition.IsSatisfied)
                 {
-                    if (_calculate)
+                    try
                     {
-                        if (_condition.IsSatisfied)
+                        _parser.Parse(startExpr);
+                        _parser.Calculate();
+                        var r1 = _parser.Result;
+                        var u1 = _parser.Units;
+                        _parser.Parse(endExpr);
+                        _parser.Calculate();
+                        var r2 = _parser.Result;
+                        var u2 = _parser.Units;
+                        IScalarValue start, end;
+                        if (r1.IsReal && r2.IsReal)
                         {
-                            try
-                            {
-                                _parser.Parse(startExpr);
-                                _parser.Calculate();
-                                var r1 = _parser.Result;
-                                var u1 = _parser.Units;
-                                _parser.Parse(endExpr);
-                                _parser.Calculate();
-                                var r2 = _parser.Result;
-                                var u2 = _parser.Units;
-                                IScalarValue start, end;
-                                if (r1.IsReal && r2.IsReal)
-                                {
-                                    start = new RealValue(r1.Re, u1);
-                                    end = new RealValue(r2.Re, u2);
-                                }
-                                else
-                                {
-                                    start = new ComplexValue(r1, u1);
-                                    end = new ComplexValue(r2, u2);
-                                }
-                                var count = Math.Abs((end - start).Re) + 1;
-                                if (count > Loop.MaxCount)
-                                {
-                                    AppendError(s.ToString(), string.Format(Messages.Number_of_iterations_exceeds_the_maximum_0, Loop.MaxCount), _currentLine, "CPD-5905", CalcpadErrorKind.Values);
-                                    return;
-                                }
-                                var counter = _parser.GetVariableRef(varName);
-                                _loops.Push(new ForLoop(_currentLine, start, end, counter, _condition.Id) { SourceLine = _parser.Line });
-                                _parser.SetVariable(varName, start);
-                            }
-                            catch (MathParserException ex)
-                            {
-                                AppendError(s.ToString(), ex, _currentLine);
-                            }
+                            start = new RealValue(r1.Re, u1);
+                            end = new RealValue(r2.Re, u2);
                         }
+                        else
+                        {
+                            start = new ComplexValue(r1, u1);
+                            end = new ComplexValue(r2, u2);
+                        }
+                        var count = Math.Abs((end - start).Re) + 1;
+                        if (count > Loop.MaxCount)
+                        {
+                            AppendError(s.ToString(), string.Format(Messages.Number_of_iterations_exceeds_the_maximum_0, Loop.MaxCount), _currentLine, "CPD-5905", CalcpadErrorKind.Values);
+                            return;
+                        }
+                        var counter = _parser.GetVariableRef(varName);
+                        _loops.Push(new ForLoop(_currentLine, start, end, counter, _condition.Id) { SourceLine = _parser.Line });
+                        _parser.SetVariable(varName, start);
                     }
-                    else if (_isVisible)
+                    catch (MathParserException ex)
                     {
-                        try
-                        {
-                            var varHtml = new HtmlWriter(null, _parser.Phasor).FormatVariable(varName, string.Empty, false);
-                            _parser.Parse(startExpr);
-                            var startHtml = _parser.ToHtml();
-                            _parser.Parse(endExpr);
-                            var endHtml = _parser.ToHtml();
-                            _sb.Append($"<p{HtmlId}><span class=\"cond\">#for</span> <span class=\"eq\">{varHtml} = {startHtml} : {endHtml}</span></p><div class=\"indent\">");
-                        }
-                        catch (MathParserException ex)
-                        {
-                            AppendError(s.ToString(), ex, _currentLine);
-                        }
+                        AppendError(s.ToString(), ex, _currentLine);
                     }
+                }
+            }
+            else if (_isVisible)
+            {
+                try
+                {
+                    var varHtml = new HtmlWriter(null, _parser.Phasor).FormatVariable(varName, string.Empty, false);
+                    _parser.Parse(startExpr);
+                    var startHtml = _parser.ToHtml();
+                    _parser.Parse(endExpr);
+                    var endHtml = _parser.ToHtml();
+                    _sb.Append($"<p{HtmlId}><span class=\"cond\">#for</span> <span class=\"eq\">{varHtml} = {startHtml} : {endHtml}</span></p><div class=\"indent\">");
+                }
+                catch (MathParserException ex)
+                {
+                    AppendError(s.ToString(), ex, _currentLine);
                 }
             }
         }
@@ -525,7 +565,11 @@ namespace Calcpad.Core
                 [];
 
             if (expression.IsWhiteSpace())
-                throw Exceptions.ExpressionEmpty();
+            {
+                if (!_calculate || _condition.IsSatisfied)
+                    throw Exceptions.ExpressionEmpty();
+                return;
+            }
 
             if (_calculate)
             {
@@ -922,6 +966,8 @@ namespace Calcpad.Core
                         ReportDataExchageResult(options, "read from");
                 }
             }
+            else if (_isCheck)
+                _ = new ReadWriteOptions(s, 0, null, _pathRoots);
             else if (_isVisible)
                 _sb.Append($"<p><span{HtmlId} class=\"cond\">#read</span> {s[KeywordLength(Keyword.Read)..]}</p>");
         }
@@ -946,6 +992,8 @@ namespace Calcpad.Core
                             AllowDataWrite);
                 }
             }
+            else if (_isCheck)
+                _ = new ReadWriteOptions(s, keyword - Keyword.Read, null, _pathRoots);
             else if (_isVisible)
             {
                 var kwdLength = KeywordLength(keyword);

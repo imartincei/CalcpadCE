@@ -580,4 +580,10 @@
   <data name="CannotModifyConstant" xml:space="preserve">
     <value>无法修改常量“{0}”.</value>
   </data>
+  <data name="Blocks_are_nested_too_deeply_0" xml:space="preserve">
+    <value>块嵌套过深。最大深度为 {0}。</value>
+  </data>
+  <data name="Invalid_for_loop_header" xml:space="preserve">
+    <value>无效的 "#for" 语句。应为 "#for 计数器 = 起始 : 结束"。</value>
+  </data>
 </root>

@@ -11,6 +11,10 @@ namespace Calcpad.Core
         public string Code { get; init; }
 
         public CalcpadErrorKind Kind { get; init; }
+
+        /// <summary>0-based columns in the parsed line text, end exclusive. -1 when the error covers the whole line.</summary>
+        public int StartColumn { get; init; } = -1;
+        public int EndColumn { get; init; } = -1;
     }
 
     /// <summary>What an error depends on, which decides the pass that reports it.</summary>

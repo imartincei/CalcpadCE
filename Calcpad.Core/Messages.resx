@@ -661,4 +661,10 @@
   <data name="Path_root_folder_not_found_0_1" xml:space="preserve">
     <value>{0} folder not found: {1}.</value>
   </data>
+  <data name="Blocks_are_nested_too_deeply_0" xml:space="preserve">
+    <value>Blocks are nested too deeply. The maximum depth is {0}.</value>
+  </data>
+  <data name="Invalid_for_loop_header" xml:space="preserve">
+    <value>Invalid "#for" header. Expected "#for counter = start : end".</value>
+  </data>
 </root>

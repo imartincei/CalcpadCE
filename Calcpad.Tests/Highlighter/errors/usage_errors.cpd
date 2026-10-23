@@ -3,8 +3,8 @@
 y = unknownVar * 2
 
 ' CPD-3302: Wrong param count
-square(x) = x^2
-wrongCall = square(1; 2; 3)
+square(x; y) = x^2 + y
+wrongCall = square(1)
 
 ' CPD-3303: Undefined macro
 macroResult = undefined_macro$(5)

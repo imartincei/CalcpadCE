@@ -326,6 +326,9 @@ export interface CalcpadError {
     /** CPD-xxxx code, shared with the linter where both report the same problem. */
     code?: string;
     kind?: CalcpadErrorKind;
+    /** 0-based columns in the parsed line, end exclusive; -1 when the error covers the whole line. */
+    startColumn?: number;
+    endColumn?: number;
 }
 
 export interface ConvertResult {

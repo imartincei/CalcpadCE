@@ -178,6 +178,10 @@ namespace Calcpad.Server.Services
             return true;
         }
 
+        /// <summary>Whether an #include of the resolved content changed on disk after <paramref name="utc"/>.</summary>
+        public static bool IncludesChangedSince(StagedResolvedContent staged, DateTime utc) =>
+            staged.Stage2.IncludedFileHashes.Keys.Any(path => SafeWriteTime(path) > utc);
+
         private static DateTime SafeWriteTime(string path)
         {
             try

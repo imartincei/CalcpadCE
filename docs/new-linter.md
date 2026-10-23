@@ -5,6 +5,14 @@ Each diagnostic has a short, stable code (like `CPD-3301`) so you can look up ex
 
 Diagnostics appear as squiggles in the editor and entries in the Problems panel.
 
+## Where diagnostics come from
+
+- **As you type**, CalcpadCE checks every line without calculating, including `#if` branches and loops that won't run. This catches syntax errors, unmatched brackets and blocks, wrong argument counts and unknown functions.
+- **After you run the document** (the preview runs it), its errors appear in the editor too, on the lines where they happened. These are the problems only a calculation finds, such as inconsistent units, mismatched matrix sizes or a solver with no solution.
+- If you edit the document after a run, its unit and value errors stay on unchanged lines until the next run. Errors on lines you changed are removed straight away.
+
+While an `#include` or macro has an error, only that error and the checks that don't need the expanded text are shown. Fix it first to see the rest.
+
 ## Diagnostic codes
 
 Every diagnostic has a `CPD-` code.
@@ -90,7 +98,7 @@ The tables below group them by the kind of problem.
 | CPD-3401 | Error | Invalid operator usage |
 | CPD-3402 | Error | Unknown command name |
 | CPD-3403 | Error | Unknown directive |
-| CPD-3404 | Warning | Invalid assignment |
+| CPD-3404 | Error | Invalid assignment |
 | CPD-3405 | Error | `#` directive not allowed inside a command block |
 | CPD-3406 | Error | Invalid command syntax |
 | CPD-3407 | Error | Incomplete expression |
@@ -99,9 +107,9 @@ The tables below group them by the kind of problem.
 | CPD-3410 | Error | Outer-scope assignment (`←`) to an undefined variable |
 | CPD-3411 | Warning | Invalid `paramType` value in a metadata comment |
 | CPD-3412 | Warning | Invalid metadata-comment JSON |
-| CPD-3413 | Warning | Invalid #settings JSON |
+| CPD-3413 | Error | Invalid #settings JSON (an unknown key is a warning) |
 | CPD-3414 | Warning | Invalid PDF settings in a metadata comment |
-| CPD-3415 | Warning | Invalid `#UI` format |
+| CPD-3415 | Error | Invalid `#UI` format (an unknown property is a warning) |
 | CPD-3416 | Warning | `uiOverrides` metadata comment not on the first line |
 | CPD-3417 | Warning | Duplicate `uiOverrides` metadata comment |
 | CPD-3418 | Warning | `uiOverrides` sharing a comment with another key |
@@ -140,9 +148,11 @@ Reported by Core when it checks or runs the document. Errors that match a check 
 | CPD-5117 | Syntax | Invalid data type |
 | CPD-5118 | Syntax | Missing matrix index |
 | CPD-5119 | Syntax | Invalid number of indexes |
+| CPD-5121 | Syntax | Invalid `#for` header |
 | CPD-5201 | Structure | Condition cannot be empty |
 | CPD-5202 | Structure | Duplicate #else |
 | CPD-5203 | Structure | #else if after #else |
+| CPD-5204 | Structure | Blocks nested too deeply |
 | CPD-5301 | Names | Cannot evaluate as a function |
 | CPD-5302 | Names | Cannot evaluate as a function or operator |
 | CPD-5303 | Names | Cannot redefine existing units |

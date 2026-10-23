@@ -142,6 +142,8 @@ Array<{
   source: "Macro" | "Expression";
   code: string;                 // CPD-xxxx, shared with /lint where both report the same problem
   kind: "Syntax" | "Structure" | "Names" | "Values";
+  startColumn: number;          // 0-based in the parsed line, end exclusive; -1 for the whole line
+  endColumn: number;
 }>
 ```
 
@@ -157,7 +159,9 @@ When `stepPauses` is in effect, an `X-Calcpad-Pause` header reports where the fo
 
 Both headers are listed in the CORS policy's exposed headers, so a browser client can read them.
 
-A render with line anchors (`includeLineAnchors`, on by default for anything but print) also records what the calculation executed and sets `X-Calcpad-Trace: 1`. `/lint`, `/definitions`, `/highlight` and `/symbol-at-position` requests for the same `content` and `sourceFilePath` then use it: variable types come from the run. A client should refetch lint, definitions and highlighting when it sees the header. Until then, or for any other content, those endpoints use static inference.
+A render with line anchors (`includeLineAnchors`, on by default for anything but print) also records what the calculation executed and its errors, and sets `X-Calcpad-Trace: 1`. `/lint`, `/definitions`, `/highlight` and `/symbol-at-position` requests for the same `content` and `sourceFilePath` then use it: variable types come from the run. A client should refetch lint, definitions and highlighting when it sees the header. Until then, or for any other content, those endpoints use static inference.
+
+`/lint` keeps the run's errors per document after its content changes, and returns them with `source: "Calcpad Run"` (see [POST /lint](#post-lint)).
 
 `/highlight` also keeps the variable names of a document's last run, per `sourceFilePath`, after its content changes. A unit-named identifier such as `a` (are) is then a variable only where Core would read one: a definition in a branch the run skipped leaves the unit, while a definition added since the run counts at once. A document with no `sourceFilePath` gets this only when `/convert` and `/highlight` both send the same `documentId`, which should be unique to that document.
 
@@ -478,8 +482,17 @@ Lint Calcpad source code and return diagnostics (errors, warnings, and informati
 interface LintRequest {
   content: string;          // The Calcpad source code to lint
   sourceFilePath?: string;  // Full path of source file on client
+  documentId?: string;      // Identifies a document with no sourceFilePath, as sent to /convert
 }
 ```
+
+Diagnostics come from three places:
+
+- **Static checks** in the Highlighter: names, metadata comments, `#settings`, `#UI` and style.
+- **Core's check pass**, which parses every line without calculating, including branches that don't run. It reports syntax and block structure everywhere. It reports names, such as an undefined function, only on lines the last run didn't execute.
+- **The last run** (`source: "Calcpad Run"`), from a `/convert` with line anchors for the same document. Its errors cover the lines it executed. After the document is edited, only unit, value and type errors on unchanged lines are kept, moved to their new line numbers, until the next run.
+
+When MacroParser reports an include or macro error, the check pass and run errors are left out, and only the static checks and the macro errors are returned.
 
 **Response:**
 ```typescript
@@ -497,7 +510,7 @@ interface LintDiagnostic {
   message: string;
   severity: string;    // "error", "warning", or "information"
   severityId: number;  // 0=Error, 1=Warning, 2=Information
-  source: string;      // Default: "Calcpad Linter"
+  source: string;      // "Calcpad Linter", or "Calcpad Run" for the last run's errors
 }
 ```
 
@@ -578,6 +591,7 @@ interface LintDiagnostic {
 | CPD-3417 | Semantic | Duplicate 'uiOverrides' metadata comment |
 | CPD-3418 | Semantic | 'uiOverrides' sharing a comment with another key |
 | CPD-3419 | Semantic | Deprecated stored input value |
+| CPD-3420 | Semantic | Deprecated #input keyword |
 | **Stage 3: Format (CPD-36xx)** |||
 | CPD-3601 | Format | Invalid format specifier |
 | **Core runtime and check pass (CPD-5xxx)** |||
@@ -601,9 +615,11 @@ interface LintDiagnostic {
 | CPD-5117 | Syntax | Invalid data type |
 | CPD-5118 | Syntax | Missing matrix index |
 | CPD-5119 | Syntax | Invalid number of indexes |
+| CPD-5121 | Syntax | Invalid `#for` header |
 | CPD-5201 | Structure | Condition cannot be empty |
 | CPD-5202 | Structure | Duplicate #else |
 | CPD-5203 | Structure | #else if after #else |
+| CPD-5204 | Structure | Blocks nested too deeply |
 | CPD-5301 | Names | Cannot evaluate as a function |
 | CPD-5302 | Names | Cannot evaluate as a function or operator |
 | CPD-5303 | Names | Cannot redefine existing units |

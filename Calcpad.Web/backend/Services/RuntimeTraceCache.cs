@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using Calcpad.Core;
 using Calcpad.Highlighter.ContentResolution;
+using Calcpad.Highlighter.Linter;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Calcpad.Server.Services
@@ -15,6 +16,7 @@ namespace Calcpad.Server.Services
 
         private readonly IMemoryCache _cache;
         private readonly ConcurrentDictionary<string, RuntimeVariableNames> _names = new();
+        private readonly ConcurrentDictionary<string, (RunErrors Errors, DateTime StoredUtc)> _errors = new();
         private readonly TimeSpan _expiration;
         private readonly int _sizeLimit;
         private long _version;
@@ -58,5 +60,16 @@ namespace Calcpad.Server.Services
 
         public RuntimeVariableNames? GetNames(string? sourceFilePath, string? documentId) =>
             _names.GetValueOrDefault(ContentKey.Document(sourceFilePath, documentId));
+
+        /// <summary>Keeps the run's errors for the document like its names, so lint shows them after edits.</summary>
+        public void StoreErrors(string? sourceFilePath, string? documentId, RunErrors errors)
+        {
+            var document = ContentKey.Document(sourceFilePath, documentId);
+            if (document.Length > 0)
+                _errors[document] = (errors, DateTime.UtcNow);
+        }
+
+        public (RunErrors Errors, DateTime StoredUtc)? GetErrors(string? sourceFilePath, string? documentId) =>
+            _errors.TryGetValue(ContentKey.Document(sourceFilePath, documentId), out var entry) ? entry : null;
     }
 }

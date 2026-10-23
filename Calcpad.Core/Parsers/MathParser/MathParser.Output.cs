@@ -662,6 +662,9 @@ namespace Calcpad.Core
                     var cfParameterCount = t.ParameterCount - 1;
                     if (cfParameterCount < 0)
                     {
+                        if (t.Index < 0)
+                            throw Exceptions.InvalidFunction(t.Content);
+
                         var cf = _functions[t.Index];
                         cfParameterCount = cf.ParameterCount - 1;
                     }

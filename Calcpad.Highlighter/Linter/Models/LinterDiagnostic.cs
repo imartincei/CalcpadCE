@@ -13,6 +13,14 @@ namespace Calcpad.Highlighter.Linter.Models
         public int EndColumn { get; set; }  // End column for highlighting
     }
 
+    /// <summary>What reported a diagnostic, in the order duplicates are kept.</summary>
+    internal enum DiagnosticOrigin
+    {
+        Static,
+        Check,
+        Run
+    }
+
     public class LinterDiagnostic
     {
         public int Line { get; set; }              // 0-based original line number (after mapping)
@@ -34,6 +42,8 @@ namespace Calcpad.Highlighter.Linter.Models
         /// Used internally for deferred line mapping.
         /// </summary>
         internal LineStage Stage { get; set; } = LineStage.Stage3;
+
+        internal DiagnosticOrigin Origin { get; set; }
 
         /// <summary>
         /// Additional ranges to highlight when the diagnostic spans multiple lines

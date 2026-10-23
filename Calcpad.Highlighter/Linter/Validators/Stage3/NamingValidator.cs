@@ -6,6 +6,7 @@ using Calcpad.Highlighter.Linter.Models;
 
 namespace Calcpad.Highlighter.Linter.Validators.Stage3
 {
+    /// <summary>Name conflicts and redefinitions, which Core accepts. Core's check pass reports invalid names.</summary>
     public class NamingValidator
     {
         public void Validate(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
@@ -63,7 +64,6 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 if (funcMatch.Success)
                 {
                     var funcName = funcMatch.Groups[1].Value;
-                    var paramsStr = funcMatch.Groups[2].Value.Trim();
 
                     // Redefining a user-defined function is allowed - warn rather than error.
                     // Built-in conflicts (CPD-3203) and macros ($) are handled separately.
@@ -74,28 +74,6 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                         var col = startPos >= 0 ? startPos : 0;
                         result.AddWarning(i, col, col + funcName.Length, "CPD-3313",
                             "Function '" + funcName + "' redefines an existing function");
-                    }
-
-                    // Functions must have at least one parameter
-                    if (string.IsNullOrWhiteSpace(paramsStr))
-                    {
-                        var startPos = line.IndexOf(funcName, StringComparison.Ordinal);
-                        var parenPos = line.IndexOf('(', startPos);
-                        var endPos = line.IndexOf(')', parenPos);
-                        if (endPos < 0) endPos = parenPos + 1;
-                        result.AddError(i, startPos >= 0 ? startPos : 0, endPos + 1, "CPD-3206",
-                            "Function '" + funcName + "' must have at least one parameter");
-                    }
-
-                    else
-                    {
-                        var (paramNames, defaults) = ParsingHelpers.ParseParamList(paramsStr);
-                        foreach (var name in ParsingHelpers.RequiredAfterOptional(paramNames, defaults))
-                        {
-                            var startPos = line.IndexOf(funcName, StringComparison.Ordinal);
-                            result.AddError(i, startPos >= 0 ? startPos : 0, line.Length, "CPD-3207",
-                                "Required parameter '" + name + "' cannot follow an optional parameter");
-                        }
                     }
 
                     // Pass Stage3 line index - diagnostic extensions handle mapping
@@ -114,20 +92,10 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             var endPos = startPos >= 0 ? startPos + identifier.Length : line.Length;
             var col = startPos >= 0 ? startPos : 0;
 
-            // Check if name starts with valid character
-            // Variables, functions and units must begin with a letter or ∡
-            // (underscore is NOT valid as a starting character)
-            if (identifier.Length > 0)
-            {
-                var firstChar = identifier[0];
-                if (!char.IsLetter(firstChar) && !CalcpadCharacterHelpers.IsGreekLetter(firstChar) && !CalcpadCharacterHelpers.IsSpecialMathChar(firstChar))
-                {
-                    var code = isVariable ? "CPD-3201" : "CPD-3202";
-                    result.AddError(stage3Line, col, endPos, code,
-                        "Invalid character: '" + firstChar + "'. Variables, functions and units must begin with a letter or ∡");
-                    return;
-                }
-            }
+            // Core reports names that start with an invalid character
+            if (identifier.Length > 0 && !char.IsLetter(identifier[0]) &&
+                !CalcpadCharacterHelpers.IsGreekLetter(identifier[0]) && !CalcpadCharacterHelpers.IsSpecialMathChar(identifier[0]))
+                return;
 
             // Variable names CAN overlap with built-in function names (e.g., vector = [1;2;3])
             // But user-defined function names cannot - they would shadow the built-in

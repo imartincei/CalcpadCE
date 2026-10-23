@@ -35,7 +35,8 @@ namespace Calcpad.Highlighter.ContentResolution
             {
                 Stage1 = stage1,
                 Stage2 = stage2,
-                Stage3 = stage3
+                Stage3 = stage3,
+                CoreCheck = new(() => RunCoreCheck(stage2, stage3))
             };
         }
 
@@ -53,8 +54,34 @@ namespace Calcpad.Highlighter.ContentResolution
                 Stage1 = staged.Stage1,
                 Stage2 = staged.Stage2,
                 Stage3 = stage3,
-                Runtime = overlay
+                Runtime = overlay,
+                CoreCheck = staged.CoreCheck
             };
+        }
+
+        // Skipped when MacroParser failed: its output is then only partly expanded
+        private static IReadOnlyList<Calcpad.Core.CalcpadError> RunCoreCheck(Stage2Result stage2, Stage3Result stage3)
+        {
+            if (stage2.Errors.Count > 0)
+                return [];
+            // Complex mode can be set outside the document, so only lines that fail in both modes count
+            try
+            {
+                var code = string.Join('\n', stage3.Lines);
+                var complex = Check(true).Select(e => e.SourceLine).ToHashSet();
+                return Check(false).Where(e => complex.Contains(e.SourceLine)).ToList();
+
+                IReadOnlyList<Calcpad.Core.CalcpadError> Check(bool isComplex) =>
+                    new Calcpad.Core.ExpressionParser
+                    {
+                        PathRoots = stage2.PathRoots,
+                        Settings = new Calcpad.Core.Settings { Math = { IsComplex = isComplex } }
+                    }.Check(code);
+            }
+            catch (Exception)
+            {
+                return [];
+            }
         }
 
         /// <summary>

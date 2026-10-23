@@ -103,8 +103,13 @@ namespace Calcpad.Core
                 var indexStack = new Stack<MultiFunctionStackItem>();
                 var pt = new Token(string.Empty, TokenTypes.None);
                 var firstToken = input.Peek();
+                var position = 0;
                 foreach (var t in input)
                 {
+                    if (++position == 3 && firstToken.Type == TokenTypes.CustomFunction &&
+                        pt.Type == TokenTypes.BracketLeft && t.Type == TokenTypes.BracketRight)
+                        throw Exceptions.MissingFunctionParameter();
+
                     switch (t.Type)
                     {
                         case TokenTypes.Function2:

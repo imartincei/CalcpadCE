@@ -254,6 +254,12 @@ namespace Calcpad.Core
         internal static MathParserException ElseIfAfterElse() =>
             new(Messages.else_if_is_not_allowed_after_else_in_condition_block, "CPD-5203", K.Structure);
 
+        internal static MathParserException NestingTooDeep(int maxDepth) =>
+            new(string.Format(Messages.Blocks_are_nested_too_deeply_0, maxDepth), "CPD-5204", K.Structure);
+
+        internal static MathParserException InvalidForHeader() =>
+            new(Messages.Invalid_for_loop_header, "CPD-5121", K.Syntax);
+
         internal static MathParserException ConditionComplex() =>
             new(Messages.Condition_cannot_evaluate_to_a_complex_number, "CPD-5419", K.Values);
 

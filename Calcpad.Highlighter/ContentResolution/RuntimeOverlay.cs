@@ -135,7 +135,7 @@ namespace Calcpad.Highlighter.ContentResolution
 
         // Every physical line a Stage 3 line came from, ascending. Core reports a continued
         // statement on its last physical line.
-        private static int[] GetTraceLines(StagedResolvedContent staged, int stage3Line)
+        internal static int[] GetTraceLines(StagedResolvedContent staged, int stage3Line)
         {
             if (!staged.Stage3.SourceMap.TryGetValue(stage3Line, out var stage2Line) ||
                 !staged.Stage2.SourceMap.TryGetValue(stage2Line, out var stage1Line))

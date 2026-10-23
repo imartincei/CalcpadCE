@@ -143,11 +143,14 @@ namespace Calcpad.Highlighter.ContentResolution
                     : MapToRootLine(stage3Line);
 
             var variableFirstLines = new Dictionary<string, int>(StringComparer.Ordinal);
+            var variableFirstStage3Lines = new Dictionary<string, int>(StringComparer.Ordinal);
             void AddFirstLine(string name, int stage3Line)
             {
                 var line = MapToRootLine(stage3Line);
                 if (!variableFirstLines.TryGetValue(name, out var first) || line < first)
                     variableFirstLines[name] = line;
+                if (!variableFirstStage3Lines.TryGetValue(name, out first) || stage3Line < first)
+                    variableFirstStage3Lines[name] = stage3Line;
             }
             foreach (var v in variablesWithDefs) AddFirstLine(v.Name, v.LineNumber);
             foreach (var (name, line) in tokenizerResult.DefinedVariables) AddFirstLine(name, line);
@@ -167,6 +170,7 @@ namespace Calcpad.Highlighter.ContentResolution
                 UserDefinedMacros = userDefinedMacros,
                 DefinedVariables = variables,
                 VariableFirstLines = variableFirstLines,
+                VariableFirstStage3Lines = variableFirstStage3Lines,
                 VariablesWithDefinitions = variablesWithDefs,
                 CustomUnits = customUnits,
                 TypeTracker = typeTracker,

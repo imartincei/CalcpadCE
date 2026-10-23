@@ -153,6 +153,10 @@ namespace Calcpad.Core
                 _solver.IsComplex = isComplex;
                 _vectorCalc.SetCalculator(_calc);
                 _matrixCalc.SetCalculator(_calc);
+                if (isComplex)
+                    AddComplexVariables();
+                else
+                    RemoveComplexVariables();
             }
         }
 
@@ -485,13 +489,35 @@ namespace Calcpad.Core
             _variables.Add("e", new Variable(new RealValue(Math.E)));
             _variables.Add("pi", new Variable(pi));
             _variables.Add("π", new Variable(pi) { IsReadOnly = true });
-            ;
             if (_settings.IsComplex)
-            {
-                _variables.Add("i", new Variable(Core.Complex.ImaginaryOne));
-                _variables.Add("ei", new Variable(Math.E * Core.Complex.ImaginaryOne));
-                _variables.Add("πi", new Variable(Math.PI * Core.Complex.ImaginaryOne));
-            }
+                AddComplexVariables();
+        }
+
+        private Variable[] _complexVariables;
+
+        private void AddComplexVariables()
+        {
+            _complexVariables =
+            [
+                new(Core.Complex.ImaginaryOne),
+                new(Math.E * Core.Complex.ImaginaryOne),
+                new(Math.PI * Core.Complex.ImaginaryOne)
+            ];
+            _variables.TryAdd("i", _complexVariables[0]);
+            _variables.TryAdd("ei", _complexVariables[1]);
+            _variables.TryAdd("πi", _complexVariables[2]);
+        }
+
+        private void RemoveComplexVariables()
+        {
+            if (_complexVariables is null)
+                return;
+
+            foreach (var name in (string[])["i", "ei", "πi"])
+                if (_variables.TryGetValue(name, out var v) && Array.IndexOf(_complexVariables, v) >= 0)
+                    _variables.Remove(name);
+
+            _complexVariables = null;
         }
 
         public void Parse(ReadOnlySpan<char> expression, bool allowAssignment = true)

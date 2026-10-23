@@ -329,6 +329,12 @@ async function bootstrap(): Promise<void> {
     let activeGroup!: EditorGroup;
     let editor!: monaco.editor.IStandaloneCodeEditor;
     let tabs!: TabManager;
+    activeBridge.activeDocumentId = () => documentIdFor(activeGroup.editor.getModel());
+    activeBridge.onRunRecorded = () => {
+        void refreshDefinitionsFor(activeGroup);
+        void activeGroup.diagnostics?.refresh();
+        semanticTokens?.refresh();
+    };
 
     const editorBridge = activeBridge as unknown as EditorBridge;
     const getFileContext = 'buildFileContext' in activeBridge
@@ -762,9 +768,6 @@ async function bootstrap(): Promise<void> {
                 uiPause.update(uiDocKeyFor(group), result.pause);
                 appInstance.setUiPauseState(uiPause.state(uiDocKeyFor(group)) ?? null);
             }
-            window.dispatchEvent(new MessageEvent('message', {
-                data: { type: 'updateConvertErrors', errors: result.errors },
-            }));
             await committed;
         }
         await hideLoading();

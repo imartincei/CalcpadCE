@@ -100,8 +100,7 @@ namespace Calcpad.Highlighter.Prettifier
                         break;
 
                     // #def is a starter only when multiline. Inline form (#def name = ...
-                    // or #def f(x) = ...) contains '=' and does not open a block --
-                    // mirrors BalanceValidator.
+                    // or #def f(x) = ...) contains '=' and does not open a block.
                     case ControlBlockType.Def:
                         renderDepth = depth;
                         if (!trimmed.Contains('='))

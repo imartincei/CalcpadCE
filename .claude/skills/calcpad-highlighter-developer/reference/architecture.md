@@ -46,13 +46,12 @@ Calcpad.Highlighter/
 │       ├── Stage1/IncludeValidator.cs
 │       ├── Stage2/MacroValidator.cs
 │       └── Stage3/
-│           ├── BalanceValidator.cs      - Brackets/blocks
-│           ├── NamingValidator.cs       - Variable names
-│           ├── UsageValidator.cs        - Undefined checks
-│           ├── SemanticValidator.cs     - Operators/commands
+│           ├── CoreCheckValidator.cs    - Core's check pass (syntax, brackets, blocks, calls)
+│           ├── RunErrorValidator.cs     - The last run's errors
+│           ├── NamingValidator.cs       - Name conflicts and redefinitions
+│           ├── UsageValidator.cs        - Undefined variables, macros, unused variables
 │           ├── FunctionTypeValidator.cs - Built-in argument counts
 │           ├── CommandBlockValidator.cs - $Inline/$Block/$While contents
-│           ├── FormatValidator.cs       - Format specifiers
 │           ├── HtmlCommentValidator.cs  - Metadata comment directives
 │           ├── SettingsValidator.cs     - #Settings / settings directives
 │           └── UiValidator.cs           - #UI control directives

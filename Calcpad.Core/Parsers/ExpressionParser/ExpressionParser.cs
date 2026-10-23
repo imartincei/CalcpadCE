@@ -12,12 +12,19 @@ namespace Calcpad.Core
     public partial class ExpressionParser
     {
         private const int MaxHtmlLines = 200000;
+        private const int MaxErrors = 40;
+        private const int MaxErrorOccurrences = 1000;
         private int _errorCount;
+        private int _errorOccurrences;
+        private readonly HashSet<(int Line, string Code, string Message)> _errorKeys = [];
         private int _isVal;
         private int _currentLine;
+        // Column of the parsed text in the current line, or -1 when unknown
+        private int _lineOffset = -1;
         private int _htmlLines;
         private int _decimals;
         private bool _calculate;
+        private bool _isCheck;
         private bool _isVisible;
         private readonly Stack<bool> _visibilityStack = new();
         private readonly Stack<int> _outputModeStack = new();
@@ -74,6 +81,24 @@ namespace Calcpad.Core
         public void Parse(string sourceCode, bool calculate = true, bool getXml = true) =>
             Parse(sourceCode.AsSpan(), calculate, getXml);
 
+        /// <summary>
+        /// Checks every line without calculating, including untaken branches and loop bodies, and never stops.
+        /// It reads and writes no files, and it changes <see cref="Settings"/> as #settings and #round lines do.
+        /// </summary>
+        public IReadOnlyList<CalcpadError> Check(string sourceCode)
+        {
+            _isCheck = true;
+            try
+            {
+                Parse(sourceCode.AsSpan(), false, false);
+            }
+            finally
+            {
+                _isCheck = false;
+            }
+            return _errorList;
+        }
+
         private void Parse(ReadOnlySpan<char> code, bool calculate, bool getXml)
         {
             var lines = new List<int> { 0 };
@@ -94,136 +119,155 @@ namespace Calcpad.Core
             {
                 while (++_currentLine < lineCount)
                 {
-                    // #UI metadata is scoped to the line that declared it. Clearing here
-                    // covers the paths that skip ParseLine, e.g. an unsatisfied condition.
-                    ResetUiState();
-                    ref var currentLineCache = ref _lineCache[_currentLine];
-                    var keyword = currentLineCache.Keyword;
-                    if (keyword == Keyword.SkipLine)
-                        continue;
-                    if (keyword == Keyword.Continue && !_modeSuppressed)
+                    try
                     {
-                        ParseKeywordContinue();
-                        continue;
-                    }
-                    if (!_modeSuppressed && currentLineCache.IsCached && keyword == Keyword.None)
-                    {
-                        if (IsEnabled())
-                        {
-                            _parser.Line = currentLineCache.SourceLine != 0
-                                ? currentLineCache.SourceLine
-                                : _currentLine + 1;
-                            if (Trace is not null)
-                                TraceLine();
-                            _condition.SetCondition(-1);
-                            _parser.IsCalculation = _isVal != -1;
-                            ParseLine(currentLineCache.Tokens, Keyword.None);
-                        }
-                        continue;
-                    }
-                    var i1 = lines[_currentLine];
-                    var i2 = lines[_currentLine + 1];
-                    var lineSpan = code[i1..i2];
-                    var eolIndex = lineSpan.IndexOf('\v');
-                    if (eolIndex > -1)
-                    {
-                        _parser.Line = int.Parse(lineSpan[(eolIndex + 1)..]);
-                        lineSpan = lineSpan[..eolIndex];
-                    }
-                    else
-                        _parser.Line = _currentLine + 1;
-
-                    var rawLine = lineSpan.TrimEnd();
-                    lineSpan = lineSpan.Trim();
-                    if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
-                    {
-                        var c = textSpan[^1];
-                        if (c == '_')
-                            s = textSpan[0..^2].ToString() + lineSpan.ToString();
-                        else
-                            s = $"{textSpan} {lineSpan}";
-
-                        textSpan = s.AsSpan();
-                    }
-                    else
-                        textSpan = lineSpan;
-
-                    if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
-                    {
-                        _lineCache[_currentLine] = new(null, Keyword.SkipLine);
-                        continue;
-                    }
-
-                    if (_parser.IsCanceled)
-                        break;
-
-                    if (textSpan.IsEmpty)
-                    {
-                        if (_modeSuppressed)
+                        // #UI metadata is scoped to the line that declared it. Clearing here
+                        // covers the paths that skip ParseLine, e.g. an unsatisfied condition.
+                        ResetUiState();
+                        _lineOffset = -1;
+                        ref var currentLineCache = ref _lineCache[_currentLine];
+                        var keyword = currentLineCache.Keyword;
+                        if (keyword == Keyword.SkipLine)
                             continue;
+                        if (keyword == Keyword.Continue && !_modeSuppressed)
+                        {
+                            ParseKeywordContinue();
+                            continue;
+                        }
+                        if (!_modeSuppressed && currentLineCache.IsCached && keyword == Keyword.None)
+                        {
+                            if (IsEnabled())
+                            {
+                                _parser.Line = currentLineCache.SourceLine != 0
+                                    ? currentLineCache.SourceLine
+                                    : _currentLine + 1;
+                                if (Trace is not null)
+                                    TraceLine();
+                                _condition.SetCondition(-1);
+                                _parser.IsCalculation = _isVal != -1;
+                                ParseLine(currentLineCache.Tokens, Keyword.None);
+                            }
+                            continue;
+                        }
+                        var i1 = lines[_currentLine];
+                        var i2 = lines[_currentLine + 1];
+                        var lineSpan = code[i1..i2];
+                        var eolIndex = lineSpan.IndexOf('\v');
+                        if (eolIndex > -1)
+                        {
+                            _parser.Line = int.Parse(lineSpan[(eolIndex + 1)..]);
+                            lineSpan = lineSpan[..eolIndex];
+                        }
+                        else
+                            _parser.Line = _currentLine + 1;
+
+                        var rawLine = lineSpan.TrimEnd();
+                        lineSpan = lineSpan.Trim();
+                        var lineOffset = rawLine.Length - lineSpan.Length;
+                        if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
+                        {
+                            lineOffset = -1;
+                            var c = textSpan[^1];
+                            if (c == '_')
+                                s = textSpan[0..^2].ToString() + lineSpan.ToString();
+                            else
+                                s = $"{textSpan} {lineSpan}";
+
+                            textSpan = s.AsSpan();
+                        }
+                        else
+                            textSpan = lineSpan;
+
+                        if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
+                        {
+                            _lineCache[_currentLine] = new(null, Keyword.SkipLine);
+                            continue;
+                        }
+
+                        if (_parser.IsCanceled)
+                            break;
+
+                        if (textSpan.IsEmpty)
+                        {
+                            if (_modeSuppressed)
+                                continue;
+
+                            if (IsNonCpdMode)
+                            {
+                                if (IsEnabled() && !_isCheck)
+                                    ParseNonCpdModeLine(ReadOnlySpan<char>.Empty);
+
+                                continue;
+                            }
+                            if (_isVisible && _isVal != 1 && _htmlLines < MaxHtmlLines && IsEnabled())
+                                _sb.AppendLine($"<p{HtmlId}>&nbsp;</p>");
+
+                            continue;
+                        }
+                        var lineCache = _currentLine;
+                        _parser.IsConst = false;
+                        if (Trace is not null)
+                            TraceExpression(null);
+                        var result = ParseKeyword(textSpan, ref keyword);
+                        if (keyword != currentLineCache.Keyword)
+                            _lineCache[lineCache] = new(currentLineCache.Tokens, keyword, _parser.Line);
+
+                        if (Trace is not null)
+                        {
+                            _parser.SyncTrace();
+                            if (IsEnabled())
+                                TraceLine();
+                        }
+
+                        if (result == KeywordResult.Continue)
+                            continue;
+                        else if (result == KeywordResult.Break)
+                            break;
 
                         if (IsNonCpdMode)
                         {
-                            if (IsEnabled())
-                                ParseNonCpdModeLine(ReadOnlySpan<char>.Empty);
+                            if (IsEnabled() && !_isCheck)
+                                ParseNonCpdModeLine(rawLine);
 
                             continue;
                         }
-                        if (_isVisible && _isVal != 1 && _htmlLines < MaxHtmlLines && IsEnabled())
-                            _sb.AppendLine($"<p{HtmlId}>&nbsp;</p>");
-
-                        continue;
-                    }
-                    var lineCache = _currentLine;
-                    _parser.IsConst = false;
-                    if (Trace is not null)
-                        TraceExpression(null);
-                    var result = ParseKeyword(textSpan, ref keyword);
-                    if (keyword != currentLineCache.Keyword)
-                        _lineCache[lineCache] = new(currentLineCache.Tokens, keyword, _parser.Line);
-
-                    if (Trace is not null)
-                    {
-                        _parser.SyncTrace();
-                        if (IsEnabled())
-                            TraceLine();
-                    }
-
-                    if (result == KeywordResult.Continue)
-                        continue;
-                    else if (result == KeywordResult.Break)
-                        break;
-
-                    if (IsNonCpdMode)
-                    {
-                        if (IsEnabled())
-                            ParseNonCpdModeLine(rawLine);
-
-                        continue;
-                    }
-                    _parser.IsCalculation = _isVal != -1;
-                    if ((textSpan[0] != '$' || !ParsePlot(textSpan)) &&
-                        ParseCondition(textSpan, keyword))
-                    {
-                        List<Token> tokens;
-                        if (_lineCache[_currentLine].IsCached)
-                            tokens = _lineCache[_currentLine].Tokens;
-                        else
+                        _parser.IsCalculation = _isVal != -1;
+                        if ((textSpan[0] != '$' || !ParsePlot(textSpan)) &&
+                            ParseCondition(textSpan, keyword))
                         {
-                            var skipChars = keyword == Keyword.Ui ? _uiSkipChars :
-                                keyword == Keyword.Const ? KeywordLength(Keyword.Const) : _condition.KeywordLength;
-                            tokens = GetTokens(textSpan[skipChars..]);
-                            if (_isMarkdownOn)
-                                ParseMarkdown(tokens);
+                            List<Token> tokens;
+                            if (_lineCache[_currentLine].IsCached)
+                                tokens = _lineCache[_currentLine].Tokens;
+                            else
+                            {
+                                var skipChars = keyword == Keyword.Ui ? _uiSkipChars :
+                                    keyword == Keyword.Const ? KeywordLength(Keyword.Const) : _condition.KeywordLength;
+                                if (lineOffset >= 0)
+                                    _lineOffset = lineOffset + skipChars;
+                                tokens = GetTokens(textSpan[skipChars..]);
+                                if (!_isCheck)
+                                {
+                                    if (_isMarkdownOn)
+                                        ParseMarkdown(tokens);
 
-                            ExpandImageSources(tokens);
-                            _lineCache[_currentLine] = new(tokens, keyword, _parser.Line);
+                                    ExpandImageSources(tokens);
+                                }
+                                _lineCache[_currentLine] = new(tokens, keyword, _parser.Line);
+                            }
+                            _parser.HasInputFields = false;
+                            ParseLine(tokens, keyword);
+                            // Lines with input fields are not cached, so new values are re-read
+                            if (_parser.HasInputFields)
+                                _lineCache[_currentLine] = new(null, keyword);
                         }
-                        _parser.HasInputFields = false;
-                        ParseLine(tokens, keyword);
-                        // Lines with input fields are not cached, so new values are re-read
-                        if (_parser.HasInputFields)
-                            _lineCache[_currentLine] = new(null, keyword);
+                    }
+                    catch (Exception ex) when (_isCheck)
+                    {
+                        _parser.ResetStack();
+                        if (ex is MathParserException mpe)
+                            AppendError(textSpan.ToString(), mpe, _currentLine);
+                        else
+                            RecordError(_currentLine, string.Format(Messages.Unexpected_error_0_Please_check_the_expression_consistency, ex.Message), true, "CPD-5900", CalcpadErrorKind.Values);
                     }
                 }
                 FlushMarkdown();
@@ -233,6 +277,8 @@ namespace Calcpad.Core
                         ReportUnclosed(Messages.if_block_not_closed_Missing_end_if, opening);
                     if (_loops.Count != 0)
                         ReportUnclosed(Messages.Iteration_block_not_closed_Missing_loop, (_loops.Peek().StartLine, _loops.Peek().SourceLine));
+                    else if (_checkLoops.Count != 0)
+                        ReportUnclosed(Messages.Iteration_block_not_closed_Missing_loop, (_checkLoops.Peek().Line, _checkLoops.Peek().SourceLine));
                 }
             }
             catch (MathParserException ex)
@@ -403,7 +449,7 @@ namespace Calcpad.Core
             void ParseLine(List<Token> tokens, Keyword keyword)
             {
                 var kwdLength = _condition.KeywordLength;
-                var isOutput = _isVisible &&
+                var isOutput = _isVisible && !_isCheck &&
                     (!_calculate || kwdLength == 0) &&
                     _htmlLines < MaxHtmlLines;
 
@@ -517,6 +563,8 @@ namespace Calcpad.Core
         {
             _htmlLines = 0;
             _errorCount = 0;
+            _errorOccurrences = 0;
+            _errorKeys.Clear();
             _calculate = calculate;
             _errors = new();
             _errIndex = 0;
@@ -531,6 +579,7 @@ namespace Calcpad.Core
             _sb.Clear();
             _condition = new();
             _loops.Clear();
+            _checkLoops.Clear();
             _isVal = 0;
             _outputModeStack.Clear();
             _substitutionStack.Clear();
@@ -688,9 +737,10 @@ namespace Calcpad.Core
                             else
                                 _sb.Append($"<span class=\"err\"{Id(_currentLine)}>{errText}</span>");
                         }
-                        RecordError(_currentLine, ex, Debug);
-
-                        if (++_errorCount == 40)
+                        var (start, end) = ErrorColumns(token, ui is null ? ex.Position : -1);
+                        if (RecordError(_currentLine, ex.Message, Debug, ex.Code, ex.Kind, 0, start, end))
+                            ++_errorCount;
+                        if (!_isCheck && (_errorCount == MaxErrors || ++_errorOccurrences == MaxErrorOccurrences))
                             throw new MathParserException(Messages.Too_many_errors, "CPD-5904", CalcpadErrorKind.Values);
                     }
                 }
@@ -710,12 +760,16 @@ namespace Calcpad.Core
             RecordError(line, text, Debug, code, kind);
         }
 
-        private void RecordError(int line, MathParserException ex, bool enabled) =>
+        private bool RecordError(int line, MathParserException ex, bool enabled) =>
             RecordError(line, ex.Message, enabled, ex.Code, ex.Kind);
 
-        private void RecordError(int line, string message, bool enabled, string code, CalcpadErrorKind kind, int sourceLine = 0)
+        /// <returns>False when this line already reported the same error, e.g. on an earlier loop pass.</returns>
+        private bool RecordError(int line, string message, bool enabled, string code, CalcpadErrorKind kind, int sourceLine = 0,
+            int startColumn = -1, int endColumn = -1)
         {
-            if (!enabled) return;
+            if (!_errorKeys.Add((line, code, message)))
+                return false;
+            if (!enabled && !_isCheck) return true;
             if (_isVisible)
                 _errors.Enqueue(line);
             if (sourceLine <= 0)
@@ -727,8 +781,42 @@ namespace Calcpad.Core
                 Message = message,
                 Source = CalcpadErrorSource.Expression,
                 Code = code,
-                Kind = kind
+                Kind = kind,
+                StartColumn = startColumn,
+                EndColumn = endColumn
             });
+            return true;
+        }
+
+        // The failing word when the tokenizer found the position, otherwise the whole expression
+        private (int Start, int End) ErrorColumns(Token token, int position)
+        {
+            if (_lineOffset < 0 || token.Start < 0)
+                return (-1, -1);
+
+            var offset = _lineOffset + token.Start;
+            var value = token.Value.AsSpan();
+            if (position < 0 || position > value.Length)
+            {
+                var trimmed = value.TrimStart();
+                return (offset + value.Length - trimmed.Length, offset + value.TrimEnd().Length);
+            }
+            int a = Math.Min(position, value.Length - 1), b = a + 1;
+            if (!IsWordChar(value[a]) && a > 0 && IsWordChar(value[a - 1]))
+                b = a--;
+            if (IsWordChar(value[a]))
+            {
+                while (a > 0 && IsWordChar(value[a - 1])) --a;
+                while (b < value.Length && IsWordChar(value[b])) ++b;
+                // A unit written after its number, as in 5m
+                var name = a;
+                while (name < b && !char.IsLetter(value[name])) ++name;
+                if (name < b)
+                    a = name;
+            }
+            return (offset + a, offset + b);
+
+            static bool IsWordChar(char c) => char.IsLetterOrDigit(c) || c == '_' || c == '.';
         }
 
         private static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line + 1}\">{line + 1}</a>]";

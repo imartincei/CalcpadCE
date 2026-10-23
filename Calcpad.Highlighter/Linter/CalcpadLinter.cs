@@ -15,18 +15,26 @@ namespace Calcpad.Highlighter.Linter
     {
         private readonly IncludeValidator _includeValidator = new();
         private readonly MacroValidator _macroValidator = new();
-        private readonly BalanceValidator _balanceValidator = new();
         private readonly NamingValidator _namingValidator = new();
         private readonly UsageValidator _usageValidator = new();
-        private readonly SemanticValidator _semanticValidator = new();
         private readonly FunctionTypeValidator _functionTypeValidator = new();
         private readonly CommandBlockValidator _commandBlockValidator = new();
-        private readonly FormatValidator _formatValidator = new();
         private readonly HtmlCommentValidator _htmlCommentValidator = new();
         private readonly SettingsValidator _settingsValidator = new();
         private readonly UiValidator _uiValidator = new();
         private readonly LegacyInputValidator _legacyInputValidator = new();
         private readonly DeprecatedInputKeywordValidator _deprecatedInputKeywordValidator = new();
+        private readonly CoreCheckValidator _coreCheckValidator = new();
+        private readonly RunErrorValidator _runErrorValidator = new();
+
+        // Static checks that report, more precisely, what Core gives these codes on the same line
+        private static readonly Dictionary<string, string[]> CoveredCoreCodes = new()
+        {
+            ["CPD-3307"] = ["CPD-3302", "CPD-5110", "CPD-3401"],
+            ["CPD-3308"] = ["CPD-3302", "CPD-5110", "CPD-3401"],
+            ["CPD-3311"] = ["CPD-3302", "CPD-5110", "CPD-3401"],
+            ["CPD-3405"] = ["CPD-3401"],
+        };
 
         /// <summary>
         /// Lint code using pre-processed staged content from ContentResolver.
@@ -36,8 +44,10 @@ namespace Calcpad.Highlighter.Linter
         /// Optional source-level regions in which specific diagnostic codes are suppressed, with
         /// 0-based original source line numbers. Applied after all diagnostics are mapped back.
         /// </param>
+        /// <param name="runErrors">The last run's errors, numbered by this content's lines (see <see cref="RunErrors.For"/>).</param>
         public LinterResult Lint(StagedResolvedContent staged,
-            IReadOnlyList<LintIgnoreRegion> ignoreRegions = null)
+            IReadOnlyList<LintIgnoreRegion> ignoreRegions = null,
+            IReadOnlyList<Calcpad.Core.CalcpadError> runErrors = null)
         {
             if (staged == null)
             {
@@ -67,8 +77,18 @@ namespace Calcpad.Highlighter.Linter
             ValidateStage2(stage2Context, result);
             ValidateStage3(stage3Context, result, tokenProvider);
 
+            // A failed MacroParser leaves the text partly expanded, so only its own errors count
+            if (staged.Stage2.Errors.Count == 0)
+            {
+                if (staged.CoreCheck is { } check)
+                    _coreCheckValidator.Validate(stage3Context, check.Value, result);
+                if (runErrors != null)
+                    _runErrorValidator.Validate(staged, stage3Context, runErrors, result);
+            }
+
             // Map all diagnostics from stage lines to original lines
             result.MapDiagnosticsToOriginal();
+            RemoveDuplicates(result);
 
             // Suppress diagnostics covered by LintIgnore regions
             if (ignoreRegions is { Count: > 0 })
@@ -78,9 +98,33 @@ namespace Calcpad.Highlighter.Linter
         }
 
         public Task<LinterResult> LintAsync(StagedResolvedContent staged,
-            IReadOnlyList<LintIgnoreRegion> ignoreRegions = null)
+            IReadOnlyList<LintIgnoreRegion> ignoreRegions = null,
+            IReadOnlyList<Calcpad.Core.CalcpadError> runErrors = null)
         {
-            return Task.Run(() => Lint(staged, ignoreRegions));
+            return Task.Run(() => Lint(staged, ignoreRegions, runErrors));
+        }
+
+        /// <summary>
+        /// One diagnostic per line and code. The static checks that remain are the more precise,
+        /// and the check pass already reports what a run of the same text would.
+        /// </summary>
+        private static void RemoveDuplicates(LinterResult result)
+        {
+            var seen = new HashSet<(int, string)>();
+            var duplicates = new HashSet<LinterDiagnostic>();
+            foreach (var d in result.Diagnostics.OrderBy(d => d.Origin))
+            {
+                if (d.Origin == DiagnosticOrigin.Static)
+                {
+                    seen.Add((d.Line, d.Code));
+                    foreach (var code in CoveredCoreCodes.GetValueOrDefault(d.Code, []))
+                        seen.Add((d.Line, code));
+                }
+                else if (!seen.Add((d.Line, d.Code)))
+                    duplicates.Add(d);
+            }
+            if (duplicates.Count > 0)
+                result.RemoveDiagnostics(duplicates.Contains);
         }
 
         private static void ApplyIgnoreRegions(
@@ -172,6 +216,8 @@ namespace Calcpad.Highlighter.Linter
             }
 
             context.DefinedVariables = stage3Result.DefinedVariables;
+            context.VariableFirstStage3Lines = stage3Result.VariableFirstStage3Lines;
+            context.VariableFirstLines = stage3Result.VariableFirstLines;
             context.DefinedFunctions = stage3Result.UserDefinedFunctions;
 
             // Populate macro info dictionary
@@ -220,13 +266,10 @@ namespace Calcpad.Highlighter.Linter
 
         private void ValidateStage3(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
-            _balanceValidator.Validate(stage3, result, tokenProvider);
             _namingValidator.Validate(stage3, result, tokenProvider);
             _usageValidator.Validate(stage3, result, tokenProvider);
-            _semanticValidator.Validate(stage3, result, tokenProvider);
             _functionTypeValidator.Validate(stage3, result, tokenProvider);
             _commandBlockValidator.Validate(stage3, result, tokenProvider);
-            _formatValidator.Validate(stage3, result, tokenProvider);
             _htmlCommentValidator.Validate(stage3, result, tokenProvider);
             _settingsValidator.Validate(stage3, result, tokenProvider);
             _uiValidator.Validate(stage3, result, tokenProvider);

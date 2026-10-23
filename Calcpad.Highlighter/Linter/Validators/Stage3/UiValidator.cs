@@ -42,7 +42,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             var end = line.Length;
             if (cursor >= end)
             {
-                Reporter(result, lineIndex, afterKeyword, end).Warn(Messages.The_UI_keyword_requires_a_variable_assignment);
+                Reporter(result, lineIndex, afterKeyword, end).Report(Messages.The_UI_keyword_requires_a_variable_assignment);
                 return;
             }
 
@@ -53,7 +53,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 var braceEnd = line.IndexOf('}', cursor);
                 if (braceEnd < 0)
                 {
-                    Reporter(result, lineIndex, cursor, end).Warn(Messages.Improper_format_for_UI_keyword_Missing_closing_brace);
+                    Reporter(result, lineIndex, cursor, end).Report(Messages.Improper_format_for_UI_keyword_Missing_closing_brace);
                     return;
                 }
                 if (!ValidateJson(line[cursor..(braceEnd + 1)], Reporter(result, lineIndex, cursor, braceEnd + 1), out properties))
@@ -66,32 +66,32 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             var assignments = UiSyntax.EnumerateAssignments(line.AsSpan(jsonEnd));
             if (assignments.Count == 0)
             {
-                reporter.Warn(Messages.The_UI_keyword_requires_a_variable_assignment);
+                reporter.Report(Messages.The_UI_keyword_requires_a_variable_assignment);
                 return;
             }
             foreach (var (name, rhs) in assignments)
             {
                 if (name.EndsWith('$'))
                 {
-                    reporter.Warn(Messages.Only_numbers_are_supported_by_the_UI_keyword);
+                    reporter.Report(Messages.Only_numbers_are_supported_by_the_UI_keyword);
                     return;
                 }
                 var type = UiSyntax.ResolveType(properties?.Type, rhs);
                 if (!UiSyntax.IsValue(rhs, type, properties?.AllowsExpression ?? false))
                 {
-                    reporter.Warn(Messages.UI_expressions_require_allowExpression);
+                    reporter.Report(Messages.UI_expressions_require_allowExpression);
                     return;
                 }
                 if (UiSyntax.TypeMismatch(properties?.Type, rhs, properties?.AllowsExpression ?? false) is { } mismatch)
                 {
-                    reporter.Warn(mismatch);
+                    reporter.Report(mismatch);
                     return;
                 }
                 var typeErrors = properties?.ValidateResolvedType(type);
                 if (typeErrors is { Count: > 0 })
                 {
                     foreach (var error in typeErrors)
-                        reporter.Warn(error.Message);
+                        reporter.Report(error.Message);
 
                     return;
                 }
@@ -116,12 +116,12 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             catch (JsonException)
             {
                 // The checks below only need where the block ends, not a deserialized payload.
-                reporter.Warn(Messages.A_UI_value_has_the_wrong_type);
+                reporter.Report(Messages.A_UI_value_has_the_wrong_type);
                 return true;
             }
 
             foreach (var error in properties.Validate())
-                reporter.Warn(error.Message);
+                reporter.Report(error.Message);
 
             return true;
         }
@@ -135,6 +135,6 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
         }
 
         private static DirectiveJsonReporter Reporter(LinterResult result, int lineIndex, int from, int to) =>
-            new(result, lineIndex, from, to, Code, "#UI");
+            new(result, lineIndex, from, to, Code, "#UI", coreRejects: true);
     }
 }

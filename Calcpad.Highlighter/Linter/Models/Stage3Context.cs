@@ -13,6 +13,10 @@ namespace Calcpad.Highlighter.Linter.Models
         /// <summary>Whether each Stage3 line came from the local file or an #include, keyed by Stage3 line index.</summary>
         public Dictionary<int, SourceInfo> IncludeMap { get; set; } = new();
         public HashSet<string> DefinedVariables { get; set; } = new();
+
+        /// <summary>Case-sensitive: the Stage 3 and root document line of each variable's first definition.</summary>
+        public Dictionary<string, int> VariableFirstStage3Lines { get; set; } = new(StringComparer.Ordinal);
+        public Dictionary<string, int> VariableFirstLines { get; set; } = new(StringComparer.Ordinal);
         public Dictionary<string, FunctionInfo> DefinedFunctions { get; set; } = new(StringComparer.Ordinal);
         public Dictionary<string, MacroInfo> DefinedMacros { get; set; } = new(StringComparer.Ordinal); // name -> macro info
         public HashSet<string> CustomUnits { get; set; } = new();
@@ -30,6 +34,9 @@ namespace Calcpad.Highlighter.Linter.Models
 
         /// <summary>Runtime facts from Core; null when no trace matched the content.</summary>
         public RuntimeOverlay Runtime { get; set; }
+
+        /// <summary>The run reports names on the lines it executed, so static checks skip them.</summary>
+        public bool IsExecuted(int line) => Runtime?.GetExecution(line) == LineExecution.Executed;
 
         /// <summary>
         /// Functions that use command blocks ($Inline, $Block, $While).

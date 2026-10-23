@@ -574,4 +574,10 @@
   <data name="CannotModifyConstant" xml:space="preserve">
     <value>Не може да се промени константа "{0}".</value>
   </data>
+  <data name="Blocks_are_nested_too_deeply_0" xml:space="preserve">
+    <value>Блоковете са вложени твърде дълбоко. Максималната дълбочина е {0}.</value>
+  </data>
+  <data name="Invalid_for_loop_header" xml:space="preserve">
+    <value>Невалиден ред "#for". Очаква се "#for брояч = начало : край".</value>
+  </data>
 </root>

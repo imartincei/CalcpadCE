@@ -41,6 +41,20 @@ public class RuntimeTraceCacheTests
     }
 
     [Fact]
+    public void StoredErrors_ArePerDocumentAndFollowEdits()
+    {
+        using var memoryCache = new MemoryCache(new MemoryCacheOptions());
+        var traces = new RuntimeTraceCache(memoryCache);
+        const string run = "a = 1m\nb = a + 1s\n";
+        var errors = new CalcpadService().Convert(run, debug: true).Errors;
+
+        traces.StoreErrors("/a.cpd", null, new Calcpad.Highlighter.Linter.RunErrors(run, errors));
+        Assert.Null(traces.GetErrors("/b.cpd", null));
+        var moved = traces.GetErrors("/a.cpd", null)!.Value.Errors.For("x = 1\n" + run);
+        Assert.Equal(3, Assert.Single(moved).SourceLine);
+    }
+
+    [Fact]
     public void StoredNames_ArePerDocumentWhateverTheContent()
     {
         using var memoryCache = new MemoryCache(new MemoryCacheOptions());

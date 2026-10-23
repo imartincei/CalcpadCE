@@ -1868,5 +1868,23 @@ namespace Calcpad.Core {
                 return ResourceManager.GetString("Path_root_folder_not_found_0_1", resourceCulture);
             }
         }
+
+        // / <summary>
+        // /   Looks up a localized string similar to Blocks are nested too deeply. The maximum depth is {0}..
+        // / </summary>
+        public static string Blocks_are_nested_too_deeply_0 {
+            get {
+                return ResourceManager.GetString("Blocks_are_nested_too_deeply_0", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to Invalid &quot;#for&quot; header. Expected &quot;#for counter = start : end&quot;..
+        // / </summary>
+        public static string Invalid_for_loop_header {
+            get {
+                return ResourceManager.GetString("Invalid_for_loop_header", resourceCulture);
+            }
+        }
     }
 }

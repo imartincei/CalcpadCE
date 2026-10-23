@@ -66,5 +66,22 @@ namespace Calcpad.Tests.Highlighter
         public void DefDirective_IsMatchedCaseInsensitively() =>
             Assert.Contains(new CalcpadTokenizer().Tokenize("#Def m$(a$)").Tokens,
                 t => t.Type == TokenType.Macro && t.Text == "m$");
+
+        [Theory]
+        [InlineData("#settings {\"decimals\": }", LinterSeverity.Error)]
+        [InlineData("#settings {\"decimals\": 40}", LinterSeverity.Error)]
+        [InlineData("#settings {\"decimals\": \"x\"}", LinterSeverity.Error)]
+        [InlineData("#settings {\"colour\": 1}", LinterSeverity.Warning)]
+        public void Severity_FollowsWhetherCoreRejectsIt(string source, LinterSeverity severity)
+        {
+            Assert.Equal(severity, Assert.Single(Lint(source).Diagnostics, d => d.Code == "CPD-3413").Severity);
+        }
+
+        [Fact]
+        public void MetadataCommentJson_StaysAWarning()
+        {
+            Assert.Equal(LinterSeverity.Warning,
+                Assert.Single(Lint("\'<!--{\"desc\": }-->\nx = 1\nx").Diagnostics, d => d.Code == "CPD-3412").Severity);
+        }
     }
 }

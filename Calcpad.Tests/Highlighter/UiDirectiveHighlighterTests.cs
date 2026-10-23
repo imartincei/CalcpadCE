@@ -296,5 +296,22 @@ namespace Calcpad.Tests.Highlighter
         public void JsonBlock_IsNotValidatedAgainstSettingsKeys() =>
             Assert.DoesNotContain(Lint("#UI {\"type\": \"entry\"} L = 10m\nL").Diagnostics,
                 d => d.Code == "CPD-3413");
+
+        [Theory]
+        [InlineData("#UI {\"type\": bad} x = 5")]
+        [InlineData("#UI {\"type\": \"entry\"")]
+        [InlineData("#UI {\"type\": \"slider\"} x = 5")]
+        [InlineData("#UI {\"type\": \"entry\"} s$ = 5")]
+        public void RejectedPayload_IsAnError(string source)
+        {
+            Assert.Contains(Lint(source).Diagnostics, d => d.Code == "CPD-3415" && d.Severity == LinterSeverity.Error);
+        }
+
+        [Fact]
+        public void UnknownProperty_IsAWarning()
+        {
+            var d = Assert.Single(Lint("#UI {\"colour\": \"red\"} x = 5\nx").Diagnostics, d => d.Code == "CPD-3415");
+            Assert.Equal(LinterSeverity.Warning, d.Severity);
+        }
     }
 }

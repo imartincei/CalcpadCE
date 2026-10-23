@@ -112,6 +112,10 @@ const BUILTIN_THEMES = [
  * `handlePlatformMessage`.
  */
 export abstract class BaseMessageBridge {
+    /** Identifies an untitled active document to the server, as its editor does. */
+    public activeDocumentId?: () => string | undefined;
+    /** Called when the server recorded a run of the active document, so its lint is worth refetching. */
+    public onRunRecorded?: () => void;
     protected apiClient: CalcpadApiClient;
     protected snippetService: CalcpadSnippetService;
     protected definitionsService: CalcpadDefinitionsService;
@@ -883,13 +887,13 @@ export abstract class BaseMessageBridge {
         const { sourceFilePath } = await this.buildFileContext(content);
         const result = await this.apiClient.convert(
             content, buildApiSettings(this.settings), 'html', true, sourceFilePath, undefined,
-            this.uiOptionsFor('report'), true, { write: true });
+            this.uiOptionsFor('report'), true, { write: true, documentId: this.activeDocumentId?.() });
         if (result == null || result instanceof ArrayBuffer) {
             await this.onExportError('The document could not be run, so nothing was written.');
             return;
         }
+        if (result.traceUpdated) this.onRunRecorded?.();
         const errors = result.errors ?? [];
-        this.postToVue({ type: 'updateConvertErrors', errors });
         this.postToVue({
             type: 'writeFilesResult',
             ok: errors.length === 0,

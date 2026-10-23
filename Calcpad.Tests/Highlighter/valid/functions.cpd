@@ -92,8 +92,10 @@ length = 5m
 unitsOf = getunits(length)
 withUnits = setunits(5; m)
 noUnits = clrunits(length)
+#settings {"complex": false}
 hpConv = hp([1; 2; 3])
 isHpRes = ishp(hpConv)
+#settings {"complex": true}
 deepNest = sqr(abs(sin(45) + cos(45)))
 
 ' Function redefinition is allowed (reports CPD-3314 Information, not an error)

@@ -75,12 +75,17 @@ namespace Calcpad.Server.Controllers
                 });
                 Response.Headers["X-Calcpad-Errors"] = Uri.EscapeDataString(errorsJson);
                 // Tells the client lint and definitions can now use what this run executed.
+                // Only a debug run records its errors, the same default CalcpadService uses
+                if (request.IncludeLineAnchors ?? !request.ForPrint)
+                {
+                    _runtimeTraceCache.StoreErrors(request.SourceFilePath, request.DocumentId, new RunErrors(request.Content, errors));
+                    Response.Headers["X-Calcpad-Trace"] = "1";
+                }
                 if (trace != null)
                 {
                     _runtimeTraceCache.Store(request.SourceFilePath, request.DocumentId, request.Content, trace);
                     _runtimeTraceCache.StoreNames(request.SourceFilePath, request.DocumentId, RuntimeVariableNames.From(
                         trace, _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, request.DocumentId)));
-                    Response.Headers["X-Calcpad-Trace"] = "1";
                 }
                 if (pause is not null)
                 {
@@ -534,7 +539,11 @@ namespace Calcpad.Server.Controllers
 
                 // Extract LintIgnore regions from raw source, then lint with suppression
                 var ignoreRegions = _lintIgnoreRegionParser.ExtractRegions(request.Content);
-                var lintResult = linter.Lint(staged, ignoreRegions);
+                var run = _runtimeTraceCache.GetErrors(request.SourceFilePath, request.DocumentId);
+                var runErrors = run is { } r && !ContentResolutionCache.IncludesChangedSince(staged, r.StoredUtc)
+                    ? r.Errors.For(request.Content)
+                    : null;
+                var lintResult = linter.Lint(staged, ignoreRegions, runErrors);
 
                 var response = new LintResponse
                 {

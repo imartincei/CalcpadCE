@@ -75,7 +75,7 @@ namespace Calcpad.Core
                 catch (JsonException)
                 {
                     AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, UiKeyword), _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
-                    _uiSkipChars = SkipSpaces(s, UiKeyword.Length);
+                    _uiSkipChars = SkipSpaces(s, braceEnd + 1);
                     return KeywordResult.None;
                 }
                 _uiSkipChars = SkipSpaces(s, braceEnd + 1);
@@ -131,7 +131,18 @@ namespace Calcpad.Core
                         AutoDetectGridSizeFromFunction(assignment.Rhs, ref rows, ref columns);
                 }
                 if (type == "datagrid")
-                    CheckGridSize(rows, columns);
+                {
+                    try
+                    {
+                        CheckGridSize(rows, columns);
+                    }
+                    catch (MathParserException ex)
+                    {
+                        AppendError(s.ToString(), ex, _currentLine);
+                        _lineUiControls = null;
+                        return KeywordResult.None;
+                    }
+                }
 
                 var (declarationKey, key) = GetUiKey(assignment.Name);
                 _lineUiControls.Add(new UiPropertyMetadata

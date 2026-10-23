@@ -17,4 +17,4 @@ f(x) = $Block{y = x*2
 	z = 1
 
 ' CPD-3106: Unmatched closing brace
-g(x) = x*2}
+r = $Root x^2 - 4 @ x = 0 : 5}

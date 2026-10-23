@@ -71,6 +71,8 @@ async function lintAndMark(
         (diag: LintDiagnostic) => ({
             severity: mapSeverity(diag.severityId),
             message: diag.message,
+            code: diag.code,
+            source: diag.source,
             startLineNumber: diag.line + 1,
             startColumn: diag.column + 1,
             endLineNumber: diag.line + 1,

@@ -14,23 +14,17 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
     {
         public void Validate(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
-            ValidateCommands(stage3, result, tokenProvider);
+            ValidateCommandVariables(stage3, result, tokenProvider);
             ValidateUndefinedIdentifiers(stage3, result, tokenProvider);
-            ValidateUndefinedUnits(stage3, result, tokenProvider);
-            ValidateFunctionCalls(stage3, result, tokenProvider);
             ValidateUndefinedMacros(stage3, result, tokenProvider);
             ValidateUnusedDefinitions(stage3, result, tokenProvider);
         }
 
         /// <summary>
-        /// Validates the @ separator pattern in commands like $Repeat{expr @ variable = start : end},
-        /// folding two former passes into one:
-        ///   - CPD-3406: command syntax — exactly one variable token between @ and =, no numbers
-        ///   - CPD-3408: expression uses the declared loop variable
-        /// $Plot is exempt from both when the expression contains | or & (multi-function /
-        /// parametric forms), and $Map is exempt from the loop-variable check.
+        /// CPD-3408: the expression of a command like $Sum{expr @ i = 1 : n} uses its variable.
+        /// Core's check pass reports the command syntax itself.
         /// </summary>
-        private void ValidateCommands(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
+        private void ValidateCommandVariables(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
             for (int i = 0; i < stage3.Lines.Count; i++)
             {
@@ -62,19 +56,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 }
                 if (!hasCommand) continue;
 
-                // Tokens consumed by both phases — fetch once.
                 var tokens = tokenProvider.GetTokensForLine(i);
 
-                // $Plot with | or & is fully exempt (parametric / multi-function form).
-                bool skipSyntaxPhase = false;
-                if (commandName.Equals("$Plot", StringComparison.OrdinalIgnoreCase))
-                {
-                    var beforeAt = line.AsSpan(0, atIndex);
-                    if (beforeAt.Contains('|') || beforeAt.Contains('&'))
-                        skipSyntaxPhase = true;
-                }
-
-                // Find the non-comparison = sign after @. Used by both phases when present.
+                // Find the non-comparison = sign after @
                 var afterAt = line.AsSpan(atIndex + 1);
                 var equalsIndex = -1;
                 for (int j = 0; j < afterAt.Length; j++)
@@ -94,48 +78,6 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 var atAbsolutePos = atIndex;
                 var equalsAbsolutePos = equalsIndex >= 0 ? atIndex + 1 + equalsIndex : -1;
 
-                // --- Phase 1: command syntax (CPD-3406) ---
-                if (!skipSyntaxPhase)
-                {
-                    if (equalsIndex < 0)
-                    {
-                        result.AddError(i, atIndex, atIndex + 1, "CPD-3406",
-                            "Invalid command syntax: expected 'variable = start : end' after '@'");
-                        continue;
-                    }
-
-                    var variableTokens = new List<Token>();
-                    var numberTokens = new List<Token>();
-                    foreach (var token in tokens)
-                    {
-                        if (token.Column > atAbsolutePos && token.Column < equalsAbsolutePos)
-                        {
-                            if (token.Type == TokenType.LocalVariable || token.Type == TokenType.Variable)
-                                variableTokens.Add(token);
-                            else if (token.Type == TokenType.Const)
-                                numberTokens.Add(token);
-                        }
-                    }
-
-                    if (variableTokens.Count == 0)
-                    {
-                        result.AddError(i, atAbsolutePos + 1, equalsAbsolutePos, "CPD-3406",
-                            "Invalid command syntax: expected variable name after '@'");
-                    }
-                    else if (variableTokens.Count > 1)
-                    {
-                        result.AddError(i, atAbsolutePos + 1, equalsAbsolutePos, "CPD-3406",
-                            "Invalid command syntax: expected single variable name after '@'");
-                    }
-                    else if (numberTokens.Count > 0)
-                    {
-                        var firstNumber = numberTokens[0];
-                        result.AddError(i, firstNumber.Column, firstNumber.Column + firstNumber.Length, "CPD-3406",
-                            "Invalid command syntax: unexpected number '" + firstNumber.Text + "' between '@' and variable name");
-                    }
-                }
-
-                // --- Phase 2: command variable matching (CPD-3408) ---
                 // $Plot and $Map are exempt (different counter semantics). $Repeat is exempt
                 // too: its counter only controls the iteration count, so the body (which may be
                 // pure side-effect assignments) is not required to reference the loop variable.
@@ -144,7 +86,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     commandName.Equals("$Repeat", StringComparison.OrdinalIgnoreCase))
                     continue;
 
-                if (equalsIndex < 0) continue; // already reported above
+                if (equalsIndex < 0) continue;
 
                 string declaredVar = null;
                 foreach (var token in tokens)
@@ -231,7 +173,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                         continue;
                 }
 
-                if (wasNoCalculation)
+                if (wasNoCalculation || stage3.IsExecuted(i))
                     continue;
 
                 // Skip undefined variable checks for function definitions with command blocks
@@ -244,6 +186,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
                 // Check if this line is a function definition and extract its parameters
                 var functionParams = ParsingHelpers.GetFunctionParamsFromLine(line);
+                // A function body resolves its names when called, not where it is defined
+                var isFunctionDefinition = CalcpadPatterns.FunctionDefinition.IsMatch(line);
 
                 // Check for command-scope variables (e.g., x in $Root{f(x) @ x = 0 : 5})
                 var commandScopeVars = GetCommandScopeVariables(line, tokens);
@@ -284,8 +228,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     if (commandScopeVars.Contains(baseName))
                         continue;
 
-                    // Check if defined
-                    var isDefined = stage3.DefinedVariables.Contains(baseName) ||
+                    var isVariable = stage3.VariableFirstStage3Lines.TryGetValue(baseName, out var firstLine);
+                    var isDefined = isVariable && (firstLine <= i || isFunctionDefinition) ||
                                    stage3.DefinedFunctions.ContainsKey(baseName) ||
                                    CalcpadBuiltIns.Functions.Contains(baseName) ||
                                    CalcpadBuiltIns.CommonConstants.Contains(baseName) ||
@@ -322,48 +266,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                                     continue;
                             }
                         }
-                        // Line continuation mapping is handled automatically by LinterResult
                         result.AddError(i, token.Column, token.Column + token.Length, "CPD-3301",
-                            "'" + baseName + "'");
-                    }
-                }
-            }
-        }
-
-        private void ValidateUndefinedUnits(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
-        {
-            for (int i = 0; i < stage3.Lines.Count; i++)
-            {
-                if (!tokenProvider.IsCpdMode(i)) continue;
-
-                var line = stage3.Lines[i];
-
-                if (LineParser.ShouldSkipLine(line))
-                    continue;
-
-                var trimmed = line.Trim();
-
-                if (LineParser.IsDirectiveLine(trimmed))
-                    continue;
-
-                var tokens = tokenProvider.GetTokensForLine(i);
-
-                foreach (var token in tokens)
-                {
-                    // Only check Units tokens
-                    if (token.Type != TokenType.Units)
-                        continue;
-
-                    var unitName = token.Text;
-
-                    // Check if it's a valid built-in unit or custom unit
-                    var isValidUnit = CalcpadBuiltIns.Units.Contains(unitName) ||
-                                     stage3.CustomUnits.Contains(unitName);
-
-                    if (!isValidUnit)
-                    {
-                        result.AddError(i, token.Column, token.Column + token.Length, "CPD-3310",
-                            "'" + unitName + "'");
+                            UndefinedMessage(stage3, baseName, isVariable));
                     }
                 }
             }
@@ -474,115 +378,6 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             return CalcpadPatterns.FunctionWithCommandBlock.IsMatch(trimmedLine);
         }
 
-        private void ValidateFunctionCalls(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
-        {
-            // When a function is redefined, the latest definition wins (matching Calcpad.Core),
-            // so calls are checked against the last definition's parameter count.
-            var lastDefParamCount = BuildLastDefinitionParamCounts(stage3, tokenProvider);
-
-            for (int i = 0; i < stage3.Lines.Count; i++)
-            {
-                if (!tokenProvider.IsCpdMode(i)) continue;
-
-                var line = stage3.Lines[i];
-
-                if (LineParser.ShouldSkipLine(line))
-                    continue;
-
-                var trimmed = line.Trim();
-
-                if (LineParser.IsDirectiveLine(trimmed))
-                    continue;
-
-                // The name on the left of a function definition is a (re)definition, not a call.
-                // Redefining an existing function is allowed, so don't check it against a param count.
-                var defMatch = CalcpadPatterns.FunctionDefinition.Match(line);
-                var defName = defMatch.Success ? defMatch.Groups[1].Value : null;
-                var defNameCol = defMatch.Success ? defMatch.Groups[1].Index : -1;
-
-                var tokens = tokenProvider.GetTokensForLine(i);
-
-                foreach (var token in tokens)
-                {
-                    // Only check Function tokens
-                    if (token.Type != TokenType.Function)
-                        continue;
-
-                    var funcName = token.Text;
-
-                    if (funcName == defName && token.Column == defNameCol)
-                        continue;
-
-                    // Skip built-in functions (they have variable param counts)
-                    if (CalcpadBuiltIns.Functions.Contains(funcName))
-                        continue;
-
-                    // Check user-defined functions
-                    if (stage3.DefinedFunctions.TryGetValue(funcName, out FunctionInfo funcInfo))
-                    {
-                        var (found, paramsStr) = ParsingHelpers.ExtractParamsString(line, token.Column + token.Length);
-                        if (found)
-                        {
-                            var argList = ParameterParser.ParseParameters(paramsStr);
-                            // Filter out empty-only result (zero args case)
-                            if (argList.Count == 1 && argList[0].Length == 0)
-                                argList.Clear();
-
-                            if (lastDefParamCount.TryGetValue(funcName, out var lastDef))
-                                funcInfo = lastDef;
-
-                            var endCol = CallEndColumn(line, token);
-                            foreach (var arg in argList)
-                            {
-                                if (IsUnknownKeywordArg(arg, funcInfo.ParamNames, out var kwName))
-                                    result.AddError(i, token.Column, endCol, "CPD-3315",
-                                        "'" + kwName + "' is not a parameter of '" + funcName + "'");
-                            }
-                            if (ArgCountMessage(funcName, argList.Count, funcInfo.RequiredParamCount, funcInfo.ParamCount) is { } message)
-                                result.AddError(i, token.Column, endCol, "CPD-3302", message);
-                        }
-                    }
-                    else
-                    {
-                        // Function not defined - the content resolver handles included files
-                        result.AddError(i, token.Column, token.Column + token.Length, "CPD-3305",
-                            "'" + funcName + "' is not defined");
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Maps each user-defined function name to the parameter count of its last textual
-        /// definition. The tokenizer only registers the first definition's arity, but Calcpad
-        /// resolves redefinitions to the latest one, so call checks must use the last count.
-        /// </summary>
-        private static Dictionary<string, FunctionInfo> BuildLastDefinitionParamCounts(Stage3Context stage3, TokenizedLineProvider tokenProvider)
-        {
-            var counts = new Dictionary<string, FunctionInfo>(StringComparer.Ordinal);
-            for (int i = 0; i < stage3.Lines.Count; i++)
-            {
-                if (!tokenProvider.IsCpdMode(i)) continue;
-
-                var line = stage3.Lines[i];
-                if (LineParser.ShouldSkipLine(line))
-                    continue;
-
-                var defMatch = CalcpadPatterns.FunctionDefinition.Match(line);
-                if (!defMatch.Success)
-                    continue;
-
-                var (names, defaults) = ParsingHelpers.ParseParamList(defMatch.Groups[2].Value);
-                counts[defMatch.Groups[1].Value] = new FunctionInfo
-                {
-                    ParamCount = names.Count,
-                    RequiredParamCount = ParsingHelpers.CountRequiredParams(names.Count, defaults),
-                    ParamNames = names
-                };
-            }
-            return counts;
-        }
-
         // MacroParser only expands once a macro exists; before that, Core fails only at run time.
         private static void ValidateUndefinedMacros(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
@@ -602,19 +397,17 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             }
         }
 
-        private static bool IsUnknownKeywordArg(string arg, List<string> paramNames, out string name) =>
-            ParsingHelpers.TryParseKeywordArg(arg, out name, out _) && !paramNames.Contains(name);
-
-        private static int CallEndColumn(string line, Token token)
+        private static string UndefinedMessage(Stage3Context stage3, string name, bool isDefinedLater)
         {
-            var nameEnd = token.Column + token.Length;
-            return Math.Max(ParsingHelpers.FindClosingParen(line, nameEnd), nameEnd);
-        }
+            if (isDefinedLater)
+                return "'" + name + "' is used before its definition on line " + (stage3.VariableFirstLines.GetValueOrDefault(name) + 1);
 
-        private static string ArgCountMessage(string name, int actual, int required, int total) =>
-            actual >= required && actual <= total ? null :
-            "'" + name + "' expects " + (required == total ? total.ToString() : required + "-" + total) +
-            " parameter(s) but got " + actual;
+            foreach (var defined in stage3.VariableFirstStage3Lines.Keys)
+                if (string.Equals(defined, name, StringComparison.OrdinalIgnoreCase))
+                    return "'" + name + "'. Names are case-sensitive: did you mean '" + defined + "'?";
+
+            return "'" + name + "'";
+        }
 
         private static bool IsBeingDefined(string line, int identifierStart, string identifier)
         {
@@ -634,19 +427,6 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Count the number of parameters in a function call.
-        /// Returns -1 if no opening parenthesis is found.
-        /// </summary>
-        private static int CountFunctionParams(string line, int afterFuncName)
-        {
-            var (found, paramsStr) = ParsingHelpers.ExtractParamsString(line, afterFuncName);
-            if (!found)
-                return -1;
-
-            return ParameterParser.CountParameters(paramsStr);
         }
 
         /// <summary>
