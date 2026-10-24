@@ -328,6 +328,7 @@ namespace Calcpad.Core
                         ref var item = ref _items[0];
                         item.Html = new HtmlWriter(_parser._settings, _parser.Phasor).AddBrackets(item.Html, 1);
                         item.Xml = new XmlWriter(_parser._settings, _parser.Phasor).AddBrackets(item.Xml, 1);
+                        item.MathMl = new MathMlWriter(_parser._settings, _parser.Phasor).AddBrackets(item.MathMl, 1);
                     }
                 }
             }
@@ -679,6 +680,97 @@ namespace Calcpad.Core
                 return sb.ToString();
             }
 
+            internal string ToMathMl(bool formatEquations)
+            {
+                var len = _items.Length;
+                var writer = new MathMlWriter(_parser._settings, _parser.Phasor);
+                var equals = writer.FormatOperator('=');
+                if (IsBlock)
+                {
+                    var rows = new string[len];
+                    for (int i = 0; i < len; ++i)
+                        rows[i] = _items[i].MathMl;
+
+                    if (_type == SolverTypes.Inline)
+                        rows = [string.Join(writer.FormatOperator(';'), rows)];
+                    else if (_type == SolverTypes.While)
+                        rows[0] = MathMlWriter.Keyword("while") + rows[0];
+
+                    return writer.FormatBlock(rows);
+                }
+                if (formatEquations)
+                {
+                    if (_type == SolverTypes.Integral || _type == SolverTypes.Area)
+                        return writer.FormatNary(
+                            TypeName(_type),
+                            _items[2].MathMl,
+                            _items[3].MathMl,
+                            string.Concat(_items[0].MathMl, "<mspace width=\"0.17em\"/><mi mathvariant=\"normal\">d</mi>", _items[1].MathMl));
+
+                    if (_type == SolverTypes.Sum || _type == SolverTypes.Product)
+                        return writer.FormatNary(
+                            TypeName(_type),
+                            string.Concat(_items[1].MathMl, equals, _items[2].MathMl),
+                            _items[3].MathMl,
+                            _items[0].MathMl);
+
+                    if (_type == SolverTypes.Slope || _type == SolverTypes.Derivative)
+                    {
+                        const string d = "<mi mathvariant=\"normal\">d</mi>";
+                        var derivative = writer.AddBrackets(
+                            string.Concat(writer.FormatDivision(d, d + _items[1].MathMl, 0), _items[0].MathMl),
+                            1, ' ', '|');
+                        return $"<msub>{derivative}<mrow>{_items[1].MathMl}{equals}{_items[2].MathMl}</mrow></msub>";
+                    }
+                }
+                const string open = "<mo stretchy=\"false\">{</mo>";
+                const string close = "<mo stretchy=\"false\">}</mo>";
+                var sb = new StringBuilder(MathMlWriter.Keyword(TypeName(_type)));
+                if (_type == SolverTypes.Repeat && len > 4)
+                {
+                    var rows = new string[len - 2];
+                    rows[0] = string.Concat(MathMlWriter.Keyword("for"), _items[1].MathMl, equals, _items[2].MathMl, "<mo>…</mo>", _items[3].MathMl);
+                    rows[1] = _items[0].MathMl;
+                    for (int i = 4; i < len; ++i)
+                        rows[i - 2] = _items[i].MathMl;
+
+                    sb.Append(writer.FormatBlock(rows));
+                    return sb.ToString();
+                }
+                sb.Append(open).Append(_items[0].MathMl);
+                if (_type == SolverTypes.Root)
+                {
+                    if (_items.Length > 4 && _items[4].MathMl is not null)
+                        sb.Append(equals).Append(_items[4].MathMl);
+                    else
+                        sb.Append(equals).Append("<mn>0</mn>");
+                }
+
+                if (_type == SolverTypes.Repeat)
+                    sb.Append(MathMlWriter.Keyword("for"));
+                else
+                    sb.Append(writer.FormatOperator(';'));
+
+                sb.Append(_items[1].MathMl);
+                if (_type == SolverTypes.Repeat || _type == SolverTypes.Slope || _type == SolverTypes.Derivative)
+                {
+                    sb.Append(equals).Append(_items[2].MathMl);
+                    if (_type == SolverTypes.Repeat)
+                        sb.Append("<mo>…</mo>").Append(_items[3].MathMl);
+
+                    sb.Append(close);
+                }
+                else
+                    sb.Append("<mo>∈</mo><mo stretchy=\"false\">[</mo>")
+                        .Append(_items[2].MathMl)
+                        .Append(writer.FormatOperator(';'))
+                        .Append(_items[3].MathMl)
+                        .Append("<mo stretchy=\"false\">]</mo>")
+                        .Append(close);
+
+                return sb.ToString();
+            }
+
             internal string ToXml()
             {
                 var len = _items.Length;
@@ -833,6 +925,7 @@ namespace Calcpad.Core
                 internal string Input;
                 internal string Html;
                 internal string Xml;
+                internal string MathMl;
                 internal Token[] Rpn;
 
                 internal void Render(MathParser parser)
@@ -840,8 +933,9 @@ namespace Calcpad.Core
                     if (Rpn is not null)
                     {
                         parser._rpn = Rpn;
-                        Html = parser.ToHtml();
+                        Html = parser.ToClassicHtml();
                         Xml = parser.ToXml();
+                        MathMl = parser.Render(OutputWriter.OutputFormat.MathMl, false);
                     }
                 }
             }

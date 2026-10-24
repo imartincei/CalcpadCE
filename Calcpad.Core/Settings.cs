@@ -23,7 +23,8 @@ namespace Calcpad.Core
         PlotHeight,
         PlotStep,
         Precision,
-        Tol
+        Tol,
+        MathRenderer
     }
 
     /// <summary>
@@ -50,6 +51,14 @@ namespace Calcpad.Core
         public int? PlotStep { get; set; }
         public double? Precision { get; set; }
         public double? Tol { get; set; }
+        public string MathRenderer { get; set; }
+
+        internal MathRenderers? MathRendererValue => MathRenderer?.ToLowerInvariant() switch
+        {
+            "html" => MathRenderers.Html,
+            "mathml" => MathRenderers.MathMl,
+            _ => null
+        };
 
         /// <summary>
         /// Bounds mirror how <c>Calcpad.Core</c> constrains each value: <c>decimals</c> and
@@ -69,6 +78,8 @@ namespace Calcpad.Core
             CheckRange(errors, SettingKey.Tol, "tol", Tol, 1e-15, 1e-2);
             if (ColorScale is not null && !Enum.TryParse<PlotSettings.ColorScales>(ColorScale, true, out _))
                 errors.Add(new(SettingKey.ColorScale, $"'colorScale' must be one of: {string.Join(", ", Enum.GetNames(typeof(PlotSettings.ColorScales)))}"));
+            if (MathRenderer is not null && MathRendererValue is null)
+                errors.Add(new(SettingKey.MathRenderer, "'mathRenderer' must be one of: html, mathml"));
         }
     }
 
@@ -120,6 +131,7 @@ namespace Calcpad.Core
         public string FormatString { get; set; }
         public double Precision { get; set; }
         public double Tol { get; set; }
+        public MathRenderers MathRenderer { get; set; }
 
         public MathSettings()
         {
@@ -134,6 +146,12 @@ namespace Calcpad.Core
             Precision = 1e-14;
             Tol = 1e-6;
         }
+    }
+
+    public enum MathRenderers
+    {
+        Html,
+        MathMl
     }
 
     [Serializable()]

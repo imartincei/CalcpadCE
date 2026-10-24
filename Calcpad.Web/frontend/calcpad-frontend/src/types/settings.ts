@@ -155,6 +155,10 @@ export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
     { key: 'plotStep', label: 'Plot mesh step', detail: 'Mesh size for map (surface) plotting in pixels; 0 lets Calcpad choose automatically. Can be overridden per-document with a PlotStep = … line.', type: 'number', def: 0, min: 0 },
     { key: 'precision', label: 'Numerical precision', detail: 'Relative precision for numerical methods such as integration and root finding (1e-15 to 1e-2). Can be overridden per-document with a Precision = … line.', type: 'number', def: 1e-14, min: 1e-15, max: 1e-2 },
     { key: 'tol', label: 'Solver tolerance', detail: 'Target tolerance for the iterative PCG solver and eigensolver (1e-15 to 1e-2). Can be overridden per-document with a Tol = … line.', type: 'number', def: 1e-6, min: 1e-15, max: 1e-2 },
+    {
+        key: 'mathRenderer', label: 'Math renderer', detail: 'Equation markup: html (classic CSS layout) or mathml (native browser math layout). Applies from the line it is set on.', type: 'enum', def: 'html',
+        options: [{ value: 'html', label: 'HTML' }, { value: 'mathml', label: 'MathML' }],
+    },
 ];
 
 /** Looks up the definition for a `#settings` key. */

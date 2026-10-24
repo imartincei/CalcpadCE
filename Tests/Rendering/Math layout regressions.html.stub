@@ -1,0 +1,5236 @@
+<div class="calcpad-output">
+ <h3>Math layout regressions</h3>
+ <p>
+  Stress cases for equation layout. Each case is labelled so a screenshot can be matched back to its source line.
+  <i>Math layout regressions MathML.cpd</i>
+  renders this file with
+  <code>#settings {"mathRenderer": "mathml"}</code>
+  for comparison.
+ </p>
+ <h3>A. Powers</h3>
+ <p>A1 power with fraction exponent in a denominator (#282)</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>1</sub>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    1
+    <sup>
+     <span class="dvc">
+      5
+      <span class="dvl">
+      </span>
+      4
+     </span>
+    </sup>
+   </span>
+   = 1
+  </span>
+ </p>
+ <p>A2 same with variables</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>2</sub>
+   =
+   <span class="dvc">
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    <var>b</var>
+    <sup>
+     <span class="dvc">
+      <var>c</var>
+      <span class="dvl">
+      </span>
+      <var>d</var>
+     </span>
+    </sup>
+   </span>
+   =
+   <span class="dvc">
+    3
+    <span class="dvl">
+    </span>
+    4
+    <sup>
+     <span class="dvc">
+      5
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+   </span>
+   = 0.0938
+  </span>
+ </p>
+ <p>A3 raised power of a fraction</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>3</sub>
+   =
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    <var>b</var>
+   </span>
+   <span class="b1">)</span>
+   <sup class="raised">
+    <span class="dvc">
+     <var>c</var>
+     <span class="dvl">
+     </span>
+     <var>d</var>
+    </span>
+   </sup>
+   =
+   <span class="b1">(</span>
+   <span class="dvc">
+    3
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   <span class="b1">)</span>
+   <sup class="raised">
+    <span class="dvc">
+     5
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </sup>
+   = 0.487
+  </span>
+ </p>
+ <p>A4 raised power of a fraction, inside a denominator</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>4</sub>
+   =
+   <span class="dvc down">
+    1
+    <span class="dvl">
+    </span>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>a</var>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
+     <span class="dvc">
+      <var>c</var>
+      <span class="dvl">
+      </span>
+      <var>d</var>
+     </span>
+    </sup>
+   </span>
+   =
+   <span class="dvc down">
+    1
+    <span class="dvl">
+    </span>
+    <span class="b1">(</span>
+    <span class="dvc">
+     3
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
+     <span class="dvc">
+      5
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+   </span>
+   = 2.05
+  </span>
+ </p>
+ <p>A5 power tower</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>5</sub>
+   =
+   <var>a</var>
+   <sup>
+    <var>b</var>
+    <sup>
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+   </sup>
+   = 3
+   <sup>
+    4
+    <sup>
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+   </sup>
+   = 9
+  </span>
+ </p>
+ <p>A6 Gaussian, fraction with power inside the exponent</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>6</sub>
+   =
+   <var>e</var>
+   <sup>
+    <span class="dvc">
+     - (
+     <var>x</var>
+     <sup>2</sup>
+     )
+     <span class="dvl">
+     </span>
+     2 ·
+     <var>σ</var>
+     <sub>x</sub>
+     <sup>2</sup>
+    </span>
+   </sup>
+   = 2.72
+   <sup>
+    <span class="dvc">
+     - ( 0.5
+     <sup>2</sup>
+     )
+     <span class="dvl">
+     </span>
+     2 · 1.2
+     <sup>2</sup>
+    </span>
+   </sup>
+   = 0.917
+  </span>
+ </p>
+ <p>A7 nested fraction in exponent</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>7</sub>
+   =
+   <var>y</var>
+   <sup>
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   = 2
+   <sup>
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   = 1.68
+  </span>
+ </p>
+ <p>A8 square root in exponent</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>8</sub>
+   =
+   <var>y</var>
+   <sup>
+    <span class="o0">
+     <span class="r">√</span>
+     2
+    </span>
+   </sup>
+   = 2
+   <sup>
+    <span class="o0">
+     <span class="r">√</span>
+     2
+    </span>
+   </sup>
+   = 2.67
+  </span>
+ </p>
+ <p>A9 n-th root in exponent</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>9</sub>
+   =
+   <var>y</var>
+   <sup>
+    <sup class="nth">3</sup>
+    <span class="o0">
+     <span class="r">√</span>
+     <var>a</var>
+    </span>
+   </sup>
+   = 2
+   <sup>
+    <sup class="nth">3</sup>
+    <span class="o0">
+     <span class="r">√</span>
+     3
+    </span>
+   </sup>
+   = 2.72
+  </span>
+ </p>
+ <p>A10 bracketed fraction to a power</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>10</sub>
+   =
+   <span class="b1">(</span>
+   1 +
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>n</var>
+   </span>
+   <span class="b1">)</span>
+   <sup class="raised">
+    <var>n</var>
+   </sup>
+   =
+   <span class="b1">(</span>
+   1 +
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   <span class="b1">)</span>
+   <sup class="raised">3</sup>
+   = 2.37
+  </span>
+ </p>
+ <p>A11 bracketed fraction to a fractional power, inside a denominator</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>11</sub>
+   =
+   <span class="dvc down">
+    1
+    <span class="dvl">
+    </span>
+    <span class="b1">(</span>
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     <var>n</var>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
+     <span class="dvc">
+      <var>n</var>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+   </span>
+   =
+   <span class="dvc down">
+    1
+    <span class="dvl">
+    </span>
+    <span class="b1">(</span>
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     3
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
+     <span class="dvc">
+      3
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+   </span>
+   = 0.65
+  </span>
+ </p>
+ <p>A12 power of a power of a fraction</p>
+ <p>
+  <span class="eq">
+   <var>A</var>
+   <sub>12</sub>
+   =
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    <var>b</var>
+   </span>
+   <span class="b1">)</span>
+   <sup class="raised">2</sup>
+   ∙
+   <sup class="raised">
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     3
+    </span>
+   </sup>
+   =
+   <span class="b1">(</span>
+   <span class="dvc">
+    3
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   <span class="b1">)</span>
+   <sup class="raised">2</sup>
+   ∙
+   <sup class="raised">
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     3
+    </span>
+   </sup>
+   = 0.825
+  </span>
+ </p>
+ <h3>B. Fractions</h3>
+ <p>B1 continued fraction, three levels</p>
+ <p>
+  <span class="eq">
+   <var>B</var>
+   <sub>1</sub>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>x</var>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      0.5
+     </span>
+    </span>
+   </span>
+   = 0.75
+  </span>
+ </p>
+ <p>B2 continued fraction, four levels (switches to ÷)</p>
+ <p>
+  <span class="eq">
+   <var>B</var>
+   <sub>2</sub>
+   = 1 ÷
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   = 1 ÷
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   = 0.571
+  </span>
+ </p>
+ <p>B3 fraction over fraction</p>
+ <p>
+  <span class="eq">
+   <var>B</var>
+   <sub>3</sub>
+   =
+   <span class="dvc">
+    <span class="dvc">
+     <var>a</var>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+    </span>
+    <span class="dvl">
+    </span>
+    <span class="dvc">
+     <var>c</var>
+     <span class="dvl">
+     </span>
+     <var>d</var>
+    </span>
+   </span>
+   =
+   <span class="dvc">
+    <span class="dvc">
+     3
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    <span class="dvl">
+    </span>
+    <span class="dvc">
+     5
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </span>
+   = 0.3
+  </span>
+ </p>
+ <p>B4 mixed fractions in numerator and denominator</p>
+ <p>
+  <span class="eq">
+   <var>B</var>
+   <sub>4</sub>
+   =
+   <span class="b1">(</span>
+   <var>a</var>
+   +
+   <span class="dvc">
+    <var>b</var>
+    <span class="dvl">
+    </span>
+    <var>c</var>
+   </span>
+   <span class="b1">)</span>
+   ÷
+   <span class="b2">(</span>
+   <span class="dvc down">
+    <var>d</var>
+    −
+    <span class="dvc up">
+     <span class="dvc">
+      <var>p</var>
+      <span class="dvl">
+      </span>
+      <var>q</var>
+     </span>
+     <span class="dvl">
+     </span>
+     <var>n</var>
+    </span>
+   </span>
+   <span class="b2">)</span>
+   =
+   <span class="b1">(</span>
+   3 +
+   <span class="dvc">
+    4
+    <span class="dvl">
+    </span>
+    5
+   </span>
+   <span class="b1">)</span>
+   ÷
+   <span class="b2">(</span>
+   <span class="dvc down">
+    2 −
+    <span class="dvc up">
+     <span class="dvc">
+      7
+      <span class="dvl">
+      </span>
+      6
+     </span>
+     <span class="dvl">
+     </span>
+     3
+    </span>
+   </span>
+   <span class="b2">)</span>
+   = 2.36
+  </span>
+ </p>
+ <p>B5 brackets around uneven numerator/denominator heights</p>
+ <p>
+  <span class="eq">
+   <var>B</var>
+   <sub>5</sub>
+   =
+   <span class="b2">(</span>
+   <span class="dvc up">
+    <span class="dvc down">
+     <var>a</var>
+     <span class="dvl">
+     </span>
+     <span class="dvc">
+      <var>b</var>
+      <span class="dvl">
+      </span>
+      <var>c</var>
+     </span>
+    </span>
+    + 1
+   </span>
+   <span class="b2">)</span>
+   ·
+   <var>d</var>
+   =
+   <span class="b2">(</span>
+   <span class="dvc up">
+    <span class="dvc down">
+     3
+     <span class="dvl">
+     </span>
+     <span class="dvc">
+      4
+      <span class="dvl">
+      </span>
+      5
+     </span>
+    </span>
+    + 1
+   </span>
+   <span class="b2">)</span>
+   · 2 = 9.5
+  </span>
+ </p>
+ <p>B6 brackets around a fraction whose denominator is tall</p>
+ <p>
+  <span class="eq">
+   <var>B</var>
+   <sub>6</sub>
+   =
+   <span class="b2">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc down">
+     <var>a</var>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+     +
+     <span class="dvc">
+      <var>c</var>
+      <span class="dvl">
+      </span>
+      <var>d</var>
+      +
+      <var>x</var>
+     </span>
+    </span>
+   </span>
+   <span class="b2">)</span>
+   <sup class="raised">2</sup>
+   =
+   <span class="b2">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc down">
+     3
+     <span class="dvl">
+     </span>
+     4 +
+     <span class="dvc">
+      5
+      <span class="dvl">
+      </span>
+      2 + 0.5
+     </span>
+    </span>
+   </span>
+   <span class="b2">)</span>
+   <sup class="raised">2</sup>
+   = 2.25
+  </span>
+ </p>
+ <p>B7 chained division</p>
+ <p>
+  <span class="eq">
+   <var>B</var>
+   <sub>7</sub>
+   =
+   <span class="dvc">
+    <span class="dvc">
+     <span class="dvc">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+     </span>
+     <span class="dvl">
+     </span>
+     <var>c</var>
+    </span>
+    <span class="dvl">
+    </span>
+    <var>d</var>
+   </span>
+   =
+   <span class="dvc">
+    <span class="dvc">
+     <span class="dvc">
+      3
+      <span class="dvl">
+      </span>
+      4
+     </span>
+     <span class="dvl">
+     </span>
+     5
+    </span>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   = 0.075
+  </span>
+ </p>
+ <p>B8 fraction next to a power in the numerator</p>
+ <p>
+  <span class="eq">
+   <var>B</var>
+   <sub>8</sub>
+   =
+   <span class="dvc">
+    <var>a</var>
+    <sup>2</sup>
+    +
+    <var>b</var>
+    <sup>
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+    <span class="dvl">
+    </span>
+    <var>c</var>
+    <sup>
+     <span class="dvc">
+      <var>d</var>
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </sup>
+   </span>
+   =
+   <span class="dvc">
+    3
+    <sup>2</sup>
+    + 4
+    <sup>
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+    <span class="dvl">
+    </span>
+    5
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+   </span>
+   = 3.76
+  </span>
+ </p>
+ <h3>C. Roots</h3>
+ <p>C1 root of a fraction</p>
+ <p>
+  <span class="eq">
+   <var>C</var>
+   <sub>1</sub>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>a</var>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+    </span>
+   </span>
+   =
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     3
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   = 0.866
+  </span>
+ </p>
+ <p>C2 nested roots</p>
+ <p>
+  <span class="eq">
+   <var>C</var>
+   <sub>2</sub>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    1 +
+    <span class="o0">
+     <span class="r">√</span>
+     1 +
+     <span class="o0">
+      <span class="r">√</span>
+      <var>x</var>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    1 +
+    <span class="o0">
+     <span class="r">√</span>
+     1 +
+     <span class="o0">
+      <span class="r">√</span>
+      0.5
+     </span>
+    </span>
+   </span>
+   = 1.52
+  </span>
+ </p>
+ <p>C3 cube root of a fraction</p>
+ <p>
+  <span class="eq">
+   <var>C</var>
+   <sub>3</sub>
+   =
+   <small class="nth">3</small>
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     <var>a</var>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+    </span>
+   </span>
+   =
+   <small class="nth">3</small>
+   <span class="o1">
+    <span class="r1">
+    </span>
+    <span class="dvc">
+     3
+     <span class="dvl">
+     </span>
+     4
+    </span>
+   </span>
+   = 0.909
+  </span>
+ </p>
+ <p>C4 root in a denominator</p>
+ <p>
+  <span class="eq">
+   <var>C</var>
+   <sub>4</sub>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <span class="o0">
+     <span class="r">√</span>
+     <var>a</var>
+     <sup>2</sup>
+     +
+     <var>b</var>
+     <sup>2</sup>
+    </span>
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <span class="o0">
+     <span class="r">√</span>
+     3
+     <sup>2</sup>
+     + 4
+     <sup>2</sup>
+    </span>
+   </span>
+   = 0.2
+  </span>
+ </p>
+ <p>C5 root of a fractional power</p>
+ <p>
+  <span class="eq">
+   <var>C</var>
+   <sub>5</sub>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>a</var>
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+   </span>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    3
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+   </span>
+   = 1.44
+  </span>
+ </p>
+ <p>C6 n-th root of a nested fraction</p>
+ <p>
+  <span class="eq">
+   <var>C</var>
+   <sub>6</sub>
+   =
+   <small class="nth">5</small>
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     <span class="dvc down">
+      <var>x</var>
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>x</var>
+       <span class="dvl">
+       </span>
+       <var>y</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <small class="nth">5</small>
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     <span class="dvc down">
+      0.5
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       0.5
+       <span class="dvl">
+       </span>
+       2
+      </span>
+     </span>
+    </span>
+   </span>
+   = 0.833
+  </span>
+ </p>
+ <p>C7 root raised to a fractional power</p>
+ <p>
+  <span class="eq">
+   <var>C</var>
+   <sub>7</sub>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    <var>y</var>
+   </span>
+   <sup>
+    <span class="dvc">
+     3
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </sup>
+   =
+   <span class="o0">
+    <span class="r">√</span>
+    2
+   </span>
+   <sup>
+    <span class="dvc">
+     3
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </sup>
+   = 1.68
+  </span>
+ </p>
+ <p>C8 root of a continued fraction</p>
+ <p>
+  <span class="eq">
+   <var>C</var>
+   <sub>8</sub>
+   =
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       1 +
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       1 + 0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.26
+  </span>
+ </p>
+ <h3>D. Brackets and absolute value</h3>
+ <p>D1 nested bracket levels</p>
+ <p>
+  <span class="eq">
+   <var>D</var>
+   <sub>1</sub>
+   =  (  (
+   <var>a</var>
+   +
+   <var>b</var>
+   )  ·  (
+   <var>c</var>
+   −  (
+   <var>d</var>
+   +
+   <var>x</var>
+   −
+   <var>y</var>
+   )  )  )
+   <sup>2</sup>
+   =  (  ( 3 + 4 )  ·  ( 5 −  ( 2 + 0.5 − 2 )  )  )
+   <sup>2</sup>
+   = 992.25
+  </span>
+ </p>
+ <p>D2 absolute value of a difference of fractions</p>
+ <p>
+  <span class="eq">
+   <var>D</var>
+   <sub>2</sub>
+   =
+   <span class="b1">|</span>
+   <span class="dvc">
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    <var>b</var>
+   </span>
+   −
+   <span class="dvc">
+    <var>c</var>
+    <span class="dvl">
+    </span>
+    <var>d</var>
+   </span>
+   <span class="b1">|</span>
+   =
+   <span class="b1">|</span>
+   <span class="dvc">
+    3
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   −
+   <span class="dvc">
+    5
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   <span class="b1">|</span>
+   = 1.75
+  </span>
+ </p>
+ <p>D3 redundant brackets around a fraction</p>
+ <p>
+  <span class="eq">
+   <var>D</var>
+   <sub>3</sub>
+   =
+   <span class="dvc">
+    <var>a</var>
+    <span class="dvl">
+    </span>
+    <var>b</var>
+   </span>
+   =
+   <span class="dvc">
+    3
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   = 0.75
+  </span>
+ </p>
+ <p>D4 bracketed fraction in a denominator</p>
+ <p>
+  <span class="eq">
+   <var>D</var>
+   <sub>4</sub>
+   =
+   <span class="dvc down">
+    1
+    <span class="dvl">
+    </span>
+    <span class="dvc">
+     <var>a</var>
+     <span class="dvl">
+     </span>
+     <var>b</var>
+    </span>
+    +
+    <span class="dvc">
+     <var>c</var>
+     <span class="dvl">
+     </span>
+     <var>d</var>
+    </span>
+   </span>
+   =
+   <span class="dvc down">
+    1
+    <span class="dvl">
+    </span>
+    <span class="dvc">
+     3
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    +
+    <span class="dvc">
+     5
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </span>
+   = 0.308
+  </span>
+ </p>
+ <h3>E. Sums, products and integrals</h3>
+ <p>E1 sum of a fraction with a power</p>
+ <p>
+  <span class="eq">
+   <var>E</var>
+   <sub>1</sub>
+   =
+   <span class="dvr">
+    <small>10</small>
+    <span class="nary">∑</span>
+    <small>
+     <var>k</var>
+     = 1
+    </small>
+   </span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>k</var>
+    <sup>2</sup>
+   </span>
+   = 1.55
+  </span>
+ </p>
+ <p>E2 sum in a denominator</p>
+ <p>
+  <span class="eq">
+   <var>E</var>
+   <sub>2</sub>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <span class="dvr">
+     <small>10</small>
+     <span class="nary">∑</span>
+     <small>
+      <var>k</var>
+      = 1
+     </small>
+    </span>
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     <var>k</var>
+     <sup>2</sup>
+    </span>
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    1.55
+   </span>
+   = 0.645
+  </span>
+ </p>
+ <p>E3 integral of a fraction</p>
+ <p>
+  <span class="eq">
+   <var>E</var>
+   <sub>3</sub>
+   =
+   <span class="dvr">
+    <small>1</small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>0</small>
+   </span>
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    1 +
+    <var>t</var>
+    <sup>2</sup>
+   </span>
+   d
+   <var>t</var>
+   = 0.785
+  </span>
+ </p>
+ <p>E4 sum with factorial in denominator, over a fraction</p>
+ <p>
+  <span class="eq">
+   <var>E</var>
+   <sub>4</sub>
+   =
+   <span class="dvc">
+    <span class="dvr">
+     <small>10</small>
+     <span class="nary">∑</span>
+     <small>
+      <var>k</var>
+      = 0
+     </small>
+    </span>
+    <span class="dvc">
+     <var>x</var>
+     <sup>
+      <var>k</var>
+     </sup>
+     <span class="dvl">
+     </span>
+     <var>k</var>
+     !
+    </span>
+    <span class="dvl">
+    </span>
+    1 +
+    <var>x</var>
+   </span>
+   =
+   <span class="dvc">
+    1.65
+    <span class="dvl">
+    </span>
+    1 + 0.5
+   </span>
+   = 1.1
+  </span>
+ </p>
+ <p>E5 product raised to a fractional power</p>
+ <p>
+  <span class="eq">
+   <var>E</var>
+   <sub>5</sub>
+   =
+   <span class="b2">(</span>
+   <span class="dvr">
+    <small>10</small>
+    <span class="nary">∏</span>
+    <small>
+     <var>k</var>
+     = 1
+    </small>
+   </span>
+   <span class="b1">(</span>
+   1 +
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>k</var>
+    <sup>2</sup>
+   </span>
+   <span class="b1">)</span>
+   <span class="b2">)</span>
+   <sup class="raised">
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </sup>
+   = 3.34
+   <sup>
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </sup>
+   = 1.83
+  </span>
+ </p>
+ <p>E6 integral with fraction limits</p>
+ <p>
+  <span class="eq">
+   <var>E</var>
+   <sub>6</sub>
+   =
+   <span class="dvr">
+    <small>
+     <span class="dvc">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+     </span>
+    </small>
+    <span class="nary">
+     <em>∫</em>
+    </span>
+    <small>
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>a</var>
+     </span>
+    </small>
+   </span>
+   <var>t</var>
+   <sup>2</sup>
+   d
+   <var>t</var>
+   = 0.128
+  </span>
+ </p>
+ <h3>F. Conditionals</h3>
+ <p>F1 if with fractions</p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   <sub>1</sub>
+   =
+   <span class="dvcs">
+    <span class="c3">{</span>
+    <span class="dvs">
+     if
+     <var>a</var>
+     &lt;
+     <var>b</var>
+     :
+     <span class="dvc">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+     </span>
+     <br/>
+     else:
+     <span class="dvc">
+      <var>b</var>
+      <span class="dvl">
+      </span>
+      <var>a</var>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="dvcs">
+    <span class="c3">{</span>
+    <span class="dvs">
+     if 3 &lt; 4:
+     <span class="dvc">
+      3
+      <span class="dvl">
+      </span>
+      4
+     </span>
+     <br/>
+     else:
+     <span class="dvc">
+      4
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </span>
+   = 0.75
+  </span>
+ </p>
+ <p>F2 switch inside a fraction</p>
+ <p>
+  <span class="eq">
+   <var>F</var>
+   <sub>2</sub>
+   = 1 ÷
+   <span class="b5">(</span>
+   1 +
+   <span class="dvcs">
+    <span class="c5">{</span>
+    <span class="dvs">
+     if
+     <var>x</var>
+     &lt; 1:
+     <span class="dvc">
+      <var>x</var>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     <br/>
+     else if
+     <var>x</var>
+     &lt; 2:
+     <span class="dvc">
+      <var>x</var>
+      <sup>2</sup>
+      <span class="dvl">
+      </span>
+      3
+     </span>
+     <br/>
+     else: 1
+    </span>
+   </span>
+   <span class="b5">)</span>
+   = 1 ÷
+   <span class="b5">(</span>
+   1 +
+   <span class="dvcs">
+    <span class="c5">{</span>
+    <span class="dvs">
+     if 0.5 &lt; 1:
+     <span class="dvc">
+      0.5
+      <span class="dvl">
+      </span>
+      2
+     </span>
+     <br/>
+     else if 0.5 &lt; 2:
+     <span class="dvc">
+      0.5
+      <sup>2</sup>
+      <span class="dvl">
+      </span>
+      3
+     </span>
+     <br/>
+     else: 1
+    </span>
+   </span>
+   <span class="b5">)</span>
+   = 0.8
+  </span>
+ </p>
+ <h3>G. Units and number formatting</h3>
+ <p>G1 section modulus with units and substitution</p>
+ <p>
+  <span class="eq">
+   <var>G</var>
+   <sub>1</sub>
+   =
+   <span class="dvc down">
+    <var>M</var>
+    <span class="dvl">
+    </span>
+    <span class="dvc">
+     <var>b</var>
+     <sub>w</sub>
+     ·
+     <var>h</var>
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     6
+    </span>
+   </span>
+   =
+   <span class="dvc down">
+    45
+    <i>kN</i>
+    <i>·</i>
+    <i>m</i>
+    <span class="dvl">
+    </span>
+    <span class="dvc">
+     300
+     <i>mm</i>
+     ·  ( 500
+     <i>mm</i>
+     )
+     <sup>2</sup>
+     <span class="dvl">
+     </span>
+     6
+    </span>
+   </span>
+   = 3.6
+   <i>MPa</i>
+  </span>
+ </p>
+ <p>G2 unit powers in the denominator</p>
+ <p>
+  <span class="eq">
+   <var>G</var>
+   <sub>2</sub>
+   =
+   <span class="dvc">
+    <var>q</var>
+    <sub>d</sub>
+    <span class="dvl">
+    </span>
+    <var>L</var>
+    <sup>2</sup>
+   </span>
+   =
+   <span class="dvc">
+    12
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    <sup class="unit">2</sup>
+    <span class="dvl">
+    </span>
+    ( 6
+    <i>m</i>
+    )
+    <sup>2</sup>
+   </span>
+   = 0.333
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   <sup class="unit">4</sup>
+  </span>
+ </p>
+ <p>G3 fractional unit exponent</p>
+ <p>
+  <span class="eq">
+   <var>G</var>
+   <sub>3</sub>
+   =
+   <span class="dvc">
+    <var>k</var>
+    <sub>s</sub>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <var>L</var>
+   </span>
+   =
+   <span class="dvc">
+    ( 2
+    <i>m</i>
+    <sup class="unit">
+     1
+     <em>/</em>
+     2
+    </sup>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    6
+    <i>m</i>
+   </span>
+   = 0.667
+  </span>
+ </p>
+ <p>G4 scientific notation in a denominator</p>
+ <p>
+  <span class="eq">
+   <var>G</var>
+   <sub>4</sub>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>x</var>
+    · 10
+    <sup>-8</sup>
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    0.5 · 10
+    <sup>-8</sup>
+   </span>
+   = 200000000
+  </span>
+ </p>
+ <p>G5 scientific notation raised to a power</p>
+ <p>
+  <span class="eq">
+   <var>G</var>
+   <sub>5</sub>
+   =
+   <span class="dvc">
+    10
+    <sup>-5</sup>
+    ∙
+    <sup>
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+    <span class="dvl">
+    </span>
+    <var>a</var>
+   </span>
+   =
+   <span class="dvc">
+    10
+    <sup>-5</sup>
+    ∙
+    <sup>
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+    <span class="dvl">
+    </span>
+    3
+   </span>
+   = 0.00105
+  </span>
+ </p>
+ <h3>H. Subscripts with powers</h3>
+ <p>H1 subscripted base with fractional power over subscripted variable</p>
+ <p>
+  <span class="eq">
+   <var>H</var>
+   <sub>1</sub>
+   =
+   <span class="dvc up">
+    <span class="o1">
+     <span class="r1">
+     </span>
+     <span class="dvc">
+      <var>f</var>
+      <sub>ck</sub>
+      <span class="dvl">
+      </span>
+      <i>MPa</i>
+     </span>
+    </span>
+    <sup class="raised">
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+    <span class="dvl">
+    </span>
+    <var>γ</var>
+    <sub>c</sub>
+   </span>
+   =
+   <span class="dvc up">
+    <span class="o1">
+     <span class="r1">
+     </span>
+     <span class="dvc">
+      30
+      <i>MPa</i>
+      <span class="dvl">
+      </span>
+      <i>MPa</i>
+     </span>
+    </span>
+    <sup class="raised">
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+    <span class="dvl">
+    </span>
+    1.5
+   </span>
+   = 1.56
+  </span>
+ </p>
+ <p>H2 subscripts on both sides of a fraction</p>
+ <p>
+  <span class="eq">
+   <var>H</var>
+   <sub>2</sub>
+   =
+   <span class="dvc">
+    <var>A</var>
+    <sub>1</sub>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    <var>A</var>
+    <sub>3</sub>
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+   </span>
+   =
+   <span class="dvc">
+    1
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    0.487
+    <sup>
+     <span class="dvc">
+      2
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </sup>
+   </span>
+   = 1.62
+  </span>
+ </p>
+ <p>H3 subscript and fractional power in a denominator</p>
+ <p>
+  <span class="eq">
+   <var>H</var>
+   <sub>3</sub>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    <var>B</var>
+    <sub>1</sub>
+    <sup>
+     <span class="dvc">
+      <var>n</var>
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+   </span>
+   =
+   <span class="dvc">
+    1
+    <span class="dvl">
+    </span>
+    0.75
+    <sup>
+     <span class="dvc">
+      3
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+   </span>
+   = 1.54
+  </span>
+ </p>
+ <h3>I. Vectors and matrices</h3>
+ <p>I1 vector over its norm</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    v
+   </var>
+   =
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1 2 3
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    I
+   </var>
+   <sub>1</sub>
+   =
+   <span class="dvc">
+    <var>
+     <span class="vec">⃗</span>
+     v
+    </var>
+    <span class="dvl">
+    </span>
+    <b>norm</b>
+    (
+    <var>
+     <span class="vec">⃗</span>
+     v
+    </var>
+    )
+   </span>
+   =
+   <b class="b0">[</b>
+   0.267 0.535 0.802
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>I2 matrix expression divided by a determinant</p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>K</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   <var>a</var>
+   ;
+   <var>b</var>
+   <span class="b0">|</span>
+   <var>c</var>
+   ;
+   <var>d</var>
+   <span class="b0">]</span>
+   =
+   <span class="b0">[</span>
+   3; 4
+   <span class="b0">|</span>
+   5; 2
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">5</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>I</var>
+   </b>
+   <sub>2</sub>
+   =
+   <span class="dvc">
+    <b>inverse</b>
+    (
+    <b>
+     <var>K</var>
+    </b>
+    )
+    <span class="dvl">
+    </span>
+    <b>det</b>
+    (
+    <b>
+     <var>K</var>
+    </b>
+    )
+   </span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">0.0102</span>
+     <span class="td">-0.0204</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-0.0255</span>
+     <span class="td">0.0153</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <h3>J. Functions</h3>
+ <p>J1 squared function of a fraction</p>
+ <p>
+  <span class="eq">
+   <var>J</var>
+   <sub>1</sub>
+   =
+   <b>sin</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>x</var>
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   <span class="b1">)</span>
+   <sup class="raised">2</sup>
+   =
+   <b>sin</b>
+   <span class="b1">(</span>
+   <span class="dvc">
+    0.5
+    <span class="dvl">
+    </span>
+    2
+   </span>
+   <span class="b1">)</span>
+   <sup class="raised">2</sup>
+   = 1.9×10
+   <sup>-5</sup>
+  </span>
+ </p>
+ <p>J2 log of a nested fraction</p>
+ <p>
+  <span class="eq">
+   <var>J</var>
+   <sub>2</sub>
+   =
+   <b>ln</b>
+   <span class="b2">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc down">
+     <var>x</var>
+     <span class="dvl">
+     </span>
+     <var>y</var>
+     +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>z</var>
+     </span>
+    </span>
+   </span>
+   <span class="b2">)</span>
+   =
+   <b>ln</b>
+   <span class="b2">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc down">
+     0.5
+     <span class="dvl">
+     </span>
+     2 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1.5
+     </span>
+    </span>
+   </span>
+   <span class="b2">)</span>
+   = 0.172
+  </span>
+ </p>
+ <p>J3 function powers in numerator and denominator</p>
+ <p>
+  <span class="eq">
+   <var>J</var>
+   <sub>3</sub>
+   =
+   <span class="dvc up">
+    <b>sin</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>π</var>
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+    <span class="dvl">
+    </span>
+    <b>cos</b>
+    (
+    <var>x</var>
+    )
+    <sup>2</sup>
+   </span>
+   =
+   <span class="dvc up">
+    <b>sin</b>
+    <span class="b1">(</span>
+    <span class="dvc">
+     3.14
+     <span class="dvl">
+     </span>
+     4
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      2
+     </span>
+    </sup>
+    <span class="dvl">
+    </span>
+    <b>cos</b>
+    ( 0.5 )
+    <sup>2</sup>
+   </span>
+   = 0.117
+  </span>
+ </p>
+ <h3>K. Page-break stress</h3>
+ <p>Tall equations in sequence. Print to PDF and check that no equation is split or clipped at a page boundary.</p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       1
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 1
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.23
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       2
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 2
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.26
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       3
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 3
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.27
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       4
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 4
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.27
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 5
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.27
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       6
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 6
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.27
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       7
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 7
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.28
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       8
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 8
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.28
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       9
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 9
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.28
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       10
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 10
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.28
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       11
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 11
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.28
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       12
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 12
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.28
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       13
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 13
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.28
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       14
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 14
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.28
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       15
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 15
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.28
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       16
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 16
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.28
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       17
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 17
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.28
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       18
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 18
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.27
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       19
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 19
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.27
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       20
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 20
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.27
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       21
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 21
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.27
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       22
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 22
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.27
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       23
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 23
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.27
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>K</var>
+   <sub>i</sub>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       <var>i</var>
+       <span class="dvl">
+       </span>
+       <var>x</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      <var>n</var>
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      <var>a</var>
+      <span class="dvl">
+      </span>
+      <var>b</var>
+      +
+      <span class="dvc">
+       <var>c</var>
+       <span class="dvl">
+       </span>
+       <var>d</var>
+       +
+       <var>i</var>
+      </span>
+     </span>
+    </span>
+   </span>
+   =
+   <span class="b3">(</span>
+   <span class="dvc up">
+    1 +
+    <span class="dvc">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      1 +
+      <span class="dvc">
+       24
+       <span class="dvl">
+       </span>
+       0.5
+      </span>
+     </span>
+    </span>
+   </span>
+   <span class="b3">)</span>
+   <sup class="raised">
+    <span class="dvc down">
+     1
+     <span class="dvl">
+     </span>
+     1 +
+     <span class="dvc">
+      1
+      <span class="dvl">
+      </span>
+      3
+     </span>
+    </span>
+   </sup>
+   ÷
+   <span class="o2">
+    <span class="r2">
+    </span>
+    <span class="dvc up">
+     1 +
+     <span class="dvc down">
+      3
+      <span class="dvl">
+      </span>
+      4 +
+      <span class="dvc">
+       5
+       <span class="dvl">
+       </span>
+       2 + 24
+      </span>
+     </span>
+    </span>
+   </span>
+   = 1.27
+  </span>
+ </p>
+</div>

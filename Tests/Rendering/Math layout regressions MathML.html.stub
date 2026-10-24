@@ -1,0 +1,8048 @@
+<div class="calcpad-output">
+ <h3>Math layout regressions</h3>
+ <p>
+  Stress cases for equation layout. Each case is labelled so a screenshot can be matched back to its source line.
+  <i>Math layout regressions MathML.cpd</i>
+  renders this file with
+  <code>#settings {"mathRenderer": "mathml"}</code>
+  for comparison.
+ </p>
+ <h3>A. Powers</h3>
+ <p>A1 power with fraction exponent in a denominator (#282)</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">A</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">1</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>5</mn>
+         </mrow>
+         <mrow>
+          <mn>4</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>1</mn>
+   </math>
+  </span>
+ </p>
+ <p>A2 same with variables</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">A</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">2</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mi class="var">a</mi>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mi class="var">b</mi>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mi class="var">c</mi>
+         </mrow>
+         <mrow>
+          <mi class="var">d</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>3</mn>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mn>4</mn>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>5</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.0938</mn>
+   </math>
+  </span>
+ </p>
+ <p>A3 raised power of a fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">A</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">3</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">a</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">b</mi>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mi class="var">c</mi>
+       </mrow>
+       <mrow>
+        <mi class="var">d</mi>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mfrac>
+        <mrow>
+         <mn>3</mn>
+        </mrow>
+        <mrow>
+         <mn>4</mn>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>5</mn>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>0.487</mn>
+   </math>
+  </span>
+ </p>
+ <p>A4 raised power of a fraction, inside a denominator</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">A</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">4</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mfrac>
+          <mrow>
+           <mi class="var">a</mi>
+          </mrow>
+          <mrow>
+           <mi class="var">b</mi>
+          </mrow>
+         </mfrac>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mi class="var">c</mi>
+         </mrow>
+         <mrow>
+          <mi class="var">d</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mfrac>
+          <mrow>
+           <mn>3</mn>
+          </mrow>
+          <mrow>
+           <mn>4</mn>
+          </mrow>
+         </mfrac>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>5</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>2.05</mn>
+   </math>
+  </span>
+ </p>
+ <p>A5 power tower</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">A</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">5</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mi class="var">a</mi>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mi class="var">b</mi>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mn>3</mn>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mn>4</mn>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>9</mn>
+   </math>
+  </span>
+ </p>
+ <p>A6 Gaussian, fraction with power inside the exponent</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">A</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">6</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mi class="var">e</mi>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mo form="prefix">-</mo>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <msup>
+          <mrow>
+           <mi class="var">x</mi>
+          </mrow>
+          <mrow>
+           <mn>2</mn>
+          </mrow>
+         </msup>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+        <mo>·</mo>
+        <msup>
+         <mrow>
+          <msub>
+           <mrow>
+            <mi class="var">σ</mi>
+           </mrow>
+           <mrow>
+            <mtext class="sub">x</mtext>
+           </mrow>
+          </msub>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </msup>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mn>2.72</mn>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mo form="prefix">-</mo>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <msup>
+          <mrow>
+           <mn>0.5</mn>
+          </mrow>
+          <mrow>
+           <mn>2</mn>
+          </mrow>
+         </msup>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+        <mo>·</mo>
+        <msup>
+         <mrow>
+          <mn>1.2</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </msup>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>0.917</mn>
+   </math>
+  </span>
+ </p>
+ <p>A7 nested fraction in exponent</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">A</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">7</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mi class="var">y</mi>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mn>2</mn>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>1.68</mn>
+   </math>
+  </span>
+ </p>
+ <p>A8 square root in exponent</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">A</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">8</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mi class="var">y</mi>
+     </mrow>
+     <mrow>
+      <msqrt>
+       <mn>2</mn>
+      </msqrt>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mn>2</mn>
+     </mrow>
+     <mrow>
+      <msqrt>
+       <mn>2</mn>
+      </msqrt>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>2.67</mn>
+   </math>
+  </span>
+ </p>
+ <p>A9 n-th root in exponent</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">A</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">9</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mi class="var">y</mi>
+     </mrow>
+     <mrow>
+      <mroot>
+       <mrow>
+        <mi class="var">a</mi>
+       </mrow>
+       <mrow>
+        <mn>3</mn>
+       </mrow>
+      </mroot>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mn>2</mn>
+     </mrow>
+     <mrow>
+      <mroot>
+       <mrow>
+        <mn>3</mn>
+       </mrow>
+       <mrow>
+        <mn>3</mn>
+       </mrow>
+      </mroot>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>2.72</mn>
+   </math>
+  </span>
+ </p>
+ <p>A10 bracketed fraction to a power</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">A</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">10</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mi class="var">n</mi>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mi class="var">n</mi>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>3</mn>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mn>3</mn>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>2.37</mn>
+   </math>
+  </span>
+ </p>
+ <p>A11 bracketed fraction to a fractional power, inside a denominator</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">A</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">11</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mi class="var">n</mi>
+          </mrow>
+         </mfrac>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>3</mn>
+          </mrow>
+         </mfrac>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.65</mn>
+   </math>
+  </span>
+ </p>
+ <p>A12 power of a power of a fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">A</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">12</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">a</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">b</mi>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mn>2</mn>
+      <mo>·</mo>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>3</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mfrac>
+        <mrow>
+         <mn>3</mn>
+        </mrow>
+        <mrow>
+         <mn>4</mn>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mn>2</mn>
+      <mo>·</mo>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>3</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>0.825</mn>
+   </math>
+  </span>
+ </p>
+ <h3>B. Fractions</h3>
+ <p>B1 continued fraction, three levels</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">B</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">1</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <mn>1</mn>
+      <mo>+</mo>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">x</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <mn>1</mn>
+      <mo>+</mo>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>0.5</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.75</mn>
+   </math>
+  </span>
+ </p>
+ <p>B2 continued fraction, four levels (switches to ÷)</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">B</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">2</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mn>1</mn>
+    <mo>÷</mo>
+    <mrow>
+     <mo symmetric="false">(</mo>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>1</mn>
+      </mrow>
+      <mrow>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mi class="var">x</mi>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+     <mo symmetric="false">)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mn>1</mn>
+    <mo>÷</mo>
+    <mrow>
+     <mo symmetric="false">(</mo>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>1</mn>
+      </mrow>
+      <mrow>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>0.5</mn>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+     <mo symmetric="false">)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mn>0.571</mn>
+   </math>
+  </span>
+ </p>
+ <p>B3 fraction over fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">B</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">3</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mi class="var">a</mi>
+       </mrow>
+       <mrow>
+        <mi class="var">b</mi>
+       </mrow>
+      </mfrac>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mi class="var">c</mi>
+       </mrow>
+       <mrow>
+        <mi class="var">d</mi>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>3</mn>
+       </mrow>
+       <mrow>
+        <mn>4</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>5</mn>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.3</mn>
+   </math>
+  </span>
+ </p>
+ <p>B4 mixed fractions in numerator and denominator</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">B</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">4</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">(</mo>
+     <mi class="var">a</mi>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">b</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">c</mi>
+      </mrow>
+     </mfrac>
+     <mo symmetric="false">)</mo>
+    </mrow>
+    <mo>÷</mo>
+    <mrow>
+     <mo symmetric="false">(</mo>
+     <mi class="var">d</mi>
+     <mo>−</mo>
+     <mfrac>
+      <mrow>
+       <mfrac>
+        <mrow>
+         <mi class="var">p</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">q</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+      <mrow>
+       <mi class="var">n</mi>
+      </mrow>
+     </mfrac>
+     <mo symmetric="false">)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">(</mo>
+     <mn>3</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>4</mn>
+      </mrow>
+      <mrow>
+       <mn>5</mn>
+      </mrow>
+     </mfrac>
+     <mo symmetric="false">)</mo>
+    </mrow>
+    <mo>÷</mo>
+    <mrow>
+     <mo symmetric="false">(</mo>
+     <mn>2</mn>
+     <mo>−</mo>
+     <mfrac>
+      <mrow>
+       <mfrac>
+        <mrow>
+         <mn>7</mn>
+        </mrow>
+        <mrow>
+         <mn>6</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+     </mfrac>
+     <mo symmetric="false">)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mn>2.36</mn>
+   </math>
+  </span>
+ </p>
+ <p>B5 brackets around uneven numerator/denominator heights</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">B</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">5</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">(</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mfrac>
+        <mrow>
+         <mi class="var">b</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+     <mo>+</mo>
+     <mn>1</mn>
+     <mo symmetric="false">)</mo>
+    </mrow>
+    <mo>·</mo>
+    <mi class="var">d</mi>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">(</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mfrac>
+        <mrow>
+         <mn>4</mn>
+        </mrow>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+     <mo>+</mo>
+     <mn>1</mn>
+     <mo symmetric="false">)</mo>
+    </mrow>
+    <mo>·</mo>
+    <mn>2</mn>
+    <mo>=</mo>
+    <mn>9.5</mn>
+   </math>
+  </span>
+ </p>
+ <p>B6 brackets around a fraction whose denominator is tall</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">B</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">6</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">a</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">b</mi>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mi class="var">c</mi>
+          </mrow>
+          <mrow>
+           <mi class="var">d</mi>
+           <mo>+</mo>
+           <mi class="var">x</mi>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mn>2</mn>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>3</mn>
+        </mrow>
+        <mrow>
+         <mn>4</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>5</mn>
+          </mrow>
+          <mrow>
+           <mn>2</mn>
+           <mo>+</mo>
+           <mn>0.5</mn>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mn>2</mn>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>2.25</mn>
+   </math>
+  </span>
+ </p>
+ <p>B7 chained division</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">B</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">7</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mi class="var">a</mi>
+         </mrow>
+         <mrow>
+          <mi class="var">b</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+       <mrow>
+        <mi class="var">c</mi>
+       </mrow>
+      </mfrac>
+     </mrow>
+     <mrow>
+      <mi class="var">d</mi>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+         <mrow>
+          <mn>4</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+       <mrow>
+        <mn>5</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+     <mrow>
+      <mn>2</mn>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.075</mn>
+   </math>
+  </span>
+ </p>
+ <p>B8 fraction next to a power in the numerator</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">B</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">8</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msup>
+       <mrow>
+        <mi class="var">a</mi>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </msup>
+      <mo>+</mo>
+      <msup>
+       <mrow>
+        <mi class="var">b</mi>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mi class="var">c</mi>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mi class="var">d</mi>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msup>
+       <mrow>
+        <mn>3</mn>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </msup>
+      <mo>+</mo>
+      <msup>
+       <mrow>
+        <mn>4</mn>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mn>5</mn>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>3.76</mn>
+   </math>
+  </span>
+ </p>
+ <h3>C. Roots</h3>
+ <p>C1 root of a fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">C</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">1</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msqrt>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msqrt>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>0.866</mn>
+   </math>
+  </span>
+ </p>
+ <p>C2 nested roots</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">C</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">2</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <msqrt>
+      <mn>1</mn>
+      <mo>+</mo>
+      <msqrt>
+       <mi class="var">x</mi>
+      </msqrt>
+     </msqrt>
+    </msqrt>
+    <mo>=</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <msqrt>
+      <mn>1</mn>
+      <mo>+</mo>
+      <msqrt>
+       <mn>0.5</mn>
+      </msqrt>
+     </msqrt>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.52</mn>
+   </math>
+  </span>
+ </p>
+ <p>C3 cube root of a fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">C</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">3</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mroot>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mi class="var">a</mi>
+       </mrow>
+       <mrow>
+        <mi class="var">b</mi>
+       </mrow>
+      </mfrac>
+     </mrow>
+     <mrow>
+      <mn>3</mn>
+     </mrow>
+    </mroot>
+    <mo>=</mo>
+    <mroot>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>3</mn>
+       </mrow>
+       <mrow>
+        <mn>4</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+     <mrow>
+      <mn>3</mn>
+     </mrow>
+    </mroot>
+    <mo>=</mo>
+    <mn>0.909</mn>
+   </math>
+  </span>
+ </p>
+ <p>C4 root in a denominator</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">C</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">4</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <msqrt>
+       <msup>
+        <mrow>
+         <mi class="var">a</mi>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+        </mrow>
+       </msup>
+       <mo>+</mo>
+       <msup>
+        <mrow>
+         <mi class="var">b</mi>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+        </mrow>
+       </msup>
+      </msqrt>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <msqrt>
+       <msup>
+        <mrow>
+         <mn>3</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+        </mrow>
+       </msup>
+       <mo>+</mo>
+       <msup>
+        <mrow>
+         <mn>4</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+        </mrow>
+       </msup>
+      </msqrt>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.2</mn>
+   </math>
+  </span>
+ </p>
+ <p>C5 root of a fractional power</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">C</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">5</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msqrt>
+     <msup>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mfrac>
+        <mrow>
+         <mn>2</mn>
+        </mrow>
+        <mrow>
+         <mn>3</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </msup>
+    </msqrt>
+    <mo>=</mo>
+    <msqrt>
+     <msup>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mfrac>
+        <mrow>
+         <mn>2</mn>
+        </mrow>
+        <mrow>
+         <mn>3</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </msup>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.44</mn>
+   </math>
+  </span>
+ </p>
+ <p>C6 n-th root of a nested fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">C</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">6</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mroot>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mi class="var">x</mi>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mi class="var">x</mi>
+         </mrow>
+         <mrow>
+          <mi class="var">y</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+     <mrow>
+      <mn>5</mn>
+     </mrow>
+    </mroot>
+    <mo>=</mo>
+    <mroot>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>0.5</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>0.5</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+     <mrow>
+      <mn>5</mn>
+     </mrow>
+    </mroot>
+    <mo>=</mo>
+    <mn>0.833</mn>
+   </math>
+  </span>
+ </p>
+ <p>C7 root raised to a fractional power</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">C</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">7</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <msqrt>
+       <mi class="var">y</mi>
+      </msqrt>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>3</mn>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <msqrt>
+       <mn>2</mn>
+      </msqrt>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>3</mn>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>1.68</mn>
+   </math>
+  </span>
+ </p>
+ <p>C8 root of a continued fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">C</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">8</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>1</mn>
+      </mrow>
+      <mrow>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mi class="var">x</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>1</mn>
+      </mrow>
+      <mrow>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mn>0.5</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.26</mn>
+   </math>
+  </span>
+ </p>
+ <h3>D. Brackets and absolute value</h3>
+ <p>D1 nested bracket levels</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">D</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">1</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mrow>
+        <mo symmetric="false">(</mo>
+        <mi class="var">a</mi>
+        <mo>+</mo>
+        <mi class="var">b</mi>
+        <mo symmetric="false">)</mo>
+       </mrow>
+       <mo>·</mo>
+       <mrow>
+        <mo symmetric="false">(</mo>
+        <mi class="var">c</mi>
+        <mo>−</mo>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">x</mi>
+         <mo>−</mo>
+         <mi class="var">y</mi>
+         <mo symmetric="false">)</mo>
+        </mrow>
+        <mo symmetric="false">)</mo>
+       </mrow>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mn>2</mn>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mrow>
+        <mo symmetric="false">(</mo>
+        <mn>3</mn>
+        <mo>+</mo>
+        <mn>4</mn>
+        <mo symmetric="false">)</mo>
+       </mrow>
+       <mo>·</mo>
+       <mrow>
+        <mo symmetric="false">(</mo>
+        <mn>5</mn>
+        <mo>−</mo>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>0.5</mn>
+         <mo>−</mo>
+         <mn>2</mn>
+         <mo symmetric="false">)</mo>
+        </mrow>
+        <mo symmetric="false">)</mo>
+       </mrow>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mn>2</mn>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>992.25</mn>
+   </math>
+  </span>
+ </p>
+ <p>D2 absolute value of a difference of fractions</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">D</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">2</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">|</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+      </mrow>
+     </mfrac>
+     <mo>−</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">c</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">d</mi>
+      </mrow>
+     </mfrac>
+     <mo symmetric="false">|</mo>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">|</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+      </mrow>
+     </mfrac>
+     <mo>−</mo>
+     <mfrac>
+      <mrow>
+       <mn>5</mn>
+      </mrow>
+      <mrow>
+       <mn>2</mn>
+      </mrow>
+     </mfrac>
+     <mo symmetric="false">|</mo>
+    </mrow>
+    <mo>=</mo>
+    <mn>1.75</mn>
+   </math>
+  </span>
+ </p>
+ <p>D3 redundant brackets around a fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">D</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">3</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mi class="var">a</mi>
+     </mrow>
+     <mrow>
+      <mi class="var">b</mi>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>3</mn>
+     </mrow>
+     <mrow>
+      <mn>4</mn>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.75</mn>
+   </math>
+  </span>
+ </p>
+ <p>D4 bracketed fraction in a denominator</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">D</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">4</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mi class="var">a</mi>
+       </mrow>
+       <mrow>
+        <mi class="var">b</mi>
+       </mrow>
+      </mfrac>
+      <mo>+</mo>
+      <mfrac>
+       <mrow>
+        <mi class="var">c</mi>
+       </mrow>
+       <mrow>
+        <mi class="var">d</mi>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>3</mn>
+       </mrow>
+       <mrow>
+        <mn>4</mn>
+       </mrow>
+      </mfrac>
+      <mo>+</mo>
+      <mfrac>
+       <mrow>
+        <mn>5</mn>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.308</mn>
+   </math>
+  </span>
+ </p>
+ <h3>E. Sums, products and integrals</h3>
+ <p>E1 sum of a fraction with a power</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">E</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">1</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mrow>
+     <munderover>
+      <mo class="m-nary" largeop="true" movablelimits="false">∑</mo>
+      <mrow>
+       <mi class="var">k</mi>
+       <mo>=</mo>
+       <mn>1</mn>
+      </mrow>
+      <mrow>
+       <mn>10</mn>
+      </mrow>
+     </munderover>
+     <mfrac>
+      <mrow>
+       <mn>1</mn>
+      </mrow>
+      <mrow>
+       <msup>
+        <mrow>
+         <mi class="var">k</mi>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+        </mrow>
+       </msup>
+      </mrow>
+     </mfrac>
+    </mrow>
+    <mo>=</mo>
+    <mn>1.55</mn>
+   </math>
+  </span>
+ </p>
+ <p>E2 sum in a denominator</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">E</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">2</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <mrow>
+       <munderover>
+        <mo class="m-nary" largeop="true" movablelimits="false">∑</mo>
+        <mrow>
+         <mi class="var">k</mi>
+         <mo>=</mo>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>10</mn>
+        </mrow>
+       </munderover>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <msup>
+          <mrow>
+           <mi class="var">k</mi>
+          </mrow>
+          <mrow>
+           <mn>2</mn>
+          </mrow>
+         </msup>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <mn>1.55</mn>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.645</mn>
+   </math>
+  </span>
+ </p>
+ <p>E3 integral of a fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">E</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">3</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mrow>
+     <munderover>
+      <mo class="m-nary" largeop="true" movablelimits="false">∫</mo>
+      <mrow>
+       <mn>0</mn>
+      </mrow>
+      <mrow>
+       <mn>1</mn>
+      </mrow>
+     </munderover>
+     <mfrac>
+      <mrow>
+       <mn>1</mn>
+      </mrow>
+      <mrow>
+       <mn>1</mn>
+       <mo>+</mo>
+       <msup>
+        <mrow>
+         <mi class="var">t</mi>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+        </mrow>
+       </msup>
+      </mrow>
+     </mfrac>
+     <mspace width="0.17em">
+     </mspace>
+     <mi mathvariant="normal">d</mi>
+     <mi class="var">t</mi>
+    </mrow>
+    <mo>=</mo>
+    <mn>0.785</mn>
+   </math>
+  </span>
+ </p>
+ <p>E4 sum with factorial in denominator, over a fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">E</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">4</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mrow>
+       <munderover>
+        <mo class="m-nary" largeop="true" movablelimits="false">∑</mo>
+        <mrow>
+         <mi class="var">k</mi>
+         <mo>=</mo>
+         <mn>0</mn>
+        </mrow>
+        <mrow>
+         <mn>10</mn>
+        </mrow>
+       </munderover>
+       <mfrac>
+        <mrow>
+         <msup>
+          <mrow>
+           <mi class="var">x</mi>
+          </mrow>
+          <mrow>
+           <mi class="var">k</mi>
+          </mrow>
+         </msup>
+        </mrow>
+        <mrow>
+         <mi class="var">k</mi>
+         <mo>!</mo>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mn>1</mn>
+      <mo>+</mo>
+      <mi class="var">x</mi>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1.65</mn>
+     </mrow>
+     <mrow>
+      <mn>1</mn>
+      <mo>+</mo>
+      <mn>0.5</mn>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>1.1</mn>
+   </math>
+  </span>
+ </p>
+ <p>E5 product raised to a fractional power</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">E</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">5</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mrow>
+        <munderover>
+         <mo class="m-nary" largeop="true" movablelimits="false">∏</mo>
+         <mrow>
+          <mi class="var">k</mi>
+          <mo>=</mo>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>10</mn>
+         </mrow>
+        </munderover>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <msup>
+            <mrow>
+             <mi class="var">k</mi>
+            </mrow>
+            <mrow>
+             <mn>2</mn>
+            </mrow>
+           </msup>
+          </mrow>
+         </mfrac>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mn>3.34</mn>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>1.83</mn>
+   </math>
+  </span>
+ </p>
+ <p>E6 integral with fraction limits</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">E</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">6</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mrow>
+     <munderover>
+      <mo class="m-nary" largeop="true" movablelimits="false">∫</mo>
+      <mrow>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mi class="var">a</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+      <mrow>
+       <mfrac>
+        <mrow>
+         <mi class="var">a</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">b</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </munderover>
+     <msup>
+      <mrow>
+       <mi class="var">t</mi>
+      </mrow>
+      <mrow>
+       <mn>2</mn>
+      </mrow>
+     </msup>
+     <mspace width="0.17em">
+     </mspace>
+     <mi mathvariant="normal">d</mi>
+     <mi class="var">t</mi>
+    </mrow>
+    <mo>=</mo>
+    <mn>0.128</mn>
+   </math>
+  </span>
+ </p>
+ <h3>F. Conditionals</h3>
+ <p>F1 if with fractions</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">F</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">1</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">{</mo>
+     <mtable class="m-cases">
+      <mtr>
+       <mtd>
+        <mtext>if</mtext>
+        <mi class="var">a</mi>
+        <mo>&lt;</mo>
+        <mi class="var">b</mi>
+        <mo>:</mo>
+       </mtd>
+       <mtd>
+        <mfrac>
+         <mrow>
+          <mi class="var">a</mi>
+         </mrow>
+         <mrow>
+          <mi class="var">b</mi>
+         </mrow>
+        </mfrac>
+       </mtd>
+      </mtr>
+      <mtr>
+       <mtd>
+        <mtext>else:</mtext>
+       </mtd>
+       <mtd>
+        <mfrac>
+         <mrow>
+          <mi class="var">b</mi>
+         </mrow>
+         <mrow>
+          <mi class="var">a</mi>
+         </mrow>
+        </mfrac>
+       </mtd>
+      </mtr>
+     </mtable>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">{</mo>
+     <mtable class="m-cases">
+      <mtr>
+       <mtd>
+        <mtext>if</mtext>
+        <mn>3</mn>
+        <mo>&lt;</mo>
+        <mn>4</mn>
+        <mo>:</mo>
+       </mtd>
+       <mtd>
+        <mfrac>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+         <mrow>
+          <mn>4</mn>
+         </mrow>
+        </mfrac>
+       </mtd>
+      </mtr>
+      <mtr>
+       <mtd>
+        <mtext>else:</mtext>
+       </mtd>
+       <mtd>
+        <mfrac>
+         <mrow>
+          <mn>4</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mtd>
+      </mtr>
+     </mtable>
+    </mrow>
+    <mo>=</mo>
+    <mn>0.75</mn>
+   </math>
+  </span>
+ </p>
+ <p>F2 switch inside a fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">F</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">2</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mn>1</mn>
+    <mo>÷</mo>
+    <mrow>
+     <mo symmetric="false">(</mo>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mrow>
+      <mo symmetric="false">{</mo>
+      <mtable class="m-cases">
+       <mtr>
+        <mtd>
+         <mtext>if</mtext>
+         <mi class="var">x</mi>
+         <mo>&lt;</mo>
+         <mn>1</mn>
+         <mo>:</mo>
+        </mtd>
+        <mtd>
+         <mfrac>
+          <mrow>
+           <mi class="var">x</mi>
+          </mrow>
+          <mrow>
+           <mn>2</mn>
+          </mrow>
+         </mfrac>
+        </mtd>
+       </mtr>
+       <mtr>
+        <mtd>
+         <mtext>else if</mtext>
+         <mi class="var">x</mi>
+         <mo>&lt;</mo>
+         <mn>2</mn>
+         <mo>:</mo>
+        </mtd>
+        <mtd>
+         <mfrac>
+          <mrow>
+           <msup>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+            <mrow>
+             <mn>2</mn>
+            </mrow>
+           </msup>
+          </mrow>
+          <mrow>
+           <mn>3</mn>
+          </mrow>
+         </mfrac>
+        </mtd>
+       </mtr>
+       <mtr>
+        <mtd>
+         <mtext>else:</mtext>
+        </mtd>
+        <mtd>
+         <mn>1</mn>
+        </mtd>
+       </mtr>
+      </mtable>
+     </mrow>
+     <mo symmetric="false">)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mn>1</mn>
+    <mo>÷</mo>
+    <mrow>
+     <mo symmetric="false">(</mo>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mrow>
+      <mo symmetric="false">{</mo>
+      <mtable class="m-cases">
+       <mtr>
+        <mtd>
+         <mtext>if</mtext>
+         <mn>0.5</mn>
+         <mo>&lt;</mo>
+         <mn>1</mn>
+         <mo>:</mo>
+        </mtd>
+        <mtd>
+         <mfrac>
+          <mrow>
+           <mn>0.5</mn>
+          </mrow>
+          <mrow>
+           <mn>2</mn>
+          </mrow>
+         </mfrac>
+        </mtd>
+       </mtr>
+       <mtr>
+        <mtd>
+         <mtext>else if</mtext>
+         <mn>0.5</mn>
+         <mo>&lt;</mo>
+         <mn>2</mn>
+         <mo>:</mo>
+        </mtd>
+        <mtd>
+         <mfrac>
+          <mrow>
+           <msup>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+            <mrow>
+             <mn>2</mn>
+            </mrow>
+           </msup>
+          </mrow>
+          <mrow>
+           <mn>3</mn>
+          </mrow>
+         </mfrac>
+        </mtd>
+       </mtr>
+       <mtr>
+        <mtd>
+         <mtext>else:</mtext>
+        </mtd>
+        <mtd>
+         <mn>1</mn>
+        </mtd>
+       </mtr>
+      </mtable>
+     </mrow>
+     <mo symmetric="false">)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mn>0.8</mn>
+   </math>
+  </span>
+ </p>
+ <h3>G. Units and number formatting</h3>
+ <p>G1 section modulus with units and substitution</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">G</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">1</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mi class="var">M</mi>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <msub>
+         <mrow>
+          <mi class="var">b</mi>
+         </mrow>
+         <mrow>
+          <mtext class="sub">w</mtext>
+         </mrow>
+        </msub>
+        <mo>·</mo>
+        <msup>
+         <mrow>
+          <mi class="var">h</mi>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </msup>
+       </mrow>
+       <mrow>
+        <mn>6</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>45</mn>
+      <mspace width="0.17em">
+      </mspace>
+      <mi class="unit" mathvariant="normal">kN</mi>
+      <mo class="unit" lspace="0.05em" rspace="0.05em">·</mo>
+      <mi class="unit" mathvariant="normal">m</mi>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>300</mn>
+        <mspace width="0.17em">
+        </mspace>
+        <mi class="unit" mathvariant="normal">mm</mi>
+        <mo>·</mo>
+        <msup>
+         <mrow>
+          <mrow>
+           <mo symmetric="false">(</mo>
+           <mn>500</mn>
+           <mspace width="0.17em">
+           </mspace>
+           <mi class="unit" mathvariant="normal">mm</mi>
+           <mo symmetric="false">)</mo>
+          </mrow>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </msup>
+       </mrow>
+       <mrow>
+        <mn>6</mn>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>3.6</mn>
+    <mspace width="0.17em">
+    </mspace>
+    <mi class="unit" mathvariant="normal">MPa</mi>
+   </math>
+  </span>
+ </p>
+ <p>G2 unit powers in the denominator</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">G</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">2</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msub>
+       <mrow>
+        <mi class="var">q</mi>
+       </mrow>
+       <mrow>
+        <mtext class="sub">d</mtext>
+       </mrow>
+      </msub>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mi class="var">L</mi>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>12</mn>
+      <mspace width="0.17em">
+      </mspace>
+      <mi class="unit" mathvariant="normal">kN</mi>
+      <mo class="unit" lspace="0.05em" rspace="0.05em">∕</mo>
+      <msup>
+       <mrow>
+        <mi class="unit" mathvariant="normal">m</mi>
+       </mrow>
+       <mn>2</mn>
+      </msup>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mn>6</mn>
+         <mspace width="0.17em">
+         </mspace>
+         <mi class="unit" mathvariant="normal">m</mi>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.333</mn>
+    <mspace width="0.17em">
+    </mspace>
+    <mi class="unit" mathvariant="normal">kN</mi>
+    <mo class="unit" lspace="0.05em" rspace="0.05em">∕</mo>
+    <msup>
+     <mrow>
+      <mi class="unit" mathvariant="normal">m</mi>
+     </mrow>
+     <mn>4</mn>
+    </msup>
+   </math>
+  </span>
+ </p>
+ <p>G3 fractional unit exponent</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">G</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">3</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msup>
+       <mrow>
+        <msub>
+         <mrow>
+          <mi class="var">k</mi>
+         </mrow>
+         <mrow>
+          <mtext class="sub">s</mtext>
+         </mrow>
+        </msub>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </msup>
+     </mrow>
+     <mrow>
+      <mi class="var">L</mi>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msup>
+       <mrow>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mn>2</mn>
+         <mspace width="0.17em">
+         </mspace>
+         <msup>
+          <mrow>
+           <mi class="unit" mathvariant="normal">m</mi>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>/</mo>
+           <mn>2</mn>
+          </mrow>
+         </msup>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </msup>
+     </mrow>
+     <mrow>
+      <mn>6</mn>
+      <mspace width="0.17em">
+      </mspace>
+      <mi class="unit" mathvariant="normal">m</mi>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.667</mn>
+   </math>
+  </span>
+ </p>
+ <p>G4 scientific notation in a denominator</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">G</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">4</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <mi class="var">x</mi>
+      <mo>·</mo>
+      <msup>
+       <mrow>
+        <mn>10</mn>
+       </mrow>
+       <mrow>
+        <mo form="prefix">-</mo>
+        <mn>8</mn>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <mn>0.5</mn>
+      <mo>·</mo>
+      <msup>
+       <mrow>
+        <mn>10</mn>
+       </mrow>
+       <mrow>
+        <mo form="prefix">-</mo>
+        <mn>8</mn>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>200000000</mn>
+   </math>
+  </span>
+ </p>
+ <p>G5 scientific notation raised to a power</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">G</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">5</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msup>
+       <mrow>
+        <mn>10</mn>
+       </mrow>
+       <mrow>
+        <mo form="prefix">-</mo>
+        <mn>5</mn>
+        <mo>·</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+     <mrow>
+      <mi class="var">a</mi>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msup>
+       <mrow>
+        <mn>10</mn>
+       </mrow>
+       <mrow>
+        <mo form="prefix">-</mo>
+        <mn>5</mn>
+        <mo>·</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+     <mrow>
+      <mn>3</mn>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.00105</mn>
+   </math>
+  </span>
+ </p>
+ <h3>H. Subscripts with powers</h3>
+ <p>H1 subscripted base with fractional power over subscripted variable</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">H</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">1</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msup>
+       <mrow>
+        <msqrt>
+         <mfrac>
+          <mrow>
+           <msub>
+            <mrow>
+             <mi class="var">f</mi>
+            </mrow>
+            <mrow>
+             <mtext class="sub">ck</mtext>
+            </mrow>
+           </msub>
+          </mrow>
+          <mrow>
+           <mi class="unit" mathvariant="normal">MPa</mi>
+          </mrow>
+         </mfrac>
+        </msqrt>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+     <mrow>
+      <msub>
+       <mrow>
+        <mi class="var">γ</mi>
+       </mrow>
+       <mrow>
+        <mtext class="sub">c</mtext>
+       </mrow>
+      </msub>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msup>
+       <mrow>
+        <msqrt>
+         <mfrac>
+          <mrow>
+           <mn>30</mn>
+           <mspace width="0.17em">
+           </mspace>
+           <mi class="unit" mathvariant="normal">MPa</mi>
+          </mrow>
+          <mrow>
+           <mi class="unit" mathvariant="normal">MPa</mi>
+          </mrow>
+         </mfrac>
+        </msqrt>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+     <mrow>
+      <mn>1.5</mn>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>1.56</mn>
+   </math>
+  </span>
+ </p>
+ <p>H2 subscripts on both sides of a fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">H</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">2</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msup>
+       <mrow>
+        <msub>
+         <mrow>
+          <mi class="var">A</mi>
+         </mrow>
+         <mrow>
+          <mtext class="sub">1</mtext>
+         </mrow>
+        </msub>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </msup>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <msub>
+         <mrow>
+          <mi class="var">A</mi>
+         </mrow>
+         <mrow>
+          <mtext class="sub">3</mtext>
+         </mrow>
+        </msub>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msup>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </msup>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mn>0.487</mn>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>1.62</mn>
+   </math>
+  </span>
+ </p>
+ <p>H3 subscript and fractional power in a denominator</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">H</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">3</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <msub>
+         <mrow>
+          <mi class="var">B</mi>
+         </mrow>
+         <mrow>
+          <mtext class="sub">1</mtext>
+         </mrow>
+        </msub>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mn>1</mn>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mn>0.75</mn>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>1.54</mn>
+   </math>
+  </span>
+ </p>
+ <h3>I. Vectors and matrices</h3>
+ <p>I1 vector over its norm</p>
+ <p>
+  <span class="eq">
+   <math>
+    <mover accent="true">
+     <mi class="var">v</mi>
+     <mo class="m-vec">→</mo>
+    </mover>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">[</mo>
+     <mn>1</mn>
+     <mo>;</mo>
+     <mn>2</mn>
+     <mo>;</mo>
+     <mn>3</mn>
+     <mo symmetric="false">]</mo>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">[</mo>
+     <mn>1</mn>
+     <mspace width="0.5em">
+     </mspace>
+     <mn>2</mn>
+     <mspace width="0.5em">
+     </mspace>
+     <mn>3</mn>
+     <mo symmetric="false">]</mo>
+    </mrow>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mover accent="true">
+       <mi class="var">I</mi>
+       <mo class="m-vec">→</mo>
+      </mover>
+     </mrow>
+     <mrow>
+      <mtext class="sub">1</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mover accent="true">
+       <mi class="var">v</mi>
+       <mo class="m-vec">→</mo>
+      </mover>
+     </mrow>
+     <mrow>
+      <mi class="fn" mathvariant="normal">norm</mi>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mover accent="true">
+        <mi class="var">v</mi>
+        <mo class="m-vec">→</mo>
+       </mover>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">[</mo>
+     <mn>0.267</mn>
+     <mspace width="0.5em">
+     </mspace>
+     <mn>0.535</mn>
+     <mspace width="0.5em">
+     </mspace>
+     <mn>0.802</mn>
+     <mo symmetric="false">]</mo>
+    </mrow>
+   </math>
+  </span>
+ </p>
+ <p>I2 matrix expression divided by a determinant</p>
+ <p>
+  <span class="eq">
+   <math>
+    <mi class="var bold">K</mi>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">[</mo>
+     <mi class="var">a</mi>
+     <mo>;</mo>
+     <mi class="var">b</mi>
+     <mo stretchy="false">|</mo>
+     <mi class="var">c</mi>
+     <mo>;</mo>
+     <mi class="var">d</mi>
+     <mo symmetric="false">]</mo>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">[</mo>
+     <mn>3</mn>
+     <mo>;</mo>
+     <mn>4</mn>
+     <mo stretchy="false">|</mo>
+     <mn>5</mn>
+     <mo>;</mo>
+     <mn>2</mn>
+     <mo symmetric="false">]</mo>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">[</mo>
+     <mtable class="m-matrix">
+      <mtr>
+       <mtd>
+        <mn>3</mn>
+       </mtd>
+       <mtd>
+        <mn>4</mn>
+       </mtd>
+      </mtr>
+      <mtr>
+       <mtd>
+        <mn>5</mn>
+       </mtd>
+       <mtd>
+        <mn>2</mn>
+       </mtd>
+      </mtr>
+     </mtable>
+     <mo symmetric="false">]</mo>
+    </mrow>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var bold">I</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">2</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <mi class="fn" mathvariant="normal">inverse</mi>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mi class="var bold">K</mi>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mi class="fn" mathvariant="normal">det</mi>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mi class="var bold">K</mi>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mrow>
+     <mo symmetric="false">[</mo>
+     <mtable class="m-matrix">
+      <mtr>
+       <mtd>
+        <mn>0.0102</mn>
+       </mtd>
+       <mtd>
+        <mn>-0.0204</mn>
+       </mtd>
+      </mtr>
+      <mtr>
+       <mtd>
+        <mn>-0.0255</mn>
+       </mtd>
+       <mtd>
+        <mn>0.0153</mn>
+       </mtd>
+      </mtr>
+     </mtable>
+     <mo symmetric="false">]</mo>
+    </mrow>
+   </math>
+  </span>
+ </p>
+ <h3>J. Functions</h3>
+ <p>J1 squared function of a fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">J</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">1</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mi class="fn" mathvariant="normal">sin</mi>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">x</mi>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mn>2</mn>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mi class="fn" mathvariant="normal">sin</mi>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mfrac>
+        <mrow>
+         <mn>0.5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mn>2</mn>
+     </mrow>
+    </msup>
+    <mo>=</mo>
+    <mn>1.9</mn>
+    <mo>×</mo>
+    <msup>
+     <mn>10</mn>
+     <mn>-5</mn>
+    </msup>
+   </math>
+  </span>
+ </p>
+ <p>J2 log of a nested fraction</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">J</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">2</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mi class="fn" mathvariant="normal">ln</mi>
+    <mrow>
+     <mo symmetric="false">(</mo>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">x</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">y</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mi class="var">z</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+     <mo symmetric="false">)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mi class="fn" mathvariant="normal">ln</mi>
+    <mrow>
+     <mo symmetric="false">(</mo>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>0.5</mn>
+      </mrow>
+      <mrow>
+       <mn>2</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1.5</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+     <mo symmetric="false">)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mn>0.172</mn>
+   </math>
+  </span>
+ </p>
+ <p>J3 function powers in numerator and denominator</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">J</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">3</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msup>
+       <mrow>
+        <mi class="fn" mathvariant="normal">sin</mi>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mfrac>
+          <mrow>
+           <mi class="var">π</mi>
+          </mrow>
+          <mrow>
+           <mn>4</mn>
+          </mrow>
+         </mfrac>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mi class="fn" mathvariant="normal">cos</mi>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mi class="var">x</mi>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+     <mrow>
+      <msup>
+       <mrow>
+        <mi class="fn" mathvariant="normal">sin</mi>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mfrac>
+          <mrow>
+           <mn>3.14</mn>
+          </mrow>
+          <mrow>
+           <mn>4</mn>
+          </mrow>
+         </mfrac>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mrow>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>2</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </msup>
+     </mrow>
+     <mrow>
+      <msup>
+       <mrow>
+        <mi class="fn" mathvariant="normal">cos</mi>
+        <mrow>
+         <mo symmetric="false">(</mo>
+         <mn>0.5</mn>
+         <mo symmetric="false">)</mo>
+        </mrow>
+       </mrow>
+       <mrow>
+        <mn>2</mn>
+       </mrow>
+      </msup>
+     </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mn>0.117</mn>
+   </math>
+  </span>
+ </p>
+ <h3>K. Page-break stress</h3>
+ <p>Tall equations in sequence. Print to PDF and check that no equation is split or clipped at a page boundary.</p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>1</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>1</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.23</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>2</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>2</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.26</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>3</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>3</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.27</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>4</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>4</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.27</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>5</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>5</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.27</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>6</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>6</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.27</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>7</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>7</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.28</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>8</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>8</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.28</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>9</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>9</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.28</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>10</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>10</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.28</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>11</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>11</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.28</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>12</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>12</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.28</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>13</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>13</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.28</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>14</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>14</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.28</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>15</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>15</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.28</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>16</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>16</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.28</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>17</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>17</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.28</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>18</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>18</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.27</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>19</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>19</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.27</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>20</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>20</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.27</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>21</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>21</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.27</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>22</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>22</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.27</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>23</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>23</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.27</mn>
+   </math>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <math>
+    <msub>
+     <mrow>
+      <mi class="var">K</mi>
+     </mrow>
+     <mrow>
+      <mtext class="sub">i</mtext>
+     </mrow>
+    </msub>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mi class="var">i</mi>
+            </mrow>
+            <mrow>
+             <mi class="var">x</mi>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mi class="var">n</mi>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mi class="var">a</mi>
+      </mrow>
+      <mrow>
+       <mi class="var">b</mi>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mi class="var">c</mi>
+        </mrow>
+        <mrow>
+         <mi class="var">d</mi>
+         <mo>+</mo>
+         <mi class="var">i</mi>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <msup>
+     <mrow>
+      <mrow>
+       <mo symmetric="false">(</mo>
+       <mn>1</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>1</mn>
+        </mrow>
+        <mrow>
+         <mn>1</mn>
+         <mo>+</mo>
+         <mfrac>
+          <mrow>
+           <mn>1</mn>
+          </mrow>
+          <mrow>
+           <mn>1</mn>
+           <mo>+</mo>
+           <mfrac>
+            <mrow>
+             <mn>24</mn>
+            </mrow>
+            <mrow>
+             <mn>0.5</mn>
+            </mrow>
+           </mfrac>
+          </mrow>
+         </mfrac>
+        </mrow>
+       </mfrac>
+       <mo symmetric="false">)</mo>
+      </mrow>
+     </mrow>
+     <mrow>
+      <mfrac>
+       <mrow>
+        <mn>1</mn>
+       </mrow>
+       <mrow>
+        <mn>1</mn>
+        <mo>+</mo>
+        <mfrac>
+         <mrow>
+          <mn>1</mn>
+         </mrow>
+         <mrow>
+          <mn>3</mn>
+         </mrow>
+        </mfrac>
+       </mrow>
+      </mfrac>
+     </mrow>
+    </msup>
+    <mo>÷</mo>
+    <msqrt>
+     <mn>1</mn>
+     <mo>+</mo>
+     <mfrac>
+      <mrow>
+       <mn>3</mn>
+      </mrow>
+      <mrow>
+       <mn>4</mn>
+       <mo>+</mo>
+       <mfrac>
+        <mrow>
+         <mn>5</mn>
+        </mrow>
+        <mrow>
+         <mn>2</mn>
+         <mo>+</mo>
+         <mn>24</mn>
+        </mrow>
+       </mfrac>
+      </mrow>
+     </mfrac>
+    </msqrt>
+    <mo>=</mo>
+    <mn>1.27</mn>
+   </math>
+  </span>
+ </p>
+</div>

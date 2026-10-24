@@ -24,7 +24,7 @@ namespace Calcpad.Core
                 _formatEquations = _parser._settings.FormatEquations;
             }
 
-            internal string Render(OutputWriter.OutputFormat format)
+            internal string Render(OutputWriter.OutputFormat format, bool wrap = true)
             {
                 _assignmentPosition = 0;
                 _hasVariables = false;
@@ -33,6 +33,7 @@ namespace Calcpad.Core
                 {
                     OutputWriter.OutputFormat.Html => new HtmlWriter(_parser._settings, _parser.Phasor),
                     OutputWriter.OutputFormat.Xml => new XmlWriter(_parser._settings, _parser.Phasor),
+                    OutputWriter.OutputFormat.MathMl => new MathMlWriter(_parser._settings, _parser.Phasor),
                     _ => new TextWriter(_parser._settings, _parser.Phasor)
                 };
                 _stringBuilder.Clear();
@@ -64,6 +65,8 @@ namespace Calcpad.Core
                             _stringBuilder.Append(warning);
                         else if (format == OutputWriter.OutputFormat.Html)
                             _stringBuilder.Append($"<b class=\"err\" title = \"{warning}\"> !!!</b>");
+                        else if (format == OutputWriter.OutputFormat.MathMl)
+                            _stringBuilder.Append($"<mtext class=\"err\" title=\"{warning}\"> !!!</mtext>");
                     }
                 }
                 else
@@ -103,6 +106,11 @@ namespace Calcpad.Core
                                                 isSplit = true;
                                                 _stringBuilder.Append($"<br/><span class=\"indent\">");
                                             }
+                                            else if (_parser.Split && wrap && format == OutputWriter.OutputFormat.MathMl)
+                                            {
+                                                isSplit = true;
+                                                _stringBuilder.Append("</math><br/><span class=\"indent\"><math>");
+                                            }
                                         }
                                         _stringBuilder.Append(subst);
                                     }
@@ -128,9 +136,14 @@ namespace Calcpad.Core
                             _stringBuilder.Append(res);
                         }
                         if (isSplit)
-                            _stringBuilder.Append("</span>");
+                            _stringBuilder.Append(format == OutputWriter.OutputFormat.MathMl ?
+                                "</math></span><math>" :
+                                "</span>");
                     }
                 }
+                if (wrap && format == OutputWriter.OutputFormat.MathMl)
+                    return MathMlWriter.Wrap(_stringBuilder.ToString());
+
                 return _stringBuilder.ToString();
             }
 
@@ -454,6 +467,8 @@ namespace Calcpad.Core
                                             t.Content = sa + sb;
                                         else if (writer is XmlWriter)
                                             t.Content = sa + XmlWriter.RunThinSpace + sb;
+                                        else if (writer is MathMlWriter)
+                                            t.Content = sa + MathMlWriter.ThinSpaceElement + sb;
                                         else
                                             t.Content = sa + thinSpace + sb;
 
@@ -464,6 +479,8 @@ namespace Calcpad.Core
                                         t.Content = sa + HtmlWriter.UnitProduct + sb;
                                     else if (t.Order == 1 && writer is XmlWriter)
                                         t.Content = sa + XmlWriter.UnitProduct + sb;
+                                    else if (t.Order == 1 && writer is MathMlWriter)
+                                        t.Content = sa + MathMlWriter.UnitProduct + sb;
                                     else
                                         t.Content = sa + writer.FormatOperator('*') + sb;
                                 }
@@ -473,6 +490,8 @@ namespace Calcpad.Core
                                         t.Content = sa + HtmlWriter.UnitDivision + sb;
                                     else if (writer is XmlWriter)
                                         t.Content = sa + XmlWriter.UnitDivision + sb;
+                                    else if (writer is MathMlWriter)
+                                        t.Content = sa + MathMlWriter.UnitDivision + sb;
                                     else
                                         t.Content = sa + TextWriter.UnitDivision + sb;
                                 }
@@ -500,7 +519,15 @@ namespace Calcpad.Core
 
                 string FixPowerFormatting(string s)
                 {
-                    if (writer is XmlWriter)
+                    if (writer is MathMlWriter)
+                    {
+                        ReadOnlySpan<char> span = s;
+                        int i2 = span.IndexOf("</");
+                        int i1 = i2 > 0 ? span[..i2].LastIndexOf('>') + 1 : 0;
+                        if (i1 > 0 && double.TryParse(span[i1..i2], out var d))
+                            return string.Concat(span[..i1], d.ToString(), span[i2..]);
+                    }
+                    else if (writer is XmlWriter)
                     {
                         ReadOnlySpan<char> span = s;
                         int i2 = span.IndexOf("</");
@@ -867,6 +894,9 @@ namespace Calcpad.Core
 
                 if (writer is HtmlWriter)
                     return _solveBlocks[index].ToHtml(_formatEquations);
+
+                if (writer is MathMlWriter)
+                    return _solveBlocks[index].ToMathMl(_formatEquations);
 
                 if (writer is XmlWriter)
                     return _solveBlocks[index].ToXml();

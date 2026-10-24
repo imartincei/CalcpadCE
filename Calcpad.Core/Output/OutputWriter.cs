@@ -43,7 +43,8 @@ namespace Calcpad.Core
         {
             Text,
             Html,
-            Xml
+            Xml,
+            MathMl
         }
         protected abstract OutputFormat FormatType { get; }
 

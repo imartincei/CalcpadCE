@@ -1,0 +1,2 @@
+#settings {"mathRenderer": "mathml"}
+#include Math layout regressions.cpd

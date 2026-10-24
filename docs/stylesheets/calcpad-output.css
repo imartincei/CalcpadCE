@@ -664,6 +664,61 @@
         bottom: 0.6em;
     }
 
+    .eq math {
+        font-family: 'DejaVu Math TeX Gyre', 'Cambria Math', 'STIX Two Math', 'Latin Modern Math', math;
+        math-style: normal;
+        padding-block: 0.1em;
+    }
+
+    .eq mfrac > * {
+        math-style: normal;
+    }
+
+    .eq mi, .eq mn, .eq mtext {
+        font-family: 'DejaVu Serif Condensed', 'Century Schoolbook', 'Times New Roman', Times, serif;
+    }
+
+    .eq mi.var {
+        color: #06d;
+        font-style: italic;
+        text-transform: none;
+    }
+
+    .eq mi.fn, .eq mi.bold {
+        font-weight: 600;
+    }
+
+    .eq mi.unit, .eq mo.unit {
+        color: #086;
+        font-size: 85%;
+    }
+
+    .eq mtext.sub {
+        font-family: 'Segoe UI', 'Gill Sans', 'Gill Sans MT', 'Trebuchet MS', sans-serif;
+    }
+
+    .eq mo.m-nary {
+        color: #C080F0;
+    }
+
+    .eq mo.m-vec {
+        color: #06d;
+    }
+
+    .eq mtable.m-cases mtd, .eq mtable.m-block mtd {
+        text-align: left;
+        padding: 0.1em 0.3em;
+    }
+
+    .eq mtable.m-block {
+        border-left: solid 1pt #80b0e8;
+    }
+
+    .eq mtable.m-matrix mtd {
+        padding: 0.15em 0.5em;
+    }
+
+
     .low {
         font-size: 70%;
         display: inline-block;

@@ -873,7 +873,11 @@ namespace Calcpad.Core
         }
 
         public override string ToString() => _output.Render(OutputWriter.OutputFormat.Text);
-        public string ToHtml() => _output.Render(OutputWriter.OutputFormat.Html);
+        public string ToHtml() => _output.Render(_settings.MathRenderer == MathRenderers.MathMl ?
+            OutputWriter.OutputFormat.MathMl :
+            OutputWriter.OutputFormat.Html);
+        internal string ToClassicHtml() => _output.Render(OutputWriter.OutputFormat.Html);
+        internal string Render(OutputWriter.OutputFormat format, bool wrap) => _output.Render(format, wrap);
         public string ToXml() => _output.Render(OutputWriter.OutputFormat.Xml)
             .Replace("    ", string.Empty).ReplaceLineEndings();
 

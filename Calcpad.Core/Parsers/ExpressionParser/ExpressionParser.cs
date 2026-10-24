@@ -624,7 +624,9 @@ namespace Calcpad.Core
                                 _sb.Append(_parser.ResultAsVal);
                             else
                             {
-                                var html = _parser.ToHtml();
+                                var html = EnableUi && ui is not null ?
+                                    _parser.ToClassicHtml() :
+                                    _parser.ToHtml();
                                 if (EnableUi && ui is not null)
                                     html = ui.Type == "datagrid" ?
                                         string.Empty :

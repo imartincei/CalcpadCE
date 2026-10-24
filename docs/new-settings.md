@@ -17,6 +17,7 @@ In VS Code, do not use VS Code's own settings editor.
 | **Max Output Count** | 5–100 | Maximum number of rows/columns shown for large matrices and vectors. |
 | **Numerical Precision** | 1e-15–1e-2 | Relative precision used by integration, root-finding, and other numerical methods. |
 | **Solver Tolerance** | 1e-15–1e-2 | Target tolerance for the iterative (PCG/eigen) solver. |
+| **Math Renderer** | html / mathml | Per-document only, via `#settings {"mathRenderer": "mathml"}`. *html* is the classic CSS layout; *mathml* emits MathML that the browser lays out, which avoids overlapping exponents and equations split across PDF page breaks. Takes effect from the line it is set on, so one file can switch back and forth. |
 
 ## Plot
 

@@ -149,6 +149,20 @@ namespace Calcpad.Core
             }
         }
 
+        internal string MathMl
+        {
+            get
+            {
+                if (_text is null)
+                    return GetText(OutputWriter.OutputFormat.MathMl);
+
+                if (Text == "°")
+                    return "°";
+
+                return new MathMlWriter(null, false).FormatUnitsText(Text);
+            }
+        }
+
         internal string FormatString
         {
             get
@@ -902,6 +916,7 @@ namespace Calcpad.Core
             {
                 OutputWriter.OutputFormat.Html => new HtmlWriter(null, false),
                 OutputWriter.OutputFormat.Xml => new XmlWriter(null, false),
+                OutputWriter.OutputFormat.MathMl => new MathMlWriter(null, false),
                 _ => new TextWriter(null, false)
             };
             var stringBuilder = new StringBuilder(50);
@@ -934,6 +949,8 @@ namespace Calcpad.Core
                     return XmlWriter.UnitProduct;
                 if (format == OutputWriter.OutputFormat.Html)
                     return HtmlWriter.UnitProduct;
+                if (format == OutputWriter.OutputFormat.MathMl)
+                    return MathMlWriter.UnitProduct;
 
                 return TextWriter.UnitProduct.ToString();
             }
@@ -941,6 +958,8 @@ namespace Calcpad.Core
                 return XmlWriter.UnitDivision;
             else if (format == OutputWriter.OutputFormat.Html)
                 return HtmlWriter.UnitDivision;
+            else if (format == OutputWriter.OutputFormat.MathMl)
+                return MathMlWriter.UnitDivision;
 
             return TextWriter.UnitDivision.ToString();
         }

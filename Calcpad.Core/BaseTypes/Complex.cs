@@ -508,6 +508,7 @@ namespace Calcpad.Core
                 OutputWriter.OutputFormat.Text => new TextWriter(settings, phasor).FormatComplex(c._a, c._b, null),
                 OutputWriter.OutputFormat.Html => new HtmlWriter(settings, phasor).FormatComplex(c._a, c._b, null),
                 OutputWriter.OutputFormat.Xml => new XmlWriter(settings, phasor).FormatComplex(c._a, c._b, null),
+                OutputWriter.OutputFormat.MathMl => new MathMlWriter(settings, phasor).FormatComplex(c._a, c._b, null),
                 _ => "undefined format"
             };
         }

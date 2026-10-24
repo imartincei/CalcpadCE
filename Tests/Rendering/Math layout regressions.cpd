@@ -1,0 +1,146 @@
+"Math layout regressions
+'<p>Stress cases for equation layout. Each case is labelled so a screenshot can be matched back to its source line. <i>Math layout regressions MathML.cpd</i> renders this file with <code>#settings {"mathRenderer": "mathml"}</code> for comparison.</p>
+#hide
+a = 3
+b = 4
+c = 5
+d = 2
+p = 7
+q = 6
+n = 3
+x = 0.5
+y = 2
+z = 1.5
+σ_x = 1.2
+γ_c = 1.5
+f_ck = 30MPa
+M = 45kN*m
+b_w = 300mm
+h = 500mm
+q_d = 12kN/m^2
+L = 6m
+k_s = 2*m^(1/2)
+#show
+'<h3>A. Powers</h3>
+'A1 power with fraction exponent in a denominator (#282)
+A_1 = 1/1^(5/4)
+'A2 same with variables
+A_2 = a/b^(c/d)
+'A3 raised power of a fraction
+A_3 = (a/b)^(c/d)
+'A4 raised power of a fraction, inside a denominator
+A_4 = 1/(a/b)^(c/d)
+'A5 power tower
+A_5 = a^(b^(1/2))
+'A6 Gaussian, fraction with power inside the exponent
+A_6 = e^(-x^2/(2*σ_x^2))
+'A7 nested fraction in exponent
+A_7 = y^(1/(1 + 1/n))
+'A8 square root in exponent
+A_8 = y^sqrt(2)
+'A9 n-th root in exponent
+A_9 = y^root(a; 3)
+'A10 bracketed fraction to a power
+A_10 = (1 + 1/n)^n
+'A11 bracketed fraction to a fractional power, inside a denominator
+A_11 = 1/(1 + 1/n)^(n/2)
+'A12 power of a power of a fraction
+A_12 = ((a/b)^2)^(1/3)
+'<h3>B. Fractions</h3>
+'B1 continued fraction, three levels
+B_1 = 1/(1 + 1/(1 + 1/x))
+'B2 continued fraction, four levels (switches to ÷)
+B_2 = 1/(1 + 1/(1 + 1/(1 + 1/x)))
+'B3 fraction over fraction
+B_3 = (a/b)/(c/d)
+'B4 mixed fractions in numerator and denominator
+B_4 = (a + b/c)/(d - p/q/n)
+'B5 brackets around uneven numerator/denominator heights
+B_5 = (a/(b/c) + 1)*d
+'B6 brackets around a fraction whose denominator is tall
+B_6 = (1 + a/(b + c/(d + x)))^2
+'B7 chained division
+B_7 = a/b/c/d
+'B8 fraction next to a power in the numerator
+B_8 = (a^2 + b^(1/2))/(c^(d/n))
+'<h3>C. Roots</h3>
+'C1 root of a fraction
+C_1 = sqrt(a/b)
+'C2 nested roots
+C_2 = sqrt(1 + sqrt(1 + sqrt(x)))
+'C3 cube root of a fraction
+C_3 = root(a/b; 3)
+'C4 root in a denominator
+C_4 = 1/sqrt(a^2 + b^2)
+'C5 root of a fractional power
+C_5 = sqrt(a^(2/3))
+'C6 n-th root of a nested fraction
+C_6 = root(x/(1 + x/y); 5)
+'C7 root raised to a fractional power
+C_7 = sqrt(y)^(3/2)
+'C8 root of a continued fraction
+C_8 = sqrt(1 + 1/(1 + 1/(1 + x)))
+'<h3>D. Brackets and absolute value</h3>
+'D1 nested bracket levels
+D_1 = ((a + b)*(c - (d + (x - y))))^2
+'D2 absolute value of a difference of fractions
+D_2 = abs(a/b - c/d)
+'D3 redundant brackets around a fraction
+D_3 = (((a/b)))
+'D4 bracketed fraction in a denominator
+D_4 = 1/(a/b + c/d)
+'<h3>E. Sums, products and integrals</h3>
+'E1 sum of a fraction with a power
+E_1 = $Sum{1/k^2 @ k = 1 : 10}
+'E2 sum in a denominator
+E_2 = 1/$Sum{1/k^2 @ k = 1 : 10}
+'E3 integral of a fraction
+E_3 = $Integral{1/(1 + t^2) @ t = 0 : 1}
+'E4 sum with factorial in denominator, over a fraction
+E_4 = $Sum{x^k/k! @ k = 0 : 10}/(1 + x)
+'E5 product raised to a fractional power
+E_5 = $Product{(1 + 1/k^2) @ k = 1 : 10}^(1/2)
+'E6 integral with fraction limits
+E_6 = $Integral{t^2 @ t = 1/a : a/b}
+'<h3>F. Conditionals</h3>
+'F1 if with fractions
+F_1 = if(a < b; a/b; b/a)
+'F2 switch inside a fraction
+F_2 = 1/(1 + switch(x < 1; x/2; x < 2; x^2/3; 1))
+'<h3>G. Units and number formatting</h3>
+'G1 section modulus with units and substitution
+G_1 = M/(b_w*h^2/6)|MPa
+'G2 unit powers in the denominator
+G_2 = q_d/L^2
+'G3 fractional unit exponent
+G_3 = k_s^2/L
+'G4 scientific notation in a denominator
+G_4 = 1/(x*10^(-8))
+'G5 scientific notation raised to a power
+G_5 = (10^(-5))^(1/2)/a
+'<h3>H. Subscripts with powers</h3>
+'H1 subscripted base with fractional power over subscripted variable
+H_1 = sqrt(f_ck/MPa)^(1/2)/γ_c
+'H2 subscripts on both sides of a fraction
+H_2 = A_1^2/A_3^(2/3)
+'H3 subscript and fractional power in a denominator
+H_3 = 1/B_1^(n/2)
+'<h3>I. Vectors and matrices</h3>
+'I1 vector over its norm
+v = [1; 2; 3]
+I_1 = v/norm(v)
+'I2 matrix expression divided by a determinant
+K = [a; b|c; d]
+I_2 = inverse(K)/det(K)
+'<h3>J. Functions</h3>
+'J1 squared function of a fraction
+J_1 = sin(x/2)^2
+'J2 log of a nested fraction
+J_2 = ln(1 + x/(y + 1/z))
+'J3 function powers in numerator and denominator
+J_3 = sin(π/4)^(1/2)/cos(x)^2
+'<h3>K. Page-break stress</h3>
+'<p>Tall equations in sequence. Print to PDF and check that no equation is split or clipped at a page boundary.</p>
+#for i = 1 : 24
+K_i = (1 + 1/(1 + 1/(1 + i/x)))^(1/(1 + 1/n))/sqrt(1 + a/(b + c/(d + i)))
+#loop

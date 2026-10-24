@@ -880,6 +880,10 @@ namespace Calcpad.Core
                         _parser.SetVariable("Tol", dto.Tol.Value);
                     }
                     break;
+                case SettingKey.MathRenderer:
+                    if (dto.MathRendererValue is { } renderer)
+                        Settings.Math.MathRenderer = renderer;
+                    break;
             }
         }
 
