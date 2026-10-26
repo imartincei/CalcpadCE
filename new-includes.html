@@ -3159,7 +3159,7 @@
 <li><strong>The folder has to actually exist.</strong> A value that doesn't resolve to a real folder on disk is an error at the declaration</li>
 </ul>
 <h2 id="ui-overrides-and-includes"><code>#UI</code> overrides and includes<a class="headerlink" href="#ui-overrides-and-includes" title="Permanent link">&para;</a></h2>
-<p>A saved <code>uiOverrides</code> comment only takes effect on the <strong>first line of the file that carries it</strong> — a second one anywhere in the same file is ignored.</p>
+<p>A saved <code>uiOverrides</code> comment only takes effect in <strong>the file that carries it</strong>, at the end of that file — a second one anywhere in the same file is ignored.</p>
 <ul>
 <li><strong>A <code>uiOverrides</code> comment inside an included file never reaches the document that includes it.</strong> The calculation engine treats any <code>uiOverrides</code> comment in an included file's content as if it sat inside that file's own <code>#local</code> block: it is stripped out.</li>
 <li><strong>Only the includer's own <code>uiOverrides</code> comment can override it instead</strong>, by targeting the rendered element after the preview is generated.</li>

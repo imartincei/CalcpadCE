@@ -3418,7 +3418,7 @@ This syntax will throw an error in a future update instead of being ignored, so 
 <p>Declare the input with <code>#UI</code> and give it an ordinary value:</p>
 <div class="language-calcpad highlight"><pre><span></span><code><span class="k">#</span><span class="nv">UI</span><span class="w"> </span><span class="nv">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6</span><span class="na">m</span>
 </code></pre></div>
-<p>Entering a value in the input form is stored in a <code>uiOverrides</code> entry on the first line of the CalcpadCE file, so the file keeps its own default values and they stay unchanged when input fields are updated.
+<p>Entering a value in the input form is stored in a <code>uiOverrides</code> entry at the end of the CalcpadCE file, so the file keeps its own default values and they stay unchanged when input fields are updated.
 You never have to write that entry yourself, but it is plain text if you ever want to edit it.</p>
 <h3 id="u-in-comments-is-removed"><code>%u</code> in comments is removed<a class="headerlink" href="#u-in-comments-is-removed" title="Permanent link">&para;</a></h3>
 <p>A <code>%u</code> in a comment used to be replaced with the document's length unit, and a <strong>m</strong> / <strong>cm</strong> / <strong>mm</strong> combo box was added to the input form so the reader could switch every occurrence at once.
