@@ -3206,7 +3206,7 @@ It shows what your document defines, lets you insert symbols and snippets, contr
 Because every CalcpadCE frontend embeds the same panel, the tabs and settings are identical everywhere; only how you open it differs:</p>
 <ul>
 <li><strong>VS Code</strong> — click the <strong>CalcpadCE</strong> icon in the activity bar. The view title bar has buttons to refresh and stop the background calculation engine.</li>
-<li><strong>Desktop app</strong> — <strong>View → Toggle Sidebar</strong>.</li>
+<li><strong>Desktop app</strong> — press <strong>Ctrl+Shift+B</strong> or use the sidebar reveal button.</li>
 </ul>
 <h2 id="panel-tabs">Panel tabs<a class="headerlink" href="#panel-tabs" title="Permanent link">&para;</a></h2>
 <p>The <strong>CalcpadCE</strong> view is organized into tabs:</p>
@@ -3228,7 +3228,7 @@ Because every CalcpadCE frontend embeds the same panel, the tabs and settings ar
 </tr>
 <tr>
 <td><strong>Settings</strong></td>
-<td>All calculation, plot, unit, PDF export, theme, editor, and linter settings, plus named configurations. See <a href="new-settings.html">Settings Documentation</a>.</td>
+<td>All calculation, plot, unit, PDF export, theme, editor, formatting, and linter settings, plus named configurations. See <a href="new-settings.html">Settings Documentation</a>.</td>
 </tr>
 <tr>
 <td><strong>Variables</strong></td>
@@ -3237,10 +3237,6 @@ Because every CalcpadCE frontend embeds the same panel, the tabs and settings ar
 <tr>
 <td><strong>Properties</strong></td>
 <td>Form-based editor for the <a href="new-metadata-comments.html">metadata comment</a> at the cursor — descriptions, parameter/return types, per-file settings, lint-ignore, and per-document PDF export settings. Also allows editing #UI JSON, #settings JSON, and the UI Overrides line.</td>
-</tr>
-<tr>
-<td><strong>Formatting</strong></td>
-<td>Prettify options and the <strong>Prettify Document</strong> button.</td>
 </tr>
 <tr>
 <td><strong>Export</strong></td>
@@ -3252,8 +3248,9 @@ Because every CalcpadCE frontend embeds the same panel, the tabs and settings ar
 </tr>
 </tbody>
 </table>
-<p>While a <a href="new-ui-mode.html"><code>#UI</code> input form</a> (or a compiled <code>.cpdz</code> worksheet) is the active document, <strong>Insert</strong>, <strong>Variables</strong>, <strong>Formatting</strong>, <strong>Errors</strong>, and <strong>Properties</strong> go inactive — they act on the document source, which the form doesn't edit.
-<strong>TOC</strong>, <strong>Settings</strong>, and <strong>Export</strong> stay available.</p>
+<p>While a <a href="new-ui-mode.html"><code>#UI</code> input form</a> (or a compiled <code>.cpdz</code> worksheet) is the active document, <strong>Insert</strong>, <strong>Variables</strong>, <strong>Errors</strong>, and <strong>Properties</strong> go inactive — they act on the document source, which the form doesn't edit.
+<strong>TOC</strong>, <strong>Settings</strong>, and <strong>Export</strong> stay available.
+<strong>Prettify Document</strong> is disabled in input mode.</p>
 <h3 id="insert">Insert<a class="headerlink" href="#insert" title="Permanent link">&para;</a></h3>
 <p>A searchable palette grouped by category.
 Typing filters the list; clicking an item inserts it at the cursor.
@@ -3280,7 +3277,7 @@ See <a href="new-metadata-comments.html">Metadata Comments</a>, <a href="new-set
 Selecting a heading scrolls the editor to that line.
 While a <a href="new-ui-mode.html"><code>#UI</code> input form</a> is open and there is no editor to scroll, it scrolls the form and the report.  </p>
 <h3 id="formatting-prettify">Formatting (Prettify)<a class="headerlink" href="#formatting-prettify" title="Permanent link">&para;</a></h3>
-<p>Controls the <strong>Prettify Document</strong> command, which reformats the active file:</p>
+<p>Open <strong>Settings → Formatting</strong> to use the <strong>Prettify Document</strong> command, which reformats the active file:</p>
 <ul>
 <li><strong>Indent style</strong> — Tab or Space</li>
 <li><strong>Spaces per level</strong> — used when the indent style is Space</li>

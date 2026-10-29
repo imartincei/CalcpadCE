@@ -1373,10 +1373,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-native-menu" class="md-nav__link">
+  <a href="#the-file-menu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The native menu
+        The File menu
       
     </span>
   </a>
@@ -3258,10 +3258,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-native-menu" class="md-nav__link">
+  <a href="#the-file-menu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The native menu
+        The File menu
       
     </span>
   </a>
@@ -3332,7 +3332,8 @@
 <h1 id="calcpadce-desktop-app">CalcpadCE Desktop App<a class="headerlink" href="#calcpadce-desktop-app" title="Permanent link">&para;</a></h1>
 <p>The <strong>CalcpadCE Desktop App</strong> is a native application for Windows.
 You get the full editor — multi-tab editing, syntax highlighting, autocomplete, live preview, and the CalcpadCE sidebar.
-It uses native file dialogs and menu bar and has offline capabilities.</p>
+It uses native file dialogs and has offline capabilities.
+The custom title bar has a File menu, document actions, and window controls.</p>
 <p>See <a href="new-selecting-calcpadce-deployment.html">Selecting a CalcpadCE Deployment</a> to help decide if this is the right CalcpadCE deployment for you.</p>
 <h2 id="installing">Installing<a class="headerlink" href="#installing" title="Permanent link">&para;</a></h2>
 <p>The app ships as a per-platform download:</p>
@@ -3390,7 +3391,7 @@ On Linux, the app will tell you which package to install if none is found — se
 </code></pre></div>
 </li>
 <li>
-<p>The <strong>preview pane</strong> renders your report live as you type. Toggle it from <strong>View → Toggle Preview</strong>.</p>
+<p>The <strong>preview pane</strong> renders your report live as you type. Toggle it with <strong>Ctrl+P</strong> or the results-pane button beside the tabs.</p>
 </li>
 <li>Save with <strong>Ctrl+S</strong> (or <strong>File → Save</strong>). A native save dialog lets you choose the location.</li>
 </ol>
@@ -3447,14 +3448,14 @@ See <a href="new-ui-mode.html#compiled-cpdz-worksheets">UI Mode</a>.</p>
 <li>JuliaMono is bundled with the app, so math glyphs render consistantly without installing a font.</li>
 </ul>
 <h2 id="the-calcpadce-sidebar">The CalcpadCE sidebar<a class="headerlink" href="#the-calcpadce-sidebar" title="Permanent link">&para;</a></h2>
-<p>Toggle the sidebar with <strong>View → Toggle Sidebar</strong>.
-It has a <strong>Files</strong> view and a <strong>CalcpadCE</strong> view.</p>
+<p>Toggle the sidebar with <strong>Ctrl+Shift+B</strong> or its hide and reveal buttons.
+The <strong>Files</strong> tab sits alongside the other sidebar tabs.</p>
 <p>The sidebar is the same across every CalcpadCE frontend — see <strong><a href="new-calcpad-panel.html">The CalcpadCE Panel &amp; Settings</a></strong> for a full walkthrough of each tab.</p>
 <h2 id="live-results">Live results<a class="headerlink" href="#live-results" title="Permanent link">&para;</a></h2>
 <p>The <strong>Results</strong> pane renders your document live and re-renders as you type.
-Its toolbar (and <strong>View → Result Mode</strong>) offers four modes — <strong>Preview</strong>, <strong>Unwrapped</strong>, <strong>Input</strong>, and <strong>Report</strong> — each rendering the same thing its matching export captures.
+The controls beside the document tabs offer four modes — <strong>Preview</strong>, <strong>Unwrapped</strong>, <strong>Input</strong>, and <strong>Report</strong> — each rendering the same thing its matching export captures.
 See <a href="new-exports.html#export-variants">Exports → Export variants</a> for a breakdown of each one.</p>
-<p><strong>View → Toggle Preview</strong> shows and hides the pane.
+<p><strong>Ctrl+P</strong> or the results-pane button shows and hides the pane.
 Drag the border between the editor and the results pane to resize either side.</p>
 <p>Right-click a preview → <strong>View Webview Source HTML</strong> to inspect the rendered HTML.</p>
 <h3 id="running-on-demand-auto-run-off">Running on demand (Auto-Run off)<a class="headerlink" href="#running-on-demand-auto-run-off" title="Permanent link">&para;</a></h3>
@@ -3464,11 +3465,10 @@ If you turn <strong>Settings → Auto-Run Preview</strong> off, the preview only
 <li>Click <strong>▶ Run</strong> on the editor toolbar.</li>
 <li>Press <strong>Ctrl+Alt+X</strong>.</li>
 <li>Right-click in the editor → <strong>Run Preview</strong>.</li>
-<li>Use <strong>Server → Refresh</strong> in the menu bar.</li>
 </ul>
 <p>A manual run also re-lints the document, writes data, refreshes definitions and the table of contents, and rebuilds the Export tab's plot list.</p>
 <h2 id="splitting-the-editor">Splitting the editor<a class="headerlink" href="#splitting-the-editor" title="Permanent link">&para;</a></h2>
-<p>The <strong>Split ⬓</strong> button in the editor toolbar (also <strong>View → Split Editor</strong>) opens a second editor group stacked below the first.
+<p>The <strong>Split ⬓</strong> button beside the result modes opens a second editor group stacked below the first.
 Each group has its own tabs, tab strip, preview, and Problems markers.
 Click <strong>Unsplit</strong> (same button) to close the bottom group; any unsaved tabs in it are walked through the save prompt first.
 The active group drives the sidebar.</p>
@@ -3481,29 +3481,26 @@ Issues are marked in red, yellow, or blue at the spot with the problem, based on
 <p>Exporting is the same across every CalcpadCE frontend — see <strong><a href="new-exports.html">Exports</a></strong>.</p>
 <p>Desktop specifics:</p>
 <ul>
-<li>Every export is in <strong>File → Export</strong>.</li>
-<li><strong>File → Save As Compiled Worksheet…</strong> and <strong>File → Export Portable Package…</strong> produce the two handoff formats — see <a href="new-exports.html#portable-exports">Exports → Portable exports</a>.</li>
+<li>The title bar has Save, Open, PDF, and Word buttons.</li>
+<li>PDF and Word exports open immediately in your default application from a temporary folder.</li>
+<li>All export formats are available in the sidebar’s <strong>Export</strong> tab.</li>
+<li>The <strong>Export</strong> tab includes compiled worksheets and portable packages — see <a href="new-exports.html#portable-exports">Exports → Portable exports</a>.</li>
 </ul>
-<h2 id="the-native-menu">The native menu<a class="headerlink" href="#the-native-menu" title="Permanent link">&para;</a></h2>
-<p>The menu bar drives the whole app:</p>
-<ul>
-<li><strong>File</strong> — New Tab · Open… · Save · Save As… · Save As Compiled Worksheet… · Export Portable Package… · Close Tab · Export ▸ · Quit — see <a href="new-exports.html">Exports</a> for what each export command produces</li>
-<li><strong>Edit</strong> — Undo · Redo · Cut · Copy · Paste · Select All · Find · Replace</li>
-<li><strong>View</strong> — Toggle Sidebar · Go to Settings · Toggle Preview · Toggle Word Wrap · Split Editor · Result Mode: Preview / Unwrapped / Input / Report</li>
-<li><strong>Server</strong> — Refresh (<strong>Ctrl+Alt+X</strong>) · Show Server Log · Stop Server · Restart Server</li>
-<li><strong>Help</strong> — Documentation (opens the docs site in your default browser)</li>
-</ul>
+<h2 id="the-file-menu">The File menu<a class="headerlink" href="#the-file-menu" title="Permanent link">&para;</a></h2>
+<p>Click <strong>☰ File</strong> beside the CalcpadCE logo to open the application menu:</p>
+<p>The menu contains document commands, recent files, and server controls.
+Use <strong>Show Server Log</strong>, <strong>Stop Server</strong>, or <strong>Restart Server</strong> directly from this menu.</p>
 <h2 id="settings-and-configurations">Settings and configurations<a class="headerlink" href="#settings-and-configurations" title="Permanent link">&para;</a></h2>
 <p>All calculation, plot, unit, theme, editor, and linter settings live in the <strong>Settings</strong> tab of the sidebar. 
-Open it with <strong>View → Go to Settings</strong> (Ctrl+,).
+Open it with <strong>Ctrl+,</strong> or click the <strong>Settings</strong> tab.
+Prettify and its options are in <strong>Settings → Formatting</strong>.
 The desktop app also supports <strong>named configurations</strong> — save different sets of settings (e.g. one for metric with 3 decimals, one for imperial with degrees) and switch the active configuration from the Settings tab; configurations persist between sessions.</p>
 <p>See <strong><a href="new-calcpad-panel.html#settings">The CalcpadCE Panel &amp; Settings → Settings</a></strong> for the full list, and <strong><a href="new-calcpad-panel.html#formatting-prettify">→ Formatting</a></strong> for the Prettify options.</p>
 <h2 id="the-built-in-engine">The built-in engine<a class="headerlink" href="#the-built-in-engine" title="Permanent link">&para;</a></h2>
 <p>The app runs the calculation engine inside it.
 It starts automatically when the app launches and shuts down when you close it — you never launch or configure it yourself.</p>
-<p>If calculations stop responding, use the <strong>Server</strong> menu:</p>
+<p>If calculations stop responding, use the <strong>File</strong> menu:</p>
 <ul>
-<li><strong>Refresh</strong> (<strong>Ctrl+Alt+X</strong>) — re-run the active document.</li>
 <li><strong>Show Server Log</strong> — open the engine's log file to diagnose a problem.</li>
 <li><strong>Stop Server</strong> / <strong>Restart Server</strong> — cycle the calculation engine.</li>
 </ul>
@@ -3519,7 +3516,7 @@ It starts automatically when the app launches and shuts down when you close it �
 <tbody>
 <tr>
 <td>Preview blank or not updating</td>
-<td><strong>Server → Refresh</strong>, then <strong>Server → Restart Server</strong> if needed. Check <strong>Server → Show Server Log</strong> to see messages from the calculation engine. Click <strong>Open Log Folder</strong> in the <strong>Settings</strong> tab to submit logs showing an error as a Github Issue.</td>
+<td>Click <strong>Refresh</strong> beside the document tabs, then <strong>File → Restart Server</strong> if needed. Check <strong>File → Show Server Log</strong> to see messages from the calculation engine. Click <strong>Open Log Folder</strong> in the <strong>Settings</strong> tab to submit logs showing an error as a Github Issue.</td>
 </tr>
 <tr>
 <td>PDF export fails</td>
