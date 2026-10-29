@@ -4009,15 +4009,16 @@ A <code>reportStyle</code> class lands on the line's element, which is a paragra
 <p>A grid is a third-party widget, so a <code>style</code> class reaches its outer container but not the cells, headers or context menu inside it.</p>
 <p>There is limited customization available using the datagrid properties, and more customization is planned.</p>
 <h2 id="saving-what-was-entered">Saving what was entered<a class="headerlink" href="#saving-what-was-entered" title="Permanent link">&para;</a></h2>
-<p>Saving input values writes them into a metadata comment at the top of the document, which is what restores them the next time you open it:</p>
-<div class="language-text highlight"><pre><span></span><code>'&lt;!--{"uiOverrides":{"L:1":"8","q:1":"30"}}--&gt;
+<p>Saving input values writes them into a metadata comment at the end of the document, which is what restores them the next time you open it:</p>
+<div class="language-text highlight"><pre><span></span><code>'&lt;!--CalcpadCE Metadata--&gt;
+'&lt;!--{"uiOverrides":{"L:1":"8","q:1":"30"}}--&gt;
 </code></pre></div>
 <p>The keys are control identities: the variable name, a number indicating the order that variable appears in when it is re-defined (<code>L:1</code> is the first <code>L</code>), then a number representing the order it was re-defined inside a loop (<code>y:1:2</code>).
 A saved value replaces the right-hand side of its assignment in the form and in the report, so the report shows the numbers that were entered.
 Hand-writing an entry in the uiOverrides data works too, and the Properties tab can help make editing easier.
 This is useful if you changed the CalcpadCE file after applying inputs and need to re-map renamed variables or want to remove deleted entries.</p>
 <p>See <a href="new-metadata-comments.html">Metadata Comments</a> for the comment format itself.
-The comment has to be the <strong>first line of the file</strong> to take effect.
+The comment has to be in the <a href="new-metadata-comments.html#file-metadata-footer">metadata footer</a> at the <strong>end of the file</strong> to take effect.
 See <a href="new-includes.html#ui-overrides-and-includes"><code>#UI</code> overrides and includes</a> for more information.</p>
 <p>Values do not have to be saved to be exported: an export made while the form is filled in uses what is currently entered.
 Saving is what makes them survive closing the document.</p>

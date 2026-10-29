@@ -1570,6 +1570,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#file-metadata-footer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File metadata footer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3048,6 +3059,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#file-metadata-footer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File metadata footer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3139,6 +3161,15 @@ See <a href="new-exports.html#pdf-export">Exports → PDF export</a> for additio
 Wrap those lines between a <code>LintIgnore</code> and an <code>EndLintIgnore</code> marker, listing the warning codes to hide (or leave the list empty to hide/unhide everything).</p>
 <p>The <strong>Properties</strong> tab has a picker for the codes, so you don't have to memorize them.
 See <a href="new-linter.html#suppressing-diagnostics-lint-ignore">Suppressing diagnostics</a> for additional details.</p>
+<h2 id="file-metadata-footer">File metadata footer<a class="headerlink" href="#file-metadata-footer" title="Permanent link">&para;</a></h2>
+<p>CalcpadCE stores document-level data at the end of the file:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="c1">'&lt;!--CalcpadCE Metadata--&gt;</span>
+<span class="c1">'&lt;!--{"uiOverrides":{"L:1":"8"}}--&gt;</span>
+<span class="c1">'&lt;!--{"fileInfo":{"title":"Beam Check","author":"J. Smith"}}--&gt;</span>
+</code></pre></div>
+<p><code>uiOverrides</code> holds <a href="new-ui-mode.html#saving-what-was-entered">saved input values</a>.
+<code>fileInfo</code> holds the title, author, reviewer, and timestamps, which gets created on save.
+The footer is hidden unless <strong>Show File Metadata</strong> is on in <a href="new-settings.html#editor-features">Settings</a>, and never appears in the preview or exports.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="new-calcpad-panel.html">The CalcpadCE Panel &amp; Settings</a></li>
