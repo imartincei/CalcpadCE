@@ -1,0 +1,5 @@
+#pre
+#UI 'Input x -' x = 5
+#post
+y = x^2
+y
