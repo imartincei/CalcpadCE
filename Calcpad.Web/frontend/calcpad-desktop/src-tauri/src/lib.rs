@@ -16,6 +16,7 @@ use tauri_plugin_window_state::StateFlags;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
 
+mod control;
 mod navigation_history;
 use navigation_history::{
     complete_navigation, navigate_history, record_navigation, remove_navigation,
@@ -449,7 +450,7 @@ fn take_pending_launch_files(state: State<'_, PendingLaunchFiles>) -> Vec<String
 /// since image `src`s resolve relative to the document's folder and the dialog plugin grants
 /// only the clicked file. Non-recursive, so picking a file in a large tree does not hand over
 /// the whole subtree.
-fn allow_file_and_parent(app: &AppHandle, path: &Path) {
+pub(crate) fn allow_file_and_parent(app: &AppHandle, path: &Path) {
     let scope = app.fs_scope();
     let _ = scope.allow_file(path);
     if let Some(parent) = path.parent() {
@@ -1563,6 +1564,9 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    if let Some(code) = control::try_run_client() {
+        std::process::exit(code);
+    }
     install_panic_hook();
     let context = tauri::generate_context!();
     #[cfg(all(windows, feature = "window-tests"))]
@@ -1657,6 +1661,7 @@ pub fn run() {
         .manage(OpenFiles::default())
         .manage(MenuState::default())
         .manage(NavigationHistoryState::default())
+        .manage(control::ControlState::default())
         .menu(build_menu)
         .invoke_handler(tauri::generate_handler![
             server_url,
@@ -1693,6 +1698,8 @@ pub fn run() {
             create_export_path,
             #[cfg(target_os = "linux")]
             linux_file_dialog::linux_file_dialog,
+            control::control_respond,
+            control::control_ready,
         ])
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::DragDrop(tauri::DragDropEvent::Drop { paths, .. }) => {
@@ -1725,6 +1732,7 @@ pub fn run() {
                     .state::<NavigationHistoryState>()
                     .remove_window(window.label());
                 let app = window.app_handle();
+                control::mark_window_closed(app, window.label());
                 let next = app
                     .webview_windows()
                     .into_keys()
@@ -1786,6 +1794,8 @@ pub fn run() {
                     },
                 );
             });
+
+            control::start(app.handle().clone());
 
             let handle_for_spawn = app.handle().clone();
             tauri::async_runtime::spawn(async move {
@@ -1858,6 +1868,7 @@ pub fn run() {
             }
             if let RunEvent::Exit = event {
                 stop_sidecar(app);
+                control::cleanup();
             }
         });
 }

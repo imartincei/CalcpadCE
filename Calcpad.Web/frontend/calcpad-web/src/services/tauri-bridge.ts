@@ -86,6 +86,12 @@ function withExtension(filePath: string, accepted: string[]): string {
     return accepted.some(a => a.toLowerCase() === ext) ? filePath : `${filePath}.${accepted[0]}`;
 }
 
+/** Add a default extension only when the caller supplied none. */
+function withDefaultExtension(filePath: string, accepted: string[]): string {
+    if (accepted.length === 0 || accepted.includes('*')) return filePath;
+    return pathExtension(filePath) ? filePath : `${filePath}.${accepted[0]}`;
+}
+
 /**
  * Message bridge for the Tauri desktop platform. Settings JSON files live under
  * `$APPDATA/settings/` and recent files in a plugin-store JSON, while native dialogs,
@@ -311,22 +317,27 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     protected async saveExportedFile(req: ExportRequest): Promise<string | null> {
-        if (req.openDirectly) {
-            const filename = pathBasename(this.getExportDefaultPath(req) ?? req.defaultName);
-            const filePath = await invoke<string>('create_export_path', { filename });
-            const bytes = req.data instanceof Uint8Array ? req.data : new Uint8Array(req.data as ArrayBuffer);
-            await fsWriteFile(filePath, bytes);
-            await this.openPathSafe(filePath);
-            return filePath;
+        let filePath: string;
+        if (req.targetPath) {
+            filePath = withDefaultExtension(req.targetPath, req.extensions);
+        } else {
+            if (req.openDirectly) {
+                const filename = pathBasename(this.getExportDefaultPath(req) ?? req.defaultName);
+                const filePath = await invoke<string>('create_export_path', { filename });
+                const bytes = req.data instanceof Uint8Array ? req.data : new Uint8Array(req.data as ArrayBuffer);
+                await fsWriteFile(filePath, bytes);
+                await this.openPathSafe(filePath);
+                return filePath;
+            }
+            const chosen = await dialogSave({
+                title: req.dialogTitle,
+                defaultPath: this.getExportDefaultPath(req),
+                filters: [{ name: `${req.dialogTitle} Files`, extensions: req.extensions }],
+            });
+            if (!chosen) return null;
+            filePath = withExtension(chosen, req.extensions);
         }
-        const chosen = await dialogSave({
-            title: req.dialogTitle,
-            defaultPath: this.getExportDefaultPath(req),
-            filters: [{ name: `${req.dialogTitle} Files`, extensions: req.extensions }],
-        });
-        if (!chosen) return null;
-        const filePath = withExtension(chosen, req.extensions);
-        this.rememberDialogDir(filePath);
+        if (!req.targetPath) this.rememberDialogDir(filePath);
         if (typeof req.data === 'string') {
             await writeTextFile(filePath, req.data);
         } else {
@@ -355,11 +366,14 @@ export class TauriMessageBridge extends BaseMessageBridge {
         };
     }
 
-    protected async runPdfPreflight(): Promise<boolean> {
+    protected async runPdfPreflight(interactive = true): Promise<boolean> {
         const status = await fetchPdfBrowserStatus(this.apiClient.getBaseUrl(), this.apiClient.authHeaders());
         // A null status means the endpoint is unreachable or predates this contract —
         // let the export run and report whatever it actually hits.
         if (!status || status.available) return true;
+        if (!interactive) {
+            throw new Error('PDF export requires a Chromium-based browser. Install one or run an interactive export once to set it up.');
+        }
         return await this.offerBrowserDownload(status.downloadSizeMb);
     }
 
@@ -663,19 +677,30 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     /** `content` may be a function of the chosen path, for content that depends on the file name. */
-    async saveFileAs(content: string | ((filePath: string) => string)): Promise<string | null> {
-        const filePath = await dialogSave({
-            title: 'Save File',
-            defaultPath: this.getSaveDialogDefaultPath(),
-            filters: [
-                { name: 'CalcpadCE Files', extensions: ['cpd'] },
-                { name: 'CalcpadCE Compiled', extensions: ['cpdz'] },
-                { name: 'All Files', extensions: ['*'] },
-            ],
-        });
-        if (!filePath) return null;
-        this.rememberDialogDir(filePath);
-        await this.allowDocumentDir(filePath);
+    async saveFileAs(
+        content: string | ((filePath: string) => string),
+        targetPath?: string,
+    ): Promise<string | null> {
+        let filePath: string;
+        if (targetPath) {
+            filePath = targetPath;
+        } else {
+            const chosen = await dialogSave({
+                title: 'Save File',
+                defaultPath: this.getSaveDialogDefaultPath(),
+                filters: [
+                    { name: 'CalcpadCE Files', extensions: ['cpd'] },
+                    { name: 'CalcpadCE Compiled', extensions: ['cpdz'] },
+                    { name: 'All Files', extensions: ['*'] },
+                ],
+            });
+            if (!chosen) return null;
+            filePath = chosen;
+        }
+        if (!targetPath) this.rememberDialogDir(filePath);
+        // Control-supplied paths are pre-authorized by the Rust shell; a dialog
+        // path is already in scope. Ignore a refusal rather than abort the save.
+        await this.allowDocumentDir(filePath).catch(() => {});
         await this.saveFile(filePath, typeof content === 'function' ? content(filePath) : content);
         return filePath;
     }
@@ -855,7 +880,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     private async handlePrettifyDocument(): Promise<void> {
-        const editor = monaco.editor.getEditors()[0];
+        const editor = (window as any).calcpadActiveEditor ?? monaco.editor.getEditors()[0];
         const model = editor?.getModel();
         if (!editor || !model) {
             console.warn('[Prettify] No active Monaco editor.');

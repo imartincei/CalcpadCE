@@ -30,6 +30,7 @@ import {
     previewLimitNoticeHtml,
     formatSize,
     type InlineImageBudget,
+    type ExportVariant,
 } from 'calcpad-frontend';
 import { registerCalcpadLanguage, registerCalcpadTheme, remeasureEditorFontsWhenReady, resolveEditorFontFamily } from './editor/setup';
 import { setAppTheme, coerceAppTheme, getResolvedAppTheme, onAppThemeChanged } from './editor/app-theme';
@@ -2757,13 +2758,13 @@ async function bootstrap(): Promise<void> {
                 }
 
                 case 'open': {
-                    const result = await tauriBridge.openFile();
+                    const result = await tauriBridge!.openFile();
                     if (result) await loadFile(result.path);
                     break;
                 }
 
                 case 'clear-recent':
-                    await tauriBridge.clearRecentFiles();
+                    await tauriBridge!.clearRecentFiles();
                     break;
 
                 case 'save':
@@ -2777,11 +2778,11 @@ async function bootstrap(): Promise<void> {
                 // An export, so the tab keeps its own path and stays editable —
                 // unlike Save As, which would turn it into a locked worksheet.
                 case 'save-as-compiled':
-                    await tauriBridge.saveCompiled();
+                    await tauriBridge!.saveCompiled();
                     break;
 
                 case 'save-as-portable':
-                    await tauriBridge.savePortable();
+                    await tauriBridge!.savePortable();
                     break;
 
                 case 'toggle-sidebar':
@@ -2884,7 +2885,533 @@ async function bootstrap(): Promise<void> {
             }
         };
         appInstance.onCommandRequest = (id: string) => { void runMenuCommand(id); };
-        await listenHere<{ id: string }>('menu-click', (evt) => { void runMenuCommand(evt.payload.id); });
+        await listenHere<{ id: string }>('menu-click', (evt) => {
+            void runMenuCommand(evt.payload.id).catch(err => console.error('menu action failed:', err));
+        });
+
+        interface ControlRequestPayload {
+            id: number;
+            command: string;
+            args: Record<string, unknown>;
+        }
+
+        function controlRespond(id: number, ok: boolean, result?: unknown, error?: string): void {
+            const response: Record<string, unknown> = { ok };
+            if (result !== undefined) response.result = result;
+            if (error !== undefined) response.error = error;
+            void tauriInvoke('control_respond', { id, response })
+                .catch(err => console.error('control response failed:', err));
+        }
+
+        function findOpenTab(path: string): {
+            group: EditorGroup;
+            tab: { id: string; title: string; filePath: string | null; dirty: boolean };
+        } | null {
+            for (const group of groups.values()) {
+                const tab = group.tabs.findByPath(path);
+                if (tab) return { group, tab };
+            }
+            return null;
+        }
+
+        function currentPreviewHtml(): string {
+            const buffers = Array.from(document.querySelectorAll<HTMLElement>('.preview-buffers'));
+            const target = document.querySelector<HTMLElement>('.preview-buffers.active-group') ?? buffers[0];
+            return target?.querySelector<HTMLIFrameElement>('.preview-frame:not(.preview-frame-back)')?.srcdoc ?? '';
+        }
+
+        function activeTabOrThrow() {
+            const tab = activeGroup.tabs.activeTab;
+            if (!tab) throw new Error('no active tab');
+            return tab;
+        }
+
+        async function saveActiveToPath(targetPath: string): Promise<string> {
+            const saved = await tauriBridge!.saveFileAs(stampedContentFor, targetPath);
+            if (!saved) throw new Error('save failed');
+            tabs.markActiveSaved({ filePath: saved });
+            applyCompiledWorksheetMode(activeGroup);
+            await tauriBridge!.addRecentFile(saved);
+            const active = tabs.activeTab;
+            if (active) await deleteDraft(active.id);
+            return saved;
+        }
+
+        async function setTabContent(path: string, content: string): Promise<void> {
+            let found = findOpenTab(path);
+            if (!found) {
+                const disk = await tauriBridge!.readFile(path).catch(() => '');
+                activeGroup.tabs.openFile(path, disk);
+                found = findOpenTab(path);
+            }
+            if (!found) throw new Error(`could not open ${path}`);
+            const model = found.group.tabs.modelForTab(found.tab.id);
+            if (!model) throw new Error(`no editor model for ${path}`);
+            model.setValue(content);
+            if (found.group.id !== activeGroup.id) setActiveGroup(found.group);
+            found.group.tabs.activate(found.tab.id);
+        }
+
+        function closeTabForControl(path: string | undefined, force: boolean): string | null {
+            let group: EditorGroup;
+            let tab: { id: string; title: string; filePath: string | null; dirty: boolean };
+            if (path) {
+                const found = findOpenTab(path);
+                if (!found) throw new Error(`not open: ${path}`);
+                group = found.group;
+                tab = found.tab;
+            } else {
+                group = activeGroup;
+                tab = activeTabOrThrow();
+            }
+            if (group.tabs.isDirty(tab.id) && group.tabs.isLastReference(tab.id) && !force) {
+                throw new Error('the tab has unsaved changes; pass --force to discard them');
+            }
+            group.tabs.close(tab.id);
+            return tab.filePath;
+        }
+
+        async function reloadTabForControl(path: string | undefined, force: boolean): Promise<string> {
+            let group: EditorGroup;
+            let tab: { id: string; title: string; filePath: string | null; dirty: boolean };
+            if (path) {
+                const found = findOpenTab(path);
+                if (!found) throw new Error(`not open: ${path}`);
+                group = found.group;
+                tab = found.tab;
+            } else {
+                group = activeGroup;
+                tab = activeTabOrThrow();
+            }
+            if (!tab.filePath) throw new Error('the tab has no file on disk');
+            if (group.tabs.isDirty(tab.id) && !force) {
+                throw new Error('the tab has unsaved changes; pass --force to discard them');
+            }
+            const content = await tauriBridge!.readFile(tab.filePath);
+            const model = group.tabs.modelForTab(tab.id);
+            if (!model) throw new Error(`no editor model for ${tab.filePath}`);
+            if (group.id !== activeGroup.id) setActiveGroup(group);
+            group.tabs.activate(tab.id);
+            model.setValue(content);
+            group.tabs.markActiveSaved();
+            return tab.filePath;
+        }
+
+        function controlState(): Record<string, unknown> {
+            const sidebar = document.querySelector<HTMLElement>('.sidebar-pane');
+            const editor = (window as any).calcpadActiveEditor;
+            return {
+                window: windowLabel,
+                windowTitle: document.title,
+                activeGroup: activeGroup.id,
+                activeId: activeGroup.tabs.activeId,
+                activeFile: activeGroup.tabs.activeTab?.filePath ?? null,
+                activeTitle: activeGroup.tabs.activeTab?.title ?? null,
+                dirty: [...groups.values()].some(group => group.tabs.anyDirty()),
+                resultMode: appInstance.getResultMode(),
+                previewVisible: appInstance.isPreviewVisible(),
+                sidebarVisible: !!sidebar && getComputedStyle(sidebar).display !== 'none',
+                wordWrap: editor?.getRawOptions?.().wordWrap ?? null,
+                serverUrl: ((window as any).calcpadBridge as { apiClient?: { getBaseUrl?(): string } })
+                    ?.apiClient?.getBaseUrl?.() ?? null,
+                groups: [...groups.values()].map(group => ({
+                    id: group.id,
+                    activeId: group.tabs.activeId,
+                    active: group === activeGroup,
+                    tabs: group.tabs.all.map(tab => ({
+                        id: tab.id,
+                        title: tab.title,
+                        filePath: tab.filePath,
+                        dirty: tab.dirty,
+                        active: tab.id === group.tabs.activeId,
+                    })),
+                })),
+            };
+        }
+
+        async function handleControlRequest(request: ControlRequestPayload): Promise<void> {
+            const { id, command, args } = request;
+            try {
+                switch (command) {
+                    case 'open': {
+                        const path = String(args.path ?? '');
+                        if (!path) throw new Error('missing path');
+                        await loadFile(path);
+                        const found = findOpenTab(path);
+                        if (!found) throw new Error(`could not open ${path}`);
+                        controlRespond(id, true, {
+                            path,
+                            activeId: found?.tab.id ?? null,
+                            title: found?.tab.title ?? null,
+                        });
+                        return;
+                    }
+                    case 'close': {
+                        const path = args.path ? String(args.path) : undefined;
+                        const closed = closeTabForControl(path, Boolean(args.force));
+                        controlRespond(id, true, { closed: true, path: closed });
+                        return;
+                    }
+                    case 'save': {
+                        const active = activeTabOrThrow();
+                        if (!active.filePath) throw new Error('the active tab has no path; use save-as');
+                        const saved = await saveActive();
+                        if (!saved) throw new Error('save failed');
+                        controlRespond(id, true, { saved: true, path: active.filePath });
+                        return;
+                    }
+                    case 'save_as': {
+                        const path = String(args.path ?? '');
+                        if (!path) throw new Error('missing path');
+                        const saved = await saveActiveToPath(path);
+                        controlRespond(id, true, { saved: true, path: saved });
+                        return;
+                    }
+                    case 'menu': {
+                        const menuId = String(args.id ?? '');
+                        if (!menuId) throw new Error('missing menu id');
+                        await runMenuCommand(menuId);
+                        controlRespond(id, true, { id: menuId });
+                        return;
+                    }
+                    case 'refresh': {
+                        await runRefresh('Control refresh');
+                        while (refreshInFlight || refreshQueued) {
+                            await new Promise(resolve => setTimeout(resolve, 50));
+                        }
+                        controlRespond(id, true, { refreshed: true });
+                        return;
+                    }
+                    case 'state':
+                        controlRespond(id, true, controlState());
+                        return;
+                    case 'content': {
+                        const path = args.path ? String(args.path) : undefined;
+                        const active = activeGroup.tabs.activeTab;
+                        const found = path ? findOpenTab(path) : (active ? { group: activeGroup, tab: active } : null);
+                        if (found) {
+                            const content = found.group.tabs.modelForTab(found.tab.id)?.getValue() ?? '';
+                            controlRespond(id, true, {
+                                path: found.tab.filePath,
+                                title: found.tab.title,
+                                content,
+                                dirty: found.tab.dirty,
+                                open: true,
+                            });
+                            return;
+                        }
+                        if (!path) throw new Error('no active tab');
+                        controlRespond(id, true, {
+                            path,
+                            title: null,
+                            content: await tauriBridge!.readFile(path),
+                            dirty: false,
+                            open: false,
+                        });
+                        return;
+                    }
+                    case 'set_content': {
+                        const content = String(args.content ?? '');
+                        const path = args.path ? String(args.path) : activeTabOrThrow().filePath;
+                        if (!path) throw new Error('the active tab has no path; pass a destination file');
+                        if (isCompiledPath(path)) throw new Error('compiled worksheets are read-only');
+                        await setTabContent(path, content);
+                        const found = findOpenTab(path);
+                        controlRespond(id, true, {
+                            path,
+                            dirty: found ? found.group.tabs.isDirty(found.tab.id) : true,
+                        });
+                        return;
+                    }
+                    case 'reload': {
+                        const path = args.path ? String(args.path) : undefined;
+                        const reloaded = await reloadTabForControl(path, Boolean(args.force));
+                        controlRespond(id, true, { reloaded: true, path: reloaded });
+                        return;
+                    }
+                    case 'result': {
+                        if (!appInstance.isPreviewVisible()) appInstance.togglePreview();
+                        await refreshPreviewFor(activeGroup);
+                        let html = currentPreviewHtml();
+                        for (let attempt = 0; attempt < 100 && !html; attempt += 1) {
+                            await new Promise(resolve => setTimeout(resolve, 100));
+                            html = currentPreviewHtml();
+                        }
+                        if (!html) throw new Error('the preview did not render in time');
+                        controlRespond(id, true, {
+                            html,
+                            resultMode: appInstance.getResultMode(),
+                            previewVisible: appInstance.isPreviewVisible(),
+                        });
+                        return;
+                    }
+                    case 'export': {
+                        const format = String(args.format ?? '');
+                        const path = String(args.path ?? '');
+                        const variant = String(args.variant ?? 'report') as ExportVariant;
+                        if (!path) throw new Error('missing output path');
+                        if (!['pdf', 'html', 'docx', 'cpdz', 'zip'].includes(format)) {
+                            throw new Error(`unsupported export format: ${format}`);
+                        }
+                        if (!['report', 'preview', 'input', 'unwrapped'].includes(variant)) {
+                            throw new Error(`unsupported export variant: ${variant}`);
+                        }
+                        const saved = await activeBridge.exportActive(
+                            format as 'pdf' | 'html' | 'docx' | 'cpdz' | 'zip', variant, path);
+                        if (!saved) throw new Error('the export produced no file');
+                        controlRespond(id, true, { path: saved });
+                        return;
+                    }
+                    case 'plots': {
+                        const plots = await activeBridge.collectPlots();
+                        controlRespond(id, true, {
+                            plots: plots.map((plot, index) => ({
+                                index,
+                                sourceIndex: plot.index,
+                                ext: plot.ext,
+                                mime: plot.mime,
+                                sizeBytes: plot.bytes.length,
+                            })),
+                        });
+                        return;
+                    }
+                    case 'save_plot': {
+                        const index = Number(args.index);
+                        const path = String(args.path ?? '');
+                        if (!Number.isInteger(index) || index < 0) throw new Error('invalid plot index');
+                        if (!path) throw new Error('missing output path');
+                        const saved = await activeBridge.savePlotTo(index, path);
+                        if (!saved) throw new Error('the plot was not saved');
+                        controlRespond(id, true, { path: saved });
+                        return;
+                    }
+                    case 'save_plots': {
+                        const path = String(args.path ?? '');
+                        if (!path) throw new Error('missing output path');
+                        const saved = await activeBridge.savePlotsZipTo(path);
+                        if (!saved) throw new Error('the plots were not saved');
+                        controlRespond(id, true, { path: saved });
+                        return;
+                    }
+                    case 'editor': {
+                        const editor = (window as any).calcpadActiveEditor;
+                        if (!editor) throw new Error('no active editor');
+                        const model = editor.getModel();
+                        const action = String(args.action ?? '');
+                        if (action === 'focus') {
+                            editor.focus();
+                            controlRespond(id, true, { focused: true });
+                            return;
+                        }
+                        if (!model) throw new Error('no active editor model');
+                        const selection = editor.getSelection();
+                        switch (action) {
+                            case 'info': {
+                                const position = editor.getPosition();
+                                const current = editor.getSelection();
+                                controlRespond(id, true, {
+                                    position: position
+                                        ? { line: position.lineNumber, column: position.column }
+                                        : null,
+                                    selection: current
+                                        ? {
+                                            startLine: current.startLineNumber,
+                                            startColumn: current.startColumn,
+                                            endLine: current.endLineNumber,
+                                            endColumn: current.endColumn,
+                                        }
+                                        : null,
+                                    lineCount: model.getLineCount(),
+                                    valueLength: model.getValueLength(),
+                                    readOnly: editor.getRawOptions?.().readOnly ?? false,
+                                });
+                                return;
+                            }
+                            case 'goto': {
+                                const line = Math.max(1, Number(args.line ?? 1));
+                                const column = Math.max(1, Number(args.column ?? 1));
+                                const position = { lineNumber: line, column };
+                                editor.setPosition(position, 'control');
+                                editor.revealPositionInCenter(position);
+                                editor.focus();
+                                controlRespond(id, true, { position: { line, column } });
+                                return;
+                            }
+                            case 'select': {
+                                const range = new monaco.Range(
+                                    Number(args.startLine ?? 1),
+                                    Number(args.startColumn ?? 1),
+                                    Number(args.endLine ?? args.startLine ?? 1),
+                                    Number(args.endColumn ?? args.startColumn ?? 1),
+                                );
+                                editor.setSelection(range);
+                                editor.focus();
+                                controlRespond(id, true, {
+                                    selection: {
+                                        startLine: range.startLineNumber,
+                                        startColumn: range.startColumn,
+                                        endLine: range.endLineNumber,
+                                        endColumn: range.endColumn,
+                                    },
+                                });
+                                return;
+                            }
+                            case 'insert': {
+                                const text = String(args.text ?? '');
+                                if (!selection) throw new Error('no editor selection');
+                                const applied = editor.executeEdits('control-insert', [
+                                    { range: selection, text, forceMoveMarkers: true },
+                                ]);
+                                if (!applied) throw new Error('the editor is read-only');
+                                editor.pushUndoStop();
+                                controlRespond(id, true, { inserted: text.length });
+                                return;
+                            }
+                            case 'undo':
+                            case 'redo':
+                                editor.trigger('control', action, null);
+                                controlRespond(id, true, { action });
+                                return;
+                            case 'find': {
+                                const query = String(args.query ?? '');
+                                if (!query) throw new Error('missing query');
+                                const wordSeparators = args.wholeWord
+                                    ? editor.getOption(monaco.editor.EditorOption.wordSeparators)
+                                    : null;
+                                const matches = model.findMatches(
+                                    query,
+                                    false,
+                                    Boolean(args.regex),
+                                    Boolean(args.caseSensitive),
+                                    wordSeparators,
+                                    false,
+                                    200,
+                                );
+                                controlRespond(id, true, {
+                                    count: matches.length,
+                                    matches: matches.map((match: monaco.editor.FindMatch) => ({
+                                        startLine: match.range.startLineNumber,
+                                        startColumn: match.range.startColumn,
+                                        endLine: match.range.endLineNumber,
+                                        endColumn: match.range.endColumn,
+                                        text: match.matches ? match.matches[0] : model.getValueInRange(match.range),
+                                    })),
+                                });
+                                return;
+                            }
+                            case 'replace_all': {
+                                const query = String(args.query ?? '');
+                                if (!query) throw new Error('missing query');
+                                const replacement = String(args.replacement ?? '');
+                                const wordSeparators = args.wholeWord
+                                    ? editor.getOption(monaco.editor.EditorOption.wordSeparators)
+                                    : null;
+                                const all = model.findMatches(
+                                    query,
+                                    false,
+                                    Boolean(args.regex),
+                                    Boolean(args.caseSensitive),
+                                    wordSeparators,
+                                    true,
+                                    10001,
+                                );
+                                const truncated = all.length > 10000;
+                                const matches = truncated ? all.slice(0, 10000) : all;
+                                const expand = (match: monaco.editor.FindMatch): string => {
+                                    if (!args.regex || !match.matches) return replacement;
+                                    return replacement.replace(/\$(\$|&|\d+)/g, (_, token: string) => {
+                                        if (token === '$') return '$';
+                                        if (token === '&') return match.matches?.[0] ?? '';
+                                        return match.matches?.[Number(token)] ?? '';
+                                    });
+                                };
+                                if (matches.length > 0) {
+                                    const applied = editor.executeEdits('control-replace', matches
+                                        .slice()
+                                        .reverse()
+                                        .map((match: monaco.editor.FindMatch) => ({ range: match.range, text: expand(match) })));
+                                    if (!applied) throw new Error('the editor is read-only');
+                                    editor.pushUndoStop();
+                                }
+                                controlRespond(id, true, { replaced: matches.length, truncated });
+                                return;
+                            }
+                            default:
+                                throw new Error(`unknown editor action: ${action}`);
+                        }
+                    }
+                    case 'clipboard_read': {
+                        controlRespond(id, true, { text: await tauriClipboard.readText() });
+                        return;
+                    }
+                    case 'clipboard_write': {
+                        const text = String(args.text ?? '');
+                        await tauriClipboard.writeText(text);
+                        controlRespond(id, true, { written: text.length });
+                        return;
+                    }
+                    case 'message': {
+                        const message = args.message;
+                        if (!message || typeof message !== 'object') throw new Error('missing message object');
+                        const waitFor = args.waitFor ? String(args.waitFor) : '';
+                        let waiter: Promise<unknown> | null = null;
+                        if (waitFor) {
+                            waiter = new Promise((resolve, reject) => {
+                                const timeout = window.setTimeout(() => {
+                                    window.removeEventListener('message', onMessage);
+                                    reject(new Error(`timed out waiting for ${waitFor}`));
+                                }, Number(args.timeoutMs ?? 10000));
+                                const onMessage = (event: MessageEvent) => {
+                                    if (event.source !== null) return;
+                                    const data = event.data as { type?: string } | null;
+                                    if (data?.type === waitFor) {
+                                        window.clearTimeout(timeout);
+                                        window.removeEventListener('message', onMessage);
+                                        resolve(data);
+                                    }
+                                };
+                                window.addEventListener('message', onMessage);
+                            });
+                        }
+                        try {
+                            activeBridge.handleMessage(message as never);
+                        } catch (error) {
+                            waiter?.catch(() => {});
+                            throw error;
+                        }
+                        controlRespond(id, true, waiter ? await waiter : { sent: true });
+                        return;
+                    }
+                    case 'eval': {
+                        const expression = String(args.expression ?? '');
+                        if (!expression.trim()) throw new Error('missing expression');
+                        const evaluate = new Function(`return (async () => (${expression}))();`);
+                        let value: unknown = await evaluate();
+                        if (value === undefined) value = null;
+                        try {
+                            value = JSON.parse(JSON.stringify(value));
+                        } catch {
+                            value = String(value);
+                        }
+                        controlRespond(id, true, { value });
+                        return;
+                    }
+                    default:
+                        throw new Error(`unknown command: ${command}`);
+                }
+            } catch (error) {
+                controlRespond(id, false, undefined, error instanceof Error ? error.message : String(error));
+            }
+        }
+
+        let controlQueue = Promise.resolve();
+        await listenHere<ControlRequestPayload>('control-request', evt => {
+            controlQueue = controlQueue
+                .then(() => handleControlRequest(evt.payload))
+                .catch(err => console.error('control request failed:', err));
+        });
+        void tauriInvoke('control_ready')
+            .catch(err => console.error('control ready failed:', err));
 
         // Server stderr (captured by start-server.sh) and PDF errors flow
         // through bridge → window message → Output panel.
