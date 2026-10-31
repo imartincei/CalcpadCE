@@ -29,6 +29,8 @@ import {
     previewSizeLimitChars,
     previewLimitNoticeHtml,
     formatSize,
+    pdfViewerHtml,
+    pdfPreviewErrorHtml,
     type InlineImageBudget,
 } from 'calcpad-frontend';
 import { registerCalcpadLanguage, registerCalcpadTheme, remeasureEditorFontsWhenReady, resolveEditorFontFamily } from './editor/setup';
@@ -739,6 +741,33 @@ async function bootstrap(): Promise<void> {
         };
     }
 
+    let pdfjsSources: Promise<{ libSource: string; workerSource: string }> | null = null;
+    function loadPdfjsSources(): Promise<{ libSource: string; workerSource: string }> {
+        pdfjsSources ??= Promise.all([
+            import('pdfjs-dist/legacy/build/pdf.min.mjs?raw'),
+            import('pdfjs-dist/legacy/build/pdf.worker.min.mjs?raw'),
+        ]).then(([lib, worker]) => ({ libSource: lib.default, workerSource: worker.default }))
+            .catch((err) => { pdfjsSources = null; throw err; });
+        return pdfjsSources;
+    }
+
+    /** The PDF export of `html` in a pdf.js viewer, or null when a newer render superseded it. */
+    async function pdfPreviewHtml(
+        group: EditorGroup, content: string, html: string, theme: 'light' | 'dark', key = `previewPdf:${group.id}`,
+    ): Promise<string | null> {
+        try {
+            const [pdf, sources] = await Promise.all([
+                activeBridge.api.pdf(html, activeBridge.getEffectivePdfOptions(content), { key }),
+                loadPdfjsSources(),
+            ]);
+            return pdf ? pdfViewerHtml({ pdf, theme, ...sources }) : null;
+        } catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            appInstance.appendOutput('error', `PDF preview failed: ${message}`, 'preview', group.id);
+            return pdfPreviewErrorHtml(message, theme);
+        }
+    }
+
     async function refreshPreviewFor(group: EditorGroup): Promise<void> {
         if (!appInstance.isPreviewVisible()) return;
         if (appInstance.getResultMode() === 'ui' && group !== activeGroup) return;
@@ -755,6 +784,8 @@ async function bootstrap(): Promise<void> {
         }
 
         const fileContext = getFileContext ? await getFileContext(content) : {};
+        const pdfView = (mode === 'preview' || mode === 'report')
+            && editorBridge.getExtraSetting('previewPdf') === 'true';
 
         const hideLoading = showPreviewLoading(group);
         let result;
@@ -779,10 +810,11 @@ async function bootstrap(): Promise<void> {
             result = mode === 'unwrapped'
                 ? await activeBridge.api.convertUnwrapped(content, apiSettings, fileContext.sourceFilePath, theme, { key: `preview:${group.id}`, write })
                 // The report is a print layout, but on screen, so it keeps the line
-                // anchors that forPrint would otherwise suppress.
+                // anchors that forPrint would otherwise suppress. The PDF view renders as an export does.
                 : await activeBridge.api.convert(
-                    content, apiSettings, 'html', mode === 'report', fileContext.sourceFilePath, theme, ui,
-                    mode === 'report' ? true : undefined, { key: `preview:${group.id}`, write });
+                    content, apiSettings, 'html', mode === 'report', fileContext.sourceFilePath,
+                    pdfView ? undefined : theme, ui,
+                    pdfView ? false : mode === 'report' ? true : undefined, { key: `preview:${group.id}`, write });
         } catch (err) {
             void hideLoading();
             throw err;
@@ -809,7 +841,16 @@ async function bootstrap(): Promise<void> {
             const finalHtml = tauriBridge
                 ? await tauriBridge.inlineDocumentImages(result.html, previewImageBudget(group))
                 : result.html;
-            const committed = appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine, uiDocKeyFor(group));
+            let frameHtml: string | undefined;
+            if (pdfView) {
+                const pdfHtml = await pdfPreviewHtml(group, content, finalHtml, theme);
+                if (pdfHtml === null) {
+                    await hideLoading();
+                    return;
+                }
+                frameHtml = pdfHtml;
+            }
+            const committed = appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine, uiDocKeyFor(group), frameHtml);
             if (mode === 'ui') {
                 uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
                 uiPause.update(uiDocKeyFor(group), result.pause);
@@ -838,17 +879,23 @@ async function bootstrap(): Promise<void> {
         sourceFilePath: string | undefined,
         theme: 'light' | 'dark',
     ): Promise<void> {
+        const pdfView = editorBridge.getExtraSetting('previewPdf') === 'true';
         const result = await activeBridge.api.convert(
-            content, apiSettings, 'html', true, sourceFilePath, theme,
-            { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)), hideErrorLines: true },
+            content, apiSettings, 'html', true, sourceFilePath, pdfView ? undefined : theme,
+            { uiOverrides: uiOverrides.toRecord(uiDocKeyFor(group)), hideErrorLines: !pdfView },
             // A report even though a form is open, so this is the half of input mode that writes.
-            true, { key: `preview:${group.id}`, write: activeBridge.mayWrite(true) });
+            !pdfView, { key: `preview:${group.id}`, write: activeBridge.mayWrite(true) });
         if (!result || result instanceof ArrayBuffer) return;
         if (previewTooLarge(group, result.html, true)) return;
 
-        const html = tauriBridge
+        let html = tauriBridge
             ? await tauriBridge.inlineDocumentImages(result.html, previewImageBudget(group))
             : result.html;
+        if (pdfView) {
+            const pdfHtml = await pdfPreviewHtml(group, content, html, theme, `uiPrintPdf:${group.id}`);
+            if (pdfHtml === null) return;
+            html = pdfHtml;
+        }
         await appInstance.setUiPrintHtml(group.id, html, uiDocKeyFor(group));
     }
 
@@ -1530,7 +1577,7 @@ async function bootstrap(): Promise<void> {
         // Settings announcements are the host talking to itself; a preview must not
         // be able to trigger a full re-render loop by forging one.
         if (data.type === 'previewThemeChanged' || data.type === 'settingsChanged'
-            || data.type === 'previewUiOverridesChanged') {
+            || data.type === 'previewUiOverridesChanged' || data.type === 'previewPdfChanged') {
             if (!fromHost) return;
             refreshAllPreviews();
             return;

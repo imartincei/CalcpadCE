@@ -333,7 +333,7 @@ namespace Calcpad.Server.Controllers
         /// Generate PDF from HTML content using Playwright and PDFsharp.
         /// </summary>
         [HttpPost("pdf")]
-        public async Task<IActionResult> GeneratePdf([FromBody] PdfGenerateRequest request)
+        public async Task<IActionResult> GeneratePdf([FromBody] PdfGenerateRequest request, CancellationToken cancellationToken)
         {
             try
             {
@@ -342,11 +342,15 @@ namespace Calcpad.Server.Controllers
 
                 FileLogger.LogVerbose("PDF generation request received", $"HTML length: {request.Html.Length}");
 
-                var pdfBytes = await _pdfService.GeneratePdfAsync(request.Html, request.Options);
+                var pdfBytes = await _pdfService.GeneratePdfAsync(request.Html, request.Options, cancellationToken);
 
                 FileLogger.LogVerbose("PDF generated successfully", $"Size: {pdfBytes.Length} bytes");
 
                 return File(pdfBytes, "application/pdf", "document.pdf");
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(499);
             }
             catch (BrowserLaunchFailedException ex)
             {

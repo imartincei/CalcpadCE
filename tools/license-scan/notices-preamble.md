@@ -64,3 +64,30 @@ Licence files ship alongside the fonts.
   `Calcpad.Web/backend/UiAssets/` have had their upstream banners stripped by
   the minifier, so MIT's copyright and permission notice cannot travel inside
   the copy. Their licence texts are therefore reproduced below.
+- **core-js** 3.50.0 — MIT. Compiled into pdf.js's legacy build
+  (`pdf.min.mjs`, `pdf.worker.min.mjs`), which the PDF preview ships in the
+  web app, the desktop app and the VS Code extension. It has no package of its
+  own in either tree, so its licence is reproduced here:
+
+  ```
+  Copyright (c) 2013–2025 Denis Pushkarev (zloirock.ru)
+  Copyright (c) 2025–2026 CoreJS Company (core-js.io)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  ```

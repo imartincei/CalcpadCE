@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt, toRangeEdits, planFileInfoStamp, stampFileInfoText, onlyReviewChanged, pdfDocumentTitle } from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt, toRangeEdits, planFileInfoStamp, stampFileInfoText, onlyReviewChanged, pdfDocumentTitle, pdfViewerHtml, pdfPreviewErrorHtml } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError, LineEdit } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -439,6 +439,36 @@ function getPdfSettings(documentContent?: string, sourceFileUri?: vscode.Uri): F
         : '';
 
     return resolveEffectivePdfSettings(stored, pdfSettingsFromDocument(lines), pdfDocumentTitle(lines, fileName));
+}
+
+let pdfjsSources: Promise<{ libSource: string; workerSource: string }> | undefined;
+
+/** pdf.js, copied into dist/pdfjs by the rollup build. */
+function loadPdfjsSources(): Promise<{ libSource: string; workerSource: string }> {
+    const dir = vscode.Uri.joinPath(extensionContext.extensionUri, 'dist', 'pdfjs');
+    const read = async (name: string) =>
+        new TextDecoder().decode(await vscode.workspace.fs.readFile(vscode.Uri.joinPath(dir, name)));
+    pdfjsSources ??= Promise.all([read('pdf.min.mjs'), read('pdf.worker.min.mjs')])
+        .then(([libSource, workerSource]) => ({ libSource, workerSource }))
+        .catch((err) => { pdfjsSources = undefined; throw err; });
+    return pdfjsSources;
+}
+
+/** The PDF export of `html` in a pdf.js viewer, or null when a newer render superseded it. */
+async function pdfPreviewHtml(html: string, content: string, sourceFileUri: vscode.Uri, docKey: string): Promise<string | null> {
+    const theme = getEffectivePreviewTheme();
+    try {
+        if (!sharedApiClient) throw new Error(NO_SERVER_MESSAGE);
+        const [pdf, sources] = await Promise.all([
+            sharedApiClient.pdf(html, getPdfSettings(content, sourceFileUri), { key: `previewPdf:${docKey}` }),
+            loadPdfjsSources(),
+        ]);
+        return pdf ? pdfViewerHtml({ pdf, theme, ...sources }) : null;
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        outputChannel.appendLine(`[PDF preview] ${message}`, 'warning');
+        return pdfPreviewErrorHtml(message, theme);
+    }
 }
 
 function getEffectivePreviewTheme(): 'light' | 'dark' {
@@ -968,10 +998,12 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         outputChannel.appendLine(`Making API call to ${endpoint}...`, 'verbose');
 
         const theme = getEffectivePreviewTheme();
+        // Rendered as an export would be, so the pages match the exported PDF.
+        const pdfView = !enableUi && !unwrapped && settingsManager.getExtraBool('previewPdf', false);
         const requestBody = JSON.stringify({
             content: content,
             settings: settings,
-            theme: theme,
+            theme: pdfView ? undefined : theme,
             forceUnwrappedCode: unwrapped,
             sourceFilePath: sourceFileUri.fsPath,
             enableUi: enableUi,
@@ -979,10 +1011,10 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             uiOverrides: applyOverrides ? uiOverridesFor(docKey, content) : undefined,
             // The report is a print layout, but on screen beside the editor, so it
             // keeps the line links that forPrint would otherwise suppress.
-            includeLineAnchors: forPrint ? true : undefined,
+            includeLineAnchors: pdfView ? false : forPrint ? true : undefined,
             // The input form has no source editor for "on line [N]" to point at, and
             // neither does the report while it's shown behind that form.
-            hideErrorLines: forPrint && uiPanel !== undefined ? true : undefined,
+            hideErrorLines: !pdfView && forPrint && uiPanel !== undefined ? true : undefined,
             stepPauses: enableUi,
             pauseAfter: enableUi ? uiPause.pauseAfter(docKey) : undefined,
             write: settingsManager.mayWrite(forPrint, enableUi)
@@ -1069,6 +1101,15 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         const documentDir = activeEditor && !activeEditor.document.isUntitled
             ? path.dirname(activeEditor.document.uri.fsPath) : '';
         const imageCache = await buildImageCache(apiResponse, documentDir, MAX_INLINE_IMAGE_TOTAL_BYTES);
+
+        if (pdfView) {
+            const viewerHtml = await pdfPreviewHtml(applyImageCache(apiResponse, imageCache), content, sourceFileUri, docKey);
+            if (viewerHtml === null) return;
+            const pdfFrameState = frameStateFor(panel, docKey);
+            renderIntoShell(panel, viewerHtml.replace('</head>', getFrameAgentScript({ scroll: pdfFrameState.scroll }) + '</head>'),
+                { background: previewBackground() });
+            return;
+        }
 
         // Inject JavaScript for error link navigation and console interception. The relay cap
         // goes to both blocks that install the guard, since only the first to run sets it.

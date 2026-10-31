@@ -64,12 +64,39 @@ Licence files ship alongside the fonts.
   `Calcpad.Web/backend/UiAssets/` have had their upstream banners stripped by
   the minifier, so MIT's copyright and permission notice cannot travel inside
   the copy. Their licence texts are therefore reproduced below.
+- **core-js** 3.50.0 — MIT. Compiled into pdf.js's legacy build
+  (`pdf.min.mjs`, `pdf.worker.min.mjs`), which the PDF preview ships in the
+  web app, the desktop app and the VS Code extension. It has no package of its
+  own in either tree, so its licence is reproduced here:
+
+  ```
+  Copyright (c) 2013–2025 Denis Pushkarev (zloirock.ru)
+  Copyright (c) 2025–2026 CoreJS Company (core-js.io)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  ```
 
 ---
 
 ## Components by licence
 
-515 components across 29 declared licences. Generated
+516 components across 29 declared licences. Generated
 from `corpus/inventory.csv`; regenerate with `tools/license-scan/generate-notices.sh`.
 
 | Licence | Components |
@@ -82,9 +109,9 @@ from `corpus/inventory.csv`; regenerate with `tools/license-scan/generate-notice
 | MIT/Apache-2.0 | 13 |
 | MPL-2.0 | 5 |
 | Unlicense OR MIT | 5 |
+| Apache-2.0 | 4 |
 | BSD-3-Clause | 4 |
 | MIT OR Apache-2.0 OR Zlib | 4 |
-| Apache-2.0 | 3 |
 | BSD-2-Clause | 3 |
 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | 2 |
 | Apache-2.0/MIT | 2 |
@@ -623,6 +650,15 @@ licence file beside them are covered under Fonts above; those marked
 | memchr | 2.8.2 | cargo | https://github.com/BurntSushi/memchr |
 | winapi-util | 0.1.11 | cargo | https://github.com/BurntSushi/winapi-util |
 
+### Apache-2.0
+
+| Component | Version | Ecosystem | Source / note |
+|---|---|---|---|
+| borsh-derive | 1.7.0 | cargo | https://github.com/near/borsh-rs |
+| gethostname | 1.1.0 | cargo | https://codeberg.org/swsnr/gethostname.rs.git |
+| pdfjs-dist | 6.4.299 | npm | https://mozilla.github.io/pdf.js/ |
+| tao | 0.35.3 | cargo | https://github.com/tauri-apps/tao |
+
 ### BSD-3-Clause
 
 | Component | Version | Ecosystem | Source / note |
@@ -640,14 +676,6 @@ licence file beside them are covered under Fonts above; those marked
 | tinyvec_macros | 0.1.1 | cargo | https://github.com/Soveu/tinyvec_macros |
 | zune-core | 0.5.1 | cargo | https://github.com/etemesi254/zune-image |
 | zune-jpeg | 0.5.15 | cargo | https://github.com/etemesi254/zune-image/tree/dev/crates/zune-jpeg |
-
-### Apache-2.0
-
-| Component | Version | Ecosystem | Source / note |
-|---|---|---|---|
-| borsh-derive | 1.7.0 | cargo | https://github.com/near/borsh-rs |
-| gethostname | 1.1.0 | cargo | https://codeberg.org/swsnr/gethostname.rs.git |
-| tao | 0.35.3 | cargo | https://github.com/tauri-apps/tao |
 
 ### BSD-2-Clause
 
@@ -772,7 +800,7 @@ licence file beside them are covered under Fonts above; those marked
 
 ## Licence texts
 
-81 distinct licence texts, covering 491 components. Each body
+81 distinct licence texts, covering 492 components. Each body
 appears once; the copyright notices from every component sharing it are listed
 above it. Texts are reproduced verbatim from the packages as shipped, or for
 packages that ship none, from the project's own repository as recorded below.
@@ -1596,7 +1624,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-### Licence text 4 — 60 components
+### Licence text 4 — 61 components
 
 Components using this text:
 
@@ -1615,6 +1643,7 @@ Components using this text:
   - libc 0.2.186
   - miniz_oxide 0.8.9
   - num-conv 0.2.2
+  - pdfjs-dist 6.4.299
   - pin-project-lite 0.2.17
   - proc-macro2 1.0.106
   - quote 1.0.46
@@ -15513,18 +15542,18 @@ or tag the package was built from where one is recorded.
 | Swashbuckle.AspNetCore.Swagger | 10.0.1 | nuget | `1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef` | https://raw.githubusercontent.com/domaindrivendev/Swashbuckle.AspNetCore/1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef/LICENSE |
 | Swashbuckle.AspNetCore.SwaggerGen | 10.0.1 | nuget | `1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef` | https://raw.githubusercontent.com/domaindrivendev/Swashbuckle.AspNetCore/1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef/LICENSE |
 | Swashbuckle.AspNetCore.SwaggerUI | 10.0.1 | nuget | `1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef` | https://raw.githubusercontent.com/domaindrivendev/Swashbuckle.AspNetCore/1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef/LICENSE |
-| toml_parser | 1.1.2+spec-1.1.0 | cargo | `toml_parser-v1.1.2` | https://raw.githubusercontent.com/toml-rs/toml/toml_parser-v1.1.2/LICENSE-MIT |
 | toml_parser | 1.1.2+spec-1.1.0 | cargo | `toml_parser-v1.1.2` | https://raw.githubusercontent.com/toml-rs/toml/toml_parser-v1.1.2/LICENSE-APACHE |
+| toml_parser | 1.1.2+spec-1.1.0 | cargo | `toml_parser-v1.1.2` | https://raw.githubusercontent.com/toml-rs/toml/toml_parser-v1.1.2/LICENSE-MIT |
 | toml_writer | 1.1.1+spec-1.1.0 | cargo | `toml_writer-v1.1.1` | https://raw.githubusercontent.com/toml-rs/toml/toml_writer-v1.1.1/LICENSE-APACHE |
 | toml_writer | 1.1.1+spec-1.1.0 | cargo | `toml_writer-v1.1.1` | https://raw.githubusercontent.com/toml-rs/toml/toml_writer-v1.1.1/LICENSE-MIT |
-| unic-char-property | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
 | unic-char-property | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
+| unic-char-property | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
 | unic-char-range | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
 | unic-char-range | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
-| unic-common | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
 | unic-common | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
-| unic-ucd-ident | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
+| unic-common | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
 | unic-ucd-ident | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
+| unic-ucd-ident | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
 | unic-ucd-version | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
 | unic-ucd-version | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
 | WebDriverBiDi | 0.0.43 | nuget | `a4d3a93333ca3d780dd3f0ce9869008073e8a043` | https://raw.githubusercontent.com/webdriverbidi-net/webdriverbidi-net/a4d3a93333ca3d780dd3f0ce9869008073e8a043/LICENSE |

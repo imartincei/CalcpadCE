@@ -45,6 +45,7 @@
         "autoRun": true,
         "autoInputMode": true,
         "previewUiOverrides": false,
+        "previewPdf": false,
         "showFileMetadata": false,
         "linterMinSeverity": "information",
         "logLevel": "warning",

@@ -290,7 +290,7 @@ copyright line can legitimately change between releases.
 
 ### Not distributed
 
-28 rows resolve into the dependency tree but ship in nothing. Verified against
+32 rows resolve into the dependency tree but ship in nothing. Verified against
 the artifacts `build-desktop.sh` actually produces, not inferred from metadata,
 so `harvest.sh` marks them `not-shipped:` and the notices file omits them.
 
@@ -319,8 +319,19 @@ the compiler is ~9MB), not the npm package. The extension is packaged
 `--no-dependencies` with `node_modules/**` in `.vscodeignore`, so the on-disk
 peer copy is not redistributed either.
 
-Re-run both checks after any dependency bump that could move a build-dependency
+**4 npm `@napi-rs/canvas` rows** (the package and its host platform binary, in
+`calcpad-web-frontend` and `vscode-calcpad`). An optional dependency of
+`pdfjs-dist`, loaded only by a runtime `require` behind pdf.js's Node check; the
+browser bundles never reach it. `NODE_ONLY_OPTIONAL` in `harvest_lib.py` marks it.
+
+Re-run these checks after any dependency bump that could move a build-dependency
 into the normal graph.
+
+Within a shipped package, `UNSHIPPED_PATHS` in `notices_lib.py` drops the licence
+files of subtrees no build copies. Only the two `legacy/build/*.min.mjs` files of
+`pdfjs-dist` ship, so its `wasm/`, `standard_fonts/`, `cmaps/` and `iccs/`
+licences are left out. core-js, compiled into those two files, is credited in the
+preamble.
 
 ## Components
 

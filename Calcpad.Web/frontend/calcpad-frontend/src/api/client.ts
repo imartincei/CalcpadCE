@@ -21,6 +21,7 @@ import type {
     PortablePackageResult,
 } from '../types/api';
 import type { SnippetsResponse } from '../types/snippets';
+import { pdfResponseError } from './pdf-browser';
 
 /** Request header carrying the server's per-launch token. Must match the backend's constant. */
 export const API_TOKEN_HEADER = 'X-Calcpad-Token';
@@ -443,6 +444,27 @@ export class CalcpadApiClient {
             } catch (error) {
                 this.logError('ConvertUnwrapped', error);
                 return null;
+            }
+        });
+    }
+
+    /** HTML → PDF bytes. Throws the {@link pdfResponseError} error on failure; null once superseded. */
+    public async pdf(html: string, options: unknown, opts?: { key?: string }): Promise<ArrayBuffer | null> {
+        return this.withSupersession(opts?.key, async (signal) => {
+            const url = await this.resolveUrl('/api/calcpad/pdf', 'Pdf');
+            if (url === null) return null;
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: this.jsonHeaders(),
+                    body: JSON.stringify({ html, options }),
+                    signal: combineSignals(AbortSignal.timeout(60000), signal),
+                });
+                if (!response.ok) throw await pdfResponseError(response);
+                return await response.arrayBuffer();
+            } catch (error) {
+                if (signal.aborted) return null;
+                throw error;
             }
         });
     }

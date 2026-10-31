@@ -46,7 +46,6 @@ import {
     installPdfBrowser,
     isBrowserNotFound,
     isBrowserLaunchFailed,
-    pdfResponseError,
     type PickedImage,
     type InlineImageBudget,
 } from 'calcpad-frontend';
@@ -376,14 +375,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
         // as data URIs.
         const html = await this.inlineDocumentImages(rendered);
 
-        const pdfResp = await fetch(`${this.apiClient.getBaseUrl()}/api/calcpad/pdf`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...this.apiClient.authHeaders() },
-            body: JSON.stringify({ html, options: this.getEffectivePdfOptions(content) }),
-            signal: AbortSignal.timeout(60000),
-        });
-        if (!pdfResp.ok) throw await pdfResponseError(pdfResp);
-        return await pdfResp.arrayBuffer();
+        return this.apiClient.pdf(html, this.getEffectivePdfOptions(content));
     }
 
     protected async onPdfError(err: unknown): Promise<boolean> {

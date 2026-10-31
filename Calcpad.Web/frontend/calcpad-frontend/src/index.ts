@@ -163,6 +163,10 @@ export type { PreviewLimitNotice } from './services/preview-limits';
 export type { ScrollAnchor, PreviewScrollState } from './services/scroll-anchor';
 export { scrollAnchorScript, parseScrollState } from './services/scroll-anchor';
 
+// --- Print Preview -------------------------------------------------------------
+export { pdfViewerHtml, pdfPreviewErrorHtml } from './services/pdf-viewer';
+export type { PdfViewerOptions } from './services/pdf-viewer';
+
 // --- Plot Extraction + ZIP ---------------------------------------------------
 export { extractPlotsFromHtml } from './services/plot-extract';
 export type { ExtractedPlot } from './services/plot-extract';
