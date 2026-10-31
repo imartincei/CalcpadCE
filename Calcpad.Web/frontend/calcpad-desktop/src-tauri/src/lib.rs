@@ -505,6 +505,14 @@ async fn stop_server(app: AppHandle) -> Result<(), String> {
 /// `$AWS_SECRET_ACCESS_KEY` in a document into a value the webview can see. Only names that name
 /// a location are answered; everything else reads as unset.
 fn is_readable_env(name: &str) -> bool {
+    // Windows env names are case-insensitive (`%userprofile%`).
+    let upper;
+    let name = if cfg!(windows) {
+        upper = name.to_ascii_uppercase();
+        upper.as_str()
+    } else {
+        name
+    };
     // Only ever set on the sidecar's own env block, so this process should never
     // hold it — denied anyway so an inherited one can't be expanded out of a
     // worksheet and into the rendered preview, which has network egress.
