@@ -1,9 +1,7 @@
 <template>
   <div class="errors-tab">
     <div class="errors-container p-3">
-      <div v-if="errors.length === 0" class="no-errors">
-        No errors from the last render.
-      </div>
+      <div v-if="errors.length === 0" class="no-errors">{{ t('No errors from the last render.') }}</div>
       <div v-else class="errors-list" @contextmenu.prevent="openContextMenu($event, null)">
         <div
           v-for="(err, i) in errors"
@@ -31,16 +29,19 @@
         v-if="contextMenu.error"
         class="context-menu"
         @click="onCopyError"
-      >Copy</button>
-      <button class="context-menu" @click="onCopyAllErrors">Copy All</button>
+      >{{ t('Copy') }}</button>
+      <button class="context-menu" @click="onCopyAllErrors">{{ t('Copy All') }}</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import type { CalcpadError } from '../../types/api'
 import { writeClipboard } from '../services/clipboard'
+
+const { t } = useI18n()
 
 interface Props {
   errors?: CalcpadError[]

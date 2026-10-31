@@ -607,11 +607,28 @@ fn create_export_path(app: AppHandle, filename: String) -> Result<String, String
     Ok(path.to_string_lossy().into_owned())
 }
 
+/// Menu labels for the active UI language, keyed by their English text.
+static MENU_LABELS: Mutex<Option<HashMap<String, String>>> = Mutex::new(None);
+
+fn menu_tr(text: &str) -> String {
+    MENU_LABELS
+        .lock()
+        .ok()
+        .and_then(|labels| labels.as_ref().and_then(|map| map.get(text).cloned()))
+        .unwrap_or_else(|| text.to_string())
+}
+
 fn refresh_all_menus(app: &AppHandle) -> Result<(), String> {
     for label in app.webview_windows().into_keys() {
         refresh_menu(app, &label)?;
     }
     Ok(())
+}
+
+#[tauri::command]
+fn set_menu_labels(app: AppHandle, labels: HashMap<String, String>) -> Result<(), String> {
+    *MENU_LABELS.lock().map_err(|e| e.to_string())? = Some(labels);
+    refresh_all_menus(&app)
 }
 
 /// Replaces the File → Open Recent entries, most recent first. The list itself is
@@ -1502,8 +1519,20 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
             )
         })
         .collect::<tauri::Result<Vec<_>>>()?;
-    let no_recent = MenuItem::with_id(app, "no-recent", "No Recent Files", false, None::<&str>)?;
-    let clear_recent = MenuItem::with_id(app, "clear-recent", "Clear Recent", true, None::<&str>)?;
+    let no_recent = MenuItem::with_id(
+        app,
+        "no-recent",
+        menu_tr("No Recent Files"),
+        false,
+        None::<&str>,
+    )?;
+    let clear_recent = MenuItem::with_id(
+        app,
+        "clear-recent",
+        menu_tr("Clear Recent"),
+        true,
+        None::<&str>,
+    )?;
     let recent_sep = sep()?;
     let mut recent_refs: Vec<&dyn IsMenuItem<tauri::Wry>> = Vec::new();
     if recent_items.is_empty() {
@@ -1517,46 +1546,64 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         recent_refs.push(&recent_sep);
         recent_refs.push(&clear_recent);
     }
-    let open_recent = Submenu::with_items(app, "Open Recent", true, &recent_refs)?;
+    let open_recent = Submenu::with_items(app, menu_tr("Open Recent"), true, &recent_refs)?;
 
     Menu::with_items(
         app,
         &[
-            &MenuItem::with_id(app, "new", "New Tab", true, Some("CmdOrCtrl+N"))?,
+            &MenuItem::with_id(app, "new", menu_tr("New Tab"), true, Some("CmdOrCtrl+N"))?,
             // Ctrl+Shift+N and Ctrl+Q are the editor's Numbered List and Toggle Comment,
             // and a menu accelerator beats Monaco — so neither is bound here.
             &MenuItem::with_id(
                 app,
                 "new-window",
-                "New Window",
+                menu_tr("New Window"),
                 true,
                 Some("CmdOrCtrl+Alt+W"),
             )?,
-            &MenuItem::with_id(app, "open", "Open...", true, Some("CmdOrCtrl+O"))?,
+            &MenuItem::with_id(app, "open", menu_tr("Open..."), true, Some("CmdOrCtrl+O"))?,
             &open_recent,
             &sep()?,
-            &MenuItem::with_id(app, "save", "Save", true, Some("CmdOrCtrl+S"))?,
+            &MenuItem::with_id(app, "save", menu_tr("Save"), true, Some("CmdOrCtrl+S"))?,
             &MenuItem::with_id(
                 app,
                 "save-as",
-                "Save As...",
+                menu_tr("Save As..."),
                 true,
                 Some("CmdOrCtrl+Shift+S"),
             )?,
             &sep()?,
-            &MenuItem::with_id(app, "close-tab", "Close Tab", true, Some("CmdOrCtrl+W"))?,
+            &MenuItem::with_id(
+                app,
+                "close-tab",
+                menu_tr("Close Tab"),
+                true,
+                Some("CmdOrCtrl+W"),
+            )?,
             &sep()?,
             &MenuItem::with_id(
                 app,
                 "show-server-log",
-                "Show Server Log",
+                menu_tr("Show Server Log"),
                 true,
                 None::<&str>,
             )?,
-            &MenuItem::with_id(app, "stop-server", "Stop Server", true, None::<&str>)?,
-            &MenuItem::with_id(app, "restart-server", "Restart Server", true, None::<&str>)?,
+            &MenuItem::with_id(
+                app,
+                "stop-server",
+                menu_tr("Stop Server"),
+                true,
+                None::<&str>,
+            )?,
+            &MenuItem::with_id(
+                app,
+                "restart-server",
+                menu_tr("Restart Server"),
+                true,
+                None::<&str>,
+            )?,
             &sep()?,
-            &MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?,
+            &MenuItem::with_id(app, "quit", menu_tr("Quit"), true, None::<&str>)?,
         ],
     )
 }
@@ -1659,6 +1706,7 @@ pub fn run() {
         .manage(NavigationHistoryState::default())
         .menu(build_menu)
         .invoke_handler(tauri::generate_handler![
+            set_menu_labels,
             server_url,
             server_failure,
             server_token,

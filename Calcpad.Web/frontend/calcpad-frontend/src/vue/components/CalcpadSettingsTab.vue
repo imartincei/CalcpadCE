@@ -4,16 +4,30 @@
       <CalcpadSearchField
         v-model="searchQuery"
         class="settings-search"
-        placeholder="Search settings..."
+        :placeholder="t('Search settings...')"
       />
       <CollapseAllButton v-if="!searchActive" :expand="allCollapsed" @click="setAll(!allCollapsed)" />
     </div>
 
     <div class="settings-container">
+      <section v-show="sectionVisible('language')" class="settings-section">
+        <h3 class="section-header" @click="toggle('language')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('language') }">&#x25BC;</span>
+          {{ t('Language') }}
+        </h3>
+        <div v-show="bodyVisible('language')" class="section-body">
+          <div class="setting-group">
+            <label for="uiLanguage">{{ t('Language:') }}</label>
+            <select id="uiLanguage" v-model="localeSetting" @change="changeLocale">
+              <option v-for="opt in LOCALE_OPTIONS" :key="opt.value" :value="opt.value">{{ tt(opt.label) }}</option>
+            </select>
+          </div>
+        </div>
+      </section>
       <section v-show="sectionVisible('math')" class="settings-section">
         <h3 class="section-header" @click="toggle('math')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('math') }">&#x25BC;</span>
-          <CalcpadSearchHighlight text="Math Settings" :query="query" />
+          <CalcpadSearchHighlight :text="t('Math Settings')" :query="query" />
         </h3>
         <div v-show="bodyVisible('math')" class="section-body">
           <div
@@ -28,13 +42,13 @@
                 v-model="settingModel(spec.key).value"
                 @change="updateSettings"
               />
-              <CalcpadSearchHighlight :text="spec.label" :query="query" />
-              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+              <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />
+              <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
             </label>
             <template v-else>
               <label :for="spec.key">
-                <CalcpadSearchHighlight :text="spec.label" :query="query" />:
-                <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+                <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />:
+                <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
               </label>
               <select
                 v-if="spec.type === 'enum'"
@@ -42,7 +56,7 @@
                 v-model="settingModel(spec.key).value"
                 @change="updateSettings"
               >
-                <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ tt(opt.label) }}</option>
               </select>
               <input
                 v-else-if="spec.type === 'number'"
@@ -82,8 +96,8 @@
           >
             <label>
               <input type="checkbox" v-model="settingModel(spec.key).value" @change="updateSettings" />
-              <CalcpadSearchHighlight :text="spec.label" :query="query" />
-              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+              <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />
+              <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
             </label>
           </div>
 
@@ -110,13 +124,13 @@
           >
             <label v-if="spec.type === 'boolean'">
               <input type="checkbox" v-model="settingModel(spec.key).value" @change="updateSettings" />
-              <CalcpadSearchHighlight :text="spec.label" :query="query" />
-              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+              <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />
+              <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
             </label>
             <template v-else>
               <label :for="spec.key">
-                <CalcpadSearchHighlight :text="spec.label" :query="query" />:
-                <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+                <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />:
+                <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
               </label>
               <select
                 v-if="spec.type === 'enum'"
@@ -124,7 +138,7 @@
                 v-model="settingModel(spec.key).value"
                 @change="updateSettings"
               >
-                <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ tt(opt.label) }}</option>
               </select>
               <input
                 v-else
@@ -163,8 +177,8 @@
             class="setting-group"
           >
             <label :for="spec.key">
-              <CalcpadSearchHighlight :text="spec.label" :query="query" />:
-              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+              <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />:
+              <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
             </label>
             <input
               :id="spec.key"
@@ -216,8 +230,8 @@
             class="setting-group"
           >
             <label :for="'pdf-' + spec.key">
-              <CalcpadSearchHighlight :text="spec.label" :query="query" />:
-              <span class="setting-info" :title="spec.detail">ⓘ</span>
+              <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />:
+              <span class="setting-info" :title="tt(spec.detail)">ⓘ</span>
             </label>
             <select
               v-if="spec.type === 'boolean'"
@@ -234,7 +248,7 @@
               v-model="localPdfSettings[spec.key]"
               @change="updatePdfSettings"
             >
-              <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ tt(opt.label) }}</option>
             </select>
             <input
               v-else
@@ -497,7 +511,7 @@
                 v-if="colorTheme && !knownThemeLabels.has(colorTheme) && colorTheme !== 'System'"
                 :value="colorTheme"
               >{{ colorTheme }}</option>
-              <option value="System">System</option>
+              <option value="System">{{ t('System') }}</option>
               <optgroup v-if="darkThemes.length" label="Dark">
                 <option
                   v-for="t in darkThemes"
@@ -592,7 +606,7 @@
                 v-for="opt in LOG_LEVEL_OPTIONS"
                 :key="opt.value"
                 :value="opt.value"
-              >{{ opt.label }}</option>
+              >{{ tt(opt.label) }}</option>
             </select>
           </div>
 
@@ -715,6 +729,7 @@
 
 <script setup lang="ts">
 import { ref, watch, computed, reactive, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import CalcpadSearchField from './CalcpadSearchField.vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
 import CollapseAllButton from './CollapseAllButton.vue'
@@ -724,11 +739,21 @@ import { DEFAULT_PDF_SETTINGS, DEFAULT_VERSION_CONFIG } from '../types'
 import { getDefaultSettings, METADATA_SETTINGS_KEYS, validateSettingValue, SETTINGS_PATH, LOG_LEVEL_OPTIONS, DEFAULT_COMPLETION_DELAY_MS } from '../../types/settings'
 import { PDF_SETTING_KEYS, validatePdfValue } from '../../types/pdf-settings'
 import { specForKey } from '../../types/catalog'
+import { LOCALE_OPTIONS, readLocaleSetting, resolveLocale, writeLocaleSetting, type LocaleSetting } from '../../i18n'
 import {
   DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB, MAX_PREVIEW_SIZE_MB,
   DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
   MAX_CONSOLE_MESSAGES_PER_DOCUMENT,
 } from '../../services/preview-limits'
+
+const { t, t: tt, locale } = useI18n()
+const localeSetting = ref<LocaleSetting>(readLocaleSetting())
+
+function changeLocale() {
+  writeLocaleSetting(localeSetting.value)
+  locale.value = resolveLocale(localeSetting.value)
+  document.documentElement.lang = locale.value
+}
 
 // Props
 interface Props {
@@ -905,7 +930,7 @@ const darkBackground = ref(props.initialDarkBackground)
 const linterMinSeverity = ref(props.initialLinterMinSeverity)
 const logLevel = ref(props.initialLogLevel)
 const logLevelDetail = computed(() =>
-  LOG_LEVEL_OPTIONS.find(o => o.value === logLevel.value)?.detail ?? ''
+  tt(LOG_LEVEL_OPTIONS.find(o => o.value === logLevel.value)?.detail ?? '')
 )
 const maxOutputLines = ref(props.initialMaxOutputLines)
 const maxPreviewSizeMB = ref(props.initialMaxPreviewSize)

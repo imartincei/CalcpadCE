@@ -13,7 +13,7 @@
       v-if="model"
       type="button"
       class="icon search-clear-btn"
-      title="Clear search"
+      :title="t('Clear search')"
       @click="clearSearch"
     >
       <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
@@ -29,7 +29,10 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref } from 'vue'
+
+const { t } = useI18n()
 
 defineProps<{
   placeholder: string

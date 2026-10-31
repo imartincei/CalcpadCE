@@ -1,30 +1,28 @@
 <template>
   <div class="files-tab">
     <div v-if="!openedFolder" class="files-empty">
-      <p class="files-empty-message">No folder open.</p>
-      <button class="files-open-btn" @click="$emit('open-folder-request')">Open Folder</button>
+      <p class="files-empty-message">{{ t('No folder open.') }}</p>
+      <button class="files-open-btn" @click="$emit('open-folder-request')">{{ t('Open Folder') }}</button>
     </div>
     <template v-else>
       <div class="files-header">
-        <button class="icon files-close-btn" @click="$emit('close-folder')" title="Close Folder">
+        <button class="icon files-close-btn" @click="$emit('close-folder')" :title="t('Close Folder')">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 8.707l3.646 3.647.708-.707L8.707 8l3.647-3.646-.707-.708L8 7.293 4.354 3.646l-.707.708L7.293 8l-3.647 3.646.708.708L8 8.707z"/></svg>
         </button>
         <span class="files-folder-name" :title="openedFolder">{{ folderBasename }}</span>
         <div class="files-header-actions">
-          <button class="icon" @click="onRefresh" title="Refresh">
+          <button class="icon" @click="onRefresh" :title="t('Refresh')">
             <RefreshIcon />
           </button>
-          <button class="icon" @click="collapseAll" title="Collapse All">
+          <button class="icon" @click="collapseAll" :title="t('Collapse All')">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M4 9h11v1H4z"/></svg>
           </button>
-          <button class="secondary files-change-btn" @click="$emit('open-folder-request')" title="Open a different folder">
-            Change Folder
-          </button>
+          <button class="secondary files-change-btn" @click="$emit('open-folder-request')" :title="t('Open a different folder')">{{ t('Change Folder') }}</button>
         </div>
       </div>
       <label class="files-show-all">
         <input type="checkbox" v-model="showAll" />
-        <span>Show all files</span>
+        <span>{{ t('Show all files') }}</span>
       </label>
       <div class="file-tree" @contextmenu.prevent>
         <FileTreeNode
@@ -63,12 +61,15 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import type { FileNode } from '../types'
 import FileTreeNode from './FileTreeNode.vue'
 import RefreshIcon from './RefreshIcon.vue'
 import type { ContextMenuPayload } from './FileTreeNode.vue'
 import { writeClipboard } from '../services/clipboard'
+
+const { t } = useI18n()
 
 interface Props {
   openedFolder: string | null

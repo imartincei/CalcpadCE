@@ -5,6 +5,8 @@
 
 **An open-source engineering worksheet editor with simple syntax and beautifully rendered output in real time.**
 
+**English** | [中文](README.zh.md)
+
 [![Build Status](https://img.shields.io/github/actions/workflow/status/imartincei/CalcpadCE/push-to-main.yml?branch=main)](https://github.com/imartincei/CalcpadCE/actions)
 [![Latest Release](https://img.shields.io/github/v/release/imartincei/CalcpadCE)](https://github.com/imartincei/CalcpadCE/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)

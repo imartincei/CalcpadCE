@@ -32,8 +32,8 @@
         <button
           v-if="(versionConfig.isWeb || versionConfig.isDesktop) && paneIndex === 0"
           class="icon"
-          title="Hide the sidebar (Ctrl+Shift+B)"
-          aria-label="Hide the sidebar"
+          :title="t('Hide the sidebar (Ctrl+Shift+B)')"
+          :aria-label="t('Hide the sidebar')"
           @click="hideSidebar()"
         ><SidebarIcon /></button>
       </div>
@@ -205,6 +205,7 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import CalcpadInsertTab from './CalcpadInsertTab.vue'
 import SidebarIcon from './SidebarIcon.vue'
@@ -228,6 +229,8 @@ import type { CalcpadError, ExportVariant } from '../../types/api'
 import type { WriteMode } from '../../types/settings'
 import { coerceWriteMode, DEFAULT_COMPLETION_DELAY_MS } from '../../types/settings'
 import { DEFAULT_PDF_SETTINGS } from '../types'
+
+const { t } = useI18n()
 import {
   DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB,
   DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
@@ -311,19 +314,19 @@ const uiControls = ref<UiControl[] | null>(null)
 
 const tabs = computed<Tab[]>(() => {
   const base: Tab[] = [
-    { id: 'insert', label: 'Insert' },
-    { id: 'toc', label: 'TOC' },
-    { id: 'settings', label: 'Settings' },
-    { id: 'variables', label: 'Variables' },
-    { id: 'export', label: 'Export' },
-    { id: 'errors', label: 'Errors' }
+    { id: 'insert', label: t('Insert') },
+    { id: 'toc', label: t('TOC') },
+    { id: 'settings', label: t('Settings') },
+    { id: 'variables', label: t('Variables') },
+    { id: 'export', label: t('Export') },
+    { id: 'errors', label: t('Errors') }
   ]
-  if (props.versionConfig.isDesktop) base.unshift({ id: 'files', label: 'Files' })
+  if (props.versionConfig.isDesktop) base.unshift({ id: 'files', label: t('Files') })
   // The metadata comment editor is driven by editor cursor tracking, available
   // in the VS Code webview and the desktop app (both host a real editor).
   // File info is stamped on save, which only those two hosts have.
   if (props.versionConfig.isVSCode || props.versionConfig.isDesktop) {
-    base.push({ id: 'metadata', label: 'Properties' })
+    base.push({ id: 'metadata', label: t('Properties') })
   }
   return base
 })

@@ -83,6 +83,8 @@ COMPARISON_SETTINGS = Path(__file__).with_name("CliSettingsComparison.xml")
 STUB_RENDER_ENV = {
     "DOTNET_EnableAVX2": "1",
     "DOTNET_EnableHWIntrinsic": "1",
+    # Keep stubs independent of the host UI language.
+    "CALCPAD_CULTURE": "en",
 }
 NUMBER_REL_TOL = 1e-9
 NUMBER_ABS_TOL = 1e-12

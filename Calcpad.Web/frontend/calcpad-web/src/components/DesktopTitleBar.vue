@@ -2,12 +2,12 @@
   <header class="desktop-titlebar" :style="{ '--titlebar-leading-width': leadingWidth + 'px' }" data-tauri-drag-region @contextmenu.prevent>
     <div ref="leading" class="titlebar-leading">
       <img class="titlebar-logo" :src="CALCPAD_ICON_URL" alt="CalcpadCE" />
-      <button ref="fileButton" class="titlebar-button" title="File menu (Alt+M)" aria-label="File menu" aria-haspopup="menu" :aria-expanded="menuOpen" @mousedown.left="onMenuMouseDown" @click="onMenuClick">
+      <button ref="fileButton" class="titlebar-button" :title="t('File menu (Alt+M)')" :aria-label="t('File menu')" aria-haspopup="menu" :aria-expanded="menuOpen" @mousedown.left="onMenuMouseDown" @click="onMenuClick">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
-        <span>File</span>
+        <span>{{ t('File') }}</span>
       </button>
       <div class="titlebar-actions">
-        <button v-for="action in actions" :key="action.id" class="titlebar-button" :title="action.title" :aria-label="action.label" :disabled="action.id === 'save' && !canSave" @click="$emit('command', action.id)">
+        <button v-for="action in actions" :key="action.id" class="titlebar-button" :title="t(action.title)" :aria-label="t(action.label)" :disabled="action.id === 'save' && !canSave" @click="$emit('command', action.id)">
           <svg viewBox="0 0 16 16" aria-hidden="true" :class="action.format">
             <path :d="action.path"/>
             <template v-if="action.format === 'pdf'">
@@ -27,18 +27,18 @@
       <span data-tauri-drag-region>{{ title }}</span>
     </div>
     <div class="titlebar-window-controls">
-      <button class="titlebar-button" aria-label="Minimize" @click="desktopWindow.minimize()">
+      <button class="titlebar-button" :aria-label="t('Minimize')" @click="desktopWindow.minimize()">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5h10"/></svg>
       </button>
-      <button class="titlebar-button" :aria-label="maximized ? 'Restore' : 'Maximize'" @click="desktopWindow.toggleMaximize()">
+      <button class="titlebar-button" :aria-label="maximized ? t('Restore') : t('Maximize')" @click="desktopWindow.toggleMaximize()">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path :d="maximized ? 'M5.5 5.5h7v7h-7zM3.5 10V3.5H10' : 'M3.5 3.5h9v9h-9z'"/></svg>
       </button>
-      <button class="titlebar-button titlebar-close" aria-label="Close window" @click="desktopWindow.close()">
+      <button class="titlebar-button titlebar-close" :aria-label="t('Close window')" @click="desktopWindow.close()">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 3.5 9 9m0-9-9 9"/></svg>
       </button>
     </div>
   </header>
-  <div v-if="linux && menuOpen" ref="fileMenu" class="tab-context-menu desktop-file-menu" :style="{ left: menuLeft + 'px' }" role="menu" aria-label="File" @mousedown.stop @keydown="onMenuKeyDown">
+  <div v-if="linux && menuOpen" ref="fileMenu" class="tab-context-menu desktop-file-menu" :style="{ left: menuLeft + 'px' }" role="menu" :aria-label="t('File')" @mousedown.stop @keydown="onMenuKeyDown">
     <template v-for="entry in menuEntries" :key="entry.id">
       <div v-if="!entry.text" class="tab-context-sep" role="separator"></div>
       <details v-else-if="entry.children.length" class="recent-menu">
@@ -63,8 +63,10 @@ import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { platform } from '@tauri-apps/plugin-os'
 import { CALCPAD_ICON_URL } from 'calcpad-frontend/vue/calcpad-icon'
+import { useI18n } from 'vue-i18n'
 
 defineProps<{ title: string; canSave: boolean }>()
+const { t } = useI18n()
 const emit = defineEmits<{ command: [id: string] }>()
 
 const desktopWindow = getCurrentWindow()
@@ -102,7 +104,7 @@ async function showMenu(): Promise<void> {
     return
   }
   if (menuOpen.value) return
-  const button = document.querySelector('[aria-label="File menu"]')!.getBoundingClientRect()
+  const button = fileButton.value!.getBoundingClientRect()
   menuOpen.value = true
   try {
     await invoke('show_app_menu', { x: button.left, y: button.bottom })

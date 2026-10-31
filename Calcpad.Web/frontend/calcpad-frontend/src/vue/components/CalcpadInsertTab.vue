@@ -3,7 +3,7 @@
     <CalcpadSearchField
       ref="searchField"
       v-model="searchTerm"
-      placeholder="Search items... (Alt+I)"
+      :placeholder="t('Search items... (Alt+I)')"
       class="search-container"
       @submit="focusResult(0)"
       @keydown.down.exact="enterResults($event, 0)"
@@ -12,7 +12,7 @@
 
     <div class="insert-scroll-container">
       <div v-if="!searchQuery" class="insert-actions">
-        <button @click="insertImage" class="icon" title="Insert an image from file" aria-label="Insert an image from file">
+        <button @click="insertImage" class="icon" :title="t('Insert an image from file')" :aria-label="t('Insert an image from file')">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
             <rect x="2" y="2" width="12" height="12" rx="1" />
             <circle cx="5.5" cy="5.5" r="1.5" />
@@ -24,10 +24,9 @@
 
       <!-- Symbols Palette -->
       <div v-if="!searchQuery && symbolGroups.length > 0" class="symbols-palette">
-        <div class="symbols-palette-header" title="Symbol Palette" @click="panelState.symbolsPaletteOpen = !panelState.symbolsPaletteOpen">
+        <div class="symbols-palette-header" :title="t('Symbol Palette')" @click="panelState.symbolsPaletteOpen = !panelState.symbolsPaletteOpen">
           <span class="symbols-palette-arrow" :class="{ open: panelState.symbolsPaletteOpen }">&#x25B6;</span>
-          <span class="symbols-palette-title" aria-label="Symbol Palette">
-            Symbols: <span class="symbols-palette-examples">α β π Δ Ω x̄ ẋ °</span>
+          <span class="symbols-palette-title" :aria-label="t('Symbol Palette')">{{ t('Symbols:') }}<span class="symbols-palette-examples">α β π Δ Ω x̄ ẋ °</span>
           </span>
         </div>
         <div v-show="panelState.symbolsPaletteOpen" class="symbols-palette-body">
@@ -54,15 +53,13 @@
       <div v-if="searchQuery && filteredItems.length === 0" class="no-items">
         No items found for "{{ searchQuery }}"
       </div>
-      <div v-else-if="displayItems.length === 0" class="no-items">
-        No insert items available
-      </div>
+      <div v-else-if="displayItems.length === 0" class="no-items">{{ t('No insert items available') }}</div>
       <div
         v-else-if="searchQuery"
         ref="searchResults"
         class="insert-results"
         role="listbox"
-        aria-label="Insert search results"
+        :aria-label="t('Insert search results')"
         @keydown.down.exact.prevent.stop="focusResult(Math.min(selectedResultIndex + 1, filteredItems.length - 1))"
         @keydown.up.exact.prevent.stop="focusResult(Math.max(selectedResultIndex - 1, 0))"
         @keydown.home.exact.prevent.stop="focusResult(0)"
@@ -90,9 +87,7 @@
       <div v-else>
         <div id="tree-container">
           <!-- Tree structure will be built here -->
-          <div class="tree-placeholder">
-            Loading insert items...
-          </div>
+          <div class="tree-placeholder">{{ t('Loading insert items...') }}</div>
         </div>
       </div>
     </div>
@@ -100,12 +95,15 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import CalcpadSearchField from './CalcpadSearchField.vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
 import CollapseAllButton from './CollapseAllButton.vue'
 import type { InsertItem } from '../types'
 import { replaceParameterPlaceholders } from '../../text/snippet-insert'
+
+const { t } = useI18n()
 
 // Props
 interface Props {

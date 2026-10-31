@@ -1,15 +1,11 @@
 <template>
   <div class="ui-overrides-section">
-    <p v-if="!hasDocument" class="note">No document is open.</p>
-    <p v-else-if="!rows.length && !dirty" class="note">
-      No saved #UI values. Values entered into the input form are saved here, at the end of the file.
-    </p>
+    <p v-if="!hasDocument" class="note">{{ t('No document is open.') }}</p>
+    <p v-else-if="!rows.length && !dirty" class="note">{{ t('No saved #UI values. Values entered into the input form are saved here, at the end of the file.') }}</p>
 
     <template v-else>
-      <p class="note">
-        Values entered into the input form. Click a name to go to the #UI line that declares it.
-      </p>
-      <p v-if="!uiControlsResolved" class="note">Checking which controls still exist…</p>
+      <p class="note">{{ t('Values entered into the input form. Click a name to go to the #UI line that declares it.') }}</p>
+      <p v-if="!uiControlsResolved" class="note">{{ t('Checking which controls still exist…') }}</p>
       <p v-else-if="unusedRows.length" class="warning">
         {{ unusedRows.length }} value{{ unusedRows.length === 1 ? '' : 's' }}
         no longer match a #UI control.
@@ -24,30 +20,33 @@
         ><CalcpadSearchHighlight :text="row.key" :query="query" /></button>
         <input type="text" v-model="rows[i].value" @keyup.enter="apply" />
         <span v-if="uiControlsResolved && !row.used" class="unused-badge">unused</span>
-        <button class="icon" title="Remove" @click="rows.splice(i, 1)">✕</button>
+        <button class="icon" :title="t('Remove')" @click="rows.splice(i, 1)">✕</button>
       </div>
 
       <div class="actions">
-        <button :disabled="!dirty" @click="apply">Apply</button>
-        <button class="secondary" :disabled="!dirty" @click="reset">Reset</button>
+        <button :disabled="!dirty" @click="apply">{{ t('Apply') }}</button>
+        <button class="secondary" :disabled="!dirty" @click="reset">{{ t('Reset') }}</button>
         <button
           class="tertiary"
           :disabled="!unusedRows.length"
           :title="uiControlsResolved ? undefined : 'Waiting for the document to be rendered'"
           @click="purgeUnused"
-        >Purge unused</button>
+        >{{ t('Purge unused') }}</button>
       </div>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
 import { classifyUiOverrides } from '../../services/ui-overrides'
 import type { UiControl, UiOverrideRow, UiOverrides } from '../../services/ui-overrides'
 import { getUiOverridesDraft, setUiOverridesDraft, clearUiOverridesDraft, metadataDraftDiscarded } from '../metadata-drafts'
 import type { UiOverrideDraftRow } from '../metadata-drafts'
+
+const { t } = useI18n()
 
 interface Props {
   overrides?: UiOverrides

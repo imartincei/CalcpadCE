@@ -1,21 +1,19 @@
 <template>
   <div class="formatting-tab">
     <div class="formatting-container p-3">
-      <h3 class="section-title">Prettify</h3>
-      <p class="section-desc">
-        Auto-indents the active document. Content is not modified outside of whitespace.
-      </p>
+      <h3 class="section-title">{{ t('Prettify') }}</h3>
+      <p class="section-desc">{{ t('Auto-indents the active document. Content is not modified outside of whitespace.') }}</p>
 
       <div class="setting-group">
-        <label for="indentStyle">Indent style:</label>
+        <label for="indentStyle">{{ t('Indent style:') }}</label>
         <select id="indentStyle" :value="indentStyle" @change="onIndentStyleChange">
-          <option value="tab">Tab</option>
-          <option value="space">Space</option>
+          <option value="tab">{{ t('Tab') }}</option>
+          <option value="space">{{ t('Space') }}</option>
         </select>
       </div>
 
       <div class="setting-group" v-if="indentStyle === 'space'">
-        <label for="indentSize">Spaces per level:</label>
+        <label for="indentSize">{{ t('Spaces per level:') }}</label>
         <input
           id="indentSize"
           type="number"
@@ -32,14 +30,12 @@
             type="checkbox"
             :checked="trimTrailingWhitespace"
             @change="onTrimChange"
-          />
-          Trim trailing whitespace
-        </label>
+          />{{ t('Trim trailing whitespace') }}</label>
       </div>
 
       <div class="actions">
-        <button @click="onPrettify" :disabled="sourceUnavailable" :title="sourceUnavailable ? 'Unavailable in input mode' : undefined">
-          Prettify Document
+        <button @click="onPrettify" :disabled="sourceUnavailable" :title="sourceUnavailable ? t('Unavailable in input mode') : undefined">
+          {{ t('Prettify Document') }}
         </button>
       </div>
     </div>
@@ -47,6 +43,9 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 interface Props {
   sourceUnavailable?: boolean
   indentStyle?: 'tab' | 'space'

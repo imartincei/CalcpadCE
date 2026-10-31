@@ -3,16 +3,12 @@
     <div class="search-container">
       <CalcpadSearchField
         v-model="searchTerm"
-        placeholder="Search variables, macros, functions, custom units..."
+        :placeholder="t('Search variables, macros, functions, custom units...')"
       />
     </div>
     <div class="variables-container p-3">
-      <div v-if="loading" class="loading">
-        Loading variables...
-      </div>
-      <div v-else-if="!hasVariables" class="no-variables">
-        No variables found. Open a CalcpadCE document to see variables, macros, and functions.
-      </div>
+      <div v-if="loading" class="loading">{{ t('Loading variables...') }}</div>
+      <div v-else-if="!hasVariables" class="no-variables">{{ t('No variables found. Open a CalcpadCE document to see variables, macros, and functions.') }}</div>
       <div v-else-if="searchTerm && !hasFilteredResults" class="no-variables">
         No results found for "{{ searchTerm }}"
       </div>
@@ -42,7 +38,7 @@
               <div class="variable-name">
                 <CalcpadSearchHighlight :text="macro.name" :query="searchTerm" />
               </div>
-              <div class="variable-type">Macro</div>
+              <div class="variable-type">{{ t('Macro') }}</div>
               <div v-if="macro.definition" class="variable-content">{{ macro.definition }}</div>
               <div class="variable-source source-local">{{ getSourceLabel(macro.source) }}</div>
             </div>
@@ -74,7 +70,7 @@
               <div class="variable-name">
                 <CalcpadSearchHighlight :text="variable.name" :query="searchTerm" />
               </div>
-              <div class="variable-type">Variable</div>
+              <div class="variable-type">{{ t('Variable') }}</div>
               <div v-if="variable.definition" class="variable-content">{{ variable.definition }}</div>
               <div class="variable-source source-local">{{ getSourceLabel(variable.source) }}</div>
             </div>
@@ -106,7 +102,7 @@
               <div class="variable-name">
                 <CalcpadSearchHighlight :text="func.name" :query="searchTerm" />
               </div>
-              <div class="variable-type">Function</div>
+              <div class="variable-type">{{ t('Function') }}</div>
               <div v-if="func.params" class="variable-content">Parameters: {{ func.params }}</div>
               <div v-if="func.definition" class="variable-content">{{ func.definition }}</div>
               <div class="variable-source source-local">{{ getSourceLabel(func.source) }}</div>
@@ -139,7 +135,7 @@
               <div class="variable-name">
                 <CalcpadSearchHighlight :text="'.' + unit.name" :query="searchTerm" />
               </div>
-              <div class="variable-type">Custom Unit</div>
+              <div class="variable-type">{{ t('Custom Unit') }}</div>
               <div v-if="unit.definition" class="variable-content">{{ unit.definition }}</div>
               <div class="variable-source source-local">{{ getSourceLabel(unit.source) }}</div>
             </div>
@@ -154,22 +150,25 @@
       @mousedown.stop
       @click.stop
     >
-      <button class="context-menu" @click="onCopyName">Copy Name</button>
+      <button class="context-menu" @click="onCopyName">{{ t('Copy Name') }}</button>
       <button
         v-if="contextMenu.definition"
         class="context-menu"
         @click="onCopyDefinition"
-      >Copy Definition</button>
+      >{{ t('Copy Definition') }}</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import CalcpadSearchField from './CalcpadSearchField.vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
 import { writeClipboard } from '../services/clipboard'
 import type { VariablesData, VariableItem } from '../types'
+
+const { t } = useI18n()
 
 // Props
 interface Props {

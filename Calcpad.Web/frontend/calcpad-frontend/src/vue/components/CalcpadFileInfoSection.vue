@@ -1,43 +1,41 @@
 <template>
   <div class="file-info-section">
-    <p v-if="!userName" class="note">
-      No user name is set, so saves and reviews won't record who made them.
-      <button class="link-button" @click="emit('open-settings')">Set it in Settings</button>
+    <p v-if="!userName" class="note">{{ t("No user name is set, so saves and reviews won't record who made them.") }}<button class="link-button" @click="emit('open-settings')">{{ t('Set it in Settings') }}</button>
     </p>
 
-    <p v-if="!hasDocument" class="note">No document is open.</p>
-    <p v-else-if="!info" class="note">File info is added to the last line the first time this file is saved.</p>
+    <p v-if="!hasDocument" class="note">{{ t('No document is open.') }}</p>
+    <p v-else-if="!info" class="note">{{ t('File info is added to the last line the first time this file is saved.') }}</p>
 
     <template v-else>
       <div v-show="rowVisible('title')" class="field">
         <label for="fileInfoTitle">
-          <CalcpadSearchHighlight text="Title" :query="query" />
-          <span class="setting-info" title="Also the header title of PDF exports, unless the Title PDF setting hides it. Set to the file name on first save.">ⓘ</span>
+          <CalcpadSearchHighlight :text="t('Title')" :query="query" />
+          <span class="setting-info" :title="t('Also the header title of PDF exports, unless the Title PDF setting hides it. Set to the file name on first save.')">ⓘ</span>
         </label>
         <input id="fileInfoTitle" v-model="draft.title" type="text" @keyup.enter="apply" />
       </div>
       <div v-show="rowVisible('project')" class="field">
-        <label for="fileInfoProject"><CalcpadSearchHighlight text="Project" :query="query" /></label>
-        <input id="fileInfoProject" v-model="draft.project" type="text" placeholder="(none)" @keyup.enter="apply" />
+        <label for="fileInfoProject"><CalcpadSearchHighlight :text="t('Project')" :query="query" /></label>
+        <input id="fileInfoProject" v-model="draft.project" type="text" :placeholder="t('(none)')" @keyup.enter="apply" />
       </div>
       <div v-show="rowVisible('title') || rowVisible('project')" class="actions">
-        <button :disabled="!dirty" @click="apply">Apply</button>
-        <button class="secondary" :disabled="!dirty" @click="reset">Reset</button>
+        <button :disabled="!dirty" @click="apply">{{ t('Apply') }}</button>
+        <button class="secondary" :disabled="!dirty" @click="reset">{{ t('Reset') }}</button>
       </div>
 
       <dl v-show="rowVisible('details')" class="details">
-        <dt>Author</dt><dd>{{ info.author || '—' }}</dd>
-        <dt>Created</dt><dd>{{ formatTimestamp(info.createdAt) }}</dd>
-        <dt>Last updated</dt><dd>{{ formatTimestamp(info.lastUpdatedAt) }}</dd>
-        <dt>Last updated by</dt><dd>{{ info.lastUpdatedBy || '—' }}</dd>
-        <dt>Program version</dt><dd>{{ info.programVersion || '—' }}</dd>
+        <dt>{{ t('Author') }}</dt><dd>{{ info.author || '—' }}</dd>
+        <dt>{{ t('Created') }}</dt><dd>{{ formatTimestamp(info.createdAt) }}</dd>
+        <dt>{{ t('Last updated') }}</dt><dd>{{ formatTimestamp(info.lastUpdatedAt) }}</dd>
+        <dt>{{ t('Last updated by') }}</dt><dd>{{ info.lastUpdatedBy || '—' }}</dd>
+        <dt>{{ t('Program version') }}</dt><dd>{{ info.programVersion || '—' }}</dd>
       </dl>
 
       <div v-show="rowVisible('review')">
-        <h4 class="sub-title"><CalcpadSearchHighlight text="Review" :query="query" /></h4>
+        <h4 class="sub-title"><CalcpadSearchHighlight :text="t('Review')" :query="query" /></h4>
         <dl class="details">
-          <dt>Reviewed by</dt><dd>{{ info.reviewedBy || 'Not reviewed' }}</dd>
-          <dt>Reviewed</dt><dd>{{ formatTimestamp(info.reviewedAt) }}</dd>
+          <dt>{{ t('Reviewed by') }}</dt><dd>{{ info.reviewedBy || 'Not reviewed' }}</dd>
+          <dt>{{ t('Reviewed') }}</dt><dd>{{ formatTimestamp(info.reviewedAt) }}</dd>
         </dl>
         <p v-if="savedSinceReview(info)" class="warning">
           ⚠ This file was changed after it was reviewed (last updated
@@ -50,12 +48,8 @@
             :disabled="!userName"
             :title="userName ? `Record ${userName} as the reviewer, as of now, and save the file` : 'Set a user name in Settings first'"
             @click="markReviewed"
-          >
-            Set as Reviewed
-          </button>
-          <button v-if="info.reviewedBy || info.reviewedAt" class="secondary" @click="clearReview">
-            Clear Review
-          </button>
+          >{{ t('Set as Reviewed') }}</button>
+          <button v-if="info.reviewedBy || info.reviewedAt" class="secondary" @click="clearReview">{{ t('Clear Review') }}</button>
         </div>
       </div>
     </template>
@@ -63,12 +57,15 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { computed, onBeforeUnmount, reactive, watch } from 'vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
 import { savedSinceReview } from '../../services/file-info'
 import type { FileInfo } from '../../services/file-info'
 import { getFileInfoDraft, setFileInfoDraft, clearFileInfoDraft, metadataDraftDiscarded } from '../metadata-drafts'
 import type { FileInfoDraft } from '../metadata-drafts'
+
+const { t } = useI18n()
 
 interface Props {
   info?: FileInfo | null

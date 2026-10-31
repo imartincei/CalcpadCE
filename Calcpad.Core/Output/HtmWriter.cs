@@ -122,7 +122,7 @@ namespace Calcpad.Core
         {
             '/' => "<em>\u200A/\u200A</em>",
             '÷' => "<em>\u200A/\u200A</em>",
-            '*' => "\u2006·\u2006",
+            '*' => $"\u2006{MultiplySymbol}\u2006",
             '<' => " &lt; ",
             '>' => " &gt; ",
             '≤' => " &le; ",

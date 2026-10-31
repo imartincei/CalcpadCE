@@ -2,12 +2,12 @@
   <div class="toc-tab">
     <div class="toc-container p-3">
       <div v-if="loading" class="loading">
-        Loading headings...
+        {{ t('Loading headings...') }}
       </div>
       <div v-else-if="headings.length === 0" class="no-headings">
-        No headings found. Add headings to your document using
+        {{ t('No headings found. Add headings to your document using') }}
         <code>"Title</code>, <code>'&lt;h2&gt;...&lt;/h2&gt;</code>,
-        or markdown <code>'## ...</code> syntax.
+        {{ t('or markdown') }} <code>'## ...</code> {{ t('syntax.') }}
       </div>
       <div v-else class="toc-list">
         <div
@@ -38,8 +38,11 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref, computed, watch } from 'vue'
 import type { TocHeading } from '../types'
+
+const { t } = useI18n()
 
 interface Props {
   headings?: TocHeading[]

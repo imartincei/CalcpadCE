@@ -60,6 +60,11 @@ jobs:
         working-directory: .
         run: node --test tools/monaco-language.test.mjs
 
+      - name: Monaco zh map is up to date
+        if: ${{ !cancelled() }}
+        run: |
+          node scripts/generate-monaco-zh-map.mjs
+          git diff --exit-code -- calcpad-web/src/editor/monaco-zh-map.json
       - name: Test navigation history
         working-directory: .
         run: node --test tools/navigation-history.test.mjs

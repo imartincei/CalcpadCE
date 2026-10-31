@@ -174,7 +174,7 @@ namespace Calcpad.Core
             '>' => opRuns[1],
             '≤' => opRuns[2],
             '≥' => opRuns[3],
-            '*' => opRuns[4],
+            '*' => Run(MultiplySymbol),
             '/' => opRuns[5],
             '÷' => opRuns[6],
             '⦼' => opRuns[7],

@@ -4,7 +4,7 @@
       <CalcpadSearchField
         v-model="searchQuery"
         class="metadata-search"
-        placeholder="Search properties..."
+        :placeholder="t('Search properties...')"
       />
       <CollapseAllButton v-if="!searchActive" :expand="allCollapsed" @click="setAll(!allCollapsed)" />
     </div>
@@ -13,8 +13,8 @@
       <section v-show="sectionVisible('fileInfo')" data-anchor="fileInfo" class="metadata-section">
         <h3 class="section-header" @click="toggle('fileInfo')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('fileInfo') }">&#x25BC;</span>
-          <CalcpadSearchHighlight text="File Info" :query="query" />
-          <span v-if="fileInfoDirty" class="dirty-mark" title="Unsaved changes - Apply or Reset">*</span>
+          <CalcpadSearchHighlight :text="t('File Info')" :query="query" />
+          <span v-if="fileInfoDirty" class="dirty-mark" :title="t('Unsaved changes - Apply or Reset')">*</span>
         </h3>
         <div v-show="bodyVisible('fileInfo')" class="section-body">
           <CalcpadFileInfoSection
@@ -35,8 +35,8 @@
       <section v-show="sectionVisible('uiOverrides')" data-anchor="uiOverrides" class="metadata-section">
         <h3 class="section-header" @click="toggle('uiOverrides')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('uiOverrides') }">&#x25BC;</span>
-          <CalcpadSearchHighlight text="UI Overrides" :query="query" />
-          <span v-if="uiOverridesDirty" class="dirty-mark" title="Unsaved changes - Apply or Reset">*</span>
+          <CalcpadSearchHighlight :text="t('UI Overrides')" :query="query" />
+          <span v-if="uiOverridesDirty" class="dirty-mark" :title="t('Unsaved changes - Apply or Reset')">*</span>
         </h3>
         <div v-show="bodyVisible('uiOverrides')" class="section-body">
           <p v-if="sourceUnavailable" class="note">{{ sourceUnavailableNote }}</p>
@@ -60,17 +60,17 @@
       <section v-show="sectionVisible('fields')" data-anchor="fields" class="metadata-section">
         <h3 class="section-header" @click="toggle('fields')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('fields') }">&#x25BC;</span>
-          <CalcpadSearchHighlight text="Fields" :query="query" />
-          <span v-if="dirty" class="dirty-mark" title="Unsaved changes - Apply or Reset">*</span>
+          <CalcpadSearchHighlight :text="t('Fields')" :query="query" />
+          <span v-if="dirty" class="dirty-mark" :title="t('Unsaved changes - Apply or Reset')">*</span>
         </h3>
         <div v-show="bodyVisible('fields')" class="section-body">
           <p v-if="sourceUnavailable" class="note">{{ sourceUnavailableNote }}</p>
-          <p v-else-if="!boundBlock" class="note">Place the cursor on a line to edit its properties.</p>
+          <p v-else-if="!boundBlock" class="note">{{ t('Place the cursor on a line to edit its properties.') }}</p>
           <template v-else>
             <div class="bound-target" :class="kindClass">
               <button
                 class="line-chip"
-                title="Go to this line"
+                :title="t('Go to this line')"
                 @click="emit('go-to-line', boundBlock.line + 1)"
               >Line {{ boundBlock.line + 1 }}</button>
               <span v-if="targetKind" class="target-kind">{{ targetKind }}</span>
@@ -83,42 +83,42 @@
             </p>
 
             <div v-if="showDesc" v-show="rowVisible('fields', 'desc')" class="field">
-              <label><CalcpadSearchHighlight text="Description" :query="query" /></label>
+              <label><CalcpadSearchHighlight :text="t('Description')" :query="query" /></label>
               <textarea
                 v-model="model.desc"
                 rows="2"
-                placeholder="What this definition does"
+                :placeholder="t('What this definition does')"
               ></textarea>
             </div>
 
             <div v-if="showParams" v-show="rowVisible('fields', 'params')" class="field">
-              <label><CalcpadSearchHighlight text="Parameter types" :query="query" /></label>
+              <label><CalcpadSearchHighlight :text="t('Parameter types')" :query="query" /></label>
               <div v-for="(_, i) in model.paramTypes" :key="'pt' + i" class="list-row">
                 <select v-model="model.paramTypes[i]">
                   <option value="">(none)</option>
-                  <optgroup v-if="showFunctionTypes" label="Function">
+                  <optgroup v-if="showFunctionTypes" :label="t('Function')">
                     <option v-for="t in functionTypes" :key="t" :value="t">{{ t }}</option>
                   </optgroup>
-                  <optgroup v-if="showMacroTypes" label="Macro (TokenType)">
+                  <optgroup v-if="showMacroTypes" :label="t('Macro (TokenType)')">
                     <option v-for="t in macroTypes" :key="t" :value="t">{{ t }}</option>
                   </optgroup>
                 </select>
-                <button class="icon" title="Remove" @click="model.paramTypes.splice(i, 1)">✕</button>
+                <button class="icon" :title="t('Remove')" @click="model.paramTypes.splice(i, 1)">✕</button>
               </div>
               <button class="tertiary" @click="model.paramTypes.push('')">+ Add type</button>
             </div>
 
             <div v-if="showParams" v-show="rowVisible('fields', 'params')" class="field">
-              <label><CalcpadSearchHighlight text="Parameter descriptions" :query="query" /></label>
+              <label><CalcpadSearchHighlight :text="t('Parameter descriptions')" :query="query" /></label>
               <div v-for="(_, i) in model.paramDesc" :key="'pd' + i" class="list-row">
-                <input type="text" v-model="model.paramDesc[i]" placeholder="Description" />
-                <button class="icon" title="Remove" @click="model.paramDesc.splice(i, 1)">✕</button>
+                <input type="text" v-model="model.paramDesc[i]" :placeholder="t('Description')" />
+                <button class="icon" :title="t('Remove')" @click="model.paramDesc.splice(i, 1)">✕</button>
               </div>
               <button class="tertiary" @click="model.paramDesc.push('')">+ Add description</button>
             </div>
 
             <div v-if="showReturnType" v-show="rowVisible('fields', 'returnType')" class="field">
-              <label><CalcpadSearchHighlight text="Return type" :query="query" /></label>
+              <label><CalcpadSearchHighlight :text="t('Return type')" :query="query" /></label>
               <select v-model="model.returnType">
                 <option value="">(none)</option>
                 <option v-for="t in functionTypes" :key="t" :value="t">{{ t }}</option>
@@ -127,84 +127,82 @@
 
             <div v-if="showUi" v-show="rowVisible('fields', 'ui')" class="field">
               <label><CalcpadSearchHighlight text="#UI Control" :query="query" /></label>
-              <p v-if="uiBlock && !uiBlock.valid" class="warning">
-                This #UI directive contains invalid JSON. Applying will replace it with the values below.
-              </p>
+              <p v-if="uiBlock && !uiBlock.valid" class="warning">{{ t('This #UI directive contains invalid JSON. Applying will replace it with the values below.') }}</p>
 
               <div class="sub-row">
-                <span class="sub-label">Type</span>
+                <span class="sub-label">{{ t('Type') }}</span>
                 <select v-model="model.ui.type">
                   <option v-for="opt in uiTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                 </select>
               </div>
               <div class="sub-row">
-                <span class="sub-label">Mode</span>
+                <span class="sub-label">{{ t('Mode') }}</span>
                 <select v-model="model.ui.mode">
                   <option v-for="opt in uiModeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                 </select>
               </div>
               <div class="sub-row">
-                <span class="sub-label">Style class</span>
+                <span class="sub-label">{{ t('Style class') }}</span>
                 <input type="text" v-model="model.ui.style" />
               </div>
               <div class="sub-row">
-                <span class="sub-label">Report style class</span>
+                <span class="sub-label">{{ t('Report style class') }}</span>
                 <input type="text" v-model="model.ui.reportStyle" />
               </div>
               <div class="sub-row">
-                <span class="sub-label" title="Off puts the unit in the control instead of leaving it in the document.">Keep the unit</span>
+                <span class="sub-label" :title="t('Off puts the unit in the control instead of leaving it in the document.')">{{ t('Keep the unit') }}</span>
                 <select v-model="model.ui.forceUnits">
                   <option :value="''">(default: on)</option>
                   <option :value="true">On</option>
-                  <option :value="false">Off</option>
+                  <option :value="false">{{ t('Off') }}</option>
                 </select>
               </div>
               <div class="sub-row">
-                <span class="sub-label" title="Accept any expression, written to the document verbatim. Turns 'Keep the unit' off.">Allow expressions</span>
+                <span class="sub-label" :title="t('Accept any expression, written to the document verbatim. Turns \'Keep the unit\' off.')">{{ t('Allow expressions') }}</span>
                 <select v-model="model.ui.allowExpression">
                   <option :value="''">(default: off)</option>
                   <option :value="true">On</option>
-                  <option :value="false">Off</option>
+                  <option :value="false">{{ t('Off') }}</option>
                 </select>
               </div>
 
               <template v-if="model.ui.type === 'datagrid'">
                 <div class="sub-row">
-                  <span class="sub-label">Rows</span>
+                  <span class="sub-label">{{ t('Rows') }}</span>
                   <input type="number" min="0" v-model.number="model.ui.rows" />
                 </div>
                 <div class="sub-row">
-                  <span class="sub-label">Columns</span>
+                  <span class="sub-label">{{ t('Columns') }}</span>
                   <input type="number" min="0" v-model.number="model.ui.columns" />
                 </div>
 
-                <label>Column headers</label>
+                <label>{{ t('Column headers') }}</label>
                 <div v-for="(_, i) in model.ui.columnHeaders" :key="'ch' + i" class="list-row">
                   <input type="text" v-model="model.ui.columnHeaders[i]" />
-                  <button class="icon" title="Remove" @click="model.ui.columnHeaders.splice(i, 1)">✕</button>
+                  <button class="icon" :title="t('Remove')" @click="model.ui.columnHeaders.splice(i, 1)">✕</button>
                 </div>
                 <button class="tertiary" @click="model.ui.columnHeaders.push('')">+ Add column header</button>
 
-                <label>Row headers</label>
+                <label>{{ t('Row headers') }}</label>
                 <div v-for="(_, i) in model.ui.rowHeaders" :key="'rh' + i" class="list-row">
                   <input type="text" v-model="model.ui.rowHeaders[i]" />
-                  <button class="icon" title="Remove" @click="model.ui.rowHeaders.splice(i, 1)">✕</button>
+                  <button class="icon" :title="t('Remove')" @click="model.ui.rowHeaders.splice(i, 1)">✕</button>
                 </div>
                 <button class="tertiary" @click="model.ui.rowHeaders.push('')">+ Add row header</button>
 
                 <div class="sub-row">
-                  <span class="sub-label" title="Pixels, or a percentage of the line such as 75%. Natural width when empty.">Grid width</span>
+                  <span class="sub-label" :title="t('Pixels, or a percentage of the line such as 75%. Natural width when empty.')">{{ t('Grid width') }}</span>
                   <input type="text" placeholder="100%" v-model="model.ui.width" />
                 </div>
                 <div class="sub-row">
-                  <span class="sub-label">Row header width</span>
+                  <span class="sub-label">{{ t('Row header width') }}</span>
                   <input type="number" min="1" v-model.number="model.ui.rowHeaderWidth" />
                 </div>
 
-                <label>Column widths</label>
+                <label>{{ t('Column widths') }}</label>
                 <div v-for="(_, i) in model.ui.columnWidths" :key="'cw' + i" class="list-row">
                   <input type="number" min="1" v-model.number="model.ui.columnWidths[i]" />
-                  <button class="icon" title="Remove" @click="model.ui.columnWidths.splice(i, 1)">✕</button>
+                  <button class="icon" :title="t('Remove')" @click="model.ui.columnWidths.splice(i, 1)">✕</button>
                 </div>
                 <button class="tertiary" @click="model.ui.columnWidths.push('')">+ Add column width</button>
               </template>
@@ -388,6 +386,7 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { reactive, ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import {
   FUNCTION_PARAM_TYPES,
@@ -411,6 +410,8 @@ import CalcpadSearchField from './CalcpadSearchField.vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
 import CalcpadFileInfoSection from './CalcpadFileInfoSection.vue'
 import CalcpadUiOverridesSection from './CalcpadUiOverridesSection.vue'
+
+const { t } = useI18n()
 
 interface Props {
   block?: MetadataCommentBlock | null
